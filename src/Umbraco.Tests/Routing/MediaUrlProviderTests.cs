@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Routing
                 new FileUploadPropertyEditor(logger, mediaFileSystemMock, contentSection, dataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, umbracoSettingsSection),
                 new ImageCropperPropertyEditor(logger, mediaFileSystemMock, contentSection, dataTypeService, LocalizationService, IOHelper, ShortStringHelper, LocalizedTextService, umbracoSettingsSection),
             }));
-            _mediaUrlProvider = new DefaultMediaUrlProvider(propertyEditors);
+            _mediaUrlProvider = new DefaultMediaUrlProvider(propertyEditors, UriUtility);
         }
 
         public override void TearDown()

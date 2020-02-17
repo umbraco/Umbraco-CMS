@@ -12,6 +12,8 @@ namespace Umbraco.Tests.Misc
     [TestFixture]
     public class UriUtilityTests
     {
+
+        public UriUtility UriUtility { get; } = TestHelper.UriUtility;
         [TearDown]
         public void TearDown()
         {

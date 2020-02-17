@@ -83,7 +83,8 @@ namespace Umbraco.Tests.Cache.PublishedCache
                 Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility);
 
             _cache = _umbracoContext.Content;
         }

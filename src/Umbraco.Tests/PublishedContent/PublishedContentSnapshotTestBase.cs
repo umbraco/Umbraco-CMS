@@ -77,7 +77,8 @@ namespace Umbraco.Tests.PublishedContent
                 Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility);
 
             return umbracoContext;
         }

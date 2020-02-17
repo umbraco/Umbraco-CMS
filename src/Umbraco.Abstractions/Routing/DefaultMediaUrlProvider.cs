@@ -11,10 +11,12 @@ namespace Umbraco.Web.Routing
     public class DefaultMediaUrlProvider : IMediaUrlProvider
     {
         private readonly PropertyEditorCollection _propertyEditors;
+        private readonly UriUtility _uriUtility;
 
-        public DefaultMediaUrlProvider(PropertyEditorCollection propertyEditors)
+        public DefaultMediaUrlProvider(PropertyEditorCollection propertyEditors, UriUtility uriUtility)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
+            _uriUtility = uriUtility;
         }
 
         /// <inheritdoc />
@@ -70,7 +72,7 @@ namespace Umbraco.Web.Routing
                     throw new ArgumentOutOfRangeException(nameof(mode));
             }
 
-            return UriUtility.MediaUriFromUmbraco(uri);
+            return _uriUtility.MediaUriFromUmbraco(uri);
         }
     }
 }

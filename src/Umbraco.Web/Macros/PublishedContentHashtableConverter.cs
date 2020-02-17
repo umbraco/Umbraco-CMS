@@ -8,7 +8,6 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Routing;
 
@@ -17,7 +16,7 @@ namespace Umbraco.Web.Macros
     /// <summary>
     /// Legacy class used by macros which converts a published content item into a hashset of values
     /// </summary>
-    public class PublishedContentHashtableConverter
+    internal class PublishedContentHashtableConverter
     {
         #region Constructors
 
