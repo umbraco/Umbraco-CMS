@@ -1,7 +1,9 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
+using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
-using Umbraco.Infrastructure.Persistence.Repositories;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -19,8 +21,14 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Insert new key/value
             using (var scope = provider.CreateScope())
             {
+                var keyValue = new KeyValue
+                {
+                    Identifier = "foo",
+                    Value = "bar",
+                    UpdateDate = DateTime.Now,
+                };
                 var repo = CreateRepository(provider);
-                repo.SetValue("foo", "bar");
+                repo.Save(keyValue);
                 scope.Complete();
             }
 
@@ -28,17 +36,20 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = provider.CreateScope())
             {
                 var repo = CreateRepository(provider);
-                var value = repo.GetValue("foo");
+                var keyValue = repo.Get("foo");
                 scope.Complete();
 
-                Assert.AreEqual("bar", value);
+                Assert.AreEqual("bar", keyValue.Value);
             }
 
-            // Update new key/value
+            // Update value
             using (var scope = provider.CreateScope())
             {
                 var repo = CreateRepository(provider);
-                repo.SetValue("foo", "buzz");
+                var keyValue = repo.Get("foo");
+                keyValue.Value = "buzz";
+                keyValue.UpdateDate = DateTime.Now;
+                repo.Save(keyValue);
                 scope.Complete();
             }
 
@@ -46,10 +57,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = provider.CreateScope())
             {
                 var repo = CreateRepository(provider);
-                var value = repo.GetValue("foo");
+                var keyValue = repo.Get("foo");
                 scope.Complete();
 
-                Assert.AreEqual("buzz", value);
+                Assert.AreEqual("buzz", keyValue.Value);
             }
         }
 

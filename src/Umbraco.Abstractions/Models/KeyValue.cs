@@ -28,12 +28,5 @@ namespace Umbraco.Core.Models
             get => _value;
             set => SetPropertyValueAndDetectChanges(value, ref _value, nameof(Value));
         }
-
-        /// <inheritdoc />
-        public DateTime UpdateDate
-        {
-            get => _updateDate;
-            set => SetPropertyValueAndDetectChanges(value, ref _updateDate, nameof(UpdateDate));
-        }
     }
 }

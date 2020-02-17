@@ -21,6 +21,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
+using Umbraco.Infrastructure.Migrations.Custom;
 
 namespace Umbraco.Core.Runtime
 {
@@ -128,6 +129,7 @@ namespace Umbraco.Core.Runtime
                 .Append<DefaultUrlSegmentProvider>();
 
             composition.RegisterUnique<IMigrationBuilder>(factory => new MigrationBuilder(factory));
+            composition.RegisterUnique<IKeyValueServiceInitialization, KeyValueServiceInitialization>();
 
             // by default, register a noop factory
             composition.RegisterUnique<IPublishedModelFactory, NoopPublishedModelFactory>();

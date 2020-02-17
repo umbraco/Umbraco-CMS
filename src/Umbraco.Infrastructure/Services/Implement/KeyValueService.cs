@@ -1,8 +1,10 @@
 ﻿using System;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
-using Umbraco.Infrastructure.Persistence.Repositories;
+using Umbraco.Infrastructure.Migrations.Custom;
 
 namespace Umbraco.Core.Services.Implement
 {
@@ -11,14 +13,16 @@ namespace Umbraco.Core.Services.Implement
         private readonly object _initialock = new object();
         private readonly IScopeProvider _scopeProvider;
         private readonly IKeyValueRepository _repository;
+        private readonly IKeyValueServiceInitialization _initialization;
         private readonly ILogger _logger;
         private readonly IUmbracoVersion _umbracoVersion;
         private bool _initialized;
 
-        public KeyValueService(IScopeProvider scopeProvider, IKeyValueRepository repository, ILogger logger, IUmbracoVersion umbracoVersion)
+        public KeyValueService(IScopeProvider scopeProvider, IKeyValueRepository repository, IKeyValueServiceInitialization initialization, ILogger logger, IUmbracoVersion umbracoVersion)
         {
             _scopeProvider = scopeProvider;
             _repository = repository;
+            _initialization = initialization;
             _logger = logger;
             _umbracoVersion = umbracoVersion;
         }
@@ -51,7 +55,7 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = _scopeProvider.CreateScope())
             {
-                _repository.Initialize();
+                _initialization.PerformInitialMigration(scope.Database);
                 scope.Complete();
             }
 
@@ -67,7 +71,7 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = _scopeProvider.CreateScope())
             {
-                return _repository.GetValue(key);
+                return _repository.Get(key)?.Value;
             }
         }
 
@@ -80,7 +84,23 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.KeyValues);
 
-                _repository.SetValue(key, value);
+                var keyValue = _repository.Get(key);
+                if (keyValue == null)
+                {
+                    keyValue = new KeyValue
+                    {
+                        Identifier = key,
+                        Value = value,
+                        UpdateDate = DateTime.Now,
+                    };
+                }
+                else
+                {
+                    keyValue.Value = value;
+                    keyValue.UpdateDate = DateTime.Now;
+                }
+
+                _repository.Save(keyValue);
 
                 scope.Complete();
             }
@@ -102,10 +122,15 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.KeyValues);
 
-                if (!_repository.TrySetValue(key, originalValue, newValue))
+                var keyValue = _repository.Get(key);
+                if (keyValue == null || keyValue.Value != originalValue)
                 {
                     return false;
                 }
+
+                keyValue.Value = newValue;
+                keyValue.UpdateDate = DateTime.Now;
+                _repository.Save(keyValue);
 
                 scope.Complete();
             }

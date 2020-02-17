@@ -1,13 +1,8 @@
-﻿namespace Umbraco.Infrastructure.Persistence.Repositories
+﻿using Umbraco.Core.Models;
+
+namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IKeyValueRepository
+    public interface IKeyValueRepository : IReadRepository<string, IKeyValue>, IWriteRepository<IKeyValue>
     {
-        void Initialize();
-
-        string GetValue(string key);
-
-        void SetValue(string key, string value);
-
-        bool TrySetValue(string key, string originalValue, string newValue);
     }
 }

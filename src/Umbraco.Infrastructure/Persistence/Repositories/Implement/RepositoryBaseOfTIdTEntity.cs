@@ -132,7 +132,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// </summary>
         /// <remarks>This method is backed by an <see cref="IAppPolicyCache"/> cache</remarks>
         /// <param name="entity"></param>
-        public void Save(TEntity entity)
+        public virtual void Save(TEntity entity)
         {
             if (entity.HasIdentity == false)
                 CachePolicy.Create(entity, PersistNewItem);
