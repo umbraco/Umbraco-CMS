@@ -106,6 +106,7 @@ namespace Umbraco.Tests.Runtimes
             composition.Register<IDefaultCultureAccessor, TestDefaultCultureAccessor>(Lifetime.Singleton);
             composition.Register<ISiteDomainHelper>(_ => Mock.Of<ISiteDomainHelper>(), Lifetime.Singleton);
             composition.RegisterUnique(f => new DistributedCache(f.GetInstance<IServerMessenger>(), f.GetInstance<CacheRefresherCollection>()));
+            composition.Register(_ => Mock.Of<IImageUrlGenerator>(), Lifetime.Singleton);
             composition.WithCollectionBuilder<UrlProviderCollectionBuilder>().Append<DefaultUrlProvider>();
             composition.RegisterUnique<IDistributedCacheBinder, DistributedCacheBinder>();
             composition.RegisterUnique<IExamineManager, ExamineManager>();

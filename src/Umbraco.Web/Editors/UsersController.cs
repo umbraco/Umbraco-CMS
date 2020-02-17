@@ -48,6 +48,7 @@ namespace Umbraco.Web.Editors
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
         private readonly IIOHelper _ioHelper;
         private readonly ISqlContext _sqlContext;
+        private readonly IImageUrlGenerator _imageUrlGenerator;
 
         public UsersController(
             IGlobalSettings globalSettings,
@@ -62,13 +63,15 @@ namespace Umbraco.Web.Editors
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
             IUmbracoSettingsSection umbracoSettingsSection,
-            IIOHelper ioHelper)
+            IIOHelper ioHelper,
+            IImageUrlGenerator imageUrlGenerator)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _mediaFileSystem = mediaFileSystem;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
             _ioHelper = ioHelper;
             _sqlContext = sqlContext;
+            _imageUrlGenerator = imageUrlGenerator;
         }
 
         /// <summary>
@@ -77,7 +80,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public string[] GetCurrentUserAvatarUrls()
         {
-            var urls = UmbracoContext.Security.CurrentUser.GetUserAvatarUrls(AppCaches.RuntimeCache, _mediaFileSystem);
+            var urls = UmbracoContext.Security.CurrentUser.GetUserAvatarUrls(AppCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator);
             if (urls == null)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Could not access Gravatar endpoint"));
 
@@ -89,10 +92,10 @@ namespace Umbraco.Web.Editors
         [AdminUsersAuthorize]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
-            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, _mediaFileSystem, ShortStringHelper, _umbracoSettingsSection, _ioHelper, id);
+            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, _mediaFileSystem, ShortStringHelper, _umbracoSettingsSection, _ioHelper, _imageUrlGenerator, id);
         }
 
-        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, int id)
+        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, IImageUrlGenerator imageUrlGenerator, int id)
         {
             if (request.Content.IsMimeMultipartContent() == false)
             {
@@ -146,7 +149,7 @@ namespace Umbraco.Web.Editors
                 });
             }
 
-            return request.CreateResponse(HttpStatusCode.OK, user.GetUserAvatarUrls(cache, mediaFileSystem));
+            return request.CreateResponse(HttpStatusCode.OK, user.GetUserAvatarUrls(cache, mediaFileSystem, imageUrlGenerator));
         }
 
         [AppendUserModifiedHeader("id")]
@@ -180,7 +183,7 @@ namespace Umbraco.Web.Editors
                     _mediaFileSystem.DeleteFile(filePath);
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, found.GetUserAvatarUrls(AppCaches.RuntimeCache, _mediaFileSystem));
+            return Request.CreateResponse(HttpStatusCode.OK, found.GetUserAvatarUrls(AppCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator));
         }
 
         /// <summary>

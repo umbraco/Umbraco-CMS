@@ -72,10 +72,9 @@ namespace Umbraco.Web.Routing
 
         #region GetUrl
 
-        public UrlMode GetMode(bool absolute) => absolute ? UrlMode.Absolute : Mode;
-        public IPublishedContent GetDocument(int id) => _umbracoContext.Content.GetById(id);
-        public IPublishedContent GetDocument(Guid id) => _umbracoContext.Content.GetById(id);
-        public IPublishedContent GetMedia(Guid id) => _umbracoContext.Media.GetById(id);
+        private IPublishedContent GetDocument(int id) => _umbracoContext.Content.GetById(id);
+        private IPublishedContent GetDocument(Guid id) => _umbracoContext.Content.GetById(id);
+        private IPublishedContent GetMedia(Guid id) => _umbracoContext.Media.GetById(id);
 
         /// <summary>
         /// Gets the url of a published content.

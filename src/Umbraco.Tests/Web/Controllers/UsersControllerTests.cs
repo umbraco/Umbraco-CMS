@@ -90,7 +90,8 @@ namespace Umbraco.Tests.Web.Controllers
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IUmbracoSettingsSection>(),
-                    Factory.GetInstance<IIOHelper>()
+                    Factory.GetInstance<IIOHelper>(),
+                    Factory.GetInstance<IImageUrlGenerator>()
                 );
                 return usersController;
             }
@@ -160,7 +161,8 @@ namespace Umbraco.Tests.Web.Controllers
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IUmbracoSettingsSection>(),
-                    Factory.GetInstance<IIOHelper>()
+                    Factory.GetInstance<IIOHelper>(),
+                    Factory.GetInstance<IImageUrlGenerator>()
                     );
                 return usersController;
             }
@@ -201,7 +203,8 @@ namespace Umbraco.Tests.Web.Controllers
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IUmbracoSettingsSection>(),
-                    Factory.GetInstance<IIOHelper>()
+                    Factory.GetInstance<IIOHelper>(),
+                    Factory.GetInstance<IImageUrlGenerator>()
                 );
                 return usersController;
             }
@@ -277,7 +280,8 @@ namespace Umbraco.Tests.Web.Controllers
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IUmbracoSettingsSection>(),
-                    Factory.GetInstance<IIOHelper>()
+                    Factory.GetInstance<IIOHelper>(),
+                    Factory.GetInstance<IImageUrlGenerator>()
                 );
                 return usersController;
             }

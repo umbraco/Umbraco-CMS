@@ -88,8 +88,6 @@ namespace Umbraco.Web
         /// </summary>
         bool InPreviewMode { get; }
 
-        string PreviewToken { get; }
-
         /// <summary>
         /// Gets the url of a content identified by its identifier.
         /// </summary>
