@@ -17,12 +17,16 @@ namespace Umbraco.Web.Routing
         private readonly IRequestHandlerSection _requestConfig;
         private readonly ISiteDomainHelper _siteDomainHelper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly UriUtility _uriUtility;
+        private readonly IPublishedValueFallback _publishedValueFallback;
 
-        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig, ISiteDomainHelper siteDomainHelper, IUmbracoContextAccessor umbracoContextAccessor)
+        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig, ISiteDomainHelper siteDomainHelper, UriUtility uriUtility, IPublishedValueFallback publishedValueFallback, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _globalSettings = globalSettings;
             _requestConfig = requestConfig;
             _siteDomainHelper = siteDomainHelper;
+            _uriUtility = uriUtility;
+            _publishedValueFallback = publishedValueFallback;
             _umbracoContextAccessor = umbracoContextAccessor;
         }
 
@@ -86,7 +90,7 @@ namespace Umbraco.Web.Routing
                 if (varies)
                     yield break;
 
-                var umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias);
+                var umbracoUrlName = node.Value<string>(_publishedValueFallback, Constants.Conventions.Content.UrlAlias);
                 var aliases = umbracoUrlName?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
                 if (aliases == null || aliases.Any() == false)
@@ -96,7 +100,7 @@ namespace Umbraco.Web.Routing
                 {
                     var path = "/" + alias;
                     var uri = new Uri(path, UriKind.Relative);
-                    yield return UrlInfo.Url(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
+                    yield return UrlInfo.Url(_uriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
                 }
             }
             else
@@ -111,8 +115,8 @@ namespace Umbraco.Web.Routing
                     if (varies && !node.HasCulture(domainUri.Culture.Name)) continue;
 
                     var umbracoUrlName = varies
-                        ? node.Value<string>(Constants.Conventions.Content.UrlAlias, culture: domainUri.Culture.Name)
-                        : node.Value<string>(Constants.Conventions.Content.UrlAlias);
+                        ? node.Value<string>(_publishedValueFallback,Constants.Conventions.Content.UrlAlias, culture: domainUri.Culture.Name)
+                        : node.Value<string>(_publishedValueFallback, Constants.Conventions.Content.UrlAlias);
 
                     var aliases = umbracoUrlName?.Split(new [] {','}, StringSplitOptions.RemoveEmptyEntries);
 
@@ -123,7 +127,7 @@ namespace Umbraco.Web.Routing
                     {
                         var path = "/" + alias;
                         var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
-                        yield return UrlInfo.Url(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString(), domainUri.Culture.Name);
+                        yield return UrlInfo.Url(_uriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString(), domainUri.Culture.Name);
                     }
                 }
             }

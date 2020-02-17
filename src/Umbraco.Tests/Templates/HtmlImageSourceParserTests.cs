@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Templates
                 umbracoContextAccessor: umbracoContextAccessor);
 
 
-            var publishedUrlProvider = new UrlProvider(new Lazy<IUmbracoContextAccessor>(() => umbracoContextAccessor),
+            var publishedUrlProvider = new UrlProvider(umbracoContextAccessor,
                 TestHelper.WebRoutingSection,
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 new MediaUrlProviderCollection(new []{mediaUrlProvider.Object}),

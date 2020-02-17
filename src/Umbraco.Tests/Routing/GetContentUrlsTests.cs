@@ -60,6 +60,7 @@ namespace Umbraco.Tests.Routing
                 GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
                 VariationContextAccessor,
                 Logger,
+                UriUtility,
                 PublishedUrlProvider).ToList();
 
             Assert.AreEqual(1, urls.Count);
@@ -80,9 +81,10 @@ namespace Umbraco.Tests.Routing
 
             var umbContext = GetUmbracoContext("http://localhost:8000");
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbContext);
-            var urlProvider = new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(), umbracoContextAccessor);
+            var urlProvider = new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(),
+                umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = new UrlProvider(
-                new Lazy<IUmbracoContextAccessor>(() => umbracoContextAccessor),
+                umbracoContextAccessor,
                 TestHelper.WebRoutingSection,
                 new UrlProviderCollection(new []{urlProvider}),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
@@ -96,6 +98,7 @@ namespace Umbraco.Tests.Routing
                 GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
                 VariationContextAccessor,
                 Logger,
+                UriUtility,
                 publishedUrlProvider).ToList();
 
             Assert.AreEqual(1, urls.Count);
@@ -124,14 +127,14 @@ namespace Umbraco.Tests.Routing
 
             var umbContext = GetUmbracoContext("http://localhost:8000");
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbContext);
-            var urlProvider = new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(), umbracoContextAccessor);
+            var urlProvider = new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = new UrlProvider(
-                new Lazy<IUmbracoContextAccessor>(() => umbracoContextAccessor),
+                umbracoContextAccessor,
                 TestHelper.WebRoutingSection,
                 new UrlProviderCollection(new []{urlProvider}),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IVariationContextAccessor>()
-                );
+            );
 
             var publishedRouter = CreatePublishedRouter(Factory,
                 contentFinders: new ContentFinderCollection(new[] { new ContentFinderByUrl(Logger) }));
@@ -140,7 +143,9 @@ namespace Umbraco.Tests.Routing
                 GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
                 VariationContextAccessor,
                 Logger,
-                publishedUrlProvider).ToList();
+                UriUtility,
+                publishedUrlProvider
+                ).ToList();
 
             Assert.AreEqual(1, urls.Count);
             Assert.AreEqual("/home/sub1/", urls[0].Text);

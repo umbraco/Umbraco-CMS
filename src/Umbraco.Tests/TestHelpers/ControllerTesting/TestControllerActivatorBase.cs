@@ -143,7 +143,8 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 webSecurity.Object,
                 globalSettings,
                 new TestVariationContextAccessor(),
-                TestHelper.IOHelper);
+                TestHelper.IOHelper,
+                TestHelper.UriUtility);
 
             //replace it
             umbracoContextAccessor.UmbracoContext = umbCtx;

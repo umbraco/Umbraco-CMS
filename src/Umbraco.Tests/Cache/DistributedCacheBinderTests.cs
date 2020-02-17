@@ -164,6 +164,7 @@ namespace Umbraco.Tests.Cache
                 TestObjects.GetGlobalSettings(),
                 Mock.Of<IUserService>(),
                 IOHelper,
+                UriUtility,
                 httpContextAccessor);
 
             // just assert it does not throw

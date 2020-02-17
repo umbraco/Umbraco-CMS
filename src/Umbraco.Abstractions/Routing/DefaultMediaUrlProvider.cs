@@ -1,5 +1,4 @@
 ﻿using System;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 
@@ -10,11 +9,13 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class DefaultMediaUrlProvider : IMediaUrlProvider
     {
+        private readonly UriUtility _uriUtility;
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
 
-        public DefaultMediaUrlProvider(Lazy<PropertyEditorCollection> propertyEditors)
+        public DefaultMediaUrlProvider(Lazy<PropertyEditorCollection> propertyEditors, UriUtility uriUtility)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
+            _uriUtility = uriUtility;
         }
 
         /// <inheritdoc />
@@ -70,7 +71,7 @@ namespace Umbraco.Web.Routing
                     throw new ArgumentOutOfRangeException(nameof(mode));
             }
 
-            return UriUtility.MediaUriFromUmbraco(uri);
+            return _uriUtility.MediaUriFromUmbraco(uri);
         }
     }
 }

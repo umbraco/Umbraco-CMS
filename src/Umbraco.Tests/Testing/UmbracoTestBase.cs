@@ -115,6 +115,7 @@ namespace Umbraco.Tests.Testing
         protected IJsonSerializer JsonNetSerializer { get; } = new JsonNetSerializer();
 
         protected IIOHelper IOHelper { get; private set; }
+        protected UriUtility UriUtility => new UriUtility(HostingEnvironment);
         protected IPublishedUrlProvider PublishedUrlProvider => Factory.GetInstance<IPublishedUrlProvider>();
         protected IDataTypeService DataTypeService => Factory.GetInstance<IDataTypeService>();
         protected IPasswordHasher PasswordHasher => Factory.GetInstance<IPasswordHasher>();
@@ -130,7 +131,7 @@ namespace Umbraco.Tests.Testing
 
         protected virtual IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
 
-        protected IHostingEnvironment HostingEnvironment => Factory.GetInstance<IHostingEnvironment>();
+        protected IHostingEnvironment HostingEnvironment { get; } = new AspNetHostingEnvironment(SettingsForTests.GetDefaultHostingSettings());
         protected IIpResolver IpResolver => Factory.GetInstance<IIpResolver>();
         protected IBackOfficeInfo BackOfficeInfo => Factory.GetInstance<IBackOfficeInfo>();
         protected AppCaches AppCaches => Factory.GetInstance<AppCaches>();
@@ -163,20 +164,18 @@ namespace Umbraco.Tests.Testing
             var proflogger = new ProfilingLogger(logger, profiler);
             IOHelper = TestHelper.IOHelper;
 
-
             TypeFinder = new TypeFinder(logger);
             var appCaches = GetAppCaches();
             var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
-            var hostingSettings = SettingsForTests.GetDefaultHostingSettings();
             var settings = SettingsForTests.GetDefaultUmbracoSettings();
-            IHostingEnvironment hostingEnvironment = new AspNetHostingEnvironment(hostingSettings);
+
             IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, settings, logger);
             IIpResolver ipResolver = new AspNetIpResolver();
             UmbracoVersion = new UmbracoVersion(globalSettings);
 
 
             LocalizedTextService = new LocalizedTextService(new Dictionary<CultureInfo, Lazy<XDocument>>(), logger);
-            var typeLoader = GetTypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, hostingEnvironment, proflogger, Options.TypeLoader);
+            var typeLoader = GetTypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, HostingEnvironment, proflogger, Options.TypeLoader);
 
             var register = TestHelper.GetRegister();
 
@@ -187,6 +186,7 @@ namespace Umbraco.Tests.Testing
 
 
             Composition.RegisterUnique(IOHelper);
+            Composition.RegisterUnique(UriUtility);
             Composition.RegisterUnique(UmbracoVersion);
             Composition.RegisterUnique(TypeFinder);
             Composition.RegisterUnique(LocalizedTextService);
@@ -195,7 +195,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(profiler);
             Composition.RegisterUnique<IProfilingLogger>(proflogger);
             Composition.RegisterUnique(appCaches);
-            Composition.RegisterUnique(hostingEnvironment);
+            Composition.RegisterUnique(HostingEnvironment);
             Composition.RegisterUnique(backOfficeInfo);
             Composition.RegisterUnique(ipResolver);
             Composition.RegisterUnique<IPasswordHasher, AspNetPasswordHasher>();
@@ -302,7 +302,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IPublishedValueFallback, NoopPublishedValueFallback>();
             Composition.RegisterUnique<IPublishedUrlProvider>(factory =>
                 new UrlProvider(
-                    new Lazy<IUmbracoContextAccessor>(() => factory.GetInstance<IUmbracoContextAccessor>()),
+                    factory.GetInstance<IUmbracoContextAccessor>(),
                     TestObjects.GetUmbracoSettings().WebRouting,
                     new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                     new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
@@ -522,7 +522,7 @@ namespace Umbraco.Tests.Testing
             Current.Reset(); // disposes the factory
 
             // reset all other static things that should not be static ;(
-            UriUtility.ResetAppDomainAppVirtualPath();
+            UriUtility.ResetAppDomainAppVirtualPath(HostingEnvironment);
             SettingsForTests.Reset(); // FIXME: should it be optional?
 
             // clear static events

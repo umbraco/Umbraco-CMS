@@ -31,9 +31,6 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IIOHelper _ioHelper;
-        private readonly ILogger _logger;
-        private readonly IMediaService _mediaService;
-        private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly HtmlImageSourceParser _imageSourceParser;
         private readonly RichTextEditorPastedImages _pastedImages;
         private readonly HtmlLocalLinkParser _localLinkParser;
@@ -41,8 +38,6 @@ namespace Umbraco.Web.PropertyEditors
 
         public GridPropertyEditor(
             ILogger logger,
-            IMediaService mediaService,
-            IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
             IUmbracoContextAccessor umbracoContextAccessor,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
@@ -57,9 +52,6 @@ namespace Umbraco.Web.PropertyEditors
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _ioHelper = ioHelper;
-            _logger = logger;
-            _mediaService = mediaService;
-            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
             _imageSourceParser = imageSourceParser;
             _pastedImages = pastedImages;
             _localLinkParser = localLinkParser;
@@ -72,7 +64,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger, DataTypeService, LocalizationService, LocalizedTextService, _imageSourceParser, _pastedImages, _localLinkParser, ShortStringHelper, _imageUrlGenerator);
+        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute,_umbracoContextAccessor, DataTypeService, LocalizationService, LocalizedTextService, _imageSourceParser, _pastedImages, _localLinkParser, ShortStringHelper, _imageUrlGenerator);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor(_ioHelper);
 
@@ -87,10 +79,7 @@ namespace Umbraco.Web.PropertyEditors
 
             public GridPropertyValueEditor(
                 DataEditorAttribute attribute,
-                IMediaService mediaService,
-                IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
                 IUmbracoContextAccessor umbracoContextAccessor,
-                ILogger logger,
                 IDataTypeService dataTypeService,
                 ILocalizationService localizationService,
                 ILocalizedTextService localizedTextService,

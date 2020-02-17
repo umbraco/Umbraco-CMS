@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Routing
                 new FileUploadPropertyEditor(logger, mediaFileSystemMock, contentSection, dataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, umbracoSettingsSection),
                 new ImageCropperPropertyEditor(logger, mediaFileSystemMock, contentSection, dataTypeService, LocalizationService, IOHelper, ShortStringHelper, LocalizedTextService, umbracoSettingsSection),
             }));
-            _mediaUrlProvider = new DefaultMediaUrlProvider(new Lazy<PropertyEditorCollection>(() => propertyEditors));
+            _mediaUrlProvider = new DefaultMediaUrlProvider(new Lazy<PropertyEditorCollection>(() => propertyEditors), UriUtility);
         }
 
         public override void TearDown()
@@ -152,7 +152,7 @@ namespace Umbraco.Tests.Routing
         private IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext)
         {
             return new UrlProvider(
-                new Lazy<IUmbracoContextAccessor>(() => new TestUmbracoContextAccessor(umbracoContext)),
+                new TestUmbracoContextAccessor(umbracoContext),
                 TestHelper.WebRoutingSection,
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 new MediaUrlProviderCollection(new []{_mediaUrlProvider}),

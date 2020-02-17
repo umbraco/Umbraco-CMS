@@ -1,17 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading;
-using System.Web;
-using System.Web.Hosting;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web
@@ -32,11 +26,21 @@ namespace Umbraco.Web
         private readonly IUserService _userService;
         private readonly IIOHelper _ioHelper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly UriUtility _uriUtility;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoContextFactory"/> class.
         /// </summary>
-        public UmbracoContextFactory(IUmbracoContextAccessor umbracoContextAccessor, IPublishedSnapshotService publishedSnapshotService, IVariationContextAccessor variationContextAccessor, IDefaultCultureAccessor defaultCultureAccessor, IGlobalSettings globalSettings, IUserService userService, IIOHelper ioHelper, IHttpContextAccessor httpContextAccessor)
+        public UmbracoContextFactory(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IPublishedSnapshotService publishedSnapshotService,
+            IVariationContextAccessor variationContextAccessor,
+            IDefaultCultureAccessor defaultCultureAccessor,
+            IGlobalSettings globalSettings,
+            IUserService userService,
+            IIOHelper ioHelper,
+            UriUtility uriUtility,
+            IHttpContextAccessor httpContextAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -45,6 +49,7 @@ namespace Umbraco.Web
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _ioHelper = ioHelper;
+            _uriUtility = uriUtility;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -64,7 +69,7 @@ namespace Umbraco.Web
 
             var webSecurity = new WebSecurity(_httpContextAccessor, _userService, _globalSettings, _ioHelper);
 
-            return new UmbracoContext(_httpContextAccessor, _publishedSnapshotService, webSecurity, _globalSettings, _variationContextAccessor, _ioHelper);
+            return new UmbracoContext(_httpContextAccessor, _publishedSnapshotService, webSecurity, _globalSettings, _variationContextAccessor, _ioHelper, _uriUtility);
         }
 
         /// <inheritdoc />

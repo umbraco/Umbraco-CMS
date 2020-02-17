@@ -50,11 +50,10 @@ namespace Umbraco.Tests.Routing
 
             var umbracoSettings = Current.Configs.Settings();
 
-
             var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings.Object);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object,
-                new SiteDomainHelper(), umbracoContextAccessor);
+                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
 
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
             var requestHandlerMock = Mock.Get(umbracoSettings.RequestHandler);
@@ -102,7 +101,7 @@ namespace Umbraco.Tests.Routing
         private IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext, DefaultUrlProvider urlProvider)
         {
             return new UrlProvider(
-                new Lazy<IUmbracoContextAccessor>(() => new TestUmbracoContextAccessor(umbracoContext)),
+                new TestUmbracoContextAccessor(umbracoContext),
                 TestHelper.WebRoutingSection,
                 new UrlProviderCollection(new []{urlProvider}),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
@@ -130,7 +129,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings.Object);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object,
-                new SiteDomainHelper(), umbracoContextAccessor);
+                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             var result = publishedUrlProvider.GetUrl(nodeId);
@@ -159,7 +158,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings.Object);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object,
-                new SiteDomainHelper(), umbracoContextAccessor);
+                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             var result = publishedUrlProvider.GetUrl(nodeId);
@@ -202,7 +201,7 @@ namespace Umbraco.Tests.Routing
                 snapshotService: snapshotService.Object);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object,
-                new SiteDomainHelper(), umbracoContextAccessor);
+                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             //even though we are asking for a specific culture URL, there are no domains assigned so all that can be returned is a normal relative url.
@@ -258,7 +257,7 @@ namespace Umbraco.Tests.Routing
                 snapshotService: snapshotService.Object);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object,
-                new SiteDomainHelper(), umbracoContextAccessor);
+                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
 
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
@@ -313,7 +312,7 @@ namespace Umbraco.Tests.Routing
                 snapshotService: snapshotService.Object);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object,
-                new SiteDomainHelper(), umbracoContextAccessor);
+                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
 
 
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
@@ -335,7 +334,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, globalSettings: globalSettings.Object);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object,
-                new SiteDomainHelper(), umbracoContextAccessor);
+                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             Assert.AreEqual("/home/sub1/custom-sub-1/", publishedUrlProvider.GetUrl(1177));
@@ -353,7 +352,7 @@ namespace Umbraco.Tests.Routing
             var umbracoSettings = Current.Configs.Settings();
 
             var urlProvider = new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object,
-                new SiteDomainHelper(), UmbracoContextAccessor);
+                new SiteDomainHelper(), UmbracoContextAccessor, UriUtility);
             var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, globalSettings: globalSettings.Object);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 

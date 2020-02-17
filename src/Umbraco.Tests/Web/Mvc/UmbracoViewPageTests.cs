@@ -444,7 +444,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new WebSecurity(httpContextAccessor, Current.Services.UserService, globalSettings, IOHelper),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility);
 
             //if (setSingleton)
             //{

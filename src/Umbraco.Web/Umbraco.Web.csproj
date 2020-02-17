@@ -200,11 +200,6 @@
     <Compile Include="PropertyEditors\RichTextPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\RteMacroRenderingValueConverter.cs" />
     <Compile Include="RoutableDocumentFilter.cs" />
-    <Compile Include="Routing\DefaultMediaUrlProvider.cs" />
-    <Compile Include="Routing\IMediaUrlProvider.cs" />
-    <Compile Include="Routing\IPublishedRouter.cs" />
-    <Compile Include="Routing\MediaUrlProviderCollection.cs" />
-    <Compile Include="Routing\MediaUrlProviderCollectionBuilder.cs" />
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
     <Compile Include="Search\BackgroundIndexRebuilder.cs" />
     <Compile Include="Search\ExamineFinalComponent.cs" />
@@ -324,13 +319,6 @@
     <Compile Include="PropertyEditors\NestedContentController.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
     <Compile Include="PublishedModels\DummyClassSoThatPublishedModelsNamespaceExists.cs" />
-    <Compile Include="Routing\ContentFinderByUrl.cs" />
-    <Compile Include="Routing\ContentFinderByUrlAndTemplate.cs" />
-    <Compile Include="Routing\ContentFinderCollection.cs" />
-    <Compile Include="Routing\ContentFinderCollectionBuilder.cs" />
-    <Compile Include="Routing\IContentLastChanceFinder.cs" />
-    <Compile Include="Routing\UrlProviderCollection.cs" />
-    <Compile Include="Routing\UrlProviderCollectionBuilder.cs" />
     <Compile Include="Search\UmbracoTreeSearcher.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />
     <Compile Include="Security\UmbracoSecureDataFormat.cs" />
@@ -377,7 +365,6 @@
     <Compile Include="Routing\RedirectTrackingComponent.cs" />
     <Compile Include="Editors\RedirectUrlManagementController.cs" />
     <Compile Include="DefaultEventMessagesFactory.cs" />
-    <Compile Include="Routing\ContentFinderByRedirectUrl.cs" />
     <Compile Include="Security\ExternalSignInAutoLinkOptions.cs" />
     <Compile Include="Security\FixWindowsAuthMiddlware.cs" />
     <Compile Include="Security\ForceRenewalCookieAuthenticationHandler.cs" />
@@ -465,7 +452,6 @@
     <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
-    <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Security\AppBuilderExtensions.cs" />
     <Compile Include="Security\AuthenticationOptionsExtensions.cs" />
     <Compile Include="Security\AuthenticationManagerExtensions.cs" />
@@ -611,16 +597,9 @@
     <Compile Include="Mvc\PluginControllerMetadata.cs" />
     <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
-    <Compile Include="Routing\AliasUrlProvider.cs" />
     <Compile Include="Routing\ContentFinderByConfigured404.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQuery.cs" />
-    <Compile Include="Routing\RoutableAttemptEventArgs.cs" />
-    <Compile Include="Routing\DefaultUrlProvider.cs" />
-    <Compile Include="Routing\IUrlProvider.cs" />
-    <Compile Include="Routing\SiteDomainHelper.cs" />
-    <Compile Include="Routing\EnsureRoutableOutcome.cs" />
     <Compile Include="Routing\PublishedRouter.cs" />
-    <Compile Include="Routing\UrlProvider.cs" />
     <Compile Include="Search\ExamineSearcherModel.cs" />
     <Compile Include="Search\ExamineComponent.cs" />
     <Compile Include="Compose\DatabaseServerRegistrarAndMessengerComponent.cs" />
@@ -642,24 +621,19 @@
     <Compile Include="Mvc\RenderViewEngine.cs" />
     <Compile Include="Mvc\RouteDefinition.cs" />
     <Compile Include="Mvc\RouteValueDictionaryExtensions.cs" />
-    <Compile Include="Routing\UmbracoRequestEventArgs.cs" />
     <Compile Include="WebApi\UmbracoAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoAuthorizedApiController.cs" />
     <Compile Include="WebApi\Filters\ValidationFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoUserTimeoutFilterAttribute.cs" />
     <Compile Include="Runtime\WebRuntime.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
-    <Compile Include="Routing\ContentFinderByUrlAlias.cs" />
     <Compile Include="Routing\ContentFinderByIdPath.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
-    <Compile Include="Routing\PublishedRequest.cs" />
-    <Compile Include="Routing\IContentFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="UmbracoApplication.cs" />
     <Compile Include="UmbracoInjectedModule.cs" />
-    <Compile Include="UriUtility.cs" />
     <Compile Include="Web References\org.umbraco.update\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
