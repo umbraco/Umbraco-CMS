@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function EditorContentHeader(serverValidationManager, localizationService, editorState, contentVariantUtilities) {
+    function EditorContentHeader(serverValidationManager, localizationService, editorState) {
 
         function link(scope) {
 
@@ -121,8 +121,6 @@
                 
                 
             }
-
-            scope.getVariantDisplayName = contentVariantUtilities.getDisplayName;
 
             scope.goBack = function () {
                 if (scope.onBack) {
