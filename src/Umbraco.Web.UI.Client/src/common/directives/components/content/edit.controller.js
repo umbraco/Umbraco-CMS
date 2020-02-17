@@ -42,7 +42,7 @@
                 $scope.page.isNew = Object.toBoolean(newVal);
 
                 //We fetch all ancestors of the node to generate the footer breadcrumb navigation
-                if (content.parentId && content.parentId !== -1) {
+                if (content.parentId && content.parentId !== -1 && content.parentId !== -20) {
                     loadBreadcrumb();
                     if (!watchingCulture) {
                         $scope.$watch('culture',

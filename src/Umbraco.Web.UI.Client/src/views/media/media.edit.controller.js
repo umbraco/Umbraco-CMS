@@ -245,7 +245,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
                     syncTreeNode($scope.content, data.path, true); 
                 }
                
-                if ($scope.content.parentId && $scope.content.parentId != -1) {
+                if ($scope.content.parentId && $scope.content.parentId !== -1 && $scope.content.parentId !== -21) {
                     //We fetch all ancestors of the node to generate the footer breadcrump navigation
                     entityResource.getAncestors(nodeId, "media")
                         .then(function (anc) {
