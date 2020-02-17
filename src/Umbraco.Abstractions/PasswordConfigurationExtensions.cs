@@ -5,7 +5,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web
 {
-    internal static class PasswordConfigurationExtensions
+    public static class PasswordConfigurationExtensions
     {
         /// <summary>
         /// Returns the configuration of the membership provider used to configure change password editors

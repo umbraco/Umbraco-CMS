@@ -6,12 +6,11 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Dictionary;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal abstract class TabsAndPropertiesMapper
+    public abstract class TabsAndPropertiesMapper
     {
         protected ICultureDictionary CultureDictionary { get; }
         protected ILocalizedTextService LocalizedTextService { get; }
@@ -115,7 +114,7 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Creates the tabs collection with properties assigned for display models
     /// </summary>
-    internal class TabsAndPropertiesMapper<TSource> : TabsAndPropertiesMapper
+    public class TabsAndPropertiesMapper<TSource> : TabsAndPropertiesMapper
         where TSource : IContentBase
     {
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;

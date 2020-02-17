@@ -17,22 +17,20 @@ using UserProfile = Umbraco.Web.Models.ContentEditing.UserProfile;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class CommonMapper
+    public class CommonMapper
     {
         private readonly IUserService _userService;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ContentAppFactoryCollection _contentAppDefinitions;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICurrentUserAccessor _currentUserAccessor;
 
-        public CommonMapper(IUserService userService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor,
+        public CommonMapper(IUserService userService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
             ContentAppFactoryCollection contentAppDefinitions, ILocalizedTextService localizedTextService, IHttpContextAccessor httpContextAccessor, ICurrentUserAccessor currentUserAccessor)
         {
             _userService = userService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
-            _umbracoContextAccessor = umbracoContextAccessor;
             _contentAppDefinitions = contentAppDefinitions;
             _localizedTextService = localizedTextService;
             _httpContextAccessor = httpContextAccessor;

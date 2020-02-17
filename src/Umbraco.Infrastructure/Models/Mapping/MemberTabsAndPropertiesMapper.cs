@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -20,7 +20,7 @@ namespace Umbraco.Web.Models.Mapping
     /// This also ensures that the IsLocked out property is readonly when the member is not locked out - this is because
     /// an admin cannot actually set isLockedOut = true, they can only unlock.
     /// </remarks>
-    internal class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
+    public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizedTextService _localizedTextService;
@@ -28,8 +28,17 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IMemberService _memberService;
         private readonly IMemberGroupService _memberGroupService;
         private readonly IMemberPasswordConfiguration _memberPasswordConfiguration;
+        private readonly PropertyEditorCollection _propertyEditorCollection;
 
-        public MemberTabsAndPropertiesMapper(ICultureDictionary cultureDictionary, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IMemberTypeService memberTypeService, IMemberService memberService, IMemberGroupService memberGroupService, IMemberPasswordConfiguration memberPasswordConfiguration, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+        public MemberTabsAndPropertiesMapper(ICultureDictionary cultureDictionary,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ILocalizedTextService localizedTextService,
+            IMemberTypeService memberTypeService,
+            IMemberService memberService,
+            IMemberGroupService memberGroupService,
+            IMemberPasswordConfiguration memberPasswordConfiguration,
+            IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+            PropertyEditorCollection propertyEditorCollection)
             : base(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -38,6 +47,7 @@ namespace Umbraco.Web.Models.Mapping
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
             _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
             _memberPasswordConfiguration = memberPasswordConfiguration;
+            _propertyEditorCollection = propertyEditorCollection;
         }
 
         /// <inheritdoc />
@@ -108,7 +118,7 @@ namespace Umbraco.Web.Models.Mapping
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}doctype",
                     Label = _localizedTextService.Localize("content/membertype"),
                     Value = _localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, member.ContentType.Name),
-                    View = Current.PropertyEditors[Constants.PropertyEditors.Aliases.Label].GetValueEditor().View
+                    View = _propertyEditorCollection[Constants.PropertyEditors.Aliases.Label].GetValueEditor().View
                 },
                 GetLoginProperty(_memberTypeService, member, _localizedTextService),
                 new ContentPropertyDisplay

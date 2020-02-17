@@ -40,8 +40,6 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         public RichTextPropertyEditor(
             ILogger logger,
-            IMediaService mediaService,
-            IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
             IUmbracoContextAccessor umbracoContextAccessor,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,

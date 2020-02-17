@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
@@ -20,7 +19,7 @@ using Umbraco.Web.Services;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class UserMapDefinition : IMapDefinition
+    public class UserMapDefinition : IMapDefinition
     {
         private readonly ISectionService _sectionService;
         private readonly IEntityService _entityService;

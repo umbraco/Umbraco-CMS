@@ -18,7 +18,7 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Defines mappings for content/media/members type mappings
     /// </summary>
-    internal class ContentTypeMapDefinition : IMapDefinition
+    public class ContentTypeMapDefinition : IMapDefinition
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
@@ -591,7 +591,7 @@ namespace Umbraco.Web.Models.Mapping
             return aliases.OrderBy(x => x);
         }
 
-        internal static Udi MapContentTypeUdi(IContentTypeComposition source)
+        public static Udi MapContentTypeUdi(IContentTypeComposition source)
         {
             if (source == null) return null;
 

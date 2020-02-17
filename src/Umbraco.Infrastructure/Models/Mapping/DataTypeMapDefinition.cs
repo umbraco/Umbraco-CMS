@@ -7,12 +7,11 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class DataTypeMapDefinition : IMapDefinition
+    public class DataTypeMapDefinition : IMapDefinition
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly ILogger _logger;
@@ -142,7 +141,7 @@ namespace Umbraco.Web.Models.Mapping
             // an empty fields list, which made no sense since there would be nothing to map to - and besides,
             // a datatype without an editor alias is a serious issue - v8 wants an editor here
 
-            if (string.IsNullOrWhiteSpace(dataType.EditorAlias) || !Current.PropertyEditors.TryGet(dataType.EditorAlias, out var editor))
+            if (string.IsNullOrWhiteSpace(dataType.EditorAlias) || !_propertyEditors.TryGet(dataType.EditorAlias, out var editor))
                 throw new InvalidOperationException($"Could not find a property editor with alias \"{dataType.EditorAlias}\".");
 
             var configurationEditor = editor.GetConfigurationEditor();

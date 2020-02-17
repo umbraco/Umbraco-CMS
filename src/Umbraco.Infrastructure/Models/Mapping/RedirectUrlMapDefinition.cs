@@ -5,7 +5,7 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class RedirectUrlMapDefinition : IMapDefinition
+    public class RedirectUrlMapDefinition : IMapDefinition
     {
         private readonly IPublishedUrlProvider _publishedUrlProvider;
 

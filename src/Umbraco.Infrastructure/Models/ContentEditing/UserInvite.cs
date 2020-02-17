@@ -2,8 +2,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
+using Umbraco.Composing;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Models.ContentEditing
 {

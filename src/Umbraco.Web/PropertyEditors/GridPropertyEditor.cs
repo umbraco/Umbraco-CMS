@@ -30,8 +30,6 @@ namespace Umbraco.Web.PropertyEditors
     public class GridPropertyEditor : DataEditor
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly IDataTypeService _dataTypeService;
-        private readonly ILocalizationService _localizationService;
         private readonly IIOHelper _ioHelper;
         private readonly ILogger _logger;
         private readonly IMediaService _mediaService;
@@ -58,8 +56,6 @@ namespace Umbraco.Web.PropertyEditors
             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
-            _dataTypeService = dataTypeService;
-            _localizationService = localizationService;
             _ioHelper = ioHelper;
             _logger = logger;
             _mediaService = mediaService;

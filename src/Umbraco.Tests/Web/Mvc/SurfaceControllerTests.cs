@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -7,7 +6,6 @@ using System.Web.Security;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
@@ -18,7 +16,6 @@ using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.Security.Providers;
 using Current = Umbraco.Web.Composing.Current;
@@ -134,7 +131,6 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Mock_Current_Page()
         {
-            var webRoutingSettings = Mock.Of<IWebRoutingSection>(section => section.UrlProviderMode == "Auto");
             var globalSettings = TestObjects.GetGlobalSettings();
             var httpContextAccessor = TestHelper.GetHttpContextAccessor();
 

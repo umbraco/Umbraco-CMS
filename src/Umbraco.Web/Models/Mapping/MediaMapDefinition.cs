@@ -15,7 +15,7 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Declares model mappings for media.
     /// </summary>
-    internal class MediaMapDefinition : IMapDefinition
+    public class MediaMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;
         private readonly ILogger _logger;
