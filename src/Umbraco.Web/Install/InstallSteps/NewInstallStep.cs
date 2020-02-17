@@ -6,15 +6,12 @@ using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
-using Umbraco.Web.Models.Identity;
-using Umbraco.Web.Security;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Cookie;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -37,8 +34,9 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly IUserPasswordConfiguration _passwordConfiguration;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
         private readonly IConnectionStrings _connectionStrings;
+        private readonly ICookieManager _cookieManager;
 
-        public NewInstallStep(IHttpContextAccessor httpContextAccessor, IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration, IUmbracoSettingsSection umbracoSettingsSection, IConnectionStrings connectionStrings)
+        public NewInstallStep(IHttpContextAccessor httpContextAccessor, IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration, IUmbracoSettingsSection umbracoSettingsSection, IConnectionStrings connectionStrings, ICookieManager cookieManager)
         {
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
@@ -47,6 +45,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
             _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
+            _cookieManager = cookieManager;
         }
 
         public override async Task<InstallSetupResult> ExecuteAsync(UserModel user)
@@ -137,7 +136,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             // In this one case when it's a brand new install and nothing has been configured, make sure the
             // back office cookie is cleared so there's no old cookies lying around causing problems
-            _httpContextAccessor.HttpContext.ExpireCookie(_umbracoSettingsSection.Security.AuthCookieName);
+            _cookieManager.ExpireCookie(_umbracoSettingsSection.Security.AuthCookieName);
 
                 return true;
         }

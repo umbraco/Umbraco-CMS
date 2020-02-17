@@ -24,8 +24,6 @@ namespace Umbraco.Web
         private static bool _registered;
         // ReSharper restore StaticMemberInGenericType
 
-      //  private readonly IHttpContextAccessor _httpContextAccessor;
-
         protected abstract string ItemKey { get; }
 
         // read

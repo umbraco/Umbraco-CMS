@@ -10,7 +10,13 @@ namespace Umbraco.Web
             get
             {
                 var httpContext = System.Web.HttpContext.Current;
-                return httpContext is null ? null : new HttpContextWrapper(httpContext);
+
+                if (httpContext is null)
+                {
+                    throw new InvalidOperationException("HttpContext is not available");
+                }
+
+                return new HttpContextWrapper(httpContext);
             }
             set
             {

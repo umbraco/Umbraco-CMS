@@ -14,23 +14,22 @@ namespace Umbraco.Web
     /// </remarks>
     public class UmbracoContextReference : IDisposable //fixme - should we inherit from DisposableObjectSlim?
     {
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private bool _disposed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoContextReference"/> class.
         /// </summary>
-        internal UmbracoContextReference(bool isRoot, IUmbracoContextAccessor umbracoContextAccessor)
+        internal UmbracoContextReference(bool isRoot, IUmbracoContext umbracoContext)
         {
             IsRoot = isRoot;
 
-            _umbracoContextAccessor = umbracoContextAccessor;
+            UmbracoContext = umbracoContext;
         }
 
         /// <summary>
         /// Gets the <see cref="UmbracoContext"/>.
         /// </summary>
-        public IUmbracoContext UmbracoContext => _umbracoContextAccessor.UmbracoContext;
+        public IUmbracoContext UmbracoContext { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the reference is a root reference.
@@ -50,7 +49,7 @@ namespace Umbraco.Web
             if (IsRoot)
             {
                 UmbracoContext.Dispose();
-                _umbracoContextAccessor.UmbracoContext = null;
+                UmbracoContext = null;
             }
 
             GC.SuppressFinalize(this);

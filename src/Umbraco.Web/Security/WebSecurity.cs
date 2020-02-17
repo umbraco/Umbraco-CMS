@@ -101,13 +101,6 @@ namespace Umbraco.Web.Security
                 Core.Constants.Security.BackOfficeExternalAuthenticationType);
         }
 
-        /// <summary>
-        /// Renews the user's login ticket
-        /// </summary>
-        public void RenewLoginTimeout()
-        {
-            _httpContextAccessor.HttpContext.RenewUmbracoAuthTicket();
-        }
 
         /// <summary>
         /// Gets the current user's id.
