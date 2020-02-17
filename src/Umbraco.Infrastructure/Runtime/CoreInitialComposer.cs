@@ -22,6 +22,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
 
 namespace Umbraco.Core.Runtime
@@ -139,6 +140,7 @@ namespace Umbraco.Core.Runtime
 
             composition.SetCultureDictionaryFactory<DefaultCultureDictionaryFactory>();
             composition.Register(f => f.GetInstance<ICultureDictionaryFactory>().CreateDictionary(), Lifetime.Singleton);
+            composition.RegisterUnique<UriUtility>();
 
             // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
             composition.RegisterUnique<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();

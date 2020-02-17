@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web;
@@ -144,6 +146,14 @@ namespace Umbraco.Core
 
             var template = fileService.GetTemplate(content.TemplateId.Value);
             return template == null ? string.Empty : template.Alias;
+        }
+
+        public static bool IsAllowedTemplate(this IPublishedContent content, IContentTypeService contentTypeService,
+            IUmbracoSettingsSection umbracoSettingsSection, int templateId)
+        {
+            return content.IsAllowedTemplate(contentTypeService,
+                umbracoSettingsSection.WebRouting.DisableAlternativeTemplates,
+                umbracoSettingsSection.WebRouting.ValidateAlternativeTemplates, templateId);
         }
 
         public static bool IsAllowedTemplate(this IPublishedContent content, IContentTypeService contentTypeService, bool disableAlternativeTemplates, bool validateAlternativeTemplates, int templateId)

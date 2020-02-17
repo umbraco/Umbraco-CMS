@@ -40,6 +40,7 @@ namespace Umbraco.Web
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly RoutableDocumentFilter _routableDocumentLookup;
         private readonly IRequestCache _requestCache;
+        private readonly UriUtility _uriUtility;
 
         public UmbracoInjectedModule(
             IGlobalSettings globalSettings,
@@ -48,6 +49,7 @@ namespace Umbraco.Web
             IPublishedRouter publishedRouter,
             IUmbracoContextFactory umbracoContextFactory,
             RoutableDocumentFilter routableDocumentLookup,
+            UriUtility uriUtility,
             IRequestCache requestCache)
         {
             _globalSettings = globalSettings;
@@ -56,6 +58,7 @@ namespace Umbraco.Web
             _publishedRouter = publishedRouter;
             _umbracoContextFactory = umbracoContextFactory;
             _routableDocumentLookup = routableDocumentLookup;
+            _uriUtility = uriUtility;
             _requestCache = requestCache;
         }
 
@@ -121,7 +124,7 @@ namespace Umbraco.Web
             var isRoutableAttempt = EnsureUmbracoRoutablePage(umbracoContext, httpContext);
 
             // raise event here
-            UmbracoModule.OnRouteAttempt(this, new RoutableAttemptEventArgs(isRoutableAttempt.Result, umbracoContext, httpContext));
+            UmbracoModule.OnRouteAttempt(this, new RoutableAttemptEventArgs(isRoutableAttempt.Result, umbracoContext));
             if (isRoutableAttempt.Success == false) return;
 
             httpContext.Trace.Write("UmbracoModule", "Umbraco request confirmed");
@@ -210,7 +213,7 @@ namespace Umbraco.Web
                 case RuntimeLevel.Upgrade:
                     // redirect to install
                     ReportRuntime(level, "Umbraco must install or upgrade.");
-                    var installPath = UriUtility.ToAbsolute(Constants.SystemDirectories.Install);
+                    var installPath = _uriUtility.ToAbsolute(Constants.SystemDirectories.Install);
                     var installUrl = $"{installPath}/?redir=true&url={HttpUtility.UrlEncode(uri.ToString())}";
                     httpContext.Response.Redirect(installUrl, true);
                     return false; // cannot serve content
@@ -242,7 +245,7 @@ namespace Umbraco.Web
             _logger.Warn<UmbracoModule>("Umbraco has no content");
 
             const string noContentUrl = "~/config/splashes/noNodes.aspx";
-            httpContext.RewritePath(UriUtility.ToAbsolute(noContentUrl));
+            httpContext.RewritePath(_uriUtility.ToAbsolute(noContentUrl));
 
             return false;
         }
@@ -430,7 +433,7 @@ namespace Umbraco.Web
                     _logger.Verbose<UmbracoModule>("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, httpContext.Request.Url, DateTime.Now.Subtract(Current.UmbracoContext.ObjectCreated).TotalMilliseconds);
                 }
 
-                UmbracoModule.OnEndRequest(this, new UmbracoRequestEventArgs(Current.UmbracoContext, new HttpContextWrapper(httpContext)));
+                UmbracoModule.OnEndRequest(this, new UmbracoRequestEventArgs(Current.UmbracoContext));
 
                 DisposeRequestCacheItems(httpContext, _requestCache);
             };

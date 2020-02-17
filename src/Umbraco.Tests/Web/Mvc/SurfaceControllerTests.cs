@@ -49,6 +49,7 @@ namespace Umbraco.Tests.Web.Mvc
                 globalSettings,
                 Mock.Of<IUserService>(),
                 IOHelper,
+                UriUtility,
                 httpContextAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
@@ -77,6 +78,7 @@ namespace Umbraco.Tests.Web.Mvc
                 globalSettings,
                 Mock.Of<IUserService>(),
                 IOHelper,
+                UriUtility,
                 httpContextAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
@@ -108,6 +110,7 @@ namespace Umbraco.Tests.Web.Mvc
                 globalSettings,
                 Mock.Of<IUserService>(),
                 IOHelper,
+                UriUtility,
                 httpContextAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
@@ -146,6 +149,7 @@ namespace Umbraco.Tests.Web.Mvc
                 globalSettings,
                 Mock.Of<IUserService>(),
                 IOHelper,
+                UriUtility,
                 httpContextAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();

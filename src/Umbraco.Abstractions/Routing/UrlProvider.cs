@@ -4,7 +4,6 @@ using System.Linq;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.Routing
 {

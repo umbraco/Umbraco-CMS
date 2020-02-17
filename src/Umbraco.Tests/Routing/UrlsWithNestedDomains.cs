@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext(url, 9999, globalSettings:globalSettings.Object);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object,
-                new SiteDomainHelper(), umbracoContextAccessor);
+                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             Assert.AreEqual("http://domain2.com/1001-1-1/", publishedUrlProvider.GetUrl(100111, UrlMode.Absolute));

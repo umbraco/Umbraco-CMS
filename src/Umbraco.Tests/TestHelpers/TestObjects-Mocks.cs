@@ -133,6 +133,7 @@ namespace Umbraco.Tests.TestHelpers
                 globalSettings,
                 Mock.Of<IUserService>(),
                 TestHelper.IOHelper,
+                TestHelper.UriUtility,
                 httpContextAccessor);
 
             return umbracoContextFactory.EnsureUmbracoContext().UmbracoContext;

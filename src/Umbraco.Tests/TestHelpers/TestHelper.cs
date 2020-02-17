@@ -102,6 +102,8 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IIOHelper IOHelper { get; } = new IOHelper(GetHostingEnvironment());
         public static IMainDom MainDom { get; } = new MainDom(Mock.Of<ILogger>(), GetHostingEnvironment(), new MainDomSemaphoreLock(Mock.Of<ILogger>(), GetHostingEnvironment()));
+        public static UriUtility UriUtility { get; } = new UriUtility(GetHostingEnvironment());
+
         public static IWebRoutingSection WebRoutingSection => SettingsForTests.GetDefaultUmbracoSettings().WebRouting;
 
         /// <summary>
