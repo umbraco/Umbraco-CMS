@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Web.Install.Models
 {
@@ -9,7 +8,7 @@ namespace Umbraco.Web.Install.Models
     public class InstallInstructions
     {
         [DataMember(Name = "instructions")]
-        public IDictionary<string, JToken> Instructions { get; set; }
+        public IDictionary<string, object> Instructions { get; set; }
 
         [DataMember(Name = "installId")]
         public Guid InstallId { get; set; }

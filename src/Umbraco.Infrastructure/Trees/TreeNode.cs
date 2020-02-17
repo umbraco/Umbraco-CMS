@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Umbraco.Composing;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Trees
@@ -23,7 +23,7 @@ namespace Umbraco.Web.Models.Trees
         /// <param name="parentId">The parent id for the current node</param>
         /// <param name="getChildNodesUrl"></param>
         /// <param name="menuUrl"></param>
-        internal TreeNode(string nodeId, string parentId, string getChildNodesUrl, string menuUrl)
+        public TreeNode(string nodeId, string parentId, string getChildNodesUrl, string menuUrl)
         {
             if (nodeId == null) throw new ArgumentNullException(nameof(nodeId));
             if (string.IsNullOrWhiteSpace(nodeId)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(nodeId));

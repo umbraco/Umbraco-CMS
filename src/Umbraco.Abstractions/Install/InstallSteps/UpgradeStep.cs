@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Umbraco.Web.Composing;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Install.Models;
 
@@ -14,10 +14,12 @@ namespace Umbraco.Web.Install.InstallSteps
     {
         public override bool RequiresExecution(object model) => true;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IRuntimeState _runtimeState;
 
-        public UpgradeStep(IUmbracoVersion umbracoVersion)
+        public UpgradeStep(IUmbracoVersion umbracoVersion, IRuntimeState runtimeState)
         {
             _umbracoVersion = umbracoVersion;
+            _runtimeState = runtimeState;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model) => Task.FromResult<InstallSetupResult>(null);
@@ -43,9 +45,9 @@ namespace Umbraco.Web.Install.InstallSteps
                     return value;
                 }
 
-                var state = Current.RuntimeState; // TODO: inject
-                var currentState = FormatGuidState(state.CurrentMigrationState);
-                var newState = FormatGuidState(state.FinalMigrationState);
+
+                var currentState = FormatGuidState(_runtimeState.CurrentMigrationState);
+                var newState = FormatGuidState(_runtimeState.FinalMigrationState);
 
                 var reportUrl = $"https://our.umbraco.com/contribute/releases/compare?from={currentVersion}&to={newVersion}&notes=1";
 

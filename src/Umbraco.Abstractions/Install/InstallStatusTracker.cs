@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Collections;
-using Umbraco.Web.Composing;
+using Umbraco.Core.IO;
+using Umbraco.Core.Serialization;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install
@@ -13,29 +13,37 @@ namespace Umbraco.Web.Install
     /// <summary>
     /// An internal in-memory status tracker for the current installation
     /// </summary>
-    internal static class InstallStatusTracker
+    public class InstallStatusTracker
     {
+        private readonly IIOHelper _ioHelper;
+        private readonly IJsonSerializer _jsonSerializer;
+
+        public InstallStatusTracker(IIOHelper ioHelper, IJsonSerializer jsonSerializer)
+        {
+            _ioHelper = ioHelper;
+            _jsonSerializer = jsonSerializer;
+        }
 
         private static ConcurrentHashSet<InstallTrackingItem> _steps = new ConcurrentHashSet<InstallTrackingItem>();
 
-        private static string GetFile(Guid installId)
+        private string GetFile(Guid installId)
         {
-            var file = Current.IOHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "Install/"
-                                                                                                         + "install_"
-                                                                                                         + installId.ToString("N")
-                                                                                                         + ".txt");
+            var file = _ioHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "Install/"
+                                                                                                  + "install_"
+                                                                                                  + installId.ToString("N")
+                                                                                                  + ".txt");
             return file;
         }
 
-        public static void Reset()
+        public void Reset()
         {
             _steps = new ConcurrentHashSet<InstallTrackingItem>();
             ClearFiles();
         }
 
-        public static void ClearFiles()
+        public void ClearFiles()
         {
-            var dir = Current.IOHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "Install/");
+            var dir = _ioHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "Install/");
             if (Directory.Exists(dir))
             {
                 var files = Directory.GetFiles(dir);
@@ -50,13 +58,13 @@ namespace Umbraco.Web.Install
             }
         }
 
-        public static IEnumerable<InstallTrackingItem> InitializeFromFile(Guid installId)
+        public IEnumerable<InstallTrackingItem> InitializeFromFile(Guid installId)
         {
             //check if we have our persisted file and read it
             var file = GetFile(installId);
             if (File.Exists(file))
             {
-                var deserialized = JsonConvert.DeserializeObject<IEnumerable<InstallTrackingItem>>(
+                var deserialized = _jsonSerializer.Deserialize<IEnumerable<InstallTrackingItem>>(
                     File.ReadAllText(file));
                 foreach (var item in deserialized)
                 {
@@ -70,7 +78,7 @@ namespace Umbraco.Web.Install
             return new List<InstallTrackingItem>(_steps);
         }
 
-        public static IEnumerable<InstallTrackingItem> Initialize(Guid installId, IEnumerable<InstallSetupStep> steps)
+        public IEnumerable<InstallTrackingItem> Initialize(Guid installId, IEnumerable<InstallSetupStep> steps)
         {
             //if there are no steps in memory
             if (_steps.Count == 0)
@@ -79,7 +87,7 @@ namespace Umbraco.Web.Install
                 var file = GetFile(installId);
                 if (File.Exists(file))
                 {
-                    var deserialized = JsonConvert.DeserializeObject<IEnumerable<InstallTrackingItem>>(
+                    var deserialized = _jsonSerializer.Deserialize<IEnumerable<InstallTrackingItem>>(
                         File.ReadAllText(file));
                     foreach (var item in deserialized)
                     {
@@ -96,7 +104,7 @@ namespace Umbraco.Web.Install
                         _steps.Add(new InstallTrackingItem(step.Name, step.ServerOrder));
                     }
                     //save the file
-                    var serialized = JsonConvert.SerializeObject(new List<InstallTrackingItem>(_steps));
+                    var serialized = _jsonSerializer.Serialize(new List<InstallTrackingItem>(_steps));
                     Directory.CreateDirectory(Path.GetDirectoryName(file));
                     File.WriteAllText(file, serialized);
                 }
@@ -110,7 +118,7 @@ namespace Umbraco.Web.Install
                     ClearFiles();
 
                     //save the correct file
-                    var serialized = JsonConvert.SerializeObject(new List<InstallTrackingItem>(_steps));
+                    var serialized = _jsonSerializer.Serialize(new List<InstallTrackingItem>(_steps));
                     Directory.CreateDirectory(Path.GetDirectoryName(file));
                     File.WriteAllText(file, serialized);
                 }
@@ -119,7 +127,7 @@ namespace Umbraco.Web.Install
             return new List<InstallTrackingItem>(_steps);
         }
 
-        public static void SetComplete(Guid installId, string name, IDictionary<string, object> additionalData = null)
+        public void SetComplete(Guid installId, string name, IDictionary<string, object> additionalData = null)
         {
             var trackingItem = _steps.Single(x => x.Name == name);
             if (additionalData != null)
@@ -130,7 +138,7 @@ namespace Umbraco.Web.Install
 
             //save the file
             var file = GetFile(installId);
-            var serialized = JsonConvert.SerializeObject(new List<InstallTrackingItem>(_steps));
+            var serialized = _jsonSerializer.Serialize(new List<InstallTrackingItem>(_steps));
             File.WriteAllText(file, serialized);
         }
 

@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Install.Models
 {
-    internal class InstallTrackingItem
+    public class InstallTrackingItem
     {
         public InstallTrackingItem(string name, int serverOrder)
         {

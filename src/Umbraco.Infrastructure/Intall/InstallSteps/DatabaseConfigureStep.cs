@@ -11,7 +11,7 @@ namespace Umbraco.Web.Install.InstallSteps
     [InstallSetupStep(InstallationType.NewInstall,
         "DatabaseConfigure", "database", 10, "Setting up a database, so Umbraco has a place to store your website",
         PerformsAppRestart = true)]
-    internal class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
+    public class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
     {
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly ILogger _logger;

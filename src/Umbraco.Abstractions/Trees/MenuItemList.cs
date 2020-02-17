@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Models.Trees
 {
@@ -13,13 +12,17 @@ namespace Umbraco.Web.Models.Trees
     /// </remarks>
     public class MenuItemList : List<MenuItem>
     {
-        public MenuItemList()
+        private readonly ActionCollection _actionCollection;
+
+        public MenuItemList(ActionCollection actionCollection)
         {
+            _actionCollection = actionCollection;
         }
 
-        public MenuItemList( IEnumerable<MenuItem> items)
+        public MenuItemList(ActionCollection actionCollection, IEnumerable<MenuItem> items)
             : base(items)
         {
+            _actionCollection = actionCollection;
         }
 
         /// <summary>
@@ -44,7 +47,7 @@ namespace Umbraco.Web.Models.Trees
         private MenuItem CreateMenuItem<T>(ILocalizedTextService textService, bool hasSeparator = false, bool opensDialog = false)
             where T : IAction
         {
-            var item = Current.Actions.GetAction<T>();
+            var item = _actionCollection.GetAction<T>();
             if (item == null) return null;
 
             var menuItem = new MenuItem(item, textService.Localize($"actions/{item.Alias}"))

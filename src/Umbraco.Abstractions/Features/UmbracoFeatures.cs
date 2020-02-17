@@ -1,5 +1,4 @@
 using System;
-using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Features
 {
@@ -16,7 +15,7 @@ namespace Umbraco.Web.Features
             Disabled = new DisabledFeatures();
             Enabled = new EnabledFeatures();
         }
-        
+
         /// <summary>
         /// Gets the disabled features.
         /// </summary>
@@ -32,7 +31,7 @@ namespace Umbraco.Web.Features
         /// </summary>
         internal bool IsControllerEnabled(Type feature)
         {
-            if (typeof(UmbracoApiControllerBase).IsAssignableFrom(feature))
+            if (typeof(IUmbracoFeature).IsAssignableFrom(feature))
                 return Disabled.Controllers.Contains(feature) == false;
 
             throw new NotSupportedException("Not a supported feature type.");

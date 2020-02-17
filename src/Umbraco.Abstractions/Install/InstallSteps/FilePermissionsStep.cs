@@ -4,7 +4,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Install;
-using Umbraco.Core.IO;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps

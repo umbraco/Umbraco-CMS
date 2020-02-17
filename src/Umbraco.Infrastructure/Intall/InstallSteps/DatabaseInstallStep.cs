@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -13,19 +12,21 @@ namespace Umbraco.Web.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.NewInstall | InstallationType.Upgrade,
         "DatabaseInstall", 11, "")]
-    internal class DatabaseInstallStep : InstallSetupStep<object>
+    public class DatabaseInstallStep : InstallSetupStep<object>
     {
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
         private readonly IIOHelper _ioHelper;
+        private readonly IConnectionStrings _connectionStrings;
 
-        public DatabaseInstallStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger, IIOHelper ioHelper)
+        public DatabaseInstallStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger, IIOHelper ioHelper, IConnectionStrings connectionStrings)
         {
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
             _logger = logger;
             _ioHelper = ioHelper;
+            _connectionStrings = connectionStrings;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
@@ -42,7 +43,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             if (result.RequiresUpgrade == false)
             {
-                HandleConnectionStrings(_logger, _ioHelper);
+                HandleConnectionStrings(_logger, _ioHelper, _connectionStrings);
                 return Task.FromResult<InstallSetupResult>(null);
             }
 
@@ -53,12 +54,18 @@ namespace Umbraco.Web.Install.InstallSteps
             }));
         }
 
-        internal static void HandleConnectionStrings(ILogger logger, IIOHelper ioHelper)
+        internal static void HandleConnectionStrings(ILogger logger, IIOHelper ioHelper, IConnectionStrings connectionStrings)
         {
+
+
+            var databaseSettings = connectionStrings[Constants.System.UmbracoConnectionName];
+
+
+
             // Remove legacy umbracoDbDsn configuration setting if it exists and connectionstring also exists
-            if (ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName] != null)
+            if (databaseSettings != null)
             {
-                GlobalSettings.RemoveSetting(Constants.System.UmbracoConnectionName, ioHelper);
+                connectionStrings.RemoveConnectionString(Constants.System.UmbracoConnectionName);
             }
             else
             {

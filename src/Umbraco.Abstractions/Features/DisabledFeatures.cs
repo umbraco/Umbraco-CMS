@@ -1,5 +1,4 @@
 using Umbraco.Core.Collections;
-using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Features
 {
@@ -13,19 +12,19 @@ namespace Umbraco.Web.Features
         /// </summary>
         public DisabledFeatures()
         {
-            Controllers = new TypeList<UmbracoApiControllerBase>();
+            Controllers = new TypeList<IUmbracoFeature>();
         }
 
         /// <summary>
         /// Gets the disabled controllers.
         /// </summary>
-        public TypeList<UmbracoApiControllerBase> Controllers { get; }
+        public TypeList<IUmbracoFeature> Controllers { get; }
 
         /// <summary>
         /// Disables the device preview feature of previewing.
         /// </summary>
         public bool DisableDevicePreview { get; set; }
-        
+
         /// <summary>
         /// If true, all references to templates will be removed in the back office and routing
         /// </summary>

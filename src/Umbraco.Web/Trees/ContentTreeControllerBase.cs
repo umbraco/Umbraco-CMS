@@ -28,6 +28,8 @@ namespace Umbraco.Web.Trees
 {
     public abstract class ContentTreeControllerBase : TreeController
     {
+        public IMenuItemCollectionFactory MenuItemCollectionFactory { get; }
+
 
         protected ContentTreeControllerBase(
             IGlobalSettings globalSettings,
@@ -39,9 +41,11 @@ namespace Umbraco.Web.Trees
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
             UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider)
+            IPublishedUrlProvider publishedUrlProvider,
+            IMenuItemCollectionFactory menuItemCollectionFactory)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper, publishedUrlProvider)
         {
+            MenuItemCollectionFactory = menuItemCollectionFactory;
         }
 
         protected ContentTreeControllerBase()
@@ -430,7 +434,7 @@ namespace Umbraco.Web.Trees
                     deleteAllowed = perms.FirstOrDefault(x => x.Contains(deleteAction.Letter)) != null;
                 }
 
-                var menu = new MenuItemCollection();
+                var menu = MenuItemCollectionFactory.Create();
                 // only add empty recycle bin if the current user is allowed to delete by default
                 if (deleteAllowed)
                 {

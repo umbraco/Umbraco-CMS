@@ -7,7 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Install;
 using Umbraco.Core.IO;
-using Umbraco.Web.Composing;
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Install
 {
@@ -21,11 +21,13 @@ namespace Umbraco.Web.Install
         private readonly string[] _permissionFiles = { };
         private readonly IGlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
+        private readonly IPublishedSnapshotService _publishedSnapshotService;
 
-        public FilePermissionHelper(IGlobalSettings globalSettings, IIOHelper ioHelper)
+        public FilePermissionHelper(IGlobalSettings globalSettings, IIOHelper ioHelper, IPublishedSnapshotService publishedSnapshotService)
         {
             _globalSettings = globalSettings;
             _ioHelper = ioHelper;
+            _publishedSnapshotService = publishedSnapshotService;
             _permissionDirs = new[] { _globalSettings.UmbracoCssPath, Constants.SystemDirectories.Config, Constants.SystemDirectories.Data, _globalSettings.UmbracoMediaPath, Constants.SystemDirectories.Preview };
             _packagesPermissionsDirs = new[] { Constants.SystemDirectories.Bin, _globalSettings.UmbracoPath, Constants.SystemDirectories.Packages };
         }
@@ -48,7 +50,7 @@ namespace Umbraco.Web.Install
                 if (TestPublishedSnapshotService(out errors) == false)
                     report["Published snapshot environment check failed"] = errors.ToList();
 
-                if (EnsureCanCreateSubDirectory(Current.Configs.Global().UmbracoMediaPath, out errors) == false)
+                if (EnsureCanCreateSubDirectory(_globalSettings.UmbracoMediaPath, out errors) == false)
                     report["Media folder creation failed"] = errors.ToList();
             }
 
@@ -129,8 +131,7 @@ namespace Umbraco.Web.Install
 
         public bool TestPublishedSnapshotService(out IEnumerable<string> errors)
         {
-            var publishedSnapshotService = Current.PublishedSnapshotService;
-            return publishedSnapshotService.EnsureEnvironment(out errors);
+            return _publishedSnapshotService.EnsureEnvironment(out errors);
         }
 
         // tries to create a sub-directory

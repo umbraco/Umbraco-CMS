@@ -7,7 +7,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.Upgrade;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
 using Umbraco.Web.Migrations.PostMigrations;
 
@@ -15,7 +14,7 @@ namespace Umbraco.Web.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.Upgrade | InstallationType.NewInstall,
         "DatabaseUpgrade", 12, "")]
-    internal class DatabaseUpgradeStep : InstallSetupStep<object>
+    public class DatabaseUpgradeStep : InstallSetupStep<object>
     {
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly IRuntimeState _runtime;
@@ -56,7 +55,7 @@ namespace Umbraco.Web.Install.InstallSteps
                     throw new InstallException("The database failed to upgrade. ERROR: " + result.Message);
                 }
 
-                DatabaseInstallStep.HandleConnectionStrings(_logger, _ioHelper);
+                DatabaseInstallStep.HandleConnectionStrings(_logger, _ioHelper, _connectionStrings);
             }
 
             return Task.FromResult<InstallSetupResult>(null);
