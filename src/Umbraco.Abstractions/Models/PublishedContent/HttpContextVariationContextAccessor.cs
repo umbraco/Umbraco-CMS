@@ -9,7 +9,7 @@ namespace Umbraco.Web.Models.PublishedContent
     public class HttpContextVariationContextAccessor : IVariationContextAccessor
     {
         private readonly IRequestCache _requestCache;
-        private const string _contextKey = "Umbraco.Web.Models.PublishedContent.DefaultVariationContextAccessor";
+        private const string ContextKey = "Umbraco.Web.Models.PublishedContent.DefaultVariationContextAccessor";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpContextVariationContextAccessor"/> class.
@@ -22,8 +22,8 @@ namespace Umbraco.Web.Models.PublishedContent
         /// <inheritdoc />
         public VariationContext VariationContext
         {
-            get => (VariationContext) _requestCache.Get(_contextKey);
-            set => _requestCache.Set(_contextKey, value);
+            get => (VariationContext) _requestCache.Get(ContextKey);
+            set => _requestCache.Set(ContextKey, value);
         }
     }
 }
