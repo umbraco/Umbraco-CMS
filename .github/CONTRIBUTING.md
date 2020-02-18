@@ -65,7 +65,7 @@ Great question! The short version goes like this:
   * **Change** - make your changes, experiment, have fun, explore and learn, and don't be afraid. We welcome all contributions and will [happily give feedback](#questions)
   * **Commit** - done? Yay! 🎉 **Important:** create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-12345`. This means it's a temporary branch for the particular issue you're working on, in this case `12345`. When you have a branch, commit your changes. Don't commit to `v8/contrib`, create a new branch first.
   * **Push** - great, now you can push the changes up to your fork on GitHub
-  * **Create pull request** - exciting! You're ready to show us your changes (or not quite ready, you just need some feedback to progress - you can now make use of GitHub's draft pull request status, detailed [here] (https://github.blog/2019-02-14-introducing-draft-pull-requests/)). GitHub has picked up on the new branch you've pushed and will offer to create a Pull Request. Click that green button and away you go.
+  * **Create pull request** - exciting! You're ready to show us your changes (or not quite ready, you just need some feedback to progress - you can now make use of GitHub's draft pull request status, detailed [here](https://github.blog/2019-02-14-introducing-draft-pull-requests/)). GitHub has picked up on the new branch you've pushed and will offer to create a Pull Request. Click that green button and away you go.
 
   ![Create a pull request](img/createpullrequest.png)
 
@@ -164,7 +164,7 @@ Please note: we are no longer accepting features for v7 but will continue to mer
 
 ![Which branch should I target?](img/defaultbranch.png)
 
-### Making changes after the PR is open
+### Making changes after the PR was opened
 
 If you make the corrections we ask for in the same branch and push them to your fork again, the pull request automatically updates with the additional commit(s) so we can review it again. If all is well, we'll merge the code and your commits are forever part of Umbraco!
 
