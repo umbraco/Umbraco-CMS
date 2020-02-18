@@ -141,7 +141,7 @@ namespace Umbraco.Web.Models.Mapping
             variantDisplay.Segment = segment;
             variantDisplay.Language = language;
             variantDisplay.Name = content.GetCultureName(language?.IsoCode);
-            variantDisplay.DisplayName = GetDisplayName(language, segment);           
+            variantDisplay.DisplayName = GetDisplayName(language, segment);
 
             return variantDisplay;
         }
@@ -152,20 +152,20 @@ namespace Umbraco.Web.Models.Mapping
             var isSegmentVariant = !segment.IsNullOrWhiteSpace();
 
             if(!isCultureVariant && !isSegmentVariant)
-            {                
+            {
                 return _localizedTextService.Localize("general/default");
             }
 
             var parts = new List<string>();
 
-            if (isCultureVariant)
-                parts.Add(new CultureInfo(language.IsoCode).NativeName);
-
             if (isSegmentVariant)
                 parts.Add(segment);
 
-            return string.Join(" - ", parts);
-            
+            if (isCultureVariant)
+                parts.Add(language.Name);
+
+            return string.Join(" — ", parts);
+
         }
     }
 }
