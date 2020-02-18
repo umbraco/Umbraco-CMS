@@ -1,6 +1,6 @@
-﻿using Umbraco.Core;
+﻿using Umbraco.Composing;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Composing;
 using Umbraco.Examine;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Search;
@@ -34,7 +34,7 @@ namespace Umbraco.Web
                 _suspended = true;
             }
 
-            public static void ResumeDocumentCache()
+            public static void ResumeDocumentCache(CacheRefresherCollection cacheRefresherCollection)
             {
                 _suspended = false;
 
@@ -43,7 +43,7 @@ namespace Umbraco.Web
                 if (_tried == false) return;
                 _tried = false;
 
-                var pageRefresher = Current.CacheRefreshers[ContentCacheRefresher.UniqueId];
+                var pageRefresher = cacheRefresherCollection[ContentCacheRefresher.UniqueId];
                 pageRefresher.RefreshAll();
             }
         }
@@ -70,7 +70,7 @@ namespace Umbraco.Web
                 _suspended = true;
             }
 
-            public static void ResumeIndexers(IndexRebuilder indexRebuilder, ILogger logger)
+            public static void ResumeIndexers(IndexRebuilder indexRebuilder, ILogger logger, BackgroundIndexRebuilder backgroundIndexRebuilder)
             {
                 _suspended = false;
 
@@ -79,7 +79,7 @@ namespace Umbraco.Web
                 if (_tried == false) return;
                 _tried = false;
 
-                Current.Factory.GetInstance<BackgroundIndexRebuilder>().RebuildIndexes(false);
+                backgroundIndexRebuilder.RebuildIndexes(false);
             }
         }
 

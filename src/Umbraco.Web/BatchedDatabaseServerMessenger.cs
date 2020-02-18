@@ -25,7 +25,7 @@ namespace Umbraco.Web
     /// <remarks>
     /// This binds to appropriate umbraco events in order to trigger the Boot(), Sync() & FlushBatch() calls
     /// </remarks>
-    public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
+    public class BatchedDatabaseServerMessenger : DatabaseServerMessenger, IBatchedDatabaseServerMessenger
     {
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IRequestCache _requestCache;

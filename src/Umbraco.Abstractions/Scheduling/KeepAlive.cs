@@ -9,7 +9,7 @@ using Umbraco.Core.Sync;
 
 namespace Umbraco.Web.Scheduling
 {
-    internal class KeepAlive : RecurringTaskBase
+    public class KeepAlive : RecurringTaskBase
     {
         private readonly IRuntimeState _runtime;
         private readonly IKeepAliveSection _keepAliveSection;

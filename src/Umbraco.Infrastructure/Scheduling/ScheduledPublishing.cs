@@ -7,21 +7,23 @@ using Umbraco.Core.Sync;
 
 namespace Umbraco.Web.Scheduling
 {
-    internal class ScheduledPublishing : RecurringTaskBase
+    public class ScheduledPublishing : RecurringTaskBase
     {
         private readonly IRuntimeState _runtime;
         private readonly IContentService _contentService;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly ILogger _logger;
+        private readonly IServerMessenger _serverMessenger;
 
         public ScheduledPublishing(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IContentService contentService, IUmbracoContextFactory umbracoContextFactory, ILogger logger)
+            IRuntimeState runtime, IContentService contentService, IUmbracoContextFactory umbracoContextFactory, ILogger logger, IServerMessenger serverMessenger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
             _contentService = contentService;
             _umbracoContextFactory = umbracoContextFactory;
             _logger = logger;
+            _serverMessenger = serverMessenger;
         }
 
         public override bool PerformRun()
@@ -76,7 +78,7 @@ namespace Umbraco.Web.Scheduling
                     finally
                     {
                         // if running on a temp context, we have to flush the messenger
-                        if (contextReference.IsRoot && Composing.Current.ServerMessenger is BatchedDatabaseServerMessenger m)
+                        if (contextReference.IsRoot && _serverMessenger is IBatchedDatabaseServerMessenger m)
                             m.FlushBatch();
                     }
                 }

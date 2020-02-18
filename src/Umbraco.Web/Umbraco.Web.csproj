@@ -111,10 +111,6 @@
       <Project>{fbe7c065-dac0-4025-a78b-63b24d3ab00b}</Project>
       <Name>Umbraco.Configuration</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj">
-      <Project>{f9b7fe05-0f93-4d0d-9c10-690b33ecbbd8}</Project>
-      <Name>Umbraco.Examine</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj">
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
       <Name>Umbraco.Infrastructure</Name>
@@ -194,7 +190,8 @@
     <Compile Include="PropertyEditors\ValueConverters\RteMacroRenderingValueConverter.cs" />
     <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
-    <Compile Include="Search\BackgroundIndexRebuilder.cs" />
+    <Compile Include="Scheduling\SchedulerComponent.cs" />
+    <Compile Include="Scheduling\SchedulerComposer.cs" />
     <Compile Include="Search\ExamineFinalComponent.cs" />
     <Compile Include="Search\ExamineFinalComposer.cs" />
     <Compile Include="Search\ExamineUserComponent.cs" />
@@ -226,8 +223,6 @@
     <Compile Include="PropertyEditors\GridPropertyIndexValueFactory.cs" />
     <Compile Include="Routing\RedirectTrackingComposer.cs" />
     <Compile Include="Runtime\WebInitialComposer.cs" />
-    <Compile Include="Scheduling\SchedulerComposer.cs" />
-    <Compile Include="Search\ExamineComposer.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
     <Compile Include="Security\BackOfficeUserManagerMarker.cs" />
@@ -289,7 +284,6 @@
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="Install\InstallStepCollection.cs" />
     <Compile Include="Install\InstallSteps\ConfigureMachineKey.cs" />
-    <Compile Include="IPublishedContentQuery.cs" />
     <Compile Include="Editors\MemberGroupController.cs" />
     <Compile Include="Composing\CompositionExtensions\Controllers.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
@@ -315,7 +309,6 @@
     <Compile Include="SignalR\IPreviewHub.cs" />
     <Compile Include="SignalR\PreviewHub.cs" />
     <Compile Include="SignalR\PreviewHubComponent.cs" />
-    <Compile Include="Suspendable.cs" />
     <Compile Include="Trees\ContentBlueprintTreeController.cs" />
     <Compile Include="Trees\RelationTypeTreeController.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
@@ -416,7 +409,6 @@
     <Compile Include="Editors\MemberController.cs" />
     <Compile Include="Editors\CurrentUserController.cs" />
     <Compile Include="PropertyEditors\RichTextPreValueController.cs" />
-    <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
     <Compile Include="Security\AppBuilderExtensions.cs" />
@@ -463,7 +455,6 @@
     <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Editors\MediaTypeController.cs" />
-    <Compile Include="Scheduling\ScheduledPublishing.cs" />
     <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="Editors\SectionController.cs" />
     <Compile Include="Editors\UmbracoAuthorizedJsonController.cs" />
@@ -541,9 +532,7 @@
     <Compile Include="Mvc\UmbracoMvcHandler.cs" />
     <Compile Include="Mvc\UmbracoViewPageOfTModel.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
-    <Compile Include="ExamineExtensions.cs" />
     <Compile Include="HtmlHelperRenderExtensions.cs" />
-    <Compile Include="Scheduling\SchedulerComponent.cs" />
     <Compile Include="ModelStateExtensions.cs" />
     <Compile Include="Mvc\HtmlTagWrapper.cs" />
     <Compile Include="Mvc\HtmlTagWrapperTextNode.cs" />
@@ -568,7 +557,6 @@
     <Compile Include="Routing\ContentFinderByPageIdQuery.cs" />
     <Compile Include="Routing\PublishedRouter.cs" />
     <Compile Include="Search\ExamineSearcherModel.cs" />
-    <Compile Include="Search\ExamineComponent.cs" />
     <Compile Include="Compose\DatabaseServerRegistrarAndMessengerComponent.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Trees\PartialViewMacrosTreeController.cs" />
