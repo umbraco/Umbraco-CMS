@@ -10,8 +10,10 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
+using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
 
@@ -24,16 +26,18 @@ namespace Umbraco.Web.Install
         private readonly HttpContextBase _httpContext;
         private readonly ILogger _logger;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IInstallationService _installationService;
         private InstallationType? _installationType;
 
         public InstallHelper(IUmbracoContextAccessor umbracoContextAccessor,
             DatabaseBuilder databaseBuilder,
-            ILogger logger, IGlobalSettings globalSettings)
+            ILogger logger, IGlobalSettings globalSettings, IInstallationService installationService)
         {
             _httpContext = umbracoContextAccessor.UmbracoContext.HttpContext;
             _logger = logger;
             _globalSettings = globalSettings;
             _databaseBuilder = databaseBuilder;
+            _installationService = installationService;
         }
 
         public InstallationType GetInstallationType()
@@ -70,18 +74,13 @@ namespace Umbraco.Web.Install
                     dbProvider = GetDbProviderString(Current.SqlContext);
                 }
 
-                var check = new org.umbraco.update.CheckForUpgrade();
-                check.Install(installId,
-                    IsBrandNewInstall == false,
-                    isCompleted,
-                    DateTime.Now,
-                    UmbracoVersion.Current.Major,
-                    UmbracoVersion.Current.Minor,
-                    UmbracoVersion.Current.Build,
-                    UmbracoVersion.Comment,
-                    errorMsg,
-                    userAgent,
-                    dbProvider);
+                var installLog = new InstallLog(installId: installId, isUpgrade: IsBrandNewInstall == false,
+                    installCompleted: isCompleted, timestamp: DateTime.Now, versionMajor: UmbracoVersion.Current.Major,
+                    versionMinor: UmbracoVersion.Current.Minor, versionPatch: UmbracoVersion.Current.Build,
+                    versionComment: UmbracoVersion.Comment, error: errorMsg, userAgent: userAgent,
+                    dbProvider: dbProvider);
+
+                _installationService.Install(installLog);
             }
             catch (Exception ex)
             {
