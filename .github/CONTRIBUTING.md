@@ -28,7 +28,7 @@ This project and everyone participating in it, is governed by the [our Code of C
 [Working with the code](#working-with-the-code)
   * [Building Umbraco from source code](#building-umbraco-from-source-code)
   * [Working with the source code](#working-with-the-source-code)
-  * [Making changes after the PR was opened](#making-changes-after-the-pr-was-opened)
+  * [Making changes after the PR is open](#making-changes-after-the-pr-is-open)
   * [Which branch should I target for my contributions?](#which-branch-should-i-target-for-my-contributions)
   * [Keeping your Umbraco fork in sync with the main repository](#keeping-your-umbraco-fork-in-sync-with-the-main-repository)
 
@@ -164,7 +164,7 @@ Please note: we are no longer accepting features for v7 but will continue to mer
 
 ![Which branch should I target?](img/defaultbranch.png)
 
-### Making changes after the PR was opened
+### Making changes after the PR is open
 
 If you make the corrections we ask for in the same branch and push them to your fork again, the pull request automatically updates with the additional commit(s) so we can review it again. If all is well, we'll merge the code and your commits are forever part of Umbraco!
 
