@@ -10,11 +10,11 @@ namespace Umbraco.Web.Routing
     public class DefaultMediaUrlProvider : IMediaUrlProvider
     {
         private readonly UriUtility _uriUtility;
-        private readonly Lazy<PropertyEditorCollection> _propertyEditors;
+        private readonly DataEditorWithMediaPathCollection _dataEditors;
 
-        public DefaultMediaUrlProvider(Lazy<PropertyEditorCollection> propertyEditors, UriUtility uriUtility)
+        public DefaultMediaUrlProvider(DataEditorWithMediaPathCollection dataEditors, UriUtility uriUtility)
         {
-            _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
+            _dataEditors = dataEditors ?? throw new ArgumentNullException(nameof(dataEditors));
             _uriUtility = uriUtility;
         }
 
@@ -34,8 +34,7 @@ namespace Umbraco.Web.Routing
             var propType = prop.PropertyType;
             string path = null;
 
-            if (_propertyEditors.Value.TryGet(propType.EditorAlias, out var editor)
-                && editor is IDataEditorWithMediaPath dataEditor)
+            if (_dataEditors.TryGet(propType.EditorAlias, out var dataEditor))
             {
                 path = dataEditor.GetMediaPath(value);
             }

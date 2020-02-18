@@ -9,6 +9,8 @@
     /// </remarks>
     public interface IDataEditorWithMediaPath
     {
+        string Alias { get; }
+
         /// <summary>
         /// Returns the media path for the value stored for a property
         /// </summary>

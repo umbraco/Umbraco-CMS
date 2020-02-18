@@ -24,6 +24,7 @@ using Umbraco.Core.Sync;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web;
+using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Services;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
 
@@ -79,6 +80,11 @@ namespace Umbraco.Core.Runtime
             // properties and parameters derive from data editors
             composition.DataEditors()
                 .Add(() => composition.TypeLoader.GetDataEditors());
+
+            composition.DataEditorsWithMediaPath()
+                .Add<FileUploadPropertyEditor>()
+                .Add<ImageCropperPropertyEditor>();
+
             composition.RegisterUnique<PropertyEditorCollection>();
             composition.RegisterUnique<ParameterEditorCollection>();
 
