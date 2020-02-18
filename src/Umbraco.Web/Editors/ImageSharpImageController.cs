@@ -4,16 +4,16 @@ using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Editors
 {
-    public class ImageSharpImageController : PluginController
+    public class ImageSharpImageController : SurfaceController
     {
-        private readonly IImageSharpImageService _imageSharpImageSertvice;
-        public ImageSharpImageController(IImageSharpImageService imageSharpImageSertvice)
+        private readonly IImageSharpImageService _imageSharpImageService;
+        public ImageSharpImageController(IImageSharpImageService imageSharpImageService)
         {
-            _imageSharpImageSertvice = imageSharpImageSertvice;
+            _imageSharpImageService = imageSharpImageService;
         }
         public ActionResult ManipulateImage(string imagePath, int? width, int? height)
         {
-            var imageModel = _imageSharpImageSertvice.GetImage(imagePath, width, height);
+            var imageModel = _imageSharpImageService.GetImage(imagePath, width, height);
 
             return new FileContentResult(imageModel.Data, imageModel.MimeType);
         }

@@ -47,6 +47,7 @@ using Umbraco.Web.WebApi;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Examine;
+using Umbraco.Infrastructure.Media;
 
 namespace Umbraco.Web.Runtime
 {
@@ -149,7 +150,8 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
             composition.RegisterUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
             composition.RegisterUnique<ITreeService, TreeService>();
-            composition.RegisterUnique<ISectionService, SectionService>();            
+            composition.RegisterUnique<ISectionService, SectionService>();
+            composition.RegisterUnique<IImageSharpImageService, ImageSharpImageService>();            
 
             composition.RegisterUnique<IDashboardService, DashboardService>();
 
