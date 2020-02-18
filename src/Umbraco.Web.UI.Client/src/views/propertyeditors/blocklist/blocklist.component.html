@@ -90,6 +90,21 @@
             <localize key="grid_addElement"></localize>
         </button>
 
+
+        <input type="hidden" name="minCount" ng-model="vm.blocks" />
+        <input type="hidden" name="maxCount" ng-model="vm.blocks" />
+
+        <div ng-messages="vm.propertyForm.minCount.$error" show-validation-on-submit>
+            <div class="help text-error" ng-message="minCount">
+                <localize key="validation_entriesShort" tokens="[vm.validationLimit.min, vm.validationLimit.min - vm.blocks.length]" watch-tokens="true">Minimum %0% entries, needs <strong>%1%</strong> more.</localize>
+            </div>
+        </div>
+        <div ng-if="vm.propertyForm.maxCount.$error === true || vm.blocks.length > vm.validationLimit.max">
+            <div class="help text-error">
+                <localize key="validation_entriesExceed" tokens="[vm.validationLimit.max, vm.blocks.length - vm.validationLimit.max]" watch-tokens="true">Maximum %0% entries, <strong>%1%</strong> too many.</localize>
+            </div>
+        </div>
+
     </div>
 
     <umb-overlay

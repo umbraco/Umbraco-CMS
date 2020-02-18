@@ -3,7 +3,6 @@
     <ng-form name="elementTypeForm" val-form-manager>
         <umb-editor-view ng-if="!page.loading">
 
-            <!-- editor header missing -->
             <umb-editor-header
                 name="vm.title"
                 name-locked="true"
@@ -19,7 +18,7 @@
 
                 <div class="umb-pane">
                     <div class="umb-editor-sub-views" val-sub-view>
-                        <umb-element-editor content="vm.content"></umb-element-editor>
+                        <umb-element-content-editor content="vm.content"></umb-element-content-editor>
                     </div>
                 </div>
             </div>

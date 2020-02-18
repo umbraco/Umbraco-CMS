@@ -15,8 +15,8 @@ namespace Umbraco.Web.PropertyEditors
         public ElementType[] ElementTypes { get; set; }
 
 
-        [ConfigurationField("range", "Amount", "numberrange", Description = "Set a required range of blocks")]
-        public NumberRange Range { get; set; } = new NumberRange();
+        [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of blocks")]
+        public NumberRange ValidationLimit { get; set; } = new NumberRange();
 
         public class NumberRange
         {

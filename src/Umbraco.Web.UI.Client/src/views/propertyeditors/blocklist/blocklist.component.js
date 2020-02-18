@@ -1,35 +1,35 @@
 (function () {
-    'use strict';
+    "use strict";
 
     angular
-        .module('umbraco')
-        .component('blockListPropertyEditor', {
-            templateUrl: 'views/propertyeditors/blocklist/blocklist.component.html',
+        .module("umbraco")
+        .component("blockListPropertyEditor", {
+            templateUrl: "views/propertyeditors/blocklist/blocklist.component.html",
             controller: BlockListController,
-            controllerAs: 'vm',
+            controllerAs: "vm",
             bindings: {
                 
             },
             require: {
-                umbProperty: '?^umbProperty',
-                propertyForm: '?^propertyForm'
+                umbProperty: "?^umbProperty"
             }
         });
 
     function BlockListController($scope, $interpolate, editorService, clipboardService, localizationService, overlayService) {
         
+        var unsubscribe = [];
         var vm = this;
         var model = $scope.$parent.$parent.model;
+        vm.propertyForm = $scope.$parent.$parent.propertyForm;
 
         $scope.moveFocusToBlock = null;
 
-        vm.quickMenuVisible = false;
-        vm.quickMenuIndex = 0;
-        
-        vm.quickMenuAddNewBlock = function(type) {
-            addNewBlock(vm.quickMenuIndex, type);
-            vm.quickMenuVisible = false;
-        }
+        console.log("config:", model.config);
+
+        vm.validationLimit = model.config.validationLimit;
+
+        console.log("value:", model.value);
+
         
         vm.availableBlockTypes = [
             {
@@ -39,14 +39,14 @@
                 prototype_paste_data: {
                     
                     elementType: {
-                        alias: 'contentTypeAlias',
+                        alias: "contentTypeAlias",
                         icon: "icon-document",
                         label: "Text"
                     },
                     labelTemplate: "{{pageTitle | truncate:true:36}}",
                     labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
                     editor: "views/blockelements/labelblock/labelblock.editor.html",
-                    overlaySize: 'medium',
+                    overlaySize: "medium",
                     content: {
                         apps: [
                             {
@@ -135,7 +135,7 @@
                                         readonly: false,
                                         id: 442,
                                         dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                        value: "Let's have a chat",
+                                        value: "Let´s have a chat",
                                         alias: "imageDesc",
                                         editor: "Umbraco.TextBox",
                                         isSensitive: false,
@@ -158,7 +158,7 @@
                                         readonly: false,
                                         id: 441,
                                         dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                        value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn't distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
+                                        value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn´t distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
                                         alias: "pageTitle",
                                         editor: "Umbraco.TextBox",
                                         isSensitive: false,
@@ -177,7 +177,7 @@
                 icon: "icon-document",
                 prototype_paste_data: {
                     elementType: {
-                        alias: 'contentTypeAlias',
+                        alias: "contentTypeAlias",
                         icon: "icon-document",
                         label: "Text"
                     },
@@ -185,7 +185,7 @@
                     labelInterpolate: $interpolate("{{imageTitle | truncate:true:36}}"),
                     key: 1,
                     editor: "views/blockelements/inlineblock/inlineblock.editor.html",
-                    overlaySize: 'medium',
+                    overlaySize: "medium",
                     content: {
                         apps: [
                             {
@@ -234,7 +234,7 @@
                                         readonly: false,
                                         id: 441,
                                         dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                        value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn't distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
+                                        value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn´t distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
                                         alias: "imageTitle",
                                         editor: "Umbraco.TextBox",
                                         isSensitive: false,
@@ -276,14 +276,14 @@
                 icon: "icon-info",
                 prototype_paste_data: {
                     elementType: {
-                        alias: 'contentTypeAlias',
+                        alias: "contentTypeAlias",
                         icon: "icon-document",
                         label: "Text"
                     },
                     labelTemplate: "Label",
                     labelInterpolate: $interpolate("Label"),
                     editor: "views/blockelements/textareablock/textareablock.editor.html",
-                    overlaySize: 'medium',
+                    overlaySize: "medium",
                     content: {
                         apps: [
                             {
@@ -351,14 +351,14 @@
                 icon: "icon-picture",
                 prototype_paste_data: {
                     elementType: {
-                        alias: 'contentTypeAlias',
+                        alias: "contentTypeAlias",
                         icon: "icon-document",
                         label: "Text"
                     },
                     labelTemplate: "Label",
                     labelInterpolate: $interpolate("Label"),
                     editor: "views/blockelements/imageblock/imageblock.editor.html",
-                    overlaySize: 'medium',
+                    overlaySize: "medium",
                     content: {
                         apps: [
                             {
@@ -430,7 +430,7 @@
                                         readonly: false,
                                         id: 441,
                                         dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                        value: "Let's have a chat",
+                                        value: "Let´s have a chat",
                                         alias: "imageDesc",
                                         editor: "Umbraco.TextBox",
                                         isSensitive: false,
@@ -452,7 +452,7 @@
         vm.blocks = [
             {
                 elementType: {
-                    alias: 'contentTypeAlias',
+                    alias: "contentTypeAlias",
                     icon: "icon-document",
                     label: "Text"
                 },
@@ -460,7 +460,7 @@
                 labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
                 key: 1,
                 editor: "views/blockelements/labelblock/labelblock.editor.html",
-                overlaySize: 'medium',
+                overlaySize: "medium",
                 content: {
                     apps: [
                         {
@@ -468,7 +468,7 @@
                             alias: "umbContent",
                             weight: -100,
                             icon: "icon-document",
-                            view: "views/content/apps/content/content.html",
+                            view: "views/common/infiniteeditors/elementeditor/elementeditor.content.html",
                             viewModel: 0,
                             active: true,
                             badge: null,
@@ -509,7 +509,7 @@
                                     readonly: false,
                                     id: 441,
                                     dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                    value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn't distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
+                                    value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn´t distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
                                     alias: "pageTitle",
                                     editor: "Umbraco.TextBox",
                                     isSensitive: false,
@@ -549,7 +549,7 @@
                                     readonly: false,
                                     id: 442,
                                     dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                    value: "Let's have a chat",
+                                    value: "Let´s have a chat",
                                     alias: "imageDesc",
                                     editor: "Umbraco.TextBox",
                                     isSensitive: false,
@@ -572,7 +572,7 @@
                                     readonly: false,
                                     id: 441,
                                     dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                    value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn't distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
+                                    value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn´t distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
                                     alias: "pageTitle",
                                     editor: "Umbraco.TextBox",
                                     isSensitive: false,
@@ -586,7 +586,7 @@
             },
             {
                 elementType: {
-                    alias: 'contentTypeAlias',
+                    alias: "contentTypeAlias",
                     icon: "icon-document",
                     label: "Text"
                 },
@@ -594,7 +594,7 @@
                 labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
                 key: 2,
                 editor: "views/blockelements/labelblock/labelblock.editor.html",
-                overlaySize: 'medium',
+                overlaySize: "medium",
                 content: {
                     apps: [
                         {
@@ -683,7 +683,7 @@
                                     readonly: false,
                                     id: 442,
                                     dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                    value: "Let's have a chat",
+                                    value: "Let´s have a chat",
                                     alias: "imageDesc",
                                     editor: "Umbraco.TextBox",
                                     isSensitive: false,
@@ -706,7 +706,7 @@
                                     readonly: false,
                                     id: 441,
                                     dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                    value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn't distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
+                                    value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn´t distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
                                     alias: "pageTitle",
                                     editor: "Umbraco.TextBox",
                                     isSensitive: false,
@@ -721,7 +721,7 @@
             {
                 
                 elementType: {
-                    alias: 'contentTypeAlias',
+                    alias: "contentTypeAlias",
                     icon: "icon-document",
                     label: "Text"
                 },
@@ -729,7 +729,7 @@
                 labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
                 key: 3,
                 editor: "views/blockelements/labelblock/labelblock.editor.html",
-                overlaySize: 'medium',
+                overlaySize: "medium",
                 content: {
                     apps: [
                         {
@@ -818,7 +818,7 @@
                                     readonly: false,
                                     id: 442,
                                     dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                    value: "Let's have a chat",
+                                    value: "Let´s have a chat",
                                     alias: "imageDesc",
                                     editor: "Umbraco.TextBox",
                                     isSensitive: false,
@@ -841,7 +841,7 @@
                                     readonly: false,
                                     id: 441,
                                     dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                    value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn't distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
+                                    value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn´t distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
                                     alias: "pageTitle",
                                     editor: "Umbraco.TextBox",
                                     isSensitive: false,
@@ -873,62 +873,8 @@
             $scope.moveFocusToBlock = block;
 
         }
-        /*
-        function moveFocusToNextBlock(blockModel, $event) {
-            var index = vm.blocks.indexOf(blockModel);
-            if(index < vm.blocks.length) {
-                var nextBlock = vm.blocks[index+1];
-                $scope.moveFocusToBlock = nextBlock;
-            } else {
-                showCreateOptions(blockModel, $event);
-            }
-        }
-        */
-
-        vm.showCreateOptionsFor = function(blockModel, $event) {
-            var index = vm.blocks.indexOf(blockModel);
-            $event.preventDefault();
-            showCreateOptionsAt(index);
-        }
-        function showCreateOptionsAt(index) {
-            vm.quickMenuIndex = index;
-            vm.quickMenuVisible = true;
-            window.addEventListener("keydown", handleTypingInCreateOptions);
-        }
-
-        function handleTypingInCreateOptions(event) {
-            if (event.ctrlKey || event.metaKey || event.altKey)
-                return;
-
-            if (
-                (event.keyCode === 13) // enter
-                ||
-                (event.keyCode >= 48 && event.keyCode <= 90)// 0 to z
-                ||
-                (event.keyCode >= 96 && event.keyCode <= 111)// numpads
-                ||
-                (event.keyCode >= 186 && event.keyCode <= 222)// semi-colon and a lot of other special characters
-             ) {
-                // Continue writting... needs to know default text-element. if we have one.
-            }
-        }
-
-        function hideCreateOptions() {
-            vm.quickMenuVisible = false;
-            window.removeEventListener("keydown", handleTypingInCreateOptions);
-        }
-
-        vm.onCreateOptionsBlur = function($event) {
-
-            if(!$($event.relatedTarget).is(".umb-block-list__block--create-bar > button")) {
-                hideCreateOptions();
-            }
-
-        }
 
         function getBlockLabel(block) {
-
-            console.log("getBlockLabel", block)
 
             // TODO: we should do something about this for performance.
 
@@ -1012,13 +958,11 @@
             console.log("copy")
         }
         vm.requestDeleteBlock = function(block) {
-            localizationService.localizeMany(["content_nestedContentDeleteItem", "general_delete", "general_cancel", "contentTypeEditor_yesDelete"]).then(function (data) {
+            localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "contentTypeEditor_yesDelete"]).then(function (data) {
                 const overlay = {
-                    title: data[1],
-                    content: data[0],
-                    closeButtonLabel: data[2],
-                    submitButtonLabel: data[3],
-                    submitButtonStyle: "danger",
+                    title: data[0],
+                    content: localizationService.tokenReplace(data[1], [block.label]),
+                    submitButtonLabel: data[2],
                     close: function () {
                         overlayService.close();
                     },
@@ -1028,7 +972,7 @@
                     }
                 };
 
-                overlayService.open(overlay);
+                overlayService.confirmDelete(overlay);
             });
         }
 
@@ -1040,9 +984,9 @@
         vm.sortableOptions = {
             axis: "y",
             cursor: "grabbing",
-            handle: '.blockelement__draggable-element',
-            cancel: 'input,textarea,select,option',
-            classes: '.blockelement--dragging',
+            handle: ".blockelement__draggable-element",
+            cancel: "input,textarea,select,option",
+            classes: ".blockelement--dragging",
             distance: 5,
             tolerance: "pointer",
             scroll: true,
@@ -1062,15 +1006,14 @@
         };
 
         $scope.blockApi = {
-            showCreateOptionsFor: vm.showCreateOptionsFor,
             removeBlock: vm.removeBlock
         }
 
 
         var copyAllEntriesAction = {
-            labelKey: 'clipboard_labelForCopyAllEntries',
+            labelKey: "clipboard_labelForCopyAllEntries",
             labelTokens: [model.label],
-            icon: 'documents',
+            icon: "documents",
             method: function () {},
             isDisabled: true
         }
@@ -1085,14 +1028,40 @@
             }
         };
 
+
+        function validateLimits() {
+            if (vm.validationLimit.min && vm.blocks.length < vm.validationLimit.min) {
+                vm.propertyForm.minCount.$setValidity("minCount", false);
+            }
+            else {
+                vm.propertyForm.minCount.$setValidity("minCount", true);
+            }
+
+            if (vm.validationLimit.max && vm.blocks.length > vm.validationLimit.max) {
+                vm.propertyForm.maxCount.$setValidity("maxCount", false);
+            }
+            else {
+                vm.propertyForm.maxCount.$setValidity("maxCount", true);
+            }
+        }
+
+
+
+
         // TODO: We need to investigate if we can do a specific watch on each block, so we dont re-render all blocks.
-        $scope.$watch('vm.blocks', onBlocksUpdated, true);
+        unsubscribe.push($scope.$watch("vm.blocks", onBlocksUpdated, true));
         function onBlocksUpdated(newVal, oldVal){
-            console.log("onBlocksUpdated");
             for(const block of vm.blocks) {
                 block.label = getBlockLabel(block);
             }
         }
+        unsubscribe.push($scope.$watch(() => vm.blocks.length, validateLimits));
+
+        $scope.$on("$destroy", function () {
+            for (const subscription of unsubscribe) {
+                subscription();
+            }
+        });
 
 
     }
