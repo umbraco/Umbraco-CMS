@@ -4,6 +4,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Dashboards;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
@@ -25,6 +26,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web;
 using Umbraco.Web.Install;
 using Umbraco.Web.Trees;
+using Umbraco.Web.Services;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
 
 namespace Umbraco.Core.Runtime
@@ -150,6 +152,12 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
 
             composition.RegisterUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
+
+            composition.RegisterUnique<IDashboardService, DashboardService>();
+
+            // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
+            composition.Dashboards()
+                .Add(composition.TypeLoader.GetTypes<IDashboard>());
         }
     }
 }
