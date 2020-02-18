@@ -38,12 +38,12 @@ namespace Umbraco.Tests.Routing
             var dataTypeService = Mock.Of<IDataTypeService>();
             var umbracoSettingsSection = TestObjects.GetUmbracoSettings();
 
-            var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(new IDataEditor[]
+            var propertyEditors = new DataEditorWithMediaPathCollection(new IDataEditorWithMediaPath[]
             {
                 new FileUploadPropertyEditor(logger, mediaFileSystemMock, contentSection, dataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, umbracoSettingsSection),
                 new ImageCropperPropertyEditor(logger, mediaFileSystemMock, contentSection, dataTypeService, LocalizationService, IOHelper, ShortStringHelper, LocalizedTextService, umbracoSettingsSection),
-            }));
-            _mediaUrlProvider = new DefaultMediaUrlProvider(new Lazy<PropertyEditorCollection>(() => propertyEditors), UriUtility);
+            });
+            _mediaUrlProvider = new DefaultMediaUrlProvider(propertyEditors, UriUtility);
         }
 
         public override void TearDown()
