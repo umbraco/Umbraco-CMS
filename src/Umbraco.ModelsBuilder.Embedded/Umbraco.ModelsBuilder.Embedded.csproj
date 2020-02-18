@@ -109,10 +109,6 @@
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
       <Name>Umbraco.Infrastructure</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj">
-      <Project>{9b95eef7-63fe-4432-8c63-166be9c1a929}</Project>
-      <Name>Umbraco.Web.BackOffice</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651e1350-91b6-44b7-bd60-7207006d7003}</Project>
       <Name>Umbraco.Web</Name>
