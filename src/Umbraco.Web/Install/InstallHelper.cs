@@ -4,6 +4,7 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -45,7 +46,7 @@ namespace Umbraco.Web.Install
             return _installationType ?? (_installationType = IsBrandNewInstall ? InstallationType.NewInstall : InstallationType.Upgrade).Value;
         }
 
-        internal void InstallStatus(bool isCompleted, string errorMsg)
+        internal async Task InstallStatus(bool isCompleted, string errorMsg)
         {
             try
             {
@@ -80,7 +81,7 @@ namespace Umbraco.Web.Install
                     versionComment: UmbracoVersion.Comment, error: errorMsg, userAgent: userAgent,
                     dbProvider: dbProvider);
 
-                _installationService.Install(installLog);
+                await _installationService.Install(installLog);
             }
             catch (Exception ex)
             {
