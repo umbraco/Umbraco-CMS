@@ -17,11 +17,13 @@ namespace Umbraco.Web.Routing
     {
         private readonly IRedirectUrlService _redirectUrlService;
         private readonly ILogger _logger;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-        public ContentFinderByRedirectUrl(IRedirectUrlService redirectUrlService, ILogger logger)
+        public ContentFinderByRedirectUrl(IRedirectUrlService redirectUrlService, ILogger logger, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _redirectUrlService = redirectUrlService;
             _logger = logger;
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         /// <summary>
@@ -30,7 +32,7 @@ namespace Umbraco.Web.Routing
         /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         /// <remarks>Optionally, can also assign the template or anything else on the document request, although that is not required.</remarks>
-        public bool TryFindContent(PublishedRequest frequest)
+        public bool TryFindContent(IPublishedRequest frequest)
         {
             var route = frequest.HasDomain
                 ? frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.Uri.GetAbsolutePathDecoded())
@@ -45,7 +47,7 @@ namespace Umbraco.Web.Routing
             }
 
             var content = frequest.UmbracoContext.Content.GetById(redirectUrl.ContentId);
-            var url = content == null ? "#" : content.Url(redirectUrl.Culture);
+            var url = content == null ? "#" : content.Url(_umbracoContextAccessor.UmbracoContext.UrlProvider, redirectUrl.Culture);
             if (url.StartsWith("#"))
             {
                 _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} which has no url.", route, redirectUrl.ContentId);
@@ -63,7 +65,8 @@ namespace Umbraco.Web.Routing
             // See http://issues.umbraco.org/issue/U4-8361#comment=67-30532
             // Setting automatic 301 redirects to not be cached because browsers cache these very aggressively which then leads
             // to problems if you rename a page back to it's original name or create a new page with the original name
-            frequest.Cacheability = HttpCacheability.NoCache;
+            //frequest.Cacheability = HttpCacheability.NoCache;
+            frequest.CacheabilityNoCache = true;
             frequest.CacheExtensions = new List<string> { "no-store, must-revalidate" };
             frequest.Headers = new Dictionary<string, string> { { "Pragma", "no-cache" }, { "Expires", "0" } };
 

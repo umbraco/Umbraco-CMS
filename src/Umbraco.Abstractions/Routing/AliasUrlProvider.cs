@@ -16,12 +16,16 @@ namespace Umbraco.Web.Routing
         private readonly IGlobalSettings _globalSettings;
         private readonly IRequestHandlerSection _requestConfig;
         private readonly ISiteDomainHelper _siteDomainHelper;
+        private readonly UriUtility _uriUtility;
+        private readonly IPublishedValueFallback _publishedValueFallback;
 
-        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig, ISiteDomainHelper siteDomainHelper)
+        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig, ISiteDomainHelper siteDomainHelper, UriUtility uriUtility, IPublishedValueFallback publishedValueFallback)
         {
             _globalSettings = globalSettings;
             _requestConfig = requestConfig;
             _siteDomainHelper = siteDomainHelper;
+            _uriUtility = uriUtility;
+            _publishedValueFallback = publishedValueFallback;
         }
 
         // note - at the moment we seem to accept pretty much anything as an alias
@@ -31,7 +35,7 @@ namespace Umbraco.Web.Routing
         #region GetUrl
 
         /// <inheritdoc />
-        public UrlInfo GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlMode mode, string culture, Uri current)
+        public UrlInfo GetUrl(IUmbracoContext umbracoContext, IPublishedContent content, UrlMode mode, string culture, Uri current)
         {
             return null; // we have nothing to say
         }
@@ -51,7 +55,7 @@ namespace Umbraco.Web.Routing
         /// <para>Other urls are those that <c>GetUrl</c> would not return in the current context, but would be valid
         /// urls for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
         /// </remarks>
-        public IEnumerable<UrlInfo> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
+        public IEnumerable<UrlInfo> GetOtherUrls(IUmbracoContext umbracoContext, int id, Uri current)
         {
             var node = umbracoContext.Content.GetById(id);
             if (node == null)
@@ -83,7 +87,7 @@ namespace Umbraco.Web.Routing
                 if (varies)
                     yield break;
 
-                var umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias);
+                var umbracoUrlName = node.Value<string>(_publishedValueFallback, Constants.Conventions.Content.UrlAlias);
                 var aliases = umbracoUrlName?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
                 if (aliases == null || aliases.Any() == false)
@@ -93,7 +97,7 @@ namespace Umbraco.Web.Routing
                 {
                     var path = "/" + alias;
                     var uri = new Uri(path, UriKind.Relative);
-                    yield return UrlInfo.Url(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
+                    yield return UrlInfo.Url(_uriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
                 }
             }
             else
@@ -108,8 +112,8 @@ namespace Umbraco.Web.Routing
                     if (varies && !node.HasCulture(domainUri.Culture.Name)) continue;
 
                     var umbracoUrlName = varies
-                        ? node.Value<string>(Constants.Conventions.Content.UrlAlias, culture: domainUri.Culture.Name)
-                        : node.Value<string>(Constants.Conventions.Content.UrlAlias);
+                        ? node.Value<string>(_publishedValueFallback,Constants.Conventions.Content.UrlAlias, culture: domainUri.Culture.Name)
+                        : node.Value<string>(_publishedValueFallback, Constants.Conventions.Content.UrlAlias);
 
                     var aliases = umbracoUrlName?.Split(new [] {','}, StringSplitOptions.RemoveEmptyEntries);
 
@@ -120,7 +124,7 @@ namespace Umbraco.Web.Routing
                     {
                         var path = "/" + alias;
                         var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
-                        yield return UrlInfo.Url(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString(), domainUri.Culture.Name);
+                        yield return UrlInfo.Url(_uriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString(), domainUri.Culture.Name);
                     }
                 }
             }

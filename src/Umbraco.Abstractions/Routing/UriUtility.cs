@@ -4,21 +4,22 @@ using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web
 {
-    public static class UriUtility
+    public sealed class UriUtility
     {
         static string _appPath;
         static string _appPathPrefix;
 
-        static UriUtility()
+        public UriUtility(IHostingEnvironment hostingEnvironment)
         {
-            ResetAppDomainAppVirtualPath();
+            ResetAppDomainAppVirtualPath(hostingEnvironment);
         }
 
         // internal for unit testing only
-        internal static void SetAppDomainAppVirtualPath(string appPath)
+        internal void SetAppDomainAppVirtualPath(string appPath)
         {
             _appPath = appPath ?? "/";
             _appPathPrefix = _appPath;
@@ -26,20 +27,20 @@ namespace Umbraco.Web
                 _appPathPrefix = String.Empty;
         }
 
-        internal static void ResetAppDomainAppVirtualPath()
+        internal void ResetAppDomainAppVirtualPath(IHostingEnvironment hostingEnvironment)
         {
-            SetAppDomainAppVirtualPath(HttpRuntime.AppDomainAppVirtualPath);
+            SetAppDomainAppVirtualPath(hostingEnvironment.ApplicationVirtualPath);
         }
 
         // will be "/" or "/foo"
-        public static string AppPath => _appPath;
+        public string AppPath => _appPath;
 
         // will be "" or "/foo"
-        public static string AppPathPrefix => _appPathPrefix;
+        public string AppPathPrefix => _appPathPrefix;
 
         // adds the virtual directory if any
         // see also VirtualPathUtility.ToAbsolute
-        public static string ToAbsolute(string url)
+        public string ToAbsolute(string url)
         {
             //return ResolveUrl(url);
             url = url.TrimStart('~');
@@ -48,7 +49,7 @@ namespace Umbraco.Web
 
         // strips the virtual directory if any
         // see also VirtualPathUtility.ToAppRelative
-        public static string ToAppRelative(string virtualPath)
+        public string ToAppRelative(string virtualPath)
         {
             if (virtualPath.InvariantStartsWith(_appPathPrefix)
                     && (virtualPath.Length == _appPathPrefix.Length || virtualPath[_appPathPrefix.Length] == '/'))
@@ -60,7 +61,7 @@ namespace Umbraco.Web
 
         // maps an internal umbraco uri to a public uri
         // ie with virtual directory, .aspx if required...
-        public static Uri UriFromUmbraco(Uri uri, IGlobalSettings globalSettings, IRequestHandlerSection requestConfig)
+        public Uri UriFromUmbraco(Uri uri, IGlobalSettings globalSettings, IRequestHandlerSection requestConfig)
         {
             var path = uri.GetSafeAbsolutePath();
 
@@ -74,7 +75,7 @@ namespace Umbraco.Web
 
         // maps a media umbraco uri to a public uri
         // ie with virtual directory - that is all for media
-        public static Uri MediaUriFromUmbraco(Uri uri)
+        public Uri MediaUriFromUmbraco(Uri uri)
         {
             var path = uri.GetSafeAbsolutePath();
             path = ToAbsolute(path);
@@ -83,7 +84,7 @@ namespace Umbraco.Web
 
         // maps a public uri to an internal umbraco uri
         // ie no virtual directory, no .aspx, lowercase...
-        public static Uri UriToUmbraco(Uri uri)
+        public Uri UriToUmbraco(Uri uri)
         {
             // note: no need to decode uri here because we're returning a uri
             // so it will be re-encoded anyway
@@ -120,7 +121,7 @@ namespace Umbraco.Web
         // ResolveUrl("page2.aspx") returns "/page2.aspx"
         // Page.ResolveUrl("page2.aspx") returns "/sub/page2.aspx" (relative...)
         //
-        public static string ResolveUrl(string relativeUrl)
+        public string ResolveUrl(string relativeUrl)
         {
             if (relativeUrl == null) throw new ArgumentNullException("relativeUrl");
 
@@ -177,74 +178,27 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region Uri string utilities
-
-        public static bool HasScheme(string uri)
-        {
-            return uri.IndexOf("://") > 0;
-        }
-
-        public static string StartWithScheme(string uri)
-        {
-            return StartWithScheme(uri, null);
-        }
-
-        public static string StartWithScheme(string uri, string scheme)
-        {
-            return HasScheme(uri) ? uri : String.Format("{0}://{1}", scheme ?? Uri.UriSchemeHttp, uri);
-        }
-
-        public static string EndPathWithSlash(string uri)
-        {
-            var pos1 = Math.Max(0, uri.IndexOf('?'));
-            var pos2 = Math.Max(0, uri.IndexOf('#'));
-            var pos = Math.Min(pos1, pos2);
-
-            var path = pos > 0 ? uri.Substring(0, pos) : uri;
-            path = path.EnsureEndsWith('/');
-
-            if (pos > 0)
-                path += uri.Substring(pos);
-
-            return path;
-        }
-
-        public static string TrimPathEndSlash(string uri)
-        {
-            var pos1 = Math.Max(0, uri.IndexOf('?'));
-            var pos2 = Math.Max(0, uri.IndexOf('#'));
-            var pos = Math.Min(pos1, pos2);
-
-            var path = pos > 0 ? uri.Substring(0, pos) : uri;
-            path = path.TrimEnd('/');
-
-            if (pos > 0)
-                path += uri.Substring(pos);
-
-            return path;
-        }
-
-        #endregion
 
         /// <summary>
         /// Returns an full url with the host, port, etc...
         /// </summary>
         /// <param name="absolutePath">An absolute path (i.e. starts with a '/' )</param>
-        /// <param name="httpContext"> </param>
+        /// <param name="curentRequestUrl"> </param>
         /// <returns></returns>
         /// <remarks>
         /// Based on http://stackoverflow.com/questions/3681052/get-absolute-url-from-relative-path-refactored-method
         /// </remarks>
-        internal static Uri ToFullUrl(string absolutePath, HttpContextBase httpContext)
+        internal Uri ToFullUrl(string absolutePath, Uri curentRequestUrl)
         {
-            if (httpContext == null) throw new ArgumentNullException("httpContext");
             if (string.IsNullOrEmpty(absolutePath))
-                throw new ArgumentNullException("absolutePath");
+                throw new ArgumentNullException(nameof(absolutePath));
 
             if (!absolutePath.StartsWith("/"))
                 throw new FormatException("The absolutePath specified does not start with a '/'");
 
-            return new Uri(absolutePath, UriKind.Relative).MakeAbsolute(httpContext.Request.Url);
+            return new Uri(absolutePath, UriKind.Relative).MakeAbsolute(curentRequestUrl);
         }
+
+
     }
 }

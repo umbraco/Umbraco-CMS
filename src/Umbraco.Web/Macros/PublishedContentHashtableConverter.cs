@@ -8,7 +8,6 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Routing;
 
@@ -24,14 +23,14 @@ namespace Umbraco.Web.Macros
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedContentHashtableConverter"/> class for a published document request.
         /// </summary>
-        /// <param name="frequest">The <see cref="PublishedRequest"/> pointing to the document.</param>
+        /// <param name="frequest">The <see cref="IPublishedRequest"/> pointing to the document.</param>
         /// <param name="userService">The <see cref="IUserService"/>.</param>
         /// <remarks>
         /// The difference between creating the page with PublishedRequest vs an IPublishedContent item is
         /// that the PublishedRequest takes into account how a template is assigned during the routing process whereas
         /// with an IPublishedContent item, the template id is assigned purely based on the default.
         /// </remarks>
-        internal PublishedContentHashtableConverter(PublishedRequest frequest, IUserService userService)
+        internal PublishedContentHashtableConverter(IPublishedRequest frequest, IUserService userService)
         {
             if (!frequest.HasPublishedContent)
                 throw new ArgumentException("Document request has no node.", nameof(frequest));

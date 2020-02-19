@@ -50,7 +50,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IUserService>(),
-                IOHelper);
+                IOHelper,
+                UriUtility);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
             var umbracoContext = umbracoContextReference.UmbracoContext;
@@ -79,7 +80,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IUserService>(),
-                IOHelper);
+                IOHelper,
+                UriUtility);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
             var umbCtx = umbracoContextReference.UmbracoContext;
@@ -111,7 +113,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IUserService>(),
-                IOHelper);
+                IOHelper,
+                UriUtility);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
             var umbracoContext = umbracoContextReference.UmbracoContext;
@@ -124,7 +127,7 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<ICultureDictionaryFactory>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
                 Mock.Of<IPublishedContentQuery>(query => query.Content(2) == content.Object),
-                new MembershipHelper(umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper, Mock.Of<IEntityService>()));
+                new MembershipHelper(Mock.Of<HttpContextBase>(), Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper, Mock.Of<IEntityService>()));
 
             var ctrl = new TestSurfaceController(umbracoContextAccessor, helper);
             var result = ctrl.GetContent(2) as PublishedContentResult;
@@ -150,7 +153,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IUserService>(),
-                IOHelper);
+                IOHelper,
+                UriUtility);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
             var umbracoContext = umbracoContextReference.UmbracoContext;
@@ -159,7 +163,7 @@ namespace Umbraco.Tests.Web.Mvc
 
             var content = Mock.Of<IPublishedContent>(publishedContent => publishedContent.Id == 12345);
 
-            var contextBase = umbracoContext.HttpContext;
+
             var publishedRouter = BaseWebTest.CreatePublishedRouter(TestObjects.GetUmbracoSettings().WebRouting);
             var frequest = publishedRouter.CreateRequest(umbracoContext, new Uri("http://localhost/test"));
             frequest.PublishedContent = content;
@@ -173,7 +177,7 @@ namespace Umbraco.Tests.Web.Mvc
             routeData.DataTokens.Add(Core.Constants.Web.UmbracoRouteDefinitionDataToken, routeDefinition);
 
             var ctrl = new TestSurfaceController(umbracoContextAccessor, new UmbracoHelper());
-            ctrl.ControllerContext = new ControllerContext(contextBase, routeData, ctrl);
+            ctrl.ControllerContext = new ControllerContext(Mock.Of<HttpContextBase>(), routeData, ctrl);
 
             var result = ctrl.GetContentFromCurrentPage() as PublishedContentResult;
 

@@ -404,7 +404,7 @@ namespace Umbraco.Tests.Web.Mvc
             return context;
         }
 
-        protected UmbracoContext GetUmbracoContext(ILogger logger, IUmbracoSettingsSection umbracoSettings, string url, int templateId, RouteData routeData = null, bool setSingleton = false)
+        protected IUmbracoContext GetUmbracoContext(ILogger logger, IUmbracoSettingsSection umbracoSettings, string url, int templateId, RouteData routeData = null, bool setSingleton = false)
         {
             var svcCtx = GetServiceContext();
 
@@ -446,7 +446,8 @@ namespace Umbraco.Tests.Web.Mvc
                 Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility);
 
             //if (setSingleton)
             //{

@@ -28,7 +28,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the Umbraco context.
         /// </summary>
-        public virtual UmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
+        public virtual IUmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
 
         /// <summary>
         /// Gets or sets the Umbraco context accessor.
@@ -70,7 +70,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the web security helper.
         /// </summary>
-        public virtual WebSecurity Security => UmbracoContext.Security;
+        public virtual IWebSecurity Security => UmbracoContext.Security;
 
         protected UmbracoController()
             : this(

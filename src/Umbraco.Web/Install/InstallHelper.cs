@@ -25,11 +25,11 @@ namespace Umbraco.Web.Install
         private readonly IConnectionStrings _connectionStrings;
         private InstallationType? _installationType;
 
-        public InstallHelper(IUmbracoContextAccessor umbracoContextAccessor,
+        public InstallHelper(IHttpContextAccessor httpContextAccessor,
             DatabaseBuilder databaseBuilder,
             ILogger logger, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IConnectionStrings connectionStrings)
         {
-            _httpContext = umbracoContextAccessor.UmbracoContext.HttpContext;
+            _httpContext = httpContextAccessor.HttpContext;
             _logger = logger;
             _globalSettings = globalSettings;
             _umbracoVersion = umbracoVersion;

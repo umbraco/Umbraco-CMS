@@ -23,15 +23,17 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ContentAppFactoryCollection _contentAppDefinitions;
         private readonly ILocalizedTextService _localizedTextService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public CommonMapper(IUserService userService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor,
-            ContentAppFactoryCollection contentAppDefinitions, ILocalizedTextService localizedTextService)
+            ContentAppFactoryCollection contentAppDefinitions, ILocalizedTextService localizedTextService, IHttpContextAccessor httpContextAccessor)
         {
             _userService = userService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
             _contentAppDefinitions = contentAppDefinitions;
             _localizedTextService = localizedTextService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public UserProfile GetOwner(IContentBase source, MapperContext context)
@@ -65,19 +67,19 @@ namespace Umbraco.Web.Models.Mapping
         public string GetTreeNodeUrl<TController>(IContentBase source)
             where TController : ContentTreeControllerBase
         {
-            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
-            if (umbracoContext == null) return null;
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext == null) return null;
 
-            var urlHelper = new UrlHelper(umbracoContext.HttpContext.Request.RequestContext);
+            var urlHelper = new UrlHelper(httpContext.Request.RequestContext);
             return urlHelper.GetUmbracoApiService<TController>(controller => controller.GetTreeNode(source.Key.ToString("N"), null));
         }
 
         public string GetMemberTreeNodeUrl(IContentBase source)
         {
-            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
-            if (umbracoContext == null) return null;
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext == null) return null;
 
-            var urlHelper = new UrlHelper(umbracoContext.HttpContext.Request.RequestContext);
+            var urlHelper = new UrlHelper(httpContext.Request.RequestContext);
             return urlHelper.GetUmbracoApiService<MemberTreeController>(controller => controller.GetTreeNode(source.Key.ToString("N"), null));
         }
 

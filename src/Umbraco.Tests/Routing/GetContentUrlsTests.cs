@@ -54,7 +54,8 @@ namespace Umbraco.Tests.Routing
                 umbContext,
                 GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
                 VariationContextAccessor,
-                Logger).ToList();
+                Logger,
+                UriUtility).ToList();
 
             Assert.AreEqual(1, urls.Count);
             Assert.AreEqual("content/itemNotPublished", urls[0].Text);
@@ -73,13 +74,15 @@ namespace Umbraco.Tests.Routing
             var umbracoSettings = Current.Configs.Settings();
 
             var umbContext = GetUmbracoContext("http://localhost:8000",
-                urlProviders: new []{ new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper()) });
+                urlProviders: new []{ new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(), UriUtility) });
             var publishedRouter = CreatePublishedRouter(Factory,
                 contentFinders:new ContentFinderCollection(new[]{new ContentFinderByUrl(Logger) }));
             var urls = content.GetContentUrls(publishedRouter,
                 umbContext,
                 GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
-                VariationContextAccessor, Logger).ToList();
+                VariationContextAccessor,
+                Logger,
+                UriUtility).ToList();
 
             Assert.AreEqual(1, urls.Count);
             Assert.AreEqual("/home/", urls[0].Text);
@@ -105,13 +108,15 @@ namespace Umbraco.Tests.Routing
             var umbracoSettings = Current.Configs.Settings();
 
             var umbContext = GetUmbracoContext("http://localhost:8000",
-                urlProviders: new[] { new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper()) });
+                urlProviders: new[] { new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(), UriUtility) });
             var publishedRouter = CreatePublishedRouter(Factory,
                 contentFinders: new ContentFinderCollection(new[] { new ContentFinderByUrl(Logger) }));
             var urls = child.GetContentUrls(publishedRouter,
                 umbContext,
                 GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
-                VariationContextAccessor, Logger).ToList();
+                VariationContextAccessor,
+                Logger,
+                UriUtility).ToList();
 
             Assert.AreEqual(1, urls.Count);
             Assert.AreEqual("/home/sub1/", urls[0].Text);

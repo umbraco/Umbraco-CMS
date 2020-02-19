@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -28,8 +29,9 @@ namespace Umbraco.Web.Templates
         private readonly ILocalizationService _languageService;
         private readonly IWebRoutingSection _webRoutingSection;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public TemplateRenderer(IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, IFileService fileService, ILocalizationService textService, IWebRoutingSection webRoutingSection, IShortStringHelper shortStringHelper)
+        public TemplateRenderer(IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, IFileService fileService, ILocalizationService textService, IWebRoutingSection webRoutingSection, IShortStringHelper shortStringHelper, IHttpContextAccessor httpContextAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
@@ -37,6 +39,7 @@ namespace Umbraco.Web.Templates
             _languageService = textService ?? throw new ArgumentNullException(nameof(textService));
             _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection));
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public void Render(int pageId, int? altTemplateId, StringWriter writer)
@@ -96,7 +99,7 @@ namespace Umbraco.Web.Templates
 
             //First, save all of the items locally that we know are used in the chain of execution, we'll need to restore these
             //after this page has rendered.
-            SaveExistingItems(out var oldPublishedRequest, out var oldAltTemplate);
+            SaveExistingItems(out var oldPublishedRequest);
 
             try
             {
@@ -109,12 +112,12 @@ namespace Umbraco.Web.Templates
             finally
             {
                 //restore items on context objects to continuing rendering the parent template
-                RestoreItems(oldPublishedRequest, oldAltTemplate);
+                RestoreItems(oldPublishedRequest);
             }
 
         }
 
-        private void ExecuteTemplateRendering(TextWriter sw, PublishedRequest request)
+        private void ExecuteTemplateRendering(TextWriter sw, IPublishedRequest request)
         {
             //NOTE: Before we used to build up the query strings here but this is not necessary because when we do a
             // Server.Execute in the TemplateRenderer, we pass in a 'true' to 'preserveForm' which automatically preserves all current
@@ -124,7 +127,7 @@ namespace Umbraco.Web.Templates
             //var queryString = _umbracoContext.HttpContext.Request.QueryString.AllKeys
             //    .ToDictionary(key => key, key => context.Request.QueryString[key]);
 
-            var requestContext = new RequestContext(_umbracoContextAccessor.UmbracoContext.HttpContext, new RouteData()
+            var requestContext = new RequestContext(_httpContextAccessor.HttpContext, new RouteData()
             {
                 Route = RouteTable.Routes["Umbraco_default"]
             });
@@ -169,31 +172,28 @@ namespace Umbraco.Web.Templates
             return newWriter.ToString();
         }
 
-        private void SetNewItemsOnContextObjects(PublishedRequest request)
+        private void SetNewItemsOnContextObjects(IPublishedRequest request)
         {
             //now, set the new ones for this page execution
-            _umbracoContextAccessor.UmbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = null;
             _umbracoContextAccessor.UmbracoContext.PublishedRequest = request;
         }
 
         /// <summary>
         /// Save all items that we know are used for rendering execution to variables so we can restore after rendering
         /// </summary>
-        private void SaveExistingItems(out PublishedRequest oldPublishedRequest, out object oldAltTemplate)
+        private void SaveExistingItems(out IPublishedRequest oldPublishedRequest)
         {
             //Many objects require that these legacy items are in the http context items... before we render this template we need to first
             //save the values in them so that we can re-set them after we render so the rest of the execution works as per normal
             oldPublishedRequest = _umbracoContextAccessor.UmbracoContext.PublishedRequest;
-            oldAltTemplate = _umbracoContextAccessor.UmbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate];
         }
 
         /// <summary>
         /// Restores all items back to their context's to continue normal page rendering execution
         /// </summary>
-        private void RestoreItems(PublishedRequest oldPublishedRequest, object oldAltTemplate)
+        private void RestoreItems(IPublishedRequest oldPublishedRequest)
         {
             _umbracoContextAccessor.UmbracoContext.PublishedRequest = oldPublishedRequest;
-            _umbracoContextAccessor.UmbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = oldAltTemplate;
         }
     }
 }

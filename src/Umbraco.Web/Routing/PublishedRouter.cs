@@ -29,6 +29,7 @@ namespace Umbraco.Web.Routing
         private readonly ILogger _logger;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
         private readonly IUserService _userService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedRouter"/> class.
@@ -41,7 +42,8 @@ namespace Umbraco.Web.Routing
             ServiceContext services,
             IProfilingLogger proflog,
             IUmbracoSettingsSection umbracoSettingsSection,
-            IUserService userService)
+            IUserService userService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection));
             _contentFinders = contentFinders ?? throw new ArgumentNullException(nameof(contentFinders));
@@ -52,10 +54,11 @@ namespace Umbraco.Web.Routing
             _logger = proflog;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _httpContextAccessor = httpContextAccessor;
         }
 
         /// <inheritdoc />
-        public PublishedRequest CreateRequest(UmbracoContext umbracoContext, Uri uri = null)
+        public IPublishedRequest CreateRequest(IUmbracoContext umbracoContext, Uri uri = null)
         {
             return new PublishedRequest(this, umbracoContext, _umbracoSettingsSection, uri ?? umbracoContext.CleanedUmbracoUrl);
         }
@@ -63,7 +66,7 @@ namespace Umbraco.Web.Routing
         #region Request
 
         /// <inheritdoc />
-        public bool TryRouteRequest(PublishedRequest request)
+        public bool TryRouteRequest(IPublishedRequest request)
         {
             // disabled - is it going to change the routing?
             //_pcr.OnPreparing();
@@ -94,7 +97,7 @@ namespace Umbraco.Web.Routing
         }
 
         /// <inheritdoc />
-        public bool PrepareRequest(PublishedRequest request)
+        public bool PrepareRequest(IPublishedRequest request)
         {
             // note - at that point the original legacy module did something do handle IIS custom 404 errors
             //   ie pages looking like /anything.aspx?404;/path/to/document - I guess the reason was to support
@@ -165,7 +168,7 @@ namespace Umbraco.Web.Routing
         /// This method logic has been put into it's own method in case developers have created a custom PCR or are assigning their own values
         /// but need to finalize it themselves.
         /// </remarks>
-        public bool ConfigureRequest(PublishedRequest frequest)
+        public bool ConfigureRequest(IPublishedRequest frequest)
         {
             if (frequest.HasPublishedContent == false)
             {
@@ -188,22 +191,11 @@ namespace Umbraco.Web.Routing
             // can't go beyond that point without a PublishedContent to render
             // it's ok not to have a template, in order to give MVC a chance to hijack routes
 
-            // note - the page() ctor below will cause the "page" to get the value of all its
-            // "elements" ie of all the IPublishedContent property. If we use the object value,
-            // that will trigger macro execution - which can't happen because macro execution
-            // requires that _pcr.UmbracoPage is already initialized = catch-22. The "legacy"
-            // pipeline did _not_ evaluate the macros, ie it is using the data value, and we
-            // have to keep doing it because of that catch-22.
-
-            // assign the legacy page back to the request
-            // handlers like default.aspx will want it and most macros currently need it
-            frequest.LegacyContentHashTable = new PublishedContentHashtableConverter(frequest, _userService);
-
             return true;
         }
 
         /// <inheritdoc />
-        public void UpdateRequestToNotFound(PublishedRequest request)
+        public void UpdateRequestToNotFound(IPublishedRequest request)
         {
             // clear content
             var content = request.PublishedContent;
@@ -232,12 +224,6 @@ namespace Umbraco.Web.Routing
                 // to Mvc since Mvc can't do much either
                 return;
             }
-
-            // see note in PrepareRequest()
-
-            // assign the legacy page back to the docrequest
-            // handlers like default.aspx will want it and most macros currently need it
-            request.LegacyContentHashTable = new PublishedContentHashtableConverter(request, _userService);
         }
 
         #endregion
@@ -248,7 +234,7 @@ namespace Umbraco.Web.Routing
         /// Finds the site root (if any) matching the http request, and updates the PublishedRequest accordingly.
         /// </summary>
         /// <returns>A value indicating whether a domain was found.</returns>
-        internal bool FindDomain(PublishedRequest request)
+        internal bool FindDomain(IPublishedRequest request)
         {
             const string tracePrefix = "FindDomain: ";
 
@@ -319,7 +305,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Looks for wildcard domains in the path and updates <c>Culture</c> accordingly.
         /// </summary>
-        internal void HandleWildcardDomains(PublishedRequest request)
+        internal void HandleWildcardDomains(IPublishedRequest request)
         {
             const string tracePrefix = "HandleWildcardDomains: ";
 
@@ -379,7 +365,7 @@ namespace Umbraco.Web.Routing
         /// Finds the Umbraco document (if any) matching the request, and updates the PublishedRequest accordingly.
         /// </summary>
         /// <returns>A value indicating whether a document and template were found.</returns>
-        private void FindPublishedContentAndTemplate(PublishedRequest request)
+        private void FindPublishedContentAndTemplate(IPublishedRequest request)
         {
             _logger.Debug<PublishedRouter>("FindPublishedContentAndTemplate: Path={UriAbsolutePath}", request.Uri.AbsolutePath);
 
@@ -409,7 +395,7 @@ namespace Umbraco.Web.Routing
         /// Tries to find the document matching the request, by running the IPublishedContentFinder instances.
         /// </summary>
         /// <exception cref="InvalidOperationException">There is no finder collection.</exception>
-        internal void FindPublishedContent(PublishedRequest request)
+        internal void FindPublishedContent(IPublishedRequest request)
         {
             const string tracePrefix = "FindPublishedContent: ";
 
@@ -441,7 +427,7 @@ namespace Umbraco.Web.Routing
         /// Handles "not found", internal redirects, access validation...
         /// things that must be handled in one place because they can create loops
         /// </remarks>
-        private void HandlePublishedContent(PublishedRequest request)
+        private void HandlePublishedContent(IPublishedRequest request)
         {
             // because these might loop, we have to have some sort of infinite loop detection
             int i = 0, j = 0;
@@ -500,7 +486,7 @@ namespace Umbraco.Web.Routing
         /// <para>Redirecting to a different site root and/or culture will not pick the new site root nor the new culture.</para>
         /// <para>As per legacy, if the redirect does not work, we just ignore it.</para>
         /// </remarks>
-        private bool FollowInternalRedirects(PublishedRequest request)
+        private bool FollowInternalRedirects(IPublishedRequest request)
         {
             if (request.PublishedContent == null)
                 throw new InvalidOperationException("There is no PublishedContent.");
@@ -562,7 +548,7 @@ namespace Umbraco.Web.Routing
         /// Ensures that access to current node is permitted.
         /// </summary>
         /// <remarks>Redirecting to a different site root and/or culture will not pick the new site root nor the new culture.</remarks>
-        private void EnsurePublishedContentAccess(PublishedRequest request)
+        private void EnsurePublishedContentAccess(IPublishedRequest request)
         {
             if (request.PublishedContent == null)
                 throw new InvalidOperationException("There is no PublishedContent.");
@@ -632,7 +618,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Finds a template for the current node, if any.
         /// </summary>
-        private void FindTemplate(PublishedRequest request)
+        private void FindTemplate(IPublishedRequest request)
         {
             // NOTE: at the moment there is only 1 way to find a template, and then ppl must
             // use the Prepared event to change the template if they wish. Should we also
@@ -651,7 +637,7 @@ namespace Umbraco.Web.Routing
             var useAltTemplate = request.IsInitialPublishedContent
                 || (_webRoutingSection.InternalRedirectPreservesTemplate && request.IsInternalRedirectPublishedContent);
             var altTemplate = useAltTemplate
-                ? request.UmbracoContext.HttpContext.Request[Constants.Conventions.Url.AltTemplate]
+                ? _httpContextAccessor.HttpContext.Request[Constants.Conventions.Url.AltTemplate]
                 : null;
 
             if (string.IsNullOrWhiteSpace(altTemplate))
@@ -662,7 +648,7 @@ namespace Umbraco.Web.Routing
 
                 if (request.HasTemplate)
                 {
-                    _logger.Debug<PublishedRequest>("FindTemplate: Has a template already, and no alternate template.");
+                    _logger.Debug<IPublishedRequest>("FindTemplate: Has a template already, and no alternate template.");
                     return;
                 }
 
@@ -756,7 +742,7 @@ namespace Umbraco.Web.Routing
         /// Follows external redirection through <c>umbracoRedirect</c> document property.
         /// </summary>
         /// <remarks>As per legacy, if the redirect does not work, we just ignore it.</remarks>
-        private void FollowExternalRedirect(PublishedRequest request)
+        private void FollowExternalRedirect(IPublishedRequest request)
         {
             if (request.HasPublishedContent == false) return;
 

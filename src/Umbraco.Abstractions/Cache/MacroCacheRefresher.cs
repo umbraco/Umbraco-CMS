@@ -7,7 +7,7 @@ using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Cache
 {
-    public sealed class MacroCacheRefresher : JsonCacheRefresherBase<MacroCacheRefresher, MacroCacheRefresher.JsonPayload>
+    public sealed class MacroCacheRefresher : PayloadCacheRefresherBase<MacroCacheRefresher, MacroCacheRefresher.JsonPayload>
     {
         public MacroCacheRefresher(AppCaches appCaches, IJsonSerializer jsonSerializer)
             : base(appCaches, jsonSerializer)

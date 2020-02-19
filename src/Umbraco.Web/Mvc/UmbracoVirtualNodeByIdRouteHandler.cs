@@ -12,13 +12,13 @@ namespace Umbraco.Web.Mvc
             _realNodeId = realNodeId;
         }
 
-        protected sealed override IPublishedContent FindContent(RequestContext requestContext, UmbracoContext umbracoContext)
+        protected sealed override IPublishedContent FindContent(RequestContext requestContext, IUmbracoContext umbracoContext)
         {
             var byId = umbracoContext.Content.GetById(_realNodeId);
             return byId == null ? null : FindContent(requestContext, umbracoContext, byId);
         }
 
-        protected virtual IPublishedContent FindContent(RequestContext requestContext, UmbracoContext umbracoContext, IPublishedContent baseContent)
+        protected virtual IPublishedContent FindContent(RequestContext requestContext, IUmbracoContext umbracoContext, IPublishedContent baseContent)
         {
             return baseContent;
         }

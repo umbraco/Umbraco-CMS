@@ -25,7 +25,7 @@ namespace Umbraco.Web.Mvc
         private readonly IGlobalSettings _globalSettings;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
-        private UmbracoContext _umbracoContext;
+        private IUmbracoContext _umbracoContext;
         private UmbracoHelper _helper;
 
         /// <summary>
@@ -50,13 +50,13 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the Umbraco context.
         /// </summary>
-        public UmbracoContext UmbracoContext => _umbracoContext
+        public IUmbracoContext UmbracoContext => _umbracoContext
             ?? (_umbracoContext = ViewContext.GetUmbracoContext() ?? Current.UmbracoContext);
 
         /// <summary>
         /// Gets the public content request.
         /// </summary>
-        internal PublishedRequest PublishedRequest
+        internal IPublishedRequest PublishedRequest
         {
             get
             {
@@ -67,11 +67,11 @@ namespace Umbraco.Web.Mvc
 
                 // try view context
                 if (ViewContext.RouteData.DataTokens.ContainsKey(token))
-                    return (PublishedRequest) ViewContext.RouteData.DataTokens.GetRequiredObject(token);
+                    return (IPublishedRequest) ViewContext.RouteData.DataTokens.GetRequiredObject(token);
 
                 // child action, try parent view context
                 if (ViewContext.IsChildAction && ViewContext.ParentActionViewContext.RouteData.DataTokens.ContainsKey(token))
-                    return (PublishedRequest) ViewContext.ParentActionViewContext.RouteData.DataTokens.GetRequiredObject(token);
+                    return (IPublishedRequest) ViewContext.ParentActionViewContext.RouteData.DataTokens.GetRequiredObject(token);
 
                 // fallback to UmbracoContext
                 return UmbracoContext.PublishedRequest;
@@ -221,7 +221,7 @@ namespace Umbraco.Web.Mvc
                             markupToInject =
                                 string.Format(_umbracoSettingsSection.Content.PreviewBadge,
                                     Current.IOHelper.ResolveUrl(_globalSettings.UmbracoPath),
-                                    Server.UrlEncode(Current.UmbracoContext.HttpContext.Request.Url?.PathAndQuery),
+                                    Server.UrlEncode(HttpContext.Current.Request.Url?.PathAndQuery),
                                     Current.UmbracoContext.PublishedRequest.PublishedContent.Id);
                         }
                         else

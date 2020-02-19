@@ -100,10 +100,12 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Umbraco_Route_Umbraco_Defined_Controller_Action()
         {
+            var url = "~/dummy-page";
             var template = CreateTemplate("homePage");
             var route = RouteTable.Routes["Umbraco_default"];
             var routeData = new RouteData { Route = route };
-            var umbracoContext = GetUmbracoContext("~/dummy-page", template.Id, routeData);
+            var umbracoContext = GetUmbracoContext(url, template.Id, routeData);
+            var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             frequest.PublishedContent = umbracoContext.Content.GetById(1174);
@@ -112,7 +114,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger>()), ShortStringHelper);
 
-            handler.GetHandlerForRoute(umbracoContext.HttpContext.Request.RequestContext, frequest);
+            handler.GetHandlerForRoute(httpContext.Request.RequestContext, frequest);
             Assert.AreEqual("RenderMvc", routeData.Values["controller"].ToString());
             //the route action will still be the one we've asked for because our RenderActionInvoker is the thing that decides
             // if the action matches.
@@ -136,10 +138,12 @@ namespace Umbraco.Tests.Routing
             // could exist in the database... yet creating templates should sanitize
             // aliases one way or another...
 
+            var url = "~/dummy-page";
             var template = CreateTemplate(templateName);
             var route = RouteTable.Routes["Umbraco_default"];
             var routeData = new RouteData() {Route = route};
             var umbracoContext = GetUmbracoContext("~/dummy-page", template.Id, routeData, true);
+            var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             frequest.PublishedContent = umbracoContext.Content.GetById(1172);
@@ -152,7 +156,7 @@ namespace Umbraco.Tests.Routing
             var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger>(), context =>
                 {
                     var membershipHelper = new MembershipHelper(
-                        umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper, Mock.Of<IEntityService>());
+                        httpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper, Mock.Of<IEntityService>());
                    return new CustomDocumentController(Factory.GetInstance<IGlobalSettings>(),
                         umbracoContextAccessor,
                         Factory.GetInstance<ServiceContext>(),
@@ -161,7 +165,7 @@ namespace Umbraco.Tests.Routing
                         new UmbracoHelper(Mock.Of<IPublishedContent>(), Mock.Of<ITagQuery>(), Mock.Of<ICultureDictionaryFactory>(), Mock.Of<IUmbracoComponentRenderer>(), Mock.Of<IPublishedContentQuery>(), membershipHelper));
                 }), ShortStringHelper);
 
-            handler.GetHandlerForRoute(umbracoContext.HttpContext.Request.RequestContext, frequest);
+            handler.GetHandlerForRoute(httpContext.Request.RequestContext, frequest);
             Assert.AreEqual("CustomDocument", routeData.Values["controller"].ToString());
             Assert.AreEqual(
                 //global::umbraco.cms.helpers.Casing.SafeAlias(template.Alias),

@@ -56,7 +56,7 @@ namespace Umbraco.Tests.PublishedContent
                     .ToList());
         }
 
-        private UmbracoContext GetUmbracoContext()
+        private IUmbracoContext GetUmbracoContext()
         {
             RouteData routeData = null;
 
@@ -77,7 +77,8 @@ namespace Umbraco.Tests.PublishedContent
                 Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility);
 
             return umbracoContext;
         }

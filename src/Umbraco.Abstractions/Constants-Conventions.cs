@@ -137,7 +137,7 @@ namespace Umbraco.Core
                 public static readonly string UmbracoMemberProviderName = "UmbracoMembershipProvider";
 
                 public static readonly string UmbracoRoleProviderName = "UmbracoRoleProvider";
-                
+
                 /// <summary>
                 /// Property alias for the Comments on a Member
                 /// </summary>
@@ -285,6 +285,7 @@ namespace Umbraco.Core
 
                 //TODO: return a list of built in types so we can use that to prevent deletion in the uI
             }
+
         }
     }
 }

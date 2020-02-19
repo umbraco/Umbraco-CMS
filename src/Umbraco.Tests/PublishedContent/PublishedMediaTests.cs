@@ -68,7 +68,7 @@ namespace Umbraco.Tests.PublishedContent
         /// <param name="id"></param>
         /// <param name="umbracoContext"></param>
         /// <returns></returns>
-        internal IPublishedContent GetNode(int id, UmbracoContext umbracoContext)
+        internal IPublishedContent GetNode(int id, IUmbracoContext umbracoContext)
         {
             var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null, HostingEnvironment),
                 ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache,

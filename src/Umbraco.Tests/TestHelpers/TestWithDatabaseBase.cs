@@ -31,6 +31,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -78,6 +79,9 @@ namespace Umbraco.Tests.TestHelpers
             Composition.WithCollectionBuilder<DataEditorCollectionBuilder>()
                 .Clear()
                 .Add(() => Composition.TypeLoader.GetDataEditors());
+
+            Composition.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
+                .Add(Composition.TypeLoader.GetUmbracoApiControllers());
 
             Composition.RegisterUnique(f =>
             {
@@ -355,7 +359,7 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        protected UmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null, IEnumerable<IMediaUrlProvider> mediaUrlProviders = null, IGlobalSettings globalSettings = null, IPublishedSnapshotService snapshotService = null)
+        protected IUmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null, IEnumerable<IMediaUrlProvider> mediaUrlProviders = null, IGlobalSettings globalSettings = null, IPublishedSnapshotService snapshotService = null)
         {
             // ensure we have a PublishedCachesService
             var service = snapshotService ?? PublishedSnapshotService as XmlPublishedSnapshotService;
@@ -385,7 +389,8 @@ namespace Umbraco.Tests.TestHelpers
                 mediaUrlProviders ?? Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings ?? Factory.GetInstance<IGlobalSettings>(),
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility);
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;

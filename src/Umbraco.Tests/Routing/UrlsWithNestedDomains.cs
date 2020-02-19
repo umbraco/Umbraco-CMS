@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Routing
             // get the nice url for 100111
             var umbracoContext = GetUmbracoContext(url, 9999, umbracoSettings: settings, urlProviders: new []
             {
-                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
+                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper(), UriUtility)
             }, globalSettings:globalSettings.Object);
             Assert.AreEqual("http://domain2.com/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111, UrlMode.Absolute));
 

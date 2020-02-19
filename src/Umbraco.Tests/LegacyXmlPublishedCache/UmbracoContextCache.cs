@@ -6,8 +6,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
     static class UmbracoContextCache
     {
-        static readonly ConditionalWeakTable<UmbracoContext, ConcurrentDictionary<string, object>> Caches
-            = new ConditionalWeakTable<UmbracoContext, ConcurrentDictionary<string, object>>();
+        static readonly ConditionalWeakTable<IUmbracoContext, ConcurrentDictionary<string, object>> Caches
+            = new ConditionalWeakTable<IUmbracoContext, ConcurrentDictionary<string, object>>();
 
         public static ConcurrentDictionary<string, object> Current
         {

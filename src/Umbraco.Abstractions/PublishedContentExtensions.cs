@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Core
 {
@@ -142,6 +145,14 @@ namespace Umbraco.Core
 
             var template = fileService.GetTemplate(content.TemplateId.Value);
             return template == null ? string.Empty : template.Alias;
+        }
+
+        public static bool IsAllowedTemplate(this IPublishedContent content, IContentTypeService contentTypeService,
+            IUmbracoSettingsSection umbracoSettingsSection, int templateId)
+        {
+            return content.IsAllowedTemplate(contentTypeService,
+                umbracoSettingsSection.WebRouting.DisableAlternativeTemplates,
+                umbracoSettingsSection.WebRouting.ValidateAlternativeTemplates, templateId);
         }
 
         public static bool IsAllowedTemplate(this IPublishedContent content, IContentTypeService contentTypeService, bool disableAlternativeTemplates, bool validateAlternativeTemplates, int templateId)
@@ -1075,5 +1086,36 @@ namespace Umbraco.Core
         }
 
         #endregion
+
+        /// <summary>
+        /// Gets the url of the content item.
+        /// </summary>
+        /// <remarks>
+        /// <para>If the content item is a document, then this method returns the url of the
+        /// document. If it is a media, then this methods return the media url for the
+        /// 'umbracoFile' property. Use the MediaUrl() method to get the media url for other
+        /// properties.</para>
+        /// <para>The value of this property is contextual. It depends on the 'current' request uri,
+        /// if any. In addition, when the content type is multi-lingual, this is the url for the
+        /// specified culture. Otherwise, it is the invariant url.</para>
+        /// </remarks>
+        public static string Url(this IPublishedContent content, IPublishedUrlProvider publishedUrlProvider, string culture = null, UrlMode mode = UrlMode.Default)
+        {
+            if (publishedUrlProvider == null)
+                throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext.UrlProvider is null.");
+
+            switch (content.ContentType.ItemType)
+            {
+                case PublishedItemType.Content:
+                    return publishedUrlProvider.GetUrl(content, mode, culture);
+
+                case PublishedItemType.Media:
+                    return publishedUrlProvider.GetMediaUrl(content, mode, culture, Constants.Conventions.Media.File);
+
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
     }
 }

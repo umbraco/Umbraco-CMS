@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext("/test", 1111, urlProviders: new[]
             {
-                new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
+                new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper(), UriUtility)
             }, globalSettings: globalSettings.Object);
 
             var requestHandlerMock = Mock.Get(umbracoSettings.RequestHandler);
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext("/test", 1111, urlProviders: new[]
             {
-                new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
+                new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper(), UriUtility)
             }, globalSettings: globalSettings.Object);
 
 
@@ -139,7 +139,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext("/test", 1111, urlProviders: new[]
             {
-                new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
+                new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper(), UriUtility)
             }, globalSettings: globalSettings.Object);
 
 
@@ -179,7 +179,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext(currentUri, umbracoSettings: umbracoSettings,
                 urlProviders: new[] {
-                    new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
+                    new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper(), UriUtility)
                 },
                 globalSettings: globalSettings.Object,
                 snapshotService: snapshotService.Object);
@@ -233,7 +233,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext(currentUri, umbracoSettings: umbracoSettings,
                 urlProviders: new[] {
-                    new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
+                    new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper(), UriUtility)
                 },
                 globalSettings: globalSettings.Object,
                 snapshotService: snapshotService.Object);
@@ -287,7 +287,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext(currentUri, umbracoSettings: umbracoSettings,
                 urlProviders: new[] {
-                    new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
+                    new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper(), UriUtility)
                 },
                 globalSettings: globalSettings.Object,
                 snapshotService: snapshotService.Object);
@@ -309,7 +309,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, umbracoSettings: umbracoSettings, urlProviders: new[]
             {
-                new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
+                new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper(), UriUtility)
             }, globalSettings: globalSettings.Object);
 
             Assert.AreEqual("/home/sub1/custom-sub-1/", umbracoContext.UrlProvider.GetUrl(1177));
@@ -328,7 +328,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, urlProviders: new[]
             {
-                new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
+                new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper(), UriUtility)
             }, globalSettings: globalSettings.Object);
 
             //mock the Umbraco settings that we need

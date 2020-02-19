@@ -35,7 +35,8 @@ namespace Umbraco.Tests.Web
                 Enumerable.Empty<IMediaUrlProvider>(),
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility);
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
 
@@ -55,7 +56,8 @@ namespace Umbraco.Tests.Web
                 Enumerable.Empty<IMediaUrlProvider>(),
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility);
 
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
@@ -85,7 +87,8 @@ namespace Umbraco.Tests.Web
                 Enumerable.Empty<IMediaUrlProvider>(),
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility);
 
             var httpContext = Mock.Of<HttpContextBase>();
 

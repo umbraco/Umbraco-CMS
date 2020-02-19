@@ -49,7 +49,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the Umbraco context.
         /// </summary>
-        public UmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
+        public IUmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
 
         /// <summary>
         /// Gets the Umbraco context accessor.
@@ -74,7 +74,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the web security helper.
         /// </summary>
-        public WebSecurity Security => UmbracoContext.Security;
+        public IWebSecurity Security => UmbracoContext.Security;
 
         /// <summary>
         /// Gets the Url helper.

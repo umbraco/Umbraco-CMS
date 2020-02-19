@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core.Configuration;
@@ -16,7 +17,7 @@ using Umbraco.Web.Security;
 namespace Umbraco.Web
 {
     /// <summary>
-    /// Creates and manages <see cref="UmbracoContext"/> instances.
+    /// Creates and manages <see cref="IUmbracoContext"/> instances.
     /// </summary>
     public class UmbracoContextFactory : IUmbracoContextFactory
     {
@@ -33,11 +34,23 @@ namespace Umbraco.Web
         private readonly MediaUrlProviderCollection _mediaUrlProviders;
         private readonly IUserService _userService;
         private readonly IIOHelper _ioHelper;
+        private readonly UriUtility _uriUtility;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoContextFactory"/> class.
         /// </summary>
-        public UmbracoContextFactory(IUmbracoContextAccessor umbracoContextAccessor, IPublishedSnapshotService publishedSnapshotService, IVariationContextAccessor variationContextAccessor, IDefaultCultureAccessor defaultCultureAccessor, IUmbracoSettingsSection umbracoSettings, IGlobalSettings globalSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IUserService userService, IIOHelper ioHelper)
+        public UmbracoContextFactory(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IPublishedSnapshotService publishedSnapshotService,
+            IVariationContextAccessor variationContextAccessor,
+            IDefaultCultureAccessor defaultCultureAccessor,
+            IUmbracoSettingsSection umbracoSettings,
+            IGlobalSettings globalSettings,
+            UrlProviderCollection urlProviders,
+            MediaUrlProviderCollection mediaUrlProviders,
+            IUserService userService,
+            IIOHelper ioHelper,
+            UriUtility uriUtility)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -50,9 +63,10 @@ namespace Umbraco.Web
             _mediaUrlProviders = mediaUrlProviders ?? throw new ArgumentNullException(nameof(mediaUrlProviders));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _ioHelper = ioHelper;
+            _uriUtility = uriUtility;
         }
 
-        private UmbracoContext CreateUmbracoContext(HttpContextBase httpContext)
+        private IUmbracoContext CreateUmbracoContext(HttpContextBase httpContext)
         {
             // make sure we have a variation context
             if (_variationContextAccessor.VariationContext == null)
@@ -68,7 +82,7 @@ namespace Umbraco.Web
 
             var webSecurity = new WebSecurity(httpContext, _userService, _globalSettings, _ioHelper);
 
-            return new UmbracoContext(httpContext, _publishedSnapshotService, webSecurity, _umbracoSettings, _urlProviders, _mediaUrlProviders, _globalSettings, _variationContextAccessor, _ioHelper);
+            return new UmbracoContext(httpContext, _publishedSnapshotService, webSecurity, _umbracoSettings, _urlProviders, _mediaUrlProviders, _globalSettings, _variationContextAccessor, _ioHelper, _uriUtility);
         }
 
         /// <inheritdoc />
@@ -79,13 +93,26 @@ namespace Umbraco.Web
                 return new UmbracoContextReference(currentUmbracoContext, false, _umbracoContextAccessor);
 
 
-            httpContext = httpContext ?? new HttpContextWrapper(HttpContext.Current ?? new HttpContext(new SimpleWorkerRequest("null.aspx", "", NullWriterInstance)));
+            httpContext = EnsureHttpContext(httpContext);
 
             var umbracoContext = CreateUmbracoContext(httpContext);
             _umbracoContextAccessor.UmbracoContext = umbracoContext;
 
             return new UmbracoContextReference(umbracoContext, true, _umbracoContextAccessor);
         }
+
+        public static HttpContextBase EnsureHttpContext(HttpContextBase httpContext = null)
+        {
+            var domain = Thread.GetDomain();
+            if (domain.GetData(".appPath") is null || domain.GetData(".appVPath") is null)
+            {
+                return httpContext ?? new HttpContextWrapper(HttpContext.Current ??
+                                                             new HttpContext(new SimpleWorkerRequest("", "", "null.aspx", "", NullWriterInstance)));
+            }
+            return httpContext ?? new HttpContextWrapper(HttpContext.Current ??
+                                                         new HttpContext(new SimpleWorkerRequest("null.aspx", "", NullWriterInstance)));
+        }
+
 
         // dummy TextWriter that does not write
         private class NullWriter : TextWriter

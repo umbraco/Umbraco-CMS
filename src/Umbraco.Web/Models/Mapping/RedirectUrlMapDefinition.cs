@@ -13,7 +13,7 @@ namespace Umbraco.Web.Models.Mapping
             _umbracoContextAccessor = umbracoContextAccessor;
         }
 
-        private UmbracoContext UmbracoContext => _umbracoContextAccessor.UmbracoContext;
+        private IUmbracoContext UmbracoContext => _umbracoContextAccessor.UmbracoContext;
 
         public void DefineMaps(UmbracoMapper mapper)
         {

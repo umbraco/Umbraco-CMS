@@ -43,7 +43,8 @@ namespace Umbraco.Tests.Testing.Objects
                 new UrlProviderCollection(new[] { urlProvider }),
                 new MediaUrlProviderCollection(new[] { mediaUrlProvider }),
                 Mock.Of<IUserService>(),
-                TestHelper.IOHelper);
+                TestHelper.IOHelper,
+                TestHelper.UriUtility);
 
             return umbracoContextFactory;
         }

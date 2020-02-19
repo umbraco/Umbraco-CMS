@@ -38,6 +38,7 @@ namespace Umbraco.Web
         private readonly IPublishedRouter _publishedRouter;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly RoutableDocumentFilter _routableDocumentLookup;
+        private readonly UriUtility _uriUtility;
 
         public UmbracoInjectedModule(
             IGlobalSettings globalSettings,
@@ -45,7 +46,8 @@ namespace Umbraco.Web
             ILogger logger,
             IPublishedRouter publishedRouter,
             IUmbracoContextFactory umbracoContextFactory,
-            RoutableDocumentFilter routableDocumentLookup)
+            RoutableDocumentFilter routableDocumentLookup,
+            UriUtility uriUtility)
         {
             _globalSettings = globalSettings;
             _runtime = runtime;
@@ -53,6 +55,7 @@ namespace Umbraco.Web
             _publishedRouter = publishedRouter;
             _umbracoContextFactory = umbracoContextFactory;
             _routableDocumentLookup = routableDocumentLookup;
+            _uriUtility = uriUtility;
         }
 
         #region HttpModule event handlers
@@ -117,7 +120,7 @@ namespace Umbraco.Web
             var isRoutableAttempt = EnsureUmbracoRoutablePage(umbracoContext, httpContext);
 
             // raise event here
-            UmbracoModule.OnRouteAttempt(this, new RoutableAttemptEventArgs(isRoutableAttempt.Result, umbracoContext, httpContext));
+            UmbracoModule.OnRouteAttempt(this, new RoutableAttemptEventArgs(isRoutableAttempt.Result, umbracoContext));
             if (isRoutableAttempt.Success == false) return;
 
             httpContext.Trace.Write("UmbracoModule", "Umbraco request confirmed");
@@ -155,7 +158,7 @@ namespace Umbraco.Web
         /// <param name="context"></param>
         /// <param name="httpContext"></param>
         /// <returns></returns>
-        internal Attempt<EnsureRoutableOutcome> EnsureUmbracoRoutablePage(UmbracoContext context, HttpContextBase httpContext)
+        internal Attempt<EnsureRoutableOutcome> EnsureUmbracoRoutablePage(IUmbracoContext context, HttpContextBase httpContext)
         {
             var uri = context.OriginalRequestUrl;
 
@@ -206,7 +209,7 @@ namespace Umbraco.Web
                 case RuntimeLevel.Upgrade:
                     // redirect to install
                     ReportRuntime(level, "Umbraco must install or upgrade.");
-                    var installPath = UriUtility.ToAbsolute(Constants.SystemDirectories.Install);
+                    var installPath = _uriUtility.ToAbsolute(Constants.SystemDirectories.Install);
                     var installUrl = $"{installPath}/?redir=true&url={HttpUtility.UrlEncode(uri.ToString())}";
                     httpContext.Response.Redirect(installUrl, true);
                     return false; // cannot serve content
@@ -230,7 +233,7 @@ namespace Umbraco.Web
         // ensures Umbraco has at least one published node
         // if not, rewrites to splash and return false
         // if yes, return true
-        private bool EnsureHasContent(UmbracoContext context, HttpContextBase httpContext)
+        private bool EnsureHasContent(IUmbracoContext context, HttpContextBase httpContext)
         {
             if (context.Content.HasContent())
                 return true;
@@ -238,7 +241,7 @@ namespace Umbraco.Web
             _logger.Warn<UmbracoModule>("Umbraco has no content");
 
             const string noContentUrl = "~/config/splashes/noNodes.aspx";
-            httpContext.RewritePath(UriUtility.ToAbsolute(noContentUrl));
+            httpContext.RewritePath(_uriUtility.ToAbsolute(noContentUrl));
 
             return false;
         }
@@ -273,7 +276,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="context"></param>
         /// <param name="pcr"> </param>
-        private void RewriteToUmbracoHandler(HttpContextBase context, PublishedRequest pcr)
+        private void RewriteToUmbracoHandler(HttpContextBase context, IPublishedRequest pcr)
         {
             // NOTE: we do not want to use TransferRequest even though many docs say it is better with IIS7, turns out this is
             // not what we need. The purpose of TransferRequest is to ensure that .net processes all of the rules for the newly
@@ -426,7 +429,7 @@ namespace Umbraco.Web
                     _logger.Verbose<UmbracoModule>("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, httpContext.Request.Url, DateTime.Now.Subtract(Current.UmbracoContext.ObjectCreated).TotalMilliseconds);
                 }
 
-                UmbracoModule.OnEndRequest(this, new UmbracoRequestEventArgs(Current.UmbracoContext, new HttpContextWrapper(httpContext)));
+                UmbracoModule.OnEndRequest(this, new UmbracoRequestEventArgs(Current.UmbracoContext));
 
                 DisposeHttpContextItems(httpContext);
             };

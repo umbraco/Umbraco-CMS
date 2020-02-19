@@ -4,6 +4,6 @@ namespace Umbraco.Web
 {
     public interface IHttpContextAccessor
     {
-        HttpContext HttpContext { get; set; }
+        HttpContextBase HttpContext { get; set; }
     }
 }

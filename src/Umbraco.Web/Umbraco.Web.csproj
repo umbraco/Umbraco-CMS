@@ -148,6 +148,7 @@
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
     <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
+    <Compile Include="Editors\ImageUrlGeneratorController.cs" />
     <Compile Include="Editors\PackageController.cs" />
     <Compile Include="Editors\KeepAliveController.cs" />
     <Compile Include="Editors\MacrosController.cs" />
@@ -156,6 +157,7 @@
     <Compile Include="FrameworkMarchal.cs" />
     <Compile Include="Hosting\AspNetHostingEnvironment.cs" />
     <Compile Include="HttpContextExtensions.cs" />
+    <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
     <Compile Include="IUmbracoContextFactory.cs" />
     <Compile Include="Install\ChangesMonitor.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
@@ -165,12 +167,14 @@
     <Compile Include="Logging\WebProfilerComposer.cs" />
     <Compile Include="Logging\WebProfilerProvider.cs" />
     <Compile Include="Macros\IMacroRenderer.cs" />
+    <Compile Include="Macros\PublishedContentHashtableConverter.cs" />
     <Compile Include="Migrations\PostMigrations\PublishedSnapshotRebuilder.cs" />
     <Compile Include="Models\ContentEditing\UserInvite.cs" />
     <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
     <Compile Include="Models\Identity\UserLoginInfoWrapper.cs" />
+    <Compile Include="Models\ImageProcessorImageUrlGenerator.cs" />
     <Compile Include="Models\Mapping\CommonMapper.cs" />
     <Compile Include="Models\Mapping\ContentMapDefinition.cs" />
     <Compile Include="Models\Mapping\ContentPropertyBasicMapper.cs" />
@@ -201,14 +205,10 @@
     <Compile Include="Net\AspNetPasswordHasher.cs" />
     <Compile Include="Net\AspNetSessionIdResolver.cs" />
     <Compile Include="Profiling\WebProfilingController.cs" />
+    <Compile Include="PropertyEditors\GridPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
     <Compile Include="PublishedCache\UmbracoContextPublishedSnapshotAccessor.cs" />
     <Compile Include="RoutableDocumentFilter.cs" />
-    <Compile Include="Routing\DefaultMediaUrlProvider.cs" />
-    <Compile Include="Routing\IMediaUrlProvider.cs" />
-    <Compile Include="Routing\IPublishedRouter.cs" />
-    <Compile Include="Routing\MediaUrlProviderCollection.cs" />
-    <Compile Include="Routing\MediaUrlProviderCollectionBuilder.cs" />
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
     <Compile Include="Search\BackgroundIndexRebuilder.cs" />
     <Compile Include="Search\ExamineFinalComponent.cs" />
@@ -235,6 +235,7 @@
     <Compile Include="Templates\HtmlUrlParser.cs" />
     <Compile Include="Trees\TreeCollectionBuilder.cs" />
     <Compile Include="Trees\TreeNode.cs" />
+    <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoContextFactory.cs" />
     <Compile Include="UmbracoContextReference.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByUdiRouteHandler.cs" />
@@ -348,13 +349,6 @@
     <Compile Include="PropertyEditors\ValueConverters\ContentPickerValueConverter.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
     <Compile Include="PublishedModels\DummyClassSoThatPublishedModelsNamespaceExists.cs" />
-    <Compile Include="Routing\ContentFinderByUrl.cs" />
-    <Compile Include="Routing\ContentFinderByUrlAndTemplate.cs" />
-    <Compile Include="Routing\ContentFinderCollection.cs" />
-    <Compile Include="Routing\ContentFinderCollectionBuilder.cs" />
-    <Compile Include="Routing\IContentLastChanceFinder.cs" />
-    <Compile Include="Routing\UrlProviderCollection.cs" />
-    <Compile Include="Routing\UrlProviderCollectionBuilder.cs" />
     <Compile Include="Search\UmbracoTreeSearcher.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />
     <Compile Include="Security\UmbracoSecureDataFormat.cs" />
@@ -402,7 +396,6 @@
     <Compile Include="Routing\RedirectTrackingComponent.cs" />
     <Compile Include="Editors\RedirectUrlManagementController.cs" />
     <Compile Include="DefaultEventMessagesFactory.cs" />
-    <Compile Include="Routing\ContentFinderByRedirectUrl.cs" />
     <Compile Include="Security\ExternalSignInAutoLinkOptions.cs" />
     <Compile Include="Security\FixWindowsAuthMiddlware.cs" />
     <Compile Include="Security\ForceRenewalCookieAuthenticationHandler.cs" />
@@ -417,7 +410,6 @@
     <Compile Include="Security\WebAuthExtensions.cs" />
     <Compile Include="JavaScript\UmbracoClientDependencyLoader.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
-    <Compile Include="IUmbracoContextAccessor.cs" />
     <Compile Include="HtmlStringUtilities.cs" />
     <Compile Include="IUmbracoComponentRenderer.cs" />
     <Compile Include="Mvc\ProfilingView.cs" />
@@ -472,7 +464,6 @@
     <Compile Include="Mvc\NotFoundHandler.cs" />
     <Compile Include="Mvc\PreRenderViewActionFilterAttribute.cs" />
     <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
-    <Compile Include="PropertyEditors\GridPropertyEditor.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
     <Compile Include="PropertyEditors\TagsDataController.cs" />
     <Compile Include="Mvc\JsonNetResult.cs" />
@@ -495,7 +486,6 @@
     <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
-    <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Security\AppBuilderExtensions.cs" />
     <Compile Include="Security\AuthenticationOptionsExtensions.cs" />
     <Compile Include="Security\AuthenticationManagerExtensions.cs" />
@@ -585,7 +575,6 @@
     <Compile Include="Mvc\IRenderMvcController.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
     <Compile Include="Search\ExamineIndexModel.cs" />
-    <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="JavaScript\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -651,18 +640,9 @@
     <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="PropertyEditors\ValueConverters\RteMacroRenderingValueConverter.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
-    <Compile Include="Routing\AliasUrlProvider.cs" />
     <Compile Include="Routing\ContentFinderByConfigured404.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQuery.cs" />
-    <Compile Include="Routing\ISiteDomainHelper.cs" />
-    <Compile Include="Routing\RoutableAttemptEventArgs.cs" />
-    <Compile Include="Routing\DefaultUrlProvider.cs" />
-    <Compile Include="Routing\DomainAndUri.cs" />
-    <Compile Include="Routing\IUrlProvider.cs" />
-    <Compile Include="Routing\SiteDomainHelper.cs" />
-    <Compile Include="Routing\EnsureRoutableOutcome.cs" />
     <Compile Include="Routing\PublishedRouter.cs" />
-    <Compile Include="Routing\UrlProvider.cs" />
     <Compile Include="Search\ExamineSearcherModel.cs" />
     <Compile Include="Search\ExamineComponent.cs" />
     <Compile Include="Compose\DatabaseServerRegistrarAndMessengerComponent.cs" />
@@ -684,35 +664,24 @@
     <Compile Include="Mvc\RenderViewEngine.cs" />
     <Compile Include="Mvc\RouteDefinition.cs" />
     <Compile Include="Mvc\RouteValueDictionaryExtensions.cs" />
-    <Compile Include="Routing\UmbracoRequestEventArgs.cs" />
     <Compile Include="WebApi\UmbracoAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoAuthorizedApiController.cs" />
     <Compile Include="WebApi\Filters\ValidationFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoUserTimeoutFilterAttribute.cs" />
     <Compile Include="Runtime\WebRuntime.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
-    <Compile Include="Routing\ContentFinderByUrlAlias.cs" />
     <Compile Include="Routing\ContentFinderByIdPath.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
-    <Compile Include="Routing\DomainUtilities.cs" />
-    <Compile Include="Routing\PublishedRequest.cs" />
-    <Compile Include="Routing\IContentFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Macros\PublishedContentHashtableConverter.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="UmbracoApplication.cs" />
-    <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoInjectedModule.cs" />
-    <Compile Include="UriUtility.cs" />
     <Compile Include="Web References\org.umbraco.update\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
-    <Compile Include="UmbracoAuthorizedHttpHandler.cs" />
     <Compile Include="UmbracoHttpHandler.cs" />
     <Compile Include="UmbracoWebService.cs">
       <SubType>Component</SubType>
@@ -789,7 +758,7 @@
     </PropertyGroup>
     <ItemGroup>
       <!-- we want to exclude all facade references ?! -->
-      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http'" />
+      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http' and '%(ReferencePath.FileName)' != 'System.Threading.Tasks.Extensions'" />
     </ItemGroup>
     <Delete Files="$(TargetDir)$(TargetName).XmlSerializers.dll" ContinueOnError="true" />
     <!--

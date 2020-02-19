@@ -16,12 +16,14 @@ namespace Umbraco.Web.Routing
     public class ContentFinderByIdPath : IContentFinder
     {
         private readonly ILogger _logger;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebRoutingSection _webRoutingSection;
-        
-        public ContentFinderByIdPath(IWebRoutingSection webRoutingSection, ILogger logger)
+
+        public ContentFinderByIdPath(IWebRoutingSection webRoutingSection, ILogger logger, IHttpContextAccessor httpContextAccessor)
         {
             _webRoutingSection = webRoutingSection ?? throw new System.ArgumentNullException(nameof(webRoutingSection));
             _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
+            _httpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>
@@ -29,7 +31,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-        public bool TryFindContent(PublishedRequest frequest)
+        public bool TryFindContent(IPublishedRequest frequest)
         {
 
             if (frequest.UmbracoContext != null && frequest.UmbracoContext.InPreviewMode == false
@@ -55,10 +57,10 @@ namespace Umbraco.Web.Routing
                     if (node != null)
                     {
                         //if we have a node, check if we have a culture in the query string
-                        if (frequest.UmbracoContext.HttpContext.Request.QueryString.ContainsKey("culture"))
+                        if (_httpContextAccessor.HttpContext.Request.QueryString.ContainsKey("culture"))
                         {
                             //we're assuming it will match a culture, if an invalid one is passed in, an exception will throw (there is no TryGetCultureInfo method), i think this is ok though
-                            frequest.Culture = CultureInfo.GetCultureInfo(frequest.UmbracoContext.HttpContext.Request.QueryString["culture"]);
+                            frequest.Culture = CultureInfo.GetCultureInfo(_httpContextAccessor.HttpContext.Request.QueryString["culture"]);
                         }
 
                         frequest.PublishedContent = node;

@@ -28,12 +28,22 @@ namespace Umbraco.Web
     public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
     {
         private readonly IUmbracoDatabaseFactory _databaseFactory;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public BatchedDatabaseServerMessenger(
-            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, DatabaseServerMessengerOptions options, IHostingEnvironment hostingEnvironment, CacheRefresherCollection cacheRefreshers)
+            IRuntimeState runtime,
+            IUmbracoDatabaseFactory databaseFactory,
+            IScopeProvider scopeProvider,
+            ISqlContext sqlContext,
+            IProfilingLogger proflog,
+            DatabaseServerMessengerOptions options,
+            IHostingEnvironment hostingEnvironment,
+            CacheRefresherCollection cacheRefreshers,
+            IHttpContextAccessor httpContextAccessor)
             : base(runtime, scopeProvider, sqlContext, proflog, true, options, hostingEnvironment, cacheRefreshers)
         {
             _databaseFactory = databaseFactory;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // invoked by DatabaseServerRegistrarAndMessengerComponent
@@ -105,7 +115,7 @@ namespace Umbraco.Web
             // try get the http context from the UmbracoContext, we do this because in the case we are launching an async
             // thread and we know that the cache refreshers will execute, we will ensure the UmbracoContext and therefore we
             // can get the http context from it
-            var httpContext = (Current.UmbracoContext == null ? null : Current.UmbracoContext.HttpContext)
+            var httpContext = (_httpContextAccessor.HttpContext)
                 // if this is null, it could be that an async thread is calling this method that we weren't aware of and the UmbracoContext
                 // wasn't ensured at the beginning of the thread. We can try to see if the HttpContext.Current is available which might be
                 // the case if the asp.net synchronization context has kicked in

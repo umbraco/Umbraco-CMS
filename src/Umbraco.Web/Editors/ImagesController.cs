@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Http;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
-using Umbraco.Web.Media;
+using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 
@@ -18,11 +18,13 @@ namespace Umbraco.Web.Editors
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IContentSection _contentSection;
+        private readonly IImageUrlGenerator _imageUrlGenerator;
 
-        public ImagesController(IMediaFileSystem mediaFileSystem, IContentSection contentSection)
+        public ImagesController(IMediaFileSystem mediaFileSystem, IContentSection contentSection, IImageUrlGenerator imageUrlGenerator)
         {
             _mediaFileSystem = mediaFileSystem;
             _contentSection = contentSection;
+            _imageUrlGenerator = imageUrlGenerator;
         }
 
         /// <summary>
@@ -74,12 +76,10 @@ namespace Umbraco.Web.Editors
                 // so ignore and we won't set a last modified date.
             }
 
-            // TODO: When we abstract imaging for netcore, we are actually just going to be abstracting a URI builder for images, this
-            // is one of those places where this can be used.
+            var rnd = imageLastModified.HasValue ? $"&rnd={imageLastModified:yyyyMMddHHmmss}" : null;
+            var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(imagePath) { UpScale = false, Width = width, AnimationProcessMode = "first", ImageCropMode = "max", CacheBusterValue = rnd });
 
-            var rnd = imageLastModified.HasValue ? $"&rnd={imageLastModified:yyyyMMddHHmmss}" : string.Empty;
-
-            response.Headers.Location = new Uri($"{imagePath}?upscale=false&width={width}&animationprocessmode=first&mode=max{rnd}", UriKind.RelativeOrAbsolute);
+            response.Headers.Location = new Uri(imageUrl, UriKind.RelativeOrAbsolute);
             return response;
         }
 

@@ -1,6 +1,7 @@
 ﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
@@ -16,15 +17,18 @@ namespace Umbraco.Tests.Routing
         public void Lookup_By_Page_Id(string urlAsString, int nodeMatch)
         {
             var umbracoContext = GetUmbracoContext(urlAsString);
+            var httpContext = GetHttpContextFactory(urlAsString).HttpContext;
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
-            var lookup = new ContentFinderByPageIdQuery();
+            var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+            mockHttpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
+            var lookup = new ContentFinderByPageIdQuery(mockHttpContextAccessor.Object);
 
             //we need to manually stub the return output of HttpContext.Request["umbPageId"]
-            var requestMock = Mock.Get(umbracoContext.HttpContext.Request);
+            var requestMock = Mock.Get(httpContext.Request);
 
             requestMock.Setup(x => x["umbPageID"])
-                .Returns(umbracoContext.HttpContext.Request.QueryString["umbPageID"]);
+                .Returns(httpContext.Request.QueryString["umbPageID"]);
 
             var result = lookup.TryFindContent(frequest);
 

@@ -18,10 +18,14 @@ namespace Umbraco.Web.Routing
     /// </remarks>
     public class ContentFinderByUrlAlias : IContentFinder
     {
+        private readonly IPublishedValueFallback _publishedValueFallback;
+        private readonly IVariationContextAccessor _variationContextAccessor;
         protected ILogger Logger { get; }
 
-        public ContentFinderByUrlAlias(ILogger logger)
+        public ContentFinderByUrlAlias(ILogger logger, IPublishedValueFallback publishedValueFallback, IVariationContextAccessor variationContextAccessor)
         {
+            _publishedValueFallback = publishedValueFallback;
+            _variationContextAccessor = variationContextAccessor;
             Logger = logger;
         }
 
@@ -30,7 +34,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-        public bool TryFindContent(PublishedRequest frequest)
+        public bool TryFindContent(IPublishedRequest frequest)
         {
             IPublishedContent node = null;
 
@@ -51,7 +55,7 @@ namespace Umbraco.Web.Routing
             return node != null;
         }
 
-        private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias)
+        private IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias)
         {
             if (alias == null) throw new ArgumentNullException(nameof(alias));
 
@@ -84,11 +88,11 @@ namespace Umbraco.Web.Routing
                 if (varies)
                 {
                     if (!c.HasCulture(culture)) return false;
-                    v = c.Value<string>(propertyAlias, culture);
+                    v = c.Value<string>(_publishedValueFallback, propertyAlias, culture);
                 }
                 else
                 {
-                    v = c.Value<string>(propertyAlias);
+                    v = c.Value<string>(_publishedValueFallback, propertyAlias);
                 }
                 if (string.IsNullOrWhiteSpace(v)) return false;
                 v = "," + v.Replace(" ", "") + ",";
@@ -101,12 +105,12 @@ namespace Umbraco.Web.Routing
             if (rootNodeId > 0)
             {
                 var rootNode = cache.GetById(rootNodeId);
-                return rootNode?.Descendants().FirstOrDefault(x => IsMatch(x, test1, test2));
+                return rootNode?.Descendants(_variationContextAccessor).FirstOrDefault(x => IsMatch(x, test1, test2));
             }
 
             foreach (var rootContent in cache.GetAtRoot())
             {
-                var c = rootContent.DescendantsOrSelf().FirstOrDefault(x => IsMatch(x, test1, test2));
+                var c = rootContent.DescendantsOrSelf(_variationContextAccessor).FirstOrDefault(x => IsMatch(x, test1, test2));
                 if (c != null) return c;
             }
 

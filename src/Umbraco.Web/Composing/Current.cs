@@ -108,7 +108,7 @@ namespace Umbraco.Web.Composing
 
         #region Web Getters
 
-        public static UmbracoContext UmbracoContext
+        public static IUmbracoContext UmbracoContext
             => UmbracoContextAccessor.UmbracoContext;
 
         public static UmbracoHelper UmbracoHelper
