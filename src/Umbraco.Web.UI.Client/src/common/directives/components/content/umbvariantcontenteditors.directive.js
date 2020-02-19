@@ -200,7 +200,7 @@
             if (editorIndex === 0) {
                 //If we've made it this far, then update the query string.
                 //The editor will respond to this query string changing.
-                $location.search({"cculture": variantCulture, "csegment": variant.segment});
+                $location.search("cculture", variantCulture).search("csegment", variant.segment);
             }
             else {
 
