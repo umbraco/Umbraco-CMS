@@ -53,7 +53,7 @@ namespace Umbraco.Web
             //
             // all in all, this context may be disposed more than once, but DisposableObject ensures that
             // it is ok and it will be actually disposed only once.
-            httpContextAccessor.HttpContext.DisposeOnPipelineCompleted(this);
+            httpContextAccessor.GetRequiredHttpContext().DisposeOnPipelineCompleted(this);
 
             ObjectCreated = DateTime.Now;
             UmbracoRequestId = Guid.NewGuid();
@@ -203,7 +203,7 @@ namespace Umbraco.Web
         {
             try
             {
-                return _httpContextAccessor.HttpContext.Request;
+                return _httpContextAccessor.GetRequiredHttpContext().Request;
             }
             catch (HttpException)
             {

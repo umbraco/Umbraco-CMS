@@ -156,6 +156,7 @@
     <Compile Include="Editors\TinyMceController.cs" />
     <Compile Include="FrameworkMarchal.cs" />
     <Compile Include="Hosting\AspNetHostingEnvironment.cs" />
+    <Compile Include="HttpContextAccessorExtensions.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
     <Compile Include="IUmbracoContextFactory.cs" />

@@ -67,7 +67,7 @@ namespace Umbraco.Web
                 var htmlBadge =
                     String.Format(umbracoSettingsSection.Content.PreviewBadge,
                                 ioHelper.ResolveUrl(globalSettings.UmbracoPath),
-                                  WebUtility.UrlEncode(httpContextAccessor.HttpContext.Request.Path),
+                                  WebUtility.UrlEncode(httpContextAccessor.GetRequiredHttpContext().Request.Path),
                                   Current.UmbracoContext.PublishedRequest.PublishedContent.Id);
                 return new MvcHtmlString(htmlBadge);
             }

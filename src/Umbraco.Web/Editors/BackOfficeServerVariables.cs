@@ -378,7 +378,7 @@ namespace Umbraco.Web.Editors
                     "externalLogins", new Dictionary<string, object>
                     {
                         {
-                            "providers", _httpContextAccessor.HttpContext.GetOwinContext().Authentication.GetExternalAuthenticationTypes()
+                            "providers", _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().Authentication.GetExternalAuthenticationTypes()
                                 .Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
                                 .Select(p => new
                                 {
@@ -465,7 +465,7 @@ namespace Umbraco.Web.Editors
             app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{ClientDependencySettings.Instance.Version}".GenerateHash());
 
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
-            app.Add("applicationPath", _httpContextAccessor.HttpContext.Request.ApplicationPath.EnsureEndsWith('/'));
+            app.Add("applicationPath", _httpContextAccessor.GetRequiredHttpContext().Request.ApplicationPath.EnsureEndsWith('/'));
 
             //add the server's GMT time offset in minutes
             app.Add("serverTimeOffset", Convert.ToInt32(DateTimeOffset.Now.Offset.TotalMinutes));
