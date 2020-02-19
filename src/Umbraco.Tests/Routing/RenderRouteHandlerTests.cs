@@ -144,6 +144,7 @@ namespace Umbraco.Tests.Routing
             var routeData = new RouteData() {Route = route};
             var umbracoContext = GetUmbracoContext("~/dummy-page", template.Id, routeData, true);
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor(httpContext);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             frequest.PublishedContent = umbracoContext.Content.GetById(1172);
@@ -156,7 +157,7 @@ namespace Umbraco.Tests.Routing
             var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger>(), context =>
                 {
                     var membershipHelper = new MembershipHelper(
-                        httpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper, Mock.Of<IEntityService>());
+                        httpContextAccessor, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper, Mock.Of<IEntityService>());
                    return new CustomDocumentController(Factory.GetInstance<IGlobalSettings>(),
                         umbracoContextAccessor,
                         Factory.GetInstance<ServiceContext>(),
