@@ -100,10 +100,6 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
             composition.RegisterUnique<IPublishedUrlProvider, UrlProvider>();
 
-            // register a per-request HttpContextBase object
-            // is per-request so only one wrapper is created per request
-            composition.Register<HttpContextBase>(factory => factory.GetInstance<IHttpContextAccessor>().HttpContext, Lifetime.Request);
-
             // we should stop injecting UmbracoContext and always inject IUmbracoContextAccessor, however at the moment
             // there are tons of places (controllers...) which require UmbracoContext in their ctor - so let's register
             // a way to inject the UmbracoContext - DO NOT register this as Lifetime.Request since LI will dispose the context
