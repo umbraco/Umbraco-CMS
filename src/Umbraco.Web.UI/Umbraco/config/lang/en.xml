@@ -312,7 +312,7 @@
     <key alias="publishRequiresVariants">The following variants is required for publishing to take place:</key>
 
     <key alias="notReadyToPublish">We are not ready to Publish</key>
-    <key alias="readyToPublish">Save & Publish</key>
+    <key alias="readyToPublish">Save and Publish</key>
     <key alias="readyToSave">Ready to Save?</key>
     <key alias="sendForApproval">Send for approval</key>
     <key alias="schedulePublishHelp">Select the date and time to publish and/or unpublish the content item.</key>
