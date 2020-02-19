@@ -335,6 +335,9 @@ namespace Umbraco.Tests.Testing
             // manifest
             Composition.ManifestValueValidators();
             Composition.ManifestFilters();
+            Composition.MediaUrlGenerators()
+                .Add<FileUploadPropertyEditor>()
+                .Add<ImageCropperPropertyEditor>();
 
         }
 
