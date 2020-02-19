@@ -77,7 +77,8 @@ namespace Umbraco.Tests.PublishedContent
                 globalSettings,
                 new TestVariationContextAccessor(),
                 IOHelper,
-                UriUtility);
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             return umbracoContext;
         }

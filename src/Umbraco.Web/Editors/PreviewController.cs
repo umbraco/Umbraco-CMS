@@ -6,6 +6,7 @@ using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Cookie;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
@@ -34,6 +35,7 @@ namespace Umbraco.Web.Editors
         private readonly TreeCollection _treeCollection;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ICookieManager _cookieManager;
 
         public PreviewController(
             UmbracoFeatures features,
@@ -46,7 +48,8 @@ namespace Umbraco.Web.Editors
             IIOHelper ioHelper,
             TreeCollection treeCollection,
             IHttpContextAccessor httpContextAccessor,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            ICookieManager cookieManager)
         {
             _features = features;
             _globalSettings = globalSettings;
@@ -59,6 +62,7 @@ namespace Umbraco.Web.Editors
             _treeCollection = treeCollection;
             _httpContextAccessor = httpContextAccessor;
             _hostingEnvironment = hostingEnvironment;
+            _cookieManager = cookieManager;
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
@@ -117,7 +121,7 @@ namespace Umbraco.Web.Editors
 
         public ActionResult End(string redir = null)
         {
-            var previewToken = Request.GetPreviewCookieValue();
+            var previewToken = _cookieManager.GetPreviewCookieValue();
             var service = Current.PublishedSnapshotService;
             service.ExitPreview(previewToken);
 

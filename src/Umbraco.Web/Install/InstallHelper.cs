@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Cookie;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
@@ -23,11 +24,12 @@ namespace Umbraco.Web.Install
         private readonly IGlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IConnectionStrings _connectionStrings;
+        private readonly ICookieManager _cookieManager;
         private InstallationType? _installationType;
 
         public InstallHelper(IHttpContextAccessor httpContextAccessor,
             DatabaseBuilder databaseBuilder,
-            ILogger logger, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IConnectionStrings connectionStrings)
+            ILogger logger, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IConnectionStrings connectionStrings, ICookieManager cookieManager)
         {
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
@@ -35,6 +37,7 @@ namespace Umbraco.Web.Install
             _umbracoVersion = umbracoVersion;
             _databaseBuilder = databaseBuilder;
             _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
+            _cookieManager = cookieManager;
         }
 
         public InstallationType GetInstallationType()
@@ -53,7 +56,7 @@ namespace Umbraco.Web.Install
                 // Check for current install Id
                 var installId = Guid.NewGuid();
 
-                var installCookie = httpContext.Request.GetCookieValue(Constants.Web.InstallerCookieName);
+                var installCookie = _cookieManager.GetCookieValue(Constants.Web.InstallerCookieName);
                 if (string.IsNullOrEmpty(installCookie) == false)
                 {
                     if (Guid.TryParse(installCookie, out installId))
@@ -63,7 +66,8 @@ namespace Umbraco.Web.Install
                             installId = Guid.NewGuid();
                     }
                 }
-                httpContext.Response.Cookies.Set(new HttpCookie(Constants.Web.InstallerCookieName, "1"));
+
+                _cookieManager.SetCookieValue(Constants.Web.InstallerCookieName, "1");
 
                 var dbProvider = string.Empty;
                 if (IsBrandNewInstall == false)

@@ -11,7 +11,7 @@ using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Install
 {
-    internal class FilePermissionHelper : IFilePermissionHelper
+    public class FilePermissionHelper : IFilePermissionHelper
     {
         // ensure that these directories exist and Umbraco can write to them
         private readonly string[] _permissionDirs;
@@ -155,11 +155,11 @@ namespace Umbraco.Web.Install
         // tries to create a file
         // if successful, the file is deleted
         // creates the directory if needed - does not delete it
-        public bool TryCreateDirectory(string dir)
+        public static bool TryCreateDirectory(string dir, IIOHelper ioHelper)
         {
             try
             {
-                var dirPath = _ioHelper.MapPath(dir);
+                var dirPath = ioHelper.MapPath(dir);
 
                 if (Directory.Exists(dirPath) == false)
                     Directory.CreateDirectory(dirPath);
@@ -262,7 +262,7 @@ namespace Umbraco.Web.Install
             }
         }
 
-        private string CreateRandomName()
+        private static string CreateRandomName()
         {
             return "umbraco-test." + Guid.NewGuid().ToString("N").Substring(0, 8);
         }

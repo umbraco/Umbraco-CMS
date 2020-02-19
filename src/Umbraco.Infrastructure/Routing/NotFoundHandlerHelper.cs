@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Routing
 {

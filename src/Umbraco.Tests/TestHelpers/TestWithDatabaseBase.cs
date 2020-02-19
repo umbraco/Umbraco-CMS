@@ -382,7 +382,8 @@ namespace Umbraco.Tests.TestHelpers
                 globalSettings ?? Factory.GetInstance<IGlobalSettings>(),
                 new TestVariationContextAccessor(),
                 IOHelper,
-                UriUtility);
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;

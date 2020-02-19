@@ -36,7 +36,8 @@ namespace Umbraco.Tests.Web
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor(),
                 IOHelper,
-                UriUtility);
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
 
@@ -56,7 +57,8 @@ namespace Umbraco.Tests.Web
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor(),
                 IOHelper,
-                UriUtility);
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
@@ -86,7 +88,8 @@ namespace Umbraco.Tests.Web
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor(),
                 IOHelper,
-                UriUtility);
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             var httpContext = Mock.Of<HttpContextBase>();
 

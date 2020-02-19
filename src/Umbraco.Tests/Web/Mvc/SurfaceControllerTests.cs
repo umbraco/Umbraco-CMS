@@ -47,7 +47,8 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<IUserService>(),
                 IOHelper,
                 UriUtility,
-                httpContextAccessor);
+                httpContextAccessor,
+                new AspNetCookieManager(httpContextAccessor));
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbracoContext = umbracoContextReference.UmbracoContext;
@@ -76,7 +77,8 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<IUserService>(),
                 IOHelper,
                 UriUtility,
-                httpContextAccessor);
+                httpContextAccessor,
+                new AspNetCookieManager(httpContextAccessor));
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbCtx = umbracoContextReference.UmbracoContext;
@@ -108,7 +110,8 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<IUserService>(),
                 IOHelper,
                 UriUtility,
-                httpContextAccessor);
+                httpContextAccessor,
+                new AspNetCookieManager(httpContextAccessor));
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbracoContext = umbracoContextReference.UmbracoContext;
@@ -146,7 +149,8 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<IUserService>(),
                 IOHelper,
                 UriUtility,
-                httpContextAccessor);
+                httpContextAccessor,
+                new AspNetCookieManager(httpContextAccessor));
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbracoContext = umbracoContextReference.UmbracoContext;

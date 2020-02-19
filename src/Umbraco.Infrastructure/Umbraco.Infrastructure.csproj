@@ -64,8 +64,4 @@
       <Compile Remove="obj\**" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Routing" />
-    </ItemGroup>
-
 </Project>

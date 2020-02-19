@@ -2,6 +2,7 @@ using System;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Cookie;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Composing;
@@ -20,6 +21,7 @@ namespace Umbraco.Web
         private readonly IGlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
         private readonly UriUtility _uriUtility;
+        private readonly ICookieManager _cookieManager;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
         private string _previewToken;
         private bool? _previewing;
@@ -34,7 +36,8 @@ namespace Umbraco.Web
             IGlobalSettings globalSettings,
             IVariationContextAccessor variationContextAccessor,
             IIOHelper ioHelper,
-            UriUtility uriUtility)
+            UriUtility uriUtility,
+            ICookieManager cookieManager)
         {
             if (httpContextAccessor == null) throw new ArgumentNullException(nameof(httpContextAccessor));
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -44,6 +47,7 @@ namespace Umbraco.Web
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _uriUtility = uriUtility;
+            _cookieManager = cookieManager;
 
             // ensure that this instance is disposed when the request terminates, though we *also* ensure
             // this happens in the Umbraco module since the UmbracoCOntext is added to the HttpContext items.
@@ -183,7 +187,7 @@ namespace Umbraco.Web
                 && request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, _globalSettings, _ioHelper) == false
                 && Security.CurrentUser != null)
             {
-                var previewToken = request.GetPreviewCookieValue(); // may be null or empty
+                var previewToken = _cookieManager.GetPreviewCookieValue(); // may be null or empty
                 _previewToken = previewToken.IsNullOrWhiteSpace() ? null : previewToken;
             }
 

@@ -165,7 +165,8 @@ namespace Umbraco.Tests.Cache
                 Mock.Of<IUserService>(),
                 IOHelper,
                 UriUtility,
-                httpContextAccessor);
+                httpContextAccessor,
+                new AspNetCookieManager(httpContextAccessor));
 
             // just assert it does not throw
             var refreshers = new DistributedCacheBinder(null, umbracoContextFactory, null);
