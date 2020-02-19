@@ -337,7 +337,7 @@
                     return true;
                 }
 
-                var isMandatory = variant.language && variant.language.isMandatory;
+                var isMandatory = variant.segment == null && variant.language && variant.language.isMandatory;
 
                 //if this variant will show up in the publish-able list
                 var publishable = dirtyVariantFilter(variant);
