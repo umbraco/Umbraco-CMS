@@ -29,8 +29,8 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
-        public static DataEditorWithMediaPathCollectionBuilder DataEditorsWithMediaPath(this Composition composition)
-            => composition.WithCollectionBuilder<DataEditorWithMediaPathCollectionBuilder>();
+        public static MediaUrlGeneratorCollectionBuilder MediaUrlGenerators(this Composition composition)
+            => composition.WithCollectionBuilder<MediaUrlGeneratorCollectionBuilder>();
 
         #endregion
     }

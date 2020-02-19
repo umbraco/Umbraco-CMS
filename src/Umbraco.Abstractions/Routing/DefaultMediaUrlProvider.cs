@@ -10,11 +10,11 @@ namespace Umbraco.Web.Routing
     public class DefaultMediaUrlProvider : IMediaUrlProvider
     {
         private readonly UriUtility _uriUtility;
-        private readonly DataEditorWithMediaPathCollection _dataEditors;
+        private readonly MediaUrlGeneratorCollection _mediaPathGenerators;
 
-        public DefaultMediaUrlProvider(DataEditorWithMediaPathCollection dataEditors, UriUtility uriUtility)
+        public DefaultMediaUrlProvider(MediaUrlGeneratorCollection mediaPathGenerators, UriUtility uriUtility)
         {
-            _dataEditors = dataEditors ?? throw new ArgumentNullException(nameof(dataEditors));
+            _mediaPathGenerators = mediaPathGenerators ?? throw new ArgumentNullException(nameof(mediaPathGenerators));
             _uriUtility = uriUtility;
         }
 
@@ -32,24 +32,23 @@ namespace Umbraco.Web.Routing
             }
 
             var propType = prop.PropertyType;
-            string path = null;
 
-            if (_dataEditors.TryGet(propType.EditorAlias, out var dataEditor))
+            if (_mediaPathGenerators.TryGetMediaPath(propType.EditorAlias, value, out var path))
             {
-                path = dataEditor.GetMediaPath(value);
+                var url = AssembleUrl(path, current, mode);
+                return UrlInfo.Url(url.ToString(), culture);
             }
 
-            var url = AssembleUrl(path, current, mode);
-            return url == null ? null : UrlInfo.Url(url.ToString(), culture);
+            return null;
         }
 
         private Uri AssembleUrl(string path, Uri current, UrlMode mode)
         {
-            if (string.IsNullOrEmpty(path))
-                return null;
+            if (string.IsNullOrWhiteSpace(path))
+                throw new ArgumentException($"{nameof(path)} cannot be null or whitespace", nameof(path));
 
             // the stored path is absolute so we just return it as is
-            if(Uri.IsWellFormedUriString(path, UriKind.Absolute))
+            if (Uri.IsWellFormedUriString(path, UriKind.Absolute))
                 return new Uri(path);
 
             Uri uri;
