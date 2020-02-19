@@ -69,6 +69,7 @@
         templateUrl: 'views/components/forms/umb-radiobutton.html',
         controller: UmbRadiobuttonController,
         controllerAs: 'vm',
+        transclude: true,
         bindings: {
             model: "=",
             inputId: "@",

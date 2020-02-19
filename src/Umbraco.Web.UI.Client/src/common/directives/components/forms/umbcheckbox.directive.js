@@ -71,6 +71,7 @@
         templateUrl: 'views/components/forms/umb-checkbox.html',
         controller: UmbCheckboxController,
         controllerAs: 'vm',
+        transclude: true,
         bindings: {
             model: "=",
             inputId: "@",
