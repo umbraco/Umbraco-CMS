@@ -39,7 +39,9 @@ function valPropertyMsg(serverValidationManager, localizationService) {
             scope.currentProperty = currentProperty;
 
             var currentCulture = currentProperty.culture;         
-            var isMandatory = currentProperty.validation.mandatory;
+            
+            // validation object won't exist when editor loads outside the content form (ie in settings section when modifying a content type)
+            var isMandatory = currentProperty.validation ? currentProperty.validation.mandatory : undefined;
 
             var labels = {};
             localizationService.localize("errors_propertyHasErrors").then(function (data) {
@@ -141,7 +143,7 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                     else if (_.without(_.keys(formCtrl.$error), "valPropertyMsg").length > 0) {
                         
                         // errors exist, but if the property is NOT mandatory and has no value, the errors should be cleared
-                        if (!isMandatory && !currentProperty.value) {
+                        if (isMandatory !== undefined && isMandatory === false && !currentProperty.value) {
                             hasError = false;
                             showValidation = false;
                             scope.errorMsg = "";
