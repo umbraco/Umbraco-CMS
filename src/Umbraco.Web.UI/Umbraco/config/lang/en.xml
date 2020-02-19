@@ -302,6 +302,14 @@
     <key alias="unpublishedLanguages">Unpublished Languages</key>
     <key alias="unmodifiedLanguages">Unmodified Languages</key>
     <key alias="untouchedLanguagesForFirstTime">These languages haven't been created</key>
+
+    <key alias="variantsToPublish">Which variants you would like to publish?</key>
+    <key alias="variantsToSave">Choose which variants to be saved.</key>
+    <key alias="variantsToSendForApproval">Pick variants to send for approval.</key>
+    <key alias="variantsToSchedule">Set scheduled publishing...</key>
+    <key alias="variantsToUnpublish">Select the variants to unpublish. Unpublishing a mandatory language will unpublish all variants.</key>
+    <key alias="unpublishedButMandatoryVariants">Unpublished mandatory variants</key>
+
     <key alias="readyToPublish">Ready to Publish?</key>
     <key alias="readyToSave">Ready to Save?</key>
     <key alias="sendForApproval">Send for approval</key>
@@ -1854,7 +1862,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="resetPassword">Reset password</key>
     <key alias="passwordChanged">Your password has been changed!</key>
     <key alias="passwordChangedGeneric">Password changed</key>
-    <key alias="passwordConfirm">Please confirm the new password</key>      
+    <key alias="passwordConfirm">Please confirm the new password</key>
     <key alias="passwordEnterNew">Enter your new password</key>
     <key alias="passwordIsBlank">Your new password cannot be blank!</key>
     <key alias="passwordCurrent">Current password</key>

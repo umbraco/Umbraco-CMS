@@ -11,6 +11,7 @@
         vm.changeSelection = changeSelection;
         vm.dirtyVariantFilter = dirtyVariantFilter;
         vm.pristineVariantFilter = pristineVariantFilter;
+        vm.notPublishedMandatoryFilter = notPublishedMandatoryFilter;
 
         /** Returns true if publishing is possible based on if there are un-published mandatory languages */
         function canPublish() {
@@ -63,12 +64,10 @@
 
         function dirtyVariantFilter(variant) {
             //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
-            // * the active one
             // * it's editor is in a $dirty state
             // * it has pending saves
             // * it is unpublished
-            // * it is in NotCreated state
-            return (variant.active || variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges" || variant.state === "NotCreated");
+            return (variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges");
         }
 
         function hasAnyData(variant) {
@@ -99,6 +98,9 @@
 
         function pristineVariantFilter(variant) {
             return !(dirtyVariantFilter(variant));
+        }
+        function notPublishedMandatoryFilter(variant) {
+            return !dirtyVariantFilter(variant) && variant.isMandatory === true;
         }
 
         function onInit() {
@@ -184,9 +186,7 @@
                 $scope.model.disableSubmitButton = true;
             }
 
-            var labelKey =  vm.isNew ? "content_languagesToPublishForFirstTime" : "content_languagesToPublish";
-
-            localizationService.localize(labelKey).then(function (value) {
+            localizationService.localize("content_variantsToPublish").then(function (value) {
                 vm.headline = value;
                 vm.loading = false;
             });
