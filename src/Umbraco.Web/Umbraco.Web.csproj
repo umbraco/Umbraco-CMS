@@ -141,7 +141,9 @@
     <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
+    <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
+    <Compile Include="Editors\Filters\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
     <Compile Include="Editors\ImageUrlGeneratorController.cs" />
     <Compile Include="Editors\PackageController.cs" />
@@ -149,8 +151,6 @@
     <Compile Include="Editors\MacrosController.cs" />
     <Compile Include="Editors\RelationTypeController.cs" />
     <Compile Include="Editors\TinyMceController.cs" />
-    <Compile Include="FrameworkMarchal.cs" />
-    <Compile Include="Hosting\AspNetHostingEnvironment.cs" />
     <Compile Include="HttpContextAccessorExtensions.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
@@ -195,11 +195,6 @@
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
     <Compile Include="Scheduling\SchedulerComponent.cs" />
     <Compile Include="Scheduling\SchedulerComposer.cs" />
-    <Compile Include="Security\CurrentUserAccessor.cs" />
-    <Compile Include="Search\BackgroundIndexRebuilder.cs" />
-    <Compile Include="Search\ExamineFinalComponent.cs" />
-    <Compile Include="Search\ExamineFinalComposer.cs" />
-    <Compile Include="Search\ExamineUserComponent.cs" />
     <Compile Include="Security\BackOfficeUserStore.cs" />
     <Compile Include="Security\BackOfficeUserValidator.cs" />
     <Compile Include="Security\ConfiguredPasswordValidator.cs" />
@@ -258,10 +253,6 @@
     <Compile Include="WebApi\TrimModelBinder.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\DictionaryController.cs" />
-    <Compile Include="Editors\EditorModelEventArgs.cs" />
-    <Compile Include="Editors\EditorValidatorCollection.cs" />
-    <Compile Include="Editors\EditorValidatorCollectionBuilder.cs" />
-    <Compile Include="Editors\EditorValidatorOfT.cs" />
     <Compile Include="Editors\Filters\MemberSaveModelValidator.cs" />
     <Compile Include="Editors\ExamineManagementController.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
@@ -273,7 +264,6 @@
     <Compile Include="Editors\PreviewController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\TourController.cs" />
-    <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
     <Compile Include="Editors\Filters\UserGroupAuthorizationAttribute.cs" />
     <Compile Include="Editors\Filters\UserGroupEditorAuthorizationHelper.cs" />
     <Compile Include="Editors\UserGroupsController.cs" />
@@ -288,14 +278,11 @@
     <Compile Include="Install\InstallSteps\ConfigureMachineKey.cs" />
     <Compile Include="Editors\MemberGroupController.cs" />
     <Compile Include="Composing\CompositionExtensions\Controllers.cs" />
-    <Compile Include="Editors\EditorValidator.cs" />
     <Compile Include="Macros\MacroContent.cs" />
     <Compile Include="Macros\MacroModel.cs" />
     <Compile Include="HealthCheck\HealthCheckController.cs" />
     <Compile Include="Macros\MacroPropertyModel.cs" />
     <Compile Include="Macros\MacroRenderer.cs" />
-    <Compile Include="Editors\IEditorValidator.cs" />
-    <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Composing\ModuleInjector.cs" />
     <Compile Include="Mvc\FilteredControllerFactoryCollection.cs" />
@@ -375,7 +362,6 @@
     <Compile Include="Editors\ContentTypeControllerBase.cs" />
     <Compile Include="Editors\DashboardController.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
-    <Compile Include="Editors\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\ImagesController.cs" />
     <Compile Include="Editors\PackageInstallController.cs" />
     <Compile Include="Editors\RelationController.cs" />

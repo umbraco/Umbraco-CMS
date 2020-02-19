@@ -42,8 +42,9 @@ namespace Umbraco.Web.Editors
             UmbracoHelper umbracoHelper,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider)
-            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
+            IPublishedUrlProvider publishedUrlProvider,
+            EditorValidatorCollection editorValidatorCollection)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider, editorValidatorCollection)
         {
         }
 

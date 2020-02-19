@@ -8,7 +8,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
 {
-    internal class UserEditorAuthorizationHelper
+    public class UserEditorAuthorizationHelper
     {
         private readonly IContentService _contentService;
         private readonly IMediaService _mediaService;
