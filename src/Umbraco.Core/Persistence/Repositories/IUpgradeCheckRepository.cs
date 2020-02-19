@@ -6,6 +6,6 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public interface IUpgradeCheckRepository
     {
-        Task<UpgradeResult> CheckUpgrade(SemVersion version);
+        Task<UpgradeResult> CheckUpgradeAsync(SemVersion version);
     }
 }

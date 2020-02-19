@@ -1,7 +1,6 @@
 ﻿using System.Net.Http;
-using System.Text;
+using System.Net.Http.Formatting;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Semver;
 using Umbraco.Core.Models;
 
@@ -13,20 +12,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private const string RestApiUpgradeChecklUrl = "https://our.umbraco.com/umbraco/api/UpgradeCheck/CheckUpgrade";
 
 
-        public async Task<UpgradeResult> CheckUpgrade(SemVersion version)
+        public async Task<UpgradeResult> CheckUpgradeAsync(SemVersion version)
         {
             try
             {
                 if (_httpClient == null)
                     _httpClient = new HttpClient();
 
-                var jsonObj = new { VersionMajor = version.Major, VersionMinor = version.Minor, VersionPatch = version.Patch, VersionComment = version.Prerelease };
-                var json = JsonConvert.SerializeObject(jsonObj);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var task = await _httpClient.PostAsync(RestApiUpgradeChecklUrl, content);
-                var jsonResponse = await task.Content.ReadAsStringAsync();
-                var result = JsonConvert.DeserializeObject<UpgradeResult>(jsonResponse);
+                var task = await _httpClient.PostAsync(RestApiUpgradeChecklUrl, new CheckUpgradeDto(version), new JsonMediaTypeFormatter());
+                var result = await task.Content.ReadAsAsync<UpgradeResult>();
 
                 return result ?? new UpgradeResult("None", "", "");
             }
@@ -35,6 +29,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // this occurs if the server for Our is down or cannot be reached
                 return new UpgradeResult("None", "", "");
             }
+        }
+        private class CheckUpgradeDto
+        {
+            public CheckUpgradeDto(SemVersion version)
+            {
+                VersionMajor = version.Major;
+                VersionMinor = version.Minor;
+                VersionPatch = version.Patch;
+                VersionComment = version.Prerelease;
+            }
+
+            public int VersionMajor { get;  }
+            public int VersionMinor { get; }
+            public int VersionPatch { get; }
+            public string VersionComment { get;  }
         }
     }
 }

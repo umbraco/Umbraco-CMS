@@ -13,9 +13,9 @@ namespace Umbraco.Core.Services.Implement
             _installationRepository = installationRepository;
         }
 
-        public async Task Install(InstallLog installLog)
+        public async Task LogInstall(InstallLog installLog)
         {
-            await _installationRepository.SaveInstall(installLog);
+            await _installationRepository.SaveInstallLogAsync(installLog);
         }
     }
 }

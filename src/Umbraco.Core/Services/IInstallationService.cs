@@ -5,6 +5,6 @@ namespace Umbraco.Core.Services
 {
     public interface IInstallationService
     {
-        Task Install(InstallLog installLog);
+        Task LogInstall(InstallLog installLog);
     }
 }

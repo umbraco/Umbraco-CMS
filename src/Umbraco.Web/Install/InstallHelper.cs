@@ -64,8 +64,12 @@ namespace Umbraco.Web.Install
                         if (installId == Guid.Empty)
                             installId = Guid.NewGuid();
                     }
+                    else
+                    {
+                        installId = Guid.NewGuid(); // Guid.TryParse will have reset installId to Guid.Empty
+                    }
                 }
-                _httpContext.Response.Cookies.Set(new HttpCookie(Constants.Web.InstallerCookieName, "1"));
+                _httpContext.Response.Cookies.Set(new HttpCookie(Constants.Web.InstallerCookieName, installId.ToString()));
 
                 var dbProvider = string.Empty;
                 if (IsBrandNewInstall == false)
@@ -81,7 +85,7 @@ namespace Umbraco.Web.Install
                     versionComment: UmbracoVersion.Comment, error: errorMsg, userAgent: userAgent,
                     dbProvider: dbProvider);
 
-                await _installationService.Install(installLog);
+                await _installationService.LogInstall(installLog);
             }
             catch (Exception ex)
             {

@@ -6,6 +6,6 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public interface IInstallationRepository
     {
-        Task SaveInstall(InstallLog installLog);
+        Task SaveInstallLogAsync(InstallLog installLog);
     }
 }

@@ -17,7 +17,7 @@ namespace Umbraco.Core
 
         public async Task<UpgradeResult> CheckUpgrade(SemVersion version)
         {
-            return await _upgradeCheckRepository.CheckUpgrade(version);
+            return await _upgradeCheckRepository.CheckUpgradeAsync(version);
         }
     }
 }
