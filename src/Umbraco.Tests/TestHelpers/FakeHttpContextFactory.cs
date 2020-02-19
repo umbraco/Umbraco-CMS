@@ -109,12 +109,13 @@ namespace Umbraco.Tests.TestHelpers
 
             requestContextMock.Setup(x => x.HttpContext).Returns(httpContextMock.Object);
 
-            if (routeData != null)
+
+            if (routeData is null)
             {
-                requestContextMock.Setup(x => x.RouteData).Returns(routeData);
+                routeData = new RouteData();
             }
 
-
+            requestContextMock.Setup(x => x.RouteData).Returns(routeData);
         }
 
     }

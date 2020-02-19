@@ -19,6 +19,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
@@ -45,8 +46,9 @@ namespace Umbraco.Web.Editors
             UmbracoHelper umbracoHelper,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
-            IIOHelper ioHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
+            IIOHelper ioHelper,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _ioHelper = ioHelper;
         }

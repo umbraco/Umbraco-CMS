@@ -114,14 +114,12 @@ namespace Umbraco.Web
         /// </remarks>
         public static string MediaUrl(this IPublishedContent content, string culture = null, UrlMode mode = UrlMode.Default, string propertyAlias = Constants.Conventions.Media.File)
         {
-            var umbracoContext = Composing.Current.UmbracoContext;
+            var publishedUrlProvider = Current.PublishedUrlProvider;
 
-            if (umbracoContext == null)
-                throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext is null.");
-            if (umbracoContext.UrlProvider == null)
-                throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext.UrlProvider is null.");
+            if (publishedUrlProvider== null)
+                throw new InvalidOperationException("Cannot resolve a Url when Current.PublishedUrlProvider is null.");
 
-            return umbracoContext.UrlProvider.GetMediaUrl(content, mode, culture, propertyAlias);
+            return publishedUrlProvider.GetMediaUrl(content, mode, culture, propertyAlias);
         }
 
         #endregion

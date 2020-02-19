@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.ContentApps;
@@ -16,24 +17,24 @@ using UserProfile = Umbraco.Web.Models.ContentEditing.UserProfile;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class CommonMapper
+    public class CommonMapper
     {
         private readonly IUserService _userService;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ContentAppFactoryCollection _contentAppDefinitions;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
         public CommonMapper(IUserService userService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor,
             ContentAppFactoryCollection contentAppDefinitions, ILocalizedTextService localizedTextService, IHttpContextAccessor httpContextAccessor)
         {
             _userService = userService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
-            _umbracoContextAccessor = umbracoContextAccessor;
             _contentAppDefinitions = contentAppDefinitions;
             _localizedTextService = localizedTextService;
             _httpContextAccessor = httpContextAccessor;
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         public UserProfile GetOwner(IContentBase source, MapperContext context)
@@ -50,10 +51,9 @@ namespace Umbraco.Web.Models.Mapping
 
         public ContentTypeBasic GetContentType(IContentBase source, MapperContext context)
         {
-            // TODO: We can resolve the UmbracoContext from the IValueResolver options!
-            // OMG
-            if (HttpContext.Current != null && Composing.Current.UmbracoContext != null && Composing.Current.UmbracoContext.Security.CurrentUser != null
-                && Composing.Current.UmbracoContext.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
+
+            var user = _umbracoContextAccessor.UmbracoContext?.Security?.CurrentUser;
+            if (user?.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)) ?? false)
             {
                 var contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(source);
                 var contentTypeBasic = context.Map<IContentTypeComposition, ContentTypeBasic>(contentType);

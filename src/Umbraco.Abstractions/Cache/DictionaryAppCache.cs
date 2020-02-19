@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -101,5 +102,9 @@ namespace Umbraco.Core.Cache
             var compiled = new Regex(regex, RegexOptions.Compiled);
             _items.RemoveAll(kvp => compiled.IsMatch(kvp.Key));
         }
+
+        public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => _items.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

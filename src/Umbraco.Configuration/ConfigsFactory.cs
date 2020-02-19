@@ -7,11 +7,6 @@ namespace Umbraco.Core.Configuration
 {
     public class ConfigsFactory : IConfigsFactory
     {
-
-        public ConfigsFactory()
-        {
-        }
-
         public IHostingSettings HostingSettings { get; } = new HostingSettings();
 
         public ICoreDebug CoreDebug { get; } = new CoreDebug();
@@ -32,7 +27,7 @@ namespace Umbraco.Core.Configuration
             configs.AddPasswordConfigurations();
 
             configs.Add(() => CoreDebug);
-            configs.Add<IConnectionStrings>(() => new ConnectionStrings());
+            configs.Add<IConnectionStrings>(() => new ConnectionStrings(ioHelper));
             configs.AddCoreConfigs(ioHelper);
             return configs;
         }

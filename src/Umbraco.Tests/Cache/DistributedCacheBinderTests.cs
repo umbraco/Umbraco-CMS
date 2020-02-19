@@ -10,6 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
@@ -153,18 +154,19 @@ namespace Umbraco.Tests.Cache
 
             };
 
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor();
+
             var umbracoContextFactory = new UmbracoContextFactory(
                 new TestUmbracoContextAccessor(),
                 Mock.Of<IPublishedSnapshotService>(),
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                TestObjects.GetUmbracoSettings(),
                 TestObjects.GetGlobalSettings(),
-                new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
-                new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IUserService>(),
                 IOHelper,
-                UriUtility);
+                UriUtility,
+                httpContextAccessor,
+                new AspNetCookieManager(httpContextAccessor));
 
             // just assert it does not throw
             var refreshers = new DistributedCacheBinder(null, umbracoContextFactory, null);

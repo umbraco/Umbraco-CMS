@@ -185,7 +185,7 @@ namespace Umbraco.Core.Persistence.Factories
         /// <summary>
         /// Builds a dto from an IMedia item.
         /// </summary>
-        public static MediaDto BuildDto(PropertyEditorCollection propertyEditors, IMedia entity)
+        public static MediaDto BuildDto(MediaUrlGeneratorCollection mediaUrlGenerators, IMedia entity)
         {
             var contentDto = BuildContentDto(entity, Constants.ObjectTypes.Media);
 
@@ -193,7 +193,7 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 NodeId = entity.Id,
                 ContentDto = contentDto,
-                MediaVersionDto = BuildMediaVersionDto(propertyEditors, entity, contentDto)
+                MediaVersionDto = BuildMediaVersionDto(mediaUrlGenerators, entity, contentDto)
             };
 
             return dto;
@@ -287,7 +287,7 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        private static MediaVersionDto BuildMediaVersionDto(PropertyEditorCollection propertyEditors, IMedia entity, ContentDto contentDto)
+        private static MediaVersionDto BuildMediaVersionDto(MediaUrlGeneratorCollection mediaUrlGenerators, IMedia entity, ContentDto contentDto)
         {
             // try to get a path from the string being stored for media
             // TODO: only considering umbracoFile
@@ -295,11 +295,9 @@ namespace Umbraco.Core.Persistence.Factories
             string path = null;
 
             if (entity.Properties.TryGetValue(Constants.Conventions.Media.File, out var property)
-                && propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out var editor)
-                && editor is IDataEditorWithMediaPath dataEditor)
+                && mediaUrlGenerators.TryGetMediaPath(property.PropertyType.PropertyEditorAlias, property.GetValue(), out var mediaPath))
             {
-                var value = property.GetValue();
-                path = dataEditor.GetMediaPath(value);
+                path = mediaPath;
             }
 
             var dto = new MediaVersionDto

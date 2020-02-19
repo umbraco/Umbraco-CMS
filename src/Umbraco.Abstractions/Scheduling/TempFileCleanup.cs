@@ -10,7 +10,7 @@ namespace Umbraco.Web.Scheduling
     /// <summary>
     /// Used to cleanup temporary file locations
     /// </summary>
-    internal class TempFileCleanup : RecurringTaskBase
+    public class TempFileCleanup : RecurringTaskBase
     {
         private readonly DirectoryInfo[] _tempFolders;
         private readonly TimeSpan _age;

@@ -10,18 +10,23 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Web.Features;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.WebApi
 {
+
+
     /// <summary>
     /// Provides a base class for Umbraco API controllers.
     /// </summary>
     /// <remarks>These controllers are NOT auto-routed.</remarks>
     [FeatureAuthorize]
-    public abstract class UmbracoApiControllerBase : ApiController
+    public abstract class UmbracoApiControllerBase : ApiController, IUmbracoFeature
     {
+
         // note: all Umbraco controllers have two constructors: one with all dependencies, which should be used,
         // and one with auto dependencies, ie no dependencies - and then dependencies are automatically obtained
         // here from the Current service locator - this is obviously evil, but it allows us to add new dependencies
@@ -41,14 +46,15 @@ namespace Umbraco.Web.WebApi
                 Current.Factory.GetInstance<IProfilingLogger>(),
                 Current.Factory.GetInstance<IRuntimeState>(),
                 Current.Factory.GetInstance<UmbracoHelper>(),
-                Current.Factory.GetInstance<UmbracoMapper>()
+                Current.Factory.GetInstance<UmbracoMapper>(),
+                Current.Factory.GetInstance<IPublishedUrlProvider>()
             )
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoApiControllerBase"/> class with all its dependencies.
         /// </summary>
-        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper)
+        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
         {
             UmbracoContextAccessor = umbracoContextAccessor;
             GlobalSettings = globalSettings;
@@ -59,6 +65,7 @@ namespace Umbraco.Web.WebApi
             RuntimeState = runtimeState;
             Umbraco = umbracoHelper;
             Mapper = umbracoMapper;
+            PublishedUrlProvider = publishedUrlProvider;
         }
 
         /// <summary>
@@ -127,6 +134,8 @@ namespace Umbraco.Web.WebApi
         /// Gets the mapper.
         /// </summary>
         public UmbracoMapper Mapper { get; }
+
+        protected IPublishedUrlProvider PublishedUrlProvider { get; }
 
         /// <summary>
         /// Gets the web security helper.

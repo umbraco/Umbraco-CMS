@@ -14,6 +14,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Models.TemplateQuery;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors
@@ -38,8 +39,9 @@ namespace Umbraco.Web.Editors
             UmbracoHelper umbracoHelper,
             IVariationContextAccessor variationContextAccessor,
             IShortStringHelper shortStringHelper,
-            UmbracoMapper umbracoMapper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _variationContextAccessor = variationContextAccessor;
         }

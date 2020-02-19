@@ -13,6 +13,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj" />
         <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+        <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -19,7 +19,7 @@
         public bool TryFindContent(IPublishedRequest frequest)
         {
             int pageId;
-            if (int.TryParse(_httpContextAccessor.HttpContext.Request["umbPageID"], out pageId))
+            if (int.TryParse(_httpContextAccessor.GetRequiredHttpContext().Request["umbPageID"], out pageId))
             {
                 var doc = frequest.UmbracoContext.Content.GetById(pageId);
 

@@ -1,6 +1,8 @@
+using System.Collections.Generic;
+
 namespace Umbraco.Core.Cache
 {
-    public interface IRequestCache : IAppCache
+    public interface IRequestCache : IAppCache, IEnumerable<KeyValuePair<string, object>>
     {
         bool Set(string key, object value);
         bool Remove(string key);

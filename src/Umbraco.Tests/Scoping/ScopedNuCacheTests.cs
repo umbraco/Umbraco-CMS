@@ -84,7 +84,6 @@ namespace Umbraco.Tests.Scoping
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
             var hostingEnvironment = TestHelper.GetHostingEnvironment();
-            var filePermissionHelper = Mock.Of<IFilePermissionHelper>();
 
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
 
@@ -108,7 +107,7 @@ namespace Umbraco.Tests.Scoping
                 typeFinder,
                 hostingEnvironment,
                 new MockShortStringHelper(),
-                filePermissionHelper);
+                IOHelper);
         }
 
         protected IUmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)
@@ -117,19 +116,17 @@ namespace Umbraco.Tests.Scoping
             var service = PublishedSnapshotService as PublishedSnapshotService;
 
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
-
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor(httpContext);
             var globalSettings = TestObjects.GetGlobalSettings();
             var umbracoContext = new UmbracoContext(
-                httpContext,
+                httpContextAccessor,
                 service,
-                new WebSecurity(httpContext, Current.Services.UserService, globalSettings, IOHelper),
-                umbracoSettings ?? SettingsForTests.GetDefaultUmbracoSettings(),
-                urlProviders ?? Enumerable.Empty<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
+                new WebSecurity(httpContextAccessor, Current.Services.UserService, globalSettings, IOHelper),
                 globalSettings,
                 new TestVariationContextAccessor(),
                 IOHelper,
-                UriUtility);
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;

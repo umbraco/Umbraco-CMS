@@ -25,25 +25,17 @@ namespace Umbraco.Web
     /// <remarks>
     /// This binds to appropriate umbraco events in order to trigger the Boot(), Sync() & FlushBatch() calls
     /// </remarks>
-    public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
+    public class BatchedDatabaseServerMessenger : DatabaseServerMessenger, IBatchedDatabaseServerMessenger
     {
         private readonly IUmbracoDatabaseFactory _databaseFactory;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IRequestCache _requestCache;
 
         public BatchedDatabaseServerMessenger(
-            IRuntimeState runtime,
-            IUmbracoDatabaseFactory databaseFactory,
-            IScopeProvider scopeProvider,
-            ISqlContext sqlContext,
-            IProfilingLogger proflog,
-            DatabaseServerMessengerOptions options,
-            IHostingEnvironment hostingEnvironment,
-            CacheRefresherCollection cacheRefreshers,
-            IHttpContextAccessor httpContextAccessor)
+            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, DatabaseServerMessengerOptions options, IHostingEnvironment hostingEnvironment, CacheRefresherCollection cacheRefreshers, IRequestCache requestCache)
             : base(runtime, scopeProvider, sqlContext, proflog, true, options, hostingEnvironment, cacheRefreshers)
         {
             _databaseFactory = databaseFactory;
-            _httpContextAccessor = httpContextAccessor;
+            _requestCache = requestCache;
         }
 
         // invoked by DatabaseServerRegistrarAndMessengerComponent
@@ -112,24 +104,18 @@ namespace Umbraco.Web
 
         protected ICollection<RefreshInstructionEnvelope> GetBatch(bool create)
         {
-            // try get the http context from the UmbracoContext, we do this because in the case we are launching an async
-            // thread and we know that the cache refreshers will execute, we will ensure the UmbracoContext and therefore we
-            // can get the http context from it
-            var httpContext = (_httpContextAccessor.HttpContext)
-                // if this is null, it could be that an async thread is calling this method that we weren't aware of and the UmbracoContext
-                // wasn't ensured at the beginning of the thread. We can try to see if the HttpContext.Current is available which might be
-                // the case if the asp.net synchronization context has kicked in
-                ?? (HttpContext.Current == null ? null : new HttpContextWrapper(HttpContext.Current));
-
-            // if no context was found, return null - we cannot not batch
-            if (httpContext == null) return null;
-
             var key = typeof (BatchedDatabaseServerMessenger).Name;
 
+            if (!_requestCache.IsAvailable) return null;
+
             // no thread-safety here because it'll run in only 1 thread (request) at a time
-            var batch = (ICollection<RefreshInstructionEnvelope>)httpContext.Items[key];
+            var batch = (ICollection<RefreshInstructionEnvelope>)_requestCache.Get(key);
             if (batch == null && create)
-                httpContext.Items[key] = batch = new List<RefreshInstructionEnvelope>();
+            {
+                batch = new List<RefreshInstructionEnvelope>();
+                _requestCache.Set(key, batch);
+            }
+
             return batch;
         }
 

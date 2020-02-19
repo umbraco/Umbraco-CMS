@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Cookie;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Composing;
@@ -18,9 +17,11 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd, IUmbracoContext
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IGlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
         private readonly UriUtility _uriUtility;
+        private readonly ICookieManager _cookieManager;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
         private string _previewToken;
         private bool? _previewing;
@@ -29,27 +30,24 @@ namespace Umbraco.Web
         // internal for unit tests
         // otherwise it's used by EnsureContext above
         // warn: does *not* manage setting any IUmbracoContextAccessor
-        internal UmbracoContext(HttpContextBase httpContext,
+        internal UmbracoContext(IHttpContextAccessor httpContextAccessor,
             IPublishedSnapshotService publishedSnapshotService,
             IWebSecurity webSecurity,
-            IUmbracoSettingsSection umbracoSettings,
-            IEnumerable<IUrlProvider> urlProviders,
-            IEnumerable<IMediaUrlProvider> mediaUrlProviders,
             IGlobalSettings globalSettings,
             IVariationContextAccessor variationContextAccessor,
             IIOHelper ioHelper,
-            UriUtility uriUtility)
+            UriUtility uriUtility,
+            ICookieManager cookieManager)
         {
-            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
+            if (httpContextAccessor == null) throw new ArgumentNullException(nameof(httpContextAccessor));
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
             if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
-            if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
-            if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
-            if (mediaUrlProviders == null) throw new ArgumentNullException(nameof(mediaUrlProviders));
             VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
+            _httpContextAccessor = httpContextAccessor;
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _uriUtility = uriUtility;
+            _cookieManager = cookieManager;
 
             // ensure that this instance is disposed when the request terminates, though we *also* ensure
             // this happens in the Umbraco module since the UmbracoCOntext is added to the HttpContext items.
@@ -59,11 +57,10 @@ namespace Umbraco.Web
             //
             // all in all, this context may be disposed more than once, but DisposableObject ensures that
             // it is ok and it will be actually disposed only once.
-            httpContext.DisposeOnPipelineCompleted(this);
+            httpContextAccessor.GetRequiredHttpContext().DisposeOnPipelineCompleted(this);
 
             ObjectCreated = DateTime.Now;
             UmbracoRequestId = Guid.NewGuid();
-            HttpContext = httpContext;
             Security = webSecurity;
 
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
@@ -78,7 +75,6 @@ namespace Umbraco.Web
             //
             OriginalRequestUrl = GetRequestFromContext()?.Url ?? new Uri("http://localhost");
             CleanedUmbracoUrl = _uriUtility.UriToUmbraco(OriginalRequestUrl);
-            UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders, mediaUrlProviders, variationContextAccessor);
         }
 
         /// <summary>
@@ -135,19 +131,9 @@ namespace Umbraco.Web
         public bool IsFrontEndUmbracoRequest => PublishedRequest != null;
 
         /// <summary>
-        /// Gets the url provider.
-        /// </summary>
-        public IPublishedUrlProvider UrlProvider { get; }
-
-        /// <summary>
         /// Gets/sets the PublishedRequest object
         /// </summary>
         public IPublishedRequest PublishedRequest { get; set; }
-
-        /// <summary>
-        /// Exposes the HttpContext for the current request
-        /// </summary>
-        public HttpContextBase HttpContext { get; }
 
         /// <summary>
         /// Gets the variation context accessor.
@@ -185,56 +171,6 @@ namespace Umbraco.Web
             private set => _previewing = value;
         }
 
-        #region Urls
-
-        /// <summary>
-        /// Gets the url of a content identified by its identifier.
-        /// </summary>
-        /// <param name="contentId">The content identifier.</param>
-        /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
-        public string Url(int contentId, string culture = null)
-        {
-            return UrlProvider.GetUrl(contentId, culture: culture);
-        }
-
-        /// <summary>
-        /// Gets the url of a content identified by its identifier.
-        /// </summary>
-        /// <param name="contentId">The content identifier.</param>
-        /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
-        public string Url(Guid contentId, string culture = null)
-        {
-            return UrlProvider.GetUrl(contentId, culture: culture);
-        }
-
-        /// <summary>
-        /// Gets the url of a content identified by its identifier, in a specified mode.
-        /// </summary>
-        /// <param name="contentId">The content identifier.</param>
-        /// <param name="mode">The mode.</param>
-        /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
-        public string Url(int contentId, UrlMode mode, string culture = null)
-        {
-            return UrlProvider.GetUrl(contentId, mode, culture);
-        }
-
-        /// <summary>
-        /// Gets the url of a content identified by its identifier, in a specified mode.
-        /// </summary>
-        /// <param name="contentId">The content identifier.</param>
-        /// <param name="mode">The mode.</param>
-        /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
-        public string Url(Guid contentId, UrlMode mode, string culture = null)
-        {
-            return UrlProvider.GetUrl(contentId, mode, culture);
-        }
-
-        #endregion
-
         public string PreviewToken
         {
             get
@@ -251,7 +187,7 @@ namespace Umbraco.Web
                 && request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, _globalSettings, _ioHelper) == false
                 && Security.CurrentUser != null)
             {
-                var previewToken = request.GetPreviewCookieValue(); // may be null or empty
+                var previewToken = _cookieManager.GetPreviewCookieValue(); // may be null or empty
                 _previewToken = previewToken.IsNullOrWhiteSpace() ? null : previewToken;
             }
 
@@ -271,7 +207,7 @@ namespace Umbraco.Web
         {
             try
             {
-                return HttpContext.Request;
+                return _httpContextAccessor.GetRequiredHttpContext().Request;
             }
             catch (HttpException)
             {

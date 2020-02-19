@@ -56,11 +56,12 @@ namespace Umbraco.Web.Routing
 
                     if (node != null)
                     {
+                        var httpContext = _httpContextAccessor.GetRequiredHttpContext();
                         //if we have a node, check if we have a culture in the query string
-                        if (_httpContextAccessor.HttpContext.Request.QueryString.ContainsKey("culture"))
+                        if (httpContext.Request.QueryString.ContainsKey("culture"))
                         {
                             //we're assuming it will match a culture, if an invalid one is passed in, an exception will throw (there is no TryGetCultureInfo method), i think this is ok though
-                            frequest.Culture = CultureInfo.GetCultureInfo(_httpContextAccessor.HttpContext.Request.QueryString["culture"]);
+                            frequest.Culture = CultureInfo.GetCultureInfo(httpContext.Request.QueryString["culture"]);
                         }
 
                         frequest.PublishedContent = node;

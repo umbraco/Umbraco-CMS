@@ -11,6 +11,9 @@ namespace Umbraco.Core.PropertyEditors
             : base(items)
         { }
 
+        // TODO: We could further reduce circular dependencies with PropertyEditorCollection by not having IDataValueReference implemented
+        // by property editors and instead just use the already built in IDataValueReferenceFactory and/or refactor that into a more normal collection
+
         public IEnumerable<UmbracoEntityReference> GetAllReferences(IPropertyCollection properties, PropertyEditorCollection propertyEditors)
         {
             var trackedRelations = new List<UmbracoEntityReference>();

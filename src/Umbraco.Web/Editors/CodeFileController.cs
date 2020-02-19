@@ -24,6 +24,7 @@ using Umbraco.Web.Trees;
 using Stylesheet = Umbraco.Core.Models.Stylesheet;
 using StylesheetRule = Umbraco.Web.Models.ContentEditing.StylesheetRule;
 using Umbraco.Core.Mapping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
 {
@@ -49,8 +50,9 @@ namespace Umbraco.Web.Editors
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
             IIOHelper ioHelper,
-            IFileSystems fileSystems)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
+            IFileSystems fileSystems,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _ioHelper = ioHelper;
             _fileSystems = fileSystems;

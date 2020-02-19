@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
@@ -17,24 +16,27 @@ namespace Umbraco.Web.Routing
         private readonly ILogger _logger;
         private readonly IGlobalSettings _globalSettings;
         private readonly ISiteDomainHelper _siteDomainHelper;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly UriUtility _uriUtility;
 
-        public DefaultUrlProvider(IRequestHandlerSection requestSettings, ILogger logger, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper, UriUtility uriUtility)
+        public DefaultUrlProvider(IRequestHandlerSection requestSettings, ILogger logger, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper, IUmbracoContextAccessor umbracoContextAccessor, UriUtility uriUtility)
         {
             _requestSettings = requestSettings;
             _logger = logger;
             _globalSettings = globalSettings;
             _siteDomainHelper = siteDomainHelper;
             _uriUtility = uriUtility;
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         #region GetUrl
 
         /// <inheritdoc />
-        public virtual UrlInfo GetUrl(IUmbracoContext umbracoContext, IPublishedContent content, UrlMode mode, string culture, Uri current)
+        public virtual UrlInfo GetUrl(IPublishedContent content, UrlMode mode, string culture, Uri current)
         {
             if (!current.IsAbsoluteUri) throw new ArgumentException("Current url must be absolute.", nameof(current));
 
+            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
             // will not use cache if previewing
             var route = umbracoContext.Content.GetRouteById(content.Id, culture);
 
@@ -70,7 +72,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets the other urls of a published content.
         /// </summary>
-        /// <param name="umbracoContext">The Umbraco context.</param>
+        /// <param name="umbracoContextAccessor">The Umbraco context.</param>
         /// <param name="id">The published content id.</param>
         /// <param name="current">The current absolute url.</param>
         /// <returns>The other urls for the published content.</returns>
@@ -78,8 +80,9 @@ namespace Umbraco.Web.Routing
         /// <para>Other urls are those that <c>GetUrl</c> would not return in the current context, but would be valid
         /// urls for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
         /// </remarks>
-        public virtual IEnumerable<UrlInfo> GetOtherUrls(IUmbracoContext umbracoContext, int id, Uri current)
+        public virtual IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
         {
+            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
             var node = umbracoContext.Content.GetById(id);
             if (node == null)
                 yield break;

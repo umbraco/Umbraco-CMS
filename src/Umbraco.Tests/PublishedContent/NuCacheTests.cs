@@ -186,8 +186,6 @@ namespace Umbraco.Tests.PublishedContent
 
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
 
-            var filePermissionHelper = Mock.Of<IFilePermissionHelper>();
-
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             _snapshotService = new PublishedSnapshotService(options,
@@ -211,7 +209,7 @@ namespace Umbraco.Tests.PublishedContent
                 typeFinder,
                 TestHelper.GetHostingEnvironment(),
                 new MockShortStringHelper(),
-                filePermissionHelper);
+                TestHelper.IOHelper);
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

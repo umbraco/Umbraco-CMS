@@ -5,6 +5,7 @@ using Umbraco.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 
@@ -1087,6 +1088,8 @@ namespace Umbraco.Core
 
         #endregion
 
+        #region Url
+
         /// <summary>
         /// Gets the url of the content item.
         /// </summary>
@@ -1117,5 +1120,6 @@ namespace Umbraco.Core
             }
         }
 
+        #endregion
     }
 }

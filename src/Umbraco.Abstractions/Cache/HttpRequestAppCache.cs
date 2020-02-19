@@ -171,5 +171,20 @@ namespace Umbraco.Core.Cache
         }
 
         #endregion
+
+        public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+        {
+            if (!TryGetContextItems(out var items))
+            {
+                yield break;
+            }
+
+            foreach (DictionaryEntry item in items)
+            {
+                yield return new KeyValuePair<string, object>(item.Key.ToString(), item.Value);
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

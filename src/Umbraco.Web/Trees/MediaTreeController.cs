@@ -21,6 +21,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Mapping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Trees
 {
@@ -40,7 +41,20 @@ namespace Umbraco.Web.Trees
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
 
-        public MediaTreeController(UmbracoTreeSearcher treeSearcher, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper)
+        public MediaTreeController(
+            UmbracoTreeSearcher treeSearcher,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider,
+            IMenuItemCollectionFactory menuItemCollectionFactory)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper, publishedUrlProvider, menuItemCollectionFactory)
         {
             _treeSearcher = treeSearcher;
         }
@@ -86,7 +100,7 @@ namespace Umbraco.Web.Trees
 
         protected override MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings)
         {
-            var menu = new MenuItemCollection();
+            var menu = MenuItemCollectionFactory.Create();
 
             //set the default
             menu.DefaultMenuAlias = ActionNew.ActionAlias;

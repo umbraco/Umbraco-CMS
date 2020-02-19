@@ -3,6 +3,7 @@ using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Infrastructure;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
@@ -13,10 +14,12 @@ namespace Umbraco.Web.Security
     internal class ForceRenewalCookieAuthenticationHandler : AuthenticationHandler<CookieAuthenticationOptions>
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IRequestCache _requestCache;
 
-        public ForceRenewalCookieAuthenticationHandler(IUmbracoContextAccessor umbracoContextAccessor)
+        public ForceRenewalCookieAuthenticationHandler(IUmbracoContextAccessor umbracoContextAccessor, IRequestCache requestCache)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
+            _requestCache = requestCache;
         }
 
         /// <summary>
@@ -68,9 +71,8 @@ namespace Umbraco.Web.Security
             //This is auth'd normally, so OWIN will naturally take care of the cookie renewal
             if (normalAuthUrl) return Task.FromResult(0);
 
-            var httpCtx = Context.TryGetHttpContext();
             //check for the special flag in either the owin or http context
-            var shouldRenew = Context.Get<bool?>(Constants.Security.ForceReAuthFlag) != null || (httpCtx.Success && httpCtx.Result.Items[Constants.Security.ForceReAuthFlag] != null);
+            var shouldRenew = Context.Get<bool?>(Constants.Security.ForceReAuthFlag) != null || (_requestCache.IsAvailable && _requestCache.Get(Constants.Security.ForceReAuthFlag) != null);
 
             if (shouldRenew)
             {

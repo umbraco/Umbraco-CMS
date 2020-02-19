@@ -27,6 +27,7 @@ namespace Umbraco.Web.Security
     {
         private readonly MembersMembershipProvider _membershipProvider;
         private readonly RoleProvider _roleProvider;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMemberService _memberService;
         private readonly IMemberTypeService _memberTypeService;
         private readonly IPublicAccessService _publicAccessService;
@@ -39,7 +40,7 @@ namespace Umbraco.Web.Security
 
         public MembershipHelper
         (
-            HttpContextBase httpContext,
+            IHttpContextAccessor httpContextAccessor,
             IPublishedMemberCache memberCache,
             MembersMembershipProvider membershipProvider,
             RoleProvider roleProvider,
@@ -52,8 +53,8 @@ namespace Umbraco.Web.Security
             IEntityService entityService
         )
         {
-            HttpContext = httpContext;
             MemberCache = memberCache;
+            _httpContextAccessor = httpContextAccessor;
             _memberService = memberService;
             _memberTypeService = memberTypeService;
             _publicAccessService = publicAccessService;
@@ -68,7 +69,6 @@ namespace Umbraco.Web.Security
 
         #endregion
 
-        protected HttpContextBase HttpContext { get; }
         protected IPublishedMemberCache MemberCache { get; }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace Umbraco.Web.Security
             var provider = _membershipProvider;
             var membershipUser = provider.GetCurrentUser();
             //NOTE: This should never happen since they are logged in
-            if (membershipUser == null) throw new InvalidOperationException("Could not find member with username " + HttpContext.User.Identity.Name);
+            if (membershipUser == null) throw new InvalidOperationException("Could not find member with username " + _httpContextAccessor.GetRequiredHttpContext().User.Identity.Name);
 
             try
             {
@@ -546,13 +546,14 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public bool IsLoggedIn()
         {
-            return HttpContext.User != null && HttpContext.User.Identity.IsAuthenticated;
+            var httpContext = _httpContextAccessor.HttpContext;
+            return httpContext?.User != null && httpContext.User.Identity.IsAuthenticated;
         }
 
         /// <summary>
         /// Returns the currently logged in username
         /// </summary>
-        public string CurrentUserName => HttpContext.User.Identity.Name;
+        public string CurrentUserName => _httpContextAccessor.GetRequiredHttpContext().User.Identity.Name;
 
         /// <summary>
         /// Returns true or false if the currently logged in member is authorized based on the parameters provided

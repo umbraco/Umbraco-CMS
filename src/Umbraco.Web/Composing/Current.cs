@@ -27,6 +27,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Services;
+using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Composing
@@ -259,6 +260,8 @@ namespace Umbraco.Web.Composing
         public static IHostingEnvironment HostingEnvironment => Factory.GetInstance<IHostingEnvironment>();
         public static IIpResolver IpResolver => Factory.GetInstance<IIpResolver>();
         public static IUmbracoVersion UmbracoVersion => Factory.GetInstance<IUmbracoVersion>();
+        public static IPublishedUrlProvider PublishedUrlProvider => Factory.GetInstance<IPublishedUrlProvider>();
+        public static IMenuItemCollectionFactory MenuItemCollectionFactory => Factory.GetInstance<IMenuItemCollectionFactory>();
 
         #endregion
     }

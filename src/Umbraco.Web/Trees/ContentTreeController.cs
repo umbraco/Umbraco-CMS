@@ -20,6 +20,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Mapping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Trees
 {
@@ -41,6 +42,7 @@ namespace Umbraco.Web.Trees
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly ActionCollection _actions;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
 
         protected override int RecycleBinId => Constants.System.RecycleBinContent;
 
@@ -51,11 +53,26 @@ namespace Umbraco.Web.Trees
         protected override int[] UserStartNodes
             => _userStartNodes ?? (_userStartNodes = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService));
 
-        public ContentTreeController(UmbracoTreeSearcher treeSearcher, ActionCollection actions, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper)
+        public ContentTreeController(
+            UmbracoTreeSearcher treeSearcher,
+            ActionCollection actions,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider,
+            IMenuItemCollectionFactory menuItemCollectionFactory)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper, publishedUrlProvider, menuItemCollectionFactory)
         {
             _treeSearcher = treeSearcher;
             _actions = actions;
             _globalSettings = globalSettings;
+            _menuItemCollectionFactory = menuItemCollectionFactory;
         }
 
         /// <inheritdoc />
@@ -119,7 +136,7 @@ namespace Umbraco.Web.Trees
         {
             if (id == Constants.System.RootString)
             {
-                var menu = new MenuItemCollection();
+                var menu = _menuItemCollectionFactory.Create();
 
                 // if the user's start node is not the root then the only menu item to display is refresh
                 if (UserStartNodes.Contains(Constants.System.Root) == false)
@@ -170,7 +187,7 @@ namespace Umbraco.Web.Trees
             //if the user has no path access for this node, all they can do is refresh
             if (!Security.CurrentUser.HasContentPathAccess(item, Services.EntityService))
             {
-                var menu = new MenuItemCollection();
+                var menu = _menuItemCollectionFactory.Create();
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
                 return menu;
             }
@@ -232,7 +249,7 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected MenuItemCollection GetAllNodeMenuItems(IUmbracoEntity item)
         {
-            var menu = new MenuItemCollection();
+            var menu = _menuItemCollectionFactory.Create();
             AddActionNode<ActionNew>(item, menu, opensDialog: true);
             AddActionNode<ActionDelete>(item, menu, opensDialog: true);
             AddActionNode<ActionCreateBlueprintFromContent>(item, menu, opensDialog: true);
@@ -268,7 +285,7 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected MenuItemCollection GetNodeMenuItemsForDeletedContent(IUmbracoEntity item)
         {
-            var menu = new MenuItemCollection();
+            var menu = _menuItemCollectionFactory.Create();
             menu.Items.Add<ActionRestore>(Services.TextService, opensDialog: true);
             menu.Items.Add<ActionMove>(Services.TextService, opensDialog: true);
             menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);

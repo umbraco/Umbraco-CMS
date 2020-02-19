@@ -24,9 +24,4 @@
             <_Parameter1>Umbraco.Tests.Benchmarks</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Logging\Viewer" />
-    </ItemGroup>
-    
 </Project>

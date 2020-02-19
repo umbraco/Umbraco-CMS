@@ -435,19 +435,18 @@ namespace Umbraco.Tests.Web.Mvc
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;
 
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor(http);
             var globalSettings = TestObjects.GetGlobalSettings();
 
             var ctx = new UmbracoContext(
-                http,
+                httpContextAccessor,
                 _service,
-                new WebSecurity(http, Current.Services.UserService, globalSettings, IOHelper),
-                TestObjects.GetUmbracoSettings(),
-                Enumerable.Empty<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
+                new WebSecurity(httpContextAccessor, Current.Services.UserService, globalSettings, IOHelper),
                 globalSettings,
                 new TestVariationContextAccessor(),
                 IOHelper,
-                UriUtility);
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             //if (setSingleton)
             //{

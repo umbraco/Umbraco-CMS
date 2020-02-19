@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Web.Routing;
 using System.Xml.Linq;
 using Examine;
 using Moq;
@@ -53,7 +55,9 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
+using Umbraco.Web.Install;
 using Umbraco.Web.Security;
+using Umbraco.Web.Trees;
 using Current = Umbraco.Web.Composing.Current;
 namespace Umbraco.Tests.Testing
 {
@@ -114,6 +118,7 @@ namespace Umbraco.Tests.Testing
 
         protected IIOHelper IOHelper { get; private set; }
         protected UriUtility UriUtility => new UriUtility(HostingEnvironment);
+        protected IPublishedUrlProvider PublishedUrlProvider => Factory.GetInstance<IPublishedUrlProvider>();
         protected IDataTypeService DataTypeService => Factory.GetInstance<IDataTypeService>();
         protected IPasswordHasher PasswordHasher => Factory.GetInstance<IPasswordHasher>();
         protected Lazy<PropertyEditorCollection> PropertyEditorCollection => new Lazy<PropertyEditorCollection>(() => Factory.GetInstance<PropertyEditorCollection>());
@@ -196,7 +201,6 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(backOfficeInfo);
             Composition.RegisterUnique(ipResolver);
             Composition.RegisterUnique<IPasswordHasher, AspNetPasswordHasher>();
-            Composition.RegisterUnique<ICurrentUserAccessor, CurrentUserAccessor>();
             Composition.RegisterUnique(TestHelper.ShortStringHelper);
 
 
@@ -297,6 +301,18 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<HtmlImageSourceParser>();
             Composition.RegisterUnique<RichTextEditorPastedImages>();
             Composition.RegisterUnique<IPublishedValueFallback, NoopPublishedValueFallback>();
+            Composition.RegisterUnique<IPublishedUrlProvider>(factory =>
+                new UrlProvider(
+                    factory.GetInstance<IUmbracoContextAccessor>(),
+                    TestObjects.GetUmbracoSettings().WebRouting,
+                    new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
+                    new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
+                    factory.GetInstance<IVariationContextAccessor>()
+
+                    ));
+
+
+
         }
 
         protected virtual void ComposeMisc()
@@ -321,6 +337,9 @@ namespace Umbraco.Tests.Testing
             // manifest
             Composition.ManifestValueValidators();
             Composition.ManifestFilters();
+            Composition.MediaUrlGenerators()
+                .Add<FileUploadPropertyEditor>()
+                .Add<ImageCropperPropertyEditor>();
 
         }
 
@@ -397,6 +416,8 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IExamineManager, ExamineManager>();
 
             Composition.RegisterUnique<IJsonSerializer, JsonNetSerializer>();
+            Composition.RegisterUnique<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
+            Composition.RegisterUnique<InstallStatusTracker>();
 
             // register filesystems
             Composition.RegisterUnique(factory => TestObjects.GetFileSystemsMock());
@@ -447,10 +468,19 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<ParameterEditorCollection>();
 
 
-            Composition.RegisterUnique<IHttpContextAccessor>(TestObjects.GetHttpContextAccessor());
+            Composition.RegisterUnique<IHttpContextAccessor>(TestHelper.GetHttpContextAccessor(GetHttpContextFactory("/").HttpContext));
         }
 
         #endregion
+
+        protected FakeHttpContextFactory GetHttpContextFactory(string url, RouteData routeData = null)
+        {
+            var factory = routeData != null
+                ? new FakeHttpContextFactory(url, routeData)
+                : new FakeHttpContextFactory(url);
+
+            return factory;
+        }
 
         #region Initialize
 

@@ -8,7 +8,7 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Declares model mappings for members.
     /// </summary>
-    internal class MemberMapDefinition : IMapDefinition
+    public class MemberMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;
         private readonly MemberTabsAndPropertiesMapper _tabsAndPropertiesMapper;

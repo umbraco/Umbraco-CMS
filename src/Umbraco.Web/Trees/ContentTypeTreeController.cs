@@ -14,6 +14,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Search;
 using Umbraco.Web.WebApi.Filters;
 
@@ -26,10 +27,25 @@ namespace Umbraco.Web.Trees
     public class ContentTypeTreeController : TreeController, ISearchableTree
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
+        private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
 
-        public ContentTypeTreeController(UmbracoTreeSearcher treeSearcher, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper)
+        public ContentTypeTreeController(
+            UmbracoTreeSearcher treeSearcher,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider,
+            IMenuItemCollectionFactory menuItemCollectionFactory)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper, publishedUrlProvider)
         {
             _treeSearcher = treeSearcher;
+            _menuItemCollectionFactory = menuItemCollectionFactory;
         }
 
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
@@ -90,7 +106,7 @@ namespace Umbraco.Web.Trees
 
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
-            var menu = new MenuItemCollection();
+            var menu = _menuItemCollectionFactory.Create();
 
             if (id == Constants.System.RootString)
             {

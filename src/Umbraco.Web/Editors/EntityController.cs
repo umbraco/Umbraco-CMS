@@ -31,6 +31,7 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Mapping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
 {
@@ -66,8 +67,9 @@ namespace Umbraco.Web.Editors
             SearchableTreeCollection searchableTreeCollection,
             UmbracoTreeSearcher treeSearcher,
             IShortStringHelper shortStringHelper,
-            UmbracoMapper umbracoMapper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _treeService = treeService;
             _searchableTreeCollection = searchableTreeCollection;
@@ -266,7 +268,7 @@ namespace Umbraco.Web.Editors
 
             if (type == UmbracoEntityTypes.Document)
             {
-                var foundUrl = UmbracoContext.Url(id, culture);
+                var foundUrl = PublishedUrlProvider.GetUrl(id, culture: culture);
                 if (string.IsNullOrEmpty(foundUrl) == false && foundUrl != "#")
                 {
                     returnUrl = foundUrl;
@@ -347,7 +349,7 @@ namespace Umbraco.Web.Editors
         {
             culture = culture ?? ClientCulture();
 
-            var url = UmbracoContext.UrlProvider.GetUrl(id, culture: culture);
+            var url = PublishedUrlProvider.GetUrl(id, culture: culture);
             var anchorValues = Services.ContentService.GetAnchorValuesFromRTEs(id, culture);
             return new UrlAndAnchors(url, anchorValues);
         }

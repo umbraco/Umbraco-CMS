@@ -13,6 +13,7 @@ using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core;
 using System.Diagnostics;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Templates
 {
@@ -28,8 +29,7 @@ namespace Umbraco.Tests.Templates
     </div>
 </p><p><img src='/media/234234.jpg' data-udi=""umb://media-type/B726D735E4C446D58F703F3FBCFC97A5"" /></p>";
 
-            var umbracoContextAccessor = new TestUmbracoContextAccessor();
-            var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor);
+            var imageSourceParser = new HtmlImageSourceParser(Mock.Of<IPublishedUrlProvider>());
 
             var result = imageSourceParser.FindUdisFromDataAttributes(input).ToList();
             Assert.AreEqual(2, result.Count);
@@ -40,8 +40,7 @@ namespace Umbraco.Tests.Templates
         [Test]
         public void Remove_Image_Sources()
         {
-            var umbracoContextAccessor = new TestUmbracoContextAccessor();
-            var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor);
+            var imageSourceParser = new HtmlImageSourceParser(Mock.Of<IPublishedUrlProvider>());
 
             var result = imageSourceParser.RemoveImageSources(@"<p>
 <div>
@@ -69,21 +68,27 @@ namespace Umbraco.Tests.Templates
             var media = new Mock<IPublishedContent>();
             media.Setup(x => x.ContentType).Returns(mediaType);
             var mediaUrlProvider = new Mock<IMediaUrlProvider>();
-            mediaUrlProvider.Setup(x => x.GetMediaUrl(It.IsAny<IUmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<string>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
+            mediaUrlProvider.Setup(x => x.GetMediaUrl(It.IsAny<IPublishedContent>(), It.IsAny<string>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
                 .Returns(UrlInfo.Url("/media/1001/my-image.jpg"));
 
             var umbracoContextAccessor = new TestUmbracoContextAccessor();
 
             var umbracoContextFactory = TestUmbracoContextFactory.Create(
-                mediaUrlProvider: mediaUrlProvider.Object,
                 umbracoContextAccessor: umbracoContextAccessor);
 
-            using (var reference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>()))
+
+            var publishedUrlProvider = new UrlProvider(umbracoContextAccessor,
+                TestHelper.WebRoutingSection,
+                new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
+                new MediaUrlProviderCollection(new []{mediaUrlProvider.Object}),
+                Mock.Of<IVariationContextAccessor>()
+                );
+            using (var reference = umbracoContextFactory.EnsureUmbracoContext())
             {
                 var mediaCache = Mock.Get(reference.UmbracoContext.Media);
                 mediaCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(media.Object);
 
-                var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor);
+                var imageSourceParser = new HtmlImageSourceParser(publishedUrlProvider);
 
                 var result = imageSourceParser.EnsureImageSources(@"<p>
 <div>
