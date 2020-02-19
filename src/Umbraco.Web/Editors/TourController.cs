@@ -27,7 +27,6 @@ namespace Umbraco.Web.Editors
         private readonly TourFilterCollection _filters;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
         private readonly IIOHelper _ioHelper;
-        private readonly ICurrentUserAccessor _currentUserAccessor;
 
         public TourController(
             IGlobalSettings globalSettings,
@@ -43,14 +42,12 @@ namespace Umbraco.Web.Editors
             TourFilterCollection filters,
             IUmbracoSettingsSection umbracoSettingsSection,
             IIOHelper ioHelper,
-            ICurrentUserAccessor currentUserAccessor,
             IPublishedUrlProvider publishedUrlProvider)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _filters = filters;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
             _ioHelper = ioHelper;
-            _currentUserAccessor = currentUserAccessor;
         }
 
         public IEnumerable<BackOfficeTourFile> GetTours()
@@ -60,7 +57,7 @@ namespace Umbraco.Web.Editors
             if (_umbracoSettingsSection.BackOffice.Tours.EnableTours == false)
                 return result;
 
-            var user = _currentUserAccessor.TryGetCurrentUser();
+            var user = UmbracoContext.Security.CurrentUser;
             if (user == null)
                 return result;
 

@@ -25,10 +25,9 @@ namespace Umbraco.Web.Models.Mapping
         private readonly ContentAppFactoryCollection _contentAppDefinitions;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ICurrentUserAccessor _currentUserAccessor;
 
         public CommonMapper(IUserService userService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor,
-            ContentAppFactoryCollection contentAppDefinitions, ILocalizedTextService localizedTextService, IHttpContextAccessor httpContextAccessor, ICurrentUserAccessor currentUserAccessor)
+            ContentAppFactoryCollection contentAppDefinitions, ILocalizedTextService localizedTextService, IHttpContextAccessor httpContextAccessor)
         {
             _userService = userService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
@@ -36,7 +35,6 @@ namespace Umbraco.Web.Models.Mapping
             _contentAppDefinitions = contentAppDefinitions;
             _localizedTextService = localizedTextService;
             _httpContextAccessor = httpContextAccessor;
-            _currentUserAccessor = currentUserAccessor;
         }
 
         public UserProfile GetOwner(IContentBase source, MapperContext context)
@@ -54,7 +52,7 @@ namespace Umbraco.Web.Models.Mapping
         public ContentTypeBasic GetContentType(IContentBase source, MapperContext context)
         {
 
-            var user = _currentUserAccessor.TryGetCurrentUser();
+            var user = _umbracoContextAccessor.UmbracoContext?.Security?.CurrentUser;
             if (user?.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)) ?? false)
             {
                 var contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(source);

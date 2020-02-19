@@ -199,7 +199,6 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(backOfficeInfo);
             Composition.RegisterUnique(ipResolver);
             Composition.RegisterUnique<IPasswordHasher, AspNetPasswordHasher>();
-            Composition.RegisterUnique<ICurrentUserAccessor, CurrentUserAccessor>();
             Composition.RegisterUnique(TestHelper.ShortStringHelper);
 
 

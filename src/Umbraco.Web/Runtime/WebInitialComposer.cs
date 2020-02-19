@@ -68,7 +68,6 @@ namespace Umbraco.Web.Runtime
             composition.Register<IHostingEnvironment, AspNetHostingEnvironment>();
             composition.Register<IBackOfficeInfo, AspNetBackOfficeInfo>();
             composition.Register<IPasswordHasher, AspNetPasswordHasher>();
-            composition.Register<ICurrentUserAccessor, CurrentUserAccessor>();
             composition.Register<IFilePermissionHelper, FilePermissionHelper>(Lifetime.Singleton);
 
             composition.RegisterUnique<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
