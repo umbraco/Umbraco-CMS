@@ -46,31 +46,5 @@
             </div>
             <br/>
         </div>
-
-        <div class="umb-list umb-list--condensed" ng-if="vm.hasPristineVariants">
-            <div class="bold mb3">
-                <p>
-                    <localize ng-if="!vm.isNew" key="content_unmodifiedLanguages"></localize>
-                    <localize ng-if="vm.isNew" key="content_untouchedLanguagesForFirstTime"></localize>
-                </p>
-            </div>
-
-            <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.pristineVariantFilter">
-                <div>
-                    <div style="margin-bottom: 2px;">
-                        <span>{{ variant.language.name }}</span>
-                        <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
-                    </div>
-
-                    <div ng-if="!(variant.notifications && variant.notifications.length > 0)">
-                        <umb-variant-state class="umb-list-item__description" variant="variant"></umb-variant-state>
-                    </div>
-
-                    <div ng-repeat="notification in variant.notifications">
-                        <div class="umb-list-item__description text-success">{{notification.message}}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>

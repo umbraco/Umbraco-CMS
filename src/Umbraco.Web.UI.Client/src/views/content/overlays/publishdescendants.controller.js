@@ -5,11 +5,14 @@
 
         var vm = this;
 
+        vm.includeUnpublished = false;
+
         vm.changeSelection = changeSelection;
+        vm.toggleIncludeUnpublished = toggleIncludeUnpublished;
+
 
         function onInit() {
 
-            vm.includeUnpublished = false;
             vm.variants = $scope.model.variants;
             vm.labels = {};
 
@@ -27,9 +30,24 @@
 
             if (vm.variants.length > 1) {
 
-                //now sort it so that the current one is at the top
-                vm.variants = _.sortBy(vm.variants, function (v) {
-                    return v.active ? 0 : 1;
+                vm.variants = vm.variants.sort(function (a, b) {
+                    if (a.language && b.language) {
+                        if (a.language.name > b.language.name) {
+                            return -1;
+                        }
+                        if (a.language.name < b.language.name) {
+                            return 1;
+                        }
+                    }
+                    if (a.segment && b.segment) {
+                        if (a.segment > b.segment) {
+                            return -1;
+                        }
+                        if (a.segment < b.segment) {
+                            return 1;
+                        }
+                    }
+                    return 0;
                 });
 
                 var active = _.find(vm.variants, function (v) {
@@ -48,12 +66,15 @@
                 // localize help text for invariant content
                 vm.labels.help = {
                     "key": "content_publishDescendantsHelp",
-                    "tokens": []
+                    "tokens": [vm.variants[0].name]
                 };
-                // add the node name as a token so it will show up in the translated text
-                vm.labels.help.tokens.push(vm.variants[0].name);
             }
             
+        }
+
+        function toggleIncludeUnpublished() {
+            console.log("toggleIncludeUnpublished")
+            vm.includeUnpublished = !vm.includeUnpublished;
         }
 
         /** Returns true if publishing is possible based on if there are un-published mandatory languages */
@@ -64,7 +85,7 @@
 
                 var published = !(variant.state === "NotCreated" || variant.state === "Draft");
 
-                if (variant.language.isMandatory && !published && !variant.publish) {
+                if (variant.segment == null &&  variant.language && variant.language.isMandatory && !published && !variant.publish) {
                     //if a mandatory variant isn't published 
                     //and not flagged for saving
                     //then we cannot continue

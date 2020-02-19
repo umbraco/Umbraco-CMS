@@ -133,7 +133,6 @@
             });
 
             if (vm.availableVariants.length !== 0) {
-                //now sort it so that the current one is at the top
                 vm.availableVariants = vm.availableVariants.sort(function (a, b) {
                     if (a.language && b.language) {
                         if (a.language.name > b.language.name) {

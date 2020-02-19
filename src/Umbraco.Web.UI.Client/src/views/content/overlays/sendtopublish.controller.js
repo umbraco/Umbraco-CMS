@@ -20,8 +20,7 @@
                     $scope.model.title = value;
                 });
             }
-
-
+            
             if (vm.variants.length !== 0) {
                 _.each(vm.variants,
                     function (variant) {
@@ -29,9 +28,24 @@
                         variant.htmlId = "_content_variant_" + variant.compositeId;
                     });
 
-                //now sort it so that the current one is at the top
-                vm.variants = _.sortBy(vm.variants, function (v) {
-                    return v.active ? 0 : 1;
+                vm.variants = vm.variants.sort(function (a, b) {
+                    if (a.language && b.language) {
+                        if (a.language.name > b.language.name) {
+                            return -1;
+                        }
+                        if (a.language.name < b.language.name) {
+                            return 1;
+                        }
+                    }
+                    if (a.segment && b.segment) {
+                        if (a.segment > b.segment) {
+                            return -1;
+                        }
+                        if (a.segment < b.segment) {
+                            return 1;
+                        }
+                    }
+                    return 0;
                 });
 
                 var active = _.find(vm.variants, function (v) {
