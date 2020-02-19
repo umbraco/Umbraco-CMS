@@ -234,11 +234,11 @@ namespace Umbraco.Web.Models.Mapping
         {
             switch (entity)
             {
-                case ContentEntitySlim contentEntity:
-                    // NOTE: this case covers both content and media entities
-                    return contentEntity.ContentTypeIcon;
-                case MemberEntitySlim memberEntity:
+                case IMemberEntitySlim memberEntity:
                     return memberEntity.ContentTypeIcon.IfNullOrWhiteSpace(Constants.Icons.Member);
+                case IContentEntitySlim contentEntity:
+                    // NOTE: this case covers both content and media entities
+                    return contentEntity.ContentTypeIcon;                
             }
 
             return null;

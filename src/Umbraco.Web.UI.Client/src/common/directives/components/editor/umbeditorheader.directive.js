@@ -224,7 +224,8 @@ Use this directive to construct a header inside the main editor window.
             if (editorState.current) {
                 //to do make work for user create/edit
                 // to do make it work for user group create/ edit
-                // to make it work for language edit/create
+                // to do make it work for language edit/create
+                // to do make it work for log viewer
                 scope.isNew = editorState.current.id === 0 ||
                     editorState.current.id === "0" ||
                     editorState.current.id === -1 ||
@@ -232,8 +233,8 @@ Use this directive to construct a header inside the main editor window.
                     editorState.current.id === "-1";
 
                 var localizeVars = [
-                    scope.isNew ? "placeholders_a11yCreateItem" : "placeholders_a11yEdit",
-                    "placeholders_a11yName",
+                    scope.isNew ? "visuallyHiddenTexts_createItem" : "visuallyHiddenTexts_edit",
+                    "visuallyHiddenTexts_name",
                     scope.isNew ? "general_new" : "general_edit"
                 ];
 

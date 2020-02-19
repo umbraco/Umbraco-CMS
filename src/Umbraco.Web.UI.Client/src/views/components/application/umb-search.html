@@ -2,16 +2,25 @@
 <div class="umb-search" on-outside-click="vm.closeSearch()" ng-keydown="vm.handleKeyDown($event)">
 
     <div class="flex items-center">
-        <i class="umb-search-input-icon icon-search" ng-click="vm.focusSearch()"></i>
-        <input 
-            class="umb-search-input" 
-            type="text" 
+        <label for="app-search" class="umb-search__label">
+            <i class="umb-search-input-icon icon-search" aria-hidden="true"></i>
+            <span class="sr-only">
+                <localize key="general_search">Search...</localize>
+            </span>
+        </label>
+        <input
+            class="umb-search-input"
+            type="text"
             ng-model="vm.searchQuery"
             ng-model-options="{ debounce: 200 }"
-            ng-change="vm.search(vm.searchQuery)" 
-            placeholder="Search..." 
+            ng-change="vm.search(vm.searchQuery)"
+            localize="placeholder"
+            placeholder="@placeholders_search" 
+            id="app-search"
             focus-when="{{vm.searchHasFocus}}" />
-        <button ng-show="vm.searchQuery.length > 0" tabindex="-1" class="umb-search-input-clear umb-animated" ng-click="vm.clearSearch()">Clear</button>
+        <button ng-show="vm.searchQuery.length > 0" tabindex="-1" class="umb-search-input-clear umb-animated" ng-click="vm.clearSearch()">
+            <localize key="general_clear">Clear</localize>
+        </button>
     </div>
 
     <div class="umb-search-results">

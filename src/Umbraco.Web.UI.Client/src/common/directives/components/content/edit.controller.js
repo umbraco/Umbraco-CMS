@@ -42,7 +42,7 @@
                 $scope.page.isNew = Object.toBoolean(newVal);
 
                 //We fetch all ancestors of the node to generate the footer breadcrumb navigation
-                if (content.parentId && content.parentId !== -1) {
+                if (content.parentId && content.parentId !== -1 && content.parentId !== -20) {
                     loadBreadcrumb();
                     if (!watchingCulture) {
                         $scope.$watch('culture',
@@ -287,6 +287,8 @@
                 $scope.page.showSaveButton = true;
                 // add ellipsis to the save button if it opens the variant overlay
                 $scope.page.saveButtonEllipsis = content.variants && content.variants.length > 1 ? "true" : "false";
+            } else {
+                $scope.page.showSaveButton = false;
             }
 
             // create the pubish combo button
@@ -791,6 +793,7 @@
                             $scope.content.variants[i].expireDate = model.variants[i].expireDate;
                             $scope.content.variants[i].releaseDateFormatted = model.variants[i].releaseDateFormatted;
                             $scope.content.variants[i].expireDateFormatted = model.variants[i].expireDateFormatted;
+                            $scope.content.variants[i].save = model.variants[i].save;
                         }
 
                         model.submitButtonState = "busy";

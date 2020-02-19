@@ -169,7 +169,7 @@
                                 ng-change="updateTemplate(node.template)">
                             <option value="">{{chooseLabel}}...</option>
                         </select>
-                        <button ng-show="allowChangeTemplate && node.template !== null" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()">
+                        <button type="button" ng-show="allowChangeTemplate && node.template !== null" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()">
                             <localize key="general_open">Open</localize>
                         </button>
                     </div>

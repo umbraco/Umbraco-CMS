@@ -14,6 +14,8 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.PropertyEditors;
+using System;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -29,7 +31,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             var languageRepository = new LanguageRepository(accessor, AppCaches, Logger);
             mediaTypeRepository = new MediaTypeRepository(accessor, AppCaches, Mock.Of<ILogger>(), commonRepository, languageRepository);
             var tagRepository = new TagRepository(accessor, AppCaches, Mock.Of<ILogger>());
-            var repository = new MediaRepository(accessor, AppCaches, Mock.Of<ILogger>(), mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>());
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var entityRepository = new EntityRepository(accessor);
+            var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
+            var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
+            var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
+            var repository = new MediaRepository(accessor, AppCaches, Mock.Of<ILogger>(), mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, dataValueReferences);
             return repository;
         }
 
@@ -47,7 +54,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches);
             var languageRepository = new LanguageRepository(accessor, AppCaches, Logger);
             contentTypeRepository = new ContentTypeRepository(accessor, AppCaches, Logger, commonRepository, languageRepository);
-            var repository = new DocumentRepository(accessor, AppCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var entityRepository = new EntityRepository(accessor);
+            var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
+            var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
+            var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
+            var repository = new DocumentRepository(accessor, AppCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences);
             return repository;
         }
 
@@ -406,6 +418,35 @@ namespace Umbraco.Tests.Persistence.Repositories
                     scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
                     scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
                 }
+            }
+        }
+
+        [Test]
+        public void Can_Invalidate_SecurityStamp_On_Username_Change()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                var repository = CreateRepository(provider);
+                var userGroupRepository = CreateUserGroupRepository(provider);
+
+                var user = CreateAndCommitUserWithGroup(repository, userGroupRepository);
+                var originalSecurityStamp = user.SecurityStamp;
+
+                // Ensure when user generated a security stamp is present
+                Assert.That(user.SecurityStamp, Is.Not.Null);
+                Assert.That(user.SecurityStamp, Is.Not.Empty);
+
+                // Update username
+                user.Username = user.Username + "UPDATED";
+                repository.Save(user);
+
+                // Get the user
+                var updatedUser = repository.Get(user.Id);
+
+                // Ensure the Security Stamp is invalidated & no longer the same
+                Assert.AreNotEqual(originalSecurityStamp, updatedUser.SecurityStamp);
             }
         }
 
