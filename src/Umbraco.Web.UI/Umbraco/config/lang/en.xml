@@ -303,14 +303,16 @@
     <key alias="unmodifiedLanguages">Unmodified Languages</key>
     <key alias="untouchedLanguagesForFirstTime">These languages haven't been created</key>
 
+    <key alias="variantsWillBeSaved">All new variants will be saved.</key>
     <key alias="variantsToPublish">Which variants you would like to publish?</key>
     <key alias="variantsToSave">Choose which variants to be saved.</key>
     <key alias="variantsToSendForApproval">Pick variants to send for approval.</key>
     <key alias="variantsToSchedule">Set scheduled publishing...</key>
     <key alias="variantsToUnpublish">Select the variants to unpublish. Unpublishing a mandatory language will unpublish all variants.</key>
-    <key alias="unpublishedButMandatoryVariants">Unpublished mandatory variants</key>
+    <key alias="publishRequiresVariants">The following variants is required for publishing to take place:</key>
 
-    <key alias="readyToPublish">Ready to Publish?</key>
+    <key alias="notReadyToPublish">We are not ready to Publish</key>
+    <key alias="readyToPublish">Save & Publish</key>
     <key alias="readyToSave">Ready to Save?</key>
     <key alias="sendForApproval">Send for approval</key>
     <key alias="schedulePublishHelp">Select the date and time to publish and/or unpublish the content item.</key>
