@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Migrations.PostMigrations;
+using Umbraco.Core.Migrations.Upgrade.V_8_0_0.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Services;
@@ -27,15 +28,15 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
                 RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
             var sqlPropertyData = Sql()
-                .Select<PropertyDataDto>(r => r.Select(x => x.PropertyTypeDto, r1 => r1.Select(x => x.DataTypeDto)))
-                .From<PropertyDataDto>()
-                    .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)
-                    .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId)
+                .Select<PropertyDataDto80>(r => r.Select(x => x.PropertyTypeDto, r1 => r1.Select(x => x.DataTypeDto)))
+                .From<PropertyDataDto80>()
+                    .InnerJoin<PropertyTypeDto80>().On<PropertyDataDto80, PropertyTypeDto80>((left, right) => left.PropertyTypeId == right.Id)
+                    .InnerJoin<DataTypeDto>().On<PropertyTypeDto80, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId)
                 .Where<DataTypeDto>(x =>
                     x.EditorAlias == Constants.PropertyEditors.Aliases.TinyMce ||
                     x.EditorAlias == Constants.PropertyEditors.Aliases.Grid);
 
-            var properties = Database.Fetch<PropertyDataDto>(sqlPropertyData);
+            var properties = Database.Fetch<PropertyDataDto80>(sqlPropertyData);
 
             var exceptions = new List<Exception>();
             foreach (var property in properties)
@@ -43,6 +44,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
                 var value = property.TextValue;
                 if (string.IsNullOrWhiteSpace(value)) continue;
 
+
+                bool propertyChanged = false;
                 if (property.PropertyTypeDto.DataTypeDto.EditorAlias == Constants.PropertyEditors.Aliases.Grid)
                 {
                     try
@@ -55,7 +58,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
                             var controlValue = control["value"];
                             if (controlValue?.Type == JTokenType.String)
                             {
-                                control["value"] = UpdateMediaUrls(mediaLinkPattern, controlValue.Value<string>());
+                                control["value"] = UpdateMediaUrls(mediaLinkPattern, controlValue.Value<string>(), out var controlChanged);
+                                propertyChanged |= controlChanged;
                             }
                         }
 
@@ -76,10 +80,11 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
                 }
                 else
                 {
-                    property.TextValue = UpdateMediaUrls(mediaLinkPattern, value);
+                    property.TextValue = UpdateMediaUrls(mediaLinkPattern, value, out propertyChanged);
                 }
 
-                Database.Update(property);
+                if (propertyChanged)
+                    Database.Update(property);
             }
 
 
@@ -91,10 +96,14 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
             Context.AddPostMigration<RebuildPublishedSnapshot>();
         }
 
-        private string UpdateMediaUrls(Regex mediaLinkPattern, string value)
+        private string UpdateMediaUrls(Regex mediaLinkPattern, string value, out bool changed)
         {
-            return mediaLinkPattern.Replace(value, match =>
+            bool matched = false;
+
+            var result = mediaLinkPattern.Replace(value, match =>
             {
+                matched = true;
+
                 // match groups:
                 // - 1 = from the beginning of the a tag until href attribute value begins
                 // - 2 = the href attribute value excluding the querystring (if present)
@@ -106,6 +115,10 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
                     ? match.Value
                     : $"{match.Groups[1].Value}/{{localLink:{media.GetUdi()}}}{match.Groups[3].Value}";
             });
+
+            changed = matched;
+
+            return result;
         }
     }
 }

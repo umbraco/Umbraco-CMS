@@ -130,6 +130,7 @@
                         view: "default",
                         content: labels.doctypeChangeWarning,
                         submitButtonLabelKey: "general_continue",
+                        submitButtonStyle: "warning",
                         closeButtonLabelKey: "general_cancel",
                         submit: function () {
                             openDocTypeEditor(documentType);
