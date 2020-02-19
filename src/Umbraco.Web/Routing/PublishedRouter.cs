@@ -637,7 +637,7 @@ namespace Umbraco.Web.Routing
             var useAltTemplate = request.IsInitialPublishedContent
                 || (_webRoutingSection.InternalRedirectPreservesTemplate && request.IsInternalRedirectPublishedContent);
             var altTemplate = useAltTemplate
-                ? _httpContextAccessor.HttpContext.Request[Constants.Conventions.Url.AltTemplate]
+                ? _httpContextAccessor.GetRequiredHttpContext().Request[Constants.Conventions.Url.AltTemplate]
                 : null;
 
             if (string.IsNullOrWhiteSpace(altTemplate))

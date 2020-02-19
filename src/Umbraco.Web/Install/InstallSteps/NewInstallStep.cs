@@ -56,7 +56,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 throw new InvalidOperationException("Could not find the super user!");
             }
 
-            var userManager = _httpContextAccessor.HttpContext.GetOwinContext().GetBackOfficeUserManager();
+            var userManager = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().GetBackOfficeUserManager();
             var membershipUser = await userManager.FindByIdAsync(Constants.Security.SuperUserId);
             if (membershipUser == null)
             {

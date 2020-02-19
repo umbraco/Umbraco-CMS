@@ -48,7 +48,7 @@ namespace Umbraco.Web.Install
         public void InstallStatus(bool isCompleted, string errorMsg)
         {
 
-            var httpContext = _httpContextAccessor.HttpContext;
+            var httpContext = _httpContextAccessor.GetRequiredHttpContext();
             try
             {
                 var userAgent = httpContext.Request.UserAgent;

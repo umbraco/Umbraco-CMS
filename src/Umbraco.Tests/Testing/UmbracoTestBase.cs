@@ -201,7 +201,6 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(backOfficeInfo);
             Composition.RegisterUnique(ipResolver);
             Composition.RegisterUnique<IPasswordHasher, AspNetPasswordHasher>();
-            Composition.RegisterUnique<ICurrentUserAccessor, CurrentUserAccessor>();
             Composition.RegisterUnique(TestHelper.ShortStringHelper);
 
 
@@ -338,6 +337,9 @@ namespace Umbraco.Tests.Testing
             // manifest
             Composition.ManifestValueValidators();
             Composition.ManifestFilters();
+            Composition.MediaUrlGenerators()
+                .Add<FileUploadPropertyEditor>()
+                .Add<ImageCropperPropertyEditor>();
 
         }
 

@@ -81,13 +81,13 @@ namespace Umbraco.Web
         {
             var currentUmbracoContext = _umbracoContextAccessor.UmbracoContext;
             if (currentUmbracoContext != null)
-                return new UmbracoContextReference(false, currentUmbracoContext);
+                return new UmbracoContextReference(currentUmbracoContext, false, _umbracoContextAccessor);
 
 
             var umbracoContext = CreateUmbracoContext();
             _umbracoContextAccessor.UmbracoContext = umbracoContext;
 
-            return new UmbracoContextReference(true, umbracoContext);
+            return new UmbracoContextReference(umbracoContext, true, _umbracoContextAccessor);
         }
 
         // dummy TextWriter that does not write

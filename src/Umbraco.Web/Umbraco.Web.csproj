@@ -149,6 +149,9 @@
     <Compile Include="Editors\MacrosController.cs" />
     <Compile Include="Editors\RelationTypeController.cs" />
     <Compile Include="Editors\TinyMceController.cs" />
+    <Compile Include="FrameworkMarchal.cs" />
+    <Compile Include="Hosting\AspNetHostingEnvironment.cs" />
+    <Compile Include="HttpContextAccessorExtensions.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
     <Compile Include="Install\ChangesMonitor.cs" />
@@ -193,6 +196,10 @@
     <Compile Include="Scheduling\SchedulerComponent.cs" />
     <Compile Include="Scheduling\SchedulerComposer.cs" />
     <Compile Include="Security\CurrentUserAccessor.cs" />
+    <Compile Include="Search\BackgroundIndexRebuilder.cs" />
+    <Compile Include="Search\ExamineFinalComponent.cs" />
+    <Compile Include="Search\ExamineFinalComposer.cs" />
+    <Compile Include="Search\ExamineUserComponent.cs" />
     <Compile Include="Security\BackOfficeUserStore.cs" />
     <Compile Include="Security\BackOfficeUserValidator.cs" />
     <Compile Include="Security\ConfiguredPasswordValidator.cs" />

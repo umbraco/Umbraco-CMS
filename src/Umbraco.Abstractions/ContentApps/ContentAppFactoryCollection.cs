@@ -4,7 +4,6 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.ContentApps
@@ -12,18 +11,18 @@ namespace Umbraco.Web.ContentApps
     public class ContentAppFactoryCollection : BuilderCollectionBase<IContentAppFactory>
     {
         private readonly ILogger _logger;
-        private readonly ICurrentUserAccessor _currentUserAccessor;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-        public ContentAppFactoryCollection(IEnumerable<IContentAppFactory> items, ILogger logger, ICurrentUserAccessor currentUserAccessor)
+        public ContentAppFactoryCollection(IEnumerable<IContentAppFactory> items, ILogger logger, IUmbracoContextAccessor umbracoContextAccessor)
             : base(items)
         {
             _logger = logger;
-            _currentUserAccessor = currentUserAccessor;
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         private IEnumerable<IReadOnlyUserGroup> GetCurrentUserGroups()
         {
-            var currentUser = _currentUserAccessor.TryGetCurrentUser();
+            var currentUser = _umbracoContextAccessor.UmbracoContext?.Security?.CurrentUser;
             return currentUser == null
                 ? Enumerable.Empty<IReadOnlyUserGroup>()
                 : currentUser.Groups;

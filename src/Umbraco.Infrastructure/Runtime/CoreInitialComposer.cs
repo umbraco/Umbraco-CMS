@@ -85,7 +85,7 @@ namespace Umbraco.Core.Runtime
             composition.DataEditors()
                 .Add(() => composition.TypeLoader.GetDataEditors());
 
-            composition.DataEditorsWithMediaPath()
+            composition.MediaUrlGenerators()
                 .Add<FileUploadPropertyEditor>()
                 .Add<ImageCropperPropertyEditor>();
 

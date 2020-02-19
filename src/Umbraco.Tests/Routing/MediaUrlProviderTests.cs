@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Routing
             var dataTypeService = Mock.Of<IDataTypeService>();
             var umbracoSettingsSection = TestObjects.GetUmbracoSettings();
 
-            var propertyEditors = new DataEditorWithMediaPathCollection(new IDataEditorWithMediaPath[]
+            var propertyEditors = new MediaUrlGeneratorCollection(new IMediaUrlGenerator[]
             {
                 new FileUploadPropertyEditor(logger, mediaFileSystemMock, contentSection, dataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, umbracoSettingsSection),
                 new ImageCropperPropertyEditor(logger, mediaFileSystemMock, contentSection, dataTypeService, LocalizationService, IOHelper, ShortStringHelper, LocalizedTextService, umbracoSettingsSection),
