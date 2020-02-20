@@ -141,32 +141,9 @@ namespace Umbraco.Web.Install
         {
             try
             {
-                var path = _ioHelper.MapPath(dir + "/" + CreateRandomName());
+                var path = _ioHelper.MapPath(dir + "/" + FilePermissionDirectoryHelper.CreateRandomFileName());
                 Directory.CreateDirectory(path);
                 Directory.Delete(path);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        // tries to create a file
-        // if successful, the file is deleted
-        // creates the directory if needed - does not delete it
-        public static bool TryCreateDirectory(string dir, IIOHelper ioHelper)
-        {
-            try
-            {
-                var dirPath = ioHelper.MapPath(dir);
-
-                if (Directory.Exists(dirPath) == false)
-                    Directory.CreateDirectory(dirPath);
-
-                var filePath = dirPath + "/" + CreateRandomName() + ".tmp";
-                File.WriteAllText(filePath, "This is an Umbraco internal test file. It is safe to delete it.");
-                File.Delete(filePath);
                 return true;
             }
             catch
@@ -194,7 +171,7 @@ namespace Umbraco.Web.Install
 
                 if (canWrite)
                 {
-                    var filePath = dirPath + "/" + CreateRandomName() + ".tmp";
+                    var filePath = dirPath + "/" + FilePermissionDirectoryHelper.CreateRandomFileName() + ".tmp";
                     File.WriteAllText(filePath, "This is an Umbraco internal test file. It is safe to delete it.");
                     File.Delete(filePath);
                     return true;
@@ -260,11 +237,6 @@ namespace Umbraco.Web.Install
             {
                 return false;
             }
-        }
-
-        private static string CreateRandomName()
-        {
-            return "umbraco-test." + Guid.NewGuid().ToString("N").Substring(0, 8);
         }
     }
 }

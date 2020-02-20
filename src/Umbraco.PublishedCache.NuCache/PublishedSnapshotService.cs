@@ -364,7 +364,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override bool EnsureEnvironment(out IEnumerable<string> errors)
         {
             // must have app_data and be able to write files into it
-            var ok = FilePermissionHelper.TryCreateDirectory(GetLocalFilesPath(), _ioHelper);
+            var ok = FilePermissionDirectoryHelper.TryCreateDirectory(GetLocalFilesPath(), _ioHelper);
             errors = ok ? Enumerable.Empty<string>() : new[] { "NuCache local files." };
             return ok;
         }
