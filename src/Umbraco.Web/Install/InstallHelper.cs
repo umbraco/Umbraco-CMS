@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
+using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
 
@@ -23,11 +26,16 @@ namespace Umbraco.Web.Install
         private readonly IGlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IConnectionStrings _connectionStrings;
+        private readonly IInstallationService _installationService;
         private InstallationType? _installationType;
 
         public InstallHelper(IHttpContextAccessor httpContextAccessor,
             DatabaseBuilder databaseBuilder,
-            ILogger logger, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IConnectionStrings connectionStrings)
+            ILogger logger,
+            IGlobalSettings globalSettings,
+            IUmbracoVersion umbracoVersion,
+            IConnectionStrings connectionStrings,
+            IInstallationService installationService)
         {
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
@@ -35,6 +43,7 @@ namespace Umbraco.Web.Install
             _umbracoVersion = umbracoVersion;
             _databaseBuilder = databaseBuilder;
             _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
+            _installationService = installationService;
         }
 
         public InstallationType GetInstallationType()
@@ -42,7 +51,7 @@ namespace Umbraco.Web.Install
             return _installationType ?? (_installationType = IsBrandNewInstall ? InstallationType.NewInstall : InstallationType.Upgrade).Value;
         }
 
-        internal void InstallStatus(bool isCompleted, string errorMsg)
+        internal async Task InstallStatus(bool isCompleted, string errorMsg)
         {
             try
             {
@@ -61,8 +70,12 @@ namespace Umbraco.Web.Install
                         if (installId == Guid.Empty)
                             installId = Guid.NewGuid();
                     }
+                    else
+                    {
+                        installId = Guid.NewGuid(); // Guid.TryParse will have reset installId to Guid.Empty
+                    }
                 }
-                httpContext.Response.Cookies.Set(new HttpCookie(Constants.Web.InstallerCookieName, "1"));
+                httpContext.Response.Cookies.Set(new HttpCookie(Constants.Web.InstallerCookieName, installId.ToString()));
 
                 var dbProvider = string.Empty;
                 if (IsBrandNewInstall == false)
@@ -72,18 +85,13 @@ namespace Umbraco.Web.Install
                     dbProvider = GetDbProviderString(Current.SqlContext);
                 }
 
-                var check = new org.umbraco.update.CheckForUpgrade();
-                check.Install(installId,
-                    IsBrandNewInstall == false,
-                    isCompleted,
-                    DateTime.Now,
-                    _umbracoVersion.Current.Major,
-                    _umbracoVersion.Current.Minor,
-                    _umbracoVersion.Current.Build,
-                    _umbracoVersion.Comment,
-                    errorMsg,
-                    userAgent,
-                    dbProvider);
+                var installLog = new InstallLog(installId: installId, isUpgrade: IsBrandNewInstall == false,
+                    installCompleted: isCompleted, timestamp: DateTime.Now, versionMajor: _umbracoVersion.Current.Major,
+                    versionMinor: _umbracoVersion.Current.Minor, versionPatch: _umbracoVersion.Current.Build,
+                    versionComment: _umbracoVersion.Comment, error: errorMsg, userAgent: userAgent,
+                    dbProvider: dbProvider);
+
+                await _installationService.LogInstall(installLog);
             }
             catch (Exception ex)
             {
