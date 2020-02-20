@@ -545,7 +545,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             // was library.GetMedia which had its own cache, but MediaService *also* caches
             // so, library.GetMedia is gone and now we directly work with MediaService
             // (code below copied from what library was doing)
-            var media = Current.Services.MediaService.GetById(parentId);
+            var media = _mediaService.GetById(parentId);
             if (media == null)
             {
                 return Enumerable.Empty<IPublishedContent>();

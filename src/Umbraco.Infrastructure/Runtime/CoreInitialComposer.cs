@@ -19,11 +19,13 @@ using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web;
+using Umbraco.Web.Migrations.PostMigrations;
 using Umbraco.Web.Install;
 using Umbraco.Web.Trees;
 using Umbraco.Web.PropertyEditors;
@@ -147,8 +149,8 @@ namespace Umbraco.Core.Runtime
             // by default, register a noop factory
             composition.RegisterUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
 
-            // by default, register a noop rebuilder
-            composition.RegisterUnique<IPublishedSnapshotRebuilder, NoopPublishedSnapshotRebuilder>();
+            // by default
+            composition.RegisterUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
 
             composition.SetCultureDictionaryFactory<DefaultCultureDictionaryFactory>();
             composition.Register(f => f.GetInstance<ICultureDictionaryFactory>().CreateDictionary(), Lifetime.Singleton);
@@ -164,6 +166,10 @@ namespace Umbraco.Core.Runtime
             // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
             composition.Dashboards()
                 .Add(composition.TypeLoader.GetTypes<IDashboard>());
+
+            // will be injected in controllers when needed to invoke rest endpoints on Our
+            composition.RegisterUnique<IInstallationService, InstallationService>();
+            composition.RegisterUnique<IUpgradeService, UpgradeService>();
         }
     }
 }
