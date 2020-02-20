@@ -16,14 +16,14 @@ namespace Umbraco.Web.WebApi.Filters
             if (context.Response.IsSuccessStatusCode == false) return;
 
             //remove the cookies
-            var angularCookie = new CookieHeaderValue(AngularAntiForgeryHelper.AngularCookieName, "null")
+            var angularCookie = new CookieHeaderValue(Core.Constants.Web.AngularCookieName, "null")
                 {
                     Expires = DateTime.Now.AddYears(-1),
                     //must be js readable
                     HttpOnly = false,
                     Path = "/"
                 };
-            var validationCookie = new CookieHeaderValue(AngularAntiForgeryHelper.CsrfValidationCookieName, "null")
+            var validationCookie = new CookieHeaderValue(Core.Constants.Web.CsrfValidationCookieName, "null")
             {
                 Expires = DateTime.Now.AddYears(-1),
                 HttpOnly = true,

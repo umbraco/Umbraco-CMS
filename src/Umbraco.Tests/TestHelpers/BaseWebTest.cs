@@ -29,6 +29,7 @@ namespace Umbraco.Tests.TestHelpers
         protected override void Compose()
         {
             base.Compose();
+            base.Compose();
 
             Composition.RegisterUnique<IPublishedValueFallback, PublishedValueFallback>();
             Composition.RegisterUnique<IProfilingLogger, ProfilingLogger>();
@@ -99,8 +100,9 @@ namespace Umbraco.Tests.TestHelpers
                 container?.TryGetInstance<ServiceContext>() ?? ServiceContext.CreatePartial(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()),
                 container?.TryGetInstance<IUmbracoSettingsSection>() ?? Current.Factory.GetInstance<IUmbracoSettingsSection>(),
-                Mock.Of<IUserService>(),
-                Mock.Of<IHttpContextAccessor>());
+                Mock.Of<IHttpContextAccessor>(),
+                Mock.Of<IPublishedUrlProvider>()
+                );
         }
     }
 }

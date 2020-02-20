@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models.PublishedContent;
+﻿using Umbraco.Core.Cache;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Models.PublishedContent
 {
@@ -7,22 +8,22 @@ namespace Umbraco.Web.Models.PublishedContent
     /// </summary>
     public class HttpContextVariationContextAccessor : IVariationContextAccessor
     {
-        public const string ContextKey = "Umbraco.Web.Models.PublishedContent.DefaultVariationContextAccessor";
-        public readonly IHttpContextAccessor HttpContextAccessor;
+        private readonly IRequestCache _requestCache;
+        private const string ContextKey = "Umbraco.Web.Models.PublishedContent.DefaultVariationContextAccessor";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpContextVariationContextAccessor"/> class.
         /// </summary>
-        public HttpContextVariationContextAccessor(IHttpContextAccessor httpContextAccessor)
+        public HttpContextVariationContextAccessor(IRequestCache requestCache)
         {
-            HttpContextAccessor = httpContextAccessor;
+            _requestCache = requestCache;
         }
 
         /// <inheritdoc />
         public VariationContext VariationContext
         {
-            get => (VariationContext) HttpContextAccessor.HttpContext?.Items[ContextKey];
-            set => HttpContextAccessor.HttpContext.Items[ContextKey] = value;
+            get => (VariationContext) _requestCache.Get(ContextKey);
+            set => _requestCache.Set(ContextKey, value);
         }
     }
 }

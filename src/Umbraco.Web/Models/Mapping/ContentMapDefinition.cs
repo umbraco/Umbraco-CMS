@@ -31,6 +31,7 @@ namespace Umbraco.Web.Models.Mapping
         private readonly ILogger _logger;
         private readonly IUserService _userService;
         private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly UriUtility _uriUtility;
         private readonly TabsAndPropertiesMapper<IContent> _tabsAndPropertiesMapper;
         private readonly ContentSavedStateMapper<ContentPropertyDisplay> _stateMapper;
@@ -39,7 +40,7 @@ namespace Umbraco.Web.Models.Mapping
 
         public ContentMapDefinition(CommonMapper commonMapper, ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService, IContentService contentService, IContentTypeService contentTypeService,
             IFileService fileService, IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, ILocalizationService localizationService, ILogger logger,
-            IUserService userService, IVariationContextAccessor variationContextAccessor, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, UriUtility uriUtility)
+            IUserService userService, IVariationContextAccessor variationContextAccessor, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, UriUtility uriUtility, IPublishedUrlProvider publishedUrlProvider)
         {
             _commonMapper = commonMapper;
             _cultureDictionary = cultureDictionary;
@@ -54,6 +55,7 @@ namespace Umbraco.Web.Models.Mapping
             _userService = userService;
             _variationContextAccessor = variationContextAccessor;
             _uriUtility = uriUtility;
+            _publishedUrlProvider = publishedUrlProvider;
 
             _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IContent>(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider);
             _stateMapper = new ContentSavedStateMapper<ContentPropertyDisplay>();
@@ -179,7 +181,7 @@ namespace Umbraco.Web.Models.Mapping
 
             var urls = umbracoContext == null
                 ? new[] { UrlInfo.Message("Cannot generate urls without a current Umbraco Context") }
-                : source.GetContentUrls(_publishedRouter, umbracoContext, _localizationService, _localizedTextService, _contentService, _variationContextAccessor, _logger, _uriUtility).ToArray();
+                : source.GetContentUrls(_publishedRouter, umbracoContext, _localizationService, _localizedTextService, _contentService, _variationContextAccessor, _logger, _uriUtility, _publishedUrlProvider).ToArray();
 
             return urls;
         }

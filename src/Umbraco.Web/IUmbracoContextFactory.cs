@@ -26,7 +26,6 @@ namespace Umbraco.Web
         ///   // use umbracoContext...
         /// }
         /// </example>
-        /// <param name="httpContext">An optional http context.</param>
-        UmbracoContextReference EnsureUmbracoContext(HttpContextBase httpContext = null);
+        UmbracoContextReference EnsureUmbracoContext();
     }
 }

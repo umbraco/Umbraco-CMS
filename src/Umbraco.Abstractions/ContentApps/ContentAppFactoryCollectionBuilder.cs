@@ -19,8 +19,8 @@ namespace Umbraco.Web.ContentApps
         {
             // get the logger just-in-time - see note below for manifest parser
             var logger = factory.GetInstance<ILogger>();
-            var currentUserAccessor = factory.GetInstance<ICurrentUserAccessor>();
-            return new ContentAppFactoryCollection(CreateItems(factory), logger, currentUserAccessor);
+            var umbracoContextAccessor = factory.GetInstance<IUmbracoContextAccessor>();
+            return new ContentAppFactoryCollection(CreateItems(factory), logger, umbracoContextAccessor);
         }
 
         protected override IEnumerable<IContentAppFactory> CreateItems(IFactory factory)

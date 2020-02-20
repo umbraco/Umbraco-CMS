@@ -2,9 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -12,10 +10,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     public class MemberPickerValueConverter : PropertyValueConverterBase
     {
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-        public MemberPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor)
+        public MemberPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         public override bool IsConverter(IPublishedPropertyType propertyType)
@@ -45,7 +45,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (source == null)
                 return null;
 
-            if (Current.UmbracoContext != null)
+            if (_umbracoContextAccessor.UmbracoContext != null)
             {
                 IPublishedContent member;
                 if (source is int id)

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Templates
@@ -18,10 +16,12 @@ namespace Umbraco.Web.Templates
             RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IPublishedUrlProvider _publishedUrlProvider;
 
-        public HtmlLocalLinkParser(IUmbracoContextAccessor umbracoContextAccessor)
+        public HtmlLocalLinkParser(IUmbracoContextAccessor umbracoContextAccessor, IPublishedUrlProvider publishedUrlProvider)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
+            _publishedUrlProvider = publishedUrlProvider;
         }
 
         internal IEnumerable<Udi> FindUdisFromLocalLinks(string text)
@@ -64,7 +64,6 @@ namespace Umbraco.Web.Templates
             if (_umbracoContextAccessor.UmbracoContext == null)
                 throw new InvalidOperationException("Could not parse internal links, there is no current UmbracoContext");
 
-            var urlProvider = _umbracoContextAccessor.UmbracoContext.UrlProvider;
 
             foreach((int? intId, GuidUdi udi, string tagValue) in FindLocalLinkIds(text))
             {
@@ -72,9 +71,9 @@ namespace Umbraco.Web.Templates
                 {
                     var newLink = "#";
                     if (udi.EntityType == Constants.UdiEntityType.Document)
-                        newLink = urlProvider.GetUrl(udi.Guid);
+                        newLink = _publishedUrlProvider.GetUrl(udi.Guid);
                     else if (udi.EntityType == Constants.UdiEntityType.Media)
-                        newLink = urlProvider.GetMediaUrl(udi.Guid);
+                        newLink = _publishedUrlProvider.GetMediaUrl(udi.Guid);
 
                     if (newLink == null)
                         newLink = "#";
@@ -83,7 +82,7 @@ namespace Umbraco.Web.Templates
                 }
                 else if (intId.HasValue)
                 {
-                    var newLink = urlProvider.GetUrl(intId.Value);
+                    var newLink = _publishedUrlProvider.GetUrl(intId.Value);
                     text = text.Replace(tagValue, "href=\"" + newLink);
                 }
             }

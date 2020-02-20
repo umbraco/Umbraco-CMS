@@ -28,8 +28,8 @@ namespace Umbraco.Web.Routing
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly ILogger _logger;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
-        private readonly IUserService _userService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IPublishedUrlProvider _publishedUrlProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedRouter"/> class.
@@ -42,8 +42,8 @@ namespace Umbraco.Web.Routing
             ServiceContext services,
             IProfilingLogger proflog,
             IUmbracoSettingsSection umbracoSettingsSection,
-            IUserService userService,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IPublishedUrlProvider publishedUrlProvider)
         {
             _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection));
             _contentFinders = contentFinders ?? throw new ArgumentNullException(nameof(contentFinders));
@@ -53,8 +53,8 @@ namespace Umbraco.Web.Routing
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             _logger = proflog;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _httpContextAccessor = httpContextAccessor;
+            _publishedUrlProvider = publishedUrlProvider;
         }
 
         /// <inheritdoc />
@@ -637,7 +637,7 @@ namespace Umbraco.Web.Routing
             var useAltTemplate = request.IsInitialPublishedContent
                 || (_webRoutingSection.InternalRedirectPreservesTemplate && request.IsInternalRedirectPublishedContent);
             var altTemplate = useAltTemplate
-                ? _httpContextAccessor.HttpContext.Request[Constants.Conventions.Url.AltTemplate]
+                ? _httpContextAccessor.GetRequiredHttpContext().Request[Constants.Conventions.Url.AltTemplate]
                 : null;
 
             if (string.IsNullOrWhiteSpace(altTemplate))
@@ -754,14 +754,14 @@ namespace Umbraco.Web.Routing
             var redirectUrl = "#";
             if (redirectId > 0)
             {
-                redirectUrl = request.UmbracoContext.UrlProvider.GetUrl(redirectId);
+                redirectUrl = _publishedUrlProvider.GetUrl(redirectId);
             }
             else
             {
                 // might be a UDI instead of an int Id
                 var redirectUdi = request.PublishedContent.Value<GuidUdi>(Constants.Conventions.Content.Redirect);
                 if (redirectUdi != null)
-                    redirectUrl = request.UmbracoContext.UrlProvider.GetUrl(redirectUdi.Guid);
+                    redirectUrl = _publishedUrlProvider.GetUrl(redirectUdi.Guid);
             }
             if (redirectUrl != "#")
                 request.SetRedirect(redirectUrl);

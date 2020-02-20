@@ -21,7 +21,10 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
+using Umbraco.Web.Models.PublishedContent;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web;
+using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Services;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
 
@@ -77,6 +80,11 @@ namespace Umbraco.Core.Runtime
             // properties and parameters derive from data editors
             composition.DataEditors()
                 .Add(() => composition.TypeLoader.GetDataEditors());
+
+            composition.MediaUrlGenerators()
+                .Add<FileUploadPropertyEditor>()
+                .Add<ImageCropperPropertyEditor>();
+
             composition.RegisterUnique<PropertyEditorCollection>();
             composition.RegisterUnique<ParameterEditorCollection>();
 
@@ -136,11 +144,16 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
 
             // by default, register a noop rebuilder
-            composition.RegisterUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
+            composition.RegisterUnique<IPublishedSnapshotRebuilder, NoopPublishedSnapshotRebuilder>();
 
             composition.SetCultureDictionaryFactory<DefaultCultureDictionaryFactory>();
             composition.Register(f => f.GetInstance<ICultureDictionaryFactory>().CreateDictionary(), Lifetime.Singleton);
             composition.RegisterUnique<UriUtility>();
+
+            // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
+            composition.RegisterUnique<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
+
+            composition.RegisterUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
 
             composition.RegisterUnique<IDashboardService, DashboardService>();
 

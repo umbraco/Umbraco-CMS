@@ -18,6 +18,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Mapping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Trees
 {
@@ -29,7 +30,19 @@ namespace Umbraco.Web.Trees
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
 
-        public DataTypeTreeController(UmbracoTreeSearcher treeSearcher, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper)
+        public DataTypeTreeController(
+            UmbracoTreeSearcher treeSearcher,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper, publishedUrlProvider)
         {
             _treeSearcher = treeSearcher;
         }

@@ -182,7 +182,7 @@ namespace Umbraco.Web.Models.PublishedContent
             // if we found a content with the property having a value, return that property value
             if (property != null && property.HasValue(culture, segment))
             {
-                value = property.Value<T>(culture, segment);
+                value = property.Value<T>(this, culture, segment);
                 return true;
             }
 
@@ -216,7 +216,7 @@ namespace Umbraco.Web.Models.PublishedContent
 
                 if (property.HasValue(culture2, segment))
                 {
-                    value = property.Value<T>(culture2, segment);
+                    value = property.Value<T>(this, culture2, segment);
                     return true;
                 }
 
@@ -250,7 +250,7 @@ namespace Umbraco.Web.Models.PublishedContent
 
                 if (content.HasValue(alias, culture2, segment))
                 {
-                    value = content.Value<T>(alias, culture2, segment);
+                    value = content.Value<T>(this, alias, culture2, segment);
                     return true;
                 }
 
@@ -287,7 +287,7 @@ namespace Umbraco.Web.Models.PublishedContent
 
                 if (content.HasValue(alias, culture2, segment))
                 {
-                    value = content.Value<T>(alias, culture2, segment);
+                    value = content.Value<T>(this, alias, culture2, segment);
                     return true;
                 }
 

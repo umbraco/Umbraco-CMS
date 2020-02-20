@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Templates
 {
@@ -13,10 +14,11 @@ namespace Umbraco.Web.Templates
             this._getMediaUrl = getMediaUrl;
         }
 
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        public HtmlImageSourceParser(IUmbracoContextAccessor umbracoContextAccessor)
+        private readonly IPublishedUrlProvider _publishedUrlProvider;
+
+        public HtmlImageSourceParser(IPublishedUrlProvider publishedUrlProvider)
         {
-            _umbracoContextAccessor = umbracoContextAccessor;
+            _publishedUrlProvider = publishedUrlProvider;
         }
 
         private static readonly Regex ResolveImgPattern = new Regex(@"(<img[^>]*src="")([^""\?]*)((?:\?[^""]*)?""[^>]*data-udi="")([^""]*)(""[^>]*>)",
@@ -54,7 +56,7 @@ namespace Umbraco.Web.Templates
         public string EnsureImageSources(string text)
         {
             if(_getMediaUrl == null)
-                _getMediaUrl = (guid) => _umbracoContextAccessor.UmbracoContext.UrlProvider.GetMediaUrl(guid);
+                _getMediaUrl = (guid) => _publishedUrlProvider.GetMediaUrl(guid);
 
             return ResolveImgPattern.Replace(text, match =>
             {

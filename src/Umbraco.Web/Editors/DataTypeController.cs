@@ -24,6 +24,7 @@ using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Mapping;
 using System.Web.Http.Controllers;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
 {
@@ -44,8 +45,21 @@ namespace Umbraco.Web.Editors
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
-        public DataTypeController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper, UmbracoMapper umbracoMapper, IUmbracoSettingsSection umbracoSettingsSection)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
+        public DataTypeController(
+            PropertyEditorCollection propertyEditors,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            IUmbracoSettingsSection umbracoSettingsSection,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _propertyEditors = propertyEditors;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));

@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Web.Security;
 using Current = Umbraco.Web.Composing.Current;
 

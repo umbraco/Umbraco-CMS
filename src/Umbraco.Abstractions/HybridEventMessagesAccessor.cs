@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Events;
+﻿using Umbraco.Core.Cache;
+using Umbraco.Core.Events;
 
 namespace Umbraco.Web
 {
@@ -6,8 +7,8 @@ namespace Umbraco.Web
     {
         protected override string ItemKey => "Umbraco.Core.Events.HybridEventMessagesAccessor";
 
-        public HybridEventMessagesAccessor(IHttpContextAccessor httpContextAccessor)
-            : base(httpContextAccessor)
+        public HybridEventMessagesAccessor(IRequestCache requestCache)
+            : base(requestCache)
         { }
 
         public EventMessages EventMessages

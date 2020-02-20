@@ -10,6 +10,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Examine;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Search
@@ -20,26 +21,28 @@ namespace Umbraco.Web.Search
     /// </summary>
     public class UmbracoTreeSearcher
     {
-        private readonly IUmbracoContext _umbracoContext;
         private readonly ILocalizationService _languageService;
         private readonly IEntityService _entityService;
         private readonly UmbracoMapper _mapper;
         private readonly ISqlContext _sqlContext;
         private readonly IBackOfficeExamineSearcher _backOfficeExamineSearcher;
+        private readonly IPublishedUrlProvider _publishedUrlProvider;
 
 
-        public UmbracoTreeSearcher(IUmbracoContext umbracoContext,
+        public UmbracoTreeSearcher(
             ILocalizationService languageService,
             IEntityService entityService,
             UmbracoMapper mapper,
-            ISqlContext sqlContext, IBackOfficeExamineSearcher backOfficeExamineSearcher)
+            ISqlContext sqlContext,
+            IBackOfficeExamineSearcher backOfficeExamineSearcher,
+            IPublishedUrlProvider publishedUrlProvider)
         {
-            _umbracoContext = umbracoContext;
             _languageService = languageService;
             _entityService = entityService;
             _mapper = mapper;
             _sqlContext = sqlContext;
             _backOfficeExamineSearcher = backOfficeExamineSearcher;
+            _publishedUrlProvider = publishedUrlProvider;
         }
 
         /// <summary>
@@ -157,11 +160,11 @@ namespace Umbraco.Web.Search
                     //if it varies by culture, return the default language URL
                     if (result.Values.TryGetValue(UmbracoExamineFieldNames.VariesByCultureFieldName, out var varies) && varies == "y")
                     {
-                        entity.AdditionalData["Url"] = _umbracoContext.Url(intId.Result, defaultLang);
+                        entity.AdditionalData["Url"] = _publishedUrlProvider.GetUrl(intId.Result, culture: defaultLang);
                     }
                     else
                     {
-                        entity.AdditionalData["Url"] = _umbracoContext.Url(intId.Result);
+                        entity.AdditionalData["Url"] = _publishedUrlProvider.GetUrl(intId.Result);
                     }
                 }
 

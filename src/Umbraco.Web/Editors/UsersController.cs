@@ -35,6 +35,7 @@ using IUser = Umbraco.Core.Models.Membership.IUser;
 using Task = System.Threading.Tasks.Task;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
 {
@@ -64,8 +65,9 @@ namespace Umbraco.Web.Editors
             UmbracoMapper umbracoMapper,
             IUmbracoSettingsSection umbracoSettingsSection,
             IIOHelper ioHelper,
-            IImageUrlGenerator imageUrlGenerator)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
+            IImageUrlGenerator imageUrlGenerator,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _mediaFileSystem = mediaFileSystem;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));

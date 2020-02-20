@@ -16,14 +16,15 @@ namespace Umbraco.Tests.Testing.Objects
     /// </summary>
     public class TestUmbracoContextFactory
     {
-        public static IUmbracoContextFactory Create(IGlobalSettings globalSettings = null, IUrlProvider urlProvider = null,
-            IMediaUrlProvider mediaUrlProvider = null,
-            IUmbracoContextAccessor umbracoContextAccessor = null)
+        public static IUmbracoContextFactory Create(IGlobalSettings globalSettings = null,
+            IUmbracoContextAccessor umbracoContextAccessor = null,
+            IHttpContextAccessor httpContextAccessor = null,
+            IPublishedUrlProvider publishedUrlProvider = null)
         {
             if (globalSettings == null) globalSettings = SettingsForTests.GenerateMockGlobalSettings();
-            if (urlProvider == null) urlProvider = Mock.Of<IUrlProvider>();
-            if (mediaUrlProvider == null) mediaUrlProvider = Mock.Of<IMediaUrlProvider>();
             if (umbracoContextAccessor == null) umbracoContextAccessor = new TestUmbracoContextAccessor();
+            if (httpContextAccessor == null) httpContextAccessor = TestHelper.GetHttpContextAccessor();
+            if (publishedUrlProvider == null) publishedUrlProvider = TestHelper.GetPublishedUrlProvider();
 
             var contentCache = new Mock<IPublishedContentCache>();
             var mediaCache = new Mock<IPublishedMediaCache>();
@@ -33,18 +34,18 @@ namespace Umbraco.Tests.Testing.Objects
             var snapshotService = new Mock<IPublishedSnapshotService>();
             snapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(snapshot.Object);
 
+
+
             var umbracoContextFactory = new UmbracoContextFactory(
                 umbracoContextAccessor,
                 snapshotService.Object,
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
                 globalSettings,
-                new UrlProviderCollection(new[] { urlProvider }),
-                new MediaUrlProviderCollection(new[] { mediaUrlProvider }),
                 Mock.Of<IUserService>(),
                 TestHelper.IOHelper,
-                TestHelper.UriUtility);
+                TestHelper.UriUtility,
+                httpContextAccessor);
 
             return umbracoContextFactory;
         }

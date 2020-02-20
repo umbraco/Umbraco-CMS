@@ -43,7 +43,8 @@ namespace Umbraco.Tests.Routing
                 null, // FIXME: PublishedRouter complexities...
                 Mock.Of<IUmbracoContextFactory>(),
                 new RoutableDocumentFilter(globalSettings, IOHelper),
-                UriUtility
+                UriUtility,
+                AppCaches.RequestCache
             );
 
             runtime.Level = RuntimeLevel.Run;

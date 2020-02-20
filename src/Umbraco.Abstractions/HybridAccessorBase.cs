@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Runtime.Remoting.Messaging;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Web
 {
@@ -16,12 +17,12 @@ namespace Umbraco.Web
     public abstract class HybridAccessorBase<T>
         where T : class
     {
+        private readonly IRequestCache _requestCache;
+
         // ReSharper disable StaticMemberInGenericType
         private static readonly object Locker = new object();
         private static bool _registered;
         // ReSharper restore StaticMemberInGenericType
-
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
         protected abstract string ItemKey { get; }
 
@@ -42,17 +43,16 @@ namespace Umbraco.Web
         // yes! flows with async!
         private T NonContextValue
         {
-            get => (T) CallContext.LogicalGetData(ItemKey);
+            get => CallContext<T>.GetData(ItemKey);
             set
             {
-                if (value == null) CallContext.FreeNamedDataSlot(ItemKey);
-                else CallContext.LogicalSetData(ItemKey, value);
+                CallContext<T>.SetData(ItemKey, value);
             }
         }
 
-        protected HybridAccessorBase(IHttpContextAccessor httpContextAccessor)
+        protected HybridAccessorBase(IRequestCache requestCache)
         {
-            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
 
             lock (Locker)
             {
@@ -65,15 +65,14 @@ namespace Umbraco.Web
             var itemKey = ItemKey; // virtual
             SafeCallContext.Register(() =>
             {
-                var value = CallContext.LogicalGetData(itemKey);
-                CallContext.FreeNamedDataSlot(itemKey);
+                var value = CallContext<T>.GetData(itemKey);
                 return value;
             }, o =>
             {
                 if (o == null) return;
                 var value = o as T;
                 if (value == null) throw new ArgumentException($"Expected type {typeof(T).FullName}, got {o.GetType().FullName}", nameof(o));
-                CallContext.LogicalSetData(itemKey, value);
+                CallContext<T>.SetData(itemKey, value);
             });
         }
 
@@ -81,20 +80,23 @@ namespace Umbraco.Web
         {
             get
             {
-                var httpContext = _httpContextAccessor.HttpContext;
-                if (httpContext == null) return NonContextValue;
-                return (T) httpContext.Items[ItemKey];
+                if (!_requestCache.IsAvailable)
+                {
+                    return NonContextValue;
+                }
+                return (T) _requestCache.Get(ItemKey);
             }
 
             set
             {
-                var httpContext = _httpContextAccessor.HttpContext;
-                if (httpContext == null)
+                if (!_requestCache.IsAvailable)
+                {
                     NonContextValue = value;
+                }
                 else if (value == null)
-                    httpContext.Items.Remove(ItemKey);
+                    _requestCache.Remove(ItemKey);
                 else
-                    httpContext.Items[ItemKey] = value;
+                    _requestCache.Set(ItemKey, value);
             }
         }
     }

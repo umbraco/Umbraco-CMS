@@ -22,9 +22,9 @@ namespace Umbraco.Web
         /// </summary>
         internal UmbracoContextReference(IUmbracoContext umbracoContext, bool isRoot, IUmbracoContextAccessor umbracoContextAccessor)
         {
-            UmbracoContext = umbracoContext;
             IsRoot = isRoot;
 
+            UmbracoContext = umbracoContext;
             _umbracoContextAccessor = umbracoContextAccessor;
         }
 

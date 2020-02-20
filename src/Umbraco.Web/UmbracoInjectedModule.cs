@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Web;
 using System.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -38,6 +39,7 @@ namespace Umbraco.Web
         private readonly IPublishedRouter _publishedRouter;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly RoutableDocumentFilter _routableDocumentLookup;
+        private readonly IRequestCache _requestCache;
         private readonly UriUtility _uriUtility;
 
         public UmbracoInjectedModule(
@@ -47,7 +49,8 @@ namespace Umbraco.Web
             IPublishedRouter publishedRouter,
             IUmbracoContextFactory umbracoContextFactory,
             RoutableDocumentFilter routableDocumentLookup,
-            UriUtility uriUtility)
+            UriUtility uriUtility,
+            IRequestCache requestCache)
         {
             _globalSettings = globalSettings;
             _runtime = runtime;
@@ -56,6 +59,7 @@ namespace Umbraco.Web
             _umbracoContextFactory = umbracoContextFactory;
             _routableDocumentLookup = routableDocumentLookup;
             _uriUtility = uriUtility;
+            _requestCache = requestCache;
         }
 
         #region HttpModule event handlers
@@ -81,7 +85,7 @@ namespace Umbraco.Web
             // TODO: should we move this to after we've ensured we are processing a routable page?
             // ensure there's an UmbracoContext registered for the current request
             // registers the context reference so its disposed at end of request
-            var umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext(httpContext);
+            var umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
             httpContext.DisposeOnPipelineCompleted(umbracoContextReference);
         }
 
@@ -308,15 +312,15 @@ namespace Umbraco.Web
         /// Any object that is in the HttpContext.Items collection that is IDisposable will get disposed on the end of the request
         /// </summary>
         /// <param name="http"></param>
-        private void DisposeHttpContextItems(HttpContext http)
+        private void DisposeRequestCacheItems(HttpContext http, IRequestCache requestCache)
         {
             // do not process if client-side request
             if (http.Request.Url.IsClientSideRequest())
                 return;
 
             //get a list of keys to dispose
-            var keys = new HashSet<object>();
-            foreach (DictionaryEntry i in http.Items)
+            var keys = new HashSet<string>();
+            foreach (var i in requestCache)
             {
                 if (i.Value is IDisposeOnRequestEnd || i.Key is IDisposeOnRequestEnd)
                 {
@@ -328,7 +332,7 @@ namespace Umbraco.Web
             {
                 try
                 {
-                    http.Items[k].DisposeIfDisposable();
+                    requestCache.Get(k).DisposeIfDisposable();
                 }
                 catch (Exception ex)
                 {
@@ -379,7 +383,7 @@ namespace Umbraco.Web
             {
                 var httpContext = ((HttpApplication) sender).Context;
 
-                LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, Current.AppCaches.RequestCache);
+                LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, _requestCache);
 
                 _logger.Verbose<UmbracoModule>("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, httpContext.Request.Url);
                 BeginRequest(new HttpContextWrapper(httpContext));
@@ -424,14 +428,14 @@ namespace Umbraco.Web
 
                 if (Current.UmbracoContext != null && Current.UmbracoContext.IsFrontEndUmbracoRequest)
                 {
-                    LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, Current.AppCaches.RequestCache);
+                    LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, _requestCache);
 
                     _logger.Verbose<UmbracoModule>("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, httpContext.Request.Url, DateTime.Now.Subtract(Current.UmbracoContext.ObjectCreated).TotalMilliseconds);
                 }
 
                 UmbracoModule.OnEndRequest(this, new UmbracoRequestEventArgs(Current.UmbracoContext));
 
-                DisposeHttpContextItems(httpContext);
+                DisposeRequestCacheItems(httpContext, _requestCache);
             };
         }
 

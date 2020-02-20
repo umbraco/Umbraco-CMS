@@ -18,21 +18,19 @@ namespace Umbraco.Web.Models.Mapping
     internal class MediaMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;
-        private readonly ILogger _logger;
         private readonly IMediaService _mediaService;
         private readonly IMediaTypeService _mediaTypeService;
-        private readonly PropertyEditorCollection _propertyEditorCollection;
+        private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
         private readonly TabsAndPropertiesMapper<IMedia> _tabsAndPropertiesMapper;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
-        public MediaMapDefinition(ICultureDictionary cultureDictionary, ILogger logger, CommonMapper commonMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
-            ILocalizedTextService localizedTextService, PropertyEditorCollection propertyEditorCollection, IUmbracoSettingsSection umbracoSettingsSection, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+        public MediaMapDefinition(ICultureDictionary cultureDictionary, CommonMapper commonMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
+            ILocalizedTextService localizedTextService, MediaUrlGeneratorCollection mediaUrlGenerators, IUmbracoSettingsSection umbracoSettingsSection, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
         {
-            _logger = logger;
             _commonMapper = commonMapper;
             _mediaService = mediaService;
             _mediaTypeService = mediaTypeService;
-            _propertyEditorCollection = propertyEditorCollection;
+            _mediaUrlGenerators = mediaUrlGenerators;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
 
             _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IMedia>(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider);
@@ -64,7 +62,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Id = source.Id;
             target.IsChildOfListView = DetermineIsChildOfListView(source);
             target.Key = source.Key;
-            target.MediaLink = string.Join(",", source.GetUrls(_umbracoSettingsSection.Content, _logger, _propertyEditorCollection));
+            target.MediaLink = string.Join(",", source.GetUrls(_umbracoSettingsSection.Content, _mediaUrlGenerators));
             target.Name = source.Name;
             target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
