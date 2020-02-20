@@ -22,6 +22,7 @@ using Umbraco.Web.Composing;
 using Constants = Umbraco.Core.Constants;
 using IMediaType = Umbraco.Core.Models.IMediaType;
 using Umbraco.Core.Mapping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
 {
@@ -41,8 +42,21 @@ namespace Umbraco.Web.Editors
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IEntityService _entityService;
 
-        public MediaTypeController(ICultureDictionary cultureDictionary, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper, UmbracoMapper umbracoMapper, IEntityService entityService)
-            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
+        public MediaTypeController(
+            ICultureDictionary cultureDictionary,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            IEntityService entityService,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _shortStringHelper = shortStringHelper;
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));

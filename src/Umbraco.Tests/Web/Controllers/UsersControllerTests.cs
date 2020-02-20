@@ -36,6 +36,7 @@ using Umbraco.Web.Models.ContentEditing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Web.Controllers
 {
@@ -91,7 +92,9 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IUmbracoSettingsSection>(),
                     Factory.GetInstance<IIOHelper>(),
-                    Factory.GetInstance<IImageUrlGenerator>()
+                    Factory.GetInstance<IImageUrlGenerator>(),
+                    Factory.GetInstance<IPublishedUrlProvider>()
+
                 );
                 return usersController;
             }
@@ -162,8 +165,9 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IUmbracoSettingsSection>(),
                     Factory.GetInstance<IIOHelper>(),
-                    Factory.GetInstance<IImageUrlGenerator>()
-                    );
+                    Factory.GetInstance<IImageUrlGenerator>(),
+                    Factory.GetInstance<IPublishedUrlProvider>()
+                );
                 return usersController;
             }
 
@@ -204,7 +208,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IUmbracoSettingsSection>(),
                     Factory.GetInstance<IIOHelper>(),
-                    Factory.GetInstance<IImageUrlGenerator>()
+                    Factory.GetInstance<IImageUrlGenerator>(),
+                    Factory.GetInstance<IPublishedUrlProvider>()
                 );
                 return usersController;
             }
@@ -281,7 +286,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IUmbracoSettingsSection>(),
                     Factory.GetInstance<IIOHelper>(),
-                    Factory.GetInstance<IImageUrlGenerator>()
+                    Factory.GetInstance<IImageUrlGenerator>(),
+                    Factory.GetInstance<IPublishedUrlProvider>()
                 );
                 return usersController;
             }

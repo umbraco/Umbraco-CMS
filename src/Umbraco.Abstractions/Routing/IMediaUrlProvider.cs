@@ -1,6 +1,7 @@
 ﻿using System;
 using Umbraco.Core.Models.PublishedContent;
 
+
 namespace Umbraco.Web.Routing
 {
     /// <summary>
@@ -11,7 +12,6 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets the url of a media item.
         /// </summary>
-        /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="content">The published content.</param>
         /// <param name="propertyAlias">The property alias to resolve the url from.</param>
         /// <param name="mode">The url mode.</param>
@@ -26,6 +26,6 @@ namespace Umbraco.Web.Routing
         /// e.g. a cdn url provider will most likely always return an absolute url.</para>
         /// <para>If the provider is unable to provide a url, it returns <c>null</c>.</para>
         /// </remarks>
-        UrlInfo GetMediaUrl(IUmbracoContext umbracoContext, IPublishedContent content, string propertyAlias, UrlMode mode, string culture, Uri current);
+        UrlInfo GetMediaUrl(IPublishedContent content, string propertyAlias, UrlMode mode, string culture, Uri current);
     }
 }

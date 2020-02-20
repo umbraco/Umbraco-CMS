@@ -10,6 +10,7 @@ namespace Umbraco.Web
             get
             {
                 var httpContext = System.Web.HttpContext.Current;
+
                 return httpContext is null ? null : new HttpContextWrapper(httpContext);
             }
             set

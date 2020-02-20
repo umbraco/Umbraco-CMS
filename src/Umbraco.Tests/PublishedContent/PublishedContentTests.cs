@@ -23,6 +23,7 @@ using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Templates;
 using Umbraco.Web.Models;
+using Umbraco.Web.Routing;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.PublishedContent
@@ -49,9 +50,10 @@ namespace Umbraco.Tests.PublishedContent
             var mediaFileService = Mock.Of<IMediaFileSystem>();
             var contentTypeBaseServiceProvider = Mock.Of<IContentTypeBaseServiceProvider>();
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
-            var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor);
+            var publishedUrlProvider = Mock.Of<IPublishedUrlProvider>();
+            var imageSourceParser = new HtmlImageSourceParser(publishedUrlProvider);
             var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, logger, IOHelper, mediaService, contentTypeBaseServiceProvider, mediaFileService, ShortStringHelper);
-            var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor);
+            var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor, publishedUrlProvider);
             var localizationService = Mock.Of<ILocalizationService>();
 
             var dataTypeService = new TestObjects.TestDataTypeService(

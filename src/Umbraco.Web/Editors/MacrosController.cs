@@ -22,6 +22,7 @@ using Umbraco.Core.Mapping;
 using System.Web.Http.Controllers;
 using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
 {
@@ -50,8 +51,9 @@ namespace Umbraco.Web.Editors
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
             ParameterEditorCollection parameterEditorCollection,
-            IIOHelper ioHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
+            IIOHelper ioHelper,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _parameterEditorCollection = parameterEditorCollection;
             _ioHelper = ioHelper;

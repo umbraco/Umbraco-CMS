@@ -34,6 +34,7 @@ using Umbraco.Web.Models.ContentEditing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Web.Controllers
 {
@@ -89,7 +90,9 @@ namespace Umbraco.Tests.Web.Controllers
                     helper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IUmbracoSettingsSection>(),
-                    Factory.GetInstance<IIOHelper>());
+                    Factory.GetInstance<IIOHelper>(),
+                    Factory.GetInstance<IPublishedUrlProvider>()
+                    );
                 return usersController;
             }
 

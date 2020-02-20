@@ -18,6 +18,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Services;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -37,8 +38,8 @@ namespace Umbraco.Web.Trees
 
         public ApplicationTreeController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger,
-            IRuntimeState runtimeState, ITreeService treeService, ISectionService sectionService, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper)
+            IRuntimeState runtimeState, ITreeService treeService, ISectionService sectionService, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper, publishedUrlProvider)
         {
             _treeService = treeService;
             _sectionService = sectionService;

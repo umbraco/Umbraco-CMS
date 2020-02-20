@@ -7,7 +7,6 @@ using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -17,7 +16,6 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 using static Umbraco.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -28,22 +26,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class DataTypeRepository : NPocoRepositoryBase<int, IDataType>, IDataTypeRepository
     {
         private readonly Lazy<PropertyEditorCollection> _editors;
-        private readonly IIOHelper _ioHelper;
-        private readonly Lazy<IDataTypeService> _dataTypeService;
-        private readonly ILocalizedTextService _localizedTextService;
-        private readonly ILocalizationService _localizationService;
-        private readonly IShortStringHelper _shortStringHelper;
 
-        // TODO: https://github.com/umbraco/Umbraco-CMS/issues/4237 - get rid of Lazy injection and fix circular dependencies
-        public DataTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, Lazy<PropertyEditorCollection> editors, ILogger logger, IIOHelper ioHelper, Lazy<IDataTypeService> dataTypeService, ILocalizedTextService localizedTextService, ILocalizationService localizationService, IShortStringHelper shortStringHelper)
+        public DataTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, Lazy<PropertyEditorCollection> editors, ILogger logger)
             : base(scopeAccessor, cache, logger)
         {
             _editors = editors;
-            _ioHelper = ioHelper;
-            _dataTypeService = dataTypeService;
-            _localizedTextService = localizedTextService;
-            _localizationService = localizationService;
-            _shortStringHelper = shortStringHelper;
         }
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
@@ -67,7 +54,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             var dtos = Database.Fetch<DataTypeDto>(dataTypeSql);
-            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, Logger,_ioHelper, _dataTypeService.Value, _localizedTextService, _localizationService, _shortStringHelper)).ToArray();
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, Logger)).ToArray();
         }
 
         protected override IEnumerable<IDataType> PerformGetByQuery(IQuery<IDataType> query)
@@ -78,7 +65,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var dtos = Database.Fetch<DataTypeDto>(sql);
 
-            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, Logger, _ioHelper, _dataTypeService.Value, _localizedTextService, _localizationService, _shortStringHelper)).ToArray();
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, Logger)).ToArray();
         }
 
         #endregion

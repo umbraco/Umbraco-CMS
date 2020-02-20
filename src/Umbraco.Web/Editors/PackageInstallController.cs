@@ -22,6 +22,7 @@ using Umbraco.Web.JavaScript;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using File = System.IO.File;
@@ -51,8 +52,9 @@ namespace Umbraco.Web.Editors
             IShortStringHelper shortStringHelper,
             IUmbracoVersion umbracoVersion,
             UmbracoMapper umbracoMapper,
-            IIOHelper ioHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
+            IIOHelper ioHelper,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _umbracoVersion = umbracoVersion;
             _ioHelper = ioHelper;

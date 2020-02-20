@@ -4,7 +4,7 @@ using Umbraco.Core;
 namespace Umbraco.Web.Models.ContentEditing
 {
     [DataContract(Name = "link", Namespace = "")]
-    internal class LinkDisplay
+    public class LinkDisplay
     {
         [DataMember(Name = "icon")]
         public string Icon { get; set; }

@@ -1,5 +1,4 @@
 ﻿using System;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 
@@ -10,17 +9,17 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class DefaultMediaUrlProvider : IMediaUrlProvider
     {
-        private readonly PropertyEditorCollection _propertyEditors;
         private readonly UriUtility _uriUtility;
+        private readonly MediaUrlGeneratorCollection _mediaPathGenerators;
 
-        public DefaultMediaUrlProvider(PropertyEditorCollection propertyEditors, UriUtility uriUtility)
+        public DefaultMediaUrlProvider(MediaUrlGeneratorCollection mediaPathGenerators, UriUtility uriUtility)
         {
-            _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
+            _mediaPathGenerators = mediaPathGenerators ?? throw new ArgumentNullException(nameof(mediaPathGenerators));
             _uriUtility = uriUtility;
         }
 
         /// <inheritdoc />
-        public virtual UrlInfo GetMediaUrl(IUmbracoContext umbracoContext, IPublishedContent content,
+        public virtual UrlInfo GetMediaUrl(IPublishedContent content,
             string propertyAlias, UrlMode mode, string culture, Uri current)
         {
             var prop = content.GetProperty(propertyAlias);
@@ -33,25 +32,23 @@ namespace Umbraco.Web.Routing
             }
 
             var propType = prop.PropertyType;
-            string path = null;
 
-            if (_propertyEditors.TryGet(propType.EditorAlias, out var editor)
-                && editor is IDataEditorWithMediaPath dataEditor)
+            if (_mediaPathGenerators.TryGetMediaPath(propType.EditorAlias, value, out var path))
             {
-                path = dataEditor.GetMediaPath(value);
+                var url = AssembleUrl(path, current, mode);
+                return UrlInfo.Url(url.ToString(), culture);
             }
 
-            var url = AssembleUrl(path, current, mode);
-            return url == null ? null : UrlInfo.Url(url.ToString(), culture);
+            return null;
         }
 
         private Uri AssembleUrl(string path, Uri current, UrlMode mode)
         {
-            if (string.IsNullOrEmpty(path))
-                return null;
+            if (string.IsNullOrWhiteSpace(path))
+                throw new ArgumentException($"{nameof(path)} cannot be null or whitespace", nameof(path));
 
             // the stored path is absolute so we just return it as is
-            if(Uri.IsWellFormedUriString(path, UriKind.Absolute))
+            if (Uri.IsWellFormedUriString(path, UriKind.Absolute))
                 return new Uri(path);
 
             Uri uri;

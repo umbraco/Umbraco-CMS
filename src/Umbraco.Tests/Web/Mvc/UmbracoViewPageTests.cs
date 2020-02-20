@@ -435,15 +435,13 @@ namespace Umbraco.Tests.Web.Mvc
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;
 
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor(http);
             var globalSettings = TestObjects.GetGlobalSettings();
 
             var ctx = new UmbracoContext(
-                http,
+                httpContextAccessor,
                 _service,
-                new WebSecurity(http, ServiceContext.UserService, globalSettings, IOHelper),
-                TestObjects.GetUmbracoSettings(),
-                Enumerable.Empty<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, globalSettings, IOHelper),
                 globalSettings,
                 new TestVariationContextAccessor(),
                 IOHelper,

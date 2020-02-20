@@ -15,21 +15,6 @@ namespace Umbraco.Web.WebApi.Filters
     public static class AngularAntiForgeryHelper
     {
         /// <summary>
-        /// The cookie name that is used to store the validation value
-        /// </summary>
-        public const string CsrfValidationCookieName = "UMB-XSRF-V";
-
-        /// <summary>
-        /// The cookie name that is set for angular to use to pass in to the header value for "X-UMB-XSRF-TOKEN"
-        /// </summary>
-        public const string AngularCookieName = "UMB-XSRF-TOKEN";
-
-        /// <summary>
-        /// The header name that angular uses to pass in the token to validate the cookie
-        /// </summary>
-        public const string AngularHeadername = "X-UMB-XSRF-TOKEN";
-
-        /// <summary>
         /// Returns 2 tokens - one for the cookie value and one that angular should set as the header value
         /// </summary>
         /// <param name="cookieToken"></param>
@@ -72,14 +57,14 @@ namespace Umbraco.Web.WebApi.Filters
         {
             failedReason = "";
 
-            if (requestHeaders.Any(z => z.Key.InvariantEquals(AngularHeadername)) == false)
+            if (requestHeaders.Any(z => z.Key.InvariantEquals(Constants.Web.AngularHeadername)) == false)
             {
                 failedReason = "Missing token";
                 return false;
             }
 
             var headerToken = requestHeaders
-                .Where(z => z.Key.InvariantEquals(AngularHeadername))
+                .Where(z => z.Key.InvariantEquals(Constants.Web.AngularHeadername))
                 .Select(z => z.Value)
                 .SelectMany(z => z)
                 .FirstOrDefault();
@@ -108,7 +93,7 @@ namespace Umbraco.Web.WebApi.Filters
         /// <returns></returns>
         public static bool ValidateHeaders(HttpRequestHeaders requestHeaders, out string failedReason)
         {
-            var cookieToken = requestHeaders.GetCookieValue(CsrfValidationCookieName);
+            var cookieToken = requestHeaders.GetCookieValue(Constants.Web.CsrfValidationCookieName);
 
             return ValidateHeaders(
                 requestHeaders.ToDictionary(x => x.Key, x => x.Value).ToArray(),

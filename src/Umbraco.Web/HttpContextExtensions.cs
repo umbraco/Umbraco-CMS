@@ -4,20 +4,6 @@ namespace Umbraco.Core
 {
     public static class HttpContextExtensions
     {
-        public static T GetContextItem<T>(this HttpContextBase httpContext, string key)
-        {
-            if (httpContext == null) return default(T);
-            if (httpContext.Items[key] == null) return default(T);
-            var val = httpContext.Items[key].TryConvertTo<T>();
-            if (val) return val.Result;
-            return default(T);
-        }
-
-        public static T GetContextItem<T>(this HttpContext httpContext, string key)
-        {
-            return new HttpContextWrapper(httpContext).GetContextItem<T>(key);
-        }
-
         public static string GetCurrentRequestIpAddress(this HttpContextBase httpContext)
         {
             if (httpContext == null)

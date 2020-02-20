@@ -30,6 +30,7 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Mapping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
 {
@@ -56,12 +57,19 @@ namespace Umbraco.Web.Editors
             ICultureDictionary cultureDictionary,
             IGlobalSettings globalSettings,
             IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext, PropertyEditorCollection propertyEditors,
-            ServiceContext services, AppCaches appCaches,
-            IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper,
+            ISqlContext sqlContext,
+            PropertyEditorCollection propertyEditors,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
             IScopeProvider scopeProvider,
-            IShortStringHelper shortStringHelper, UmbracoMapper umbracoMapper, IIOHelper ioHelper)
-            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            IIOHelper ioHelper,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _serializer = serializer;
             _globalSettings = globalSettings;

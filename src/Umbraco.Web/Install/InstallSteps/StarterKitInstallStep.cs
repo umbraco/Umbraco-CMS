@@ -34,7 +34,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             InstallBusinessLogic(packageId);
 
-            UmbracoApplication.Restart(_httContextAccessor.HttpContext);
+            UmbracoApplication.Restart(_httContextAccessor.GetRequiredHttpContext());
 
             return Task.FromResult<InstallSetupResult>(null);
         }

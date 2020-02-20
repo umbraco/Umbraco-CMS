@@ -20,14 +20,14 @@ namespace Umbraco.Web.Security
     /// </summary>
     public class WebSecurity : IWebSecurity
     {
-        private readonly HttpContextBase _httpContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserService _userService;
         private readonly IGlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
 
-        public WebSecurity(HttpContextBase httpContext, IUserService userService, IGlobalSettings globalSettings, IIOHelper ioHelper)
+        public WebSecurity(IHttpContextAccessor httpContextAccessor, IUserService userService, IGlobalSettings globalSettings, IIOHelper ioHelper)
         {
-            _httpContext = httpContext;
+            _httpContextAccessor = httpContextAccessor;
             _userService = userService;
             _globalSettings = globalSettings;
             _ioHelper = ioHelper;
@@ -61,7 +61,7 @@ namespace Umbraco.Web.Security
             {
                 if (_signInManager == null)
                 {
-                    var mgr = _httpContext.GetOwinContext().Get<BackOfficeSignInManager>();
+                    var mgr = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().Get<BackOfficeSignInManager>();
                     if (mgr == null)
                     {
                         throw new NullReferenceException("Could not resolve an instance of " + typeof(BackOfficeSignInManager) + " from the " + typeof(IOwinContext));
@@ -74,12 +74,13 @@ namespace Umbraco.Web.Security
 
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
-            => _userManager ?? (_userManager = _httpContext.GetOwinContext().GetBackOfficeUserManager());
+            => _userManager ?? (_userManager = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().GetBackOfficeUserManager());
 
         [Obsolete("This needs to be removed, ASP.NET Identity should always be used for this operation, this is currently only used in the installer which needs to be updated")]
         public double PerformLogin(int userId)
         {
-            var owinCtx = _httpContext.GetOwinContext();
+            var httpContext = _httpContextAccessor.GetRequiredHttpContext();
+            var owinCtx = httpContext.GetOwinContext();
             //ensure it's done for owin too
             owinCtx.Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
 
@@ -87,7 +88,7 @@ namespace Umbraco.Web.Security
 
             SignInManager.SignInAsync(user, isPersistent: true, rememberBrowser: false).Wait();
 
-            _httpContext.SetPrincipalForRequest(owinCtx.Request.User);
+            httpContext.SetPrincipalForRequest(owinCtx.Request.User);
 
             return TimeSpan.FromMinutes(_globalSettings.TimeOutInMinutes).TotalSeconds;
         }
@@ -95,19 +96,13 @@ namespace Umbraco.Web.Security
         [Obsolete("This needs to be removed, ASP.NET Identity should always be used for this operation, this is currently only used in the installer which needs to be updated")]
         public void ClearCurrentLogin()
         {
-            _httpContext.UmbracoLogout();
-            _httpContext.GetOwinContext().Authentication.SignOut(
+            var httpContext = _httpContextAccessor.GetRequiredHttpContext();
+            httpContext.UmbracoLogout();
+            httpContext.GetOwinContext().Authentication.SignOut(
                 Core.Constants.Security.BackOfficeAuthenticationType,
                 Core.Constants.Security.BackOfficeExternalAuthenticationType);
         }
 
-        /// <summary>
-        /// Renews the user's login ticket
-        /// </summary>
-        public void RenewLoginTimeout()
-        {
-            _httpContext.RenewUmbracoAuthTicket();
-        }
 
         /// <summary>
         /// Gets the current user's id.
@@ -115,7 +110,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public Attempt<int> GetUserId()
         {
-            var identity = _httpContext.GetCurrentIdentity(false);
+            var identity = _httpContextAccessor.GetRequiredHttpContext().GetCurrentIdentity(false);
             return identity == null ? Attempt.Fail<int>() : Attempt.Succeed(Convert.ToInt32(identity.Id));
         }
 
@@ -150,7 +145,7 @@ namespace Umbraco.Web.Security
             var user = CurrentUser;
 
             // Check for console access
-            if (user == null || (requiresApproval && user.IsApproved == false) || (user.IsLockedOut && RequestIsInUmbracoApplication(_httpContext, _globalSettings, _ioHelper)))
+            if (user == null || (requiresApproval && user.IsApproved == false) || (user.IsLockedOut && RequestIsInUmbracoApplication(_httpContextAccessor, _globalSettings, _ioHelper)))
             {
                 if (throwExceptions) throw new ArgumentException("You have no privileges to the umbraco console. Please contact your administrator");
                 return ValidateRequestAttempt.FailedNoPrivileges;
@@ -159,9 +154,9 @@ namespace Umbraco.Web.Security
 
         }
 
-        private static bool RequestIsInUmbracoApplication(HttpContextBase context, IGlobalSettings globalSettings, IIOHelper ioHelper)
+        private static bool RequestIsInUmbracoApplication(IHttpContextAccessor httpContextAccessor, IGlobalSettings globalSettings, IIOHelper ioHelper)
         {
-            return context.Request.Path.ToLower().IndexOf(ioHelper.ResolveUrl(globalSettings.UmbracoPath).ToLower(), StringComparison.Ordinal) > -1;
+            return httpContextAccessor.GetRequiredHttpContext().Request.Path.ToLower().IndexOf(ioHelper.ResolveUrl(globalSettings.UmbracoPath).ToLower(), StringComparison.Ordinal) > -1;
         }
 
         /// <summary>
@@ -172,7 +167,7 @@ namespace Umbraco.Web.Security
         public ValidateRequestAttempt AuthorizeRequest(bool throwExceptions = false)
         {
             // check for secure connection
-            if (_globalSettings.UseHttps && _httpContext.Request.IsSecureConnection == false)
+            if (_globalSettings.UseHttps && _httpContextAccessor.GetRequiredHttpContext().Request.IsSecureConnection == false)
             {
                 if (throwExceptions) throw new SecurityException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
                 return ValidateRequestAttempt.FailedNoSsl;
@@ -197,7 +192,8 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public bool IsAuthenticated()
         {
-            return _httpContext.User != null && _httpContext.User.Identity.IsAuthenticated && _httpContext.GetCurrentIdentity(false) != null;
+            var httpContext = _httpContextAccessor.HttpContext;
+            return httpContext?.User != null && httpContext.User.Identity.IsAuthenticated && httpContext.GetCurrentIdentity(false) != null;
         }
 
     }

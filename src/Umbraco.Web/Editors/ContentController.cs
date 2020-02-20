@@ -70,8 +70,10 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
-            IShortStringHelper shortStringHelper, UmbracoMapper umbracoMapper)
-            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
@@ -409,7 +411,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public HttpResponseMessage GetNiceUrl(int id)
         {
-            var url = UmbracoContext.Url(id);
+            var url = PublishedUrlProvider.GetUrl(id);
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(url, Encoding.UTF8, "text/plain");
             return response;
@@ -422,7 +424,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public HttpResponseMessage GetNiceUrl(Guid id)
         {
-            var url = UmbracoContext.Url(id);
+            var url = PublishedUrlProvider.GetUrl(id);
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(url, Encoding.UTF8, "text/plain");
             return response;

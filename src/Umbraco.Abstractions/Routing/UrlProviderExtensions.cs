@@ -26,7 +26,8 @@ namespace Umbraco.Web.Routing
             IContentService contentService,
             IVariationContextAccessor variationContextAccessor,
             ILogger logger,
-            UriUtility uriUtility)
+            UriUtility uriUtility,
+            IPublishedUrlProvider publishedUrlProvider)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (publishedRouter == null) throw new ArgumentNullException(nameof(publishedRouter));
@@ -35,6 +36,7 @@ namespace Umbraco.Web.Routing
             if (textService == null) throw new ArgumentNullException(nameof(textService));
             if (contentService == null) throw new ArgumentNullException(nameof(contentService));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
+            if (publishedUrlProvider == null) throw new ArgumentNullException(nameof(publishedUrlProvider));
             if (uriUtility == null) throw new ArgumentNullException(nameof(uriUtility));
             if (variationContextAccessor == null) throw new ArgumentNullException(nameof(variationContextAccessor));
 
@@ -61,7 +63,7 @@ namespace Umbraco.Web.Routing
 
             //get all URLs for all cultures
             //in a HashSet, so de-duplicates too
-            foreach (var cultureUrl in GetContentUrlsByCulture(content, cultures, publishedRouter, umbracoContext, contentService, textService, variationContextAccessor, logger, uriUtility))
+            foreach (var cultureUrl in GetContentUrlsByCulture(content, cultures, publishedRouter, umbracoContext, contentService, textService, variationContextAccessor, logger, uriUtility, publishedUrlProvider))
             {
                 urls.Add(cultureUrl);
             }
@@ -79,7 +81,7 @@ namespace Umbraco.Web.Routing
 
             // get the 'other' urls - ie not what you'd get with GetUrl() but urls that would route to the document, nevertheless.
             // for these 'other' urls, we don't check whether they are routable, collide, anything - we just report them.
-            foreach (var otherUrl in umbracoContext.UrlProvider.GetOtherUrls(content.Id).OrderBy(x => x.Text).ThenBy(x => x.Culture))
+            foreach (var otherUrl in publishedUrlProvider.GetOtherUrls(content.Id).OrderBy(x => x.Text).ThenBy(x => x.Culture))
                 if (urls.Add(otherUrl)) //avoid duplicates
                     yield return otherUrl;
         }
@@ -103,7 +105,8 @@ namespace Umbraco.Web.Routing
             ILocalizedTextService textService,
             IVariationContextAccessor variationContextAccessor,
             ILogger logger,
-            UriUtility uriUtility)
+            UriUtility uriUtility,
+            IPublishedUrlProvider publishedUrlProvider)
         {
             foreach (var culture in cultures)
             {
@@ -116,7 +119,7 @@ namespace Umbraco.Web.Routing
                 string url;
                 try
                 {
-                    url = umbracoContext.UrlProvider.GetUrl(content.Id, culture: culture);
+                    url = publishedUrlProvider.GetUrl(content.Id, culture: culture);
                 }
                 catch (Exception ex)
                 {

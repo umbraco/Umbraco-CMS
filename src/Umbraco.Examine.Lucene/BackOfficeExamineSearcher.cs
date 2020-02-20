@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Web;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Examine
@@ -17,19 +18,19 @@ namespace Umbraco.Examine
     {
         private readonly IExamineManager _examineManager;
         private readonly ILocalizationService _languageService;
-        private readonly ICurrentUserAccessor _currentUserAccessor;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IEntityService _entityService;
         private readonly IUmbracoTreeSearcherFields _treeSearcherFields;
 
         public BackOfficeExamineSearcher(IExamineManager examineManager,
            ILocalizationService languageService,
-           ICurrentUserAccessor currentUserAccessor,
+           IUmbracoContextAccessor umbracoContextAccessor,
            IEntityService entityService,
            IUmbracoTreeSearcherFields treeSearcherFields)
         {
             _examineManager = examineManager;
             _languageService = languageService;
-            _currentUserAccessor = currentUserAccessor;
+            _umbracoContextAccessor = umbracoContextAccessor;
             _entityService = entityService;
             _treeSearcherFields = treeSearcherFields;
         }
@@ -48,7 +49,7 @@ namespace Umbraco.Examine
                 query = "\"" + g.ToString() + "\"";
             }
 
-            var currentUser = _currentUserAccessor.TryGetCurrentUser();
+            var currentUser = _umbracoContextAccessor.UmbracoContext?.Security?.CurrentUser;
 
             switch (entityType)
             {

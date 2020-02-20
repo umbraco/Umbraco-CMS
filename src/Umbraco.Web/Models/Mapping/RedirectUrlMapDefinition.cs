@@ -1,19 +1,18 @@
 ﻿using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Models.Mapping
 {
     internal class RedirectUrlMapDefinition : IMapDefinition
     {
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IPublishedUrlProvider _publishedUrlProvider;
 
-        public RedirectUrlMapDefinition(IUmbracoContextAccessor umbracoContextAccessor)
+        public RedirectUrlMapDefinition(IPublishedUrlProvider publishedUrlProvider)
         {
-            _umbracoContextAccessor = umbracoContextAccessor;
+            _publishedUrlProvider = publishedUrlProvider;
         }
-
-        private IUmbracoContext UmbracoContext => _umbracoContextAccessor.UmbracoContext;
 
         public void DefineMaps(UmbracoMapper mapper)
         {
@@ -26,8 +25,8 @@ namespace Umbraco.Web.Models.Mapping
             target.ContentId = source.ContentId;
             target.CreateDateUtc = source.CreateDateUtc;
             target.Culture = source.Culture;
-            target.DestinationUrl = source.ContentId > 0 ? UmbracoContext?.UrlProvider?.GetUrl(source.ContentId, culture: source.Culture) : "#";
-            target.OriginalUrl = UmbracoContext?.UrlProvider?.GetUrlFromRoute(source.ContentId, source.Url, source.Culture);
+            target.DestinationUrl = source.ContentId > 0 ? _publishedUrlProvider?.GetUrl(source.ContentId, culture: source.Culture) : "#";
+            target.OriginalUrl = _publishedUrlProvider?.GetUrlFromRoute(source.ContentId, source.Url, source.Culture);
             target.RedirectId = source.Key;
         }
     }

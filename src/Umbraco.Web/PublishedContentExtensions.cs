@@ -714,13 +714,12 @@ namespace Umbraco.Web
              /// </remarks>
              public static string Url(this IPublishedContent content, string culture = null, UrlMode mode = UrlMode.Default)
              {
-                 var umbracoContext = Composing.Current.UmbracoContext;
+                var umbracoContext = Current.UmbracoContext;
 
+                if (umbracoContext == null)
+                    throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext is null.");
 
-                 if (umbracoContext == null)
-                     throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext is null.");
-
-                 return content.Url(umbracoContext.UrlProvider, culture, mode);
+                return content.Url(Current.PublishedUrlProvider, culture, mode);
              }
 
 

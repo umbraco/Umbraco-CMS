@@ -25,6 +25,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly ITagRepository _tagRepository;
+        private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
         private readonly MediaByGuidReadRepository _mediaByGuidReadRepository;
 
         public MediaRepository(
@@ -37,12 +38,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             IRelationRepository relationRepository,
             IRelationTypeRepository relationTypeRepository,
             Lazy<PropertyEditorCollection> propertyEditorCollection,
+            MediaUrlGeneratorCollection mediaUrlGenerators,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IDataTypeService dataTypeService)
             : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferenceFactories, dataTypeService)
         {
             _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
+            _mediaUrlGenerators = mediaUrlGenerators;
             _mediaByGuidReadRepository = new MediaByGuidReadRepository(this, scopeAccessor, cache, logger);
         }
 
@@ -239,7 +242,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // create the dto
-            var dto = ContentBaseFactory.BuildDto(PropertyEditors, entity);
+            var dto = ContentBaseFactory.BuildDto(_mediaUrlGenerators, entity);
 
             // derive path and level from parent
             var parent = GetParentNodeDto(entity.ParentId);
@@ -330,7 +333,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // create the dto
-            var dto = ContentBaseFactory.BuildDto(PropertyEditors, entity);
+            var dto = ContentBaseFactory.BuildDto(_mediaUrlGenerators, entity);
 
             // update the node dto
             var nodeDto = dto.ContentDto.NodeDto;

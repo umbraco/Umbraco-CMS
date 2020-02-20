@@ -148,13 +148,12 @@ namespace Umbraco.Web.Compose
         /// </summary>
         public sealed class Notifier
         {
-            private readonly ICurrentUserAccessor _currentUserAccessor;
+            private readonly IUmbracoContextAccessor _umbracoContextAccessor;
             private readonly IRuntimeState _runtimeState;
             private readonly INotificationService _notificationService;
             private readonly IUserService _userService;
             private readonly ILocalizedTextService _textService;
             private readonly IGlobalSettings _globalSettings;
-            private readonly IContentSection _contentConfig;
             private readonly ILogger _logger;
 
             /// <summary>
@@ -167,21 +166,20 @@ namespace Umbraco.Web.Compose
             /// <param name="globalSettings"></param>
             /// <param name="contentConfig"></param>
             /// <param name="logger"></param>
-            public Notifier(ICurrentUserAccessor currentUserAccessor, IRuntimeState runtimeState, INotificationService notificationService, IUserService userService, ILocalizedTextService textService, IGlobalSettings globalSettings, IContentSection contentConfig, ILogger logger)
+            public Notifier(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtimeState, INotificationService notificationService, IUserService userService, ILocalizedTextService textService, IGlobalSettings globalSettings, ILogger logger)
             {
-                _currentUserAccessor = currentUserAccessor;
+                _umbracoContextAccessor = umbracoContextAccessor;
                 _runtimeState = runtimeState;
                 _notificationService = notificationService;
                 _userService = userService;
                 _textService = textService;
                 _globalSettings = globalSettings;
-                _contentConfig = contentConfig;
                 _logger = logger;
             }
 
             public void Notify(IAction action, params IContent[] entities)
             {
-                var user = _currentUserAccessor.TryGetCurrentUser();
+                var user = _umbracoContextAccessor.UmbracoContext?.Security?.CurrentUser;
 
                 //if there is no current user, then use the admin
                 if (user == null)
