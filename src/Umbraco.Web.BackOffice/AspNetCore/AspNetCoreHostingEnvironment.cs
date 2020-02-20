@@ -1,5 +1,6 @@
 
 using System;
+using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -10,15 +11,19 @@ namespace Umbraco.Web.BackOffice.AspNetCore
     public class AspNetCoreHostingEnvironment : Umbraco.Core.Hosting.IHostingEnvironment
     {
         private readonly IHostingSettings _hostingSettings;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public AspNetCoreHostingEnvironment(IHostingSettings hostingSettings, IHostingEnvironment hostingEnvironment)
+        public AspNetCoreHostingEnvironment(IHostingSettings hostingSettings, IWebHostEnvironment webHostEnvironment)
         {
-            // _hostingSettings = hostingSettings ?? throw new ArgumentNullException(nameof(hostingSettings));
-            // SiteName = hostingEnvironment.ApplicationName;
-            // ApplicationId = hostingEnvironment.ApplicationID;
-            // ApplicationPhysicalPath = hostingEnvironment.WebRootPath;
-            // ApplicationVirtualPath = hostingEnvironment.ApplicationVirtualPath;
-            // CurrentDomainId = AppDomain.CurrentDomain.Id;
+            _hostingSettings = hostingSettings ?? throw new ArgumentNullException(nameof(hostingSettings));
+            _webHostEnvironment = webHostEnvironment;
+
+            SiteName = webHostEnvironment.ApplicationName;
+            ApplicationPhysicalPath = webHostEnvironment.ContentRootPath;
+            IsHosted = true;
+            ApplicationVirtualPath = "/"; //TODO how to find this, This is a server thing, not application thing.
+            ApplicationId = AppDomain.CurrentDomain.Id.ToString();
+            CurrentDomainId = AppDomain.CurrentDomain.Id;
             // IISVersion = HttpRuntime.IISVersion;
         }
 
@@ -28,10 +33,10 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         public string LocalTempPath { get; }
         public string ApplicationVirtualPath { get; }
         public int CurrentDomainId { get; }
-        public bool IsDebugMode { get; }
+        public bool IsDebugMode => _hostingSettings.DebugMode;
         public bool IsHosted { get; }
         public Version IISVersion { get; }
-        public string MapPath(string path) => throw new NotImplementedException();
+        public string MapPath(string path) => Path.Combine(_webHostEnvironment.WebRootPath, path);
 
         public string ToAbsolute(string virtualPath, string root) => throw new NotImplementedException();
 
