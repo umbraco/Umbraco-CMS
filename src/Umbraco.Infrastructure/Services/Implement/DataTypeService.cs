@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
@@ -10,6 +11,7 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services.Implement
 {
@@ -23,10 +25,15 @@ namespace Umbraco.Core.Services.Implement
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly IAuditRepository _auditRepository;
         private readonly IEntityRepository _entityRepository;
+        private readonly IIOHelper _ioHelper;
+        private readonly ILocalizedTextService _localizedTextService;
+        private readonly ILocalizationService _localizationService;
+        private readonly IShortStringHelper _shortStringHelper;
 
         public DataTypeService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
             IDataTypeRepository dataTypeRepository, IDataTypeContainerRepository dataTypeContainerRepository,
-            IAuditRepository auditRepository, IEntityRepository entityRepository, IContentTypeRepository contentTypeRepository)
+            IAuditRepository auditRepository, IEntityRepository entityRepository, IContentTypeRepository contentTypeRepository,
+            IIOHelper ioHelper, ILocalizedTextService localizedTextService, ILocalizationService localizationService, IShortStringHelper shortStringHelper)
             : base(provider, logger, eventMessagesFactory)
         {
             _dataTypeRepository = dataTypeRepository;
@@ -34,6 +41,10 @@ namespace Umbraco.Core.Services.Implement
             _auditRepository = auditRepository;
             _entityRepository = entityRepository;
             _contentTypeRepository = contentTypeRepository;
+            _ioHelper = ioHelper;
+            _localizedTextService = localizedTextService;
+            _localizationService = localizationService;
+            _shortStringHelper = shortStringHelper;
         }
 
         #region Containers
@@ -227,7 +238,9 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _dataTypeRepository.Get(Query<IDataType>().Where(x => x.Name == name)).FirstOrDefault();
+                var dataType = _dataTypeRepository.Get(Query<IDataType>().Where(x => x.Name == name)).FirstOrDefault();
+                ConvertMissingEditorOfDataTypeToLabel(dataType);
+                return dataType;
             }
         }
 
@@ -240,7 +253,9 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _dataTypeRepository.Get(id);
+                var dataType = _dataTypeRepository.Get(id);
+                ConvertMissingEditorOfDataTypeToLabel(dataType);
+                return dataType;
             }
         }
 
@@ -254,7 +269,9 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IDataType>().Where(x => x.Key == id);
-                return _dataTypeRepository.Get(query).FirstOrDefault();
+                var dataType = _dataTypeRepository.Get(query).FirstOrDefault();
+                ConvertMissingEditorOfDataTypeToLabel(dataType);
+                return dataType;
             }
         }
 
@@ -268,7 +285,9 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IDataType>().Where(x => x.EditorAlias == propertyEditorAlias);
-                return _dataTypeRepository.Get(query);
+                var dataType = _dataTypeRepository.Get(query);
+                ConvertMissingEditorsOfDataTypesToLabels(dataType);
+                return dataType;
             }
         }
 
@@ -281,7 +300,31 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _dataTypeRepository.GetMany(ids);
+                var dataTypes = _dataTypeRepository.GetMany(ids);
+                ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
+                return dataTypes;
+            }
+        }
+
+        private void ConvertMissingEditorOfDataTypeToLabel(IDataType dataType)
+        {
+            if (dataType == null)
+            {
+                return;
+            }
+
+            ConvertMissingEditorsOfDataTypesToLabels(new[] { dataType });
+        }
+
+        private void ConvertMissingEditorsOfDataTypesToLabels(IEnumerable<IDataType> dataTypes)
+        {
+            // Any data types that don't have an associated editor are created of a specific type.
+            // We convert them to labels to make clear to the user why the data type cannot be used.
+            var dataTypesWithMissingEditors = dataTypes
+                .Where(x => x.Editor is MissingPropertyEditor);
+            foreach (var dataType in dataTypesWithMissingEditors)
+            {
+                dataType.Editor = new LabelPropertyEditor(Logger, _ioHelper, this, _localizedTextService, _localizationService, _shortStringHelper);
             }
         }
 
