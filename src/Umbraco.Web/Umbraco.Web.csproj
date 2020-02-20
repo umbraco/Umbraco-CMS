@@ -647,13 +647,6 @@
     </Compile>
     <Compile Include="UmbracoApplication.cs" />
     <Compile Include="UmbracoInjectedModule.cs" />
-    <Compile Include="Web References\org.umbraco.update\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.map</DependentUpon>
-    </Compile>
-    <Compile Include="UriUtility.cs" />
-    <Compile Include="UmbracoAuthorizedHttpHandler.cs" />
     <Compile Include="UmbracoHttpHandler.cs" />
     <Compile Include="UmbracoWebService.cs">
       <SubType>Component</SubType>
@@ -685,11 +678,6 @@
     <None Include="..\Umbraco.Web.UI\Views\web.config">
       <Link>Mvc\web.config</Link>
     </None>
-    <None Include="Web References\org.umbraco.update\UpgradeResult.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
-    </None>
-    <None Include="Web References\org.umbraco.update\UpgradeResult1.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

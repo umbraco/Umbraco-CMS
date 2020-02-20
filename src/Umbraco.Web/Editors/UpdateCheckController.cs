@@ -42,16 +42,11 @@ namespace Umbraco.Web.Editors
                         _umbracoVersion.Current.Build, _umbracoVersion.Comment);
                     var result = await _upgradeService.CheckUpgrade(version);
 
-                    return new UpgradeCheckResponse(result.UpgradeType, result.Comment, result.UpgradeUrl);
+                    return new UpgradeCheckResponse(result.UpgradeType, result.Comment, result.UpgradeUrl, _umbracoVersion);
                 }
-                catch (System.Net.WebException)
+                catch
                 {
-                    //this occurs if the server is down or cannot be reached
-                    return null;
-                }
-                catch (System.Web.Services.Protocols.SoapException)
-                {
-                    //this occurs if the server has a timeout
+                    //We don't want to crash due to this
                     return null;
                 }
             }

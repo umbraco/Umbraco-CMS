@@ -1,4 +1,4 @@
-using System.IO;
+using System;
 using System.Web;
 
 namespace Umbraco.Web
@@ -9,7 +9,7 @@ namespace Umbraco.Web
         {
             var httpContext = httpContextAccessor.HttpContext;
 
-            if(httpContext is null) throw new IOException("HttpContext is null");
+            if(httpContext is null) throw new InvalidOperationException("HttpContext is null");
 
             return httpContext;
         }

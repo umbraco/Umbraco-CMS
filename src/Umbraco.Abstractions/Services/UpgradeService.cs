@@ -6,7 +6,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core
 {
-    internal class UpgradeService : IUpgradeService
+    public class UpgradeService : IUpgradeService
     {
         private readonly IUpgradeCheckRepository _upgradeCheckRepository;
 

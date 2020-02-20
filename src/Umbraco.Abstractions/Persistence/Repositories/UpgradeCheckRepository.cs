@@ -1,16 +1,22 @@
 ﻿using System.Net.Http;
-using System.Net.Http.Formatting;
+using System.Text;
 using System.Threading.Tasks;
 using Semver;
 using Umbraco.Core.Models;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
-    internal class UpgradeCheckRepository : IUpgradeCheckRepository
+    public class UpgradeCheckRepository : IUpgradeCheckRepository
     {
+        private readonly IJsonSerializer _jsonSerializer;
         private static HttpClient _httpClient;
         private const string RestApiUpgradeChecklUrl = "https://our.umbraco.com/umbraco/api/UpgradeCheck/CheckUpgrade";
 
+        public UpgradeCheckRepository(IJsonSerializer jsonSerializer)
+        {
+            _jsonSerializer = jsonSerializer;
+        }
 
         public async Task<UpgradeResult> CheckUpgradeAsync(SemVersion version)
         {
@@ -19,8 +25,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (_httpClient == null)
                     _httpClient = new HttpClient();
 
-                var task = await _httpClient.PostAsync(RestApiUpgradeChecklUrl, new CheckUpgradeDto(version), new JsonMediaTypeFormatter());
-                var result = await task.Content.ReadAsAsync<UpgradeResult>();
+                var content = new StringContent(_jsonSerializer.Serialize(new CheckUpgradeDto(version)), Encoding.UTF8, "application/json");
+
+                var task = await _httpClient.PostAsync(RestApiUpgradeChecklUrl,content);
+                var json = await task.Content.ReadAsStringAsync();
+                var result = _jsonSerializer.Deserialize<UpgradeResult>(json);
 
                 return result ?? new UpgradeResult("None", "", "");
             }
