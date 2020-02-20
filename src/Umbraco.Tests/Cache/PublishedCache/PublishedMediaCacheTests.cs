@@ -99,7 +99,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 
             //var publishedMedia = PublishedMediaTests.GetNode(mRoot.Id, GetUmbracoContext("/test", 1234));
             var umbracoContext = GetUmbracoContext("/test");
-            var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null, HostingEnvironment), Current.Services.MediaService, Current.Services.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>(), VariationContextAccessor);
+            var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null, HostingEnvironment), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>(), VariationContextAccessor);
             var publishedMedia = cache.GetById(mRoot.Id);
             Assert.IsNotNull(publishedMedia);
 
