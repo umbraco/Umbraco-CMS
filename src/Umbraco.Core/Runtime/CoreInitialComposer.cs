@@ -18,6 +18,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
@@ -129,6 +130,10 @@ namespace Umbraco.Core.Runtime
 
             // by default, register a noop rebuilder
             composition.RegisterUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
+
+            // will be injected in controllers when needed to invoke rest endpoints on Our
+            composition.RegisterUnique<IInstallationService, InstallationService>();
+            composition.RegisterUnique<IUpgradeService, UpgradeService>();
         }
     }
 }
