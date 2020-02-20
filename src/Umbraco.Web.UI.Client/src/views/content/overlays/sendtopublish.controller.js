@@ -6,8 +6,6 @@
         var vm = this;
         vm.loading = true;
 
-        vm.modifiedVariantFilter = modifiedVariantFilter;
-        vm.unmodifiedVariantFilter = unmodifiedVariantFilter;
         vm.changeSelection = changeSelection;
 
         function onInit() {
@@ -20,15 +18,19 @@
                     $scope.model.title = value;
                 });
             }
-            
-            if (vm.variants.length !== 0) {
-                _.each(vm.variants,
-                    function (variant) {
-                        variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
-                        variant.htmlId = "_content_variant_" + variant.compositeId;
-                    });
 
-                vm.variants = vm.variants.sort(function (a, b) {
+            _.each(vm.variants, function (variant) {
+                variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
+                variant.htmlId = "_content_variant_" + variant.compositeId;
+                
+                variant.isMandatory = isMandatoryFilter(variant);
+            });
+            
+            vm.availableVariants = vm.variants.filter(publishableVariantFilter);
+            
+            if (vm.availableVariants.length !== 0) {
+
+                vm.availableVariants = vm.availableVariants.sort(function (a, b) {
                     if (a.language && b.language) {
                         if (a.language.name > b.language.name) {
                             return -1;
@@ -48,14 +50,11 @@
                     return 0;
                 });
 
-                var active = _.find(vm.variants, function (v) {
-                    return v.active;
+                _.each(vm.availableVariants, function (v) {
+                    if(v.active) {
+                        v.save = true;
+                    }
                 });
-
-                if (active) {
-                    //ensure that the current one is selected
-                    active.save = true;
-                }
 
             } else {
                 //disable save button if we have nothing to save
@@ -73,20 +72,20 @@
             $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
         }
 
-        function modifiedVariantFilter(variant) {
-            //determine a variant is 'modified' (meaning it will show up as able to send for approval)
-            // * it's editor is in a $dirty state
-            // * it is in Draft state
-            // * it is published with pending changes
-            return (variant.active || variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges");
+        function isMandatoryFilter(variant) {
+            //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
+            // * has a mandatory language
+            // * without having a segment, segments cant be mandatory at current state of code.
+            return (variant.language && variant.language.isMandatory === true && variant.segment == null);
         }
 
-        function unmodifiedVariantFilter(variant) {
-            //determine a variant is 'unmodified' (meaning it will NOT show up as able to send for approval)
+        function publishableVariantFilter(variant) {
+            //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
+            // * variant is active
             // * it's editor is in a $dirty state
-            // * it has been published
-            // * it is not created for that specific language
-            return (variant.state === "Published" && !variant.isDirty && !variant.active || variant.state === "NotCreated" && !variant.isDirty && !variant.active);
+            // * it has pending saves
+            // * it is unpublished
+            return (variant.active || variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges");
         }
 
         //when this dialog is closed, reset all 'save' flags

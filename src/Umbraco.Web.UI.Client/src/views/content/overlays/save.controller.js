@@ -25,6 +25,13 @@
             return (variant.active || variant.isDirty);
         }
 
+        function isMandatoryFilter(variant) {
+            //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
+            // * has a mandatory language
+            // * without having a segment, segments cant be mandatory at current state of code.
+            return (variant.language && variant.language.isMandatory === true && variant.segment == null);
+        }
+
         function hasAnyData(variant) {
             if(variant.name == null || variant.name.length === 0) {
                 return false;
@@ -65,6 +72,8 @@
                     variant.save = false;
                     variant.publish = false;
 
+                    variant.isMandatory = isMandatoryFilter(variant);
+
                     if(variant.state !== "NotCreated"){
                         vm.isNew = false;
                     }
@@ -101,7 +110,7 @@
                     }
                     return 0;
                 });
-                
+
                 _.find(vm.variants, function (v) {
                     if(v.active) {
                         //ensure that the current one is selected

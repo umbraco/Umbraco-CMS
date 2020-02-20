@@ -53,7 +53,7 @@
                         <umb-dropdown-item
                             ng-repeat-start="entry in vm.variantMenu track by $index"
                             class="umb-variant-switcher__item"
-                            ng-class="{'--current': entry.variant === editor.content, '--active': entry.variant.active && vm.dropdownOpen, '--error': variantHasError(entry.variant), '--state-notCreated':entry.variant.state==='NotCreated', '--state-draft':entry.variant.state==='Draft'}"
+                            ng-class="{'--current': entry.variant === editor.content, '--active': entry.variant.active && vm.dropdownOpen, '--error': variantHasError(entry.variant), '--state-notCreated':entry.variant.state==='NotCreated' && entry.variant.name == null, '--state-draft':entry.variant.state==='Draft' || (entry.variant.state==='NotCreated' && entry.variant.name != null)}"
                         >
                             <button type="button" ng-if="entry.subVariants && entry.subVariants.length > 0" class="umb-variant-switcher__item-expand-button umb-outline" ng-click="entry.open = !entry.open">
                                 <i class="icon icon-navigation-down" ng-if="entry.open"></i>

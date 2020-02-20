@@ -20,11 +20,12 @@
                 });
             }
 
-            _.each(vm.variants,
-                function (variant) {
-                    variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
-                    variant.htmlId = "_content_variant_" + variant.compositeId;
-                });
+            _.each(vm.variants, function (variant) {
+                variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
+                variant.htmlId = "_content_variant_" + variant.compositeId;
+
+                variant.isMandatory = isMandatoryFilter(variant);
+            });
 
             // node has variants
             if (vm.variants.length !== 1) {
@@ -108,6 +109,13 @@
             });
             $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
 
+        }
+
+        function isMandatoryFilter(variant) {
+            //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
+            // * has a mandatory language
+            // * without having a segment, segments cant be mandatory at current state of code.
+            return (variant.language && variant.language.isMandatory === true && variant.segment == null);
         }
 
         function publishedVariantFilter(variant) {

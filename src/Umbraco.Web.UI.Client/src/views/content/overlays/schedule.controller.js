@@ -12,7 +12,6 @@
         vm.clearPublishDate = clearPublishDate;
         vm.clearUnpublishDate = clearUnpublishDate;
         vm.dirtyVariantFilter = dirtyVariantFilter;
-        vm.pristineVariantFilter = pristineVariantFilter;
         vm.changeSelection = changeSelection;
 
         vm.firstSelectedDates = {};
@@ -24,7 +23,6 @@
         function onInit() {
 
             vm.variants = $scope.model.variants;
-            vm.hasPristineVariants = false;
 
             for (let i = 0; i < vm.variants.length; i++) {
                 origDates.push({
@@ -38,23 +36,19 @@
                     $scope.model.title = value;
                 });
             }
+           
+            _.each(vm.variants, function (variant) {
+                variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
+                variant.htmlId = "_content_variant_" + variant.compositeId;
+
+                variant.isMandatory = isMandatoryFilter(variant);
+
+            });
 
             // Check for variants: if a node is invariant it will still have the default language in variants
             // so we have to check for length > 1
             if (vm.variants.length > 1) {
 
-                _.each(vm.variants,
-                    function (variant) {
-                        variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
-                        variant.htmlId = "_content_variant_" + variant.compositeId;
-    
-                        //check for pristine variants
-                        if (!vm.hasPristineVariants) {
-                            vm.hasPristineVariants = pristineVariantFilter(variant);
-                        }
-                    });
-
-                
                 vm.variants = vm.variants.sort(function (a, b) {
                     if (a.language && b.language) {
                         if (a.language.name > b.language.name) {
@@ -75,15 +69,12 @@
                     return 0;
                 });
 
-                var active = _.find(vm.variants, function (v) {
-                    return v.active;
+                _.each(vm.variants, function (v) {
+                    if (v.active) {
+                        v.save = true;
+                    }
                 });
-
-                if (active) {
-                    //ensure that the current one is selected
-                    active.save = true;
-                }
-
+                
                 $scope.model.disableSubmitButton = !canSchedule();
             
             }
@@ -143,6 +134,7 @@
          * @param {any} type publish or unpublish
          */
         function datePickerChange(variant, dateStr, type) {
+            console.log("datePickerChange", variant, dateStr, type)
             if (type === 'publish') {
                 setPublishDate(variant, dateStr);
             } else if (type === 'unpublish') {
@@ -257,6 +249,7 @@
          * @param {any} variant 
          */
         function clearPublishDate(variant) {
+            console.log("clearPublishDate", variant, variant.releaseDate)
             if(variant && variant.releaseDate) {
                 variant.releaseDate = null;
                 // we don't have a publish date anymore so we can clear the min date for unpublish
@@ -272,6 +265,7 @@
          * @param {any} variant 
          */
         function clearUnpublishDate(variant) {
+            console.log("clearUnpublishDate", variant)
             if(variant && variant.expireDate) {
                 variant.expireDate = null;
                 // we don't have a unpublish date anymore so we can clear the max date for publish
@@ -313,8 +307,11 @@
             return (variant.active || variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges" || variant.state === "NotCreated");
         }
 
-        function pristineVariantFilter(variant) {
-            return !(dirtyVariantFilter(variant));
+        function isMandatoryFilter(variant) {
+            //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
+            // * has a mandatory language
+            // * without having a segment, segments cant be mandatory at current state of code.
+            return (variant.language && variant.language.isMandatory === true && variant.segment == null);
         }
 
         /** Returns true if publishing is possible based on if there are un-published mandatory languages */

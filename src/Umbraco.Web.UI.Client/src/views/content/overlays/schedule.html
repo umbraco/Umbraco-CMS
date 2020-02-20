@@ -94,8 +94,13 @@
                             model="variant.save"
                             on-change="vm.changeSelection(variant)"
                         >
-                            <span class="umb-variant-selector-entry__title">
+                            <span class="umb-variant-selector-entry__title" ng-if="!(variant.segment && variant.language)">
                                 <span ng-bind="variant.displayName"></span>
+                                <strong ng-if="variant.isMandatory" class="umb-control-required">*</strong>
+                            </span>
+                            <span class="umb-variant-selector-entry__title" ng-if="variant.segment && variant.language">
+                                <span ng-bind="variant.segment"></span>
+                                <span class="__secondarytitle"> — {{variant.language.name}}</span>
                                 <strong ng-if="variant.isMandatory" class="umb-control-required">*</strong>
                             </span>
                             <span class="umb-variant-selector-entry__description"
@@ -110,7 +115,7 @@
 
 
                             <div class="date-wrapper-mini date-wrapper-mini--checkbox">
-                                <div class="date-wrapper-mini__date" ng-if="vm.dirtyVariantFilter(variant) && (variant.releaseDate || variant.save)">
+                                <div class="date-wrapper-mini__date" ng-if="(variant.releaseDate || variant.save)">
 
                                     <div style="font-size: 13px; margin-right: 5px;">Publish:<em ng-show="!variant.save">&nbsp;&nbsp;{{variant.releaseDateFormatted}}</em></div>
 

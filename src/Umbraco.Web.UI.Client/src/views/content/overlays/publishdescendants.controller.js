@@ -22,11 +22,12 @@
                 });
             }
 
-            _.each(vm.variants,
-                function (variant) {
-                    variant.compositeId = (variant.language ? variant.language.culture : "inv") + "_" + (variant.segment ? variant.segment : "");
-                    variant.htmlId = "_content_variant_" + variant.compositeId;
-                });
+            _.each(vm.variants, function (variant) {
+                variant.compositeId = (variant.language ? variant.language.culture : "inv") + "_" + (variant.segment ? variant.segment : "");
+                variant.htmlId = "_content_variant_" + variant.compositeId;
+                
+                variant.isMandatory = isMandatoryFilter(variant);
+            });
 
             if (vm.variants.length > 1) {
 
@@ -105,6 +106,14 @@
             $scope.model.disableSubmitButton = !canPublish();
             //need to set the Save state to true if publish is true
             variant.save = variant.publish;
+        }
+
+        
+        function isMandatoryFilter(variant) {
+            //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
+            // * has a mandatory language
+            // * without having a segment, segments cant be mandatory at current state of code.
+            return (variant.language && variant.language.isMandatory === true && variant.segment == null);
         }
 
         //when this dialog is closed, reset all 'publish' flags

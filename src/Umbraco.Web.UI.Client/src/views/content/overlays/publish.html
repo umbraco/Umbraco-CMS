@@ -21,8 +21,13 @@
                                   on-change="vm.changeSelection(variant)"
                                   server-validation-field="{{variant.htmlId}}"
                     >
-                        <span class="umb-variant-selector-entry__title">
+                        <span class="umb-variant-selector-entry__title" ng-if="!(variant.segment && variant.language)">
                             <span ng-bind="variant.displayName"></span>
+                            <strong ng-if="variant.isMandatory" class="umb-control-required">*</strong>
+                        </span>
+                        <span class="umb-variant-selector-entry__title" ng-if="variant.segment && variant.language">
+                            <span ng-bind="variant.segment"></span>
+                            <span class="__secondarytitle"> — {{variant.language.name}}</span>
                             <strong ng-if="variant.isMandatory" class="umb-control-required">*</strong>
                         </span>
                         <span class="umb-variant-selector-entry__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
@@ -54,8 +59,13 @@
 
         <div class="umb-list-item" ng-repeat="variant in vm.missingMandatoryVariants track by variant.compositeId">
             <div class="umb-variant-selector-entry" ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid}">
-                <span class="umb-variant-selector-entry__title">
+                <span class="umb-variant-selector-entry__title" ng-if="!(variant.segment && variant.language)">
                     <span ng-bind="variant.displayName"></span>
+                    <strong ng-if="variant.isMandatory" class="umb-control-required">*</strong>
+                </span>
+                <span class="umb-variant-selector-entry__title" ng-if="variant.segment && variant.language">
+                    <span ng-bind="variant.segment"></span>
+                    <span class="__secondarytitle"> — {{variant.language.name}}</span>
                     <strong ng-if="variant.isMandatory" class="umb-control-required">*</strong>
                 </span>
                 <span class="umb-variant-selector-entry__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
