@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -21,6 +21,7 @@ namespace Umbraco.Core.Services
             var result = new List<string>();
             var content = contentService.GetById(id);
 
+
             foreach (var contentProperty in content.Properties)
             {
                 if (contentProperty.PropertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.TinyMce))
@@ -30,7 +31,27 @@ namespace Umbraco.Core.Services
                     {
                         result.AddRange(contentService.GetAnchorValuesFromRTEContent(value));
                     }
+                    continue;
                 }
+
+                if (contentProperty.PropertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.NestedContent))
+                {
+                    var values = contentProperty?.Values;
+                    var numberOfProperties = (values?.Count() ?? 0);
+
+                    if (numberOfProperties <= 0)
+                        continue;
+
+                    foreach (var val in values.Where(s => culture == "*" || string.IsNullOrWhiteSpace(s.Culture) || s.Culture == culture.ToLowerInvariant()))
+                    {
+                        var value = val?.PublishedValue?.ToString()?.Replace(@"\", "");
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            result.AddRange(contentService.GetAnchorValuesFromRTEContent(value));
+                        }
+                    }
+                }
+
             }
             return result;
         }
