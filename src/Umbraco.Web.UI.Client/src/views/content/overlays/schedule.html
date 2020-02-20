@@ -89,10 +89,11 @@
                     <div class="umb-variant-selector-entry" ng-class="{'umb-list-item--error': scheduleSelectorForm.saveVariantReleaseDate.$invalid}">
 
                         <umb-checkbox
-                            input-id="{{'saveVariantSelector_' + variant.language.culture}}"
+                            input-id="{{variant.htmlId}}"
                             name="saveVariantSelector"
                             model="variant.save"
                             on-change="vm.changeSelection(variant)"
+                            server-validation-field="{{variant.htmlId}}"
                         >
                             <span class="umb-variant-selector-entry__title" ng-if="!(variant.segment && variant.language)">
                                 <span ng-bind="variant.displayName"></span>
