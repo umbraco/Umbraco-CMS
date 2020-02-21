@@ -51,6 +51,8 @@ namespace Umbraco.Core.Services
         IEnumerable<TItem> GetComposedOf(int id); // composition axis
 
         IEnumerable<TItem> GetChildren(int id);
+        IEnumerable<TItem> GetChildren(Guid id);
+
         bool HasChildren(int id);
 
         void Save(TItem item, int userId = Constants.Security.SuperUserId);
