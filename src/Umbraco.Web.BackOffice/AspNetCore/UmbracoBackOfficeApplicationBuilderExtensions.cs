@@ -5,14 +5,14 @@ namespace Umbraco.Web.BackOffice.AspNetCore
 {
     public static class UmbracoBackOfficeApplicationBuilderExtensions
     {
-        public static IApplicationBuilder UseUmbracoBackOffice(this IApplicationBuilder builder)
+        public static IApplicationBuilder UseUmbracoBackOffice(this IApplicationBuilder app)
         {
-            if (builder == null)
+            if (app == null)
             {
-                throw new ArgumentNullException(nameof(builder));
+                throw new ArgumentNullException(nameof(app));
             }
 
-            return builder.UseMiddleware<UmbracoBackOfficeMiddleware>();
+            return app;
         }
     }
 }

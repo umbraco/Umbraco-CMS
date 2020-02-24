@@ -10,4 +10,8 @@
         <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
         <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="SixLabors.ImageSharp.Web" Version="1.0.0-beta0009" />
+    </ItemGroup>
 </Project>

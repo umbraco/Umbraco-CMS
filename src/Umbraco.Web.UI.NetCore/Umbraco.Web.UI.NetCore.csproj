@@ -10,4 +10,8 @@
       <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\Media" />
+    </ItemGroup>
+
 </Project>
