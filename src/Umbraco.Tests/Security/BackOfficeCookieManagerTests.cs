@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Security
             var umbracoContext = new UmbracoContext(
                 httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(httpContextAccessor, Current.Services.UserService, globalSettings, IOHelper), globalSettings,
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, globalSettings, IOHelper), globalSettings,
                 new TestVariationContextAccessor(),
                 IOHelper,
                 UriUtility,
@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Security
             var umbCtx = new UmbracoContext(
                 httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(httpContextAccessor, Current.Services.UserService, globalSettings, IOHelper),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, globalSettings, IOHelper),
                 globalSettings,
                 new TestVariationContextAccessor(),
                 IOHelper,
