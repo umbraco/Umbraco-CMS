@@ -784,7 +784,7 @@ When building a custom infinite editor view you can use the same components as a
          * @methodOf umbraco.services.editorService
          *
          * @description
-         * Opens the user group picker in infinite editing, the submit callback returns the saved template
+         * Opens the template editor in infinite editing, the submit callback returns the saved template
          * @param {Object} editor rendering options
          * @param {String} editor.id The template id
          * @param {Callback} editor.submit Submits the editor
