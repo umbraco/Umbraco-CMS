@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Routing
             var name = "Template";
             var template = new Template(ShortStringHelper, name, alias);
             template.Content = ""; // else saving throws with a dirty internal error
-            Current.Services.FileService.SaveTemplate(template);
+            ServiceContext.FileService.SaveTemplate(template);
             return template;
         }
 

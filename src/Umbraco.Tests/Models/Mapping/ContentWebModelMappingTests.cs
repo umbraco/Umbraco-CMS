@@ -252,8 +252,8 @@ namespace Umbraco.Tests.Models.Mapping
             }
 
             Assert.AreEqual(contentType.CompositionPropertyGroups.Count(), invariantContent.Tabs.Count() - 1);
-            Assert.IsTrue(invariantContent.Tabs.Any(x => x.Label == Current.Services.TextService.Localize("general/properties")));
-            Assert.AreEqual(2, invariantContent.Tabs.Where(x => x.Label == Current.Services.TextService.Localize("general/properties")).SelectMany(x => x.Properties.Where(p => p.Alias.StartsWith("_umb_") == false)).Count());
+            Assert.IsTrue(invariantContent.Tabs.Any(x => x.Label == ServiceContext.TextService.Localize("general/properties")));
+            Assert.AreEqual(2, invariantContent.Tabs.Where(x => x.Label == ServiceContext.TextService.Localize("general/properties")).SelectMany(x => x.Properties.Where(p => p.Alias.StartsWith("_umb_") == false)).Count());
         }
 
         #region Assertions
@@ -348,7 +348,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(p.PropertyType.ValidationRegExp, pDto.ValidationRegExp);
             Assert.AreEqual(p.PropertyType.Description, pDto.Description);
             Assert.AreEqual(p.PropertyType.Name, pDto.Label);
-            Assert.AreEqual(Current.Services.DataTypeService.GetDataType(p.PropertyType.DataTypeId), pDto.DataType);
+            Assert.AreEqual(ServiceContext.DataTypeService.GetDataType(p.PropertyType.DataTypeId), pDto.DataType);
             Assert.AreEqual(Current.PropertyEditors[p.PropertyType.PropertyEditorAlias], pDto.PropertyEditor);
         }
 

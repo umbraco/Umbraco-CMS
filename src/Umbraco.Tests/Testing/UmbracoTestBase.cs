@@ -110,6 +110,7 @@ namespace Umbraco.Tests.Testing
         private TypeLoader _featureTypeLoader;
 
         #region Accessors
+        protected ServiceContext ServiceContext => Factory.GetInstance<ServiceContext>();
 
         protected ILogger Logger => Factory.GetInstance<ILogger>();
         protected IJsonSerializer JsonNetSerializer { get; } = new JsonNetSerializer();
