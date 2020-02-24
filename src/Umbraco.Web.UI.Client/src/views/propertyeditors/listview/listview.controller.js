@@ -276,6 +276,9 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     }
 
     $scope.reloadView = function (id, reloadActiveNode) {
+        if (!id) {
+            return;
+        }
         $scope.viewLoaded = false;
         $scope.folders = [];
 
@@ -713,10 +716,10 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     }
 
     function initView() {
-        //default to root id if the id is undefined
         var id = $routeParams.id;
         if (id === undefined) {
-            id = -1;
+            // no ID found in route params - don't list anything as we don't know for sure where we are
+            return;
         }
 
         getContentTypesCallback(id).then(function (listViewAllowedTypes) {
