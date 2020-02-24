@@ -376,7 +376,7 @@ namespace Umbraco.Tests.Testing
         {
             return new TypeLoader(ioHelper, typeFinder, runtimeCache, new DirectoryInfo(hostingEnvironment.LocalTempPath), logger, false, new[]
             {
-                Assembly.Load("Umbraco.Abstractions"),
+                Assembly.Load("Umbraco.Core"),
                 Assembly.Load("Umbraco.Web"),
                 Assembly.Load("Umbraco.Tests"),
                 Assembly.Load("Umbraco.Infrastructure")
