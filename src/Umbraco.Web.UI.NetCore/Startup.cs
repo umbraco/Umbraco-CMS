@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Web.BackOffice.AspNetCore;
+using Umbraco.Web.Website.AspNetCore;
 
 
 namespace Umbraco.Web.UI.BackOffice
@@ -18,6 +19,7 @@ namespace Umbraco.Web.UI.BackOffice
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddUmbracoWebsite();
             services.AddUmbracoBackOffice();
         }
 
@@ -29,7 +31,9 @@ namespace Umbraco.Web.UI.BackOffice
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseUmbracoWebsite();
             app.UseUmbracoBackOffice();
+
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>

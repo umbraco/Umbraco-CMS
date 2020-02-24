@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Http;
 
 namespace Umbraco.Web.BackOffice.AspNetCore
 {
-    public class UmbracoMiddleware
+    public class UmbracoBackOfficeMiddleware
     {
         private readonly RequestDelegate _next;
-        public UmbracoMiddleware(RequestDelegate next)
+        public UmbracoBackOfficeMiddleware(RequestDelegate next)
         {
             _next = next;
         }

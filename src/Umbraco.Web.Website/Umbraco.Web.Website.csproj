@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <OutputType>Library</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj" />
+        <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
+        <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+    </ItemGroup>
+</Project>

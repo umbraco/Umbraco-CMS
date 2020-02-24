@@ -2,10 +2,12 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
+        <RootNamespace>Umbraco.Web.UI.BackOffice</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
+      <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
     </ItemGroup>
 
 </Project>
