@@ -23,7 +23,7 @@ namespace Umbraco.Web
         //
         // besides, for tests, Current support setting a fallback without even a container
         //
-        // Update to this comment 8/2/2020: issue as been ameliorated by creating extensions methods in Umbraco.Abstractions
+        // Update to this comment 8/2/2020: issue as been ameliorated by creating extensions methods in Umbraco.Core
         // that accept the dependencies as arguments for many of these extension methods, and can be used within the Umbraco code-base.
         // For site developers, the "friendly" extension methods using service location have been maintained, delegating to the ones that
         // take the dependencies as parameters.
