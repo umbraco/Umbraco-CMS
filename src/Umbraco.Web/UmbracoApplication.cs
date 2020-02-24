@@ -34,7 +34,7 @@ namespace Umbraco.Web
 
             var mainDom = new MainDom(logger, hostingEnvironment, mainDomLock);
 
-            return new WebRuntime(this, configs, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom);
+            return new WebRuntime(configs, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom);
         }
 
         /// <summary>

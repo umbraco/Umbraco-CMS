@@ -3,11 +3,11 @@ using Umbraco.Net;
 
 namespace Umbraco.Web.BackOffice.AspNetCore
 {
-    internal class AspNetSessionIdResolver : ISessionIdResolver
+    internal class AspNetCoreSessionIdResolver : ISessionIdResolver
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AspNetSessionIdResolver(IHttpContextAccessor httpContextAccessor)
+        public AspNetCoreSessionIdResolver(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
         }

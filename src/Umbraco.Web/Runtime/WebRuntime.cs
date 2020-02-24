@@ -22,15 +22,12 @@ namespace Umbraco.Web.Runtime
     /// <remarks>On top of CoreRuntime, handles all of the web-related runtime aspects of Umbraco.</remarks>
     public class WebRuntime : CoreRuntime
     {
-        private readonly UmbracoApplicationBase _umbracoApplication;
         private BuildManagerTypeFinder _typeFinder;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebRuntime"/> class.
         /// </summary>
-        /// <param name="umbracoApplication"></param>
         public WebRuntime(
-            UmbracoApplicationBase umbracoApplication,
             Configs configs,
             IUmbracoVersion umbracoVersion,
             IIOHelper ioHelper,
@@ -42,7 +39,6 @@ namespace Umbraco.Web.Runtime
             IMainDom mainDom):
             base(configs, umbracoVersion, ioHelper, logger, profiler ,new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom)
         {
-            _umbracoApplication = umbracoApplication;
 
             Profiler = GetWebProfiler();
         }
