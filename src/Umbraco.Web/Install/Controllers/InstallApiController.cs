@@ -201,7 +201,15 @@ namespace Umbraco.Web.Install.Controllers
         // determines whether the step requires execution
         internal bool StepRequiresExecution(InstallSetupStep step, object instruction)
         {
-            var model = Convert.ChangeType(instruction, step.StepType);
+            if (step == null) throw new ArgumentNullException(nameof(step));
+
+            var modelAttempt = instruction.TryConvertTo(step.StepType);
+            if (!modelAttempt.Success)
+            {
+                throw new InvalidCastException($"Cannot cast/convert {step.GetType().FullName} into {step.StepType.FullName}");
+            }
+
+            var model = modelAttempt.Result;
             var genericStepType = typeof(InstallSetupStep<>);
             Type[] typeArgs = { step.StepType };
             var typedStepType = genericStepType.MakeGenericType(typeArgs);
