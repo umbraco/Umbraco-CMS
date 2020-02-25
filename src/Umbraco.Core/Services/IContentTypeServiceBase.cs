@@ -72,6 +72,13 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         bool HasContainerInPath(string contentPath);
 
+        /// <summary>
+        /// Gets a value indicating whether there is a list view content item in the path.
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        bool HasContainerInPath(params int[] ids);
+
         Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentContainerId, string name, int userId = Constants.Security.SuperUserId);
         Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
         EntityContainer GetContainer(int containerId);
