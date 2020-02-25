@@ -26,11 +26,8 @@ namespace Umbraco.Web.Hosting
             ApplicationId = HostingEnvironment.ApplicationID;
             ApplicationPhysicalPath = HostingEnvironment.ApplicationPhysicalPath;
             ApplicationVirtualPath = HostingEnvironment.ApplicationVirtualPath;
-            CurrentDomainId = AppDomain.CurrentDomain.Id;
             IISVersion = HttpRuntime.IISVersion;
         }
-
-        public int CurrentDomainId { get; }
 
         public string SiteName { get; }
         public string ApplicationId { get; }
