@@ -16,6 +16,19 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Security
 {
+    // TODO: SB: Create new custom BackOfficeSignInManager2 (rename pending)
+    public class BackOfficeSignInManager2
+    {
+        // Create
+        // CreateUserIdentityAsync
+        // PasswordSignInAsync
+        // SignInAsync
+        // GetVerifiedUserIdAsync
+        // GetVerifiedUserNameAsync
+        // TwoFactorSignInAsync
+        // SendTwoFactorCodeAsync
+    }
+
     // TODO: In v8 we need to change this to use an int? nullable TKey instead, see notes against overridden TwoFactorSignInAsync
     public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser, int>
     {

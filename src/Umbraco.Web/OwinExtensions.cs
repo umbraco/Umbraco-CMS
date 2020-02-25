@@ -83,6 +83,7 @@ namespace Umbraco.Web
             return marker.GetManager(owinContext)
                 ?? throw new NullReferenceException($"Could not resolve an instance of {typeof (BackOfficeUserManager<BackOfficeIdentityUser>)} from the {typeof (IOwinContext)}.");
         }
-    }
 
+        // TODO: SB: OWIN DI
+    }
 }
