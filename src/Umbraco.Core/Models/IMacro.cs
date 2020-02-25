@@ -59,21 +59,9 @@ namespace Umbraco.Core.Models
         string MacroSource { get; set; }
 
         /// <summary>
-        /// Gets or set the macro type
-        /// </summary>
-        [DataMember]
-        MacroTypes MacroType { get; set; }
-
-        /// <summary>
         /// Gets or sets a list of Macro Properties
         /// </summary>
         [DataMember]
         MacroPropertyCollection Properties { get; }
-
-        ///// <summary>
-        ///// Returns an enum <see cref="MacroTypes"/> based on the properties on the Macro
-        ///// </summary>
-        ///// <returns><see cref="MacroTypes"/></returns>
-        //MacroTypes MacroType();
     }
 }

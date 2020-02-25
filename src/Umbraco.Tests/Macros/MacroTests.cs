@@ -25,15 +25,13 @@ namespace Umbraco.Tests.Macros
                 new IsolatedCaches(type => new ObjectCacheAppCache(typeFinder)));
         }
 
-        [TestCase("PartialView", true)]
-        [TestCase("Unknown", false)]
-        public void Macro_Is_File_Based(string macroTypeString, bool expectedNonNull)
+        [TestCase("anything", true)]
+        [TestCase("", false)]
+        public void Macro_Is_File_Based(string macroSource, bool expectedNonNull)
         {
-            var macroType = Enum<MacroTypes>.Parse(macroTypeString);
             var model = new MacroModel
             {
-                MacroType = macroType,
-                MacroSource = "anything"
+                MacroSource = macroSource
             };
             var filename = MacroRenderer.GetMacroFileName(model);
             if (expectedNonNull)

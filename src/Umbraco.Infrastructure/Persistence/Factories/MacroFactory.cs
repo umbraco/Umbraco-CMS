@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.Factories
     {
         public static IMacro BuildEntity(IShortStringHelper shortStringHelper, MacroDto dto)
         {
-            var model = new Macro(shortStringHelper, dto.Id, dto.UniqueId, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.MacroSource, (MacroTypes)dto.MacroType);
+            var model = new Macro(shortStringHelper, dto.Id, dto.UniqueId, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.MacroSource);
 
             try
             {
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Persistence.Factories
                     RefreshRate = entity.CacheDuration,
                     UseInEditor = entity.UseInEditor,
                     MacroPropertyDtos = BuildPropertyDtos(entity),
-                    MacroType = (int)entity.MacroType
+                    MacroType = 7 //PartialView
                 };
 
             if (entity.HasIdentity)
