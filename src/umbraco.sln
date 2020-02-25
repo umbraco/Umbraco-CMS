@@ -99,7 +99,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IssueTemplates", "IssueTemp
 		..\.github\ISSUE_TEMPLATE\5_Security_issue.md = ..\.github\ISSUE_TEMPLATE\5_Security_issue.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Abstractions", "Umbraco.Abstractions\Umbraco.Abstractions.csproj", "{29AA69D9-B597-4395-8D42-43B1263C240A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Core", "Umbraco.Core\Umbraco.Core.csproj", "{29AA69D9-B597-4395-8D42-43B1263C240A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder.Embedded", "Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj", "{52AC0BA8-A60E-4E36-897B-E8B97A54ED1C}"
 EndProject
@@ -112,8 +112,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.TestData", "Umbraco.TestData\Umbraco.TestData.csproj", "{FB5676ED-7A69-492C-B802-E7B24144C0FC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.PublishedCache.NuCache", "Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj", "{F6DE8DA0-07CC-4EF2-8A59-2BC81DBB3830}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Examine", "Umbraco.Examine\Umbraco.Examine.csproj", "{F9B7FE05-0F93-4D0D-9C10-690B33ECBBD8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Examine.Lucene", "Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj", "{0FAD7D2A-D7DD-45B1-91FD-488BB6CDACEA}"
 EndProject
@@ -171,10 +169,6 @@ Global
 		{F6DE8DA0-07CC-4EF2-8A59-2BC81DBB3830}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6DE8DA0-07CC-4EF2-8A59-2BC81DBB3830}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6DE8DA0-07CC-4EF2-8A59-2BC81DBB3830}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F9B7FE05-0F93-4D0D-9C10-690B33ECBBD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F9B7FE05-0F93-4D0D-9C10-690B33ECBBD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F9B7FE05-0F93-4D0D-9C10-690B33ECBBD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F9B7FE05-0F93-4D0D-9C10-690B33ECBBD8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0FAD7D2A-D7DD-45B1-91FD-488BB6CDACEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0FAD7D2A-D7DD-45B1-91FD-488BB6CDACEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FAD7D2A-D7DD-45B1-91FD-488BB6CDACEA}.Release|Any CPU.ActiveCfg = Release|Any CPU

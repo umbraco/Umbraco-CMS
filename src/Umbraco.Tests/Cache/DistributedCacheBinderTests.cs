@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Cache
             // we should really refactor events entirely - in the meantime, let it be an UmbracoTestBase ;(
             //var testObjects = new TestObjects(null);
             //var serviceContext = testObjects.GetServiceContextMock();
-            var serviceContext = Current.Services;
+            var serviceContext = ServiceContext;
 
             var definitions = new IEventDefinition[]
             {
@@ -150,7 +150,7 @@ namespace Umbraco.Tests.Cache
             var definitions = new IEventDefinition[]
             {
                 // works because that event definition maps to an empty handler
-                new EventDefinition<IContentTypeService, SaveEventArgs<IContentType>>(null, Current.Services.ContentTypeService, new SaveEventArgs<IContentType>(Enumerable.Empty<IContentType>()), "Saved"),
+                new EventDefinition<IContentTypeService, SaveEventArgs<IContentType>>(null, ServiceContext.ContentTypeService, new SaveEventArgs<IContentType>(Enumerable.Empty<IContentType>()), "Saved"),
 
             };
 
@@ -165,7 +165,8 @@ namespace Umbraco.Tests.Cache
                 Mock.Of<IUserService>(),
                 IOHelper,
                 UriUtility,
-                httpContextAccessor);
+                httpContextAccessor,
+                new AspNetCookieManager(httpContextAccessor));
 
             // just assert it does not throw
             var refreshers = new DistributedCacheBinder(null, umbracoContextFactory, null);

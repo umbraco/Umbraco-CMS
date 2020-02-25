@@ -55,7 +55,9 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
+using Umbraco.Web.Install;
 using Umbraco.Web.Security;
+using Umbraco.Web.Trees;
 using Current = Umbraco.Web.Composing.Current;
 namespace Umbraco.Tests.Testing
 {
@@ -110,6 +112,7 @@ namespace Umbraco.Tests.Testing
         private TypeLoader _featureTypeLoader;
 
         #region Accessors
+        protected ServiceContext ServiceContext => Factory.GetInstance<ServiceContext>();
 
         protected ILogger Logger => Factory.GetInstance<ILogger>();
         protected IJsonSerializer JsonNetSerializer { get; } = new JsonNetSerializer();
@@ -375,7 +378,7 @@ namespace Umbraco.Tests.Testing
         {
             return new TypeLoader(ioHelper, typeFinder, runtimeCache, new DirectoryInfo(hostingEnvironment.LocalTempPath), logger, false, new[]
             {
-                Assembly.Load("Umbraco.Abstractions"),
+                Assembly.Load("Umbraco.Core"),
                 Assembly.Load("Umbraco.Web"),
                 Assembly.Load("Umbraco.Tests"),
                 Assembly.Load("Umbraco.Infrastructure")
@@ -414,6 +417,8 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IExamineManager, ExamineManager>();
 
             Composition.RegisterUnique<IJsonSerializer, JsonNetSerializer>();
+            Composition.RegisterUnique<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
+            Composition.RegisterUnique<InstallStatusTracker>();
 
             // register filesystems
             Composition.RegisterUnique(factory => TestObjects.GetFileSystemsMock());

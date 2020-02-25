@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Cookie;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models;
@@ -27,6 +28,7 @@ namespace Umbraco.Web.Install
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IConnectionStrings _connectionStrings;
         private readonly IInstallationService _installationService;
+        private readonly ICookieManager _cookieManager;
         private InstallationType? _installationType;
 
         public InstallHelper(IHttpContextAccessor httpContextAccessor,
@@ -35,7 +37,8 @@ namespace Umbraco.Web.Install
             IGlobalSettings globalSettings,
             IUmbracoVersion umbracoVersion,
             IConnectionStrings connectionStrings,
-            IInstallationService installationService)
+            IInstallationService installationService,
+            ICookieManager cookieManager)
         {
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
@@ -44,6 +47,7 @@ namespace Umbraco.Web.Install
             _databaseBuilder = databaseBuilder;
             _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
             _installationService = installationService;
+            _cookieManager = cookieManager;
         }
 
         public InstallationType GetInstallationType()
@@ -51,17 +55,18 @@ namespace Umbraco.Web.Install
             return _installationType ?? (_installationType = IsBrandNewInstall ? InstallationType.NewInstall : InstallationType.Upgrade).Value;
         }
 
-        internal async Task InstallStatus(bool isCompleted, string errorMsg)
+        public async Task InstallStatus(bool isCompleted, string errorMsg)
         {
+
+            var httpContext = _httpContextAccessor.GetRequiredHttpContext();
             try
             {
-                var httpContext = _httpContextAccessor.GetRequiredHttpContext();
                 var userAgent = httpContext.Request.UserAgent;
 
                 // Check for current install Id
                 var installId = Guid.NewGuid();
 
-                var installCookie = httpContext.Request.GetCookieValue(Constants.Web.InstallerCookieName);
+                var installCookie = _cookieManager.GetCookieValue(Constants.Web.InstallerCookieName);
                 if (string.IsNullOrEmpty(installCookie) == false)
                 {
                     if (Guid.TryParse(installCookie, out installId))
@@ -75,7 +80,8 @@ namespace Umbraco.Web.Install
                         installId = Guid.NewGuid(); // Guid.TryParse will have reset installId to Guid.Empty
                     }
                 }
-                httpContext.Response.Cookies.Set(new HttpCookie(Constants.Web.InstallerCookieName, installId.ToString()));
+
+                _cookieManager.SetCookieValue(Constants.Web.InstallerCookieName, installId.ToString());
 
                 var dbProvider = string.Empty;
                 if (IsBrandNewInstall == false)
@@ -143,7 +149,7 @@ namespace Umbraco.Web.Install
             }
         }
 
-        internal IEnumerable<Package> GetStarterKits()
+        public IEnumerable<Package> GetStarterKits()
         {
             if (_httpClient == null)
                 _httpClient = new HttpClient();

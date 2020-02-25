@@ -29,6 +29,7 @@ namespace Umbraco.Web.Trees
     public class TemplatesTreeController : TreeController, ISearchableTree
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
+        private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
 
         public TemplatesTreeController(
             UmbracoTreeSearcher treeSearcher,
@@ -41,10 +42,12 @@ namespace Umbraco.Web.Trees
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
             UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider)
+            IPublishedUrlProvider publishedUrlProvider,
+            IMenuItemCollectionFactory menuItemCollectionFactory)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper, publishedUrlProvider)
         {
             _treeSearcher = treeSearcher;
+            _menuItemCollectionFactory = menuItemCollectionFactory;
         }
 
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
@@ -97,7 +100,7 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
-            var menu = new MenuItemCollection();
+            var menu = _menuItemCollectionFactory.Create();
 
             //Create the normal create action
             var item = menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
@@ -112,7 +115,7 @@ namespace Umbraco.Web.Trees
             }
 
             var template = Services.FileService.GetTemplate(int.Parse(id));
-            if (template == null) return new MenuItemCollection();
+            if (template == null) return menu;
             var entity = FromTemplate(template);
 
             //don't allow delete if it has child layouts

@@ -84,7 +84,6 @@ namespace Umbraco.Tests.Scoping
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
             var hostingEnvironment = TestHelper.GetHostingEnvironment();
-            var filePermissionHelper = Mock.Of<IFilePermissionHelper>();
 
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
 
@@ -108,7 +107,7 @@ namespace Umbraco.Tests.Scoping
                 typeFinder,
                 hostingEnvironment,
                 new MockShortStringHelper(),
-                filePermissionHelper);
+                IOHelper);
         }
 
         protected IUmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)
@@ -122,11 +121,12 @@ namespace Umbraco.Tests.Scoping
             var umbracoContext = new UmbracoContext(
                 httpContextAccessor,
                 service,
-                new WebSecurity(httpContextAccessor, Current.Services.UserService, globalSettings, IOHelper),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, globalSettings, IOHelper),
                 globalSettings,
                 new TestVariationContextAccessor(),
                 IOHelper,
-                UriUtility);
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
@@ -146,7 +146,7 @@ namespace Umbraco.Tests.Scoping
 
             // create document type, document
             var contentType = new ContentType(ShortStringHelper, -1) { Alias = "CustomDocument", Name = "Custom Document" };
-            Current.Services.ContentTypeService.Save(contentType);
+            ServiceContext.ContentTypeService.Save(contentType);
             var item = new Content("name", -1, contentType);
 
             // event handler
@@ -164,7 +164,7 @@ namespace Umbraco.Tests.Scoping
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                Current.Services.ContentService.SaveAndPublish(item);
+                ServiceContext.ContentService.SaveAndPublish(item);
                 scope.Complete();
             }
 
@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Scoping
             using (var scope = ScopeProvider.CreateScope())
             {
                 item.Name = "changed";
-                Current.Services.ContentService.SaveAndPublish(item);
+                ServiceContext.ContentService.SaveAndPublish(item);
 
                 if (complete)
                     scope.Complete();

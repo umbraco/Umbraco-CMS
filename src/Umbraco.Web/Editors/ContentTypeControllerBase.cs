@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Web.Http;
+using System.Web.Http.ModelBinding;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -31,6 +32,8 @@ namespace Umbraco.Web.Editors
     public abstract class ContentTypeControllerBase<TContentType> : UmbracoAuthorizedJsonController
         where TContentType : class, IContentTypeComposition
     {
+        private readonly EditorValidatorCollection _editorValidatorCollection;
+
         protected ContentTypeControllerBase(
             ICultureDictionary cultureDictionary,
             IGlobalSettings globalSettings,
@@ -43,9 +46,11 @@ namespace Umbraco.Web.Editors
             UmbracoHelper umbracoHelper,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider)
+            IPublishedUrlProvider publishedUrlProvider,
+            EditorValidatorCollection editorValidatorCollection)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
+            _editorValidatorCollection = editorValidatorCollection;
             CultureDictionary = cultureDictionary;
         }
 
@@ -272,7 +277,7 @@ namespace Umbraco.Web.Editors
             }
 
             // execute the external validators
-            EditorValidator.Validate(ModelState, contentTypeSave);
+            ValidateExternalValidators(ModelState, contentTypeSave);
 
             if (ModelState.IsValid == false)
             {
@@ -362,6 +367,20 @@ namespace Umbraco.Web.Editors
                 }
                 return newCt;
             }
+        }
+
+        private void ValidateExternalValidators(ModelStateDictionary modelState, object model)
+        {
+            var modelType = model.GetType();
+
+                       var validationResults = _editorValidatorCollection
+                           .Where(x => x.ModelType == modelType)
+                           .SelectMany(x => x.Validate(model))
+                           .Where(x => !string.IsNullOrWhiteSpace(x.ErrorMessage) && x.MemberNames.Any());
+
+                       foreach (var r in validationResults)
+                       foreach (var m in r.MemberNames)
+                           modelState.AddModelError(m, r.ErrorMessage);
         }
 
         /// <summary>

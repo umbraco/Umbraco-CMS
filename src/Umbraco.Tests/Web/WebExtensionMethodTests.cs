@@ -32,11 +32,12 @@ namespace Umbraco.Tests.Web
             var umbCtx = new UmbracoContext(
                 httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(httpContextAccessor, Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, TestObjects.GetGlobalSettings(), IOHelper),
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor(),
                 IOHelper,
-                UriUtility);
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
 
@@ -52,11 +53,12 @@ namespace Umbraco.Tests.Web
             var umbCtx = new UmbracoContext(
                 httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(httpContextAccessor, Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, TestObjects.GetGlobalSettings(), IOHelper),
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor(),
                 IOHelper,
-                UriUtility);
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
@@ -82,11 +84,12 @@ namespace Umbraco.Tests.Web
             var umbCtx = new UmbracoContext(
                 httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(httpContextAccessor, Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, TestObjects.GetGlobalSettings(), IOHelper),
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor(),
                 IOHelper,
-                UriUtility);
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             var httpContext = Mock.Of<HttpContextBase>();
 

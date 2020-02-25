@@ -20,13 +20,15 @@ namespace Umbraco.Web.Install.Controllers
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly IProfilingLogger _proflog;
         private readonly InstallStepCollection _installSteps;
+        private readonly InstallStatusTracker _installStatusTracker;
         private readonly ILogger _logger;
 
-        public InstallApiController(DatabaseBuilder databaseBuilder, IProfilingLogger proflog, InstallHelper installHelper, InstallStepCollection installSteps)
+        public InstallApiController(DatabaseBuilder databaseBuilder, IProfilingLogger proflog, InstallHelper installHelper, InstallStepCollection installSteps, InstallStatusTracker installStatusTracker)
         {
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
             _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _installSteps = installSteps;
+            _installStatusTracker = installStatusTracker;
             InstallHelper = installHelper;
             _logger = _proflog;
         }
@@ -56,7 +58,7 @@ namespace Umbraco.Web.Install.Controllers
             steps.AddRange(installSteps);
             setup.Steps = steps;
 
-            InstallStatusTracker.Initialize(setup.InstallId, installSteps);
+            _installStatusTracker.Initialize(setup.InstallId, installSteps);
 
             return setup;
         }
@@ -78,7 +80,7 @@ namespace Umbraco.Web.Install.Controllers
             //there won't be any statuses returned if the app pool has restarted so we need to re-read from file.
             if (status.Any() == false)
             {
-                status = InstallStatusTracker.InitializeFromFile(installModel.InstallId).ToArray();
+                status = _installStatusTracker.InitializeFromFile(installModel.InstallId).ToArray();
             }
 
             //create a new queue of the non-finished ones
@@ -95,7 +97,7 @@ namespace Umbraco.Web.Install.Controllers
                 if (StepRequiresExecution(step, instruction) == false)
                 {
                     // set this as complete and continue
-                    InstallStatusTracker.SetComplete(installModel.InstallId, item.Name);
+                    _installStatusTracker.SetComplete(installModel.InstallId, item.Name);
                     continue;
                 }
 
@@ -104,7 +106,7 @@ namespace Umbraco.Web.Install.Controllers
                     var setupData = await ExecuteStepAsync(step, instruction);
 
                     // update the status
-                    InstallStatusTracker.SetComplete(installModel.InstallId, step.Name, setupData?.SavedStepData);
+                    _installStatusTracker.SetComplete(installModel.InstallId, step.Name, setupData?.SavedStepData);
 
                     // determine's the next step in the queue and dequeue's any items that don't need to execute
                     var nextStep = IterateSteps(step, queue, installModel.InstallId, installModel);
@@ -147,7 +149,7 @@ namespace Umbraco.Web.Install.Controllers
                 }
             }
 
-            InstallStatusTracker.Reset();
+            _installStatusTracker.Reset();
             return new InstallProgressResultModel(true, "", "");
         }
 
@@ -175,7 +177,7 @@ namespace Umbraco.Web.Install.Controllers
                 var step = _installSteps.GetAllSteps().Single(x => x.Name == item.Name);
 
                 // if this step has any instructions then extract them
-                JToken instruction;
+                object instruction;
                 installModel.Instructions.TryGetValue(item.Name, out instruction); // else null
 
                 // if the step requires execution then return its name
@@ -187,7 +189,7 @@ namespace Umbraco.Web.Install.Controllers
                 queue.Dequeue();
 
                 // complete
-                InstallStatusTracker.SetComplete(installId, step.Name);
+                _installStatusTracker.SetComplete(installId, step.Name);
 
                 // and continue
                 current = step;
@@ -197,9 +199,17 @@ namespace Umbraco.Web.Install.Controllers
         }
 
         // determines whether the step requires execution
-        internal bool StepRequiresExecution(InstallSetupStep step, JToken instruction)
+        internal bool StepRequiresExecution(InstallSetupStep step, object instruction)
         {
-            var model = instruction?.ToObject(step.StepType);
+            if (step == null) throw new ArgumentNullException(nameof(step));
+
+            var modelAttempt = instruction.TryConvertTo(step.StepType);
+            if (!modelAttempt.Success)
+            {
+                throw new InvalidCastException($"Cannot cast/convert {step.GetType().FullName} into {step.StepType.FullName}");
+            }
+
+            var model = modelAttempt.Result;
             var genericStepType = typeof(InstallSetupStep<>);
             Type[] typeArgs = { step.StepType };
             var typedStepType = genericStepType.MakeGenericType(typeArgs);
@@ -216,11 +226,11 @@ namespace Umbraco.Web.Install.Controllers
         }
 
         // executes the step
-        internal async Task<InstallSetupResult> ExecuteStepAsync(InstallSetupStep step, JToken instruction)
+        internal async Task<InstallSetupResult> ExecuteStepAsync(InstallSetupStep step, object instruction)
         {
             using (_proflog.TraceDuration<InstallApiController>($"Executing installation step: '{step.Name}'.", "Step completed"))
             {
-                var model = instruction?.ToObject(step.StepType);
+                var model = Convert.ChangeType(instruction, step.StepType);
                 var genericStepType = typeof(InstallSetupStep<>);
                 Type[] typeArgs = { step.StepType };
                 var typedStepType = genericStepType.MakeGenericType(typeArgs);

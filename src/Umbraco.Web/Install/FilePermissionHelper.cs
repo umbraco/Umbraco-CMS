@@ -7,11 +7,11 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Install;
 using Umbraco.Core.IO;
-using Umbraco.Web.Composing;
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Install
 {
-    internal class FilePermissionHelper : IFilePermissionHelper
+    public class FilePermissionHelper : IFilePermissionHelper
     {
         // ensure that these directories exist and Umbraco can write to them
         private readonly string[] _permissionDirs;
@@ -21,11 +21,13 @@ namespace Umbraco.Web.Install
         private readonly string[] _permissionFiles = { };
         private readonly IGlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
+        private readonly IPublishedSnapshotService _publishedSnapshotService;
 
-        public FilePermissionHelper(IGlobalSettings globalSettings, IIOHelper ioHelper)
+        public FilePermissionHelper(IGlobalSettings globalSettings, IIOHelper ioHelper, IPublishedSnapshotService publishedSnapshotService)
         {
             _globalSettings = globalSettings;
             _ioHelper = ioHelper;
+            _publishedSnapshotService = publishedSnapshotService;
             _permissionDirs = new[] { _globalSettings.UmbracoCssPath, Constants.SystemDirectories.Config, Constants.SystemDirectories.Data, _globalSettings.UmbracoMediaPath, Constants.SystemDirectories.Preview };
             _packagesPermissionsDirs = new[] { Constants.SystemDirectories.Bin, _globalSettings.UmbracoPath, Constants.SystemDirectories.Packages };
         }
@@ -48,7 +50,7 @@ namespace Umbraco.Web.Install
                 if (TestPublishedSnapshotService(out errors) == false)
                     report["Published snapshot environment check failed"] = errors.ToList();
 
-                if (EnsureCanCreateSubDirectory(Current.Configs.Global().UmbracoMediaPath, out errors) == false)
+                if (EnsureCanCreateSubDirectory(_globalSettings.UmbracoMediaPath, out errors) == false)
                     report["Media folder creation failed"] = errors.ToList();
             }
 
@@ -129,8 +131,7 @@ namespace Umbraco.Web.Install
 
         public bool TestPublishedSnapshotService(out IEnumerable<string> errors)
         {
-            var publishedSnapshotService = Current.PublishedSnapshotService;
-            return publishedSnapshotService.EnsureEnvironment(out errors);
+            return _publishedSnapshotService.EnsureEnvironment(out errors);
         }
 
         // tries to create a sub-directory
@@ -140,32 +141,9 @@ namespace Umbraco.Web.Install
         {
             try
             {
-                var path = _ioHelper.MapPath(dir + "/" + CreateRandomName());
+                var path = _ioHelper.MapPath(dir + "/" + _ioHelper.CreateRandomFileName());
                 Directory.CreateDirectory(path);
                 Directory.Delete(path);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        // tries to create a file
-        // if successful, the file is deleted
-        // creates the directory if needed - does not delete it
-        public bool TryCreateDirectory(string dir)
-        {
-            try
-            {
-                var dirPath = _ioHelper.MapPath(dir);
-
-                if (Directory.Exists(dirPath) == false)
-                    Directory.CreateDirectory(dirPath);
-
-                var filePath = dirPath + "/" + CreateRandomName() + ".tmp";
-                File.WriteAllText(filePath, "This is an Umbraco internal test file. It is safe to delete it.");
-                File.Delete(filePath);
                 return true;
             }
             catch
@@ -193,7 +171,7 @@ namespace Umbraco.Web.Install
 
                 if (canWrite)
                 {
-                    var filePath = dirPath + "/" + CreateRandomName() + ".tmp";
+                    var filePath = dirPath + "/" + _ioHelper.CreateRandomFileName() + ".tmp";
                     File.WriteAllText(filePath, "This is an Umbraco internal test file. It is safe to delete it.");
                     File.Delete(filePath);
                     return true;
@@ -259,11 +237,6 @@ namespace Umbraco.Web.Install
             {
                 return false;
             }
-        }
-
-        private string CreateRandomName()
-        {
-            return "umbraco-test." + Guid.NewGuid().ToString("N").Substring(0, 8);
         }
     }
 }

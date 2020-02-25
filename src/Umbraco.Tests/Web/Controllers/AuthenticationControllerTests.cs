@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Web.Controllers
             ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
             {
                 //setup some mocks
-                var userServiceMock = Mock.Get(Current.Services.UserService);
+                var userServiceMock = Mock.Get(ServiceContext.UserService);
                 userServiceMock.Setup(service => service.GetUserById(It.IsAny<int>()))
                     .Returns(() => null);
 

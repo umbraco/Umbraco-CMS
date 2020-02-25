@@ -11,9 +11,9 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Core.Sync;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Routing;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -36,6 +36,7 @@ namespace Umbraco.Web.Scheduling
         private readonly IHealthChecks _healthChecksConfig;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
         private readonly IIOHelper _ioHelper;
+        private readonly IServerMessenger _serverMessenger;
 
         private BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
         private BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
@@ -53,7 +54,7 @@ namespace Umbraco.Web.Scheduling
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger logger,
             IHostingEnvironment hostingEnvironment, IHealthChecks healthChecksConfig,
-            IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper)
+            IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, IServerMessenger serverMessenger)
         {
             _runtime = runtime;
             _contentService = contentService;
@@ -68,6 +69,7 @@ namespace Umbraco.Web.Scheduling
             _healthChecksConfig = healthChecksConfig ?? throw new ArgumentNullException(nameof(healthChecksConfig));
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
             _ioHelper = ioHelper;
+            _serverMessenger = serverMessenger;
         }
 
         public void Initialize()
@@ -140,7 +142,7 @@ namespace Umbraco.Web.Scheduling
         {
             // scheduled publishing/unpublishing
             // install on all, will only run on non-replica servers
-            var task = new ScheduledPublishing(_publishingRunner, DefaultDelayMilliseconds, OneMinuteMilliseconds, _runtime, _contentService, _umbracoContextFactory, _logger);
+            var task = new ScheduledPublishing(_publishingRunner, DefaultDelayMilliseconds, OneMinuteMilliseconds, _runtime, _contentService, _umbracoContextFactory, _logger, _serverMessenger);
             _publishingRunner.TryAdd(task);
             return task;
         }

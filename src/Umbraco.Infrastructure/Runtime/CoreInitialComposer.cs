@@ -26,6 +26,8 @@ using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web;
 using Umbraco.Web.Migrations.PostMigrations;
+using Umbraco.Web.Install;
+using Umbraco.Web.Trees;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Services;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
@@ -59,6 +61,8 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<IScopeAccessor>(f => f.GetInstance<ScopeProvider>());
 
             composition.RegisterUnique<IJsonSerializer, JsonNetSerializer>();
+            composition.RegisterUnique<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
+            composition.RegisterUnique<InstallStatusTracker>();
 
             // register database builder
             // *not* a singleton, don't want to keep it around

@@ -144,7 +144,8 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 globalSettings,
                 new TestVariationContextAccessor(),
                 TestHelper.IOHelper,
-                TestHelper.UriUtility);
+                TestHelper.UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             //replace it
             umbracoContextAccessor.UmbracoContext = umbCtx;

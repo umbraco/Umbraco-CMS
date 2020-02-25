@@ -57,7 +57,6 @@ namespace Umbraco.Tests.Services
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-            var filePermissionHelper = Mock.Of<IFilePermissionHelper>();
 
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
 
@@ -81,7 +80,7 @@ namespace Umbraco.Tests.Services
                 typeFinder,
                 hostingEnvironment,
                 new MockShortStringHelper(),
-                filePermissionHelper);
+                IOHelper);
         }
 
         public class LocalServerMessenger : ServerMessengerBase
