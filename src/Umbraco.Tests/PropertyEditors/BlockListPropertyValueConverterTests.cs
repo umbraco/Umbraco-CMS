@@ -47,7 +47,7 @@ namespace Umbraco.Tests.PropertyEditors
 
         private BlockListConfiguration ConfigForMany() => new BlockListConfiguration
         {
-            ElementTypes = new[] {
+            Blocks = new[] {
                     new BlockListConfiguration.ElementType
                     {
                         Alias = "Test1"
@@ -61,7 +61,7 @@ namespace Umbraco.Tests.PropertyEditors
 
         private BlockListConfiguration ConfigForSingle() => new BlockListConfiguration
         {
-            ElementTypes = new[] {
+            Blocks = new[] {
                     new BlockListConfiguration.ElementType
                     {
                         Alias = "Test1"
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             var valueType = editor.GetPropertyValueType(propType);
 
-            var modelType = typeof(IEnumerable<>).MakeGenericType(ModelType.For(config.ElementTypes[0].Alias));
+            var modelType = typeof(IEnumerable<>).MakeGenericType(ModelType.For(config.Blocks[0].Alias));
 
             // we can't compare the exact match of types because ModelType.For generates a new/different type even if the same alias is used
             Assert.AreEqual(modelType.FullName, valueType.FullName);

@@ -10,9 +10,8 @@ namespace Umbraco.Web.PropertyEditors
     public class BlockListConfiguration
     {
 
-        // TODO: rename this to blockDefinitions, cause its not elementTypes, its a dictionary of objects that define blocks, part of a block is the elementType used as content model.
-        [ConfigurationField("elementTypes", "Available Blocks", "views/propertyeditors/blocklist/prevalue/blocklist.elementtypepicker.html", Description = "Define the available blocks.")]
-        public ElementType[] ElementTypes { get; set; }
+        [ConfigurationField("blocks", "Available Blocks", "views/propertyeditors/blocklist/prevalue/blocklist.elementtypepicker.html", Description = "Define the available blocks.")]
+        public BlockConfiguration[] Blocks { get; set; }
 
 
         [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of blocks")]
@@ -27,7 +26,7 @@ namespace Umbraco.Web.PropertyEditors
             public int? Max { get; set; }
         }
 
-        public class ElementType
+        public class BlockConfiguration
         {
             // TODO: rename this to contentElementTypeAlias, I would like this to be specific, since we have the settings.
             [JsonProperty("elementTypeAlias")]

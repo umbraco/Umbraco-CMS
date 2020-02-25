@@ -34,7 +34,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// <inheritdoc />
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         {
-            var contentTypes = propertyType.DataType.ConfigurationAs<BlockListConfiguration>().ElementTypes;
+            var contentTypes = propertyType.DataType.ConfigurationAs<BlockListConfiguration>().Blocks;
             return contentTypes.Length == 1
                 ? typeof(IEnumerable<>).MakeGenericType(ModelType.For(contentTypes[0].Alias))
                 : typeof(IEnumerable<IPublishedElement>);
@@ -58,7 +58,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             using (_proflog.DebugDuration<BlockListPropertyValueConverter>($"ConvertPropertyToBlockList ({propertyType.DataType.Id})"))
             {
                 var configuration = propertyType.DataType.ConfigurationAs<BlockListConfiguration>();
-                var contentTypes = configuration.ElementTypes;
+                var contentTypes = configuration.Blocks;
                 var elements = (contentTypes.Length == 1
                     ? (IList<IPublishedElement>)_publishedModelFactory.CreateModelList(contentTypes[0].Alias)
                     : new List<IPublishedElement>())
@@ -116,6 +116,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             }
         }
 
-       
+
     }
 }
