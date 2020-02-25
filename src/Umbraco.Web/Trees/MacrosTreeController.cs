@@ -1,10 +1,17 @@
 ﻿using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.Actions;
+using Umbraco.Web.Routing;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -15,6 +22,25 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class MacrosTreeController : TreeController
     {
+        private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
+
+        public MacrosTreeController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider,
+            IMenuItemCollectionFactory menuItemCollectionFactory)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper, publishedUrlProvider)
+        {
+            _menuItemCollectionFactory = menuItemCollectionFactory;
+        }
+
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
             var root = base.CreateRootNode(queryStrings);
@@ -46,7 +72,7 @@ namespace Umbraco.Web.Trees
 
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
-            var menu = new MenuItemCollection();
+            var menu = _menuItemCollectionFactory.Create();
 
             if (id == Constants.System.RootString)
             {
@@ -60,7 +86,7 @@ namespace Umbraco.Web.Trees
             }
 
             var macro = Services.MacroService.GetById(int.Parse(id));
-            if (macro == null) return new MenuItemCollection();
+            if (macro == null) return menu;
 
             //add delete option for all macros
             menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);

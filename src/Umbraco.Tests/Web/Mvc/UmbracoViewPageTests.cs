@@ -445,7 +445,8 @@ namespace Umbraco.Tests.Web.Mvc
                 globalSettings,
                 new TestVariationContextAccessor(),
                 IOHelper,
-                UriUtility);
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             //if (setSingleton)
             //{

@@ -17,24 +17,24 @@ using UserProfile = Umbraco.Web.Models.ContentEditing.UserProfile;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class CommonMapper
+    public class CommonMapper
     {
         private readonly IUserService _userService;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ContentAppFactoryCollection _contentAppDefinitions;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
         public CommonMapper(IUserService userService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor,
             ContentAppFactoryCollection contentAppDefinitions, ILocalizedTextService localizedTextService, IHttpContextAccessor httpContextAccessor)
         {
             _userService = userService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
-            _umbracoContextAccessor = umbracoContextAccessor;
             _contentAppDefinitions = contentAppDefinitions;
             _localizedTextService = localizedTextService;
             _httpContextAccessor = httpContextAccessor;
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         public UserProfile GetOwner(IContentBase source, MapperContext context)

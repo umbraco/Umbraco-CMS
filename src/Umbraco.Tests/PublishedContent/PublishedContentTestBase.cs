@@ -53,8 +53,6 @@ namespace Umbraco.Tests.PublishedContent
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new RichTextPropertyEditor(
                     Mock.Of<ILogger>(),
-                    Mock.Of<IMediaService>(),
-                    Mock.Of<IContentTypeBaseServiceProvider>(),
                     Mock.Of<IUmbracoContextAccessor>(),
                     Mock.Of<IDataTypeService>(),
                     Mock.Of<ILocalizationService>(),

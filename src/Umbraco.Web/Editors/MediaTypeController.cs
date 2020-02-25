@@ -55,8 +55,9 @@ namespace Umbraco.Web.Editors
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
             IEntityService entityService,
-            IPublishedUrlProvider publishedUrlProvider)
-            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
+            IPublishedUrlProvider publishedUrlProvider,
+            EditorValidatorCollection editorValidatorCollection)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider, editorValidatorCollection)
         {
             _shortStringHelper = shortStringHelper;
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));

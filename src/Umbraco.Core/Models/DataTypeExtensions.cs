@@ -75,7 +75,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="dataType">The data type definition.</param>
         /// <returns></returns>
-        internal static bool IsBuildInDataType(this IDataType dataType)
+        public static bool IsBuildInDataType(this IDataType dataType)
         {
             return IsBuildInDataType(dataType.Key);
         }
@@ -83,7 +83,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Returns true if this date type is build-in/default.
         /// </summary>
-        internal static bool IsBuildInDataType(Guid key)
+        public static bool IsBuildInDataType(Guid key)
         {
             return IdsOfBuildInDataTypes.Contains(key);
         }

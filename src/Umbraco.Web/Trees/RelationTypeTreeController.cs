@@ -3,8 +3,14 @@ using System.Net.Http.Formatting;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Trees
 {
@@ -14,11 +20,30 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class RelationTypeTreeController : TreeController
     {
+        private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
+
+        public RelationTypeTreeController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider,
+            IMenuItemCollectionFactory menuItemCollectionFactory)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper, publishedUrlProvider)
+        {
+            _menuItemCollectionFactory = menuItemCollectionFactory;
+        }
+
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
             //TODO: Do not allow deleting built in types
 
-            var menu = new MenuItemCollection();
+            var menu = _menuItemCollectionFactory.Create();
 
             if (id == Constants.System.RootString)
             {
@@ -32,7 +57,7 @@ namespace Umbraco.Web.Trees
             }
 
             var relationType = Services.RelationService.GetRelationTypeById(int.Parse(id));
-            if (relationType == null) return new MenuItemCollection();
+            if (relationType == null) return menu;
 
             menu.Items.Add<ActionDelete>(Services.TextService);
 

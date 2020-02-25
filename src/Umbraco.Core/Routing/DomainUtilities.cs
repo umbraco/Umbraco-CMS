@@ -344,7 +344,7 @@ namespace Umbraco.Web.Routing
         /// <param name="rootNodeId">The current domain root node identifier, or null.</param>
         /// <returns>The deepest wildcard Domain in the path, or null.</returns>
         /// <remarks>Looks _under_ rootNodeId but not _at_ rootNodeId.</remarks>
-        internal static Domain FindWildcardDomainInPath(IEnumerable<Domain> domains, string path, int? rootNodeId)
+        public static Domain FindWildcardDomainInPath(IEnumerable<Domain> domains, string path, int? rootNodeId)
         {
             var stopNodeId = rootNodeId ?? -1;
 

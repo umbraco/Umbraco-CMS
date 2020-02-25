@@ -55,7 +55,9 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
+using Umbraco.Web.Install;
 using Umbraco.Web.Security;
+using Umbraco.Web.Trees;
 using Current = Umbraco.Web.Composing.Current;
 namespace Umbraco.Tests.Testing
 {
@@ -415,6 +417,8 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IExamineManager, ExamineManager>();
 
             Composition.RegisterUnique<IJsonSerializer, JsonNetSerializer>();
+            Composition.RegisterUnique<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
+            Composition.RegisterUnique<InstallStatusTracker>();
 
             // register filesystems
             Composition.RegisterUnique(factory => TestObjects.GetFileSystemsMock());

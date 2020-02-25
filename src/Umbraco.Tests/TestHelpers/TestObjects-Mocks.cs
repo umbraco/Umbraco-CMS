@@ -134,7 +134,8 @@ namespace Umbraco.Tests.TestHelpers
                 Mock.Of<IUserService>(),
                 TestHelper.IOHelper,
                 TestHelper.UriUtility,
-                httpContextAccessor);
+                httpContextAccessor,
+                new AspNetCookieManager(httpContextAccessor));
 
             return umbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
         }

@@ -10,18 +10,21 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Web.Features;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.WebApi
 {
+
+
     /// <summary>
     /// Provides a base class for Umbraco API controllers.
     /// </summary>
     /// <remarks>These controllers are NOT auto-routed.</remarks>
     [FeatureAuthorize]
-    public abstract class UmbracoApiControllerBase : ApiController
+    public abstract class UmbracoApiControllerBase : ApiController, IUmbracoFeature
     {
 
         // note: all Umbraco controllers have two constructors: one with all dependencies, which should be used,

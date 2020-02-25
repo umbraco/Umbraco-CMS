@@ -75,5 +75,6 @@ namespace Umbraco.Core.IO
             get;
             set; //Only required for unit tests
         }
+
     }
 }

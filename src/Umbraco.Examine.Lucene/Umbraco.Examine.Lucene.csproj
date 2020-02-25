@@ -27,7 +27,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
-      <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj" />
       <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
     </ItemGroup>
 

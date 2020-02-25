@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Cookie;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -26,6 +27,7 @@ namespace Umbraco.Web
         private readonly IUserService _userService;
         private readonly IIOHelper _ioHelper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICookieManager _cookieManager;
         private readonly UriUtility _uriUtility;
 
         /// <summary>
@@ -40,7 +42,8 @@ namespace Umbraco.Web
             IUserService userService,
             IIOHelper ioHelper,
             UriUtility uriUtility,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            ICookieManager cookieManager)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -51,6 +54,7 @@ namespace Umbraco.Web
             _ioHelper = ioHelper;
             _uriUtility = uriUtility;
             _httpContextAccessor = httpContextAccessor;
+            _cookieManager = cookieManager;
         }
 
         private IUmbracoContext CreateUmbracoContext()
@@ -69,7 +73,7 @@ namespace Umbraco.Web
 
             var webSecurity = new WebSecurity(_httpContextAccessor, _userService, _globalSettings, _ioHelper);
 
-            return new UmbracoContext(_httpContextAccessor, _publishedSnapshotService, webSecurity, _globalSettings, _variationContextAccessor, _ioHelper, _uriUtility);
+            return new UmbracoContext(_httpContextAccessor, _publishedSnapshotService, webSecurity, _globalSettings, _variationContextAccessor, _ioHelper, _uriUtility, _cookieManager);
         }
 
         /// <inheritdoc />

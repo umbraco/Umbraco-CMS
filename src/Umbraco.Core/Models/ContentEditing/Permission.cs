@@ -22,7 +22,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// We'll use this to map the categories but it wont' be returned in the json
         /// </summary>
         [IgnoreDataMember]
-        internal string Category { get; set; }
+        public string Category { get; set; }
 
         /// <summary>
         /// The letter from the IAction

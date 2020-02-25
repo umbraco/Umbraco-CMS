@@ -83,7 +83,8 @@ namespace Umbraco.Tests.Cache.PublishedCache
                 globalSettings,
                 new TestVariationContextAccessor(),
                 IOHelper,
-                UriUtility);
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             _cache = _umbracoContext.Content;
         }
