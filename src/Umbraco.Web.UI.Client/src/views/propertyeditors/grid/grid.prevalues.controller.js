@@ -207,12 +207,12 @@ angular.module("umbraco")
         };
 
         var editConfigCollection = function(configValues, title, callback) {
-            
+
             var editConfigCollectionOverlay = {
                 config: configValues,
                 title: title,
                 view: "views/propertyeditors/grid/dialogs/editconfig.html",
-                size: "small",
+                size: "large",
                 submit: function(model) {
                     callback(model.config);
                     editorService.close();

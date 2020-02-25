@@ -314,6 +314,10 @@ namespace Umbraco.Web.Editors
                             "tinyMceApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TinyMceController>(
                                 controller => controller.UploadImage())
                         },
+                        {
+                            "codeEditorApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<CodeEditorController>(
+                                controller => controller.GetModel(""))
+                        },
                     }
                 },
                 {

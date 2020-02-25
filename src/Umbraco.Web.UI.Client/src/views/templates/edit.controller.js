@@ -1,14 +1,16 @@
+/// <reference path="../../../node_modules/monaco-editor/monaco.d.ts" />
 (function () {
     "use strict";
 
-    function TemplatesEditController($scope, $routeParams, $timeout, templateResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, treeService, contentEditingHelper, localizationService, angularHelper, templateHelper, editorService) {
+    function TemplatesEditController($scope, $routeParams, $timeout, templateResource, notificationsService, editorState,
+        navigationService, appState, macroService, treeService, contentEditingHelper, localizationService, angularHelper, templateHelper, editorService, codeEditorResource) {
 
         var vm = this;
         var oldMasterTemplateAlias = null;
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
         var id = infiniteMode ? $scope.model.id : $routeParams.id;
         var create = infiniteMode ? $scope.model.create : $routeParams.create;
-        
+
         vm.header = {};
         vm.header.editorfor = "template_template";
         vm.header.setPageTitle = true;
@@ -61,9 +63,6 @@
             }
         ];
 
-        //Used to toggle the keyboard shortcut modal
-        //From a custom keybinding in ace editor - that conflicts with our own to show the dialog
-        vm.showKeyboardShortcut = false;
 
         //Keyboard shortcuts for help dialog
         vm.page.keyboardShortcutsOverview = [];
@@ -77,11 +76,9 @@
         templateHelper.getTemplateEditorShortcuts().then(function(data){
             vm.page.keyboardShortcutsOverview.push(data);
         });
-        
+
         vm.save = function (suppressNotification) {
             vm.page.saveButtonState = "busy";
-
-            vm.template.content = vm.editor.getValue();
 
             contentEditingHelper.contentEditorPerformSave({
                 saveMethod: templateResource.save,
@@ -105,18 +102,18 @@
                 if(!infiniteMode) {
                     editorState.set(vm.template);
                 }
-                
+
                 // sync tree
                 // if master template alias has changed move the node to it's new location
                 if(!infiniteMode && oldMasterTemplateAlias !== vm.template.masterTemplateAlias) {
-                
+
                     // When creating a new template the id is -1. Make sure We don't remove the root node.
                     if (vm.page.menu.currentNode.id !== "-1") {
                         // move node to new location in tree
                         //first we need to remove the node that we're working on
                         treeService.removeNode(vm.page.menu.currentNode);
                     }
-                    
+
                     // update stored alias to the new one so the node won't move again unless the alias is changed again
                     oldMasterTemplateAlias = vm.template.masterTemplateAlias;
 
@@ -159,9 +156,6 @@
 
         vm.init = function () {
 
-            // we need to load this somewhere, for now its here.
-            assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css", $scope);
-
             // load templates - used in the master template picker
             templateResource.getAll()
                 .then(function(templates) {
@@ -197,8 +191,8 @@
 						});
 					}
 				});
-			}	
-					
+			}
+
             // sync state
             if(!infiniteMode) {
                 editorState.set(vm.template);
@@ -210,135 +204,215 @@
             // save state of master template to use for comparison when syncing the tree on save
             oldMasterTemplateAlias = angular.copy(template.masterTemplateAlias);
 
-            // ace configuration
-            vm.aceOption = {
-                mode: "razor",
-                theme: "chrome",
-                showPrintMargin: false,
-                advanced: {
-                    fontSize: '14px',
-                    enableSnippets: false, //The Razor mode snippets are awful (Need a way to override these)
-                    enableBasicAutocompletion: true,
-                    enableLiveAutocompletion: false
-                },
-                onLoad: function(_editor) {
-                    vm.editor = _editor;
-                    
-                    //Update the auto-complete method to use ctrl+alt+space
-                    _editor.commands.bindKey("ctrl-alt-space", "startAutocomplete");
-                    
-                    // Unassigns the keybinding (That was previously auto-complete)
-                    // As conflicts with our own tree search shortcut
-                    _editor.commands.bindKey("ctrl-space", null);
 
-                    // Assign new keybinding
-                    _editor.commands.addCommands([
-                        // Disable (alt+shift+K)
-                        // Conflicts with our own show shortcuts dialog - this overrides it
-                        {
-                            name: 'unSelectOrFindPrevious',
-                            bindKey: 'Alt-Shift-K',
-                            exec: function() {
-                                // Toggle the show keyboard shortcuts overlay
-                                $scope.$apply(function(){
-                                    vm.showKeyboardShortcut = !vm.showKeyboardShortcut;
-                                });
-                                
-                            },
-                            readOnly: true
-                        },
-                        {
-                            name: 'insertUmbracoValue',
-                            bindKey: 'Alt-Shift-V',
-                            exec: function() {
-                                $scope.$apply(function(){
-                                    openPageFieldOverlay();
-                                });
-                            },
-                            readOnly: true
-                        },
-                        {
-                            name: 'insertPartialView',
-                            bindKey: 'Alt-Shift-P',
-                            exec: function() {
-                                $scope.$apply(function(){
-                                    openPartialOverlay();
-                                });
-                            },
-                            readOnly: true
-                        },
-                         {
-                            name: 'insertDictionary',
-                            bindKey: 'Alt-Shift-D',
-                            exec: function() {
-                                $scope.$apply(function(){
-                                    openDictionaryItemOverlay();
-                                });
-                            },
-                            readOnly: true
-                        },
-                        {
-                            name: 'insertUmbracoMacro',
-                            bindKey: 'Alt-Shift-M',
-                            exec: function() {
-                                $scope.$apply(function(){
-                                    openMacroOverlay();
-                                });
-                            },
-                            readOnly: true
-                        },
-                        {
-                            name: 'insertQuery',
-                            bindKey: 'Alt-Shift-Q',
-                            exec: function() {
-                                $scope.$apply(function(){
-                                    openQueryBuilderOverlay();
-                                });
-                            },
-                            readOnly: true
-                        },
-                        {
-                            name: 'insertSection',
-                            bindKey: 'Alt-Shift-S',
-                            exec: function() {
-                                $scope.$apply(function(){
-                                    openSectionsOverlay();
-                                });
-                            },
-                            readOnly: true
-                        },
-                        {
-                            name: 'chooseMasterTemplate',
-                            bindKey: 'Alt-Shift-T',
-                            exec: function() {
-                                $scope.$apply(function(){
-                                    openMasterTemplateOverlay();
-                                });
-                            },
-                            readOnly: true
-                        }
-                        
-                    ]);
-                    
+            // Options to pass to code editor (VS-Code)
+            vm.codeEditorOptions = {
+                language: "razor"
+            }
+
+            let modelPropCompletionProvider;
+
+            // When VS Code editor has loaded...
+            vm.codeEditorLoad = function(monaco, editor) {
+
+                // Assign the VS Code editor so we can reuse it all over here
+                vm.codeEditor = editor;
+
+                // Wrapped in timeout as timing issue
+                // This runs before the directive on the filename focus
+                $timeout(function() {
                     // initial cursor placement
                     // Keep cursor in name field if we are create a new template
                     // else set the cursor at the bottom of the code editor
-                    if(!create) {
-                        $timeout(function(){
-                            vm.editor.navigateFileEnd();
-                            vm.editor.focus();
-                            persistCurrentLocation();
-                        });
-                    }
+                    if(!$routeParams.create) {
 
-                    // change on blur, focus
-                    vm.editor.on("blur", persistCurrentLocation);
-                    vm.editor.on("focus", persistCurrentLocation);
-                    vm.editor.on("change", changeAceEditor);
-            	}
+                        const codeModel = editor.getModel();
+                        const codeModelRange = codeModel.getFullModelRange();
+
+                        // Set cursor position
+                        editor.setPosition({column: codeModelRange.endColumn, lineNumber: codeModelRange.endLineNumber });
+
+                        // Give the editor focus
+                        editor.focus();
+
+                        // Scroll down to last line
+                        editor.revealLine(codeModelRange.endLineNumber);
+                    }
+                });
+
+
+                // Add Actions (Keyboard shortcut & actions to list)
+                editor.addAction({
+                    id: "insertUmbracoValue",
+                    label: "Insert Umbraco Value",
+                    keybindings: [
+                        monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KEY_V
+                    ],
+                    contextMenuGroupId: "umbraco",
+                    contextMenuOrder: 1,
+                    run: function(ed) {
+                        openPageFieldOverlay();
+                    }
+                });
+
+                editor.addAction({
+                    id: "insertPartialView",
+                    label: "Insert Partial View",
+                    keybindings: [
+                        monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KEY_P
+                    ],
+                    contextMenuGroupId: "umbraco",
+                    contextMenuOrder: 2,
+                    run: function(ed) {
+                        openPartialOverlay();
+                    }
+                });
+
+                editor.addAction({
+                    id: "insertDictionary",
+                    label: "Insert Dictionary",
+                    keybindings: [
+                        monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KEY_D
+                    ],
+                    contextMenuGroupId: "umbraco",
+                    contextMenuOrder: 3,
+                    run: function(ed) {
+                        openDictionaryItemOverlay();
+                    }
+                });
+
+                editor.addAction({
+                    id: "insertUmbracoMacro",
+                    label: "Insert Macro",
+                    keybindings: [
+                        monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KEY_M
+                    ],
+                    contextMenuGroupId: "umbraco",
+                    contextMenuOrder: 4,
+                    run: function(ed) {
+                        openMacroOverlay();
+                    }
+                });
+
+                editor.addAction({
+                    id: "insertQuery",
+                    label: "Insert Query",
+                    keybindings: [
+                        monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KEY_Q
+                    ],
+                    contextMenuGroupId: "umbraco",
+                    contextMenuOrder: 5,
+                    run: function(ed) {
+                        openQueryBuilderOverlay();
+                    }
+                });
+
+                editor.addAction({
+                    id: "insertSection",
+                    label: "Insert Section",
+                    keybindings: [
+                        monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KEY_S
+                    ],
+                    contextMenuGroupId: "umbraco",
+                    contextMenuOrder: 6,
+                    run: function(ed) {
+                        openSectionsOverlay();
+                    }
+                });
+
+                editor.addAction({
+                    id: "chooseMasterTemplate",
+                    label: "Choose Master Template",
+                    keybindings: [
+                        monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KEY_T
+                    ],
+                    contextMenuGroupId: "umbraco",
+                    contextMenuOrder: 7,
+                    run: function(ed) {
+                        openMasterTemplateOverlay();
+                    }
+                });
+
+
+                // Code completion for Model. in views
+                modelPropCompletionProvider  = monaco.languages.registerCompletionItemProvider("razor", {
+                    provideCompletionItems: function(model, position) {
+
+                        // What have we just typed ?
+                        const currentLineContent = model.getLineContent(position.lineNumber);
+
+                        // We only want to fire/lookup Model properties when
+                        // The current line/cursor ends with Model
+                        if(currentLineContent.endsWith("Model") || currentLineContent.endsWith("Model.")){
+
+                            // Get all contents of file upto the current position of the cursor
+                            const textUntilPosition = model.getValueInRange({
+                                startLineNumber: 1,
+                                startColumn: 1,
+                                endLineNumber: position.lineNumber,
+                                endColumn: position.column
+                            });
+
+                            const regex = /@inherits [^\s]*UmbracoViewPage<([^\s]+)>[;]*[\r]*\n/gm;
+                            const regexResults = regex.exec(textUntilPosition);
+                            let foundModel;
+
+                            if(regexResults){
+                                // We found a match - YAY
+                                foundModel = regexResults[1];
+                            }
+
+                            // Only do an API call if we found a model
+                            // Some text is in there :)
+                            if(foundModel.length > 0){
+
+                                // The model found in the @inhertis .... UmbracoViewPage<>
+                                // Could be namespaced such as ContentModels.MyNewDocType
+                                // We simply want MyNewDocType
+                                const foundModelParts = foundModel.split('.');
+
+                                // Split creates an array of parts
+                                // If nothing is found to split, one item in array is returned
+                                const foundModelPartsLength = foundModelParts.length;
+
+                                if(foundModelPartsLength > 1){
+                                    // Get last item in the array
+                                    foundModel = foundModelParts[foundModelPartsLength - 1];
+                                } else {
+                                    foundModel = foundModelParts[0];
+                                }
+
+                                // Go and call the WebAPI with the found model from that regex lookup
+                                return codeEditorResource.getModel(foundModel).then(function(completionItems) {
+                                    let suggestion = {
+                                        suggestions: []
+                                    };
+                                    suggestion.suggestions = completionItems;
+                                    return suggestion;
+                                });
+                            }
+                        }
+                    }
+                });
+
+
+                // Use the event listener to notify & set the formstate to dirty
+                // So if you navigate away without saving your prompted
+                editor.onDidChangeModelContent(function(e){
+                    vm.setDirty();
+                });
+
             }
-            
+
+
+            vm.codeEditorDispose = function(){
+                // Dispose the completion provider
+                // When Angular is removing/destroying the component
+                // If we don't do this then we get dupe's added
+                modelPropCompletionProvider.dispose();
+            }
         };
+
 
         vm.openPageFieldOverlay = openPageFieldOverlay;
         vm.openDictionaryItemOverlay = openDictionaryItemOverlay;
@@ -351,7 +425,6 @@
         vm.selectMasterTemplate = selectMasterTemplate;
         vm.getMasterTemplateName = getMasterTemplateName;
         vm.removeMasterTemplate = removeMasterTemplate;
-        vm.closeShortcuts = closeShortcuts;
         vm.submit = submit;
         vm.close = close;
 
@@ -386,8 +459,9 @@
                 close: function(oldModel) {
                     // close the dialog
                     editorService.close();
+
                     // focus editor
-                    vm.editor.focus();
+                    vm.codeEditor.focus();
                 }
             };
             editorService.insertCodeSnippet(insertOverlay);
@@ -403,7 +477,7 @@
                 },
                 close: function() {
                     editorService.close();
-                    vm.editor.focus();
+                    vm.codeEditor.focus();
                 }
             };
             editorService.macroPicker(macroPicker);
@@ -417,7 +491,7 @@
                 },
                 close: function () {
                     editorService.close();
-                    vm.editor.focus();
+                    vm.codeEditor.focus();
                 }
             };
             editorService.insertField(insertFieldEditor);
@@ -451,7 +525,7 @@
                         // close dialog
                         editorService.close();
                         // focus editor
-                        vm.editor.focus();
+                        vm.codeEditor.focus();
                     }
                 };
 
@@ -467,7 +541,7 @@
                 var title = value;
 
                 var partialItem = {
-                    section: "settings", 
+                    section: "settings",
                     treeAlias: "partialViews",
                     entityType: "partialView",
                     multiPicker: false,
@@ -487,7 +561,7 @@
                         // close dialog
                         editorService.close();
                         // focus editor
-                        vm.editor.focus();
+                        vm.codeEditor.focus();
                     }
                 };
 
@@ -505,7 +579,7 @@
                 close: function () {
                     editorService.close();
                     // focus editor
-                    vm.editor.focus();   
+                    vm.codeEditor.focus();
                 }
             };
             editorService.queryBuilder(queryBuilder);
@@ -537,7 +611,7 @@
                 },
                 close: function(model) {
                     editorService.close();
-                    vm.editor.focus();
+                    vm.codeEditor.focus();
                 }
             }
             editorService.templateSections(templateSections);
@@ -579,12 +653,11 @@
                         // close dialog
                         editorService.close();
                         // focus editor
-                        vm.editor.focus();
+                        vm.codeEditor.focus();
                     }
                 };
                 editorService.itemPicker(masterTemplate);
             });
-
         }
 
         function selectMasterTemplate(template) {
@@ -596,7 +669,7 @@
                 vm.template.masterTemplateAlias = null;
                 setLayout(null);
             }
-            
+
         }
 
         function getMasterTemplateName(masterTemplateAlias, templates) {
@@ -617,12 +690,11 @@
 
             // call set layout with no paramters to set layout to null
             setLayout();
-
         }
 
         function setLayout(templatePath){
-            
-            var templateCode = vm.editor.getValue();
+
+            var templateCode = vm.codeEditor.getValue();
             var newValue = templatePath;
             var layoutDefRegex = new RegExp("(@{[\\s\\S]*?Layout\\s*?=\\s*?)(\"[^\"]*?\"|null)(;[\\s\\S]*?})", "gi");
 
@@ -642,21 +714,19 @@
                 }
             }
 
-            vm.editor.setValue(templateCode);
-            vm.editor.clearSelection();
-            vm.editor.navigateFileStart();
-            
-            vm.editor.focus();
+            vm.codeEditor.setValue(templateCode);
+            vm.codeEditor.focus();
+
             // set form state to $dirty
             setFormState("dirty");
-
         }
 
 
         function insert(str) {
-            vm.editor.focus();
-            vm.editor.moveCursorToPosition(vm.currentPosition);
-            vm.editor.insert(str);
+            vm.codeEditor.focus();
+
+            const selection = vm.codeEditor.getSelection();
+            vm.codeEditor.executeEdits("insert", [{ range:selection, text: str }]);
 
             // set form state to $dirty
             setFormState("dirty");
@@ -664,25 +734,26 @@
 
         function wrap(str) {
 
-            var selectedContent = vm.editor.session.getTextRange(vm.editor.getSelectionRange());
+            const selection = vm.codeEditor.getSelection();
+            const editorModel = vm.codeEditor.getModel();
+            const selectedContent = editorModel.getValueInRange(selection);
+
             str = str.replace("{0}", selectedContent);
-            vm.editor.insert(str);
-            vm.editor.focus();
-            
+
+            // TODO: Can we format/neaten the inserted code
+            vm.codeEditor.executeEdits("wrap", [{ range:selection, text: str }]);
+            vm.codeEditor.focus();
+
             // set form state to $dirty
             setFormState("dirty");
         }
 
-        function persistCurrentLocation() {
-            vm.currentPosition = vm.editor.getCursorPosition();
-        }
-
-        function changeAceEditor() {
+        vm.setDirty = function () {
             setFormState("dirty");
         }
 
         function setFormState(state) {
-            
+
             // get the current form
             var currentForm = angularHelper.getCurrentForm($scope);
 
@@ -694,9 +765,6 @@
             }
         }
 
-        function closeShortcuts() {
-            vm.showKeyboardShortcut = false;
-        }
 
         function submit() {
             if($scope.model.submit) {
@@ -710,10 +778,11 @@
                 $scope.model.close();
             }
         }
-    
+
         vm.init();
 
     }
+
 
     angular.module("umbraco").controller("Umbraco.Editors.Templates.EditController", TemplatesEditController);
 })();

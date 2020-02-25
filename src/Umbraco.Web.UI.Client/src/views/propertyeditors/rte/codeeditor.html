@@ -11,12 +11,14 @@
         </umb-editor-header>
 
         <umb-editor-container>
-            <div
-                data-element="code-editor"
-                auto-scale="85"
-                umb-ace-editor="vm.aceOption"
-                model="vm.template.content">
-            </div>
+
+            <!-- Code Editor -->
+            <umb-code-editor
+                contents="model.content"
+                config="vm.codeEditorOptions"
+                data-element="code-editor">
+            </umb-code-editor>
+
         </umb-editor-container>
 
         <umb-editor-footer>

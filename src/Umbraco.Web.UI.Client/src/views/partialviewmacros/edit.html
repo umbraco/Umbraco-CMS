@@ -48,11 +48,14 @@
 
                         </div>
 
-                        <div
-                            auto-scale="85"
-                            umb-ace-editor="vm.aceOption"
-                            model="vm.partialViewMacro.content">
-                        </div>
+                        <!-- Code Editor -->
+                        <umb-code-editor
+                            class="template-editor"
+                            on-load="vm.codeEditorLoad"
+                            contents="vm.partialViewMacro.content"
+                            config="vm.codeEditorOptions"
+                            data-element="code-editor">
+                        </umb-code-editor>
 
                     </umb-box-content>
                 </umb-box>

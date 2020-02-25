@@ -1,3 +1,4 @@
+/// <reference path="../../../../node_modules/monaco-editor/monaco.d.ts" />
 (function () {
     "use strict";
 
@@ -7,26 +8,11 @@
         vm.submit = submit;
         vm.close = close;
 
-        vm.aceOption = {};
-        vm.aceOption = {
-            mode: "razor",
-            theme: "chrome",
-            showPrintMargin: false,
-            autoFocus: true,
-            advanced: {
-                fontSize: "14px",
-                enableSnippets: false, //The Razor mode snippets are awful (Need a way to override these)
-                enableBasicAutocompletion: true,
-                enableLiveAutocompletion: false,
-                wrap: true
-            },
-            onLoad: function(aceEditor) {
-                vm.aceEditor = aceEditor;
-            }
+        vm.codeEditorOptions = {
+            language: "html",
+            formatOnType: true,
+            formatOnPaste: true
         }
-
-        vm.template = {};
-        vm.template.content = $scope.model.content;
 
         //////////
 
@@ -40,9 +26,6 @@
         }
 
         function submit(model) {
-
-            // refresh the model
-            model.content = vm.aceEditor.getValue();
 
             if($scope.model.submit) {
                 $scope.model.submit(model);

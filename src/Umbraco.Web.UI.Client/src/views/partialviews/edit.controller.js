@@ -62,10 +62,6 @@
             }
         ];
 
-        //Used to toggle the keyboard shortcut modal
-        //From a custom keybinding in ace editor - that conflicts with our own to show the dialog
-        vm.showKeyboardShortcut = false;
-
         //Keyboard shortcuts for help dialog
         vm.page.keyboardShortcutsOverview = [];
 
@@ -91,9 +87,8 @@
         /* Functions bound to view model */
 
         function save() {
-            
+
             vm.page.saveButtonState = "busy";
-            vm.partialView.content = vm.editor.getValue();
 
             contentEditingHelper.contentEditorPerformSave({
                 saveMethod: codefileResource.save,
@@ -130,7 +125,7 @@
             }, function (err) {
 
                 vm.page.saveButtonState = "error";
-                
+
                 localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
                     localizationService.localize("speechBubbles_validationFailedMessage").then(function(msgValue) {
                         notificationsService.error(headerValue, msgValue);
@@ -169,7 +164,7 @@
                     // close the dialog
                     editorService.close();
                     // focus editor
-                    vm.editor.focus();
+                    vm.codeEditor.focus();
                 }
             };
             editorService.insertCodeSnippet(insertOverlay);
@@ -186,7 +181,7 @@
                 },
                 close: function() {
                     editorService.close();
-                    vm.editor.focus();
+                    vm.codeEditor.focus();
                 }
             };
             editorService.macroPicker(macroPicker);
@@ -200,7 +195,7 @@
                 },
                 close: function () {
                     editorService.close();
-                    vm.editor.focus();                    
+                    vm.codeEditor.focus();
                 }
             };
             editorService.insertField(insertFieldEditor);
@@ -234,7 +229,7 @@
                         // close dialog
                         editorService.close();
                         // focus editor
-                        vm.editor.focus();
+                        vm.codeEditor.focus();
                     }
                 };
                 editorService.treePicker(dictionaryItem);
@@ -253,7 +248,7 @@
                     // close dialog
                     editorService.close();
                     // focus editor
-                    vm.editor.focus();   
+                    vm.codeEditor.focus();
                 }
             };
             editorService.queryBuilder(queryBuilder);
@@ -274,7 +269,7 @@
                 codefileResource.getScaffold("partialViews", id, snippet).then(function (partialView) {
                     ready(partialView, false);
                 });
-                
+
             } else {
                 codefileResource.getByPath('partialViews', id).then(function (partialView) {
                     ready(partialView, true);
@@ -297,122 +292,119 @@
                 });
             }
 
-            // ace configuration
-            vm.aceOption = {
-                mode: "razor",
-                theme: "chrome",
-                showPrintMargin: false,
-                advanced: {
-                    fontSize: '14px'
-                },
-                onLoad: function(_editor) {
-                    vm.editor = _editor;
+             // Options to pass to code editor (VS-Code)
+             vm.codeEditorOptions = {
+                language: "razor"
+            }
 
-                    //Update the auto-complete method to use ctrl+alt+space
-                    _editor.commands.bindKey("ctrl-alt-space", "startAutocomplete");
-                    
-                    //Unassigns the keybinding (That was previously auto-complete)
-                    //As conflicts with our own tree search shortcut
-                    _editor.commands.bindKey("ctrl-space", null);
+            // When VS Code editor has loaded...
+            vm.codeEditorLoad = function(monaco, editor) {
 
-                    // Assign new keybinding
-                    _editor.commands.addCommands([
-                        //Disable (alt+shift+K)
-                        //Conflicts with our own show shortcuts dialog - this overrides it
-                        {
-                            name: 'unSelectOrFindPrevious',
-                            bindKey: 'Alt-Shift-K',
-                            exec: function () {
-                                //Toggle the show keyboard shortcuts overlay
-                                $scope.$apply(function () {
-                                    vm.showKeyboardShortcut = !vm.showKeyboardShortcut;
-                                });
-                            },
-                            readOnly: true
-                        },
-                        {
-                            name: 'insertUmbracoValue',
-                            bindKey: 'Alt-Shift-V',
-                            exec: function () {
-                                $scope.$apply(function () {
-                                    openPageFieldOverlay();
-                                });
-                            },
-                            readOnly: true
-                        },
-                        {
-                            name: 'insertDictionary',
-                            bindKey: 'Alt-Shift-D',
-                            exec: function () {
-                                $scope.$apply(function () {
-                                    openDictionaryItemOverlay();
-                                });
-                            },
-                            readOnly: true
-                        },
-                        {
-                            name: 'insertUmbracoMacro',
-                            bindKey: 'Alt-Shift-M',
-                            exec: function () {
-                                $scope.$apply(function () {
-                                    openMacroOverlay();
-                                });
-                            },
-                            readOnly: true
-                        },
-                        {
-                            name: 'insertQuery',
-                            bindKey: 'Alt-Shift-Q',
-                            exec: function () {
-                                $scope.$apply(function () {
-                                    openQueryBuilderOverlay();
-                                });
-                            },
-                            readOnly: true
-                        }
+                // Assign the VS Code editor so we can reuse it all over here
+                vm.codeEditor = editor;
 
-                    ]);
-                    
+                // Wrapped in timeout as timing issue
+                // This runs before the directive on the filename focus
+                $timeout(function() {
                     // initial cursor placement
                     // Keep cursor in name field if we are create a new template
                     // else set the cursor at the bottom of the code editor
-                    if(!create) {
-                        $timeout(function(){
-                            vm.editor.navigateFileEnd();
-                            vm.editor.focus();
-                            persistCurrentLocation();
-                        });
+                    if(!$routeParams.create) {
+
+                        const codeModel = editor.getModel();
+                        const codeModelRange = codeModel.getFullModelRange();
+
+                        // Set cursor position
+                        editor.setPosition({column: codeModelRange.endColumn, lineNumber: codeModelRange.endLineNumber });
+
+                        // Give the editor focus
+                        editor.focus();
+
+                        // Scroll down to last line
+                        editor.revealLine(codeModelRange.endLineNumber);
                     }
+                });
 
-                    //change on blur, focus
-                    vm.editor.on("blur", persistCurrentLocation);
-                    vm.editor.on("focus", persistCurrentLocation);
-                    vm.editor.on("change", changeAceEditor);
 
-            	}
+                // Add Actions (Keyboard shortcut & actions to list)
+                editor.addAction({
+                    id: "insertUmbracoValue",
+                    label: "Insert Umbraco Value",
+                    keybindings: [
+                        monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KEY_V
+                    ],
+                    contextMenuGroupId: "umbraco",
+                    contextMenuOrder: 1,
+                    run: function(ed) {
+                        openPageFieldOverlay();
+                    }
+                });
+
+                editor.addAction({
+                    id: "insertDictionary",
+                    label: "Insert Dictionary",
+                    keybindings: [
+                        monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KEY_D
+                    ],
+                    contextMenuGroupId: "umbraco",
+                    contextMenuOrder: 3,
+                    run: function(ed) {
+                        openDictionaryItemOverlay();
+                    }
+                });
+
+                editor.addAction({
+                    id: "insertUmbracoMacro",
+                    label: "Insert Macro",
+                    keybindings: [
+                        monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KEY_M
+                    ],
+                    contextMenuGroupId: "umbraco",
+                    contextMenuOrder: 4,
+                    run: function(ed) {
+                        openMacroOverlay();
+                    }
+                });
+
+                editor.addAction({
+                    id: "insertQuery",
+                    label: "Insert Query",
+                    keybindings: [
+                        monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KEY_Q
+                    ],
+                    contextMenuGroupId: "umbraco",
+                    contextMenuOrder: 5,
+                    run: function(ed) {
+                        openQueryBuilderOverlay();
+                    }
+                });
+
+                // Use the event listener to notify & set the formstate to dirty
+                // So if you navigate away without saving your prompted
+                editor.onDidChangeModelContent(function(e){
+                    vm.setDirty();
+                });
+
             }
 
         }
 
         function insert(str) {
-            vm.editor.focus();
-            vm.editor.moveCursorToPosition(vm.currentPosition);
-            vm.editor.insert(str);
+            vm.codeEditor.focus();
+
+            const selection = vm.codeEditor.getSelection();
+            vm.codeEditor.executeEdits("insert", [{ range:selection, text: str }]);
 
             // set form state to $dirty
             setFormState("dirty");
         }
 
-        function persistCurrentLocation() {
-            vm.currentPosition = vm.editor.getCursorPosition();
-        }
-
-        function changeAceEditor() {
+        vm.setDirty = function () {
             setFormState("dirty");
         }
 
         function setFormState(state) {
-            
+
             // get the current form
             var currentForm = angularHelper.getCurrentForm($scope);
 
@@ -424,7 +416,7 @@
             }
         }
 
-    
+
         init();
 
     }
