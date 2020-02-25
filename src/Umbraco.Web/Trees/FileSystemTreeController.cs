@@ -20,11 +20,9 @@ namespace Umbraco.Web.Trees
 {
     public abstract class FileSystemTreeController : TreeController
     {
-        private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
-
         protected FileSystemTreeController()
         {
-            _menuItemCollectionFactory = Current.MenuItemCollectionFactory;
+            MenuItemCollectionFactory = Current.MenuItemCollectionFactory;
         }
 
         protected FileSystemTreeController(
@@ -41,10 +39,11 @@ namespace Umbraco.Web.Trees
             IMenuItemCollectionFactory menuItemCollectionFactory)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper, publishedUrlProvider)
         {
-            _menuItemCollectionFactory = menuItemCollectionFactory;
+            MenuItemCollectionFactory = menuItemCollectionFactory;
         }
 
         protected abstract IFileSystem FileSystem { get; }
+        protected IMenuItemCollectionFactory MenuItemCollectionFactory { get; }
         protected abstract string[] Extensions { get; }
         protected abstract string FileIcon { get; }
 
@@ -120,7 +119,7 @@ namespace Umbraco.Web.Trees
 
         protected virtual MenuItemCollection GetMenuForRootNode(FormDataCollection queryStrings)
         {
-            var menu = _menuItemCollectionFactory.Create();
+            var menu = MenuItemCollectionFactory.Create();
 
             //set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
@@ -134,7 +133,7 @@ namespace Umbraco.Web.Trees
 
         protected virtual MenuItemCollection GetMenuForFolder(string path, FormDataCollection queryStrings)
         {
-            var menu = _menuItemCollectionFactory.Create();
+            var menu = MenuItemCollectionFactory.Create();
 
             //set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
@@ -158,7 +157,7 @@ namespace Umbraco.Web.Trees
 
         protected virtual MenuItemCollection GetMenuForFile(string path, FormDataCollection queryStrings)
         {
-            var menu = _menuItemCollectionFactory.Create();
+            var menu = MenuItemCollectionFactory.Create();
 
             //if it's not a directory then we only allow to delete the item
             menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
@@ -174,7 +173,7 @@ namespace Umbraco.Web.Trees
                 return GetMenuForRootNode(queryStrings);
             }
 
-            var menu = _menuItemCollectionFactory.Create();
+            var menu = MenuItemCollectionFactory.Create();
 
             var path = string.IsNullOrEmpty(id) == false && id != Constants.System.RootString
                 ? HttpUtility.UrlDecode(id).TrimStart("/")
