@@ -381,7 +381,12 @@ namespace Umbraco.Web.Trees
                 var startNodes = Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes);
                 //if any of these start nodes' parent is current, then we need to render children normally so we need to switch some logic and tell
                 // the UI that this node does have children and that it isn't a container
-                if (startNodes.Any(x => x.ParentId == e.Id))
+
+                if (startNodes.Any(x =>
+                {
+                    var pathParts = x.Path.Split(',');
+                    return pathParts.Contains(e.Id.ToInvariantString());
+                }))
                 {
                     renderChildren = true;
                 }
