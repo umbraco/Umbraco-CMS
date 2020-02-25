@@ -1,12 +1,15 @@
+using System.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
+using Umbraco.Core.Runtime;
 
 namespace Umbraco.Web.BackOffice.AspNetCore
 {
@@ -20,9 +23,9 @@ namespace Umbraco.Web.BackOffice.AspNetCore
 
             CreateCompositionRoot(services);
 
-
             return services;
         }
+
 
         private static void CreateCompositionRoot(IServiceCollection services)
         {
@@ -44,7 +47,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var backOfficeInfo = new AspNetCoreBackOfficeInfo(configs.Global());
             var profiler = new LogProfiler(logger);
 
-            Composing.Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
+            Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
         }
     }
 }
