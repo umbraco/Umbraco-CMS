@@ -7,7 +7,6 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading;
 using System.Web;
-using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
@@ -231,7 +230,7 @@ namespace Umbraco.Web.Security
                 var claimsIdentity = http.User.Identity as ClaimsIdentity;
                 if (claimsIdentity != null)
                 {
-                    var sessionId = claimsIdentity.FindFirstValue(Constants.Security.SessionIdClaimType);
+                    var sessionId = claimsIdentity.FindFirst(Constants.Security.SessionIdClaimType)?.Value;
                     Guid guidSession;
                     if (sessionId.IsNullOrWhiteSpace() == false && Guid.TryParse(sessionId, out guidSession))
                     {

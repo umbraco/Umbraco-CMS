@@ -34,6 +34,11 @@
             /// The header name that angular uses to pass in the token to validate the cookie
             /// </summary>
             public const string AngularHeadername = "X-UMB-XSRF-TOKEN";
+
+            /// <summary>
+            /// The claim type for the ASP.NET Identity security stamp
+            /// </summary>
+            public const string SecurityStampClaimType = "AspNet.Identity.SecurityStamp";
         }
     }
 }

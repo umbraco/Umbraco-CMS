@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Umbraco.Core;
@@ -57,7 +56,7 @@ namespace Umbraco.Web.Security
             if (context?.OwinContext?.Authentication?.User?.Identity != null)
             {
                 var claimsIdentity = context.OwinContext.Authentication.User.Identity as ClaimsIdentity;
-                var sessionId = claimsIdentity.FindFirstValue(Core.Constants.Security.SessionIdClaimType);
+                var sessionId = claimsIdentity.FindFirst(Core.Constants.Security.SessionIdClaimType)?.Value;
                 if (sessionId.IsNullOrWhiteSpace() == false && Guid.TryParse(sessionId, out var guidSession))
                 {
                     _userService.ClearLoginSession(guidSession);
