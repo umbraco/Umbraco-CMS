@@ -262,11 +262,7 @@
                 submitButtonLabel: "Save Search",
                 disableSubmitButton: true,
                 view: "logviewersearch",
-                query: {
-                    filterExpression: vm.logOptions.filterExpression,
-                    startDate: vm.logOptions.startDate,
-                    endDate: vm.logOptions.endDate
-                },
+                query: vm.logOptions.filterExpression,
                 submit: function (model) {
                     //Resource call with two params (name & query)
                     //API that opens the JSON and adds it to the bottom

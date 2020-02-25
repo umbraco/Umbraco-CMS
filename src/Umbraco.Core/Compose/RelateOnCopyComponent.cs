@@ -26,10 +26,11 @@ namespace Umbraco.Core.Compose
 
             if (relationType == null)
             {
-                relationType = new RelationType(Constants.ObjectTypes.Document,
+                relationType = new RelationType(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias,
+                    Constants.Conventions.RelationTypes.RelateDocumentOnCopyName,
+                    true,
                     Constants.ObjectTypes.Document,
-                    Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias,
-                    Constants.Conventions.RelationTypes.RelateDocumentOnCopyName) { IsBidirectional = true };
+                    Constants.ObjectTypes.Document);
 
                 relationService.Save(relationType);
             }

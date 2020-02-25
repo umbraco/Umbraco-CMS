@@ -16,8 +16,9 @@
         var dialogOptions = $scope.model;
         var node = dialogOptions.currentNode;
 
-        $scope.model.relateToOriginal = true;
-        $scope.dialogTreeApi = {};
+      $scope.model.relateToOriginal = true;
+      $scope.model.includeDescendants = true;
+      $scope.dialogTreeApi = {};
 
         vm.searchInfo = {
             searchFromId: null,
@@ -33,14 +34,12 @@
         function onInit() {
 
             var labelKeys = [
-                "general_copy",
-                "defaultdialogs_relateToOriginalLabel"
+                "general_copy"
             ];
 
             localizationService.localizeMany(labelKeys).then(function (data) {
 
                 vm.labels.title = data[0];
-                vm.labels.relateToOriginal = data[1];
 
                 setTitle(vm.labels.title);
             });
@@ -131,6 +130,10 @@
             // If the relateToOriginal toggle is clicked
             if (type === "relate") {
                 $scope.model.relateToOriginal = !$scope.model.relateToOriginal;
+            }
+            // If the includeDescendants toggle is clicked
+            if (type === "descendants") {
+                $scope.model.includeDescendants = !$scope.model.includeDescendants;
             }
         }
 

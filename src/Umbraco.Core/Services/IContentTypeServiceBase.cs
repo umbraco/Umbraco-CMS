@@ -39,6 +39,11 @@ namespace Umbraco.Core.Services
 
         int Count();
 
+        /// <summary>
+        /// Returns true or false depending on whether content nodes have been created based on the provided content type id.
+        /// </summary>
+        bool HasContentNodes(int id);
+
         IEnumerable<TItem> GetAll(params int[] ids);
         IEnumerable<TItem> GetAll(IEnumerable<Guid> ids);
 
@@ -46,7 +51,10 @@ namespace Umbraco.Core.Services
         IEnumerable<TItem> GetComposedOf(int id); // composition axis
 
         IEnumerable<TItem> GetChildren(int id);
+        IEnumerable<TItem> GetChildren(Guid id);
+
         bool HasChildren(int id);
+        bool HasChildren(Guid id);
 
         void Save(TItem item, int userId = Constants.Security.SuperUserId);
         void Save(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId);
