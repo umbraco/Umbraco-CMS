@@ -91,7 +91,7 @@ namespace Umbraco.Web.Install.Controllers
                 var step = _installSteps.GetAllSteps().Single(x => x.Name == item.Name);
 
                 // if this step has any instructions then extract them
-                installModel.Instructions.TryGetValue(item.Name, out var instruction); // else null
+                var instruction = GetInstruction(installModel, item, step);
 
                 // if this step doesn't require execution then continue to the next one, this is just a fail-safe check.
                 if (StepRequiresExecution(step, instruction) == false)
@@ -153,6 +153,18 @@ namespace Umbraco.Web.Install.Controllers
             return new InstallProgressResultModel(true, "", "");
         }
 
+        private static object GetInstruction(InstallInstructions installModel, InstallTrackingItem item, InstallSetupStep step)
+        {
+            installModel.Instructions.TryGetValue(item.Name, out var instruction); // else null
+
+            if (instruction is JObject jObject)
+            {
+                instruction = jObject?.ToObject(step.StepType);
+            }
+
+            return instruction;
+        }
+
         /// <summary>
         /// We'll peek ahead and check if it's RequiresExecution is returning true. If it
         /// is not, we'll dequeue that step and peek ahead again (recurse)
@@ -177,8 +189,7 @@ namespace Umbraco.Web.Install.Controllers
                 var step = _installSteps.GetAllSteps().Single(x => x.Name == item.Name);
 
                 // if this step has any instructions then extract them
-                object instruction;
-                installModel.Instructions.TryGetValue(item.Name, out instruction); // else null
+                var instruction = GetInstruction(installModel, item, step);
 
                 // if the step requires execution then return its name
                 if (StepRequiresExecution(step, instruction))
@@ -230,7 +241,12 @@ namespace Umbraco.Web.Install.Controllers
         {
             using (_proflog.TraceDuration<InstallApiController>($"Executing installation step: '{step.Name}'.", "Step completed"))
             {
-                var model = Convert.ChangeType(instruction, step.StepType);
+                var modelAttempt = instruction.TryConvertTo(step.StepType);
+                if (!modelAttempt.Success)
+                {
+                    throw new InvalidCastException($"Cannot cast/convert {step.GetType().FullName} into {step.StepType.FullName}");
+                }
+                var model = modelAttempt.Result;
                 var genericStepType = typeof(InstallSetupStep<>);
                 Type[] typeArgs = { step.StepType };
                 var typedStepType = genericStepType.MakeGenericType(typeArgs);
