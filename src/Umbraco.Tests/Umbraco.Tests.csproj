@@ -42,7 +42,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -149,6 +149,7 @@
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />
     <Compile Include="UmbracoExamine\ExamineExtensions.cs" />
+    <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionTests.cs" />
     <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />
     <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />
     <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />

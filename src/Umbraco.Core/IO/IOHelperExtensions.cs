@@ -1,17 +1,17 @@
-﻿using System;
+using System;
 using System.IO;
-using Umbraco.Core.IO;
 
-namespace Umbraco.Web.Install
+namespace Umbraco.Core.IO
 {
-    public class FilePermissionDirectoryHelper
+    public static class IOHelperExtensions
     {
-
-
-        // tries to create a file
-        // if successful, the file is deleted
-        // creates the directory if needed - does not delete it
-        public static bool TryCreateDirectory(string dir, IIOHelper ioHelper)
+        /// <summary>
+        /// Tries to create a directory.
+        /// </summary>
+        /// <param name="ioHelper">The IOHelper.</param>
+        /// <param name="dir">the directory path.</param>
+        /// <returns>true if the directory was created, false otherwise.</returns>
+        public static bool TryCreateDirectory(this IIOHelper ioHelper, string dir)
         {
             try
             {
@@ -20,7 +20,7 @@ namespace Umbraco.Web.Install
                 if (Directory.Exists(dirPath) == false)
                     Directory.CreateDirectory(dirPath);
 
-                var filePath = dirPath + "/" + CreateRandomFileName() + ".tmp";
+                var filePath = dirPath + "/" + CreateRandomFileName(ioHelper) + ".tmp";
                 File.WriteAllText(filePath, "This is an Umbraco internal test file. It is safe to delete it.");
                 File.Delete(filePath);
                 return true;
@@ -31,7 +31,7 @@ namespace Umbraco.Web.Install
             }
         }
 
-        public static string CreateRandomFileName()
+        public static string CreateRandomFileName(this IIOHelper ioHelper)
         {
             return "umbraco-test." + Guid.NewGuid().ToString("N").Substring(0, 8);
         }

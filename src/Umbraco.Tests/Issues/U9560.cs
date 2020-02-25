@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Issues
             contentType.Name = "test";
             var propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "prop") { Name = "Prop", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 };
             contentType.PropertyTypeCollection.Add(propertyType);
-            Current.Services.ContentTypeService.Save(contentType);
+            ServiceContext.ContentTypeService.Save(contentType);
 
             var aliasName = string.Empty;
 

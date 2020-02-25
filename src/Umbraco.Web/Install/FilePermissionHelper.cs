@@ -141,7 +141,7 @@ namespace Umbraco.Web.Install
         {
             try
             {
-                var path = _ioHelper.MapPath(dir + "/" + FilePermissionDirectoryHelper.CreateRandomFileName());
+                var path = _ioHelper.MapPath(dir + "/" + _ioHelper.CreateRandomFileName());
                 Directory.CreateDirectory(path);
                 Directory.Delete(path);
                 return true;
@@ -171,7 +171,7 @@ namespace Umbraco.Web.Install
 
                 if (canWrite)
                 {
-                    var filePath = dirPath + "/" + FilePermissionDirectoryHelper.CreateRandomFileName() + ".tmp";
+                    var filePath = dirPath + "/" + _ioHelper.CreateRandomFileName() + ".tmp";
                     File.WriteAllText(filePath, "This is an Umbraco internal test file. It is safe to delete it.");
                     File.Delete(filePath);
                     return true;
