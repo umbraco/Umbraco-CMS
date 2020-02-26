@@ -50,10 +50,10 @@
         BlockEditorModelObject.prototype = {
 
             getBlockConfiguration: function(alias) {
-                return this.blockConfigurations.find(blockConfiguration => blockConfiguration.contentTypeAlias === alias);
+                return this.blockConfigurations.find(bc => bc.contentTypeAlias === alias);
             },
 
-            loadScaffolds: function(contentResource) {
+            loadScaffolding: function(contentResource) {
                 var tasks = [];
 
                 var scaffoldAliases = [];

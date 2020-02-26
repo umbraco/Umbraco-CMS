@@ -865,7 +865,7 @@
 
         var modelObject = blockEditorService.createModelObject(model.value, model.editor, model.config.blocks);
 
-        modelObject.loadScaffolds(contentResource).then(loaded);
+        modelObject.loadScaffolding(contentResource).then(loaded);
 
         vm.layout = [];
         vm.blocks = [];
