@@ -69,7 +69,7 @@
     <key alias="save">Salva</key>
     <key alias="saveAndPublish">Salva e pubblica</key>
     <key alias="saveToPublish">Salva e invia per approvazione</key>
-    <key alias="showPage">Anteprima</key>
+    <key alias="saveAndPreview">Anteprima</key>
     <key alias="showPageDisabled"><![CDATA[L'anteprima è disabilitata dato che non è stato assegnato alcun template]]></key>
     <key alias="styleChoose">Scegli lo stile</key>
     <key alias="styleShow">Mostra gli stili</key>
