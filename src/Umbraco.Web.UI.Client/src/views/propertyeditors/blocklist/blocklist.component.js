@@ -879,7 +879,10 @@
             
             vm.layout = modelObject.getLayout();
             vm.layout.forEach(entry => {
-                vm.blocks.push(modelObject.getEditingModel(entry));
+                var block = modelObject.getEditingModel(entry);
+                if(block !== null) {
+                    vm.blocks.push(block);
+                }
             });
 
             vm.availableBlockTypes = modelObject.getAvailableBlocksForItemPicker();
@@ -916,13 +919,20 @@
             var index = vm.blocks.indexOf(block);
             if(index !== -1) {
                 vm.blocks.splice(index, 1);
-            }
-            if(vm.quickMenuIndex > index) {
-                vm.quickMenuIndex--;
+
+                var layoutIndex = this.layout.findIndex(entry => entry.udi === block.udi);
+                if(layoutIndex !== -1) {
+                    vm.layout.splice(layoutIndex, 1);
+                }
+
+                this.modelObject.removeContentByUdi(block.udi);
             }
         }
 
         vm.editBlock = function(blockModel) {
+
+            // TODO: test wether i need to clone or if that is done by overlay.
+            //var blockModelClone = angular.copy(blockModel);
             
             var elementEditor = {
                 block: blockModel,
@@ -930,6 +940,7 @@
                 size: blockModel.overlaySize,
                 submit: function(model) {
                     blockModel.content = model.block.content;
+                    blockModel.settings = model.block.settings;
                     editorService.close();
                 },
                 close: function() {
@@ -1025,7 +1036,7 @@
         };
 
         $scope.blockApi = {
-            removeBlock: vm.removeBlock
+            deleteBlock: vm.deleteBlock
         }
 
 
