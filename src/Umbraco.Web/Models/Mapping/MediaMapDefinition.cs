@@ -18,16 +18,18 @@ namespace Umbraco.Web.Models.Mapping
     public class MediaMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;
+        private readonly CommonTreeNodeMapper _commonTreeNodeMapper;
         private readonly IMediaService _mediaService;
         private readonly IMediaTypeService _mediaTypeService;
         private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
         private readonly TabsAndPropertiesMapper<IMedia> _tabsAndPropertiesMapper;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
-        public MediaMapDefinition(ICultureDictionary cultureDictionary, CommonMapper commonMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
+        public MediaMapDefinition(ICultureDictionary cultureDictionary, CommonMapper commonMapper, CommonTreeNodeMapper commonTreeNodeMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
             ILocalizedTextService localizedTextService, MediaUrlGeneratorCollection mediaUrlGenerators, IUmbracoSettingsSection umbracoSettingsSection, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
         {
             _commonMapper = commonMapper;
+            _commonTreeNodeMapper = commonTreeNodeMapper;
             _mediaService = mediaService;
             _mediaTypeService = mediaTypeService;
             _mediaUrlGenerators = mediaUrlGenerators;
@@ -71,7 +73,7 @@ namespace Umbraco.Web.Models.Mapping
             target.State = null;
             target.Tabs = _tabsAndPropertiesMapper.Map(source, context);
             target.Trashed = source.Trashed;
-            target.TreeNodeUrl = _commonMapper.GetTreeNodeUrl<MediaTreeController>(source);
+            target.TreeNodeUrl = _commonTreeNodeMapper.GetTreeNodeUrl<MediaTreeController>(source);
             target.Udi = Udi.Create(Constants.UdiEntityType.Media, source.Key);
             target.UpdateDate = source.UpdateDate;
             target.VariesByCulture = source.ContentType.VariesByCulture();

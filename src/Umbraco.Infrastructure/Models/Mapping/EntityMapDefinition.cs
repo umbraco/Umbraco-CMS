@@ -11,7 +11,7 @@ using Umbraco.Examine;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class EntityMapDefinition : IMapDefinition
+    public class EntityMapDefinition : IMapDefinition
     {
         public void DefineMaps(UmbracoMapper mapper)
         {
@@ -236,7 +236,7 @@ namespace Umbraco.Web.Models.Mapping
                     return memberEntity.ContentTypeIcon.IfNullOrWhiteSpace(Constants.Icons.Member);
                 case IContentEntitySlim contentEntity:
                     // NOTE: this case covers both content and media entities
-                    return contentEntity.ContentTypeIcon;                
+                    return contentEntity.ContentTypeIcon;
             }
 
             return null;

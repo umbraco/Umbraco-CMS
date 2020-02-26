@@ -55,6 +55,9 @@
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Mvc, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>C:\Users\Bjarke\.nuget\packages\microsoft.aspnet.mvc\5.2.7\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
@@ -167,9 +170,8 @@
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
     <Compile Include="Models\Identity\UserLoginInfoWrapper.cs" />
-    <Compile Include="Models\Mapping\CommonMapper.cs" />
+    <Compile Include="Models\Mapping\CommonTreeNodeMapper.cs" />
     <Compile Include="Models\Mapping\ContentMapDefinition.cs" />
-    <Compile Include="Models\Mapping\EntityMapDefinition.cs" />
     <Compile Include="Models\Mapping\MediaMapDefinition.cs" />
     <Compile Include="Models\Mapping\MemberMapDefinition.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
@@ -203,6 +205,7 @@
     <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
     <Compile Include="Security\UserAwarePasswordHasher.cs" />
     <Compile Include="StringExtensions.cs" />
+    <Compile Include="Trees\ITreeNodeController.cs" />
     <Compile Include="Trees\TreeCollectionBuilder.cs" />
     <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoContextFactory.cs" />
