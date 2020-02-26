@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using System.Web.Configuration;
 using System.Xml.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Security;
 using Umbraco.Web.Install.Models;
@@ -12,13 +12,15 @@ namespace Umbraco.Web.Install.InstallSteps
         "ConfigureMachineKey", "machinekey", 2,
         "Updating some security settings...",
         PerformsAppRestart = true)]
-    internal class ConfigureMachineKey : InstallSetupStep<bool?>
+    public class ConfigureMachineKey : InstallSetupStep<bool?>
     {
         private readonly IIOHelper _ioHelper;
+        private readonly IMachineKeyConfig _machineKeyConfig;
 
-        public ConfigureMachineKey(IIOHelper ioHelper)
+        public ConfigureMachineKey(IIOHelper ioHelper, IMachineKeyConfig machineKeyConfig)
         {
             _ioHelper = ioHelper;
+            _machineKeyConfig = machineKeyConfig;
         }
 
         public override string View => HasMachineKey() == false ? base.View : "";
@@ -27,10 +29,11 @@ namespace Umbraco.Web.Install.InstallSteps
         /// Don't display the view or execute if a machine key already exists
         /// </summary>
         /// <returns></returns>
-        private static bool HasMachineKey()
+        private bool HasMachineKey()
         {
-            var section = (MachineKeySection) WebConfigurationManager.GetSection("system.web/machineKey");
-            return section.ElementInformation.Source != null;
+            return _machineKeyConfig.HasMachineKey;
+            // var section = (MachineKeySection) WebConfigurationManager.GetSection("system.web/machineKey");
+            // return section.ElementInformation.Source != null;
         }
 
         /// <summary>

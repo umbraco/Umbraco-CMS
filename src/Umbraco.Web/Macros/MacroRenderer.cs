@@ -331,7 +331,7 @@ namespace Umbraco.Web.Macros
         /// <returns>The text output of the macro execution.</returns>
         private MacroContent ExecutePartialView(MacroModel macro, IPublishedContent content)
         {
-            var engine = new PartialViewMacroEngine();
+            var engine = new PartialViewMacroEngine(_umbracoContextAccessor, _httpContextAccessor, _ioHelper);
             return engine.Execute(macro, content);
         }
 

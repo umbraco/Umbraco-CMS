@@ -2,9 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
+using Umbraco.Net;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -14,13 +13,13 @@ namespace Umbraco.Web.Install.InstallSteps
         PerformsAppRestart = true)]
     internal class StarterKitInstallStep : InstallSetupStep<object>
     {
-        private readonly IHttpContextAccessor _httContextAccessor;
+        private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IPackagingService _packagingService;
 
-        public StarterKitInstallStep(IHttpContextAccessor httContextAccessor, IUmbracoContextAccessor umbracoContextAccessor, IPackagingService packagingService)
+        public StarterKitInstallStep(IUmbracoApplicationLifetime umbracoApplicationLifetime, IUmbracoContextAccessor umbracoContextAccessor, IPackagingService packagingService)
         {
-            _httContextAccessor = httContextAccessor;
+            _umbracoApplicationLifetime = umbracoApplicationLifetime;
             _umbracoContextAccessor = umbracoContextAccessor;
             _packagingService = packagingService;
         }
@@ -34,7 +33,9 @@ namespace Umbraco.Web.Install.InstallSteps
 
             InstallBusinessLogic(packageId);
 
-            UmbracoApplication.Restart(_httContextAccessor.GetRequiredHttpContext());
+            _umbracoApplicationLifetime.Restart();
+
+
 
             return Task.FromResult<InstallSetupResult>(null);
         }

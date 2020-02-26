@@ -1,4 +1,5 @@
 using System.Configuration;
+using Umbraco.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -10,6 +11,7 @@ namespace Umbraco.Core.Configuration
         public IHostingSettings HostingSettings { get; } = new HostingSettings();
 
         public ICoreDebug CoreDebug { get; } = new CoreDebug();
+        public IMachineKeyConfig MachineKeyConfig { get; } = new MachineKeyConfig();
 
         public IUmbracoSettingsSection UmbracoSettings { get; }
 
@@ -27,6 +29,7 @@ namespace Umbraco.Core.Configuration
             configs.AddPasswordConfigurations();
 
             configs.Add(() => CoreDebug);
+            configs.Add(() => MachineKeyConfig);
             configs.Add<IConnectionStrings>(() => new ConnectionStrings(ioHelper));
             configs.AddCoreConfigs(ioHelper);
             return configs;
