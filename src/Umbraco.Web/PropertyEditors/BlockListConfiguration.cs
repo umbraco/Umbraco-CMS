@@ -29,7 +29,7 @@ namespace Umbraco.Web.PropertyEditors
         public class BlockConfiguration
         {
             // TODO: rename this to contentElementTypeAlias, I would like this to be specific, since we have the settings.
-            [JsonProperty("elementTypeAlias")]
+            [JsonProperty("contentTypeAlias")]
             public string Alias { get; set; }
 
             [JsonProperty("settingsElementTypeAlias")]
@@ -38,8 +38,8 @@ namespace Umbraco.Web.PropertyEditors
             [JsonProperty("view")]
             public string View { get; set; }
 
-            [JsonProperty("labelTemplate")]
-            public string Template { get; set; }
+            [JsonProperty("label")]
+            public string Label { get; set; }
         }
 
         [ConfigurationField("useAccordionsAsDefault", "Inline editing mode", "boolean", Description = "Use the inline editor as the default block view")]

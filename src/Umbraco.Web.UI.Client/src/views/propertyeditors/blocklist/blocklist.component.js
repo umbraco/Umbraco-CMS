@@ -15,7 +15,7 @@
             }
         });
 
-    function BlockListController($scope, $interpolate, editorService, clipboardService, localizationService, overlayService) {
+    function BlockListController($scope, $interpolate, editorService, clipboardService, localizationService, overlayService, blockEditorService, contentResource) {
         
         var unsubscribe = [];
         var vm = this;
@@ -24,13 +24,15 @@
 
         $scope.moveFocusToBlock = null;
 
+        console.log("model JSON:", JSON.stringify(model));
+        console.log("model:", model);
         console.log("config:", model.config);
 
         vm.validationLimit = model.config.validationLimit;
 
         console.log("value:", model.value);
 
-        
+        /*
         vm.availableBlockTypes = [
             {
                 alias: "pageModule",
@@ -856,7 +858,34 @@
         ];
 
 
+        */
 
+
+        model.value = model.value || {};
+
+        var modelObject = blockEditorService.createModelObject(model.value, model.editor, model.config.blocks);
+
+        modelObject.loadScaffolds(contentResource).then(loaded);
+
+        vm.layout = [];
+        vm.blocks = [];
+        vm.availableBlockTypes = [];
+
+        function loaded() {
+
+            console.log("Loading done!!!");
+            console.log(modelObject);
+
+            
+            vm.layout = modelObject.getLayout();
+            vm.layout.forEach(entry => {
+                vm.blocks.push(modelObject.getEditingModel(entry));
+            });
+
+            vm.availableBlockTypes = modelObject.getAvailableBlocksForItemPicker();
+            console.log(vm.availableBlockTypes);
+
+        }
         
 
         function setDirty() {
@@ -865,33 +894,23 @@
             }
         };
 
-        function addNewBlock(index, type) {
+        function addNewBlock(index, contentTypeAlias) {
 
-            var block = angular.copy(type.prototype_paste_data);
+            // Create layout entry.
+            var layoutEntry = modelObject.createLayoutEntry(contentTypeAlias);
+            // add layout entry a decired location in layout.
+            vm.layout.splice(index, 0, layoutEntry);
 
-            vm.blocks.splice(index, 0, block);
-            $scope.moveFocusToBlock = block;
+            // make editing object
+            var blockEditingObject = modelObject.getEditingModel(layoutEntry);
+            // apply editing model at decired location in editing model.
+            vm.blocks.splice(index, 0, blockEditingObject);
+            
+            $scope.moveFocusToBlock = blockEditingObject;
 
         }
 
-        function getBlockLabel(block) {
-
-            // TODO: we should do something about this for performance.
-
-            var props = new Object();
-
-            var tab = block.content.tabs[0];
-            // TODO: need to look up all tabs...
-            for(const property of tab.properties) {
-                props[property.alias] = property.value;
-            }
-
-            if(block.labelInterpolate) {
-                return block.labelInterpolate(props);
-            }
-
-            return "block.label";
-        }
+        
 
         vm.deleteBlock = function(block) {
             var index = vm.blocks.indexOf(block);
@@ -942,7 +961,7 @@
                 availableItems: vm.availableBlockTypes,
                 submit: function (model) {
                     if (model && model.selectedItem) {
-                        addNewBlock(createIndex, model.selectedItem);
+                        addNewBlock(createIndex, model.selectedItem.alias);
                     }
                     vm.blockTypePicker.close();
                 },
@@ -1050,9 +1069,10 @@
 
         // TODO: We need to investigate if we can do a specific watch on each block, so we dont re-render all blocks.
         unsubscribe.push($scope.$watch("vm.blocks", onBlocksUpdated, true));
-        function onBlocksUpdated(newVal, oldVal){
+        function onBlocksUpdated(newVal, oldVal) {
+            var labelIndex = 1;
             for(const block of vm.blocks) {
-                block.label = getBlockLabel(block);
+                block.label = blockEditorService.getBlockLabel(block, labelIndex++);
             }
         }
         unsubscribe.push($scope.$watch(() => vm.blocks.length, validateLimits));

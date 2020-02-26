@@ -24,16 +24,16 @@
         <div class="umb-table-body" ui-sortable="vm.sortableOptions" ng-model="model.value">
             <div class="umb-table-row block-entry" ng-repeat="entry in model.value">
                 <div class="umb-table-cell not-fixed umb-table__name">
-                    {{ contentPreview = vm.getElementTypeByAlias(entry.elementTypeAlias); "" }}
+                    {{ contentPreview = vm.getElementTypeByAlias(entry.contentTypeAlias); "" }}
                     <umb-node-preview icon="contentPreview.icon" name="contentPreview.name"></umb-node-preview>
                     <div class="cell-actions">
-                        <button type="button" class="btn-reset cell-actions-btn --open umb-outline" ng-click="vm.openElementType(entry.elementTypeAlias)">
+                        <button type="button" class="btn-reset cell-actions-btn --open umb-outline" ng-click="vm.openElementType(entry.contentTypeAlias)">
                             <i class="icon icon-edit"></i>
                         </button>
                     </div>
                 </div>
                 <div class="umb-table-cell">
-                    <input type="text" ng-model="entry.labelTemplate" class="text-input"/>
+                    <input type="text" ng-model="entry.label" class="text-input"/>
                 </div>
                 <div class="umb-table-cell">
                     <div class="settings-input --hasValue" ng-if="entry.view !== null" >

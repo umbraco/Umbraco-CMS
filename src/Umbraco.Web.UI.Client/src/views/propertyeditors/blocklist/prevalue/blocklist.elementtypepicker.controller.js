@@ -47,7 +47,7 @@
 
         vm.requestRemoveEntryByIndex = function (index) {
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "blockEditor_confirmDeleteBlockNotice"]).then(function (data) {
-                var contentElementType = vm.getElementTypeByAlias($scope.model.value[index].elementTypeAlias);
+                var contentElementType = vm.getElementTypeByAlias($scope.model.value[index].contentTypeAlias);
                 overlayService.confirmDelete({
                     title: data[0],
                     content: localizationService.tokenReplace(data[1], [contentElementType.name]),
@@ -78,7 +78,7 @@
         vm.getAvailableElementTypes = function () {
             return vm.elementTypes.filter(function (type) {
                 return !$scope.model.value.find(function (entry) {
-                    return type.alias === entry.elementTypeAlias;
+                    return type.alias === entry.contentTypeAlias;
                 });
             });
         };
@@ -91,9 +91,9 @@
 
         vm.openAddDialog = function ($event, entry) {
 
-            //we have to add the alias to the objects (they are stored as elementTypeAlias)
+            //we have to add the alias to the objects (they are stored as contentTypeAlias)
             var selectedItems = _.each($scope.model.value, function (obj) {
-                obj.alias = obj.elementTypeAlias;
+                obj.alias = obj.contentTypeAlias;
                 return obj;
             });
 
@@ -149,7 +149,7 @@
         vm.addEntryFromElementTypeAlias = function(alias) {
 
             var entry = {
-                "elementTypeAlias": alias,
+                "contentTypeAlias": alias,
                 "view": null,
                 "labelTemplate": "",
                 "settingsElementTypeAlias": null
