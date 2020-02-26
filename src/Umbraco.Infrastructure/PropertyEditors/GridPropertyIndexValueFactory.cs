@@ -1,18 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Xml;
 using Umbraco.Examine;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using Umbraco.Core.Models;
-
     /// <summary>
     /// Parses the grid value into indexable values
     /// </summary>

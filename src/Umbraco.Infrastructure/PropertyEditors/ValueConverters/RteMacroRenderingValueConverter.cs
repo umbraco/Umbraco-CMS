@@ -1,13 +1,13 @@
-﻿using System.Text;
-using Umbraco.Core;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Web.Templates;
-using System.Linq;
+﻿using System.Linq;
+using System.Text;
 using HtmlAgilityPack;
-using Umbraco.Web.Macros;
+using Umbraco.Core;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Macros;
+using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {

@@ -1,7 +1,7 @@
-﻿using HtmlAgilityPack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using HtmlAgilityPack;
 using Umbraco.Core;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
@@ -9,6 +9,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors
@@ -22,10 +23,11 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IPublishedUrlProvider _publishedUrlProvider;
 
         const string TemporaryImageDataAttribute = "data-tmpimg";
 
-        public RichTextEditorPastedImages(IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IIOHelper ioHelper, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper)
+        public RichTextEditorPastedImages(IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IIOHelper ioHelper, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IPublishedUrlProvider publishedUrlProvider)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -34,6 +36,7 @@ namespace Umbraco.Web.PropertyEditors
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider ?? throw new ArgumentNullException(nameof(contentTypeBaseServiceProvider));
             _mediaFileSystem = mediaFileSystem;
             _shortStringHelper = shortStringHelper;
+            _publishedUrlProvider = publishedUrlProvider;
         }
 
         /// <summary>
@@ -43,7 +46,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <param name="mediaParentFolder"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        internal string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId, IImageUrlGenerator imageUrlGenerator)
+        public string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId, IImageUrlGenerator imageUrlGenerator)
         {
             // Find all img's that has data-tmpimg attribute
             // Use HTML Agility Pack - https://html-agility-pack.net
@@ -108,7 +111,7 @@ namespace Umbraco.Web.PropertyEditors
                 if (mediaTyped == null)
                     throw new PanicException($"Could not find media by id {udi.Guid} or there was no UmbracoContext available.");
 
-                var location = mediaTyped.Url();
+                var location = mediaTyped.Url(_publishedUrlProvider);
 
                 // Find the width & height attributes as we need to set the imageprocessor QueryString
                 var width = img.GetAttributeValue("width", int.MinValue);
