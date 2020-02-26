@@ -108,8 +108,7 @@ namespace Umbraco.Web.Editors
                 {
                     Alias = alias,
                     Name = name,
-                    MacroSource = string.Empty,
-                    MacroType = MacroTypes.PartialView
+                    MacroSource = string.Empty
                 };
 
                 _macroService.Save(macro, this.Security.CurrentUser.Id);
@@ -223,7 +222,6 @@ namespace Umbraco.Web.Editors
             macro.DontRender = !macroDisplay.RenderInEditor;
             macro.UseInEditor = macroDisplay.UseInEditor;
             macro.MacroSource = macroDisplay.View;
-            macro.MacroType = MacroTypes.PartialView;
             macro.Properties.ReplaceAll(macroDisplay.Parameters.Select((x,i) => new MacroProperty(x.Key, x.Label, i, x.Editor)));
 
             try

@@ -20,8 +20,6 @@ namespace Umbraco.Web.Macros
         /// </summary>
         public string Alias { get; set; }
 
-        public MacroTypes MacroType { get; set; }
-
         public string MacroSource { get; set; }
 
         public int CacheDuration { get; set; }
@@ -46,7 +44,6 @@ namespace Umbraco.Web.Macros
             Id = macro.Id;
             Name = macro.Name;
             Alias = macro.Alias;
-            MacroType = macro.MacroType;
             MacroSource = macro.MacroSource;
             CacheDuration = macro.CacheDuration;
             CacheByPage = macro.CacheByPage;
@@ -55,8 +52,6 @@ namespace Umbraco.Web.Macros
 
             foreach (var prop in macro.Properties)
                 Properties.Add(new MacroPropertyModel(prop.Alias, string.Empty, prop.EditorAlias));
-
-            MacroType = macro.MacroType;
         }
     }
 }

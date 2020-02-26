@@ -163,8 +163,6 @@
     <Compile Include="Logging\WebProfilerComponent.cs" />
     <Compile Include="Logging\WebProfilerComposer.cs" />
     <Compile Include="Logging\WebProfilerProvider.cs" />
-    <Compile Include="Macros\IMacroRenderer.cs" />
-    <Compile Include="Macros\PublishedContentHashtableConverter.cs" />
     <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
@@ -234,7 +232,6 @@
     <Compile Include="Editors\BackOfficeServerVariables.cs" />
     <Compile Include="Editors\LogViewerController.cs" />
     <Compile Include="ImageProcessorLogger.cs" />
-    <Compile Include="Macros\MacroTagParser.cs" />
     <Compile Include="Trees\LogViewerTreeController.cs" />
     <Compile Include="Mvc\ContainerControllerFactory.cs" />
     <Compile Include="OwinExtensions.cs" />
@@ -278,10 +275,7 @@
     <Compile Include="Install\InstallSteps\ConfigureMachineKey.cs" />
     <Compile Include="Editors\MemberGroupController.cs" />
     <Compile Include="Composing\CompositionExtensions\Controllers.cs" />
-    <Compile Include="Macros\MacroContent.cs" />
-    <Compile Include="Macros\MacroModel.cs" />
     <Compile Include="HealthCheck\HealthCheckController.cs" />
-    <Compile Include="Macros\MacroPropertyModel.cs" />
     <Compile Include="Macros\MacroRenderer.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Composing\ModuleInjector.cs" />

@@ -19,7 +19,6 @@ namespace Umbraco.Core.Persistence.Mappers
             DefineMap<Macro, MacroDto>(nameof(Macro.Alias), nameof(MacroDto.Alias));
             DefineMap<Macro, MacroDto>(nameof(Macro.CacheByPage), nameof(MacroDto.CacheByPage));
             DefineMap<Macro, MacroDto>(nameof(Macro.CacheByMember), nameof(MacroDto.CachePersonalized));
-            DefineMap<Macro, MacroDto>(nameof(Macro.MacroType), nameof(MacroDto.MacroType));
             DefineMap<Macro, MacroDto>(nameof(Macro.DontRender), nameof(MacroDto.DontRender));
             DefineMap<Macro, MacroDto>(nameof(Macro.Name), nameof(MacroDto.Name));
             DefineMap<Macro, MacroDto>(nameof(Macro.CacheDuration), nameof(MacroDto.RefreshRate));

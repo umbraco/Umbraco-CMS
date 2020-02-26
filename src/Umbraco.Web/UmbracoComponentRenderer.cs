@@ -119,7 +119,7 @@ namespace Umbraco.Web
                 x => x.Key.ToLowerInvariant(),
                 i => (i.Value is string) ? HttpUtility.HtmlDecode(i.Value.ToString()) : i.Value);
 
-            var html = _macroRenderer.Render(alias, content, macroProps).GetAsText();
+            var html = _macroRenderer.Render(alias, content, macroProps).Text;
 
             return new HtmlString(html);
         }
