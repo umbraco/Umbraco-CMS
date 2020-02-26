@@ -98,7 +98,7 @@ module.exports = function (config) {
         // - PhantomJS
         // - IE (only Windows)
         // CLI --browsers Chrome,Firefox,Safari
-        browsers: ['PhantomJS'],
+        browsers: ['ChromeHeadless'],
 
         // allow waiting a bit longer, some machines require this
 
@@ -115,6 +115,7 @@ module.exports = function (config) {
         plugins: [
             require('karma-jasmine'),
             require('karma-phantomjs-launcher'),
+            require('karma-chrome-launcher'),
             require('karma-junit-reporter'),
             require('karma-spec-reporter')
 
