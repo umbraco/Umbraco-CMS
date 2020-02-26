@@ -71,6 +71,7 @@
     "gulp-wrap": "0.15.0",
     "gulp-wrap-js": "0.4.1",
     "jasmine-core": "3.5.0",
+    "jasmine-promise-matchers": "^2.6.0",
     "karma": "4.4.1",
     "karma-chrome-launcher": "^3.1.0",
     "karma-jasmine": "2.0.1",

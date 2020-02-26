@@ -10,6 +10,9 @@ module.exports = function (config) {
         // list of files / patterns to load in the browser
         files: [
 
+            // Jasmine plugins
+            'node_modules/jasmine-promise-matchers/dist/jasmine-promise-matchers.js',
+
             //libraries
             'node_modules/jquery/dist/jquery.min.js',
             'node_modules/angular/angular.js',
