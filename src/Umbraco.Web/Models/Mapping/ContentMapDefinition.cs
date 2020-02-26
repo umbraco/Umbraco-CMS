@@ -21,6 +21,7 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;
+        private readonly CommonTreeNodeMapper _commonTreeNodeMapper;
         private readonly ICultureDictionary _cultureDictionary;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IContentService _contentService;
@@ -41,11 +42,12 @@ namespace Umbraco.Web.Models.Mapping
         private readonly ContentVariantMapper _contentVariantMapper;
 
 
-        public ContentMapDefinition(CommonMapper commonMapper, ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService, IContentService contentService, IContentTypeService contentTypeService,
+        public ContentMapDefinition(CommonMapper commonMapper, CommonTreeNodeMapper commonTreeNodeMapper, ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService, IContentService contentService, IContentTypeService contentTypeService,
             IFileService fileService, IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, ILocalizationService localizationService, ILogger logger,
             IUserService userService, IVariationContextAccessor variationContextAccessor, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, UriUtility uriUtility, IPublishedUrlProvider publishedUrlProvider, IEntityService entityService)
         {
             _commonMapper = commonMapper;
+            _commonTreeNodeMapper = commonTreeNodeMapper;
             _cultureDictionary = cultureDictionary;
             _localizedTextService = localizedTextService;
             _contentService = contentService;
@@ -105,7 +107,7 @@ namespace Umbraco.Web.Models.Mapping
             target.TemplateAlias = GetDefaultTemplate(source);
             target.TemplateId = source.TemplateId ?? default;
             target.Trashed = source.Trashed;
-            target.TreeNodeUrl = _commonMapper.GetTreeNodeUrl<ContentTreeController>(source);
+            target.TreeNodeUrl = _commonTreeNodeMapper.GetTreeNodeUrl<ContentTreeController>(source);
             target.Udi = Udi.Create(source.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, source.Key);
             target.UpdateDate = source.UpdateDate;
             target.Updater = _commonMapper.GetCreator(source, context);

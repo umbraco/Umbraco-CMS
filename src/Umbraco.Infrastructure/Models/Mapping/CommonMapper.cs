@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Trees;
+
 using UserProfile = Umbraco.Web.Models.ContentEditing.UserProfile;
 
 namespace Umbraco.Web.Models.Mapping
@@ -23,17 +20,15 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly ContentAppFactoryCollection _contentAppDefinitions;
         private readonly ILocalizedTextService _localizedTextService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
         public CommonMapper(IUserService userService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor,
-            ContentAppFactoryCollection contentAppDefinitions, ILocalizedTextService localizedTextService, IHttpContextAccessor httpContextAccessor)
+            ContentAppFactoryCollection contentAppDefinitions, ILocalizedTextService localizedTextService)
         {
             _userService = userService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
             _contentAppDefinitions = contentAppDefinitions;
             _localizedTextService = localizedTextService;
-            _httpContextAccessor = httpContextAccessor;
             _umbracoContextAccessor = umbracoContextAccessor;
         }
 
@@ -62,25 +57,6 @@ namespace Umbraco.Web.Models.Mapping
             }
             //no access
             return null;
-        }
-
-        public string GetTreeNodeUrl<TController>(IContentBase source)
-            where TController : ContentTreeControllerBase
-        {
-            var httpContext = _httpContextAccessor.HttpContext;
-            if (httpContext == null) return null;
-
-            var urlHelper = new UrlHelper(httpContext.Request.RequestContext);
-            return urlHelper.GetUmbracoApiService<TController>(controller => controller.GetTreeNode(source.Key.ToString("N"), null));
-        }
-
-        public string GetMemberTreeNodeUrl(IContentBase source)
-        {
-            var httpContext = _httpContextAccessor.HttpContext;
-            if (httpContext == null) return null;
-
-            var urlHelper = new UrlHelper(httpContext.Request.RequestContext);
-            return urlHelper.GetUmbracoApiService<MemberTreeController>(controller => controller.GetTreeNode(source.Key.ToString("N"), null));
         }
 
         public IEnumerable<ContentApp> GetContentApps(IContentBase source)

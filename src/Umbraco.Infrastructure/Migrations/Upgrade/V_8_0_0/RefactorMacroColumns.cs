@@ -18,11 +18,12 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 AddColumn<MacroDto>("macroSource", out var sqls2);
 
                 //populate the new columns with legacy data
-                Execute.Sql($"UPDATE {Constants.DatabaseSchema.Tables.Macro} SET macroSource = '', macroType = {(int)MacroTypes.Unknown}").Do();
-                Execute.Sql($"UPDATE {Constants.DatabaseSchema.Tables.Macro} SET macroSource = macroXSLT, macroType = {(int)MacroTypes.Unknown} WHERE macroXSLT != '' AND macroXSLT IS NOT NULL").Do();
-                Execute.Sql($"UPDATE {Constants.DatabaseSchema.Tables.Macro} SET macroSource = macroScriptAssembly, macroType = {(int)MacroTypes.Unknown} WHERE macroScriptAssembly != '' AND macroScriptAssembly IS NOT NULL").Do();
-                Execute.Sql($"UPDATE {Constants.DatabaseSchema.Tables.Macro} SET macroSource = macroScriptType, macroType = {(int)MacroTypes.Unknown} WHERE macroScriptType != '' AND macroScriptType IS NOT NULL").Do();
-                Execute.Sql($"UPDATE {Constants.DatabaseSchema.Tables.Macro} SET macroSource = macroPython, macroType = {(int)MacroTypes.PartialView} WHERE macroPython != '' AND macroPython IS NOT NULL").Do();
+                //when the macro type is PartialView, it corresponds to 7, else it is 4 for Unknown
+                Execute.Sql($"UPDATE {Constants.DatabaseSchema.Tables.Macro} SET macroSource = '', macroType = 4").Do();
+                Execute.Sql($"UPDATE {Constants.DatabaseSchema.Tables.Macro} SET macroSource = macroXSLT, macroType = 4 WHERE macroXSLT != '' AND macroXSLT IS NOT NULL").Do();
+                Execute.Sql($"UPDATE {Constants.DatabaseSchema.Tables.Macro} SET macroSource = macroScriptAssembly, macroType = 4 WHERE macroScriptAssembly != '' AND macroScriptAssembly IS NOT NULL").Do();
+                Execute.Sql($"UPDATE {Constants.DatabaseSchema.Tables.Macro} SET macroSource = macroScriptType, macroType = 4 WHERE macroScriptType != '' AND macroScriptType IS NOT NULL").Do();
+                Execute.Sql($"UPDATE {Constants.DatabaseSchema.Tables.Macro} SET macroSource = macroPython, macroType = 7 WHERE macroPython != '' AND macroPython IS NOT NULL").Do();
 
                 //now apply constraints (NOT NULL) to new table
                 foreach (var sql in sqls1) Execute.Sql(sql).Do();

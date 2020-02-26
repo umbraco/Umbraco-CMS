@@ -37,7 +37,7 @@ namespace Umbraco.Web.Trees
     [PluginController("UmbracoTrees")]
     [CoreTree]
     [SearchableTree("searchResultFormatter", "configureMemberResult")]
-    public class MemberTreeController : TreeController, ISearchableTree
+    public class MemberTreeController : TreeController, ISearchableTree, ITreeNodeController
     {
 
 

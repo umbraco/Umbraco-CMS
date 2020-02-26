@@ -10,7 +10,7 @@ namespace Umbraco.Web.Macros
     /// <summary>
     /// Parses the macro syntax in a string and renders out it's contents
     /// </summary>
-    internal class MacroTagParser
+    public class MacroTagParser
     {
         private static readonly Regex MacroRteContent = new Regex(@"(<!--\s*?)(<\?UMBRACO_MACRO.*?/>)(\s*?-->)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline);
@@ -35,7 +35,7 @@ namespace Umbraco.Web.Macros
         ///     {/div}
         ///
         /// </remarks>
-        internal static string FormatRichTextPersistedDataForEditor(string persistedContent, IDictionary<string ,string> htmlAttributes)
+        public static string FormatRichTextPersistedDataForEditor(string persistedContent, IDictionary<string ,string> htmlAttributes)
         {
             return MacroPersistedFormat.Replace(persistedContent, match =>
             {
@@ -92,7 +92,7 @@ namespace Umbraco.Web.Macros
         /// since this is exactly how we need to persist it to the db.
         ///
         /// </remarks>
-        internal static string FormatRichTextContentForPersistence(string rteContent)
+        public static string FormatRichTextContentForPersistence(string rteContent)
         {
             if (string.IsNullOrEmpty(rteContent))
             {
@@ -145,7 +145,7 @@ namespace Umbraco.Web.Macros
         /// This method  simply parses the macro contents, it does not create a string or result,
         /// this is up to the developer calling this method to implement this with the callbacks.
         /// </remarks>
-        internal static void ParseMacros(
+        public static void ParseMacros(
             string text,
             Action<string> textFoundCallback,
             Action<string, Dictionary<string, string>> macroFoundCallback )

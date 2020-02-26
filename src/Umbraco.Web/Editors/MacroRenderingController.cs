@@ -195,8 +195,7 @@ namespace Umbraco.Web.Editors
             {
                 Alias = macroName.ToSafeAlias(ShortStringHelper),
                 Name = macroName,
-                MacroSource = model.VirtualPath.EnsureStartsWith("~"),
-                MacroType = MacroTypes.PartialView
+                MacroSource = model.VirtualPath.EnsureStartsWith("~")
             };
 
             _macroService.Save(macro); // may throw
