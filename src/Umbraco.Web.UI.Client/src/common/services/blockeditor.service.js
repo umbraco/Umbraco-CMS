@@ -85,12 +85,13 @@
                 this.blockConfigurations.forEach(blockConfiguration => {
 
                     var scaffold = this.getScaffoldFor(blockConfiguration.contentTypeAlias);
-
-                    blocks.push({
-                        alias: scaffold.contentTypeAlias,
-                        name: scaffold.contentTypeName,
-                        icon: scaffold.icon
-                    });
+                    if(scaffold) {
+                        blocks.push({
+                            alias: scaffold.contentTypeAlias,
+                            name: scaffold.contentTypeName,
+                            icon: scaffold.icon
+                        });
+                    }
                 });
 
                 return blocks;
@@ -109,6 +110,11 @@
                 var contentModel = this.getContentByUdi(layoutEntry.udi);
 
                 var blockConfiguration = this.getBlockConfiguration(contentModel.contentTypeAlias);
+
+                if (blockConfiguration === null) {
+                    // This is not an allowed block type, therefor we return null;
+                    return null;
+                }
 
                 // TODO: make blockConfiguration the base for model, remeber to make a copy.
                 var model = {
