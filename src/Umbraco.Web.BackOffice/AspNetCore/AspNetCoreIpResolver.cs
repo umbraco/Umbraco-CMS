@@ -1,4 +1,3 @@
-using System;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Net;
 
@@ -13,6 +12,6 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public string GetCurrentRequestIpAddress() => _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? String.Empty;
+        public string GetCurrentRequestIpAddress() => _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty;
     }
 }

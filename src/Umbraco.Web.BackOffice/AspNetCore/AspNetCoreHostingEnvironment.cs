@@ -26,10 +26,15 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             // IISVersion = HttpRuntime.IISVersion;
             IsDebugMode =  _hostingSettings.DebugMode;
         }
-
+        public bool IsHosted { get; } = true;
         public string SiteName { get; }
         public string ApplicationId { get; }
         public string ApplicationPhysicalPath { get; }
+
+        public string ApplicationVirtualPath { get; }
+        public bool IsDebugMode { get; }
+
+
         public string LocalTempPath
         {
             get
@@ -67,9 +72,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
                 }
             }
         }
-        public string ApplicationVirtualPath { get; }
-        public bool IsDebugMode { get; }
-        public bool IsHosted { get; } = true;
+
         public Version IISVersion { get; }
         public string MapPath(string path) => Path.Combine(_webHostEnvironment.WebRootPath, path);
 

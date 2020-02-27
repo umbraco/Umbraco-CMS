@@ -1,6 +1,4 @@
-﻿using System;
-using System.Web;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace Umbraco.Web.BackOffice.AspNetCore
 {
