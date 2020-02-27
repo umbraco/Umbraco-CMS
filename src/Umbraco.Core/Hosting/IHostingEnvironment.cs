@@ -22,11 +22,6 @@ namespace Umbraco.Core.Hosting
         string MapPath(string path);
         string ToAbsolute(string virtualPath, string root);
 
-        /// <summary>
-        /// Terminates the current application. The application restarts the next time a request is received for it.
-        /// </summary>
-        void LazyRestartApplication();
-
         void RegisterObject(IRegisteredObject registeredObject);
         void UnregisterObject(IRegisteredObject registeredObject);
     }
