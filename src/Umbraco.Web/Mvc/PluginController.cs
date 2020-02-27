@@ -60,11 +60,6 @@ namespace Umbraco.Web.Mvc
         public IProfilingLogger ProfilingLogger { get; }
 
         /// <summary>
-        /// Gets the membership helper.
-        /// </summary>
-        public MembershipHelper Members => Umbraco.MembershipHelper;
-
-        /// <summary>
         /// Gets the Umbraco helper.
         /// </summary>
         public UmbracoHelper Umbraco { get; }

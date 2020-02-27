@@ -6,18 +6,24 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Controllers
 {
     public class UmbLoginController : SurfaceController
     {
+        private readonly MembershipHelper _membershipHelper;
+
         public UmbLoginController()
         {
         }
 
-        public UmbLoginController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
+        public UmbLoginController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory,
+            ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper,
+            MembershipHelper membershipHelper)
             : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger, umbracoHelper)
         {
+            _membershipHelper = membershipHelper;
         }
 
         [HttpPost]
@@ -30,7 +36,7 @@ namespace Umbraco.Web.Controllers
                 return CurrentUmbracoPage();
             }
 
-            if (Members.Login(model.Username, model.Password) == false)
+            if (_membershipHelper.Login(model.Username, model.Password) == false)
             {
                 //don't add a field level error, just model level
                 ModelState.AddModelError("loginModel", "Invalid username or password");

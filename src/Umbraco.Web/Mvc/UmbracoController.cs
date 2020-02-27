@@ -58,11 +58,6 @@ namespace Umbraco.Web.Mvc
         protected IOwinContext OwinContext => Request.GetOwinContext();
 
         /// <summary>
-        /// Gets the membership helper.
-        /// </summary>
-        public MembershipHelper Members => Umbraco.MembershipHelper;
-
-        /// <summary>
         /// Gets the Umbraco helper.
         /// </summary>
         public UmbracoHelper Umbraco { get; }
