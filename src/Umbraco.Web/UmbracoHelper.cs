@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Xml.XPath;
+using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
@@ -25,7 +22,6 @@ namespace Umbraco.Web
     {
         private readonly IPublishedContentQuery _publishedContentQuery;
         private readonly ITagQuery _tagQuery;
-        private readonly MembershipHelper _membershipHelper;
         private readonly IUmbracoComponentRenderer _componentRenderer;
         private readonly ICultureDictionaryFactory _cultureDictionaryFactory;
 
@@ -48,13 +44,11 @@ namespace Umbraco.Web
             ITagQuery tagQuery,
             ICultureDictionaryFactory cultureDictionary,
             IUmbracoComponentRenderer componentRenderer,
-            IPublishedContentQuery publishedContentQuery,
-            MembershipHelper membershipHelper)
+            IPublishedContentQuery publishedContentQuery)
         {
             _tagQuery = tagQuery ?? throw new ArgumentNullException(nameof(tagQuery));
             _cultureDictionaryFactory = cultureDictionary ?? throw new ArgumentNullException(nameof(cultureDictionary));
             _componentRenderer = componentRenderer ?? throw new ArgumentNullException(nameof(componentRenderer));
-            _membershipHelper = membershipHelper ?? throw new ArgumentNullException(nameof(membershipHelper));
             _publishedContentQuery = publishedContentQuery ?? throw new ArgumentNullException(nameof(publishedContentQuery));
             _currentPage = currentPage;
         }
@@ -83,11 +77,6 @@ namespace Umbraco.Web
         /// Gets the query context.
         /// </summary>
         public IPublishedContentQuery ContentQuery => Ensure(_publishedContentQuery);
-
-        /// <summary>
-        /// Gets the membership helper.
-        /// </summary>
-        public MembershipHelper MembershipHelper => Ensure(_membershipHelper);
 
         /// <summary>
         /// Gets (or sets) the current <see cref="IPublishedContent"/> item assigned to the UmbracoHelper.
@@ -208,141 +197,7 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region Membership
 
-        /// <summary>
-        /// Check if the current user has access to a document
-        /// </summary>
-        /// <param name="path">The full path of the document object to check</param>
-        /// <returns>True if the current user has access or if the current document isn't protected</returns>
-        public bool MemberHasAccess(string path)
-        {
-            return MembershipHelper.MemberHasAccess(path);
-        }
-
-        /// <summary>
-        /// Whether or not the current member is logged in (based on the membership provider)
-        /// </summary>
-        /// <returns>True is the current user is logged in</returns>
-        public bool MemberIsLoggedOn()
-        {
-            return MembershipHelper.IsLoggedIn();
-        }
-
-        #endregion
-
-
-
-        #region Member/Content/Media from Udi
-
-        public IPublishedContent PublishedContent(Udi udi)
-        {
-            var guidUdi = udi as GuidUdi;
-            if (guidUdi == null) return null;
-
-            var umbracoType = UdiEntityTypeHelper.ToUmbracoObjectType(udi.EntityType);
-
-            switch (umbracoType)
-            {
-                case UmbracoObjectTypes.Document:
-                    return Content(guidUdi.Guid);
-                case UmbracoObjectTypes.Media:
-                    return Media(guidUdi.Guid);
-                case UmbracoObjectTypes.Member:
-                    return Member(guidUdi.Guid);
-            }
-
-            return null;
-        }
-
-        #endregion
-
-        #region Members
-
-        public IPublishedContent Member(Udi id)
-        {
-            var guidUdi = id as GuidUdi;
-            return guidUdi == null ? null : Member(guidUdi.Guid);
-        }
-
-        public IPublishedContent Member(Guid id)
-        {
-            return MembershipHelper.GetById(id);
-        }
-
-        public IPublishedContent Member(object id)
-        {
-            if (ConvertIdObjectToInt(id, out var intId))
-                return Member(intId);
-            if (ConvertIdObjectToGuid(id, out var guidId))
-                return Member(guidId);
-            if (ConvertIdObjectToUdi(id, out var udiId))
-                return Member(udiId);
-            return null;
-        }
-
-        public IPublishedContent Member(int id)
-        {
-            return MembershipHelper.GetById(id);
-        }
-
-        public IPublishedContent Member(string id)
-        {
-            var asInt = id.TryConvertTo<int>();
-            return asInt ? MembershipHelper.GetById(asInt.Result) : MembershipHelper.GetByProviderKey(id);
-        }
-
-        public IEnumerable<IPublishedContent> Members(IEnumerable<int> ids)
-        {
-            return MembershipHelper.GetByIds(ids);
-        }
-
-        public IEnumerable<IPublishedContent> Members(IEnumerable<string> ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
-
-        public IEnumerable<IPublishedContent> Members(IEnumerable<Guid> ids)
-        {
-            return MembershipHelper.GetByIds(ids);
-        }
-
-        public IEnumerable<IPublishedContent> Members(IEnumerable<Udi> ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
-
-        public IEnumerable<IPublishedContent> Members(IEnumerable<object> ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
-
-        public IEnumerable<IPublishedContent> Members(params int[] ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
-
-        public IEnumerable<IPublishedContent> Members(params string[] ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
-
-        public IEnumerable<IPublishedContent> Members(params Guid[] ids)
-        {
-            return MembershipHelper.GetByIds(ids);
-        }
-
-        public IEnumerable<IPublishedContent> Members(params Udi[] ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
-
-        public IEnumerable<IPublishedContent> Members(params object[] ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
-
-        #endregion
 
         #region Content
 

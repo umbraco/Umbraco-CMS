@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models.Packaging
         /// <remarks>
         /// This is used only for conversions and will not 'get' a PackageDefinition from the repository with a valid ID
         /// </remarks>
-        internal static PackageDefinition FromCompiledPackage(CompiledPackage compiled)
+        public static PackageDefinition FromCompiledPackage(CompiledPackage compiled)
         {
             return new PackageDefinition
             {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Cookie;
@@ -12,8 +11,9 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
+using Umbraco.Net;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install
@@ -22,25 +22,28 @@ namespace Umbraco.Web.Install
     {
         private static HttpClient _httpClient;
         private readonly DatabaseBuilder _databaseBuilder;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger _logger;
         private readonly IGlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IConnectionStrings _connectionStrings;
         private readonly IInstallationService _installationService;
         private readonly ICookieManager _cookieManager;
+        private readonly IUserAgentProvider _userAgentProvider;
+        private readonly Lazy<ISqlContext> _sqlContext;
+        private readonly IJsonSerializer _jsonSerializer;
         private InstallationType? _installationType;
 
-        public InstallHelper(IHttpContextAccessor httpContextAccessor,
-            DatabaseBuilder databaseBuilder,
+        public InstallHelper(DatabaseBuilder databaseBuilder,
             ILogger logger,
             IGlobalSettings globalSettings,
             IUmbracoVersion umbracoVersion,
             IConnectionStrings connectionStrings,
             IInstallationService installationService,
-            ICookieManager cookieManager)
+            ICookieManager cookieManager,
+            IUserAgentProvider userAgentProvider,
+            Lazy<ISqlContext> sqlContext,
+            IJsonSerializer jsonSerializer)
         {
-            _httpContextAccessor = httpContextAccessor;
             _logger = logger;
             _globalSettings = globalSettings;
             _umbracoVersion = umbracoVersion;
@@ -48,6 +51,9 @@ namespace Umbraco.Web.Install
             _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
             _installationService = installationService;
             _cookieManager = cookieManager;
+            _userAgentProvider = userAgentProvider;
+            _sqlContext = sqlContext;
+            _jsonSerializer = jsonSerializer;
         }
 
         public InstallationType GetInstallationType()
@@ -57,11 +63,9 @@ namespace Umbraco.Web.Install
 
         public async Task InstallStatus(bool isCompleted, string errorMsg)
         {
-
-            var httpContext = _httpContextAccessor.GetRequiredHttpContext();
             try
             {
-                var userAgent = httpContext.Request.UserAgent;
+                var userAgent = _userAgentProvider.GetUserAgent();
 
                 // Check for current install Id
                 var installId = Guid.NewGuid();
@@ -88,7 +92,7 @@ namespace Umbraco.Web.Install
                 {
                     // we don't have DatabaseProvider anymore... doing it differently
                     //dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
-                    dbProvider = GetDbProviderString(Current.SqlContext);
+                    dbProvider = GetDbProviderString(_sqlContext.Value);
                 }
 
                 var installLog = new InstallLog(installId: installId, isUpgrade: IsBrandNewInstall == false,
@@ -107,19 +111,7 @@ namespace Umbraco.Web.Install
 
         internal static string GetDbProviderString(ISqlContext sqlContext)
         {
-            var dbProvider = string.Empty;
-
-            // we don't have DatabaseProvider anymore...
-            //dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
-            //
-            // doing it differently
-            var syntax = sqlContext.SqlSyntax;
-            if (syntax is SqlCeSyntaxProvider)
-                dbProvider = "SqlServerCE";
-            else if (syntax is SqlServerSyntaxProvider)
-                dbProvider = (syntax as SqlServerSyntaxProvider).ServerVersion.IsAzure ? "SqlAzure" : "SqlServer";
-
-            return dbProvider;
+            return sqlContext.SqlSyntax.DbProvider;
         }
 
         /// <summary>
@@ -162,7 +154,10 @@ namespace Umbraco.Web.Install
                 using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
                 {
                     var response = _httpClient.SendAsync(request).Result;
-                    packages = response.Content.ReadAsAsync<IEnumerable<Package>>().Result.ToList();
+
+
+                    var json = response.Content.ReadAsStringAsync().Result;
+                    packages = _jsonSerializer.Deserialize<IEnumerable<Package>>(json).ToList();
                 }
             }
             catch (AggregateException ex)

@@ -7,19 +7,25 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Controllers
 {
     [MemberAuthorize]
     public class UmbLoginStatusController : SurfaceController
     {
+        private readonly MembershipHelper _membershipHelper;
+
         public UmbLoginStatusController()
         {
         }
 
-        public UmbLoginStatusController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
+        public UmbLoginStatusController(IUmbracoContextAccessor umbracoContextAccessor,
+            IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger,
+            IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper, MembershipHelper membershipHelper)
             : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger, umbracoHelper)
         {
+            _membershipHelper = membershipHelper;
         }
 
         [HttpPost]
@@ -32,7 +38,7 @@ namespace Umbraco.Web.Controllers
                 return CurrentUmbracoPage();
             }
 
-            if (Members.IsLoggedIn())
+            if (_membershipHelper.IsLoggedIn())
             {
                 FormsAuthentication.SignOut();
             }
