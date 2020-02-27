@@ -134,8 +134,7 @@ namespace Umbraco.Web.Runtime
                     var umbCtx = factory.GetInstance<IUmbracoContext>();
                     return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null,
                         factory.GetInstance<ITagQuery>(), factory.GetInstance<ICultureDictionaryFactory>(),
-                        factory.GetInstance<IUmbracoComponentRenderer>(), factory.GetInstance<IPublishedContentQuery>(),
-                        factory.GetInstance<MembershipHelper>());
+                        factory.GetInstance<IUmbracoComponentRenderer>(), factory.GetInstance<IPublishedContentQuery>());
                 });
             else
                 composition.Register(_ => new UmbracoHelper());

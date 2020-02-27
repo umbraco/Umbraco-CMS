@@ -101,11 +101,6 @@ namespace Umbraco.Web.Mvc
             }
         }
 
-        /// <summary>
-        /// Gets the membership helper.
-        /// </summary>
-        public MembershipHelper Members => Umbraco.MembershipHelper;
-
         protected UmbracoViewPage()
             : this(
                 Current.Factory.GetInstance<ServiceContext>(),
