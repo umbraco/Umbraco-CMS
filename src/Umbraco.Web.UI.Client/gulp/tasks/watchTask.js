@@ -1,48 +1,44 @@
 'use strict';
 
 const config = require('../config');
-const {watch, parallel, dest, src} = require('gulp');
-
-var _ = require('lodash');
-var MergeStream = require('merge-stream');
-
-var processJs = require('../util/processJs');
-var processLess = require('../util/processLess');
-
-//const { less } = require('./less');
-//const { views } = require('./views');
+const {watch, dest, src} = require('gulp');
+const processJs = require('../util/processJs');
+const processLess = require('../util/processLess');
 
 
 function watchTask(cb) {
-    
-    var watchInterval = 500;
-    
+
+    const watchInterval = 500;
+
     //Setup a watcher for all groups of JS files
-    _.forEach(config.sources.js, function (group) {
-        if(group.watch !== false) {
-            watch(group.files, { ignoreInitial: true, interval: watchInterval }, function JS_Group_Compile() { return processJs(group.files, group.out);});
+    for(const group in config.sources.js){
+        const groupItem = config.sources.js[group];
+        if(groupItem.watch !== false){
+            watch(groupItem.files, { ignoreInitial: true, interval: watchInterval }, function JS_Group_Compile() { return processJs(groupItem.files, groupItem.out);});
         }
-    });
+    }
 
     //Setup a watcher for all groups of LESS files
-    _.forEach(config.sources.less, function (group) {
-        if(group.watch !== false) {
-            watch(group.watch, { ignoreInitial: true, interval: watchInterval }, function Less_Group_Compile() { return processLess(group.files, group.out); });
+    for(const group in config.sources.less){
+        const groupItem = config.sources.less[group];
+        if(groupItem.watch !== false){
+            watch(groupItem.watch, { ignoreInitial: true, interval: watchInterval }, function Less_Group_Compile() { return processLess(groupItem.files, groupItem.out);});
         }
-    });
-    
+    }
+
     //Setup a watcher for all groups of view files
-    var viewWatcher;
-    _.forEach(config.sources.views, function (group) {
-        if(group.watch !== false) {
-            viewWatcher = watch(group.files, { ignoreInitial: true, interval: watchInterval });
-            viewWatcher.on('change', function(path, stats) {
-                console.log("copying " + group.files + " to " + config.root + config.targets.views + group.folder);
-                src(group.files).pipe( dest(config.root + config.targets.views + group.folder) );
+    let viewWatcher;
+    for(const group in config.sources.views){
+        const groupItem = config.sources.views[group];
+        if(groupItem.watch !== false){
+            viewWatcher = watch(groupItem.files, { ignoreInitial: true, interval: watchInterval });
+            viewWatcher.on("change", function(path, stats) {
+                console.log(`Copying ${groupItem.files} to ${config.root}${config.targets.views}${groupItem.folder}`);
+                src(groupItem.files).pipe( dest(config.root + config.targets.views + groupItem.folder) );
             });
         }
-    });
-    
+    }
+
     return cb();
 };
 

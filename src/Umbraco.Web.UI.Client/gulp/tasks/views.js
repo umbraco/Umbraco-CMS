@@ -2,24 +2,21 @@
 
 var config = require('../config');
 var gulp = require('gulp');
-
-var _ = require('lodash');
 var MergeStream = require('merge-stream');
 
 function views() {
 
     var stream = new MergeStream();
 
-    _.forEach(config.sources.views, function (group) {
+    for(const group in config.sources.views){
+        const groupItem = config.sources.views[group];
 
-        console.log("copying " + group.files + " to " + config.root + config.targets.views + group.folder)
-
+        console.log(`Copying ${groupItem.files} to ${config.root}${config.targets.views}${groupItem.folder}`);
         stream.add (
-            gulp.src(group.files)
-                .pipe( gulp.dest(config.root + config.targets.views + group.folder) )
+            gulp.src(groupItem.files)
+                .pipe( gulp.dest(config.root + config.targets.views + groupItem.folder) )
         );
-
-    });
+    }
 
     return stream;
 };
