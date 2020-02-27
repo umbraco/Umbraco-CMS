@@ -1,11 +1,12 @@
 ﻿@using System.Web.Mvc.Html
 @using Umbraco.Web
+@using Umbraco.Web.Composing
 @using Umbraco.Web.Models
 @using Umbraco.Web.Controllers
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
 @{
-    var loginStatusModel = Members.GetCurrentLoginStatus();
+    var loginStatusModel = Current.MembershipHelper.GetCurrentLoginStatus();
     var logoutModel = new PostRedirectModel();
 
     @*

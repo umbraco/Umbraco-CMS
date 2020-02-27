@@ -26,6 +26,7 @@ using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
@@ -262,6 +263,7 @@ namespace Umbraco.Web.Composing
         public static IUmbracoVersion UmbracoVersion => Factory.GetInstance<IUmbracoVersion>();
         public static IPublishedUrlProvider PublishedUrlProvider => Factory.GetInstance<IPublishedUrlProvider>();
         public static IMenuItemCollectionFactory MenuItemCollectionFactory => Factory.GetInstance<IMenuItemCollectionFactory>();
+        public static MembershipHelper MembershipHelper => Factory.GetInstance<MembershipHelper>();
 
         #endregion
     }
