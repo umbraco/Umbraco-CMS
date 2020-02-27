@@ -1,29 +1,39 @@
 using System;
+using System.Collections.Concurrent;
 using System.IO;
+using System.Threading;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-
 
 namespace Umbraco.Web.BackOffice.AspNetCore
 {
     public class AspNetCoreHostingEnvironment : Umbraco.Core.Hosting.IHostingEnvironment
     {
+        private readonly ConcurrentDictionary<IRegisteredObject, RegisteredObjectWrapper> _registeredObjects =
+            new ConcurrentDictionary<IRegisteredObject, RegisteredObjectWrapper>();
+
         private readonly IHostingSettings _hostingSettings;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private string _localTempPath;
 
-        public AspNetCoreHostingEnvironment(IHostingSettings hostingSettings, IWebHostEnvironment webHostEnvironment)
+        public AspNetCoreHostingEnvironment(IHostingSettings hostingSettings, IWebHostEnvironment webHostEnvironment, IHttpContextAccessor httpContextAccessor, IHostApplicationLifetime hostHostApplicationLifetime)
         {
             _hostingSettings = hostingSettings ?? throw new ArgumentNullException(nameof(hostingSettings));
             _webHostEnvironment = webHostEnvironment;
+            _httpContextAccessor = httpContextAccessor;
+            _hostApplicationLifetime = hostHostApplicationLifetime;
 
             SiteName = webHostEnvironment.ApplicationName;
             ApplicationId = AppDomain.CurrentDomain.Id.ToString();
             ApplicationPhysicalPath = webHostEnvironment.ContentRootPath;
 
             ApplicationVirtualPath = "/"; //TODO how to find this, This is a server thing, not application thing.
-            // IISVersion = HttpRuntime.IISVersion;
+             IISVersion = new Version(0, 0); // TODO not necessary IIS
             IsDebugMode =  _hostingSettings.DebugMode;
         }
         public bool IsHosted { get; } = true;
@@ -34,7 +44,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         public string ApplicationVirtualPath { get; }
         public bool IsDebugMode { get; }
 
-
+        public Version IISVersion { get; }
         public string LocalTempPath
         {
             get
@@ -73,24 +83,58 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             }
         }
 
-        public Version IISVersion { get; }
+
         public string MapPath(string path) => Path.Combine(_webHostEnvironment.WebRootPath, path);
 
-        public string ToAbsolute(string virtualPath, string root) => throw new NotImplementedException();
-
-        public void LazyRestartApplication()
+        public string ToAbsolute(string virtualPath, string root)
         {
-            throw new NotImplementedException();
+            if (Uri.TryCreate(virtualPath, UriKind.Absolute, out _))
+            {
+                return virtualPath;
+            }
+
+            var segment = new PathString(virtualPath.Substring(1));
+            var applicationPath = _httpContextAccessor.HttpContext.Request.PathBase;
+
+            return applicationPath.Add(segment).Value;
         }
 
         public void RegisterObject(IRegisteredObject registeredObject)
         {
-            throw new NotImplementedException();
+            var wrapped = new RegisteredObjectWrapper(registeredObject);
+            if (!_registeredObjects.TryAdd(registeredObject, wrapped))
+            {
+                throw new InvalidOperationException("Could not register object");
+            }
+
+            var cancellationTokenRegistration = _hostApplicationLifetime.ApplicationStopping.Register(() => wrapped.Stop(true));
+            wrapped.CancellationTokenRegistration = cancellationTokenRegistration;
         }
 
         public void UnregisterObject(IRegisteredObject registeredObject)
         {
-            throw new NotImplementedException();
+            if (_registeredObjects.TryGetValue(registeredObject, out var wrapped))
+            {
+                wrapped.CancellationTokenRegistration.Unregister();
+            }
+        }
+
+
+        private class RegisteredObjectWrapper
+        {
+            private readonly IRegisteredObject _inner;
+
+            public RegisteredObjectWrapper(IRegisteredObject inner)
+            {
+                _inner = inner;
+            }
+
+            public CancellationTokenRegistration CancellationTokenRegistration { get; set; }
+
+            public void Stop(bool immediate)
+            {
+                _inner.Stop(immediate);
+            }
         }
     }
 

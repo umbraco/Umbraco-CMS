@@ -1,6 +1,6 @@
 using System.Threading;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using Umbraco.Net;
 
 namespace Umbraco.Web.AspNet
@@ -8,12 +8,12 @@ namespace Umbraco.Web.AspNet
     public class AspNetCoreUmbracoApplicationLifetime : IUmbracoApplicationLifetime
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IApplicationLifetime _applicationLifetime;
+        private readonly IHostApplicationLifetime _hostApplicationLifetime;
 
-        public AspNetCoreUmbracoApplicationLifetime(IHttpContextAccessor httpContextAccessor, IApplicationLifetime applicationLifetime)
+        public AspNetCoreUmbracoApplicationLifetime(IHttpContextAccessor httpContextAccessor, IHostApplicationLifetime hostApplicationLifetime)
         {
             _httpContextAccessor = httpContextAccessor;
-            _applicationLifetime = applicationLifetime;
+            _hostApplicationLifetime = hostApplicationLifetime;
         }
 
         public bool IsRestarting { get; set; }
@@ -30,7 +30,7 @@ namespace Umbraco.Web.AspNet
             }
 
             Thread.CurrentPrincipal = null;
-            _applicationLifetime.StopApplication();
+            _hostApplicationLifetime.StopApplication();
         }
     }
 }

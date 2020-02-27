@@ -2,6 +2,7 @@ using System.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -33,13 +34,14 @@ namespace Umbraco.Web.BackOffice.AspNetCore
 
             var httpContextAccessor = serviceProvider.GetService<IHttpContextAccessor>();
             var webHostEnvironment = serviceProvider.GetService<IWebHostEnvironment>();
+            var hostApplicationLifetime = serviceProvider.GetService<IHostApplicationLifetime>();
 
             var configFactory = new ConfigsFactory();
 
             var hostingSettings = configFactory.HostingSettings;
             var coreDebug = configFactory.CoreDebug;
 
-            var hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment);
+            var hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment, httpContextAccessor, hostApplicationLifetime);
             var ioHelper = new IOHelper(hostingEnvironment);
             var configs = configFactory.Create(ioHelper);
 
