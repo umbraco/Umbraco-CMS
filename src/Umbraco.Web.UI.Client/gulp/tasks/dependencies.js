@@ -232,11 +232,6 @@ function dependencies() {
             "name": "typeahead.js",
             "src":  ["./node_modules/typeahead.js/dist/typeahead.bundle.min.js"],
             "base": "./node_modules/typeahead.js/dist"
-        },
-        {
-            "name": "underscore",
-            "src":  ["node_modules/underscore/underscore-min.js"],
-            "base": "./node_modules/underscore"
         }
     ];
 
