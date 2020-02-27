@@ -69,7 +69,7 @@ namespace Umbraco.Web.Runtime
             composition.Register<ISessionIdResolver, AspNetSessionIdResolver>();
             composition.Register<IHostingEnvironment, AspNetHostingEnvironment>();
             composition.Register<IBackOfficeInfo, AspNetBackOfficeInfo>();
-            composition.Register<IUmbracoApplicationLifetime, AspNetUmbracoApplicationLifetime>();
+            composition.Register<IUmbracoApplicationLifetime, AspNetUmbracoApplicationLifetime>(Lifetime.Singleton);
             composition.Register<IPasswordHasher, AspNetPasswordHasher>();
             composition.Register<IFilePermissionHelper, FilePermissionHelper>(Lifetime.Singleton);
 
