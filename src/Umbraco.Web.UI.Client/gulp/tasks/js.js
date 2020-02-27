@@ -19,12 +19,12 @@ function js() {
         gulp.src(config.sources.globs.js).pipe( gulp.dest(config.root + config.targets.js) )
     );
 
-    for(const group in config.sources.js){
-        const groupItem = config.sources.js[group];
+    Object.keys(config.sources.js).forEach(key => {
+        const groupItem = config.sources.js[key];
         stream.add(processJs(groupItem.files, groupItem.out));
-    }
+    });
 
-     return stream;
+    return stream;
 };
 
 module.exports = { js: js };
