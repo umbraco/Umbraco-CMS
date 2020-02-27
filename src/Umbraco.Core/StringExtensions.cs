@@ -80,6 +80,19 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Determines the extension of the path or URL
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns>Extension of the file</returns>
+        public static string GetFileExtension(this string file)
+        {
+            file = file.Split('?')[0];
+            file = file.Split(Path.DirectorySeparatorChar).Last();
+            file = file.Split(Path.AltDirectorySeparatorChar).Last();
+            return file.Contains('.') ? file.Substring(file.LastIndexOf('.')) : "";
+        }
+
+        /// <summary>
         /// Based on the input string, this will detect if the string is a JS path or a JS snippet.
         /// If a path cannot be determined, then it is assumed to be a snippet the original text is returned
         /// with an invalid attempt, otherwise a valid attempt is returned with the resolved path
