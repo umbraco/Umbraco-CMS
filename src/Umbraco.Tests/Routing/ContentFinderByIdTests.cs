@@ -1,10 +1,8 @@
-﻿using Moq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Request;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
@@ -20,7 +18,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext(urlAsString);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
-            var lookup = new ContentFinderByIdPath(Factory.GetInstance<IUmbracoSettingsSection>().WebRouting, Logger, HttpContextAccessor);
+            var lookup = new ContentFinderByIdPath(Factory.GetInstance<IUmbracoSettingsSection>().WebRouting, Logger, Factory.GetInstance<IRequestAccessor>());
 
 
             var result = lookup.TryFindContent(frequest);

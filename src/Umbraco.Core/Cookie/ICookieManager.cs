@@ -7,4 +7,5 @@ namespace Umbraco.Core.Cookie
         void SetCookieValue(string cookieName, string value);
         bool HasCookie(string cookieName);
     }
+
 }

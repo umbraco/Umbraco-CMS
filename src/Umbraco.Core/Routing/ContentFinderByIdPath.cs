@@ -4,6 +4,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using System.Globalization;
+using Umbraco.Core.Request;
 
 namespace Umbraco.Web.Routing
 {
@@ -16,14 +17,14 @@ namespace Umbraco.Web.Routing
     public class ContentFinderByIdPath : IContentFinder
     {
         private readonly ILogger _logger;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IRequestAccessor _requestAccessor;
         private readonly IWebRoutingSection _webRoutingSection;
 
-        public ContentFinderByIdPath(IWebRoutingSection webRoutingSection, ILogger logger, IHttpContextAccessor httpContextAccessor)
+        public ContentFinderByIdPath(IWebRoutingSection webRoutingSection, ILogger logger, IRequestAccessor requestAccessor)
         {
             _webRoutingSection = webRoutingSection ?? throw new System.ArgumentNullException(nameof(webRoutingSection));
             _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
-            _httpContextAccessor = httpContextAccessor;
+            _requestAccessor = requestAccessor;
         }
 
         /// <summary>
@@ -56,12 +57,14 @@ namespace Umbraco.Web.Routing
 
                     if (node != null)
                     {
-                        var httpContext = _httpContextAccessor.GetRequiredHttpContext();
+
+                        var cultureFromQuerystring = _requestAccessor.GetQueryStringValue("culture");
+
                         //if we have a node, check if we have a culture in the query string
-                        if (httpContext.Request.QueryString.ContainsKey("culture"))
+                        if (!string.IsNullOrEmpty(cultureFromQuerystring))
                         {
                             //we're assuming it will match a culture, if an invalid one is passed in, an exception will throw (there is no TryGetCultureInfo method), i think this is ok though
-                            frequest.Culture = CultureInfo.GetCultureInfo(httpContext.Request.QueryString["culture"]);
+                            frequest.Culture = CultureInfo.GetCultureInfo(cultureFromQuerystring);
                         }
 
                         frequest.PublishedContent = node;

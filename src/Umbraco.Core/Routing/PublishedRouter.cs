@@ -4,13 +4,12 @@ using System.Threading;
 using System.Globalization;
 using System.IO;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Request;
 using Umbraco.Core.Services;
-using Umbraco.Web.Macros;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Routing
@@ -23,13 +22,17 @@ namespace Umbraco.Web.Routing
         private readonly IWebRoutingSection _webRoutingSection;
         private readonly ContentFinderCollection _contentFinders;
         private readonly IContentLastChanceFinder _contentLastChanceFinder;
-        private readonly ServiceContext _services;
         private readonly IProfilingLogger _profilingLogger;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly ILogger _logger;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
+        private readonly IRequestAccessor _requestAccessor;
+        private readonly IPublishedValueFallback _publishedValueFallback;
+        private readonly IPublicAccessChecker _publicAccessChecker;
+        private readonly IFileService _fileService;
+        private readonly IContentTypeService _contentTypeService;
+        private readonly IPublicAccessService _publicAccessService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedRouter"/> class.
@@ -39,22 +42,30 @@ namespace Umbraco.Web.Routing
             ContentFinderCollection contentFinders,
             IContentLastChanceFinder contentLastChanceFinder,
             IVariationContextAccessor variationContextAccessor,
-            ServiceContext services,
             IProfilingLogger proflog,
             IUmbracoSettingsSection umbracoSettingsSection,
-            IHttpContextAccessor httpContextAccessor,
-            IPublishedUrlProvider publishedUrlProvider)
+            IPublishedUrlProvider publishedUrlProvider,
+            IRequestAccessor requestAccessor,
+            IPublishedValueFallback publishedValueFallback,
+            IPublicAccessChecker publicAccessChecker,
+            IFileService fileService,
+            IContentTypeService contentTypeService,
+            IPublicAccessService publicAccessService)
         {
             _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection));
             _contentFinders = contentFinders ?? throw new ArgumentNullException(nameof(contentFinders));
             _contentLastChanceFinder = contentLastChanceFinder ?? throw new ArgumentNullException(nameof(contentLastChanceFinder));
-            _services = services ?? throw new ArgumentNullException(nameof(services));
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             _logger = proflog;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
-            _httpContextAccessor = httpContextAccessor;
             _publishedUrlProvider = publishedUrlProvider;
+            _requestAccessor = requestAccessor;
+            _publishedValueFallback = publishedValueFallback;
+            _publicAccessChecker = publicAccessChecker;
+            _fileService = fileService;
+            _contentTypeService = contentTypeService;
+            _publicAccessService = publicAccessService;
         }
 
         /// <inheritdoc />
@@ -358,7 +369,7 @@ namespace Umbraco.Web.Routing
         /// <inheritdoc />
         public ITemplate GetTemplate(string alias)
         {
-            return _services.FileService.GetTemplate(alias);
+            return _fileService.GetTemplate(alias);
         }
 
         /// <summary>
@@ -498,7 +509,7 @@ namespace Umbraco.Web.Routing
             var redirect = false;
             var valid = false;
             IPublishedContent internalRedirectNode = null;
-            var internalRedirectId = request.PublishedContent.Value(Constants.Conventions.Content.InternalRedirectId, defaultValue: -1);
+            var internalRedirectId = request.PublishedContent.Value(_publishedValueFallback, Constants.Conventions.Content.InternalRedirectId, defaultValue: -1);
 
             if (internalRedirectId > 0)
             {
@@ -508,7 +519,7 @@ namespace Umbraco.Web.Routing
             }
             else
             {
-                var udiInternalRedirectId = request.PublishedContent.Value<GuidUdi>(Constants.Conventions.Content.InternalRedirectId);
+                var udiInternalRedirectId = request.PublishedContent.Value<GuidUdi>(_publishedValueFallback, Constants.Conventions.Content.InternalRedirectId);
                 if (udiInternalRedirectId != null)
                 {
                     // try and get the redirect node from a UDI Guid
@@ -555,64 +566,77 @@ namespace Umbraco.Web.Routing
 
             var path = request.PublishedContent.Path;
 
-            var publicAccessAttempt = _services.PublicAccessService.IsProtected(path);
+            var publicAccessAttempt = _publicAccessService.IsProtected(path);
 
             if (publicAccessAttempt)
             {
                 _logger.Debug<PublishedRouter>("EnsurePublishedContentAccess: Page is protected, check for access");
 
-                var membershipHelper = Current.Factory.GetInstance<MembershipHelper>();
-
-                if (membershipHelper.IsLoggedIn() == false)
+                var status = _publicAccessChecker.HasMemberAccessToContent(request.PublishedContent.Id);
+                switch (status)
                 {
-                    _logger.Debug<PublishedRouter>("EnsurePublishedContentAccess: Not logged in, redirect to login page");
-
-                    var loginPageId = publicAccessAttempt.Result.LoginNodeId;
-
-                    if (loginPageId != request.PublishedContent.Id)
-                        request.PublishedContent = request.UmbracoContext.PublishedSnapshot.Content.GetById(loginPageId);
-                }
-                else if (_services.PublicAccessService.HasAccess(request.PublishedContent.Id, _services.ContentService, membershipHelper.CurrentUserName, membershipHelper.GetCurrentUserRoles()) == false)
-                {
-                    _logger.Debug<PublishedRouter>("EnsurePublishedContentAccess: Current member has not access, redirect to error page");
-                    var errorPageId = publicAccessAttempt.Result.NoAccessNodeId;
-                    if (errorPageId != request.PublishedContent.Id)
-                        request.PublishedContent = request.UmbracoContext.PublishedSnapshot.Content.GetById(errorPageId);
-                }
-                else
-                {
-                    // grab the current member
-                    var member = membershipHelper.GetCurrentMember();
-                    // if the member has the "approved" and/or "locked out" properties, make sure they're correctly set before allowing access
-                    var memberIsActive = true;
-                    if (member != null)
-                    {
-                        if (member.HasProperty(Constants.Conventions.Member.IsApproved) == false)
-                            memberIsActive = member.Value<bool>(Constants.Conventions.Member.IsApproved);
-
-                        if (member.HasProperty(Constants.Conventions.Member.IsLockedOut) == false)
-                            memberIsActive = member.Value<bool>(Constants.Conventions.Member.IsLockedOut) == false;
-                    }
-
-                    if (memberIsActive == false)
-                    {
-                        _logger.Debug<PublishedRouter>(
-                            "Current member is either unapproved or locked out, redirect to error page");
-                        var errorPageId = publicAccessAttempt.Result.NoAccessNodeId;
-                        if (errorPageId != request.PublishedContent.Id)
-                            request.PublishedContent =
-                                request.UmbracoContext.PublishedSnapshot.Content.GetById(errorPageId);
-                    }
-                    else
-                    {
+                    case PublicAccessStatus.NotLoggedIn:
+                        _logger.Debug<PublishedRouter>("EnsurePublishedContentAccess: Not logged in, redirect to login page");
+                        SetPublishedContentAsOtherPage(request, publicAccessAttempt.Result.LoginNodeId);
+                        break;
+                    case PublicAccessStatus.AccessDenied:
+                        _logger.Debug<PublishedRouter>("EnsurePublishedContentAccess: Current member has not access, redirect to error page");
+                        SetPublishedContentAsOtherPage(request, publicAccessAttempt.Result.NoAccessNodeId);
+                        break;
+                    case PublicAccessStatus.LockedOut:
+                        _logger.Debug<PublishedRouter>("Current member is locked out, redirect to error page");
+                        SetPublishedContentAsOtherPage(request, publicAccessAttempt.Result.NoAccessNodeId);
+                        break;
+                    case PublicAccessStatus.NotApproved:
+                        _logger.Debug<PublishedRouter>("Current member is unapproved, redirect to error page");
+                        SetPublishedContentAsOtherPage(request, publicAccessAttempt.Result.NoAccessNodeId);
+                        break;
+                    case PublicAccessStatus.AccessAccepted:
                         _logger.Debug<PublishedRouter>("Current member has access");
-                    }
+                        break;
                 }
+
+                //
+                // else
+                // {
+                //     // grab the current member
+                //     var member = _membershipHelper.GetCurrentMember();
+                //     // if the member has the "approved" and/or "locked out" properties, make sure they're correctly set before allowing access
+                //     var memberIsActive = true;
+                //     if (member != null)
+                //     {
+                //         if (member.HasProperty(Constants.Conventions.Member.IsApproved) == false)
+                //             memberIsActive = member.Value<bool>(Constants.Conventions.Member.IsApproved);
+                //
+                //         if (member.HasProperty(Constants.Conventions.Member.IsLockedOut) == false)
+                //             memberIsActive = member.Value<bool>(Constants.Conventions.Member.IsLockedOut) == false;
+                //     }
+                //
+                //     if (memberIsActive == false)
+                //     {
+                //         _logger.Debug<PublishedRouter>(
+                //             "Current member is either unapproved or locked out, redirect to error page");
+                //         var errorPageId = publicAccessAttempt.Result.NoAccessNodeId;
+                //         if (errorPageId != request.PublishedContent.Id)
+                //             request.PublishedContent =
+                //                 request.UmbracoContext.PublishedSnapshot.Content.GetById(errorPageId);
+                //     }
+                //     else
+                //     {
+                //         _logger.Debug<PublishedRouter>("Current member has access");
+                //     }
+                // }
             }
             else
             {
                 _logger.Debug<PublishedRouter>("EnsurePublishedContentAccess: Page is not protected");
             }
+        }
+
+        private static void SetPublishedContentAsOtherPage(IPublishedRequest request, int errorPageId)
+        {
+            if (errorPageId != request.PublishedContent.Id)
+                request.PublishedContent = request.UmbracoContext.PublishedSnapshot.Content.GetById(errorPageId);
         }
 
         /// <summary>
@@ -637,7 +661,7 @@ namespace Umbraco.Web.Routing
             var useAltTemplate = request.IsInitialPublishedContent
                 || (_webRoutingSection.InternalRedirectPreservesTemplate && request.IsInternalRedirectPublishedContent);
             var altTemplate = useAltTemplate
-                ? _httpContextAccessor.GetRequiredHttpContext().Request[Constants.Conventions.Url.AltTemplate]
+                ? _requestAccessor.GetRequestValue(Constants.Conventions.Url.AltTemplate)
                 : null;
 
             if (string.IsNullOrWhiteSpace(altTemplate))
@@ -674,10 +698,15 @@ namespace Umbraco.Web.Routing
                 _logger.Debug<PublishedRouter>("FindTemplate: Look for alternative template alias={AltTemplate}", altTemplate);
 
                 // IsAllowedTemplate deals both with DisableAlternativeTemplates and ValidateAlternativeTemplates settings
-                if (request.PublishedContent.IsAllowedTemplate(altTemplate))
+                if (request.PublishedContent.IsAllowedTemplate(
+                    _fileService,
+                    _contentTypeService,
+                    _umbracoSettingsSection.WebRouting.DisableAlternativeTemplates,
+                    _umbracoSettingsSection.WebRouting.ValidateAlternativeTemplates,
+                    altTemplate))
                 {
                     // allowed, use
-                    var template = _services.FileService.GetTemplate(altTemplate);
+                    var template = _fileService.GetTemplate(altTemplate);
 
                     if (template != null)
                     {
@@ -731,7 +760,7 @@ namespace Umbraco.Web.Routing
             if (templateId == null)
                 throw new InvalidOperationException("The template is not set, the page cannot render.");
 
-            var template = _services.FileService.GetTemplate(templateId.Value);
+            var template = _fileService.GetTemplate(templateId.Value);
             if (template == null)
                 throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render.");
             _logger.Debug<PublishedRouter>("GetTemplateModel: Got template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
@@ -750,7 +779,7 @@ namespace Umbraco.Web.Routing
             if (request.PublishedContent.HasProperty(Constants.Conventions.Content.Redirect) == false)
                 return;
 
-            var redirectId = request.PublishedContent.Value(Constants.Conventions.Content.Redirect, defaultValue: -1);
+            var redirectId = request.PublishedContent.Value(_publishedValueFallback, Constants.Conventions.Content.Redirect, defaultValue: -1);
             var redirectUrl = "#";
             if (redirectId > 0)
             {
@@ -759,7 +788,7 @@ namespace Umbraco.Web.Routing
             else
             {
                 // might be a UDI instead of an int Id
-                var redirectUdi = request.PublishedContent.Value<GuidUdi>(Constants.Conventions.Content.Redirect);
+                var redirectUdi = request.PublishedContent.Value<GuidUdi>(_publishedValueFallback, Constants.Conventions.Content.Redirect);
                 if (redirectUdi != null)
                     redirectUrl = _publishedUrlProvider.GetUrl(redirectUdi.Guid);
             }
