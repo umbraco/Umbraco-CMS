@@ -1,21 +1,29 @@
 <div ng-controller="Umbraco.PropertyEditors.DropdownFlexibleController" ng-switch="model.config.multiple">
 
-    <select name="dropDownList"
-            class="umb-property-editor umb-dropdown"
-            ng-switch-default
-            ng-change="updateSingleDropdownValue()"
-            ng-model="model.singleDropdownValue"
-            ng-options="item.value as item.value for item in model.config.items"
-            ng-required="model.validation.mandatory">
-        <option></option>
-    </select>
+    <ng-form name="dropDownListForm">
+        
+        <select name="dropDownList"
+                class="umb-property-editor umb-dropdown"
+                ng-switch-default
+                ng-change="updateSingleDropdownValue()"
+                ng-model="model.singleDropdownValue"
+                ng-options="item.value as item.value for item in model.config.items"
+                ng-required="model.validation.mandatory">
+            <option></option>
+        </select>
 
-    <!--NOTE: This ng-switch is required because ng-multiple doesn't actually support dynamic bindings with multi-select lists -->
-    <select name="dropDownList"
-            class="umb-property-editor umb-dropdown"
-            ng-switch-when="true"
-            multiple
-            ng-model="model.value"
-            ng-options="item.value as item.value for item in model.config.items"
-            ng-required="model.validation.mandatory"></select>
+        <!--NOTE: This ng-switch is required because ng-multiple doesn't actually support dynamic bindings with multi-select lists -->
+        <select name="dropDownList"
+                class="umb-property-editor umb-dropdown"
+                ng-switch-when="true"
+                multiple
+                ng-model="model.value"
+                ng-options="item.value as item.value for item in model.config.items"
+                ng-required="model.validation.mandatory"></select>
+
+        <div ng-messages="dropDownListForm.dropDownList.$error" show-validation-on-submit>
+            <p class="help-inline" ng-message="required">{{mandatoryMessage}}</p>
+        </div>
+
+    </ng-form>
 </div>

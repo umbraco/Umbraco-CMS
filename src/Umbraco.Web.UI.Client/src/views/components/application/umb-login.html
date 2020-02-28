@@ -18,11 +18,11 @@
                     </p>
 
                     <div class="control-group" ng-class="{error: vm.setPasswordForm.password.$invalid}">
-                        <label for="umb-password">
+                        <label for="umb-passwordOne">
                             <localize key="user_newPassword">New password</localize>
                             <small style="font-size: 13px;">{{vm.invitedUserPasswordModel.passwordPolicyText}}</small>
                         </label>
-                        <input type="password" ng-model="vm.invitedUserPasswordModel.password" name="password" id="umb-password" class="-full-width-input" umb-auto-focus required val-server-field="value" ng-minlength="{{vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength}}" />
+                        <input type="password" ng-model="vm.invitedUserPasswordModel.password" name="password" id="umb-passwordOne" class="-full-width-input" umb-auto-focus required val-server-field="value" ng-minlength="{{vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength}}" />
                         <span ng-messages="inviteUserPasswordForm.password.$error" show-validation-on-submit >
                             <span class="help-inline" ng-message="required"><localize key="user_passwordIsBlank">Your new password cannot be blank!</localize></span>
                             <span class="help-inline" ng-message="minlength">Minimum {{vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength}} characters</span>
@@ -31,8 +31,8 @@
                     </div>
 
                     <div class="control-group" ng-class="{error: vm.setPasswordForm.confirmPassword.$invalid}">
-                        <label for="umb-confirmPassword"><localize key="user_confirmNewPassword">Confirm new password</localize></label>
-                        <input type="password" ng-model="vm.invitedUserPasswordModel.confirmPassword" name="confirmPassword" id="umb-confirmPassword" class="-full-width-input" required val-compare="password" />
+                        <label for="umb-confirmPasswordOne"><localize key="user_confirmNewPassword">Confirm new password</localize></label>
+                        <input type="password" ng-model="vm.invitedUserPasswordModel.confirmPassword" name="confirmPassword" id="umb-confirmPasswordOne" class="-full-width-input" required val-compare="password" />
                         <span ng-messages="inviteUserPasswordForm.confirmPassword.$error" show-validation-on-submit >
                             <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
                             <span class="help-inline" ng-message="valCompare"><localize key="user_passwordMismatch">The confirmed password doesn't match the new password!</localize></span>
@@ -157,8 +157,8 @@
                         </div>
 
                         <div class="control-group" ng-class="{error: vm.loginForm.password.$invalid}">
-                            <label for="umb-password"><localize key="general_password">Password</localize></label>
-                            <input type="password" ng-model="vm.password" name="password" id="umb-password" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" />
+                            <label for="umb-passwordTwo"><localize key="general_password">Password</localize></label>
+                            <input type="password" ng-model="vm.password" name="password" id="umb-passwordTwo" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" />
                             <div class="password-toggle">
                                 <a href="#" prevent-default ng-click="vm.togglePassword()">
                                     <span class="password-text show"><localize key="login_showPassword">Show password</localize></span>
@@ -183,7 +183,7 @@
                 </div>
 
                 <div ng-show="vm.view == 'request-password-reset'">
-                    <p>
+                    <p tabindex="0">
                         <localize key="login_forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</localize>
                     </p>
 
@@ -198,9 +198,11 @@
                         </div>
 
                         <div class="control-group" ng-show="vm.showEmailResetConfirmation">
-                            <div class="text-info">
+                            <div class="text-info" role="alert">
+                                <p tabindex="0">
                                 <localize key="login_requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</localize>
-                            </div>
+                                    </p>
+                                </div>
                         </div>
 
                         <div class="flex justify-between items-center">
@@ -220,13 +222,13 @@
                     <form method="POST" name="vm.setPasswordForm" ng-submit="vm.setPasswordSubmit(vm.password, vm.confirmPassword)">
 
                         <div ng-hide="vm.resetComplete" class="control-group" ng-class="{error: vm.setPasswordForm.password.$invalid}">
-                            <label for="umb-password"><localize key="user_newPassword">New password</localize></label>
-                            <input type="password" ng-model="vm.password" name="password" id="umb-password" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" focus-when="{{vm.view === 'set-password'}}" />
+                            <label for="umb-passwordThree"><localize key="user_newPassword">New password</localize></label>
+                            <input type="password" ng-model="vm.password" name="password" id="umb-passwordThree" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" focus-when="{{vm.view === 'set-password'}}" />
                         </div>
 
                         <div ng-hide="vm.resetComplete" class="control-group" ng-class="{error: vm.setPasswordForm.confirmPassword.$invalid}">
-                            <label for="umb-confirmPassword"><localize key="user_confirmNewPassword">Confirm new password</localize></label>
-                            <input type="password" ng-model="vm.confirmPassword" name="confirmPassword" id="umb-confirmPassword" class="-full-width-input" localize="placeholder" placeholder="@placeholders_confirmPassword" />
+                            <label for="umb-confirmPasswordThree"><localize key="user_confirmNewPassword">Confirm new password</localize></label>
+                            <input type="password" ng-model="vm.confirmPassword" name="confirmPassword" id="umb-confirmPasswordThree" class="-full-width-input" localize="placeholder" placeholder="@placeholders_confirmPassword" />
                         </div>
 
                         <div ng-hide="vm.resetComplete" class="control-group" ng-show="vm.setPasswordForm.$invalid">

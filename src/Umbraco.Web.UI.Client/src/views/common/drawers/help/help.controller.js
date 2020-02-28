@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function HelpDrawerController($scope, $routeParams, $timeout, dashboardResource, localizationService, userService, eventsService, helpService, appState, tourService, $filter) {
+    function HelpDrawerController($scope, $routeParams, $timeout, dashboardResource, localizationService, userService, eventsService, helpService, appState, tourService, $filter, editorState) {
 
         var vm = this;
         var evts = [];
@@ -18,6 +18,10 @@
         vm.startTour = startTour;
         vm.getTourGroupCompletedPercentage = getTourGroupCompletedPercentage;
         vm.showTourButton = showTourButton;
+
+        vm.showDocTypeTour = false;
+        vm.docTypeTours = [];
+        vm.nodeName = '';
             
         function startTour(tour) {
             tourService.startTour(tour);
@@ -58,9 +62,16 @@
                     handleSectionChange();
                 }));
 
+                evts.push(eventsService.on("editorState.changed",
+                    function (e, args) {
+                        setDocTypeTour(args.entity);
+                    }));
+
                 findHelp(vm.section, vm.tree, vm.userType, vm.userLang);
 
             });
+
+            setDocTypeTour(editorState.getCurrent());
             
             // check if a tour is running - if it is open the matching group
             var currentTour = tourService.getCurrentTour();
@@ -84,7 +95,7 @@
 
                     setSectionName();
                     findHelp(vm.section, vm.tree, vm.userType, vm.userLang);
-
+                    setDocTypeTour();
                 }
             });
         }
@@ -166,6 +177,26 @@
                 });
                 group.completedPercentage = Math.round((completedTours/group.tours.length)*100);
             });
+        }
+
+        function setDocTypeTour(node) {
+            vm.showDocTypeTour = false;
+            vm.docTypeTours = [];
+            vm.nodeName = '';
+
+            if (vm.section === 'content' && vm.tree === 'content') {
+
+                if (node) {
+                    tourService.getToursForDoctype(node.contentTypeAlias).then(function (data) {
+                        if (data && data.length > 0) {
+                            vm.docTypeTours = data;
+                            var currentVariant = _.find(node.variants, (x) => x.active);                           
+                            vm.nodeName = currentVariant.name;
+                            vm.showDocTypeTour = true;
+                        }
+                    });
+                }
+            }
         }
 
         evts.push(eventsService.on("appState.tour.complete", function (event, tour) {

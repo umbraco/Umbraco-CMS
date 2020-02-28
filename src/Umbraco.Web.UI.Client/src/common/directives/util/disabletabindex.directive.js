@@ -17,9 +17,9 @@ angular.module("umbraco.directives")
                 var observer = new MutationObserver(domChange);
 
                 // Options for the observer (which mutations to observe)
-                var config = { attributes: true, childList: true, subtree: false };
+                var config = { attributes: true, childList: true, subtree: true };
 
-                function domChange(mutationsList, observer){
+                function domChange(mutationsList, observer) {
                     for(var mutation of mutationsList) {
 
                         //DOM items have been added or removed

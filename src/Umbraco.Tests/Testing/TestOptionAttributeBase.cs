@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
@@ -8,6 +9,8 @@ namespace Umbraco.Tests.Testing
 {
     public abstract class TestOptionAttributeBase : Attribute
     {
+        public static readonly List<Assembly> ScanAssemblies = new List<Assembly>();
+
         public static TOptions GetTestOptions<TOptions>(MethodInfo method)
             where TOptions : TestOptionAttributeBase, new()
         {
@@ -28,9 +31,18 @@ namespace Umbraco.Tests.Testing
             var test = TestContext.CurrentContext.Test;
             var typeName = test.ClassName;
             var methodName = test.MethodName;
-            var type = Type.GetType(typeName, true);
+            var type = Type.GetType(typeName, false);
             if (type == null)
-                throw new PanicException($"Could not resolve the type from type name {typeName}"); // makes no sense
+            {
+                type = ScanAssemblies
+                    .Select(assembly => assembly.GetType(typeName, false))
+                    .FirstOrDefault(x => x != null);
+                if (type == null)
+                { 
+                    throw new PanicException($"Could not resolve the running test fixture from type name {typeName}.\n" +
+                                             $"To use base classes from Umbraco.Tests, add your test assembly to TestOptionAttributeBase.ScanAssemblies");
+                }
+            }
             var methodInfo = type.GetMethod(methodName); // what about overloads?
             var options = GetTestOptions<TOptions>(methodInfo);
             return options;

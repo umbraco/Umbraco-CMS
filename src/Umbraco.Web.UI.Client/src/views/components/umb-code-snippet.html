@@ -1,0 +1,23 @@
+﻿<div class="umb-code-snippet">
+    <div class="umb-code-snippet__header">
+        <span class="language" ng-if="vm.language">{{vm.language}}</span>
+
+        <umb-button umb-clipboard
+                    umb-clipboard-success="vm.copySuccess()"
+                    umb-clipboard-error="vm.copyError()"
+                    umb-clipboard-target="#umbCodeSnippet_{{vm.guid}}"
+                    state="vm.page.copyCodeButtonState"
+                    icon="icon-documents"
+                    type="button"
+                    size="s"
+                    label="Copy"
+                    label-key="general_copy">
+        </umb-button>
+
+    </div>
+    <div class="umb-code-snippet__content">
+        <pre id="umbCodeSnippet_{{vm.guid}}">
+            <code ng-transclude></code>
+        </pre>
+    </div>
+</div>

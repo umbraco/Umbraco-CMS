@@ -187,7 +187,6 @@ angular.module('umbraco.mocks').
                   "defaultdialogs_linkinternal": "Internal link:",
                   "defaultdialogs_linklocaltip": "When using local links, insert '#' infront of link",
                   "defaultdialogs_linknewwindow": "Open in new window?",
-                  "defaultdialogs_macroContainerSettings": "Macro Settings",
                   "defaultdialogs_macroDoesNotHaveProperties": "This macro does not contain any properties you can edit",
                   "defaultdialogs_paste": "Paste",
                   "defaultdialogs_permissionsEdit": "Edit Permissions for",

@@ -12,20 +12,22 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void MediaCacheRefresherCanDeserializeJsonPayload()
         {
-            var source = new[] { new MediaCacheRefresher.JsonPayload(1234, TreeChangeTypes.None) };
+            var source = new[] { new MediaCacheRefresher.JsonPayload(1234, Guid.NewGuid(), TreeChangeTypes.None) };
             var json = JsonConvert.SerializeObject(source);
             var payload = JsonConvert.DeserializeObject<MediaCacheRefresher.JsonPayload[]>(json);
             Assert.AreEqual(source[0].Id, payload[0].Id);
+            Assert.AreEqual(source[0].Key, payload[0].Key);
             Assert.AreEqual(source[0].ChangeTypes, payload[0].ChangeTypes);
         }
 
         [Test]
         public void ContentCacheRefresherCanDeserializeJsonPayload()
         {
-            var source = new[] { new ContentCacheRefresher.JsonPayload(1234, TreeChangeTypes.None) };
+            var source = new[] { new ContentCacheRefresher.JsonPayload(1234, Guid.NewGuid(), TreeChangeTypes.None) };
             var json = JsonConvert.SerializeObject(source);
             var payload = JsonConvert.DeserializeObject<ContentCacheRefresher.JsonPayload[]>(json);
             Assert.AreEqual(source[0].Id, payload[0].Id);
+            Assert.AreEqual(source[0].Key, payload[0].Key);
             Assert.AreEqual(source[0].ChangeTypes, payload[0].ChangeTypes);
         }
 

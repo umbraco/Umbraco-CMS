@@ -58,10 +58,13 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         vm.hideSearch = hideSearch;
         vm.closeMiniListView = closeMiniListView;
         vm.selectListViewNode = selectListViewNode;
+        vm.listViewItemsLoaded = listViewItemsLoaded;
         vm.submit = submit;
         vm.close = close;
 
         var currentNode = $scope.model.currentNode;
+
+        var previouslyFocusedElement = null;
 
         function initDialogTree() {
             vm.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
@@ -96,7 +99,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                     });
                 }
             }
-            if (vm.treeAlias === "documentTypes") {
+            else if (vm.treeAlias === "documentTypes") {
                 vm.entityType = "DocumentType";
                 if (!$scope.model.title) {
                     localizationService.localize("defaultdialogs_selectContentType").then(function(value){
@@ -107,15 +110,31 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             else if (vm.treeAlias === "member" || vm.section === "member") {
                 vm.entityType = "Member";
                 if (!$scope.model.title) {
-                    localizationService.localize("defaultdialogs_selectMember").then(function(value){
+                    localizationService.localize("defaultdialogs_selectMember").then(function(value) {
                         $scope.model.title = value;
-                    })
+                    });
+                }
+            }
+            else if (vm.treeAlias === "memberTypes") {
+                vm.entityType = "MemberType";
+                if (!$scope.model.title) {
+                    localizationService.localize("defaultdialogs_selectMemberType").then(function(value){
+                        $scope.model.title = value;
+                    });
                 }
             }
             else if (vm.treeAlias === "media" || vm.section === "media") {
                 vm.entityType = "Media";
                 if (!$scope.model.title) {
                     localizationService.localize("defaultdialogs_selectMedia").then(function(value){
+                        $scope.model.title = value;
+                    });
+                }
+            }
+            else if (vm.treeAlias === "mediaTypes") {
+                vm.entityType = "MediaType";
+                if (!$scope.model.title) {
+                    localizationService.localize("defaultdialogs_selectMediaType").then(function(value){
                         $scope.model.title = value;
                     });
                 }
@@ -399,7 +418,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             if ($scope.model.selection.length > 0) {
                 for (var i = 0; $scope.model.selection.length > i; i++) {
                     var selectedItem = $scope.model.selection[i];
-                    if (selectedItem.id === item.id) {
+                    if (selectedItem.id === parseInt(item.id)) {
                         found = true;
                         foundIndex = i;
                     }
@@ -470,6 +489,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         }
 
         function openMiniListView(node) {
+            previouslyFocusedElement = document.activeElement;
             vm.miniListView = node;
         }
 
@@ -614,8 +634,8 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             _.each(vm.searchInfo.results,
                 function (result) {
                     var exists = _.find($scope.model.selection,
-                        function (selectedId) {
-                            return result.id == selectedId;
+                        function (item) {
+                            return result.id == item.id;
                         });
                     if (exists) {
                         result.selected = true;
@@ -633,6 +653,21 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
 
         function closeMiniListView() {
             vm.miniListView = undefined;
+            if (previouslyFocusedElement) {
+                $timeout(function () {
+                    previouslyFocusedElement.focus();
+                    previouslyFocusedElement = null;
+                });
+            }
+        }
+
+        function listViewItemsLoaded(items) {
+            var selectedIds = _.pluck($scope.model.selection, "id");
+            _.each(items, function (item) {
+                if (_.contains(selectedIds, item.id)) {
+                    item.selected = true;
+                }
+            });
         }
 
         function submit(model) {

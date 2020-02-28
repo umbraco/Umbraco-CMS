@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function CompositionsController($scope, $location, $filter, overlayService) {
+    function CompositionsController($scope, $location, $filter, overlayService, localizationService) {
 
         var vm = this;
         var oldModel = null;
@@ -68,19 +68,23 @@
                 or the confirm checkbox has been checked */
                 if (compositionRemoved) {
                     vm.allowSubmit = false;
-                    const dialog = {
-                        view: "views/common/infiniteeditors/compositions/overlays/confirmremove.html",
-                        submitButtonLabelKey: "general_ok",
-                        closeButtonLabelKey: "general_cancel",
-                        submit: function (model) {
-                            $scope.model.submit($scope.model);
-                            overlayService.close();
-                        },
-                        close: function () {
-                            overlayService.close();
-                        }
-                    };
-                    overlayService.open(dialog);
+                    localizationService.localize("general_remove").then(function(value) {
+                        const dialog = {
+                            view: "views/common/infiniteeditors/compositions/overlays/confirmremove.html",
+                            title: value,
+                            submitButtonLabelKey: "general_ok",
+                            submitButtonStyle: "danger",
+                            closeButtonLabelKey: "general_cancel",
+                            submit: function (model) {
+                                $scope.model.submit($scope.model);
+                                overlayService.close();
+                            },
+                            close: function () {
+                                overlayService.close();
+                            }
+                        };
+                        overlayService.open(dialog);
+                    });
                     return;
                 }
 

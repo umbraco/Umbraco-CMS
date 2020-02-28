@@ -6,6 +6,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.JavaScript;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Install.Controllers
@@ -35,6 +36,7 @@ namespace Umbraco.Web.Install.Controllers
         }
 
         [HttpGet]
+        [StatusCodeResult(System.Net.HttpStatusCode.ServiceUnavailable)]
         public ActionResult Index()
         {
             if (_runtime.Level == RuntimeLevel.Run)

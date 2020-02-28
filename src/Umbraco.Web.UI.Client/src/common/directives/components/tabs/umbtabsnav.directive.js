@@ -103,29 +103,29 @@ Use this directive to render a tabs navigation.
             });
 
             function calculateWidth(){
-				$timeout(function(){
-                    // 70 is the width of the expand menu (three dots)
-                    var containerWidth = container.width() - 70;
+                $timeout(function(){
+                    // 70 is the width of the expand menu (three dots) + 20 for the margin on umb-tabs-nav
+                    var containerWidth = container.width() - 90;
                     var tabsWidth = 0;
                     ctrl.overflowingSections = 0;
                     ctrl.needTray = false;
-                    ctrl.maxTabs = 7;
-                    					
-					// detect how many tabs we can show on the screen
-					for (var i = 0; i < tabNavItemsWidths.length; i++) {
+                    ctrl.maxTabs = tabNavItemsWidths.length;
+
+                    // detect how many tabs we can show on the screen
+                    for (var i = 0; i <= tabNavItemsWidths.length; i++) {
                         
                         var tabWidth = tabNavItemsWidths[i];
                         tabsWidth += tabWidth;
 
-						if(tabsWidth >= containerWidth) {
-							ctrl.needTray = true;
-							ctrl.maxTabs = i;
-							ctrl.overflowingTabs = ctrl.maxTabs - ctrl.tabs.length;
-							break;
-						}
+                        if(tabsWidth >= containerWidth) {
+                            ctrl.needTray = true;
+                            ctrl.maxTabs = i;
+                            ctrl.overflowingTabs = ctrl.maxTabs - ctrl.tabs.length;
+                            break;
+                        }
                     }
                     
-				});
+                });
             }
 
             $(window).on('resize.tabsNav', function () {
@@ -145,7 +145,6 @@ Use this directive to render a tabs navigation.
             vm.needTray = false;
             vm.showTray = false;
             vm.overflowingSections = 0;
-            vm.maxTabs = 7;
 
             vm.clickTab = clickTab;
             vm.toggleTray = toggleTray;

@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "scripts": {
+    "docs": "gulp docs",
+    "start": "gulp docs",
+    "default": "gulp docs"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-connect": "5.6.1",
+    "gulp-ngdocs": "0.3.0",
+    "gulp-open": "3.0.1"
+  }
+}

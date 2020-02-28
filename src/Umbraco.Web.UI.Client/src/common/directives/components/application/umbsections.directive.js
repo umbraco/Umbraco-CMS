@@ -133,6 +133,17 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
                 }
             };
 
+            scope.currentSectionInOverflow = function () {
+                if (scope.overflowingSections === 0) {
+                    return false;
+                }
+
+                var currentSection = scope.sections.filter(s => s.alias === scope.currentSection);
+
+                return (scope.sections.indexOf(currentSection[0]) >= scope.maxSections);
+
+            };
+
             loadSections();
 
         }

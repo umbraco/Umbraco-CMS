@@ -45,7 +45,7 @@
             // disable the name field if the active content app is not "Content"
             vm.nameDisabled = false;
             angular.forEach(vm.editor.content.apps, function(app){
-                if(app.active && app.alias !== "umbContent" && app.alias !== "umbInfo") {
+                if(app.active && app.alias !== "umbContent" && app.alias !== "umbInfo" && app.alias !== "umbListView") {
                     vm.nameDisabled = true;
                 }
             });
@@ -58,9 +58,9 @@
         /** Called when the component has linked all elements, this is when the form controller is available */
         function postLink() {
             //set the content to dirty if the header changes
-            unsubscribe.push($scope.$watch("contentHeaderForm.$dirty",
-                function(newValue, oldValue) {
-                    if (newValue === true) {
+            unsubscribe.push($scope.$watch("vm.editor.content.name",
+                function (newValue, oldValue) {
+                    if (newValue !== oldValue) {
                         vm.editor.content.isDirty = true;
                     }
                 }));
@@ -97,7 +97,7 @@
             var app = $args.app;
             // disable the name field if the active content app is not "Content" or "Info"
             vm.nameDisabled = false;
-            if(app && app.alias !== "umbContent" && app.alias !== "umbInfo") {
+            if(app && app.alias !== "umbContent" && app.alias !== "umbInfo" && app.alias !== "umbListView") {
                 vm.nameDisabled = true;
             }
         });

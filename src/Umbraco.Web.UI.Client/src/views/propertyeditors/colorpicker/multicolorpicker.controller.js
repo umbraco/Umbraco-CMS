@@ -102,6 +102,7 @@
                 return x.value === item.value && x.label === item.label;
             });
 
+            angularHelper.getCurrentForm($scope).$setDirty();
         };
 
         $scope.add = function (evt) {
@@ -120,6 +121,7 @@
                     $scope.newLabel = "";
                     $scope.hasError = false;
                     $scope.focusOnNew = true;
+                    angularHelper.getCurrentForm($scope).$setDirty();
                     return;
                 }
 
@@ -137,30 +139,9 @@
             items: '> div.control-group',
             tolerance: 'pointer',
             update: function (e, ui) {
-                // Get the new and old index for the moved element (using the text as the identifier, so 
-                // we'd have a problem if two prevalues were the same, but that would be unlikely)
-                var newIndex = ui.item.index();
-                var movedPrevalueText = $('pre', ui.item).text();
-                var originalIndex = getElementIndexByPrevalueText(movedPrevalueText);
-
-                //// Move the element in the model
-                if (originalIndex > -1) {
-                    var movedElement = $scope.model.value[originalIndex];
-                    $scope.model.value.splice(originalIndex, 1);
-                    $scope.model.value.splice(newIndex, 0, movedElement);
-                }
+                angularHelper.getCurrentForm($scope).$setDirty();
             }
         };
-
-        function getElementIndexByPrevalueText(value) {
-            for (var i = 0; i < $scope.model.value.length; i++) {
-                if ($scope.model.value[i].value === value) {
-                    return i;
-                }
-            }
-
-            return -1;
-        }
 
         //load the separate css for the editor to avoid it blocking our js loading
         assetsService.loadCss("lib/spectrum/spectrum.css", $scope);

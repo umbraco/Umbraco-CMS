@@ -220,7 +220,7 @@ function startupLatestEditsController($scope) {
 }
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupLatestEditsController", startupLatestEditsController);
 
-function MediaFolderBrowserDashboardController($rootScope, $scope, $location, contentTypeResource, userService) {
+function MediaFolderBrowserDashboardController($scope, $routeParams, $location, contentTypeResource, userService) {
 
     var currentUser = {};
 
@@ -251,6 +251,8 @@ function MediaFolderBrowserDashboardController($rootScope, $scope, $location, co
                         view: dt.view
                     };
 
+                    // tell the list view to list content at root
+                    $routeParams.id = -1;
             });
 
         } else if (currentUser.startMediaIds.length > 0){

@@ -131,13 +131,24 @@ Use this directive to render a date time picker
 				return console.warn('Unable to find any flatpickr installation');
 			}
 
+            var fpInstance;
+
 			setUpCallbacks();
 
             if (!ctrl.options.locale) {
                 ctrl.options.locale = userLocale;
             }
 
-            var fpInstance = new fpLib(element, ctrl.options);
+            // handle special keydown events
+            ctrl.options.onKeyDown = function (selectedDates, dateStr, instance, event) {
+                var code = event.keyCode || event.which;
+                if (code === 13) {
+                    // close the datepicker on enter (this happens when entering time)
+                    fpInstance.close()
+                }
+            };
+
+            fpInstance = new fpLib(element, ctrl.options);
             
 			if (ctrl.onSetup) {
 				ctrl.onSetup({

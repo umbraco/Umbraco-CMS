@@ -32,8 +32,14 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("mandatory")]
         public bool Mandatory { get; set; }
 
+        [Column("mandatoryMessage")]
+        public string MandatoryMessage { get; set; }
+
         [Column("validationRegExp")]
         public string ValidationRegExp { get; set; }
+
+        [Column("validationRegExpMessage")]
+        public string ValidationRegExpMessage { get; set; }
 
         [Column("Description")]
         public string Description { get; set; }

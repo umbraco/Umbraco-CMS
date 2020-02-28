@@ -367,7 +367,6 @@ input.umb-group-builder__group-title-input:disabled:hover {
         overflow: visible;
         background: transparent;
         line-height: normal;
-        outline: 0;
         -webkit-appearance: none;
         
         &:hover, &:focus  {
@@ -494,11 +493,11 @@ input.umb-group-builder__group-sort-value {
         font-weight: bold;
         font-size: 14px;
         color: @ui-action-type;
-        
-        &:hover{
+
+        &:hover {
             text-decoration: none;
-            color:@ui-action-type-hover;
-            border-color:@ui-action-border-hover;
+            color: @ui-action-type-hover;
+            border-color: @ui-action-border-hover;
         }
     }
 
@@ -555,7 +554,13 @@ input.umb-group-builder__group-sort-value {
         overflow: hidden;
     }
 
-    .editor-validation-pattern{
+    .editor-validation-message {
+        min-width: 100%;
+        min-height: 25px;
+        margin-top: 4px;
+    }
+
+    .editor-validation-pattern {
         border: 1px solid @gray-7;
         margin: 10px 0 0;
         padding: 6px;

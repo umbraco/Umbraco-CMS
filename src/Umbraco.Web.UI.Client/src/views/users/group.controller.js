@@ -100,14 +100,15 @@
         }
 
         function openSectionPicker() {
-            var oldSelection = angular.copy(vm.userGroup.sections);
+            var currentSelection = [];
+            angular.copy(vm.userGroup.sections, currentSelection);
             var sectionPicker = {
-                selection: vm.userGroup.sections,
+                selection: currentSelection,
                 submit: function (model) {
+                    vm.userGroup.sections = model.selection;
                     editorService.close();
                 },
                 close: function () {
-                    vm.userGroup.sections = oldSelection;
                     editorService.close();
                 }
             };
@@ -164,14 +165,15 @@
         }
 
         function openUserPicker() {
-            var oldSelection = angular.copy(vm.userGroup.users);
+            var currentSelection = [];
+            angular.copy(vm.userGroup.users, currentSelection);
             var userPicker = {
-                selection: vm.userGroup.users,
-                submit: function () {
+                selection: currentSelection,
+                submit: function (model) {
+                    vm.userGroup.users = model.selection;
                     editorService.close();
                 },
                 close: function () {
-                    vm.userGroup.users = oldSelection;
                     editorService.close();
                 }
             };
