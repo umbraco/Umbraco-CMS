@@ -43,7 +43,7 @@ angular.mock.$Browser = function () {
     self.pollFns = [];
 
     // TODO(vojta): remove this temporary api
-    self.$$completeOutstandingRequest = anuglar.noop;
+    self.$$completeOutstandingRequest = angular.noop;
     self.$$incOutstandingRequestCount = angular.noop;
 
 
