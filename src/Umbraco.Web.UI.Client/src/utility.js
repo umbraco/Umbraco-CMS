@@ -2,61 +2,78 @@
  * A friendly utility collection to replace AngularJs' ng-functions
  * If it doesn't exist here, it's probably available as vanilla JS
  * 
- * Still carries a dependency on lodash, but if usages of lodash from 
- * elsewhere in the codebase can instead use these methods, the lodash
+ * Still carries a dependency on underscore, but if usages of underscore from 
+ * elsewhere in the codebase can instead use these methods, the underscore
  * dependency will be nicely abstracted and can be removed/swapped later
  */
+(function (window) {
 
-var umb = umb || {};
+    /**
+     * Equivalent to angular.noop
+     */
+    const noop = () => { };
 
-/**
- * Equivalent to angular.noop
- */
-umb.noop = () => {};
+    /**
+     * Equivalent to angular.copy
+     * Abstraction of underscore.clone
+     */
+    const copy = val => _.clone(val);
 
-/**
- * Equivalent to angular.copy
- * Abstraction of lodasd.cloneDeep
- */
-umb.copy = val => _.clone(val);
+    /**
+     * Equivalent to angular.isArray
+     */
+    const isArray = val => Array.isArray(val) || val instanceof Array;
 
-/**
- * Equivalent to angular.isArray
- */
-umb.isArray = val => Array.isArray(val) || val instanceof Array;
+    /**
+     * Equivalent to angular.equals
+     * Abstraction of underscore.isEqual
+     */
+    const equals = (a, b) => _.isEqual(a, b);
 
-/**
- * Equivalent to angular.equals
- * Abstraction of lodash.isEqual
- */
-umb.equals = (a, b) => _.isEqual(a, b);
+    /**
+     * Equivalent to angular.isFunction
+     */
+    const isFunction = val => typeof val === 'function';
 
-/**
- * Equivalent to angular.isFunction
- */
-umb.isFunction = val => typeof val === 'function';
+    /**
+     * Equivalent to angular.isUndefined
+     */
+    const isUndefined = val => typeof val === 'undefined';
 
-/**
- * Equivalent to angular.isUndefined
- */
-umb.isUndefined = val => typeof val === 'undefined';
+    /**
+     * Equivalent to angular.isDefined. Inverts result of const isUndefined
+     */
+    const isDefined = val => !isUndefined(val);
 
-/**
- * Equivalent to angular.isDefined. Inverts result of umb.isUndefined
- */
-umb.isDefined = val => !umb.isUndefined(val);
+    /**
+     * Equivalent to angular.isString
+     */
+    const isString = val => typeof val === 'string';
 
-/**
- * Equivalent to angular.isString
- */
-umb.isString = val => typeof val === 'string';
+    /**
+     * Equivalent to angular.isNumber
+     */
+    const isNumber = val => typeof val === 'number';
 
-/**
- * Equivalent to angular.isNumber
- */
-umb.isNumber = val => typeof val === 'number';
+    /**
+     * Equivalent to angular.isObject
+     */
+    const isObject = val => val !== null && typeof val === 'object';
 
-/**
- * Equivalent to angular.isObject
- */
-umb.isObject = val => val !== null && typeof val === 'object';
+    let _umb = {
+        noop: noop,
+        copy: copy,
+        isArray: isArray,
+        equals: equals,
+        isFunction: isFunction,
+        isUndefined: isUndefined,
+        isDefined: isDefined,
+        isString: isString,
+        isNumber: isNumber,
+        isObject: isObject
+    };
+
+    if (typeof (window.umb) === 'undefined') {
+        window.umb = _umb;
+    }
+})(window);

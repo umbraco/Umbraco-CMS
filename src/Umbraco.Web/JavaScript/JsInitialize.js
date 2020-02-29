@@ -33,7 +33,6 @@
     'lib/umbraco/NamespaceManager.js',
     'lib/umbraco/LegacySpeechBubble.js',
 
-    'js/utility.js',
     'js/app.js',
 
     'js/umbraco.resources.js',

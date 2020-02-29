@@ -179,7 +179,7 @@ function angularHelper($q) {
                 $submitted: false,
                 $pending: undefined,
                 $addControl: umb.noop,
-                $removeControl: umb.noop,
+                $removeControl: umb.noop, 
                 $setValidity: umb.noop,
                 $setDirty: umb.noop,
                 $setPristine: umb.noop,
