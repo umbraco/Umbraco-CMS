@@ -21,8 +21,6 @@ function MainController($scope, $location, appState, treeService, notificationsS
     $scope.login = {};
     $scope.tabbingActive = false;
 
-        console.log(umb.equals(1, 3));
-
     // Load TinyMCE assets ahead of time in the background for the user
     // To help with first load of the RTE
     tinyMceAssets.forEach(function (tinyJsAsset) {
