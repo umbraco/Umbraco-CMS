@@ -407,5 +407,22 @@ namespace Umbraco.Core.Configuration
 
             return backingField;
         }
+
+        /// <summary>
+        /// Gets the path to the razor file used when no published content is available.
+        /// </summary>
+        public string NoNodesViewPath
+        {
+            get
+            {
+                var configuredValue = ConfigurationManager.AppSettings[Constants.AppSettings.NoNodesViewPath];
+                if (!string.IsNullOrWhiteSpace(configuredValue))
+                {
+                    return configuredValue;
+                }
+
+                return "~/config/splashes/NoNodes.cshtml";
+            }
+        }
     }
 }

@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Web;
 using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Web.Routing;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Security;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Composing;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web
@@ -244,8 +241,8 @@ namespace Umbraco.Web
 
             _logger.Warn<UmbracoModule>("Umbraco has no content");
 
-            const string noContentUrl = "~/config/splashes/noNodes.aspx";
-            httpContext.RewritePath(_uriUtility.ToAbsolute(noContentUrl));
+            var rewriteTo = _uriUtility.ToAbsolute(_globalSettings.UmbracoPath + Constants.Web.NoContentRoute);
+            httpContext.RewritePath(_uriUtility.ToAbsolute(rewriteTo));
 
             return false;
         }

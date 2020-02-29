@@ -17,7 +17,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Strings;
 using Umbraco.Core.IO;
-using Umbraco.Core.Strings;
 using Umbraco.Web.Install;
 using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;
@@ -181,6 +180,9 @@ namespace Umbraco.Web.Runtime
             );
             defaultRoute.RouteHandler = new RenderRouteHandler(umbracoContextAccessor, ControllerBuilder.Current.GetControllerFactory(), shortStringHelper);
 
+            // register no content route
+            RouteNoContentController(umbracoPath);
+
             // register install routes
             RouteTable.Routes.RegisterArea<UmbracoInstallArea>();
 
@@ -189,6 +191,14 @@ namespace Umbraco.Web.Runtime
 
             // plugin controllers must come first because the next route will catch many things
             RoutePluginControllers(globalSettings, surfaceControllerTypes, apiControllerTypes, ioHelper);
+        }
+
+        private static void RouteNoContentController(string umbracoPath)
+        {
+            RouteTable.Routes.MapRoute(
+                "umbraco-no-content",
+                umbracoPath + Core.Constants.Web.NoContentRoute,
+                new { controller = "RenderNoContent", action = "Index" });
         }
 
         private static void RoutePluginControllers(
@@ -252,6 +262,5 @@ namespace Umbraco.Web.Runtime
             // make it use our custom/special SurfaceMvcHandler
             route.RouteHandler = new SurfaceRouteHandler();
         }
-
     }
 }

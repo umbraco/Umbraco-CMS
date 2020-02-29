@@ -95,5 +95,10 @@
         bool DisableElectionForSingleServer { get; }
         string RegisterType { get; }
         string DatabaseFactoryServerVersion { get; }
+
+        /// <summary>
+        /// Gets the path to the razor file used when no published content is available.
+        /// </summary>
+        string NoNodesViewPath { get; }
     }
 }
