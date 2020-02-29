@@ -178,11 +178,11 @@ function angularHelper($q) {
                 $valid: true,
                 $submitted: false,
                 $pending: undefined,
-                $addControl: angular.noop,
-                $removeControl: angular.noop,
-                $setValidity: angular.noop,
-                $setDirty: angular.noop,
-                $setPristine: angular.noop,
+                $addControl: umb.noop,
+                $removeControl: umb.noop,
+                $setValidity: umb.noop,
+                $setDirty: umb.noop,
+                $setPristine: umb.noop,
                 $name: formName
             };
         }

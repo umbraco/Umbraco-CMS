@@ -325,7 +325,7 @@
         /* ---------- SAVE ---------- */
 
         function save() {
-            saveInternal().then(angular.noop, angular.noop);
+            saveInternal().then(umb.noop, umb.noop);
         }
 
         /** This internal save method performs the actual saving and returns a promise, not to be bound to any buttons but used by other bound methods */

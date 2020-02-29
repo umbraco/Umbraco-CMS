@@ -112,7 +112,7 @@
                                 userGroupsResource.deleteUserGroups(_.pluck(vm.selection, "id")).then(function (data) {
                                     clearSelection();
                                     onInit();
-                                }, angular.noop);
+                                }, umb.noop);
                                 overlayService.close();
                             }
                         };

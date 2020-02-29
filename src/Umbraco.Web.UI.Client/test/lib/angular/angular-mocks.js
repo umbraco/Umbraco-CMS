@@ -43,8 +43,8 @@ angular.mock.$Browser = function () {
     self.pollFns = [];
 
     // TODO(vojta): remove this temporary api
-    self.$$completeOutstandingRequest = angular.noop;
-    self.$$incOutstandingRequestCount = angular.noop;
+    self.$$completeOutstandingRequest = umb.noop;
+    self.$$incOutstandingRequestCount = umb.noop;
 
 
     // register url polling fn
@@ -1440,7 +1440,7 @@ function MockXhr() {
         return lines.join('\n');
     };
 
-    this.abort = angular.noop;
+    this.abort = umb.noop;
 }
 
 
@@ -1873,7 +1873,7 @@ window.jstestdriver && (function (window) {
             }
             for (var i = 0, ii = blockFns.length; i < ii; i++) {
                 try {
-                    injector.invoke(blockFns[i] || angular.noop, this);
+                    injector.invoke(blockFns[i] || umb.noop, this);
                 } catch (e) {
                     if (e.stack && errorForStack) e.stack += '\n' + errorForStack.stack;
                     throw e;

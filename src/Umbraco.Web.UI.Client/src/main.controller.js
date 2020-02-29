@@ -1,19 +1,18 @@
-
-/**
+/** 
  * @ngdoc controller
- * @name Umbraco.MainController
+ * @name Umbraco.MainController  
  * @function
  * 
- * @description
+ * @description  
  * The main application controller
  * 
  */
 function MainController($scope, $location, appState, treeService, notificationsService, 
     userService, historyService, updateChecker, navigationService, eventsService, 
     tmhDynamicLocale, localStorageService, editorService, overlayService, assetsService, tinyMceAssets) {
-
+ 
     //the null is important because we do an explicit bool check on this in the view
-    $scope.authenticated = null;
+    $scope.authenticated = null; 
     $scope.touchDevice = appState.getGlobalState("touchDevice");
     $scope.infiniteMode = false;
     $scope.overlay = {};
@@ -21,6 +20,8 @@ function MainController($scope, $location, appState, treeService, notificationsS
     $scope.search = {};
     $scope.login = {};
     $scope.tabbingActive = false;
+
+        console.log(umb.equals(1, 3));
 
     // Load TinyMCE assets ahead of time in the background for the user
     // To help with first load of the RTE

@@ -80,7 +80,7 @@
                             activate: false
                         });
                         completeSave(saved);
-                    }, angular.noop);
+                    }, umb.noop);
 
                     
                 } else {
