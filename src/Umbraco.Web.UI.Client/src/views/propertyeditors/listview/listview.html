@@ -14,18 +14,18 @@
 
                     <!-- Renders when it's only possible to create one specific document type for, which no blueprint exists-->
                    <div class="btn-group" ng-show="createAllowedButtonSingle">
-                       <button type="button" class="btn btn-white" ng-click="createBlank(entityType,listViewAllowedTypes[0].alias)" prevent-default>
+                       <button type="button" class="btn btn-outline umb-outline" ng-click="createBlank(entityType,listViewAllowedTypes[0].alias)" prevent-default>
                            <localize key="actions_create">Create</localize> {{listViewAllowedTypes[0].name}}
                        </button>
                    </div>
 
                    <!-- Renders when it's only possible to create one specific document type for which a blueprint exits-->
                    <div class="btn-group" ng-show="createAllowedButtonSingleWithBlueprints" deep-blur="leaveDropdown()">
-                       <button type="button" class="btn btn-white dropdown-toggle" aria-expanded="{{page.createDropdownOpen}}" data-toggle="dropdown" ng-click="toggleDropdown()" prevent-default>
+                       <button type="button" class="btn btn-white dropdown-toggle" aria-expanded="{{page.createDropdownOpen}}" ng-click="toggleDropdown()" prevent-default>
                            <span>
                                <localize key="actions_create">Create</localize> {{listViewAllowedTypes[0].name}}
                            </span>
-                           <span class="caret"></span>
+                           <span class="caret" aria-hidden="true"></span>
                         </button>
 
 
@@ -46,11 +46,11 @@
 
                    <!-- Renders when it's possible to create multiple document types and blueprints for one or more of the document types-->
                    <div class="btn-group" ng-show="createAllowedButtonMultiWithBlueprints" deep-blur="leaveDropdown()">
-                       <button type="button" class="btn btn-white dropdown-toggle" aria-expanded="{{page.createDropdownOpen === undefined ? false : page.createDropdownOpen}}" data-toggle="dropdown" ng-click="toggleDropdown()">
+                       <button type="button" class="btn btn-white dropdown-toggle" aria-expanded="{{page.createDropdownOpen === undefined ? false : page.createDropdownOpen}}" ng-click="toggleDropdown()">
                            <localize key="actions_create">Create</localize>
                            <span class="caret" aria-hidden="true"></span>
                        </button>
-                       
+
                        <umb-dropdown ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
                            <umb-dropdown-item ng-repeat="contentType in listViewAllowedTypes track by contentType.key | orderBy:'name':false">
                                <button type="button" ng-click="createBlank(entityType,contentType.alias)" prevent-default>
@@ -70,21 +70,21 @@
                    <ul class="umb-actions umb-actions-child">
 
                        <li ng-repeat="blueprint in docType.blueprints track by blueprint.id | orderBy:'name':false">
-                           <a ng-click="createFromBlueprint(blueprint.id)">
-                               <i class="large {{docType.icon}}"></i>
+                           <button type="button" ng-click="createFromBlueprint(blueprint.id)">
+                               <i class="large {{docType.icon}}" aria-hidden="true"></i>
                                <span class="menu-label">
                                    {{blueprint.name}}&nbsp;
                                </span>
-                           </a>
+                            </button>
                        </li>
 
                        <li class="sep" ng-show="allowBlank">
-                           <a ng-click="createBlank(docType)">
-                               <i class="large {{docType.icon}}"></i>
+                           <button type="button" ng-click="createBlank(docType)">
+                               <i class="large {{docType.icon}}" aria-hidden="true"></i>
                                <span class="menu-label">
                                    <localize key="blueprints_blankBlueprint">Blank</localize>
                                </span>
-                           </a>
+                            </button>
                        </li>
 
                    </ul>
@@ -126,21 +126,10 @@
                </umb-editor-sub-header-section>
 
                <umb-editor-sub-header-section ng-show="(selection.length == 0)">
-                   <ng-form class="form-search -no-margin-bottom pull-right" novalidate>
-                       <div class="inner-addon left-addon">
-                           <i class="icon icon-search" ng-click="enterSearch($event)"></i>
-                           <input
-                               class="form-control search-input"
-                               type="text"
-                               localize="placeholder"
-                               placeholder="@general_typeToSearch"
-                               ng-model="options.filter"
-                               ng-change="enterSearch()"
-                               ng-keydown="forceSearch($event)"
-                               prevent-enter-submit
-                               no-dirty-check>
-                       </div>
-                   </ng-form>
+
+                    <umb-mini-search model="options.filter" on-search="makeSearch()" on-start-typing="onSearchStartTyping()">
+                    </umb-mini-search>
+
                </umb-editor-sub-header-section>
 
                <umb-editor-sub-header-section ng-show="(selection.length > 0)">

@@ -41,6 +41,9 @@ namespace Umbraco.Web.Security
                     : Guid.NewGuid();
 
                 backOfficeIdentity.SessionId = session.ToString();
+
+                //since it is a cookie-based authentication add that claim
+                backOfficeIdentity.AddClaim(new Claim(ClaimTypes.CookiePath, "/", ClaimValueTypes.String, UmbracoBackOfficeIdentity.Issuer, UmbracoBackOfficeIdentity.Issuer, backOfficeIdentity));
             }
 
             base.ResponseSignIn(context);

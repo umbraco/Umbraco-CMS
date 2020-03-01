@@ -339,7 +339,7 @@
     <key alias="width">Larghezza</key>
     <key alias="yes">Si</key>
     <key alias="reorder">Riordina</key>
-    <key alias="reorderDone">Ho finito di ordinare/key>
+    <key alias="reorderDone">Ho finito di ordinare</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Colore di sfondo</key>

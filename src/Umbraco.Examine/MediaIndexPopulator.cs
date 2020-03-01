@@ -10,7 +10,7 @@ namespace Umbraco.Examine
     /// <summary>
     /// Performs the data lookups required to rebuild a media index
     /// </summary>
-    public class MediaIndexPopulator : IndexPopulator<UmbracoContentIndex>
+    public class MediaIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     {
         private readonly int? _parentId;
         private readonly IMediaService _mediaService;
@@ -69,6 +69,6 @@ namespace Umbraco.Examine
                 pageIndex++;
             } while (media.Length == pageSize);
         }
-        
+
     }
 }

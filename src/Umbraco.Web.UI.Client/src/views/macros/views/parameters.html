@@ -10,13 +10,13 @@
                     <div class="umb-property-editor form-horizontal">
                         <div ui-sortable="sortableOptions" ng-model="model.macro.parameters">
                             <div class="control-group umb-prevalues-multivalues__listitem" ng-repeat="parameter in model.macro.parameters track by $id(parameter)">
-                                <i class="icon icon-navigation handle"></i>
+                                <i class="icon icon-navigation handle" aria-hidden="true"></i>
                                 <div class="umb-prevalues-multivalues__left">
                                     <span>{{parameter.label}}</span>&nbsp;<span class="muted">({{parameter.key}})</span>:&nbsp;<small>{{parameter.editor}}</small>
                                 </div>
                                 <div class="umb-prevalues-multivalues__right">
-                                    <a class="umb-node-preview__action" ng-click="vm.edit(parameter, $event)"><localize key="general_edit">Edit</localize></a>
-                                    <a class="umb-node-preview__action umb-node-preview__action--red" ng-click="vm.remove(parameter, $event)"><localize key="general_remove">Remove</localize></a>
+                                    <button type="button" class="umb-node-preview__action" ng-click="vm.edit(parameter, $event)"><localize key="general_edit">Edit</localize></button>
+                                    <button type="button" class="umb-node-preview__action umb-node-preview__action--red" ng-click="vm.remove(parameter, $event)"><localize key="general_remove">Remove</localize></button>
                                 </div>
                             </div>
                         </div>

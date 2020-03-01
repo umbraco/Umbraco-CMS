@@ -2,11 +2,6 @@
 
     <umb-box-content>
 
-        <umb-control-group label="Id" ng-if="model.showIdentifier">
-            <div>{{model.content.id}}</div>
-            <small>{{model.content.key}}</small>
-        </umb-control-group>
-
         <umb-property property="model.properties.selectedEditor">
             <div>
                 <select name="selectedEditor"
@@ -18,10 +13,6 @@
                 </span>
             </div>
 
-        </umb-property>
-
-        <umb-property property="model.properties.selectedEditorId">
-            <div>{{model.content.selectedEditor}}</div>
         </umb-property>
 
         <umb-property property="preValue"

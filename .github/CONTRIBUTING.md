@@ -28,7 +28,7 @@ This project and everyone participating in it, is governed by the [our Code of C
 [Working with the code](#working-with-the-code)
   * [Building Umbraco from source code](#building-umbraco-from-source-code)
   * [Working with the source code](#working-with-the-source-code)
-  * [Making changes after the PR was opened](#making-changes-after-the-pr-was-opened)
+  * [Making changes after the PR is open](#making-changes-after-the-pr-is-open)
   * [Which branch should I target for my contributions?](#which-branch-should-i-target-for-my-contributions)
   * [Keeping your Umbraco fork in sync with the main repository](#keeping-your-umbraco-fork-in-sync-with-the-main-repository)
 
@@ -59,12 +59,13 @@ Great question! The short version goes like this:
   * **Clone** - when GitHub has created your fork, you can clone it in your favorite Git tool
 
   ![Clone the fork](img/clonefork.png)
-
+  
+  * **Switch to the correct branch** - switch to the `v8/contrib` branch
   * **Build** - build your fork of Umbraco locally as described in [building Umbraco from source code](BUILD.md)
   * **Change** - make your changes, experiment, have fun, explore and learn, and don't be afraid. We welcome all contributions and will [happily give feedback](#questions)
-  * **Commit** - done? Yay! 🎉 **Important:** create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-12345`. This means it's a temporary branch for the particular issue you're working on, in this case `12345`. When you have a branch, commit your changes. Don't commit to `v8/dev`, create a new branch first.
+  * **Commit** - done? Yay! 🎉 **Important:** create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-12345`. This means it's a temporary branch for the particular issue you're working on, in this case `12345`. When you have a branch, commit your changes. Don't commit to `v8/contrib`, create a new branch first.
   * **Push** - great, now you can push the changes up to your fork on GitHub
-  * **Create pull request** - exciting! You're ready to show us your changes (or not quite ready, you just need some feedback to progress - you can now make use of GitHub's draft pull request status, detailed [here] (https://github.blog/2019-02-14-introducing-draft-pull-requests/)). GitHub has picked up on the new branch you've pushed and will offer to create a Pull Request. Click that green button and away you go.
+  * **Create pull request** - exciting! You're ready to show us your changes (or not quite ready, you just need some feedback to progress - you can now make use of GitHub's draft pull request status, detailed [here](https://github.blog/2019-02-14-introducing-draft-pull-requests/)). GitHub has picked up on the new branch you've pushed and will offer to create a Pull Request. Click that green button and away you go.
 
   ![Create a pull request](img/createpullrequest.png)
 
@@ -157,7 +158,7 @@ To find the general areas for something you're looking to fix or improve, have a
 
 ### Which branch should I target for my contributions?
 
-We like to use [Gitflow as much as possible](https://jeffkreeftmeijer.com/git-flow/), but don't worry if you are not familiar with it. The most important thing you need to know is that when you fork the Umbraco repository, the default branch is set to something, usually `v8/dev`. If you are working on v8, this is the branch you should be targetting. For v7 contributions, please target 'v7/dev'. 
+We like to use [Gitflow as much as possible](https://jeffkreeftmeijer.com/git-flow/), but don't worry if you are not familiar with it. The most important thing you need to know is that when you fork the Umbraco repository, the default branch is set to something, usually `v8/contrib`. If you are working on v8, this is the branch you should be targetting. For v7 contributions, please target 'v7/dev'. 
 
 Please note: we are no longer accepting features for v7 but will continue to merge bug fixes as and when they arise.
 
@@ -183,10 +184,10 @@ Then when you want to get the changes from the main repository:
 
 ```
 git fetch upstream
-git rebase upstream/v8/dev
+git rebase upstream/v8/contrib
 ```
 
-In this command we're syncing with the `v8/dev` branch, but you can of course choose another one if needed.
+In this command we're syncing with the `v8/contrib` branch, but you can of course choose another one if needed.
 
 (More info on how this works: [http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated](http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated))
 

@@ -29,13 +29,13 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>Corresponds to the NodeObjectType in the umbracoNode table</remarks>
         [DataMember]
-        Guid ParentObjectType { get; set; }
+        Guid? ParentObjectType { get; set; }
 
         /// <summary>
         /// Gets or sets the Childs object type id
         /// </summary>
         /// <remarks>Corresponds to the NodeObjectType in the umbracoNode table</remarks>
         [DataMember]
-        Guid ChildObjectType { get; set; }
+        Guid? ChildObjectType { get; set; }
     }
 }

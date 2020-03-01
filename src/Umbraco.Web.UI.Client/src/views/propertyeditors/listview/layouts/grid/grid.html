@@ -52,7 +52,9 @@
         <umb-media-grid items="vm.itemsWithoutFolders"
                         on-details-hover="vm.hoverMediaItemDetails"
                         on-click="vm.selectItem"
-                        on-click-name="vm.goToItem">
+                        on-click-name="vm.goToItem"
+                        allow-open-folder="true"
+                        allow-open-file="true">
         </umb-media-grid>
 
         <umb-tooltip ng-if="vm.mediaDetailsTooltip.show"

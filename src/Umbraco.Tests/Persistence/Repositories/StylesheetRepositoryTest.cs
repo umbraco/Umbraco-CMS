@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -284,7 +285,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual("/css/path-2/test-path-3.css", stylesheet.VirtualPath);
 
                 stylesheet = new Stylesheet("\\test-path-4.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
-                Assert.Throws<FileSecurityException>(() => // fixed in 7.3 - 7.2.8 used to strip the \
+                Assert.Throws<UnauthorizedAccessException>(() => // fixed in 7.3 - 7.2.8 used to strip the \
                 {
                     repository.Save(stylesheet);
                 });
@@ -294,11 +295,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.IsNull(stylesheet);
 
                 // fixed in 7.3 - 7.2.8 used to...
-                Assert.Throws<FileSecurityException>(() =>
+                Assert.Throws<UnauthorizedAccessException>(() =>
                 {
                     stylesheet = repository.Get("\\test-path-4.css"); // outside the filesystem, does not exist
                 });
-                Assert.Throws<FileSecurityException>(() =>
+                Assert.Throws<UnauthorizedAccessException>(() =>
                 {
                     stylesheet = repository.Get("../packages.config"); // outside the filesystem, exists
                 });

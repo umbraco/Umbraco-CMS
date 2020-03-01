@@ -126,7 +126,7 @@ namespace Umbraco.Core.Collections
                 if (_items.TryGetValue(key, out value))
                     yield return value;
                 else if (throwOnMissing)
-                    throw new Exception(MissingDependencyError);
+                    throw new Exception($"{MissingDependencyError} Error in type {typeof(TItem).Name}, with key {key}");
             }
         }
     }

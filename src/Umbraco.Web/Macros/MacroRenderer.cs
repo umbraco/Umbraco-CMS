@@ -186,7 +186,7 @@ namespace Umbraco.Web.Macros
             foreach (var prop in model.Properties)
             {
                 var key = prop.Key.ToLowerInvariant();
-                prop.Value = macroParams.ContainsKey(key)
+                prop.Value = macroParams != null && macroParams.ContainsKey(key)
                     ? macroParams[key]?.ToString() ?? string.Empty
                     : string.Empty;
             }
