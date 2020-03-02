@@ -36,16 +36,16 @@
                     <input type="text" ng-model="entry.label" class="text-input"/>
                 </div>
                 <div class="umb-table-cell">
-                    <div class="settings-input --hasValue" ng-if="entry.view !== null" >
+                    <div class="settings-input --hasValue" ng-if="entry.overlayView !== null" >
 
-                        <umb-node-preview icon="'icon-document'" name="entry.view"></umb-node-preview>
+                        <umb-node-preview icon="'icon-document'" name="entry.overlayView"></umb-node-preview>
                         <div class="cell-actions">
                             <button type="button" class="btn-reset cell-actions-btn --remove umb-outline" ng-click="vm.requestRemoveViewForEntry(entry)">
                                 <i class="icon icon-wrong"></i>
                             </button>
                         </div>
                     </div>
-                    <button type="button" class="btn-reset settings-input --noValue umb-outline" ng-if="entry.view === null" ng-click="vm.addViewForEntry(entry)">
+                    <button type="button" class="btn-reset settings-input --noValue umb-outline" ng-if="entry.overlayView === null" ng-click="vm.addViewForEntry(entry)">
                         <localize key="blockEditor_addCustomView">Add custom view</localize>
                     </button>
                 </div>

@@ -150,7 +150,7 @@
 
             var entry = {
                 "contentTypeAlias": alias,
-                "view": null,
+                "overlayView": null,
                 "labelTemplate": "",
                 "settingsElementTypeAlias": null
             };
@@ -233,7 +233,7 @@
             localizationService.localizeMany(["general_remove", "defaultdialogs_confirmremoveusageof"]).then(function (data) {
                 overlayService.confirmRemove({
                     title: data[0],
-                    content: localizationService.tokenReplace(data[1], [entry.view]),
+                    content: localizationService.tokenReplace(data[1], [entry.overlayView]),
                     close: function () {
                         overlayService.close();
                     },
@@ -245,7 +245,7 @@
             });
         };
         vm.removeViewForEntry = function(entry) {
-            entry.view = null;
+            entry.overlayView = null;
         };
         vm.addViewForEntry = function(entry) {
             const filePicker = {
@@ -255,13 +255,10 @@
                 entityType: "file",
                 isDialog: true,
                 filter: function (i) {
-                    if (i.name.indexOf(".html") !== -1) {
-                        return true;
-                    }
+                    return (i.name.indexOf(".html") !== -1);
                 },
                 select: function (file) {
-                    console.log(file);
-                    entry.view = file.name;
+                    entry.overlayView = file.name;
                     editorService.close();
                 },
                 close: function () {

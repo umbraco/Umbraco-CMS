@@ -936,7 +936,7 @@
             
             var elementEditor = {
                 block: blockModel,
-                view: "views/common/infiniteeditors/elementeditor/elementeditor.html",
+                view: blockModel.overlayView || "views/common/infiniteeditors/elementeditor/elementeditor.html",
                 size: blockModel.overlaySize,
                 submit: function(model) {
                     blockModel.content = model.block.content;
