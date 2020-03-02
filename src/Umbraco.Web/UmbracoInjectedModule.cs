@@ -241,8 +241,10 @@ namespace Umbraco.Web
 
             _logger.Warn<UmbracoModule>("Umbraco has no content");
 
-            var rewriteTo = _uriUtility.ToAbsolute(_globalSettings.UmbracoPath + Constants.Web.NoContentRoute);
-            httpContext.RewritePath(_uriUtility.ToAbsolute(rewriteTo));
+            if (RouteTable.Routes[Constants.Web.NoContentRouteName] is Route route)
+            {
+                httpContext.RewritePath(route.Url);
+            }
 
             return false;
         }

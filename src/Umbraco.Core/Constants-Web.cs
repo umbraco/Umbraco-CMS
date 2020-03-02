@@ -36,9 +36,9 @@
             public const string AngularHeadername = "X-UMB-XSRF-TOKEN";
 
             /// <summary>
-            /// The route for rendering a page when no content is published.
+            /// The route name of the page shown when Umbraco has no published content.
             /// </summary>
-            public const string NoContentRoute = "/UmbNoContent";
+            public const string NoContentRouteName = "umbraco-no-content";
         }
     }
 }

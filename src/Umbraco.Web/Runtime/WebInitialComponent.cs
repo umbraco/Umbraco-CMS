@@ -22,6 +22,7 @@ using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 
+using Constants = Umbraco.Core.Constants;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Runtime
@@ -196,8 +197,8 @@ namespace Umbraco.Web.Runtime
         private static void RouteNoContentController(string umbracoPath)
         {
             RouteTable.Routes.MapRoute(
-                "umbraco-no-content",
-                umbracoPath + Core.Constants.Web.NoContentRoute,
+                Constants.Web.NoContentRouteName,
+                umbracoPath + "/UmbNoContent",
                 new { controller = "RenderNoContent", action = "Index" });
         }
 
