@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-    function ($scope, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage) {
+    function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage) {
 
             var vm = this;
             
@@ -306,9 +306,7 @@ angular.module("umbraco")
                             });
                         } else {
                             var image = $scope.images[$scope.images.length - 1];
-                            $scope.target = image;
-                            $scope.target.url = mediaHelper.resolveFile(image);
-                            selectMedia(image);
+                            clickHandler(image);
                         }
                     });
                 });
