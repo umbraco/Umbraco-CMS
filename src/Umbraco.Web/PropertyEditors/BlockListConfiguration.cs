@@ -35,8 +35,8 @@ namespace Umbraco.Web.PropertyEditors
             [JsonProperty("settingsElementTypeAlias")]
             public string SettingsElementTypeAlias { get; set; }
 
-            [JsonProperty("overlayView")]
-            public string OverlayView { get; set; }
+            [JsonProperty("view")]
+            public string View { get; set; }
 
             [JsonProperty("label")]
             public string Label { get; set; }
