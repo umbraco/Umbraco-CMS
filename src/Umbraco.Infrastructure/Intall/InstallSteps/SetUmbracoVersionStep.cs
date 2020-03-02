@@ -6,7 +6,7 @@ using Umbraco.Web.Install.Models;
 namespace Umbraco.Web.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.NewInstall | InstallationType.Upgrade,
-        "UmbracoVersion", 50, "Installation is complete!, get ready to be redirected to your new CMS.",
+        "UmbracoVersion", 50, "Installation is complete! Get ready to be redirected to your new CMS.",
         PerformsAppRestart = true)]
     public class SetUmbracoVersionStep : InstallSetupStep<object>
     {
@@ -25,7 +25,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
-            var security = _umbracoContextAccessor.UmbracoContext.Security;
+            var security = _umbracoContextAccessor.GetRequiredUmbracoContext().Security;
             if (security.IsAuthenticated() == false && _globalSettings.ConfigurationStatus.IsNullOrWhiteSpace())
             {
                 security.PerformLogin(-1);

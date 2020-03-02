@@ -7,6 +7,7 @@ namespace Umbraco.Web
     {
         public static HttpContextBase GetRequiredHttpContext(this IHttpContextAccessor httpContextAccessor)
         {
+            if (httpContextAccessor == null) throw new ArgumentNullException(nameof(httpContextAccessor));
             var httpContext = httpContextAccessor.HttpContext;
 
             if(httpContext is null) throw new InvalidOperationException("HttpContext is null");

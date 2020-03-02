@@ -41,7 +41,7 @@ namespace Umbraco.Core
 
         public void AddDateTime(DateTime d)
         {
-            _writer.Write(d.Ticks);;
+            _writer.Write(d.Ticks);
         }
 
         public void AddString(string s)

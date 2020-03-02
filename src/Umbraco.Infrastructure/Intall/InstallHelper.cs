@@ -10,7 +10,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Net;
@@ -29,7 +28,7 @@ namespace Umbraco.Web.Install
         private readonly IInstallationService _installationService;
         private readonly ICookieManager _cookieManager;
         private readonly IUserAgentProvider _userAgentProvider;
-        private readonly Lazy<ISqlContext> _sqlContext;
+        private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
         private readonly IJsonSerializer _jsonSerializer;
         private InstallationType? _installationType;
 
@@ -41,7 +40,7 @@ namespace Umbraco.Web.Install
             IInstallationService installationService,
             ICookieManager cookieManager,
             IUserAgentProvider userAgentProvider,
-            Lazy<ISqlContext> sqlContext,
+            IUmbracoDatabaseFactory umbracoDatabaseFactory,
             IJsonSerializer jsonSerializer)
         {
             _logger = logger;
@@ -52,7 +51,7 @@ namespace Umbraco.Web.Install
             _installationService = installationService;
             _cookieManager = cookieManager;
             _userAgentProvider = userAgentProvider;
-            _sqlContext = sqlContext;
+            _umbracoDatabaseFactory = umbracoDatabaseFactory;
             _jsonSerializer = jsonSerializer;
         }
 
@@ -92,7 +91,7 @@ namespace Umbraco.Web.Install
                 {
                     // we don't have DatabaseProvider anymore... doing it differently
                     //dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
-                    dbProvider = GetDbProviderString(_sqlContext.Value);
+                    dbProvider = _umbracoDatabaseFactory.SqlContext.SqlSyntax.DbProvider;
                 }
 
                 var installLog = new InstallLog(installId: installId, isUpgrade: IsBrandNewInstall == false,
@@ -107,11 +106,6 @@ namespace Umbraco.Web.Install
             {
                 _logger.Error<InstallHelper>(ex, "An error occurred in InstallStatus trying to check upgrades");
             }
-        }
-
-        internal static string GetDbProviderString(ISqlContext sqlContext)
-        {
-            return sqlContext.SqlSyntax.DbProvider;
         }
 
         /// <summary>
