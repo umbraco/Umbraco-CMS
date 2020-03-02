@@ -27,6 +27,7 @@ namespace Umbraco.Web.Editors
     public class TemplateQueryController : UmbracoAuthorizedJsonController
     {
         private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IPublishedContentQuery _publishedContentQuery;
 
         public TemplateQueryController(
             IGlobalSettings globalSettings,
@@ -36,14 +37,15 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             IVariationContextAccessor variationContextAccessor,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
+            IPublishedUrlProvider publishedUrlProvider,
+            IPublishedContentQuery publishedContentQuery)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _variationContextAccessor = variationContextAccessor;
+            _publishedContentQuery = publishedContentQuery;
         }
 
         private IEnumerable<OperatorTerm> Terms => new List<OperatorTerm>
@@ -79,7 +81,7 @@ namespace Umbraco.Web.Editors
 
             if (model == null)
             {
-                contents = Umbraco.ContentAtRoot().FirstOrDefault().Children(_variationContextAccessor);
+                contents = _publishedContentQuery.ContentAtRoot().FirstOrDefault().Children(_variationContextAccessor);
                 queryExpression.Append("Umbraco.ContentAtRoot().FirstOrDefault().Children()");
             }
             else
@@ -110,7 +112,7 @@ namespace Umbraco.Web.Editors
             IPublishedContent sourceDocument;
             if (model.Source != null && model.Source.Id > 0)
             {
-                sourceDocument = Umbraco.Content(model.Source.Id);
+                sourceDocument = _publishedContentQuery.Content(model.Source.Id);
 
                 if (sourceDocument == null)
                     queryExpression.AppendFormat("Umbraco.Content({0})", model.Source.Id);
@@ -119,7 +121,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                sourceDocument = Umbraco.ContentAtRoot().FirstOrDefault();
+                sourceDocument = _publishedContentQuery.ContentAtRoot().FirstOrDefault();
                 queryExpression.Append("Umbraco.ContentAtRoot().FirstOrDefault()");
             }
 
