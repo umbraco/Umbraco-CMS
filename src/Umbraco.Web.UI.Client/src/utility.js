@@ -5,6 +5,8 @@
  * Still carries a dependency on underscore, but if usages of underscore from 
  * elsewhere in the codebase can instead use these methods, the underscore
  * dependency will be nicely abstracted and can be removed/swapped later
+ * 
+ * This collection is open to extension...
  */
 (function (window) {
 
@@ -60,7 +62,7 @@
      */
     const isObject = val => val !== null && typeof val === 'object';
 
-    let _umb = {
+    let _utilities = {
         noop: noop,
         copy: copy,
         isArray: isArray,
@@ -73,7 +75,7 @@
         isObject: isObject
     };
 
-    if (typeof (window.umb) === 'undefined') {
-        window.umb = _umb;
+    if (typeof (window.Utilities) === 'undefined') {
+        window.Utilities = _utilities;
     }
 })(window);

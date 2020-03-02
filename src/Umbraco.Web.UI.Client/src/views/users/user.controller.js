@@ -168,7 +168,7 @@
                         extendedSave(saved).then(function(result) {
                             //if all is good, then reset the form
                             formHelper.resetForm({ scope: $scope });
-                        }, umb.noop);
+                        }, Utilities.noop);
                         
                         vm.user = _.omit(saved, "navigation");
                         //restore

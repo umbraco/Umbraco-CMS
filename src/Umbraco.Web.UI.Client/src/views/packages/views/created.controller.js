@@ -15,7 +15,7 @@
 
             packageResource.getAllCreated().then(createdPackages => {
                 vm.createdPackages = createdPackages;
-            }, umb.noop);
+            }, Utilities.noop);
 
         }
 
