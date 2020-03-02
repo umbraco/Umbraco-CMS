@@ -37,7 +37,7 @@
 
             // ensure basic part of data-structure is in place:
             this.value = propertyModelValue;
-            this.value.layout = this.value.layout || [];
+            this.value.layout = this.value.layout || {};
             this.value.data = this.value.data || [];
 
             this.propertyEditorAlias = propertyEditorAlias;
@@ -97,7 +97,7 @@
                 return blocks;
             },
 
-            getScaffoldFor: function(contentTypeAlias, data) {
+            getScaffoldFor: function(contentTypeAlias) {
                 return this.scaffolds.find(o => o.contentTypeAlias === contentTypeAlias);
             },
 
@@ -116,14 +116,10 @@
                     return null;
                 }
 
-                // TODO: make blockConfiguration the base for model, remeber to make a copy.
-                var model = {
-                    label: "",
-                    labelInterpolate: $interpolate(blockConfiguration.label),
-                    editor: blockConfiguration.view,
-                    overlaySize: "medium" 
-                };
-
+                var model = angular.copy(blockConfiguration);
+                model.labelInterpolate = $interpolate(model.label);
+                model.overlaySize = model.overlaySize || "medium";
+                
                 var scaffold = this.getScaffoldFor(blockConfiguration.contentTypeAlias);
                 if(scaffold === null) {
                     return null;
@@ -169,12 +165,11 @@
                 return entry;
             },
 
-            // You make entries in your layout your self.
-            
+            // private
             getContentByUdi: function(udi) {
                 return this.value.data.find(entry => entry.udi === udi);
             },
-
+            // private
             createContent: function(elementTypeAlias) {
                 var content = {
                     contentTypeAlias: elementTypeAlias,
@@ -183,7 +178,7 @@
                 this.value.data.push(content);
                 return content.udi;
             },
-
+            // private
             removeContent: function(entry) {
                 const index = this.value.data.indexOf(entry)
                 if (index > -1) {
@@ -204,8 +199,6 @@
                 return new BlockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations);
             },
             getBlockLabel: function(blockModelObject, labelIndex) {
-
-                console.log("getBlockLabel", blockModelObject);
 
                 // TODO: we should do something about this for performance.
     
