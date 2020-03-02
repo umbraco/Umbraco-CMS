@@ -70,7 +70,6 @@ namespace Umbraco.Web
                 _variationContextAccessor.VariationContext = new VariationContext(_defaultCultureAccessor.DefaultCulture);
             }
 
-
             var webSecurity = new WebSecurity(_httpContextAccessor, _userService, _globalSettings, _ioHelper);
 
             return new UmbracoContext(_httpContextAccessor, _publishedSnapshotService, webSecurity, _globalSettings, _variationContextAccessor, _ioHelper, _uriUtility, _cookieManager);

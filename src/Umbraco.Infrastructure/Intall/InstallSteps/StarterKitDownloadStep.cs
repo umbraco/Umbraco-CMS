@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Packaging;
-using Umbraco.Web.Composing;
+using Umbraco.Net;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -20,14 +18,16 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly InstallHelper _installHelper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
         private readonly IContentService _contentService;
         private readonly IPackagingService _packageService;
 
-        public StarterKitDownloadStep(IContentService contentService, IPackagingService packageService, InstallHelper installHelper, IUmbracoContextAccessor umbracoContextAccessor, IUmbracoVersion umbracoVersion)
+        public StarterKitDownloadStep(IContentService contentService, IPackagingService packageService, InstallHelper installHelper, IUmbracoContextAccessor umbracoContextAccessor, IUmbracoVersion umbracoVersion, IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
             _installHelper = installHelper;
             _umbracoContextAccessor = umbracoContextAccessor;
             _umbracoVersion = umbracoVersion;
+            _umbracoApplicationLifetime = umbracoApplicationLifetime;
             _contentService = contentService;
             _packageService = packageService;
         }
@@ -54,7 +54,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             var (packageFile, packageId) = await DownloadPackageFilesAsync(starterKitId.Value);
 
-            UmbracoApplication.Restart();
+            _umbracoApplicationLifetime.Restart();
 
             return new InstallSetupResult(new Dictionary<string, object>
             {

@@ -77,12 +77,13 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string ConvertIntegerToOrderableString { get; }
         string ConvertDateToOrderableString { get; }
         string ConvertDecimalToOrderableString { get; }
-        
+
         /// <summary>
         /// Returns the default isolation level for the database
         /// </summary>
         IsolationLevel DefaultIsolationLevel { get; }
 
+        string DbProvider { get; }
         IEnumerable<string> GetTablesInSchema(IDatabase db);
         IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db);
 
