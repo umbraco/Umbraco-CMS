@@ -32,8 +32,6 @@ namespace Umbraco.Web.Install.InstallSteps
         private bool HasMachineKey()
         {
             return _machineKeyConfig.HasMachineKey;
-            // var section = (MachineKeySection) WebConfigurationManager.GetSection("system.web/machineKey");
-            // return section.ElementInformation.Source != null;
         }
 
         /// <summary>
