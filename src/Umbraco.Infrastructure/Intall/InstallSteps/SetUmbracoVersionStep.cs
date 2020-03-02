@@ -1,44 +1,31 @@
 ﻿using System.Threading.Tasks;
-using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Services;
-using Umbraco.Web.Cache;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
-using Umbraco.Web.Security;
-
 
 namespace Umbraco.Web.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.NewInstall | InstallationType.Upgrade,
-        "UmbracoVersion", 50, "Installation is complete!, get ready to be redirected to your new CMS.",
+        "UmbracoVersion", 50, "Installation is complete! Get ready to be redirected to your new CMS.",
         PerformsAppRestart = true)]
-    internal class SetUmbracoVersionStep : InstallSetupStep<object>
+    public class SetUmbracoVersionStep : InstallSetupStep<object>
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly InstallHelper _installHelper;
         private readonly IGlobalSettings _globalSettings;
-        private readonly IUserService _userService;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IIOHelper _ioHelper;
 
-        public SetUmbracoVersionStep(IHttpContextAccessor httpContextAccessor, InstallHelper installHelper, IGlobalSettings globalSettings, IUserService userService, IUmbracoVersion umbracoVersion, IIOHelper ioHelper)
+        public SetUmbracoVersionStep(IUmbracoContextAccessor umbracoContextAccessor, InstallHelper installHelper, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion)
         {
-            _httpContextAccessor = httpContextAccessor;
+            _umbracoContextAccessor = umbracoContextAccessor;
             _installHelper = installHelper;
             _globalSettings = globalSettings;
-            _userService = userService;
             _umbracoVersion = umbracoVersion;
-            _ioHelper = ioHelper;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
-            var security = new WebSecurity(_httpContextAccessor, _userService, _globalSettings, _ioHelper);
-
+            var security = _umbracoContextAccessor.GetRequiredUmbracoContext().Security;
             if (security.IsAuthenticated() == false && _globalSettings.ConfigurationStatus.IsNullOrWhiteSpace())
             {
                 security.PerformLogin(-1);

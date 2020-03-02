@@ -49,11 +49,6 @@ namespace Umbraco.Web.Hosting
         }
 
         public string ToAbsolute(string virtualPath, string root) => VirtualPathUtility.ToAbsolute(virtualPath, root);
-        public void LazyRestartApplication()
-        {
-            HttpRuntime.UnloadAppDomain();
-        }
-
         public void RegisterObject(IRegisteredObject registeredObject)
         {
             var wrapped = new RegisteredObjectWrapper(registeredObject);

@@ -32,6 +32,31 @@ namespace Umbraco.Web
         private static IExamineManager ExamineManager => Current.Factory.GetInstance<IExamineManager>();
         private static IUserService UserService => Current.Services.UserService;
 
+
+        #region Creator/Writer Names
+
+        public static string CreatorName(this IPublishedContent content, IUserService userService)
+        {
+            return userService.GetProfileById(content.CreatorId)?.Name;
+        }
+
+        public static string WriterName(this IPublishedContent content, IUserService userService)
+        {
+            return userService.GetProfileById(content.WriterId)?.Name;
+        }
+
+        public static string CreatorName(this IPublishedContent content)
+        {
+            return content.GetCreatorName(UserService);
+        }
+
+        public static string WriterName(this IPublishedContent content)
+        {
+            return content.GetWriterName(UserService);
+        }
+
+        #endregion
+
         #region Template
 
         /// <summary>
@@ -684,19 +709,6 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region Writer and creator
-
-        public static string CreatorName(this IPublishedContent content)
-        {
-            return content.GetCreatorName(UserService);
-        }
-
-        public static string WriterName(this IPublishedContent content)
-        {
-            return content.GetWriterName(UserService);
-        }
-
-        #endregion
 
         #region Url
 

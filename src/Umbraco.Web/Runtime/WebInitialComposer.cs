@@ -49,6 +49,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Request;
 using Umbraco.Core.Session;
 using Umbraco.Web.AspNet;
+using Umbraco.Web.AspNet;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Runtime
@@ -65,7 +66,7 @@ namespace Umbraco.Web.Runtime
             composition.Register<UmbracoInjectedModule>();
             composition.Register<IIpResolver, AspNetIpResolver>();
 
-
+            composition.Register<IUserAgentProvider, AspNetUserAgentProvider>();
             composition.Register<AspNetSessionManager>(Lifetime.Singleton);
             composition.Register<ISessionIdResolver>(factory => factory.GetInstance<AspNetSessionManager>(), Lifetime.Singleton);
             composition.Register<ISessionManager>(factory => factory.GetInstance<AspNetSessionManager>(), Lifetime.Singleton);
@@ -74,6 +75,7 @@ namespace Umbraco.Web.Runtime
 
             composition.Register<IHostingEnvironment, AspNetHostingEnvironment>();
             composition.Register<IBackOfficeInfo, AspNetBackOfficeInfo>();
+            composition.Register<IUmbracoApplicationLifetime, AspNetUmbracoApplicationLifetime>(Lifetime.Singleton);
             composition.Register<IPasswordHasher, AspNetPasswordHasher>();
             composition.Register<IFilePermissionHelper, FilePermissionHelper>(Lifetime.Singleton);
 

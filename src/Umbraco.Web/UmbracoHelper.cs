@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Xml.XPath;
+using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web
