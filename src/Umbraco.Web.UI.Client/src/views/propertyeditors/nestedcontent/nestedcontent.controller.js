@@ -592,7 +592,8 @@
 
         function updatePropertyActionStates() {
             copyAllEntriesAction.isDisabled = !model.value || !model.value.length;
-            removeAllEntriesAction.isDisabled = copyAllEntriesAction.isDisabled;
+            // in addition to the copy action state, remove all entries should be disallowed if a minimum number of items is being enforced
+            removeAllEntriesAction.isDisabled = copyAllEntriesAction.isDisabled || (model.config.contentTypes.length == 1 && vm.minItems !== 0);
         }
 
 
