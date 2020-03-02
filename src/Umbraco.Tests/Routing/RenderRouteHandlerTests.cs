@@ -161,7 +161,7 @@ namespace Umbraco.Tests.Routing
                         Factory.GetInstance<ServiceContext>(),
                         Factory.GetInstance<AppCaches>(),
                         Factory.GetInstance<IProfilingLogger>(),
-                        new UmbracoHelper(Mock.Of<IPublishedContent>(), Mock.Of<ITagQuery>(), Mock.Of<ICultureDictionaryFactory>(), Mock.Of<IUmbracoComponentRenderer>(), Mock.Of<IPublishedContentQuery>()));
+                        new UmbracoHelper(Mock.Of<IPublishedContent>(), Mock.Of<ICultureDictionaryFactory>(), Mock.Of<IUmbracoComponentRenderer>(), Mock.Of<IPublishedContentQuery>()));
                 }), ShortStringHelper);
 
             handler.GetHandlerForRoute(httpContext.Request.RequestContext, frequest);

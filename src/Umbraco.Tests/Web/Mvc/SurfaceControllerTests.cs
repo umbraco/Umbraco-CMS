@@ -120,7 +120,6 @@ namespace Umbraco.Tests.Web.Mvc
 
             var helper = new UmbracoHelper(
                 content.Object,
-                Mock.Of<ITagQuery>(),
                 Mock.Of<ICultureDictionaryFactory>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
                 Mock.Of<IPublishedContentQuery>(query => query.Content(2) == content.Object));

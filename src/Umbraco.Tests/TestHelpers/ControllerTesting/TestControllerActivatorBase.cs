@@ -155,7 +155,6 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 .Returns(UrlInfo.Url("/hello/world/1234"));
 
             var umbHelper = new UmbracoHelper(Mock.Of<IPublishedContent>(),
-                Mock.Of<ITagQuery>(),
                 Mock.Of<ICultureDictionaryFactory>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
                 Mock.Of<IPublishedContentQuery>());

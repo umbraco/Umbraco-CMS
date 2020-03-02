@@ -269,7 +269,6 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IPublishedUrlProvider>());
@@ -306,7 +305,6 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IPublishedUrlProvider>());
@@ -351,7 +349,6 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IPublishedUrlProvider>());
@@ -401,7 +398,6 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IPublishedUrlProvider>());
@@ -443,7 +439,6 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IPublishedUrlProvider>()
@@ -492,7 +487,6 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IPublishedUrlProvider>()
