@@ -45,19 +45,14 @@ namespace Umbraco.Web
             return userService.GetProfileById(content.WriterId)?.Name;
         }
 
-        #endregion
-
-        #region IsComposedOf
-
-        /// <summary>
-        /// Gets a value indicating whether the content is of a content type composed of the given alias
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The content type alias.</param>
-        /// <returns>A value indicating whether the content is of a content type composed of a content type identified by the alias.</returns>
-        public static bool IsComposedOf(this IPublishedContent content, string alias)
+        public static string CreatorName(this IPublishedContent content)
         {
-            return content.ContentType.CompositionAliases.InvariantContains(alias);
+            return content.GetCreatorName(UserService);
+        }
+
+        public static string WriterName(this IPublishedContent content)
+        {
+            return content.GetWriterName(UserService);
         }
 
         #endregion
@@ -714,19 +709,6 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region Writer and creator
-
-        public static string CreatorName(this IPublishedContent content)
-        {
-            return content.GetCreatorName(UserService);
-        }
-
-        public static string WriterName(this IPublishedContent content)
-        {
-            return content.GetWriterName(UserService);
-        }
-
-        #endregion
 
         #region Url
 
