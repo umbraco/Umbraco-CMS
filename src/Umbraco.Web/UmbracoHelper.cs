@@ -469,6 +469,182 @@ namespace Umbraco.Web
 
 
         #endregion
+        #region Media
+
+        public IPublishedContent Media(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            return guidUdi == null ? null : Media(guidUdi.Guid);
+        }
+
+        public IPublishedContent Media(Guid id)
+        {
+            return _publishedContentQuery.Media(id);
+        }
+
+        /// <summary>
+        /// Overloaded method accepting an 'object' type
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass
+        /// this result in to this method.
+        /// This method will throw an exception if the value is not of type int or string.
+        /// </remarks>
+        public IPublishedContent Media(object id)
+        {
+            return MediaForObject(id);
+        }
+
+        private IPublishedContent MediaForObject(object id)
+        {
+            if (ConvertIdObjectToInt(id, out var intId))
+                return _publishedContentQuery.Media(intId);
+            if (ConvertIdObjectToGuid(id, out var guidId))
+                return _publishedContentQuery.Media(guidId);
+            if (ConvertIdObjectToUdi(id, out var udiId))
+                return _publishedContentQuery.Media(udiId);
+            return null;
+        }
+
+        public IPublishedContent Media(int id)
+        {
+            return _publishedContentQuery.Media(id);
+        }
+
+        public IPublishedContent Media(string id)
+        {
+            return MediaForObject(id);
+        }
+
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> Media(params object[] ids)
+        {
+            return MediaForObjects(ids);
+        }
+
+        private IEnumerable<IPublishedContent> MediaForObjects(IEnumerable<object> ids)
+        {
+            var idsA = ids.ToArray();
+            if (ConvertIdsObjectToInts(idsA, out var intIds))
+                return _publishedContentQuery.Media(intIds);
+            if (ConvertIdsObjectToGuids(idsA, out var guidIds))
+                return _publishedContentQuery.Media(guidIds);
+            return Enumerable.Empty<IPublishedContent>();
+        }
+
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> Media(params int[] ids)
+        {
+            return _publishedContentQuery.Media(ids);
+        }
+
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> Media(params string[] ids)
+        {
+            return MediaForObjects(ids);
+        }
+
+
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> Media(params Udi[] ids)
+        {
+            return ids.Select(id => _publishedContentQuery.Media(id)).WhereNotNull();
+        }
+
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> Media(params GuidUdi[] ids)
+        {
+            return ids.Select(id => _publishedContentQuery.Media(id));
+        }
+
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> Media(IEnumerable<object> ids)
+        {
+            return MediaForObjects(ids);
+        }
+
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids)
+        {
+            return _publishedContentQuery.Media(ids);
+        }
+
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> Media(IEnumerable<Udi> ids)
+        {
+            return ids.Select(id => _publishedContentQuery.Media(id)).WhereNotNull();
+        }
+
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> Media(IEnumerable<GuidUdi> ids)
+        {
+            return ids.Select(id => _publishedContentQuery.Media(id));
+        }
+
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> Media(IEnumerable<string> ids)
+        {
+            return MediaForObjects(ids);
+        }
+
+        public IEnumerable<IPublishedContent> MediaAtRoot()
+        {
+            return _publishedContentQuery.MediaAtRoot();
+        }
+
+        #endregion
 
         internal static bool DecryptAndValidateEncryptedRouteString(string ufprt, out IDictionary<string, string> parts)
         {
