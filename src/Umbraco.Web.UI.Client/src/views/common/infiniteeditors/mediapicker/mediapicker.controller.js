@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService) {
+    function ($scope, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage) {
 
             var vm = this;
             
@@ -37,6 +37,11 @@ angular.module("umbraco")
             $scope.cropSize = dialogOptions.cropSize;
             $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
             $scope.lockedFolder = true;
+            $scope.allowMediaEdit = dialogOptions.allowMediaEdit ? dialogOptions.allowMediaEdit : false;
+
+            $scope.filterOptions = {
+                excludeSubFolders: umbSessionStorage.get("mediaPickerExcludeSubFolders") || false
+            };
 
             var userStartNodes = [];
 
@@ -319,7 +324,7 @@ angular.module("umbraco")
 
                 // also make sure the node is not trashed
                 if (nodePath.indexOf($scope.startNodeId.toString()) !== -1 && node.trashed === false) {
-                    gotoFolder({ id: $scope.lastOpenedNode, name: "Media", icon: "icon-folder", path: node.path });
+                    gotoFolder({ id: $scope.lastOpenedNode || $scope.startNodeId, name: "Media", icon: "icon-folder", path: node.path });
                     return true;
                 } else {
                     gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
@@ -392,6 +397,7 @@ angular.module("umbraco")
             }
 
             function toggle() {
+                umbSessionStorage.set("mediaPickerExcludeSubFolders", $scope.filterOptions.excludeSubFolders);
                 // Make sure to activate the changeSearch function everytime the toggle is clicked
                 changeSearch();
             }
@@ -404,7 +410,7 @@ angular.module("umbraco")
 
             function searchMedia() {
                 vm.loading = true;
-                entityResource.getPagedDescendants($scope.currentFolder.id, "Media", vm.searchOptions)
+                entityResource.getPagedDescendants($scope.filterOptions.excludeSubFolders ? $scope.currentFolder.id : $scope.startNodeId, "Media", vm.searchOptions)
                     .then(function (data) {
                         // update image data to work with image grid
                         angular.forEach(data.items, function (mediaItem) {

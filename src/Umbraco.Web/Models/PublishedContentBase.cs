@@ -54,6 +54,7 @@ namespace Umbraco.Web.Models
         public abstract int CreatorId { get; }
 
         /// <inheritdoc />
+        [Obsolete("Use CreatorName(IUserService) extension instead")]
         public abstract string CreatorName { get; }
 
         /// <inheritdoc />
@@ -63,12 +64,14 @@ namespace Umbraco.Web.Models
         public abstract int WriterId { get; }
 
         /// <inheritdoc />
+        [Obsolete("Use WriterName(IUserService) extension instead")]
         public abstract string WriterName { get; }
 
         /// <inheritdoc />
         public abstract DateTime UpdateDate { get; }
 
         /// <inheritdoc />
+        [Obsolete("Use the Url() extension instead")]
         public virtual string Url => this.Url();
 
         /// <inheritdoc />
