@@ -73,13 +73,12 @@ namespace Umbraco.Web.Mvc
                   Current.Factory.GetInstance<IUmbracoContextAccessor>(),
                   Current.Factory.GetInstance<ServiceContext>(),
                   Current.Factory.GetInstance<AppCaches>(),
-                  Current.Factory.GetInstance<IProfilingLogger>(),
-                  Current.Factory.GetInstance<UmbracoHelper>()
+                  Current.Factory.GetInstance<IProfilingLogger>()
             )
         {
         }
 
-        protected UmbracoController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
+        protected UmbracoController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
         {
             GlobalSettings = globalSettings;
             UmbracoContextAccessor = umbracoContextAccessor;
@@ -87,7 +86,6 @@ namespace Umbraco.Web.Mvc
             AppCaches = appCaches;
             Logger = profilingLogger;
             ProfilingLogger = profilingLogger;
-            Umbraco = umbracoHelper;
         }
     }
 }

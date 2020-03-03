@@ -49,6 +49,7 @@ using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Examine;
 using Umbraco.Core.Models;
+using Umbraco.Web.AspNet;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Runtime
@@ -64,9 +65,11 @@ namespace Umbraco.Web.Runtime
 
             composition.Register<UmbracoInjectedModule>();
             composition.Register<IIpResolver, AspNetIpResolver>();
+            composition.Register<IUserAgentProvider, AspNetUserAgentProvider>();
             composition.Register<ISessionIdResolver, AspNetSessionIdResolver>();
             composition.Register<IHostingEnvironment, AspNetHostingEnvironment>();
             composition.Register<IBackOfficeInfo, AspNetBackOfficeInfo>();
+            composition.Register<IUmbracoApplicationLifetime, AspNetUmbracoApplicationLifetime>(Lifetime.Singleton);
             composition.Register<IPasswordHasher, AspNetPasswordHasher>();
             composition.Register<IFilePermissionHelper, FilePermissionHelper>(Lifetime.Singleton);
 
@@ -129,8 +132,7 @@ namespace Umbraco.Web.Runtime
                 composition.Register<UmbracoHelper>(factory =>
                 {
                     var umbCtx = factory.GetInstance<IUmbracoContext>();
-                    return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null,
-                        factory.GetInstance<ITagQuery>(), factory.GetInstance<ICultureDictionaryFactory>(),
+                    return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null, factory.GetInstance<ICultureDictionaryFactory>(),
                         factory.GetInstance<IUmbracoComponentRenderer>(), factory.GetInstance<IPublishedContentQuery>());
                 });
             else

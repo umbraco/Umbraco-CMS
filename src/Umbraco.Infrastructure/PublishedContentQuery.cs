@@ -14,35 +14,85 @@ using Umbraco.Web.PublishedCache;
 namespace Umbraco.Web
 {
     /// <summary>
-    /// A class used to query for published content, media items
+    ///     A class used to query for published content, media items
     /// </summary>
     public class PublishedContentQuery : IPublishedContentQuery
     {
+        private readonly IExamineManager _examineManager;
         private readonly IPublishedSnapshot _publishedSnapshot;
         private readonly IVariationContextAccessor _variationContextAccessor;
-        private readonly IExamineManager _examineManager;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PublishedContentQuery"/> class.
+        ///     Initializes a new instance of the <see cref="PublishedContentQuery" /> class.
         /// </summary>
-        public PublishedContentQuery(IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, IExamineManager examineManager)
+        public PublishedContentQuery(IPublishedSnapshot publishedSnapshot,
+            IVariationContextAccessor variationContextAccessor, IExamineManager examineManager)
         {
             _publishedSnapshot = publishedSnapshot ?? throw new ArgumentNullException(nameof(publishedSnapshot));
-            _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
+            _variationContextAccessor = variationContextAccessor ??
+                                        throw new ArgumentNullException(nameof(variationContextAccessor));
             _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
         }
 
+        #region Convert Helpers
+
+        private static bool ConvertIdObjectToInt(object id, out int intId)
+        {
+            switch (id)
+            {
+                case string s:
+                    return int.TryParse(s, out intId);
+
+                case int i:
+                    intId = i;
+                    return true;
+
+                default:
+                    intId = default;
+                    return false;
+            }
+        }
+
+        private static bool ConvertIdObjectToGuid(object id, out Guid guidId)
+        {
+            switch (id)
+            {
+                case string s:
+                    return Guid.TryParse(s, out guidId);
+
+                case Guid g:
+                    guidId = g;
+                    return true;
+
+                default:
+                    guidId = default;
+                    return false;
+            }
+        }
+        private static bool ConvertIdObjectToUdi(object id, out Udi guidId)
+        {
+            switch (id)
+            {
+                case string s:
+                    return UdiParser.TryParse(s, out guidId);
+
+                case Udi u:
+                    guidId = u;
+                    return true;
+
+                default:
+                    guidId = default;
+                    return false;
+            }
+        }
+
+        #endregion
+
         #region Content
 
-        public IPublishedContent Content(int id)
-        {
-            return ItemById(id, _publishedSnapshot.Content);
-        }
+        public IPublishedContent Content(int id) => ItemById(id, _publishedSnapshot.Content);
 
-        public IPublishedContent Content(Guid id)
-        {
-            return ItemById(id, _publishedSnapshot.Content);
-        }
+        public IPublishedContent Content(Guid id) => ItemById(id, _publishedSnapshot.Content);
 
         public IPublishedContent Content(Udi id)
         {
@@ -50,49 +100,45 @@ namespace Umbraco.Web
             return ItemById(udi.Guid, _publishedSnapshot.Content);
         }
 
-        public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
+        public IPublishedContent Content(object id)
         {
-            return ItemByXPath(xpath, vars, _publishedSnapshot.Content);
+            if (ConvertIdObjectToInt(id, out var intId))
+                return Content(intId);
+            if (ConvertIdObjectToGuid(id, out var guidId))
+                return Content(guidId);
+            if (ConvertIdObjectToUdi(id, out var udiId))
+                return Content(udiId);
+            return null;
         }
 
-        public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids)
-        {
-            return ItemsByIds(_publishedSnapshot.Content, ids);
-        }
+        public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars) =>
+            ItemByXPath(xpath, vars, _publishedSnapshot.Content);
 
-        public IEnumerable<IPublishedContent> Content(IEnumerable<Guid> ids)
-        {
-            return ItemsByIds(_publishedSnapshot.Content, ids);
-        }
+        public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids) =>
+            ItemsByIds(_publishedSnapshot.Content, ids);
 
-        public IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars)
-        {
-            return ItemsByXPath(xpath, vars, _publishedSnapshot.Content);
-        }
+        public IEnumerable<IPublishedContent> Content(IEnumerable<Guid> ids) =>
+            ItemsByIds(_publishedSnapshot.Content, ids);
 
-        public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
+        public IEnumerable<IPublishedContent> Content(IEnumerable<object> ids)
         {
-            return ItemsByXPath(xpath, vars, _publishedSnapshot.Content);
+            return ids.Select(Content).WhereNotNull();
         }
+        public IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars) =>
+            ItemsByXPath(xpath, vars, _publishedSnapshot.Content);
 
-        public IEnumerable<IPublishedContent> ContentAtRoot()
-        {
-            return ItemsAtRoot(_publishedSnapshot.Content);
-        }
+        public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars) =>
+            ItemsByXPath(xpath, vars, _publishedSnapshot.Content);
+
+        public IEnumerable<IPublishedContent> ContentAtRoot() => ItemsAtRoot(_publishedSnapshot.Content);
 
         #endregion
 
         #region Media
 
-        public IPublishedContent Media(int id)
-        {
-            return ItemById(id, _publishedSnapshot.Media);
-        }
+        public IPublishedContent Media(int id) => ItemById(id, _publishedSnapshot.Media);
 
-        public IPublishedContent Media(Guid id)
-        {
-            return ItemById(id, _publishedSnapshot.Media);
-        }
+        public IPublishedContent Media(Guid id) => ItemById(id, _publishedSnapshot.Media);
 
         public IPublishedContent Media(Udi id)
         {
@@ -100,21 +146,26 @@ namespace Umbraco.Web
             return ItemById(udi.Guid, _publishedSnapshot.Media);
         }
 
-        public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids)
+        public IPublishedContent Media(object id)
         {
-            return ItemsByIds(_publishedSnapshot.Media, ids);
+            if (ConvertIdObjectToInt(id, out var intId))
+                return Media(intId);
+            if (ConvertIdObjectToGuid(id, out var guidId))
+                return Media(guidId);
+            if (ConvertIdObjectToUdi(id, out var udiId))
+                return Media(udiId);
+            return null;
         }
 
-        public IEnumerable<IPublishedContent> Media(IEnumerable<Guid> ids)
+        public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids) => ItemsByIds(_publishedSnapshot.Media, ids);
+        public IEnumerable<IPublishedContent> Media(IEnumerable<object> ids)
         {
-            return ItemsByIds(_publishedSnapshot.Media, ids);
+            return ids.Select(Media).WhereNotNull();
         }
 
-        public IEnumerable<IPublishedContent> MediaAtRoot()
-        {
-            return ItemsAtRoot(_publishedSnapshot.Media);
-        }
+        public IEnumerable<IPublishedContent> Media(IEnumerable<Guid> ids) => ItemsByIds(_publishedSnapshot.Media, ids);
 
+        public IEnumerable<IPublishedContent> MediaAtRoot() => ItemsAtRoot(_publishedSnapshot.Media);
 
         #endregion
 
@@ -155,44 +206,45 @@ namespace Umbraco.Web
             return ids.Select(eachId => ItemById(eachId, cache)).WhereNotNull();
         }
 
-        private static IEnumerable<IPublishedContent> ItemsByXPath(string xpath, XPathVariable[] vars, IPublishedCache cache)
+        private static IEnumerable<IPublishedContent> ItemsByXPath(string xpath, XPathVariable[] vars,
+            IPublishedCache cache)
         {
             var doc = cache.GetByXPath(xpath, vars);
             return doc;
         }
 
-        private static IEnumerable<IPublishedContent> ItemsByXPath(XPathExpression xpath, XPathVariable[] vars, IPublishedCache cache)
+        private static IEnumerable<IPublishedContent> ItemsByXPath(XPathExpression xpath, XPathVariable[] vars,
+            IPublishedCache cache)
         {
             var doc = cache.GetByXPath(xpath, vars);
             return doc;
         }
 
-        private static IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache cache)
-        {
-            return cache.GetAtRoot();
-        }
+        private static IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache cache) => cache.GetAtRoot();
 
         #endregion
 
         #region Search
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName)
-        {
-            return Search(term, 0, 0, out _, culture, indexName);
-        }
+        public IEnumerable<PublishedSearchResult> Search(string term, string culture = "*",
+            string indexName = Constants.UmbracoIndexes.ExternalIndexName) =>
+            Search(term, 0, 0, out _, culture, indexName);
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName)
+        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords,
+            string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName)
         {
             if (skip < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(skip), skip, "The value must be greater than or equal to zero.");
+                throw new ArgumentOutOfRangeException(nameof(skip), skip,
+                    "The value must be greater than or equal to zero.");
             }
 
             if (take < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(take), take, "The value must be greater than or equal to zero.");
+                throw new ArgumentOutOfRangeException(nameof(take), take,
+                    "The value must be greater than or equal to zero.");
             }
 
             if (string.IsNullOrEmpty(indexName))
@@ -202,7 +254,8 @@ namespace Umbraco.Web
 
             if (!_examineManager.TryGetIndex(indexName, out var index) || !(index is IUmbracoIndex umbIndex))
             {
-                throw new InvalidOperationException($"No index found by name {indexName} or is not of type {typeof(IUmbracoIndex)}");
+                throw new InvalidOperationException(
+                    $"No index found by name {indexName} or is not of type {typeof(IUmbracoIndex)}");
             }
 
             var query = umbIndex.GetSearcher().CreateQuery(IndexTypes.Content);
@@ -216,13 +269,16 @@ namespace Umbraco.Web
             else if (string.IsNullOrWhiteSpace(culture))
             {
                 // Only search invariant
-                queryExecutor = query.Field(UmbracoExamineFieldNames.VariesByCultureFieldName, "n") // Must not vary by culture
+                queryExecutor = query
+                    .Field(UmbracoExamineFieldNames.VariesByCultureFieldName, "n") // Must not vary by culture
                     .And().ManagedQuery(term);
             }
             else
             {
                 // Only search the specified culture
-                var fields = umbIndex.GetCultureAndInvariantFields(culture).ToArray(); // Get all index fields suffixed with the culture name supplied
+                var fields =
+                    umbIndex.GetCultureAndInvariantFields(culture)
+                        .ToArray(); // Get all index fields suffixed with the culture name supplied
                 queryExecutor = query.ManagedQuery(term, fields);
             }
 
@@ -232,26 +288,28 @@ namespace Umbraco.Web
 
             totalRecords = results.TotalItemCount;
 
-            return new CultureContextualSearchResults(results.Skip(skip).ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor, culture);
+            return new CultureContextualSearchResults(
+                results.Skip(skip).ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor,
+                culture);
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query)
-        {
-            return Search(query, 0, 0, out _);
-        }
+        public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query) => Search(query, 0, 0, out _);
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords)
+        public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take,
+            out long totalRecords)
         {
             if (skip < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(skip), skip, "The value must be greater than or equal to zero.");
+                throw new ArgumentOutOfRangeException(nameof(skip), skip,
+                    "The value must be greater than or equal to zero.");
             }
 
             if (take < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(take), take, "The value must be greater than or equal to zero.");
+                throw new ArgumentOutOfRangeException(nameof(take), take,
+                    "The value must be greater than or equal to zero.");
             }
 
             var results = skip == 0 && take == 0
@@ -264,15 +322,17 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// This is used to contextualize the values in the search results when enumerating over them so that the correct culture values are used
+        ///     This is used to contextualize the values in the search results when enumerating over them so that the correct
+        ///     culture values are used
         /// </summary>
         private class CultureContextualSearchResults : IEnumerable<PublishedSearchResult>
         {
-            private readonly IEnumerable<PublishedSearchResult> _wrapped;
-            private readonly IVariationContextAccessor _variationContextAccessor;
             private readonly string _culture;
+            private readonly IVariationContextAccessor _variationContextAccessor;
+            private readonly IEnumerable<PublishedSearchResult> _wrapped;
 
-            public CultureContextualSearchResults(IEnumerable<PublishedSearchResult> wrapped, IVariationContextAccessor variationContextAccessor, string culture)
+            public CultureContextualSearchResults(IEnumerable<PublishedSearchResult> wrapped,
+                IVariationContextAccessor variationContextAccessor, string culture)
             {
                 _wrapped = wrapped;
                 _variationContextAccessor = variationContextAccessor;
@@ -287,24 +347,23 @@ namespace Umbraco.Web
                     _variationContextAccessor.VariationContext = new VariationContext(_culture);
 
                 //now the IPublishedContent returned will be contextualized to the culture specified and will be reset when the enumerator is disposed
-                return new CultureContextualSearchResultsEnumerator(_wrapped.GetEnumerator(), _variationContextAccessor, originalContext);
+                return new CultureContextualSearchResultsEnumerator(_wrapped.GetEnumerator(), _variationContextAccessor,
+                    originalContext);
             }
 
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
             /// <summary>
-            /// Resets the variation context when this is disposed
+            ///     Resets the variation context when this is disposed
             /// </summary>
             private class CultureContextualSearchResultsEnumerator : IEnumerator<PublishedSearchResult>
             {
-                private readonly IEnumerator<PublishedSearchResult> _wrapped;
-                private readonly IVariationContextAccessor _variationContextAccessor;
                 private readonly VariationContext _originalContext;
+                private readonly IVariationContextAccessor _variationContextAccessor;
+                private readonly IEnumerator<PublishedSearchResult> _wrapped;
 
-                public CultureContextualSearchResultsEnumerator(IEnumerator<PublishedSearchResult> wrapped, IVariationContextAccessor variationContextAccessor, VariationContext originalContext)
+                public CultureContextualSearchResultsEnumerator(IEnumerator<PublishedSearchResult> wrapped,
+                    IVariationContextAccessor variationContextAccessor, VariationContext originalContext)
                 {
                     _wrapped = wrapped;
                     _variationContextAccessor = variationContextAccessor;
@@ -318,10 +377,7 @@ namespace Umbraco.Web
                     _variationContextAccessor.VariationContext = _originalContext;
                 }
 
-                public bool MoveNext()
-                {
-                    return _wrapped.MoveNext();
-                }
+                public bool MoveNext() => _wrapped.MoveNext();
 
                 public void Reset()
                 {

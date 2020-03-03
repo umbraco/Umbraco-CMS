@@ -57,11 +57,10 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
             IPublishedUrlProvider publishedUrlProvider)
-            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _passwordConfig = passwordConfig ?? throw new ArgumentNullException(nameof(passwordConfig));
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));

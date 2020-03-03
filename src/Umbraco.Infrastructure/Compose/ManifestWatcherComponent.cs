@@ -4,6 +4,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
+using Umbraco.Net;
 
 namespace Umbraco.Core.Compose
 {
@@ -12,18 +13,18 @@ namespace Umbraco.Core.Compose
         private readonly IRuntimeState _runtimeState;
         private readonly ILogger _logger;
         private readonly IIOHelper _ioHelper;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
 
         // if configured and in debug mode, a ManifestWatcher watches App_Plugins folders for
         // package.manifest chances and restarts the application on any change
         private ManifestWatcher _mw;
 
-        public ManifestWatcherComponent(IRuntimeState runtimeState, ILogger logger, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment)
+        public ManifestWatcherComponent(IRuntimeState runtimeState, ILogger logger, IIOHelper ioHelper, IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
             _runtimeState = runtimeState;
             _logger = logger;
             _ioHelper = ioHelper;
-            _hostingEnvironment = hostingEnvironment;
+            _umbracoApplicationLifetime = umbracoApplicationLifetime;
         }
 
         public void Initialize()
@@ -36,7 +37,7 @@ namespace Umbraco.Core.Compose
             var appPlugins = _ioHelper.MapPath("~/App_Plugins/");
             if (Directory.Exists(appPlugins) == false) return;
 
-            _mw = new ManifestWatcher(_logger, _hostingEnvironment);
+            _mw = new ManifestWatcher(_logger, _umbracoApplicationLifetime);
             _mw.Start(Directory.GetDirectories(appPlugins));
         }
 

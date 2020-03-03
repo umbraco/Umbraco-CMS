@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Web.Models;
@@ -17,6 +18,12 @@ namespace Umbraco.Web.PropertyEditors
     [PluginController("UmbracoApi")]
     public class TagsDataController : UmbracoAuthorizedApiController
     {
+        private readonly ITagQuery _tagQuery;
+
+        public TagsDataController(ITagQuery tagQuery)
+        {
+            _tagQuery = tagQuery ?? throw new ArgumentNullException(nameof(tagQuery));
+        }
         /// <summary>
         /// Returns all tags matching tagGroup, culture and an optional query
         /// </summary>
@@ -28,9 +35,9 @@ namespace Umbraco.Web.PropertyEditors
         {
             if (culture == string.Empty) culture = null;
 
-            var result = Umbraco.TagQuery.GetAllTags(tagGroup, culture);
+            var result = _tagQuery.GetAllTags(tagGroup, culture);
 
-            
+
             if (!query.IsNullOrWhiteSpace())
             {
                 //TODO: add the query to TagQuery + the tag service, this is ugly but all we can do for now.

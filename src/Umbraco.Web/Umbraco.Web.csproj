@@ -138,7 +138,9 @@
     <Compile Include="AppBuilderExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="AspNet\AspNetHostingEnvironment.cs" />
+    <Compile Include="AspNet\AspNetUserAgentProvider.cs" />
     <Compile Include="AspNet\FrameworkMarchal.cs" />
+    <Compile Include="AspNet\AspNetUmbracoApplicationLifetime.cs" />
     <Compile Include="Cache\WebCachingAppCache.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
@@ -162,8 +164,6 @@
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
     <Compile Include="Install\ChangesMonitor.cs" />
-    <Compile Include="Install\InstallSteps\StarterKitDownloadStep.cs" />
-    <Compile Include="Install\InstallSteps\StarterKitInstallStep.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
     <Compile Include="Logging\OwinLoggerFactory.cs" />
     <Compile Include="Logging\WebProfiler.cs" />
@@ -274,7 +274,6 @@
     <Compile Include="Composing\CompositionExtensions\WebMappingProfiles.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="Install\InstallStepCollection.cs" />
-    <Compile Include="Install\InstallSteps\ConfigureMachineKey.cs" />
     <Compile Include="Editors\MemberGroupController.cs" />
     <Compile Include="Composing\CompositionExtensions\Controllers.cs" />
     <Compile Include="HealthCheck\HealthCheckController.cs" />
@@ -363,7 +362,6 @@
     <Compile Include="Editors\RelationController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
     <Compile Include="Editors\TemplateQueryController.cs" />
-    <Compile Include="Install\InstallSteps\SetUmbracoVersionStep.cs" />
     <Compile Include="Install\InstallSteps\NewInstallStep.cs" />
     <Compile Include="Install\UmbracoInstallArea.cs" />
     <Compile Include="Install\Controllers\InstallApiController.cs" />
@@ -459,7 +457,6 @@
     <Compile Include="HttpRequestExtensions.cs" />
     <Compile Include="HttpUrlHelperExtensions.cs" />
     <Compile Include="Install\FilePermissionHelper.cs" />
-    <Compile Include="Install\InstallHelper.cs" />
     <Compile Include="Install\HttpInstallAuthorizeAttribute.cs" />
     <Compile Include="Macros\PartialViewMacroController.cs" />
     <Compile Include="Macros\PartialViewMacroEngine.cs" />

@@ -65,7 +65,6 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger profilingLogger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             IUmbracoVersion umbracoVersion,
             IGridConfig gridConfig,
             IUmbracoSettingsSection umbracoSettingsSection,
@@ -74,7 +73,8 @@ namespace Umbraco.Web.Editors
             IHostingEnvironment hostingEnvironment,
             IHttpContextAccessor httpContextAccessor,
             IRuntimeSettings settings)
-            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
+
         {
             _manifestParser = manifestParser;
             _features = features;

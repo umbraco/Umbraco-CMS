@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
@@ -28,6 +27,7 @@ namespace Umbraco.Web.Trees
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
+        private readonly IMediaTypeService _mediaTypeService;
 
         public MediaTypeTreeController(
             UmbracoTreeSearcher treeSearcher,
@@ -38,14 +38,15 @@ namespace Umbraco.Web.Trees
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             UmbracoMapper umbracoMapper,
             IPublishedUrlProvider publishedUrlProvider,
-            IMenuItemCollectionFactory menuItemCollectionFactory)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper, publishedUrlProvider)
+            IMenuItemCollectionFactory menuItemCollectionFactory,
+            IMediaTypeService mediaTypeService)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
             _treeSearcher = treeSearcher;
             _menuItemCollectionFactory = menuItemCollectionFactory;
+            _mediaTypeService = mediaTypeService;
         }
 
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
@@ -71,6 +72,8 @@ namespace Umbraco.Web.Trees
             // if the request is for folders only then just return
             if (queryStrings["foldersonly"].IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1") return nodes;
 
+            var mediaTypes = _mediaTypeService.GetAll();
+
             nodes.AddRange(
                 Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.MediaType)
                     .OrderBy(entity => entity.Name)
@@ -79,7 +82,8 @@ namespace Umbraco.Web.Trees
                         // since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to.
                         // need this check to keep supporting sites where children have already been created.
                         var hasChildren = dt.HasChildren;
-                        var node = CreateTreeNode(dt, Constants.ObjectTypes.MediaType, id, queryStrings, Constants.Icons.MediaType, hasChildren);
+                        var mt = mediaTypes.FirstOrDefault(x => x.Id == dt.Id);
+                        var node = CreateTreeNode(dt, Constants.ObjectTypes.MediaType, id, queryStrings,  mt?.Icon ?? Constants.Icons.MediaType, hasChildren);
 
                         node.Path = dt.Path;
                         return node;
