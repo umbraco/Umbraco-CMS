@@ -70,24 +70,31 @@ namespace Umbraco.Web
         #endregion
 
         // ensures that we can return the specified value
+        [Obsolete("This method is only used in Obsolete properties")]
         T Ensure<T>(T o) where T : class => o ?? throw new InvalidOperationException("This UmbracoHelper instance has not been initialized.");
-
+        
+        [Obsolete("Inject and use an instance of " + nameof(IUmbracoComponentRenderer) + " in the constructor for using it in classes or get it from Current in views")]
         private IUmbracoComponentRenderer ComponentRenderer => Ensure(_componentRenderer);
+
+        [Obsolete("Inject and use an instance of " + nameof(ICultureDictionaryFactory) + " in the constructor instead")]
         private ICultureDictionaryFactory CultureDictionaryFactory => Ensure(_cultureDictionaryFactory);
 
         /// <summary>
         /// Gets the tag context.
         /// </summary>
+        [Obsolete("Inject and use an instance of " + nameof(ITagQuery) + " in the constructor instead")]
         public ITagQuery TagQuery => Ensure(_tagQuery);
 
         /// <summary>
         /// Gets the query context.
         /// </summary>
+        [Obsolete("Inject and use an instance of " + nameof(IPublishedContentQuery) + " in the constructor for using it in classes or get it from Current in views")]
         public IPublishedContentQuery ContentQuery => Ensure(_publishedContentQuery);
 
         /// <summary>
         /// Gets the membership helper.
         /// </summary>
+        [Obsolete("Inject and use an instance of " + nameof(Security.MembershipHelper) + " in the constructor instead")]
         public MembershipHelper MembershipHelper => Ensure(_membershipHelper);
 
         /// <summary>
