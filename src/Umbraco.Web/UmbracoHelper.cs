@@ -188,6 +188,29 @@ namespace Umbraco.Web
         }
 
         /// <summary>
+        /// Gets a content item from the cache.
+        /// </summary>
+        /// <param name="id">The unique identifier of the content item.</param>
+        /// <returns>The content, or null of the content item is not in the cache.</returns>
+        public IPublishedContent Content(int id) => _publishedContentQuery.Content(id);
+
+        /// <summary>
+        /// Gets a content item from the cache.
+        /// </summary>
+        /// <param name="id">The key of the content item.</param>
+        /// <returns>The content, or null of the content item is not in the cache.</returns>
+        public IPublishedContent Content(Guid id) => _publishedContentQuery.Content(id);
+
+        /// <summary>
+        /// Gets a content item from the cache.
+        /// </summary>
+        /// <param name="id">The unique identifier, or the key, of the content item.</param>
+        /// <returns>The content, or null of the content item is not in the cache.</returns>
+        public IPublishedContent Content(string id) => _publishedContentQuery.Content(id);
+
+        public IPublishedContent Content(Udi id) => _publishedContentQuery.Content(id);
+
+        /// <summary>
         /// Gets content items from the cache.
         /// </summary>
         /// <param name="ids">The unique identifiers, or the keys, of the content items.</param>
