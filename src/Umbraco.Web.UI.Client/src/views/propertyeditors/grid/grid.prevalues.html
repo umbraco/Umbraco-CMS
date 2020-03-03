@@ -32,7 +32,7 @@
 
                     <div>
                         {{template.name}} <br />
-                        <button class="btn btn-small btn-link" ng-click="deleteTemplate($index)">
+                        <button type="button" class="btn btn-small btn-link" ng-click="deleteTemplate($index)">
                             <i class="icon-delete red" aria-hidden="true"></i>
                             <localize key="general_delete">Delete</localize>
                         </button>
@@ -41,8 +41,7 @@
                 </li>
             </ul>
 
-            <button class="btn btn-small btn-info"
-                    prevent-default
+            <button type="button" class="btn btn-small btn-info"
                     ng-click="configureTemplate()">
                 <i class="icon-add" aria-hidden="true"></i>
                 <localize key="grid_addGridLayout" />
@@ -85,7 +84,7 @@
 
                         <div>
                             {{layout.label || layout.name}}<br />
-                            <button class="btn btn-small btn-link" ng-click="deleteLayout($index)">
+                            <button type="button" class="btn btn-small btn-link" ng-click="deleteLayout($index)">
                                 <i class="icon-delete red" aria-hidden="true"></i>
                                 <localize key="general_delete">Delete</localize>
                             </button>
@@ -94,7 +93,7 @@
                     </li>
                 </ul>
 
-                <button class="btn btn-small" prevent-default ng-click="configureLayout()">
+                <button type="button" class="btn btn-small" ng-click="configureLayout()">
                     <i class="icon-add" aria-hidden="true"></i>
                     <localize key="grid_addRowConfiguration">Add row configuration</localize>
                 </button>
@@ -122,7 +121,7 @@
                 <li ng-repeat="configValue in model.value.config">
                     <i class="icon icon-navigation handle" aria-hidden="true"></i>
 
-                    <button class="btn-link" prevent-default ng-click="removeConfigValue(model.value.config, $index)">
+                    <button type="button" class="btn-link" ng-click="removeConfigValue(model.value.config, $index)">
                         <i class="icon icon-delete red" aria-hidden="true"></i>
                         {{configValue.label}}
                     </button>
@@ -131,7 +130,7 @@
 
             <ul class="unstyled list-icons">
                 <li>                    
-                    <button ng-click="editConfig()" class="btn-link" prevent-default>
+                    <button type="button" ng-click="editConfig()" class="btn-link">
                         <i class="icon icon-settings-alt-2 turquoise" aria-hidden="true"></i>
                         <localize key="general_edit">Edit</localize>
                     </button>
@@ -150,7 +149,7 @@
                 <li ng-repeat="style in model.value.styles">
                     <i class="icon icon-navigation handle" aria-hidden="true"></i>
 
-                    <button class="btn-link" prevent-default ng-click="removeConfigValue(model.value.styles, $index)">
+                    <button type="button" class="btn-link" ng-click="removeConfigValue(model.value.styles, $index)">
                         <i class="icon icon-delete red" aria-hidden="true"></i>
                         {{style.label}}
                     </button>
@@ -160,7 +159,7 @@
 
             <ul class="unstyled list-icons">
                 <li>                    
-                    <button ng-click="editStyles()" class="btn-link" prevent-default>
+                    <button type="button" ng-click="editStyles()" class="btn-link">
                         <i class="icon icon-settings-alt-2 turquoise" aria-hidden="true"></i>
                         <localize key="general_edit">Edit</localize>
                     </button>
