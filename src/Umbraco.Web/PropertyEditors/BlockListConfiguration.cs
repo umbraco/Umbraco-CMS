@@ -42,8 +42,8 @@ namespace Umbraco.Web.PropertyEditors
             public string Label { get; set; }
         }
 
-        [ConfigurationField("useAccordionsAsDefault", "Inline editing mode", "boolean", Description = "Use the inline editor as the default block view")]
-        public bool useInlineEditingAsDefault { get; set; }
+        [ConfigurationField("useInlineEditingAsDefault", "Inline editing mode", "boolean", Description = "Use the inline editor as the default block view")]
+        public bool UseInlineEditingAsDefault { get; set; }
 
     }
 }

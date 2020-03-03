@@ -14,8 +14,6 @@
 
     function ElementEditorComponentController() {
 
-        const vm = this;
-
         // TODO: we might not need this..
 
     }

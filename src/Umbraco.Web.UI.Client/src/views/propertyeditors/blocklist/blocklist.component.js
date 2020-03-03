@@ -8,7 +8,8 @@
             controller: BlockListController,
             controllerAs: "vm",
             bindings: {
-                
+                model: "=",
+                propertyForm: "="
             },
             require: {
                 umbProperty: "?^umbProperty"
@@ -17,905 +18,135 @@
 
     function BlockListController($scope, $interpolate, editorService, clipboardService, localizationService, overlayService, blockEditorService, contentResource) {
         
+        var modelObject;
         var unsubscribe = [];
         var vm = this;
-        var model = $scope.$parent.$parent.model;
-        vm.propertyForm = $scope.$parent.$parent.propertyForm;
 
-        $scope.moveFocusToBlock = null;
+        vm.moveFocusToBlock = null;
 
-        console.log("model JSON:", JSON.stringify(model));
-        console.log("model:", model);
-        console.log("config:", model.config);
+        vm.$onInit = function() {
 
-        vm.validationLimit = model.config.validationLimit;
+            vm.validationLimit = vm.model.config.validationLimit;
+    
+            vm.model.value = vm.model.value || {};
+    
+            modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks);
+            modelObject.loadScaffolding(contentResource).then(loaded);
+    
+            vm.layout = [];// Property models layout object specific to this Block Editor.
+            vm.blocks = [];// Runtime model of editing models, needs to be synced to property model on form submit.
+            vm.availableBlockTypes = [];// Available block entries of this property editor.
 
-        console.log("value:", model.value);
-
-        /*
-        vm.availableBlockTypes = [
-            {
-                alias: "pageModule",
-                name: "Module",
-                icon: "icon-document",
-                prototype_paste_data: {
-                    
-                    elementType: {
-                        alias: "contentTypeAlias",
-                        icon: "icon-document",
-                        label: "Text"
-                    },
-                    labelTemplate: "{{pageTitle | truncate:true:36}}",
-                    labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
-                    editor: "views/blockelements/labelblock/labelblock.editor.html",
-                    overlaySize: "medium",
-                    content: {
-                        apps: [
-                            {
-                                name: "Content",
-                                alias: "umbContent",
-                                weight: -100,
-                                icon: "icon-document",
-                                view: "views/content/apps/content/content.html",
-                                viewModel: 0,
-                                active: true,
-                                badge: null,
-                                anchors: [],
-                                hasError: false
-                            },
-                            {
-                                name: "Info",
-                                alias: "umbInfo",
-                                weight: 100,
-                                icon: "icon-info",
-                                view: "views/content/apps/info/info.html",
-                                viewModel: null,
-                                active: false,
-                                badge: null,
-                                hasError: false
-                            }
-                        ],
-                        variants: [
-                            {
-                                language: {
-                                    isDefault: true
-                                }
-                            }
-                        ],
-                        tabs: [
-                            {
-                                id: 1234,
-                                label: "Content",
-                                properties: [
-                                    {
-                                        label: "Page Title",
-                                        description: "The title of the page",
-                                        view: "textbox",
-                                        config: {maxChars: 500},
-                                        hideLabel: false,
-                                        validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                        readonly: false,
-                                        id: 441,
-                                        dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                        value: "Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-                                        alias: "pageTitle",
-                                        editor: "Umbraco.TextBox",
-                                        isSensitive: false,
-                                        culture: null,
-                                        segment: null
-                                    },
-                                    {
-                                        label: "Image",
-                                        description: "",
-                                        view: "mediapicker",
-                                        config: {multiPicker: false, 
-                                            onlyImages: true, 
-                                            disableFolderSelect: true, 
-                                            startNodeId: "umb://media/1fd2ecaff3714c009306867fa4585e7a", 
-                                            ignoreUserStartNodes: false, 
-                                            idType: "udi"
-                                        },
-                                        hideLabel: false,
-                                        validation: {mandatory: false, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                        readonly: false,
-                                        id: 495,
-                                        dataTypeKey: "e26a8d91-a9d7-475b-bc3b-2a09f4743754",
-                                        value: "umb://media/fa763e0d0ceb408c8720365d57e06e32",
-                                        alias: "photo",
-                                        editor: "Umbraco.MediaPicker",
-                                        isSensitive: false,
-                                        culture: null,
-                                        segment: null
-                                    }, 
-                                    {
-                                        label: "Image Description",
-                                        description: "The title of the page",
-                                        view: "textbox",
-                                        config: {maxChars: 500},
-                                        hideLabel: false,
-                                        validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                        readonly: false,
-                                        id: 442,
-                                        dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                        value: "Let´s have a chat",
-                                        alias: "imageDesc",
-                                        editor: "Umbraco.TextBox",
-                                        isSensitive: false,
-                                        culture: null,
-                                        segment: null
-                                    }
-                                ]
-                            },
-                            {
-                                id: 1234,
-                                label: "Styling",
-                                properties: [
-                                    {
-                                        label: "Background color",
-                                        description: "",
-                                        view: "textbox",
-                                        config: {maxChars: 500},
-                                        hideLabel: false,
-                                        validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                        readonly: false,
-                                        id: 441,
-                                        dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                        value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn´t distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
-                                        alias: "pageTitle",
-                                        editor: "Umbraco.TextBox",
-                                        isSensitive: false,
-                                        culture: null,
-                                        segment: null
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                alias: "pageModule",
-                name: "Inline module",
-                icon: "icon-document",
-                prototype_paste_data: {
-                    elementType: {
-                        alias: "contentTypeAlias",
-                        icon: "icon-document",
-                        label: "Text"
-                    },
-                    labelTemplate: "{{imageTitle | truncate:true:36}}",
-                    labelInterpolate: $interpolate("{{imageTitle | truncate:true:36}}"),
-                    key: 1,
-                    editor: "views/blockelements/inlineblock/inlineblock.editor.html",
-                    overlaySize: "medium",
-                    content: {
-                        apps: [
-                            {
-                                name: "Content",
-                                alias: "umbContent",
-                                weight: -100,
-                                icon: "icon-document",
-                                view: "views/content/apps/content/content.html",
-                                viewModel: 0,
-                                active: true,
-                                badge: null,
-                                anchors: [],
-                                hasError: false
-                            },
-                            {
-                                name: "Info",
-                                alias: "umbInfo",
-                                weight: 100,
-                                icon: "icon-info",
-                                view: "views/content/apps/info/info.html",
-                                viewModel: null,
-                                active: false,
-                                badge: null,
-                                hasError: false
-                            }
-                        ],
-                        variants: [
-                            {
-                                language: {
-                                    isDefault: true
-                                }
-                            }
-                        ],
-                        tabs: [
-                            {
-                                id: 1234,
-                                label: "Content",
-                                properties: [
-                                    {
-                                        label: "Image Title",
-                                        description: "The title on top of image",
-                                        view: "textbox",
-                                        config: {maxChars: 500},
-                                        hideLabel: false,
-                                        validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                        readonly: false,
-                                        id: 441,
-                                        dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                        value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn´t distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
-                                        alias: "imageTitle",
-                                        editor: "Umbraco.TextBox",
-                                        isSensitive: false,
-                                        culture: null,
-                                        segment: null
-                                    },
-                                    {
-                                        label: "Image",
-                                        description: "",
-                                        view: "mediapicker",
-                                        config: {multiPicker: false, 
-                                            onlyImages: true, 
-                                            disableFolderSelect: true, 
-                                            startNodeId: "umb://media/1fd2ecaff3714c009306867fa4585e7a", 
-                                            ignoreUserStartNodes: false, 
-                                            idType: "udi"
-                                        },
-                                        hideLabel: false,
-                                        validation: {mandatory: false, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                        readonly: false,
-                                        id: 495,
-                                        dataTypeKey: "e26a8d91-a9d7-475b-bc3b-2a09f4743754",
-                                        value: "umb://media/fa763e0d0ceb408c8720365d57e06e32",
-                                        alias: "photo",
-                                        editor: "Umbraco.MediaPicker",
-                                        isSensitive: false,
-                                        culture: null,
-                                        segment: null
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                alias: "contentTypeAlias",
-                name: "Text",
-                icon: "icon-info",
-                prototype_paste_data: {
-                    elementType: {
-                        alias: "contentTypeAlias",
-                        icon: "icon-document",
-                        label: "Text"
-                    },
-                    labelTemplate: "Label",
-                    labelInterpolate: $interpolate("Label"),
-                    editor: "views/blockelements/textareablock/textareablock.editor.html",
-                    overlaySize: "medium",
-                    content: {
-                        apps: [
-                            {
-                                name: "Content",
-                                alias: "umbContent",
-                                weight: -100,
-                                icon: "icon-document",
-                                view: "views/content/apps/content/content.html",
-                                viewModel: 0,
-                                active: true,
-                                badge: null,
-                                anchors: [],
-                                hasError: false
-                            },
-                            {
-                                name: "Info",
-                                alias: "umbInfo",
-                                weight: 100,
-                                icon: "icon-info",
-                                view: "views/content/apps/info/info.html",
-                                viewModel: null,
-                                active: false,
-                                badge: null,
-                                hasError: false
-                            }
-                        ],
-                        variants: [
-                            {
-                                language: {
-                                    isDefault: true
-                                }
-                            }
-                        ],
-                        tabs: [
-                            {
-                                id: 1234,
-                                label: "Content",
-                                properties: [
-                                    {
-                                        label: "Page Title",
-                                        description: "The title of the page",
-                                        view: "textbox",
-                                        config: {maxChars: 500},
-                                        hideLabel: false,
-                                        validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                        readonly: false,
-                                        id: 441,
-                                        dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                        value: "",
-                                        alias: "pageTitle",
-                                        editor: "Umbraco.TextBox",
-                                        isSensitive: false,
-                                        culture: null,
-                                        segment: null
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                alias: "contentTypeAlias",
-                name: "Image",
-                icon: "icon-picture",
-                prototype_paste_data: {
-                    elementType: {
-                        alias: "contentTypeAlias",
-                        icon: "icon-document",
-                        label: "Text"
-                    },
-                    labelTemplate: "Label",
-                    labelInterpolate: $interpolate("Label"),
-                    editor: "views/blockelements/imageblock/imageblock.editor.html",
-                    overlaySize: "medium",
-                    content: {
-                        apps: [
-                            {
-                                name: "Content",
-                                alias: "umbContent",
-                                weight: -100,
-                                icon: "icon-document",
-                                view: "views/content/apps/content/content.html",
-                                viewModel: 0,
-                                active: true,
-                                badge: null,
-                                anchors: [],
-                                hasError: false
-                            },
-                            {
-                                name: "Info",
-                                alias: "umbInfo",
-                                weight: 100,
-                                icon: "icon-info",
-                                view: "views/content/apps/info/info.html",
-                                viewModel: null,
-                                active: false,
-                                badge: null,
-                                hasError: false
-                            }
-                        ],
-                        variants: [
-                            {
-                                language: {
-                                    isDefault: true
-                                }
-                            }
-                        ],
-                        tabs: [
-                            {
-                                id: 1234,
-                                label: "Content",
-                                properties: [
-                                    {
-                                        label: "Image",
-                                        description: "",
-                                        view: "mediapicker",
-                                        config: {multiPicker: false, 
-                                            onlyImages: true, 
-                                            disableFolderSelect: true, 
-                                            startNodeId: "umb://media/1fd2ecaff3714c009306867fa4585e7a", 
-                                            ignoreUserStartNodes: false, 
-                                            idType: "udi"
-                                        },
-                                        hideLabel: false,
-                                        validation: {mandatory: false, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                        readonly: false,
-                                        id: 495,
-                                        dataTypeKey: "e26a8d91-a9d7-475b-bc3b-2a09f4743754",
-                                        value: "umb://media/fa763e0d0ceb408c8720365d57e06e32",
-                                        alias: "photo",
-                                        editor: "Umbraco.MediaPicker",
-                                        isSensitive: false,
-                                        culture: null,
-                                        segment: null
-                                    }, 
-                                    {
-                                        label: "Image Description",
-                                        description: "The title of the page",
-                                        view: "textbox",
-                                        config: {maxChars: 500},
-                                        hideLabel: false,
-                                        validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                        readonly: false,
-                                        id: 441,
-                                        dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                        value: "Let´s have a chat",
-                                        alias: "imageDesc",
-                                        editor: "Umbraco.TextBox",
-                                        isSensitive: false,
-                                        culture: null,
-                                        segment: null
-                                    }
-                                ]
-                            }
-                        ],
-                        temp_image: "/umbraco/assets/img/login.jpg"
-                    }
-                }
+            var copyAllEntriesAction = {
+                labelKey: "clipboard_labelForCopyAllEntries",
+                labelTokens: [vm.model.label],
+                icon: "documents",
+                method: function () {},
+                isDisabled: true
             }
-        ];
-
-        // var defaultBlockType...
-
-        // TODO: get icon, properties etc. from available types?
-        vm.blocks = [
-            {
-                elementType: {
-                    alias: "contentTypeAlias",
-                    icon: "icon-document",
-                    label: "Text"
-                },
-                labelTemplate: "{{pageTitle | truncate:true:36}}",
-                labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
-                key: 1,
-                editor: "views/blockelements/labelblock/labelblock.editor.html",
-                overlaySize: "medium",
-                content: {
-                    apps: [
-                        {
-                            name: "Content",
-                            alias: "umbContent",
-                            weight: -100,
-                            icon: "icon-document",
-                            view: "views/common/infiniteeditors/elementeditor/elementeditor.content.html",
-                            viewModel: 0,
-                            active: true,
-                            badge: null,
-                            anchors: [],
-                            hasError: false
-                        },
-                        {
-                            name: "Info",
-                            alias: "umbInfo",
-                            weight: 100,
-                            icon: "icon-info",
-                            view: "views/content/apps/info/info.html",
-                            viewModel: null,
-                            active: false,
-                            badge: null,
-                            hasError: false
-                        }
-                    ],
-                    variants: [
-                        {
-                            language: {
-                                isDefault: true
-                            }
-                        }
-                    ],
-                    tabs: [
-                        {
-                            id: 1234,
-                            label: "Content",
-                            properties: [
-                                {
-                                    label: "Page Title",
-                                    description: "The title of the page",
-                                    view: "textbox",
-                                    config: {maxChars: 500},
-                                    hideLabel: false,
-                                    validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                    readonly: false,
-                                    id: 441,
-                                    dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                    value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn´t distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
-                                    alias: "pageTitle",
-                                    editor: "Umbraco.TextBox",
-                                    isSensitive: false,
-                                    culture: null,
-                                    segment: null
-                                },
-                                {
-                                    label: "Image",
-                                    description: "",
-                                    view: "mediapicker",
-                                    config: {multiPicker: false, 
-                                        onlyImages: true, 
-                                        disableFolderSelect: true, 
-                                        startNodeId: "umb://media/1fd2ecaff3714c009306867fa4585e7a", 
-                                        ignoreUserStartNodes: false, 
-                                        idType: "udi"
-                                    },
-                                    hideLabel: false,
-                                    validation: {mandatory: false, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                    readonly: false,
-                                    id: 495,
-                                    dataTypeKey: "e26a8d91-a9d7-475b-bc3b-2a09f4743754",
-                                    value: "umb://media/fa763e0d0ceb408c8720365d57e06e32",
-                                    alias: "photo",
-                                    editor: "Umbraco.MediaPicker",
-                                    isSensitive: false,
-                                    culture: null,
-                                    segment: null
-                                }, 
-                                {
-                                    label: "Image Description",
-                                    description: "The title of the page",
-                                    view: "textbox",
-                                    config: {maxChars: 500},
-                                    hideLabel: false,
-                                    validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                    readonly: false,
-                                    id: 442,
-                                    dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                    value: "Let´s have a chat",
-                                    alias: "imageDesc",
-                                    editor: "Umbraco.TextBox",
-                                    isSensitive: false,
-                                    culture: null,
-                                    segment: null
-                                }
-                            ]
-                        },
-                        {
-                            id: 1234,
-                            label: "Styling",
-                            properties: [
-                                {
-                                    label: "Background color",
-                                    description: "",
-                                    view: "textbox",
-                                    config: {maxChars: 500},
-                                    hideLabel: false,
-                                    validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                    readonly: false,
-                                    id: 441,
-                                    dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                    value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn´t distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
-                                    alias: "pageTitle",
-                                    editor: "Umbraco.TextBox",
-                                    isSensitive: false,
-                                    culture: null,
-                                    segment: null
-                                }
-                            ]
-                        }
-                    ]
-                }
-            },
-            {
-                elementType: {
-                    alias: "contentTypeAlias",
-                    icon: "icon-document",
-                    label: "Text"
-                },
-                labelTemplate: "{{pageTitle | truncate:true:36}}",
-                labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
-                key: 2,
-                editor: "views/blockelements/labelblock/labelblock.editor.html",
-                overlaySize: "medium",
-                content: {
-                    apps: [
-                        {
-                            name: "Content",
-                            alias: "umbContent",
-                            weight: -100,
-                            icon: "icon-document",
-                            view: "views/content/apps/content/content.html",
-                            viewModel: 0,
-                            active: true,
-                            badge: null,
-                            anchors: [],
-                            hasError: false
-                        },
-                        {
-                            name: "Info",
-                            alias: "umbInfo",
-                            weight: 100,
-                            icon: "icon-info",
-                            view: "views/content/apps/info/info.html",
-                            viewModel: null,
-                            active: false,
-                            badge: null,
-                            hasError: false
-                        }
-                    ],
-                    variants: [
-                        {
-                            language: {
-                                isDefault: true
-                            }
-                        }
-                    ],
-                    tabs: [
-                        {
-                            id: 1234,
-                            label: "Content",
-                            properties: [
-                                {
-                                    label: "Page Title",
-                                    description: "The title of the page",
-                                    view: "textbox",
-                                    config: {maxChars: 500},
-                                    hideLabel: false,
-                                    validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                    readonly: false,
-                                    id: 441,
-                                    dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                    value: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-                                    alias: "pageTitle",
-                                    editor: "Umbraco.TextBox",
-                                    isSensitive: false,
-                                    culture: null,
-                                    segment: null
-                                },
-                                {
-                                    label: "Image",
-                                    description: "",
-                                    view: "mediapicker",
-                                    config: {multiPicker: false, 
-                                        onlyImages: true, 
-                                        disableFolderSelect: true, 
-                                        startNodeId: "umb://media/1fd2ecaff3714c009306867fa4585e7a", 
-                                        ignoreUserStartNodes: false, 
-                                        idType: "udi"
-                                    },
-                                    hideLabel: false,
-                                    validation: {mandatory: false, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                    readonly: false,
-                                    id: 495,
-                                    dataTypeKey: "e26a8d91-a9d7-475b-bc3b-2a09f4743754",
-                                    value: "umb://media/fa763e0d0ceb408c8720365d57e06e32",
-                                    alias: "photo",
-                                    editor: "Umbraco.MediaPicker",
-                                    isSensitive: false,
-                                    culture: null,
-                                    segment: null
-                                }, 
-                                {
-                                    label: "Image Description",
-                                    description: "The title of the page",
-                                    view: "textbox",
-                                    config: {maxChars: 500},
-                                    hideLabel: false,
-                                    validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                    readonly: false,
-                                    id: 442,
-                                    dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                    value: "Let´s have a chat",
-                                    alias: "imageDesc",
-                                    editor: "Umbraco.TextBox",
-                                    isSensitive: false,
-                                    culture: null,
-                                    segment: null
-                                }
-                            ]
-                        },
-                        {
-                            id: 1234,
-                            label: "Styling",
-                            properties: [
-                                {
-                                    label: "Background color",
-                                    description: "",
-                                    view: "textbox",
-                                    config: {maxChars: 500},
-                                    hideLabel: false,
-                                    validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                    readonly: false,
-                                    id: 441,
-                                    dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                    value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn´t distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
-                                    alias: "pageTitle",
-                                    editor: "Umbraco.TextBox",
-                                    isSensitive: false,
-                                    culture: null,
-                                    segment: null
-                                }
-                            ]
-                        }
-                    ]
-                }
-            },
-            {
-                
-                elementType: {
-                    alias: "contentTypeAlias",
-                    icon: "icon-document",
-                    label: "Text"
-                },
-                labelTemplate: "{{pageTitle | truncate:true:36}}",
-                labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
-                key: 3,
-                editor: "views/blockelements/labelblock/labelblock.editor.html",
-                overlaySize: "medium",
-                content: {
-                    apps: [
-                        {
-                            name: "Content",
-                            alias: "umbContent",
-                            weight: -100,
-                            icon: "icon-document",
-                            view: "views/content/apps/content/content.html",
-                            viewModel: 0,
-                            active: true,
-                            badge: null,
-                            anchors: [],
-                            hasError: false
-                        },
-                        {
-                            name: "Info",
-                            alias: "umbInfo",
-                            weight: 100,
-                            icon: "icon-info",
-                            view: "views/content/apps/info/info.html",
-                            viewModel: null,
-                            active: false,
-                            badge: null,
-                            hasError: false
-                        }
-                    ],
-                    variants: [
-                        {
-                            language: {
-                                isDefault: true
-                            }
-                        }
-                    ],
-                    tabs: [
-                        {
-                            id: 1234,
-                            label: "Content",
-                            properties: [
-                                {
-                                    label: "Page Title",
-                                    description: "The title of the page",
-                                    view: "textbox",
-                                    config: {maxChars: 500},
-                                    hideLabel: false,
-                                    validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                    readonly: false,
-                                    id: 441,
-                                    dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                    value: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-                                    alias: "pageTitle",
-                                    editor: "Umbraco.TextBox",
-                                    isSensitive: false,
-                                    culture: null,
-                                    segment: null
-                                },
-                                {
-                                    label: "Image",
-                                    description: "",
-                                    view: "mediapicker",
-                                    config: {multiPicker: false, 
-                                        onlyImages: true, 
-                                        disableFolderSelect: true, 
-                                        startNodeId: "umb://media/1fd2ecaff3714c009306867fa4585e7a", 
-                                        ignoreUserStartNodes: false, 
-                                        idType: "udi"
-                                    },
-                                    hideLabel: false,
-                                    validation: {mandatory: false, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                    readonly: false,
-                                    id: 495,
-                                    dataTypeKey: "e26a8d91-a9d7-475b-bc3b-2a09f4743754",
-                                    value: "umb://media/fa763e0d0ceb408c8720365d57e06e32",
-                                    alias: "photo",
-                                    editor: "Umbraco.MediaPicker",
-                                    isSensitive: false,
-                                    culture: null,
-                                    segment: null
-                                }, 
-                                {
-                                    label: "Image Description",
-                                    description: "The title of the page",
-                                    view: "textbox",
-                                    config: {maxChars: 500},
-                                    hideLabel: false,
-                                    validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                    readonly: false,
-                                    id: 442,
-                                    dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                    value: "Let´s have a chat",
-                                    alias: "imageDesc",
-                                    editor: "Umbraco.TextBox",
-                                    isSensitive: false,
-                                    culture: null,
-                                    segment: null
-                                }
-                            ]
-                        },
-                        {
-                            id: 1234,
-                            label: "Styling",
-                            properties: [
-                                {
-                                    label: "Background color",
-                                    description: "",
-                                    view: "textbox",
-                                    config: {maxChars: 500},
-                                    hideLabel: false,
-                                    validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                    readonly: false,
-                                    id: 441,
-                                    dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                    value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn´t distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
-                                    alias: "pageTitle",
-                                    editor: "Umbraco.TextBox",
-                                    isSensitive: false,
-                                    culture: null,
-                                    segment: null
-                                }
-                            ]
-                        }
-                    ]
-                }
+    
+            var propertyActions = [
+                copyAllEntriesAction
+            ];
+            
+            if (this.umbProperty) {
+                this.umbProperty.setPropertyActions(propertyActions);
             }
-        ];
+        };
+
+        
 
 
-        */
-
-
-        model.value = model.value || {};
-
-        var modelObject = blockEditorService.createModelObject(model.value, model.editor, model.config.blocks);
-
-        modelObject.loadScaffolding(contentResource).then(loaded);
-
-        vm.layout = [];
-        vm.blocks = [];
-        vm.availableBlockTypes = [];
-
+        
         function loaded() {
 
-            console.log("Loading done!!!");
-            console.log(modelObject);
-
-            
             vm.layout = modelObject.getLayout();
+            mapToBlocks();
+
+            vm.availableBlockTypes = modelObject.getAvailableBlocksForItemPicker();
+
+        }
+
+
+        function getEditingModel(entry) {
+            var block = modelObject.getEditingModel(entry);
+
+            if (block === null) return null;
+
+            block.view = block.config.view || vm.model.config.useInlineEditingAsDefault ? "views/blockelements/inlineblock/inlineblock.editor.html" : "views/blockelements/labelblock/labelblock.editor.html";
+
+            return block;
+        }
+
+        /**
+         * Maps property model to the runtime editing model (blocks).
+         */
+        function mapToBlocks() {
+            // clear blocks.
+            vm.blocks = [];
+
+            // make all blocks.
             vm.layout.forEach(entry => {
-                var block = modelObject.getEditingModel(entry);
+                var block = getEditingModel(entry);
                 if(block !== null) {
                     vm.blocks.push(block);
                 }
             });
 
-            vm.availableBlockTypes = modelObject.getAvailableBlocksForItemPicker();
-            console.log(vm.availableBlockTypes);
-
+            $scope.$apply();
         }
-        
+
+        /**
+         * Maps content from runtime editing model (blocks) to the property model.
+         * Does not take care of ordering, we need the sort-UI to sync that, on the fly.
+         */
+        function mapToContent() {
+
+            // sync data from blocks to content models.
+            vm.blocks.forEach(block => {
+                modelObject.setDataFromEditingModel(block);
+            });
+        }
+
+        function sync() {
+            mapToContent();
+        }
+
+        function syncBlockData(block) {
+            modelObject.setDataFromEditingModel(block);
+        }
 
         function setDirty() {
             if (vm.propertyForm) {
                 vm.propertyForm.$setDirty();
             }
-        };
+        }
 
         function addNewBlock(index, contentTypeAlias) {
 
-            // Create layout entry.
+            // Create layout entry. (not added to property model jet.)
             var layoutEntry = modelObject.createLayoutEntry(contentTypeAlias);
-            // add layout entry a decired location in layout.
-            vm.layout.splice(index, 0, layoutEntry);
 
             // make editing object
-            var blockEditingObject = modelObject.getEditingModel(layoutEntry);
-            // apply editing model at decired location in editing model.
-            vm.blocks.splice(index, 0, blockEditingObject);
+            var blockEditingObject = getEditingModel(layoutEntry);
+
+            if (blockEditingObject !== null) {
             
-            $scope.moveFocusToBlock = blockEditingObject;
+                // add layout entry at the decired location in layout.
+                vm.layout.splice(index, 0, layoutEntry);
+
+                // apply editing model at decired location in editing model.
+                vm.blocks.splice(index, 0, blockEditingObject);
+                
+                vm.moveFocusToBlock = blockEditingObject;
+
+            }
 
         }
 
         
 
-        vm.deleteBlock = function(block) {
+        function deleteBlock(block) {
             var index = vm.blocks.indexOf(block);
             if(index !== -1) {
                 vm.blocks.splice(index, 1);
@@ -929,18 +160,18 @@
             }
         }
 
-        vm.editBlock = function(blockModel) {
+        function editBlock(blockModel) {
 
-            // TODO: test wether i need to clone or if that is done by overlay.
-            //var blockModelClone = angular.copy(blockModel);
+            // TODO: make a clone to ensure edits arent made directly.
+            var blockContentModelClone = angular.copy(blockModel.content);
             
-            var elementEditor = {
-                block: blockModel,
+            var elementEditorModel = {
+                content: blockContentModelClone,
+                title: blockModel.label,
                 view: "views/common/infiniteeditors/elementeditor/elementeditor.html",
-                size: blockModel.overlaySize,
-                submit: function(model) {
-                    blockModel.content = model.block.content;
-                    blockModel.settings = model.block.settings;
+                size: blockModel.config.overlaySize || "medium",
+                submit: function(elementEditorModel) {
+                    blockModel.content = elementEditorModel.content;
                     editorService.close();
                 },
                 close: function() {
@@ -949,10 +180,11 @@
             };
 
             // open property settings editor
-            editorService.open(elementEditor);
+            editorService.open(elementEditorModel);
         }
 
-        vm.showCreateDialog = function (createIndex, $event) {
+        vm.showCreateDialog = showCreateDialog;
+        function showCreateDialog(createIndex, $event) {
             
             if (vm.blockTypePicker) {
                 return;
@@ -984,10 +216,10 @@
 
         };
 
-        vm.requestCopyBlock = function(block) {
-            console.log("copy")
+        function requestCopyBlock(block) {
+            console.log("copy still needs to be done.")
         }
-        vm.requestDeleteBlock = function(block) {
+        function requestDeleteBlock (block) {
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "contentTypeEditor_yesDelete"]).then(function (data) {
                 const overlay = {
                     title: data[0],
@@ -997,7 +229,7 @@
                         overlayService.close();
                     },
                     submit: function () {
-                        vm.deleteBlock(block);
+                        deleteBlock(block);
                         overlayService.close();
                     }
                 };
@@ -1008,7 +240,7 @@
 
         vm.showCopy = clipboardService.isSupported();
 
-        
+        var runtimeSortVars = {};
 
         vm.sorting = false;
         vm.sortableOptions = {
@@ -1021,6 +253,7 @@
             tolerance: "pointer",
             scroll: true,
             start: function (ev, ui) {
+                runtimeSortVars.moveFromIndex = ui.item.index();
                 $scope.$apply(function () {
                     vm.sorting = true;
                 });
@@ -1029,45 +262,42 @@
                 setDirty();
             },
             stop: function (ev, ui) {
+
+                // Lets update the layout part of the property model to match the update.
+                var moveFromIndex = runtimeSortVars.moveFromIndex;
+                var moveToIndex = ui.item.index();
+
+                if (moveToIndex > -1 && moveFromIndex !== moveToIndex) {
+                    var movedEntry = vm.layout[moveFromIndex];
+                    vm.layout.splice(moveFromIndex, 1);
+                    vm.layout.splice(moveToIndex, 0, movedEntry);
+                }
+
                 $scope.$apply(function () {
                     vm.sorting = false;
                 });
             }
         };
 
-        $scope.blockApi = {
-            deleteBlock: vm.deleteBlock
+        vm.blockEditorApi = {
+            editBlock: editBlock,
+            requestCopyBlock: requestCopyBlock,
+            requestDeleteBlock: requestDeleteBlock,
+            deleteBlock: deleteBlock,
+            syncBlockData: syncBlockData
         }
-
-
-        var copyAllEntriesAction = {
-            labelKey: "clipboard_labelForCopyAllEntries",
-            labelTokens: [model.label],
-            icon: "documents",
-            method: function () {},
-            isDisabled: true
-        }
-
-        var propertyActions = [
-            copyAllEntriesAction
-        ];
-        
-        this.$onInit = function () {
-            if (this.umbProperty) {
-                this.umbProperty.setPropertyActions(propertyActions);
-            }
-        };
 
 
         function validateLimits() {
-            if (vm.validationLimit.min && vm.blocks.length < vm.validationLimit.min) {
-                vm.propertyForm.minCount.$setValidity("minCount", false);
+            if (vm.validationLimit.min !== null) {
+                if (vm.blocks.length < vm.validationLimit.min) {
+                    vm.propertyForm.minCount.$setValidity("minCount", false);
+                }
+                else {
+                    vm.propertyForm.minCount.$setValidity("minCount", true);
+                }
             }
-            else {
-                vm.propertyForm.minCount.$setValidity("minCount", true);
-            }
-
-            if (vm.validationLimit.max && vm.blocks.length > vm.validationLimit.max) {
+            if (vm.validationLimit.max !== null && vm.blocks.length > vm.validationLimit.max) {
                 vm.propertyForm.maxCount.$setValidity("maxCount", false);
             }
             else {
@@ -1079,14 +309,31 @@
 
 
         // TODO: We need to investigate if we can do a specific watch on each block, so we dont re-render all blocks.
-        unsubscribe.push($scope.$watch("vm.blocks", onBlocksUpdated, true));
+        /*
+        unsubscribe.push($scope.$watch("vm.blocks[0]", onBlocksUpdated, true));
         function onBlocksUpdated(newVal, oldVal) {
+            
+            console.log("blocks update", oldVal, " > ", newVal);
+            //setDirty();
+
             var labelIndex = 1;
             for(const block of vm.blocks) {
                 block.label = blockEditorService.getBlockLabel(block, labelIndex++);
             }
         }
+        */
+
+
         unsubscribe.push($scope.$watch(() => vm.blocks.length, validateLimits));
+
+        unsubscribe.push($scope.$on("formSubmitting", function (ev, args) {
+
+            console.log("formSubmitting is happening, we need to make sure sub property editors are synced first.")
+
+            console.log(vm.layout, vm.model.value);
+
+            //sync();
+        }));
 
         $scope.$on("$destroy", function () {
             for (const subscription of unsubscribe) {

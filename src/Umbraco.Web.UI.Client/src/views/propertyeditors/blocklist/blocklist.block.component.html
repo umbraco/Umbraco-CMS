@@ -1,0 +1,20 @@
+<div class="umb-block-list__block">
+    <div class="umb-block-list__block--content" ng-if="vm.block.view" ng-include="vm.block.view">
+    </div>
+
+    <div class="umb-block-list__block--actions">
+        <button type="button" class="btn-reset action --copy" localize="title" title="general_copy" ng-click="vm.blockEditorApi.requestCopyBlock(vm.block);" ng-if="vm.showCopy">
+            <i class="icon icon-documents" aria-hidden="true"></i>
+            <span class="sr-only">
+                <localize key="general_copy">Copy</localize>
+            </span>
+        </button>
+        <button type="button" class="btn-reset action --delete" localize="title" title="general_delete" ng-click="vm.blockEditorApi.requestDeleteBlock(vm.block);">
+            <i class="icon icon-trash" aria-hidden="true"></i>
+            <span class="sr-only">
+                <localize key="general_delete">Delete</localize>
+            </span>
+        </button>
+    </div>
+
+</div>

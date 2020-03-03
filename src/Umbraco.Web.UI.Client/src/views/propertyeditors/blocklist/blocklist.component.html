@@ -5,81 +5,20 @@
 
         <div ui-sortable="vm.sortableOptions" ng-model="vm.blocks">
 
-            <div ng-repeat="block in vm.blocks">
+            <div ng-repeat="blockItem in vm.blocks">
 
                 <button
                     type="button"
                     class="btn-reset umb-block-list__block--create-button"
                     ng-click="vm.showCreateDialog($index, $event)"
-                    outcommented-ng-if="vm.quickMenuVisible === false || $index !== vm.quickMenuIndex"
                 >
                 </button>
-<!--
-                <div class="umb-block-list__block--create-bar" ng-if="vm.quickMenuVisible === true && $index === vm.quickMenuIndex">
-                    <button type="button"
-                        class="btn-reset"
-                        ng-repeat="type in vm.availableBlockTypes | limitTo:4"
-                        focus-when="{{$index === 0}}"
-                        ng-blur="vm.onCreateOptionsBlur($event)"
-                        ng-click="vm.quickMenuAddNewBlock(type)"
-                    >
-                        <i class="icon {{type.icon}}"></i>
-                        <span>{{type.name}}</span>
-                    </button>
-                    <button type="button"
-                        ng-if="vm.availableBlockTypes.length > 4"
-                        class="btn-reset"
-                        ng-click="vm.showCreateDialog($index, $event)"
-                    >
-                        <i class="icon icon-three-dots"></i>
-                        <span>more</span>
-                    </button>
-                </div>
-            -->
 
-                <div class="umb-block-list__block">
-<!--
-                    <div class="umb-block-list__block--head">
-                        <i class="icon" ng-class="block.icon"></i>
-                        <small>{{block.elementType.label}}</small>
-                    </div>
--->
-                    <div class="umb-block-list__block--content" ng-if="block.editor" ng-include="block.editor">
-                    </div>
-                    <div class="umb-block-list__block--content" ng-if="!block.editor">
-                        <!-- TODO: Move LabelBlock into this, no reason to have that as seperate code, that would make it the default fallback. -->
-                        <h1>No editor</h1>
-                    </div>
-
-                    <div class="umb-block-list__block--actions">
-                        <button type="button" class="btn-reset action --copy" localize="title" title="general_copy" ng-click="vm.requestCopyBlock(block);" ng-if="vm.showCopy">
-                            <i class="icon icon-documents" aria-hidden="true"></i>
-                            <span class="sr-only">
-                                <localize key="general_copy">Copy</localize>
-                            </span>
-                        </button>
-                        <button type="button" class="btn-reset action --delete" localize="title" title="general_delete" ng-click="vm.requestDeleteBlock(block);">
-                            <i class="icon icon-trash" aria-hidden="true"></i>
-                            <span class="sr-only">
-                                <localize key="general_delete">Delete</localize>
-                            </span>
-                        </button>
-                    </div>
-
-                </div>
+                <block-list-property-editor-block block="blockItem" block-editor-api="vm.blockEditorApi" focus-this-block="false">
+                </block-list-property-editor-block>
 
             </div>
         </div>
-
-        <!--
-            <button
-                type="button"
-                class="btn-reset umb-block-list__block--create-button"
-                ng-click="vm.showCreateDialog(vm.blocks.length, $event)"
-                ng-if="vm.blocks.length !== 0"
-            >
-            </button>
-        -->
 
         <button
             type="button"
@@ -90,16 +29,14 @@
             <localize key="grid_addElement"></localize>
         </button>
 
-
         <input type="hidden" name="minCount" ng-model="vm.blocks" />
         <input type="hidden" name="maxCount" ng-model="vm.blocks" />
-
         <div ng-messages="vm.propertyForm.minCount.$error" show-validation-on-submit>
             <div class="help text-error" ng-message="minCount">
                 <localize key="validation_entriesShort" tokens="[vm.validationLimit.min, vm.validationLimit.min - vm.blocks.length]" watch-tokens="true">Minimum %0% entries, needs <strong>%1%</strong> more.</localize>
             </div>
         </div>
-        <div ng-if="vm.propertyForm.maxCount.$error === true || vm.blocks.length > vm.validationLimit.max">
+        <div ng-if="vm.propertyForm.maxCount.$error === true && vm.blocks.length > vm.validationLimit.max">
             <div class="help text-error">
                 <localize key="validation_entriesExceed" tokens="[vm.validationLimit.max, vm.blocks.length - vm.validationLimit.max]" watch-tokens="true">Maximum %0% entries, <strong>%1%</strong> too many.</localize>
             </div>

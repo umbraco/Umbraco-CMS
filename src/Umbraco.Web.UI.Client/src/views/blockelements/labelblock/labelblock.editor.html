@@ -1,4 +1,4 @@
-<button type="button" class="btn-reset umb-outline blockelement-labelblock-editor blockelement__draggable-element" ng-click="vm.editBlock(block)" focus-when="{{moveFocusToBlock === block}}">
-    <i class="icon {{block.content.icon}}"></i>
-    <span>{{block.label}}</span>
+<button type="button" class="btn-reset umb-outline blockelement-labelblock-editor blockelement__draggable-element" ng-click="vm.blockEditorApi.editBlock(vm.block)" focus-when="{{vm.focusThis}}">
+    <i class="icon {{vm.block.content.icon}}"></i>
+    <span>{{vm.block.label}}</span>
 </button>

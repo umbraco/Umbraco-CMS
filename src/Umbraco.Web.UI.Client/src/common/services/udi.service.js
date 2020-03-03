@@ -22,7 +22,7 @@
              * @returns {string} The generated UDI
              */
             create: function(entityType) {
-                return "umb://" + entityType + "/" + String.CreateGuid();
+                return "umb://" + entityType + "/" + (String.CreateGuid().replace(/-/g, ""));
             }
         }
     }

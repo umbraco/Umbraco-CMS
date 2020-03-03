@@ -5,22 +5,41 @@
     function blockEditorService($interpolate, udiService) {
 
 
-        function applyModelToScaffold(scaffold, contentModel) {
-            
-            scaffold.key = contentModel.key;
+        function mapToEditingModel(editingModel, contentModel) {
 
-            var variant = scaffold.variants[0];
+            var variant = editingModel.variants[0];
+            
+            for (var t = 0; t < variant.tabs.length; t++) {
+                var tab = variant.tabs[t];
+                
+                for (var p = 0; p < tab.properties.length; p++) {
+                    var prop = tab.properties[p];
+                    if (contentModel[prop.alias]) {
+                        console.log("mapping:", prop.alias, contentModel[prop.alias])
+                        prop.value = contentModel[prop.alias];
+                    }
+                }
+            }
+        }
+
+        function mapToPropertyModel(editingModel, contentModel) {
+            
+            var variant = editingModel.variants[0];
             
             for (var t = 0; t < variant.tabs.length; t++) {
                 var tab = variant.tabs[t];
 
                 for (var p = 0; p < tab.properties.length; p++) {
                     var prop = tab.properties[p];
-                    if (contentModel[prop.propertyAlias]) {
-                        prop.value = contentModel[prop.propertyAlias];
+                    if (prop.value) {
+                        contentModel[prop.propertyAlias] = prop.value;
                     }
                 }
             }
+        }
+
+        function mapValueToPropertyModel(value, alias, contentModel) {
+            contentModel[alias] = value;
         }
 
 
@@ -107,7 +126,9 @@
              */
             getEditingModel: function(layoutEntry) {
 
-                var contentModel = this.getContentByUdi(layoutEntry.udi);
+                var udi = layoutEntry.udi;
+
+                var contentModel = this.getContentByUdi(udi);
 
                 var blockConfiguration = this.getBlockConfiguration(contentModel.contentTypeAlias);
 
@@ -116,21 +137,44 @@
                     return null;
                 }
 
-                var model = angular.copy(blockConfiguration);
-                model.labelInterpolate = $interpolate(model.label);
-                model.overlaySize = model.overlaySize || "medium";
-                
+                var editingModel = {};
+                editingModel.config = angular.copy(blockConfiguration);
+                editingModel.labelInterpolator = $interpolate(editingModel.config.label);
+
                 var scaffold = this.getScaffoldFor(blockConfiguration.contentTypeAlias);
                 if(scaffold === null) {
                     return null;
                 }
 
-                model.content = angular.copy(scaffold);
-                applyModelToScaffold(model.content, contentModel);
+                // make basics from scaffold
+                editingModel.content = angular.copy(scaffold);
+                editingModel.content.udi = udi;
+
+                mapToEditingModel(editingModel.content, contentModel);
+
+                editingModel.contentModel = contentModel;
+                editingModel.layoutModel = layoutEntry;
 
                 // TODO: settings
 
-                return model;
+                return editingModel;
+
+            },
+
+
+            /**
+             * Retrieve editing model of a layout entry
+             * @return {Object} Scaffolded Block Content object.
+             */
+            setDataFromEditingModel: function(editingModel) {
+
+                var udi = editingModel.content.key;
+
+                var contentModel = this.getContentByUdi(udi);
+
+                mapToPropertyModel(editingModel.content, contentModel);
+
+                // TODO: sync settings to layout entry.
 
             },
 
@@ -165,7 +209,6 @@
                 return entry;
             },
 
-            // private
             getContentByUdi: function(udi) {
                 return this.value.data.find(entry => entry.udi === udi);
             },
@@ -198,12 +241,11 @@
             createModelObject: function(propertyModelValue, propertyEditorAlias, blockConfigurations) {
                 return new BlockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations);
             },
-            getBlockLabel: function(blockModelObject, labelIndex) {
+            getBlockLabel: function(blockModelObject) {
 
                 // TODO: we should do something about this for performance.
     
                 var vars = new Object();
-                vars["$index"] = labelIndex;
                 
                 var variant = blockModelObject.content.variants[0];
                 var tab = variant.tabs[0];
@@ -212,8 +254,8 @@
                     vars[property.alias] = property.value;
                 }
     
-                if(blockModelObject.labelInterpolate) {
-                    return blockModelObject.labelInterpolate(vars);
+                if(blockModelObject.labelInterpolator) {
+                    return blockModelObject.labelInterpolator(vars);
                 }
     
                 return blockModelObject.contentTypeName;
