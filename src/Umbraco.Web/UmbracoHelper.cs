@@ -180,7 +180,17 @@ namespace Umbraco.Web
 
         #region Content
 
+        /// <summary>
+        /// Gets a content item from the cache.
+        /// </summary>
+        /// <param name="id">The unique identifier, or the key, of the content item.</param>
+        /// <returns>The content, or null of the content item is not in the cache.</returns>
+        public IPublishedContent Content(object id)
+        {
+            return ContentForObject(id);
+        }
 
+        private IPublishedContent ContentForObject(object id) => _publishedContentQuery.Content(id);
 
         public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
@@ -235,7 +245,6 @@ namespace Umbraco.Web
         public IEnumerable<IPublishedContent> Content(params GuidUdi[] ids) => _publishedContentQuery.Content(ids);
 
         private IEnumerable<IPublishedContent> ContentForObjects(IEnumerable<object> ids) => _publishedContentQuery.Content(ids);
-        private IPublishedContent Content(object id) => _publishedContentQuery.Content(id);
 
         /// <summary>
         /// Gets content items from the cache.
