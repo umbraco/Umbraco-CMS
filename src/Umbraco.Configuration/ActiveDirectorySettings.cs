@@ -3,9 +3,9 @@ using Umbraco.Core.Configuration;
 
 namespace Umbraco.Configuration
 {
-    public class ActiveDirectory : IActiveDirectorySettings
+    public class ActiveDirectorySettings : IActiveDirectorySettings
     {
-        public ActiveDirectory()
+        public ActiveDirectorySettings()
         {
             ActiveDirectoryDomain = ConfigurationManager.AppSettings["ActiveDirectoryDomain"];
         }

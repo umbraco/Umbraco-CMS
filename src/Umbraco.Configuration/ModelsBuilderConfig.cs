@@ -21,7 +21,7 @@ namespace Umbraco.Configuration
         private object _flagOutOfDateModelsLock;
         private bool _flagOutOfDateModelsConfigured;
         private bool _flagOutOfDateModels;
-        public const string DefaultModelsNamespace = "Umbraco.Web.PublishedModels";
+
 
         public string DefaultModelsDirectory => _ioHelper.MapPath("~/App_Data/Models");
 
@@ -37,7 +37,7 @@ namespace Umbraco.Configuration
             Enable = ConfigurationManager.AppSettings[Prefix + "Enable"] == "true";
 
             // ensure defaults are initialized for tests
-            ModelsNamespace = DefaultModelsNamespace;
+            ModelsNamespace = Constants.ModelsBuilder.DefaultModelsNamespace;
             ModelsDirectory  = DefaultModelsDirectory;
             DebugLevel = 0;
 
@@ -95,7 +95,7 @@ namespace Umbraco.Configuration
             Enable = enable;
             _modelsMode = modelsMode;
 
-            ModelsNamespace = string.IsNullOrWhiteSpace(modelsNamespace) ? DefaultModelsNamespace : modelsNamespace;
+            ModelsNamespace = string.IsNullOrWhiteSpace(modelsNamespace) ? Constants.ModelsBuilder.DefaultModelsNamespace : modelsNamespace;
             EnableFactory = enableFactory;
             _flagOutOfDateModels = flagOutOfDateModels;
             ModelsDirectory = string.IsNullOrWhiteSpace(modelsDirectory) ? DefaultModelsDirectory : modelsDirectory;

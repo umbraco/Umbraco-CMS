@@ -18,14 +18,6 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().RequestHandler);
             composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Security);
 
-            composition.RegisterUnique<IIndexCreatorSettings, IndexCreatorSettings>();
-            composition.RegisterUnique<INuCacheSettings, NuCacheSettings>();
-            composition.RegisterUnique<ITypeFinderSettings, TypeFinderSettings>();
-            composition.RegisterUnique<IRuntimeSettings, RuntimeSettings>();
-            composition.RegisterUnique<IActiveDirectorySettings, IActiveDirectorySettings>();
-            composition.RegisterUnique<IExceptionFilterSettings, ExceptionFilterSettings>();
-            composition.RegisterUnique<IModelsBuilderConfig, ModelsBuilderConfig>();
-
             return composition;
         }
     }

@@ -34,6 +34,7 @@
             /// The header name that angular uses to pass in the token to validate the cookie
             /// </summary>
             public const string AngularHeadername = "X-UMB-XSRF-TOKEN";
+            
         }
     }
 }

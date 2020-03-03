@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
 using NUnit.Framework;
 using Umbraco.Configuration;
+using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.ModelsBuilder
@@ -26,7 +27,7 @@ namespace Umbraco.Tests.ModelsBuilder
         public void DefaultModelsNamespace()
         {
             var config = new ModelsBuilderConfig(TestHelper.IOHelper);
-            Assert.AreEqual(ModelsBuilderConfig.DefaultModelsNamespace, config.ModelsNamespace);
+            Assert.AreEqual(Constants.ModelsBuilder.DefaultModelsNamespace, config.ModelsNamespace);
         }
 
         [TestCase("c:/path/to/root", "~/dir/models", false, "c:\\path\\to\\root\\dir\\models")]

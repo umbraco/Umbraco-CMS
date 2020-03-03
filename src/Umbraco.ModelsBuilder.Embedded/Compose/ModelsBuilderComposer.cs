@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Reflection;
 using Umbraco.Core.Configuration;
-using Umbraco.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
@@ -20,15 +19,11 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         {
             var isLegacyModelsBuilderInstalled = IsLegacyModelsBuilderInstalled();
 
-
-            composition.Configs.Add<IModelsBuilderConfig>(() => new ModelsBuilderConfig(composition.IOHelper));
-
             if (isLegacyModelsBuilderInstalled)
             {
                 ComposeForLegacyModelsBuilder(composition);
                 return;
             }
-
 
             composition.Components().Append<ModelsBuilderComponent>();
             composition.Register<UmbracoServices>(Lifetime.Singleton);

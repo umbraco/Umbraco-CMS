@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Configuration;
 
 namespace Umbraco.ModelsBuilder.Embedded.Building
 {
@@ -18,6 +18,8 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
     /// </summary>
     internal abstract class Builder
     {
+
+
 
         private readonly IList<TypeModel> _typeModels;
 
@@ -210,7 +212,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
 
             // use configured else fallback to default
             return string.IsNullOrWhiteSpace(Config.ModelsNamespace)
-                ? ModelsBuilderConfig.DefaultModelsNamespace
+                ? Constants.ModelsBuilder.DefaultModelsNamespace
                 : Config.ModelsNamespace;
         }
 
