@@ -1,5 +1,5 @@
-﻿using Umbraco.Core.Configuration;
-using Umbraco.ModelsBuilder.Embedded.Configuration;
+﻿using Umbraco.Abstractions;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {

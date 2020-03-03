@@ -1,12 +1,12 @@
 ﻿using System.Linq;
 using System.Reflection;
+using Umbraco.Abstractions;
+using Umbraco.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
-using Umbraco.ModelsBuilder.Embedded.Configuration;
-using Umbraco.Web;
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {

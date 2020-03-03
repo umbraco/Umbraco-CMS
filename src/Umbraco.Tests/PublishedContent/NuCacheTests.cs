@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Abstractions;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -185,6 +186,7 @@ namespace Umbraco.Tests.PublishedContent
             _variationAccesor = new TestVariationContextAccessor();
 
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var settings = Mock.Of<INuCacheSettings>();
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
@@ -209,7 +211,8 @@ namespace Umbraco.Tests.PublishedContent
                 typeFinder,
                 TestHelper.GetHostingEnvironment(),
                 new MockShortStringHelper(),
-                TestHelper.IOHelper);
+                TestHelper.IOHelper,
+                settings);
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

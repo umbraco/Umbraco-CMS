@@ -4,6 +4,7 @@ using Umbraco.Core.Services;
 using Lucene.Net.Analysis.Standard;
 using Examine.LuceneEngine;
 using Examine;
+using Umbraco.Abstractions;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
@@ -25,7 +26,8 @@ namespace Umbraco.Examine
             IMemberService memberService,
             IUmbracoIndexConfig umbracoIndexConfig,
             IIOHelper ioHelper,
-            IRuntimeState runtimeState) : base(typeFinder, ioHelper)
+            IRuntimeState runtimeState,
+            IIndexCreatorSettings settings) : base(typeFinder, ioHelper, settings)
         {
             ProfilingLogger = profilingLogger ?? throw new System.ArgumentNullException(nameof(profilingLogger));
             LanguageService = languageService ?? throw new System.ArgumentNullException(nameof(languageService));

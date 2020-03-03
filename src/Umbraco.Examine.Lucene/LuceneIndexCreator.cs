@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using Examine;
 using Examine.LuceneEngine.Directories;
 using Lucene.Net.Store;
+using Umbraco.Abstractions;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
@@ -19,11 +19,13 @@ namespace Umbraco.Examine
     {
         private readonly ITypeFinder _typeFinder;
         private readonly IIOHelper _ioHelper;
+        private readonly IIndexCreatorSettings _settings;
 
-        protected LuceneIndexCreator(ITypeFinder typeFinder, IIOHelper ioHelper)
+        protected LuceneIndexCreator(ITypeFinder typeFinder, IIOHelper ioHelper, IIndexCreatorSettings settings)
         {
             _typeFinder = typeFinder;
             _ioHelper = ioHelper;
+            _settings = settings;
         }
 
         public abstract IEnumerable<IIndex> Create();
@@ -43,7 +45,8 @@ namespace Umbraco.Examine
                 System.IO.Directory.CreateDirectory(dirInfo.FullName);
 
             //check if there's a configured directory factory, if so create it and use that to create the lucene dir
-            var configuredDirectoryFactory = ConfigurationManager.AppSettings["Umbraco.Examine.LuceneDirectoryFactory"];
+            var configuredDirectoryFactory = _settings.LuceneDirectoryFactory;
+                
             if (!configuredDirectoryFactory.IsNullOrWhiteSpace())
             {
                 //this should be a fully qualified type

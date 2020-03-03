@@ -1,23 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Web.Configuration;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
 using System.Web.Mvc;
 using System.Web.Routing;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
+using Umbraco.Abstractions;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Strings;
 using Umbraco.Core.IO;
-using Umbraco.Core.Strings;
 using Umbraco.Web.Install;
 using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;
@@ -37,6 +35,7 @@ namespace Umbraco.Web.Runtime
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IIOHelper _ioHelper;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IRuntimeSettings _settings;
 
         public WebInitialComponent(
             IUmbracoContextAccessor umbracoContextAccessor,
@@ -46,7 +45,8 @@ namespace Umbraco.Web.Runtime
             IGlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IIOHelper ioHelper,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IRuntimeSettings settings)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _surfaceControllerTypes = surfaceControllerTypes;
@@ -56,6 +56,7 @@ namespace Umbraco.Web.Runtime
             _hostingEnvironment = hostingEnvironment;
             _ioHelper = ioHelper;
             _shortStringHelper = shortStringHelper;
+            _settings = settings;
         }
 
         public void Initialize()
@@ -146,10 +147,10 @@ namespace Umbraco.Web.Runtime
                     = Path.Combine(cachePath, "ClientDependency");
             }
 
-            if (ConfigurationManager.GetSection("system.web/httpRuntime") is HttpRuntimeSection section)
+            if (_settings.MaxQueryStringLength.HasValue || _settings.MaxRequestLength.HasValue)
             {
                 //set the max url length for CDF to be the smallest of the max query length, max request length
-                ClientDependency.Core.CompositeFiles.CompositeDependencyHandler.MaxHandlerUrlLength = Math.Min(section.MaxQueryStringLength, section.MaxRequestLength);
+                ClientDependency.Core.CompositeFiles.CompositeDependencyHandler.MaxHandlerUrlLength = Math.Min(_settings.MaxQueryStringLength.GetValueOrDefault(), _settings.MaxRequestLength.GetValueOrDefault());
             }
 
             //Register a custom renderer - used to process property editor dependencies

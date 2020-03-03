@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web.Routing;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Abstractions;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -86,6 +87,7 @@ namespace Umbraco.Tests.Scoping
             var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var settings = Mock.Of<INuCacheSettings>();
 
             return new PublishedSnapshotService(
                 options,
@@ -107,7 +109,8 @@ namespace Umbraco.Tests.Scoping
                 typeFinder,
                 hostingEnvironment,
                 new MockShortStringHelper(),
-                IOHelper);
+                IOHelper,
+                settings);
         }
 
         protected IUmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)

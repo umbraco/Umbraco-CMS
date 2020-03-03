@@ -3,6 +3,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
+using Umbraco.Abstractions;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -36,6 +37,7 @@ namespace Umbraco.Web.Editors
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
+        private IRuntimeSettings _runtimeSettings;
 
         public PreviewController(
             UmbracoFeatures features,
@@ -49,7 +51,8 @@ namespace Umbraco.Web.Editors
             TreeCollection treeCollection,
             IHttpContextAccessor httpContextAccessor,
             IHostingEnvironment hostingEnvironment,
-            ICookieManager cookieManager)
+            ICookieManager cookieManager,
+            IRuntimeSettings settings)
         {
             _features = features;
             _globalSettings = globalSettings;
@@ -63,6 +66,7 @@ namespace Umbraco.Web.Editors
             _httpContextAccessor = httpContextAccessor;
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
+            _runtimeSettings = settings;
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
@@ -71,7 +75,7 @@ namespace Umbraco.Web.Editors
         {
             var availableLanguages = _localizationService.GetAllLanguages();
 
-            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _umbracoSettingsSection, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment);
+            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _umbracoSettingsSection, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {

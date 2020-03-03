@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Configuration.UmbracoSettings;
+﻿using Umbraco.Abstractions;
+using Umbraco.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Core.Composing.CompositionExtensions
 {
@@ -15,6 +17,14 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
             composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().RequestHandler);
             composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Security);
+
+            composition.RegisterUnique<IIndexCreatorSettings, IndexCreatorSettings>();
+            composition.RegisterUnique<INuCacheSettings, NuCacheSettings>();
+            composition.RegisterUnique<ITypeFinderSettings, TypeFinderSettings>();
+            composition.RegisterUnique<IRuntimeSettings, RuntimeSettings>();
+            composition.RegisterUnique<IActiveDirectorySettings, IActiveDirectorySettings>();
+            composition.RegisterUnique<IExceptionFilterSettings, ExceptionFilterSettings>();
+            composition.RegisterUnique<IModelsBuilderConfig, ModelsBuilderConfig>();
 
             return composition;
         }

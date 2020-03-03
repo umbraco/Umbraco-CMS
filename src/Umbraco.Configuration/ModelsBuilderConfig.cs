@@ -2,11 +2,11 @@
 using System.Configuration;
 using System.IO;
 using System.Threading;
-using System.Web.Configuration;
+using Umbraco.Abstractions;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 
-namespace Umbraco.ModelsBuilder.Embedded.Configuration
+namespace Umbraco.Configuration
 {
     /// <summary>
     /// Represents the models builder configuration.
@@ -174,8 +174,13 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
         {
             get
             {
-                var section = (CompilationSection)ConfigurationManager.GetSection("system.web/compilation");
-                return section != null && section.Debug;
+                if (ConfigurationManager.GetSection("system.web/compilation") is ConfigurationSection section &&
+                    bool.TryParse(section.ElementInformation.Properties["debug"].Value.ToString(), out var isDebug))
+                {
+                    return isDebug;
+                }
+
+                return false;
             }
         }
 

@@ -59,10 +59,6 @@
     <Compile Include="Building\TypeModel.cs" />
     <Compile Include="Compose\DisabledModelsBuilderComponent.cs" />
     <Compile Include="ConfigsExtensions.cs" />
-    <Compile Include="Configuration\IModelsBuilderConfig.cs" />
-    <Compile Include="Configuration\ModelsBuilderConfig.cs" />
-    <Compile Include="Configuration\ModelsMode.cs" />
-    <Compile Include="Configuration\ModelsModeExtensions.cs" />
     <Compile Include="BackOffice\DashboardReport.cs" />
     <Compile Include="ImplementPropertyTypeAttribute.cs" />
     <Compile Include="ModelsBuilderAssemblyAttribute.cs" />
@@ -101,6 +97,14 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj">
+      <Project>{D369E986-00D5-4F49-9B2D-E7A8F0C9EEDD}</Project>
+      <Name>Umbraco.Abstractions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Configuration\Umbraco.Configuration.csproj">
+      <Project>{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}</Project>
+      <Name>Umbraco.Configuration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
       <Project>{29aa69d9-b597-4395-8d42-43b1263c240a}</Project>
       <Name>Umbraco.Core</Name>
@@ -123,6 +127,8 @@
       <Version>5.2.7</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Configuration\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

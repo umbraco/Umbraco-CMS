@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Umbraco.ModelsBuilder.Embedded.Configuration;
+using Umbraco.Abstractions;
 
 namespace Umbraco.ModelsBuilder.Embedded.Building
 {

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.ModelsBuilder.Embedded.Configuration
+﻿namespace Umbraco.Abstractions
 {
     /// <summary>
     /// Defines the models generation modes.

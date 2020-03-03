@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Abstractions;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded;
 using Umbraco.ModelsBuilder.Embedded.Building;
-using Umbraco.ModelsBuilder.Embedded.Configuration;
 
 namespace Umbraco.Tests.ModelsBuilder
 {

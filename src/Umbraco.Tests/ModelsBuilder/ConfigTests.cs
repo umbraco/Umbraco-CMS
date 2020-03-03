@@ -1,6 +1,6 @@
 ﻿using System.Configuration;
 using NUnit.Framework;
-using Umbraco.ModelsBuilder.Embedded.Configuration;
+using Umbraco.Configuration;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.ModelsBuilder

@@ -1,12 +1,13 @@
 ﻿using System.Configuration;
 using CSharpTest.Net.Collections;
 using CSharpTest.Net.Serialization;
+using Umbraco.Abstractions;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     internal class BTree
     {
-        public static BPlusTree<int, ContentNodeKit> GetTree(string filepath, bool exists)
+        public static BPlusTree<int, ContentNodeKit> GetTree(string filepath, bool exists, INuCacheSettings settings)
         {
             var keySerializer = new PrimitiveSerializer();
             var valueSerializer = new ContentNodeKitSerializer();
@@ -19,7 +20,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 CachePolicy = CachePolicy.None,
 
                 // default is 4096, min 2^9 = 512, max 2^16 = 64K
-                FileBlockSize = GetBlockSize(),
+                FileBlockSize = GetBlockSize(settings),
 
                 // other options?
             };
@@ -32,11 +33,11 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return tree;
         }
 
-        private static int GetBlockSize()
+        private static int GetBlockSize(INuCacheSettings settings)
         {
             var blockSize = 4096;
 
-            var appSetting = ConfigurationManager.AppSettings["Umbraco.Web.PublishedCache.NuCache.BTree.BlockSize"];
+            var appSetting = settings.BTreeBlockSize;
             if (appSetting == null)
                 return blockSize;
 

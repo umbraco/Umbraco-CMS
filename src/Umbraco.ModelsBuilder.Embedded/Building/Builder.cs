@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.ModelsBuilder.Embedded.Configuration;
+using Umbraco.Abstractions;
+using Umbraco.Configuration;
 
 namespace Umbraco.ModelsBuilder.Embedded.Building
 {

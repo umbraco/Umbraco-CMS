@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Abstractions;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -59,6 +60,7 @@ namespace Umbraco.Tests.Services
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
 
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var settings = Mock.Of<INuCacheSettings>();
 
             return new PublishedSnapshotService(
                 options,
@@ -80,7 +82,8 @@ namespace Umbraco.Tests.Services
                 typeFinder,
                 hostingEnvironment,
                 new MockShortStringHelper(),
-                IOHelper);
+                IOHelper,
+                settings);
         }
 
         public class LocalServerMessenger : ServerMessengerBase

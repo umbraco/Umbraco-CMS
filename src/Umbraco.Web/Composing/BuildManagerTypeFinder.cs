@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Compilation;
-using Umbraco.Core;
+using Umbraco.Abstractions;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
@@ -26,7 +23,11 @@ namespace Umbraco.Web.Composing
     internal class BuildManagerTypeFinder : TypeFinder, ITypeFinder
     {
 
-        public BuildManagerTypeFinder(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger logger, ITypeFinderConfig typeFinderConfig = null) : base(logger, typeFinderConfig)
+        public BuildManagerTypeFinder(
+            IIOHelper ioHelper,
+            IHostingEnvironment hostingEnvironment,
+            ILogger logger,
+            ITypeFinderConfig typeFinderConfig = null) : base(logger, typeFinderConfig)
         {
             if (ioHelper == null) throw new ArgumentNullException(nameof(ioHelper));
             if (hostingEnvironment == null) throw new ArgumentNullException(nameof(hostingEnvironment));
@@ -91,7 +92,14 @@ namespace Umbraco.Web.Composing
         /// </summary>
         internal class TypeFinderConfig : ITypeFinderConfig
         {
+            private readonly ITypeFinderSettings _settings;
             private IEnumerable<string> _assembliesAcceptingLoadExceptions;
+
+            public TypeFinderConfig(ITypeFinderSettings settings)
+            {
+                _settings = settings;
+            }
+
             public IEnumerable<string> AssembliesAcceptingLoadExceptions
             {
                 get
@@ -99,7 +107,7 @@ namespace Umbraco.Web.Composing
                     if (_assembliesAcceptingLoadExceptions != null)
                         return _assembliesAcceptingLoadExceptions;
 
-                    var s = ConfigurationManager.AppSettings[Constants.AppSettings.AssembliesAcceptingLoadExceptions];
+                    var s = _settings.AssembliesAcceptingLoadExceptions;
                     return _assembliesAcceptingLoadExceptions = string.IsNullOrWhiteSpace(s)
                         ? Array.Empty<string>()
                         : s.Split(',').Select(x => x.Trim()).ToArray();

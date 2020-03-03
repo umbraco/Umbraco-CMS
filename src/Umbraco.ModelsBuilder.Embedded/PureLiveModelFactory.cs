@@ -11,12 +11,12 @@ using System.Threading;
 using System.Web;
 using System.Web.Compilation;
 using System.Web.WebPages.Razor;
+using Umbraco.Abstractions;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
-using Umbraco.ModelsBuilder.Embedded.Configuration;
 using File = System.IO.File;
 
 namespace Umbraco.ModelsBuilder.Embedded

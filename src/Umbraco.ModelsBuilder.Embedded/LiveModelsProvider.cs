@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading;
-using System.Web.Hosting;
+using Umbraco.Abstractions;
+using Umbraco.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.ModelsBuilder.Embedded.Building;
-using Umbraco.ModelsBuilder.Embedded.Configuration;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.ModelsBuilder.Embedded
