@@ -100,6 +100,7 @@
          * Maps content from runtime editing model (blocks) to the property model.
          * Does not take care of ordering, we need the sort-UI to sync that, on the fly.
          */
+        /*
         function mapToContent() {
 
             // sync data from blocks to content models.
@@ -107,10 +108,15 @@
                 modelObject.setDataFromEditingModel(block);
             });
         }
+        */
 
+        /*
         function sync() {
-            mapToContent();
+            // to avoid deep watches of block editors we use an event for those instead?
+            // Lets inform container of this property editor that we updated.
+            $scope.$emit("blockEditorValueUpdated");
         }
+        */
 
         function syncBlockData(block) {
             modelObject.setDataFromEditingModel(block);
@@ -325,7 +331,7 @@
 
 
         unsubscribe.push($scope.$watch(() => vm.blocks.length, validateLimits));
-
+/*
         unsubscribe.push($scope.$on("formSubmitting", function (ev, args) {
 
             console.log("formSubmitting is happening, we need to make sure sub property editors are synced first.")
@@ -334,7 +340,7 @@
 
             //sync();
         }));
-
+*/
         $scope.$on("$destroy", function () {
             for (const subscription of unsubscribe) {
                 subscription();

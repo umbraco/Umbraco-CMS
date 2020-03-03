@@ -11,11 +11,10 @@
             
             for (var t = 0; t < variant.tabs.length; t++) {
                 var tab = variant.tabs[t];
-                
+
                 for (var p = 0; p < tab.properties.length; p++) {
                     var prop = tab.properties[p];
                     if (contentModel[prop.alias]) {
-                        console.log("mapping:", prop.alias, contentModel[prop.alias])
                         prop.value = contentModel[prop.alias];
                     }
                 }
@@ -89,7 +88,6 @@
 
                 scaffoldAliases.forEach((elementTypeAlias => {
                     tasks.push(contentResource.getScaffold(-20, elementTypeAlias).then(scaffold => {
-                        console.log(scaffold);
                         this.scaffolds.push(scaffold);
                     }));
                 }));
