@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using Umbraco.Abstractions;
+using Umbraco.Core.Configuration;
 using Umbraco.Configuration;
 
 namespace Umbraco.ModelsBuilder.Embedded.BackOffice

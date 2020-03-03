@@ -1,5 +1,5 @@
 ﻿using System.Configuration;
-using Umbraco.Abstractions;
+using Umbraco.Core.Configuration;
 using Umbraco.Core;
 
 namespace Umbraco.Configuration

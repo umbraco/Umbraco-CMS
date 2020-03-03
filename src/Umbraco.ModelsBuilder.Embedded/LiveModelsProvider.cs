@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using Umbraco.Abstractions;
+using Umbraco.Core.Configuration;
 using Umbraco.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;

@@ -1,7 +1,7 @@
 ﻿using System.Configuration;
 using CSharpTest.Net.Collections;
 using CSharpTest.Net.Serialization;
-using Umbraco.Abstractions;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {

@@ -1,4 +1,4 @@
-﻿using Umbraco.Abstractions;
+﻿using Umbraco.Core.Configuration;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.ModelsBuilder.Embedded.BackOffice

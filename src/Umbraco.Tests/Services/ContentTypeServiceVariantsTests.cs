@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Abstractions;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;

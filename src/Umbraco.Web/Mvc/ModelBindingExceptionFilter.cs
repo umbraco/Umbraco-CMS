@@ -3,7 +3,7 @@ using System.Configuration;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
-using Umbraco.Abstractions;
+using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Web.Composing;
 

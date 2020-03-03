@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Reflection;
-using Umbraco.Abstractions;
+using Umbraco.Core.Configuration;
 using Umbraco.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Logging;

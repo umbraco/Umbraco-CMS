@@ -1,4 +1,4 @@
-﻿using Umbraco.Abstractions;
+﻿using Umbraco.Core.Configuration;
 
 namespace Umbraco.Configuration
 {

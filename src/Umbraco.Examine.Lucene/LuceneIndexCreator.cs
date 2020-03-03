@@ -4,7 +4,7 @@ using System.IO;
 using Examine;
 using Examine.LuceneEngine.Directories;
 using Lucene.Net.Store;
-using Umbraco.Abstractions;
+using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;

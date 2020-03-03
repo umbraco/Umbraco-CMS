@@ -4,7 +4,7 @@ using Umbraco.Core.Services;
 using Lucene.Net.Analysis.Standard;
 using Examine.LuceneEngine;
 using Examine;
-using Umbraco.Abstractions;
+using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;

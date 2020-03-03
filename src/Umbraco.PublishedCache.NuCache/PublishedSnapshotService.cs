@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading;
 using CSharpTest.Net.Collections;
 using Newtonsoft.Json;
-using Umbraco.Abstractions;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;

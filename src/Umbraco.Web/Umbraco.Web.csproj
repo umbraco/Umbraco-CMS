@@ -106,10 +106,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj">
-      <Project>{D369E986-00D5-4F49-9B2D-E7A8F0C9EEDD}</Project>
-      <Name>Umbraco.Abstractions</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Configuration\Umbraco.Configuration.csproj">
       <Project>{fbe7c065-dac0-4025-a78b-63b24d3ab00b}</Project>
       <Name>Umbraco.Configuration</Name>

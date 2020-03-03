@@ -7,7 +7,6 @@ using System.Web;
 using System.Web.Mvc;
 using ClientDependency.Core.Config;
 using Microsoft.Owin.Security;
-using Umbraco.Abstractions;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Features;

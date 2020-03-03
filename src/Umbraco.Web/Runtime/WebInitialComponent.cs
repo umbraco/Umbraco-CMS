@@ -9,7 +9,6 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
-using Umbraco.Abstractions;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;

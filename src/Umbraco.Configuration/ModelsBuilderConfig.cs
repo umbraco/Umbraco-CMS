@@ -2,7 +2,7 @@
 using System.Configuration;
 using System.IO;
 using System.Threading;
-using Umbraco.Abstractions;
+using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 

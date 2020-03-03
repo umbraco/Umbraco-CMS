@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Abstractions;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Web.Compilation;
-using Umbraco.Abstractions;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;

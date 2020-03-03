@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
-using Umbraco.Abstractions;
+using Umbraco.Core.Configuration;
 using Umbraco.Configuration;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;

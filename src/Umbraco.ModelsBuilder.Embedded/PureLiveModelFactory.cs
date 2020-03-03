@@ -11,7 +11,7 @@ using System.Threading;
 using System.Web;
 using System.Web.Compilation;
 using System.Web.WebPages.Razor;
-using Umbraco.Abstractions;
+using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;

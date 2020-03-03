@@ -1,5 +1,4 @@
-﻿using Umbraco.Abstractions;
-using Umbraco.Core.Configuration;
+﻿using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;

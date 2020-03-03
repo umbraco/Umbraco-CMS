@@ -117,8 +117,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Examine.Lucene", "U
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.BackOffice", "Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj", "{9B95EEF7-63FE-4432-8C63-166BE9C1A929}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Abstractions", "Umbraco.Abstractions\Umbraco.Abstractions.csproj", "{D369E986-00D5-4F49-9B2D-E7A8F0C9EEDD}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -179,10 +177,6 @@ Global
 		{9B95EEF7-63FE-4432-8C63-166BE9C1A929}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B95EEF7-63FE-4432-8C63-166BE9C1A929}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B95EEF7-63FE-4432-8C63-166BE9C1A929}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D369E986-00D5-4F49-9B2D-E7A8F0C9EEDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D369E986-00D5-4F49-9B2D-E7A8F0C9EEDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D369E986-00D5-4F49-9B2D-E7A8F0C9EEDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D369E986-00D5-4F49-9B2D-E7A8F0C9EEDD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

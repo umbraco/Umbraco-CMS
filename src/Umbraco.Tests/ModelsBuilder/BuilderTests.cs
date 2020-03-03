@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Abstractions;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded;
 using Umbraco.ModelsBuilder.Embedded.Building;

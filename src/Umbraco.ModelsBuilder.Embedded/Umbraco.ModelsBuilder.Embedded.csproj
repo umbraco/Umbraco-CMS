@@ -97,10 +97,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj">
-      <Project>{D369E986-00D5-4F49-9B2D-E7A8F0C9EEDD}</Project>
-      <Name>Umbraco.Abstractions</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Configuration\Umbraco.Configuration.csproj">
       <Project>{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}</Project>
       <Name>Umbraco.Configuration</Name>
@@ -126,9 +122,6 @@
     <PackageReference Include="Microsoft.AspNet.Mvc">
       <Version>5.2.7</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Configuration\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

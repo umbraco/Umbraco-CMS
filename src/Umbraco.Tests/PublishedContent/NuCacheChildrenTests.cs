@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Abstractions;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;

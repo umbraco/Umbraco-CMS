@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Abstractions
+﻿namespace Umbraco.Core.Configuration
 {
     public interface IIndexCreatorSettings
     {
