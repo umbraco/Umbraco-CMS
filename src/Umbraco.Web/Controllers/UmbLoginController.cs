@@ -19,9 +19,9 @@ namespace Umbraco.Web.Controllers
         }
 
         public UmbLoginController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory,
-            ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper,
+            ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger,
             MembershipHelper membershipHelper)
-            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger, umbracoHelper)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger)
         {
             _membershipHelper = membershipHelper;
         }

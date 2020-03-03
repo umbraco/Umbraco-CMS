@@ -180,61 +180,7 @@ namespace Umbraco.Web
 
         #region Content
 
-        /// <summary>
-        /// Gets a content item from the cache.
-        /// </summary>
-        /// <param name="id">The unique identifier, or the key, of the content item.</param>
-        /// <returns>The content, or null of the content item is not in the cache.</returns>
-        public IPublishedContent Content(object id)
-        {
-            return ContentForObject(id);
-        }
 
-        private IPublishedContent ContentForObject(object id)
-        {
-            if (ConvertIdObjectToInt(id, out var intId))
-                return _publishedContentQuery.Content(intId);
-            if (ConvertIdObjectToGuid(id, out var guidId))
-                return _publishedContentQuery.Content(guidId);
-            if (ConvertIdObjectToUdi(id, out var udiId))
-                return _publishedContentQuery.Content(udiId);
-            return null;
-        }
-
-        /// <summary>
-        /// Gets a content item from the cache.
-        /// </summary>
-        /// <param name="id">The unique identifier of the content item.</param>
-        /// <returns>The content, or null of the content item is not in the cache.</returns>
-        public IPublishedContent Content(int id)
-        {
-            return _publishedContentQuery.Content(id);
-        }
-
-        /// <summary>
-        /// Gets a content item from the cache.
-        /// </summary>
-        /// <param name="id">The key of the content item.</param>
-        /// <returns>The content, or null of the content item is not in the cache.</returns>
-        public IPublishedContent Content(Guid id)
-        {
-            return _publishedContentQuery.Content(id);
-        }
-
-        /// <summary>
-        /// Gets a content item from the cache.
-        /// </summary>
-        /// <param name="id">The unique identifier, or the key, of the content item.</param>
-        /// <returns>The content, or null of the content item is not in the cache.</returns>
-        public IPublishedContent Content(string id)
-        {
-            return ContentForObject(id);
-        }
-
-        public IPublishedContent Content(Udi id)
-        {
-            return _publishedContentQuery.Content(id);
-        }
 
         public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
@@ -247,10 +193,7 @@ namespace Umbraco.Web
         /// <param name="ids">The unique identifiers, or the keys, of the content items.</param>
         /// <returns>The content items that were found in the cache.</returns>
         /// <remarks>Does not support mixing identifiers and keys.</remarks>
-        public IEnumerable<IPublishedContent> Content(params object[] ids)
-        {
-            return ContentForObjects(ids);
-        }
+        public IEnumerable<IPublishedContent> Content(params object[] ids) => _publishedContentQuery.Content(ids);
 
         /// <summary>
         /// Gets the contents corresponding to the identifiers.
@@ -258,10 +201,7 @@ namespace Umbraco.Web
         /// <param name="ids">The content identifiers.</param>
         /// <returns>The existing contents corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
-        public IEnumerable<IPublishedContent> Content(params Udi[] ids)
-        {
-            return ids.Select(id => _publishedContentQuery.Content(id)).WhereNotNull();
-        }
+        public IEnumerable<IPublishedContent> Content(params Udi[] ids) => _publishedContentQuery.Content(ids);
 
         /// <summary>
         /// Gets the contents corresponding to the identifiers.
@@ -269,40 +209,23 @@ namespace Umbraco.Web
         /// <param name="ids">The content identifiers.</param>
         /// <returns>The existing contents corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
-        public IEnumerable<IPublishedContent> Content(params GuidUdi[] ids)
-        {
-            return ids.Select(id => _publishedContentQuery.Content(id));
-        }
+        public IEnumerable<IPublishedContent> Content(params GuidUdi[] ids) => _publishedContentQuery.Content(ids);
 
-        private IEnumerable<IPublishedContent> ContentForObjects(IEnumerable<object> ids)
-        {
-            var idsA = ids.ToArray();
-            if (ConvertIdsObjectToInts(idsA, out var intIds))
-                return _publishedContentQuery.Content(intIds);
-            if (ConvertIdsObjectToGuids(idsA, out var guidIds))
-                return _publishedContentQuery.Content(guidIds);
-            return Enumerable.Empty<IPublishedContent>();
-        }
+        private IEnumerable<IPublishedContent> ContentForObjects(IEnumerable<object> ids) => _publishedContentQuery.Content(ids);
 
         /// <summary>
         /// Gets content items from the cache.
         /// </summary>
         /// <param name="ids">The unique identifiers of the content items.</param>
         /// <returns>The content items that were found in the cache.</returns>
-        public IEnumerable<IPublishedContent> Content(params int[] ids)
-        {
-            return _publishedContentQuery.Content(ids);
-        }
+        public IEnumerable<IPublishedContent> Content(params int[] ids) => _publishedContentQuery.Content(ids);
 
         /// <summary>
         /// Gets content items from the cache.
         /// </summary>
         /// <param name="ids">The keys of the content items.</param>
         /// <returns>The content items that were found in the cache.</returns>
-        public IEnumerable<IPublishedContent> Content(params Guid[] ids)
-        {
-            return _publishedContentQuery.Content(ids);
-        }
+        public IEnumerable<IPublishedContent> Content(params Guid[] ids) => _publishedContentQuery.Content(ids);
 
         /// <summary>
         /// Gets content items from the cache.
@@ -310,10 +233,7 @@ namespace Umbraco.Web
         /// <param name="ids">The unique identifiers, or the keys, of the content items.</param>
         /// <returns>The content items that were found in the cache.</returns>
         /// <remarks>Does not support mixing identifiers and keys.</remarks>
-        public IEnumerable<IPublishedContent> Content(params string[] ids)
-        {
-            return ContentForObjects(ids);
-        }
+        public IEnumerable<IPublishedContent> Content(params string[] ids) => _publishedContentQuery.Content(ids);
 
         /// <summary>
         /// Gets the contents corresponding to the identifiers.
@@ -321,20 +241,7 @@ namespace Umbraco.Web
         /// <param name="ids">The content identifiers.</param>
         /// <returns>The existing contents corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
-        public IEnumerable<IPublishedContent> Content(IEnumerable<object> ids)
-        {
-            return ContentForObjects(ids);
-        }
-        /// <summary>
-        /// Gets the contents corresponding to the identifiers.
-        /// </summary>
-        /// <param name="ids">The content identifiers.</param>
-        /// <returns>The existing contents corresponding to the identifiers.</returns>
-        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
-        public IEnumerable<IPublishedContent> Content(IEnumerable<Udi> ids)
-        {
-            return ids.Select(id => _publishedContentQuery.Content(id)).WhereNotNull();
-        }
+        public IEnumerable<IPublishedContent> Content(IEnumerable<object> ids) => _publishedContentQuery.Content(ids);
 
         /// <summary>
         /// Gets the contents corresponding to the identifiers.
@@ -342,10 +249,7 @@ namespace Umbraco.Web
         /// <param name="ids">The content identifiers.</param>
         /// <returns>The existing contents corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
-        public IEnumerable<IPublishedContent> Content(IEnumerable<GuidUdi> ids)
-        {
-            return ids.Select(id => _publishedContentQuery.Content(id));
-        }
+        public IEnumerable<IPublishedContent> Content(IEnumerable<Udi> ids) => _publishedContentQuery.Content(ids);
 
         /// <summary>
         /// Gets the contents corresponding to the identifiers.
@@ -353,10 +257,7 @@ namespace Umbraco.Web
         /// <param name="ids">The content identifiers.</param>
         /// <returns>The existing contents corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
-        public IEnumerable<IPublishedContent> Content(IEnumerable<string> ids)
-        {
-            return ContentForObjects(ids);
-        }
+        public IEnumerable<IPublishedContent> Content(IEnumerable<GuidUdi> ids) => _publishedContentQuery.Content(ids);
 
         /// <summary>
         /// Gets the contents corresponding to the identifiers.
@@ -364,10 +265,15 @@ namespace Umbraco.Web
         /// <param name="ids">The content identifiers.</param>
         /// <returns>The existing contents corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
-        public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids)
-        {
-            return _publishedContentQuery.Content(ids);
-        }
+        public IEnumerable<IPublishedContent> Content(IEnumerable<string> ids) => _publishedContentQuery.Content(ids);
+
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids) => _publishedContentQuery.Content(ids);
 
         public IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars)
         {
@@ -384,103 +290,15 @@ namespace Umbraco.Web
             return _publishedContentQuery.ContentAtRoot();
         }
 
-        internal static bool ConvertIdObjectToInt(object id, out int intId)
-        {
-            switch (id)
-            {
-                case string s:
-                    return int.TryParse(s, out intId);
 
-                case int i:
-                    intId = i;
-                    return true;
-
-                default:
-                    intId = default;
-                    return false;
-            }
-        }
-
-        internal static bool ConvertIdObjectToGuid(object id, out Guid guidId)
-        {
-            switch (id)
-            {
-                case string s:
-                    return Guid.TryParse(s, out guidId);
-
-                case Guid g:
-                    guidId = g;
-                    return true;
-
-                default:
-                    guidId = default;
-                    return false;
-            }
-        }
-
-        private static bool ConvertIdsObjectToInts(IEnumerable<object> ids, out IEnumerable<int> intIds)
-        {
-            var list = new List<int>();
-            intIds = null;
-            foreach (var id in ids)
-            {
-                if (ConvertIdObjectToInt(id, out var intId))
-                    list.Add(intId);
-                else
-                    return false; // if one of them is not an int, fail
-            }
-            intIds = list;
-            return true;
-        }
-
-        private static bool ConvertIdsObjectToGuids(IEnumerable<object> ids, out IEnumerable<Guid> guidIds)
-        {
-            var list = new List<Guid>();
-            guidIds = null;
-            foreach (var id in ids)
-            {
-                Guid guidId;
-                if (ConvertIdObjectToGuid(id, out guidId))
-                    list.Add(guidId);
-                else
-                    return false; // if one of them is not a guid, fail
-            }
-            guidIds = list;
-            return true;
-        }
-
-        /// <remarks>Had to change to internal for testing.</remarks>
-        internal static bool ConvertIdObjectToUdi(object id, out Udi guidId)
-        {
-            switch (id)
-            {
-                case string s:
-                    return UdiParser.TryParse(s, out guidId);
-
-                case Udi u:
-                    guidId = u;
-                    return true;
-
-                default:
-                    guidId = default;
-                    return false;
-            }
-        }
 
 
         #endregion
         #region Media
 
-        public IPublishedContent Media(Udi id)
-        {
-            var guidUdi = id as GuidUdi;
-            return guidUdi == null ? null : Media(guidUdi.Guid);
-        }
+        public IPublishedContent Media(Udi id) => _publishedContentQuery.Media(id);
 
-        public IPublishedContent Media(Guid id)
-        {
-            return _publishedContentQuery.Media(id);
-        }
+        public IPublishedContent Media(Guid id) => _publishedContentQuery.Media(id);
 
         /// <summary>
         /// Overloaded method accepting an 'object' type
@@ -497,26 +315,11 @@ namespace Umbraco.Web
             return MediaForObject(id);
         }
 
-        private IPublishedContent MediaForObject(object id)
-        {
-            if (ConvertIdObjectToInt(id, out var intId))
-                return _publishedContentQuery.Media(intId);
-            if (ConvertIdObjectToGuid(id, out var guidId))
-                return _publishedContentQuery.Media(guidId);
-            if (ConvertIdObjectToUdi(id, out var udiId))
-                return _publishedContentQuery.Media(udiId);
-            return null;
-        }
+        private IPublishedContent MediaForObject(object id) => _publishedContentQuery.Media(id);
 
-        public IPublishedContent Media(int id)
-        {
-            return _publishedContentQuery.Media(id);
-        }
+        public IPublishedContent Media(int id) => _publishedContentQuery.Media(id);
 
-        public IPublishedContent Media(string id)
-        {
-            return MediaForObject(id);
-        }
+        public IPublishedContent Media(string id) => _publishedContentQuery.Media(id);
 
         /// <summary>
         /// Gets the medias corresponding to the identifiers.
@@ -524,20 +327,9 @@ namespace Umbraco.Web
         /// <param name="ids">The media identifiers.</param>
         /// <returns>The existing medias corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
-        public IEnumerable<IPublishedContent> Media(params object[] ids)
-        {
-            return MediaForObjects(ids);
-        }
+        public IEnumerable<IPublishedContent> Media(params object[] ids) => _publishedContentQuery.Media(ids);
 
-        private IEnumerable<IPublishedContent> MediaForObjects(IEnumerable<object> ids)
-        {
-            var idsA = ids.ToArray();
-            if (ConvertIdsObjectToInts(idsA, out var intIds))
-                return _publishedContentQuery.Media(intIds);
-            if (ConvertIdsObjectToGuids(idsA, out var guidIds))
-                return _publishedContentQuery.Media(guidIds);
-            return Enumerable.Empty<IPublishedContent>();
-        }
+        private IEnumerable<IPublishedContent> MediaForObjects(IEnumerable<object> ids) => _publishedContentQuery.Media(ids);
 
         /// <summary>
         /// Gets the medias corresponding to the identifiers.
@@ -545,10 +337,7 @@ namespace Umbraco.Web
         /// <param name="ids">The media identifiers.</param>
         /// <returns>The existing medias corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
-        public IEnumerable<IPublishedContent> Media(params int[] ids)
-        {
-            return _publishedContentQuery.Media(ids);
-        }
+        public IEnumerable<IPublishedContent> Media(params int[] ids) => _publishedContentQuery.Media(ids);
 
         /// <summary>
         /// Gets the medias corresponding to the identifiers.
@@ -556,10 +345,7 @@ namespace Umbraco.Web
         /// <param name="ids">The media identifiers.</param>
         /// <returns>The existing medias corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
-        public IEnumerable<IPublishedContent> Media(params string[] ids)
-        {
-            return MediaForObjects(ids);
-        }
+        public IEnumerable<IPublishedContent> Media(params string[] ids) => _publishedContentQuery.Media(ids);
 
 
         /// <summary>
@@ -568,10 +354,7 @@ namespace Umbraco.Web
         /// <param name="ids">The media identifiers.</param>
         /// <returns>The existing medias corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
-        public IEnumerable<IPublishedContent> Media(params Udi[] ids)
-        {
-            return ids.Select(id => _publishedContentQuery.Media(id)).WhereNotNull();
-        }
+        public IEnumerable<IPublishedContent> Media(params Udi[] ids) => _publishedContentQuery.Media(ids);
 
         /// <summary>
         /// Gets the medias corresponding to the identifiers.
@@ -579,10 +362,7 @@ namespace Umbraco.Web
         /// <param name="ids">The media identifiers.</param>
         /// <returns>The existing medias corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
-        public IEnumerable<IPublishedContent> Media(params GuidUdi[] ids)
-        {
-            return ids.Select(id => _publishedContentQuery.Media(id));
-        }
+        public IEnumerable<IPublishedContent> Media(params GuidUdi[] ids) => _publishedContentQuery.Media(ids);
 
         /// <summary>
         /// Gets the medias corresponding to the identifiers.
@@ -590,10 +370,7 @@ namespace Umbraco.Web
         /// <param name="ids">The media identifiers.</param>
         /// <returns>The existing medias corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
-        public IEnumerable<IPublishedContent> Media(IEnumerable<object> ids)
-        {
-            return MediaForObjects(ids);
-        }
+        public IEnumerable<IPublishedContent> Media(IEnumerable<object> ids) => _publishedContentQuery.Media(ids);
 
         /// <summary>
         /// Gets the medias corresponding to the identifiers.
@@ -601,10 +378,7 @@ namespace Umbraco.Web
         /// <param name="ids">The media identifiers.</param>
         /// <returns>The existing medias corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
-        public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids)
-        {
-            return _publishedContentQuery.Media(ids);
-        }
+        public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids) => _publishedContentQuery.Media(ids);
 
         /// <summary>
         /// Gets the medias corresponding to the identifiers.
@@ -612,10 +386,7 @@ namespace Umbraco.Web
         /// <param name="ids">The media identifiers.</param>
         /// <returns>The existing medias corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
-        public IEnumerable<IPublishedContent> Media(IEnumerable<Udi> ids)
-        {
-            return ids.Select(id => _publishedContentQuery.Media(id)).WhereNotNull();
-        }
+        public IEnumerable<IPublishedContent> Media(IEnumerable<Udi> ids) => _publishedContentQuery.Media(ids);
 
         /// <summary>
         /// Gets the medias corresponding to the identifiers.
@@ -623,10 +394,7 @@ namespace Umbraco.Web
         /// <param name="ids">The media identifiers.</param>
         /// <returns>The existing medias corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
-        public IEnumerable<IPublishedContent> Media(IEnumerable<GuidUdi> ids)
-        {
-            return ids.Select(id => _publishedContentQuery.Media(id));
-        }
+        public IEnumerable<IPublishedContent> Media(IEnumerable<GuidUdi> ids) => _publishedContentQuery.Media(ids);
 
         /// <summary>
         /// Gets the medias corresponding to the identifiers.
@@ -634,10 +402,7 @@ namespace Umbraco.Web
         /// <param name="ids">The media identifiers.</param>
         /// <returns>The existing medias corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
-        public IEnumerable<IPublishedContent> Media(IEnumerable<string> ids)
-        {
-            return MediaForObjects(ids);
-        }
+        public IEnumerable<IPublishedContent> Media(IEnumerable<string> ids) => _publishedContentQuery.Media(ids);
 
         public IEnumerable<IPublishedContent> MediaAtRoot()
         {

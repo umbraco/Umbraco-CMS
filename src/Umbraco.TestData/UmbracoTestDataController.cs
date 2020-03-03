@@ -33,8 +33,8 @@ namespace Umbraco.TestData
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IShortStringHelper _shortStringHelper;
 
-        public UmbracoTestDataController(IScopeProvider scopeProvider, PropertyEditorCollection propertyEditors, IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper)
-            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger, umbracoHelper)
+        public UmbracoTestDataController(IScopeProvider scopeProvider, PropertyEditorCollection propertyEditors, IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, IShortStringHelper shortStringHelper)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger)
         {
             _scopeProvider = scopeProvider;
             _propertyEditors = propertyEditors;

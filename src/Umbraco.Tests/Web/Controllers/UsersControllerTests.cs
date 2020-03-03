@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async System.Threading.Tasks.Task Save_User()
         {
-            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor)
             {
                 var userServiceMock = Mock.Get(ServiceContext.UserService);
 
@@ -148,7 +148,7 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async System.Threading.Tasks.Task GetPagedUsers_Empty()
         {
-            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor)
             {
                 var usersController = new UsersController(
                     Factory.GetInstance<IGlobalSettings>(),
@@ -181,7 +181,7 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async System.Threading.Tasks.Task GetPagedUsers_10()
         {
-            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor)
             {
                 //setup some mocks
                 var userServiceMock = Mock.Get(ServiceContext.UserService);
@@ -263,7 +263,7 @@ namespace Umbraco.Tests.Web.Controllers
             Action<Tuple<HttpResponseMessage, string>> verification,
             object routeDefaults = null, string url = null)
         {
-            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor)
             {
                 //setup some mocks
                 var userServiceMock = Mock.Get(ServiceContext.UserService);

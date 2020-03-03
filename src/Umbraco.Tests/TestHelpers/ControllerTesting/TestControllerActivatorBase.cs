@@ -154,14 +154,9 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             urlHelper.Setup(provider => provider.GetUrl(It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
                 .Returns(UrlInfo.Url("/hello/world/1234"));
 
-            var umbHelper = new UmbracoHelper(Mock.Of<IPublishedContent>(),
-                Mock.Of<ICultureDictionaryFactory>(),
-                Mock.Of<IUmbracoComponentRenderer>(),
-                Mock.Of<IPublishedContentQuery>());
-
-            return CreateController(controllerType, request, umbracoContextAccessor, umbHelper);
+            return CreateController(controllerType, request, umbracoContextAccessor);
         }
 
-        protected abstract ApiController CreateController(Type controllerType, HttpRequestMessage msg, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper);
+        protected abstract ApiController CreateController(Type controllerType, HttpRequestMessage msg, IUmbracoContextAccessor umbracoContextAccessor);
     }
 }
