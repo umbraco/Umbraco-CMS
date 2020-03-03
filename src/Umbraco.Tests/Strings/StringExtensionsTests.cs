@@ -77,10 +77,15 @@ namespace Umbraco.Tests.Strings
         [TestCase("/root/folder.name/file.ext", ".ext")]
         [TestCase("http://www.domain.com/folder/name/file.txt", ".txt")]
         [TestCase("i/don't\\have\\an/extension", "")]
+        [TestCase("https://some.where/path/to/file.ext?query=this&more=that", ".ext")]
+        [TestCase("double_query.string/file.ext?query=abc?something.else", ".ext")]
+        [TestCase("test.tar.gz", ".gz")]
+        [TestCase("wierd.file,but._legal", "._legal")]
+        [TestCase("one_char.x", ".x")]
         public void Get_File_Extension(string input, string result)
         {
             var extension = input.GetFileExtension();
-            Assert.AreEqual(extension, result);
+            Assert.AreEqual(result, extension);
         }
 
         [TestCase("'+alert(1234)+'", "+alert1234+")]

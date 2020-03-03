@@ -86,10 +86,14 @@ namespace Umbraco.Core
         /// <returns>Extension of the file</returns>
         public static string GetFileExtension(this string file)
         {
-            file = file.Split('?')[0];
-            file = file.Split(Path.DirectorySeparatorChar).Last();
-            file = file.Split(Path.AltDirectorySeparatorChar).Last();
-            return file.Contains('.') ? file.Substring(file.LastIndexOf('.')) : "";
+            //Find any characters between the last . and the start of a query string or the end of the string
+            string pattern = @"(?<extension>\.[^\.\?]+)(\?.*|$)";
+            var match = Regex.Match(file, pattern);
+            if (match.Success)
+            {
+                return match.Groups[2].Value;
+            }
+            return string.Empty;
         }
 
         /// <summary>
