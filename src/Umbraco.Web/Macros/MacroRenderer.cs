@@ -32,6 +32,7 @@ namespace Umbraco.Web.Macros
         private readonly IMemberUserKeyProvider _memberUserKeyProvider;
         private readonly ISessionManager _sessionManager;
         private readonly IRequestAccessor _requestAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
 
         public MacroRenderer(
@@ -45,7 +46,8 @@ namespace Umbraco.Web.Macros
             ICookieManager cookieManager,
             IMemberUserKeyProvider memberUserKeyProvider,
             ISessionManager sessionManager,
-            IRequestAccessor requestAccessor)
+            IRequestAccessor requestAccessor,
+             IHttpContextAccessor httpContextAccessor)
         {
             _plogger = plogger ?? throw new ArgumentNullException(nameof(plogger));
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -58,6 +60,7 @@ namespace Umbraco.Web.Macros
             _memberUserKeyProvider = memberUserKeyProvider;
             _sessionManager = sessionManager;
             _requestAccessor = requestAccessor;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         #region MacroContent cache

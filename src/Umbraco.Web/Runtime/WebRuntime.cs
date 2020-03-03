@@ -22,7 +22,6 @@ namespace Umbraco.Web.Runtime
     /// <remarks>On top of CoreRuntime, handles all of the web-related runtime aspects of Umbraco.</remarks>
     public class WebRuntime : CoreRuntime
     {
-        private readonly UmbracoApplicationBase _umbracoApplication;
         private BuildManagerTypeFinder _typeFinder;
 
         /// <summary>
@@ -42,8 +41,6 @@ namespace Umbraco.Web.Runtime
             IMainDom mainDom):
             base(configs, umbracoVersion, ioHelper, logger, profiler ,new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom)
         {
-            _umbracoApplication = umbracoApplication;
-
             Profiler = GetWebProfiler();
         }
 
@@ -102,7 +99,7 @@ namespace Umbraco.Web.Runtime
         protected override AppCaches GetAppCaches() => new AppCaches(
                 // we need to have the dep clone runtime cache provider to ensure
                 // all entities are cached properly (cloned in and cloned out)
-                new DeepCloneAppCache(new WebCachingAppCache(HttpRuntime.Cache, TypeFinder)),
+                new DeepCloneAppCache(new ObjectCacheAppCache(TypeFinder)),
                 // we need request based cache when running in web-based context
                 new HttpRequestAppCache(() => HttpContext.Current?.Items, TypeFinder),
                 new IsolatedCaches(type =>

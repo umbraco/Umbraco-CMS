@@ -1,5 +1,4 @@
-﻿using System.Web.Mvc;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;

@@ -71,7 +71,7 @@ namespace Umbraco.Web.Runtime
             composition.Register<ISessionIdResolver>(factory => factory.GetInstance<AspNetSessionManager>(), Lifetime.Singleton);
             composition.Register<ISessionManager>(factory => factory.GetInstance<AspNetSessionManager>(), Lifetime.Singleton);
 
-            composition.Register<IRequestAccessor, AspNetRequestAccessor>();
+            composition.Register<IRequestAccessor, AspNetRequestAccessor>(Lifetime.Singleton);
 
             composition.Register<IHostingEnvironment, AspNetHostingEnvironment>();
             composition.Register<IBackOfficeInfo, AspNetBackOfficeInfo>();

@@ -96,7 +96,7 @@ namespace Umbraco.Web
             }
             if (cacheByMember)
             {
-                var helper = Current.Factory.GetInstance<MembershipHelper>();
+                var helper = Current.MembershipHelper;
                 var currentMember = helper.GetCurrentMember();
                 cacheKey.AppendFormat("m{0}-", currentMember?.Id ?? 0);
             }

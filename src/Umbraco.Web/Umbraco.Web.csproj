@@ -139,7 +139,6 @@
     <Compile Include="AspNet\AspNetUserAgentProvider.cs" />
     <Compile Include="AspNet\FrameworkMarchal.cs" />
     <Compile Include="AspNet\AspNetUmbracoApplicationLifetime.cs" />
-    <Compile Include="Cache\WebCachingAppCache.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
@@ -192,8 +191,6 @@
     <Compile Include="Profiling\WebProfilingController.cs" />
     <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
-    <Compile Include="Scheduling\SchedulerComponent.cs" />
-    <Compile Include="Scheduling\SchedulerComposer.cs" />
     <Compile Include="Security\BackOfficeUserStore.cs" />
     <Compile Include="Security\BackOfficeUserValidator.cs" />
     <Compile Include="Security\ConfiguredPasswordValidator.cs" />
@@ -307,7 +304,6 @@
     <Compile Include="Editors\Filters\MediaItemSaveValidationAttribute.cs" />
     <Compile Include="Editors\Filters\MemberSaveValidationAttribute.cs" />
     <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
-    <Compile Include="WebApi\UmbracoApiControllerTypeCollection.cs" />
     <Compile Include="WebApi\UmbracoApiControllerTypeCollectionBuilder.cs" />
     <Compile Include="WebApi\UnhandedExceptionLoggerConfigurationAttribute.cs" />
     <Compile Include="WebApi\UnhandledExceptionLogger.cs" />
@@ -344,7 +340,6 @@
     <Compile Include="IUmbracoComponentRenderer.cs" />
     <Compile Include="Mvc\ProfilingView.cs" />
     <Compile Include="Mvc\ProfilingViewEngine.cs" />
-    <Compile Include="BatchedDatabaseServerMessenger.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Controllers\UmbProfileController.cs" />
@@ -527,7 +522,6 @@
     <Compile Include="Mvc\PluginControllerMetadata.cs" />
     <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
-    <Compile Include="Compose\DatabaseServerRegistrarAndMessengerComponent.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Trees\PartialViewMacrosTreeController.cs" />
     <Compile Include="Trees\PartialViewsTreeController.cs" />

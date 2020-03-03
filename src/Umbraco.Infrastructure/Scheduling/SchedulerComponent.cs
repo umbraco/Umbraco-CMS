@@ -9,6 +9,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Request;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
@@ -37,6 +38,7 @@ namespace Umbraco.Web.Scheduling
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
         private readonly IIOHelper _ioHelper;
         private readonly IServerMessenger _serverMessenger;
+        private readonly IRequestAccessor _requestAccessor;
 
         private BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
         private BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
@@ -54,7 +56,7 @@ namespace Umbraco.Web.Scheduling
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger logger,
             IHostingEnvironment hostingEnvironment, IHealthChecks healthChecksConfig,
-            IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, IServerMessenger serverMessenger)
+            IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, IServerMessenger serverMessenger, IRequestAccessor requestAccessor)
         {
             _runtime = runtime;
             _contentService = contentService;
@@ -70,6 +72,7 @@ namespace Umbraco.Web.Scheduling
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
             _ioHelper = ioHelper;
             _serverMessenger = serverMessenger;
+            _requestAccessor = requestAccessor;
         }
 
         public void Initialize()
@@ -83,7 +86,7 @@ namespace Umbraco.Web.Scheduling
             _healthCheckRunner = new BackgroundTaskRunner<IBackgroundTask>("HealthCheckNotifier", _logger, _hostingEnvironment);
 
             // we will start the whole process when a successful request is made
-            UmbracoModule.RouteAttempt += RegisterBackgroundTasksOnce;
+            _requestAccessor.RouteAttempt += RegisterBackgroundTasksOnce;
         }
 
         public void Terminate()
@@ -97,7 +100,6 @@ namespace Umbraco.Web.Scheduling
             {
                 case EnsureRoutableOutcome.IsRoutable:
                 case EnsureRoutableOutcome.NotDocumentRequest:
-                    UmbracoModule.RouteAttempt -= RegisterBackgroundTasksOnce;
                     RegisterBackgroundTasks();
                     break;
             }

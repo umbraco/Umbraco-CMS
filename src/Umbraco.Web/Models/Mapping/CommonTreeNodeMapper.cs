@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.Mapping;
+﻿using System.Web.Mvc;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
-using Umbraco.Web.ContentApps;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
-using UserProfile = Umbraco.Web.Models.ContentEditing.UserProfile;
 
 namespace Umbraco.Web.Models.Mapping
 {

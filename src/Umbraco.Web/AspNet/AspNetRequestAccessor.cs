@@ -1,4 +1,6 @@
+using System;
 using Umbraco.Core.Request;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.AspNet
 {
@@ -9,7 +11,12 @@ namespace Umbraco.Web.AspNet
         public AspNetRequestAccessor(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
+
+            UmbracoModule.EndRequest += OnEndRequest;
+            UmbracoModule.RouteAttempt += OnRouteAttempt;
         }
+
+
 
         public string GetRequestValue(string name)
         {
@@ -20,5 +27,17 @@ namespace Umbraco.Web.AspNet
         {
             return _httpContextAccessor.GetRequiredHttpContext().Request.QueryString[name];
         }
+
+        private void OnEndRequest(object sender, UmbracoRequestEventArgs args)
+        {
+            EndRequest?.Invoke(sender, args);
+        }
+
+        private void OnRouteAttempt(object sender, RoutableAttemptEventArgs args)
+        {
+            RouteAttempt?.Invoke(sender, args);
+        }
+        public event EventHandler<UmbracoRequestEventArgs> EndRequest;
+        public event EventHandler<RoutableAttemptEventArgs> RouteAttempt;
     }
 }
