@@ -2,11 +2,11 @@
 using System.Configuration;
 using System.IO;
 using System.Threading;
-using System.Web.Configuration;
+using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 
-namespace Umbraco.ModelsBuilder.Embedded.Configuration
+namespace Umbraco.Configuration
 {
     /// <summary>
     /// Represents the models builder configuration.
@@ -21,7 +21,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
         private object _flagOutOfDateModelsLock;
         private bool _flagOutOfDateModelsConfigured;
         private bool _flagOutOfDateModels;
-        public const string DefaultModelsNamespace = "Umbraco.Web.PublishedModels";
+
 
         public string DefaultModelsDirectory => _ioHelper.MapPath("~/App_Data/Models");
 
@@ -37,7 +37,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
             Enable = ConfigurationManager.AppSettings[Prefix + "Enable"] == "true";
 
             // ensure defaults are initialized for tests
-            ModelsNamespace = DefaultModelsNamespace;
+            ModelsNamespace = Constants.ModelsBuilder.DefaultModelsNamespace;
             ModelsDirectory  = DefaultModelsDirectory;
             DebugLevel = 0;
 
@@ -95,7 +95,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
             Enable = enable;
             _modelsMode = modelsMode;
 
-            ModelsNamespace = string.IsNullOrWhiteSpace(modelsNamespace) ? DefaultModelsNamespace : modelsNamespace;
+            ModelsNamespace = string.IsNullOrWhiteSpace(modelsNamespace) ? Constants.ModelsBuilder.DefaultModelsNamespace : modelsNamespace;
             EnableFactory = enableFactory;
             _flagOutOfDateModels = flagOutOfDateModels;
             ModelsDirectory = string.IsNullOrWhiteSpace(modelsDirectory) ? DefaultModelsDirectory : modelsDirectory;
@@ -174,8 +174,13 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
         {
             get
             {
-                var section = (CompilationSection)ConfigurationManager.GetSection("system.web/compilation");
-                return section != null && section.Debug;
+                if (ConfigurationManager.GetSection("system.web/compilation") is ConfigurationSection section &&
+                    bool.TryParse(section.ElementInformation.Properties["debug"].Value.ToString(), out var isDebug))
+                {
+                    return isDebug;
+                }
+
+                return false;
             }
         }
 

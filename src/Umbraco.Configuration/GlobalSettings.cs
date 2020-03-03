@@ -382,6 +382,10 @@ namespace Umbraco.Core.Configuration
         private string _databaseFactoryServerVersion;
         public string DatabaseFactoryServerVersion => GetterWithDefaultValue(Constants.AppSettings.Debug.DatabaseFactoryServerVersion, string.Empty, ref _databaseFactoryServerVersion);
 
+        private string _mainDomLock;
+
+        public string MainDomLock => GetterWithDefaultValue(Constants.AppSettings.MainDomLock, string.Empty, ref _mainDomLock);
+
         private T GetterWithDefaultValue<T>(string appSettingKey, T defaultValue, ref T backingField)
         {
             if (backingField != null) return backingField;

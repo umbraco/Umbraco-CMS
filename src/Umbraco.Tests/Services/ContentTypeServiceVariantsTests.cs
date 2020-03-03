@@ -59,6 +59,7 @@ namespace Umbraco.Tests.Services
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
 
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var settings = Mock.Of<INuCacheSettings>();
 
             return new PublishedSnapshotService(
                 options,
@@ -80,7 +81,8 @@ namespace Umbraco.Tests.Services
                 typeFinder,
                 hostingEnvironment,
                 new MockShortStringHelper(),
-                IOHelper);
+                IOHelper,
+                settings);
         }
 
         public class LocalServerMessenger : ServerMessengerBase

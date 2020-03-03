@@ -2,10 +2,8 @@
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
-using System.Web.Security;
 using Moq;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -17,22 +15,17 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Core.Strings;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.Testing;
 using Umbraco.Tests.Testing.Objects.Accessors;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Runtime;
-using Umbraco.Web.Security;
 using Current = Umbraco.Web.Composing.Current;
-using Umbraco.Web.Security.Providers;
 using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Routing
@@ -141,7 +134,7 @@ namespace Umbraco.Tests.Routing
             var url = "~/dummy-page";
             var template = CreateTemplate(templateName);
             var route = RouteTable.Routes["Umbraco_default"];
-            var routeData = new RouteData() {Route = route};
+            var routeData = new RouteData() { Route = route };
             var umbracoContext = GetUmbracoContext("~/dummy-page", template.Id, routeData, true);
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
             var publishedRouter = CreatePublishedRouter();
@@ -155,6 +148,7 @@ namespace Umbraco.Tests.Routing
 
             var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger>(), context =>
                 {
+
                   return new CustomDocumentController(Factory.GetInstance<IGlobalSettings>(),
                         umbracoContextAccessor,
                         Factory.GetInstance<ServiceContext>(),

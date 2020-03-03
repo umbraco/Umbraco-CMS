@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using Umbraco.ModelsBuilder.Embedded.Configuration;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.ModelsBuilder.Embedded.Configuration
+﻿namespace Umbraco.Core.Configuration
 {
     /// <summary>
     /// Defines the models generation modes.
@@ -8,7 +8,7 @@
         /// <summary>
         /// Do not generate models.
         /// </summary>
-        Nothing = 0, // default value 
+        Nothing = 0, // default value
 
         /// <summary>
         /// Generate models in memory.

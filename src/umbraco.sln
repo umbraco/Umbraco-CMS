@@ -111,11 +111,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Persistance.SqlCe",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.TestData", "Umbraco.TestData\Umbraco.TestData.csproj", "{FB5676ED-7A69-492C-B802-E7B24144C0FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.PublishedCache.NuCache", "Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj", "{F6DE8DA0-07CC-4EF2-8A59-2BC81DBB3830}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.PublishedCache.NuCache", "Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj", "{F6DE8DA0-07CC-4EF2-8A59-2BC81DBB3830}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Examine.Lucene", "Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj", "{0FAD7D2A-D7DD-45B1-91FD-488BB6CDACEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Examine.Lucene", "Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj", "{0FAD7D2A-D7DD-45B1-91FD-488BB6CDACEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.BackOffice", "Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj", "{9B95EEF7-63FE-4432-8C63-166BE9C1A929}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.BackOffice", "Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj", "{9B95EEF7-63FE-4432-8C63-166BE9C1A929}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
