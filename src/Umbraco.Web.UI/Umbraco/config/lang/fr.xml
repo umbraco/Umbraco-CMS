@@ -124,7 +124,7 @@
     <key alias="saveAndSchedule">Sauver et planifier</key>
     <key alias="saveToPublish">Sauver et envoyer pour approbation</key>
     <key alias="saveListView">Sauver la mise en page de la liste</key>
-    <key alias="showPage">Prévisualiser</key>
+    <key alias="saveAndPreview">Prévisualiser</key>
     <key alias="showPageDisabled">La prévisualisation est désactivée car aucun modèle n'a été assigné.</key>
     <key alias="styleChoose">Choisir un style</key>
     <key alias="styleShow">Afficher les styles</key>
@@ -1180,7 +1180,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="contentTypePropertyTypeCreated">Type de propriété créé</key>
     <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Nom : %0% <br /> Type de données : %1%]]></key>
     <key alias="contentTypePropertyTypeDeleted">Type de propriété supprimé</key>
-    <key alias="contentTypeSavedHeader">Type de documet sauvegardé</key>
+    <key alias="contentTypeSavedHeader">Type de document sauvegardé</key>
     <key alias="contentTypeTabCreated">Onglet créé</key>
     <key alias="contentTypeTabDeleted">Onglet supprimé</key>
     <key alias="contentTypeTabDeletedText">Onglet avec l'ID : %0% supprimé</key>

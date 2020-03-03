@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         /// <remarks>Corresponds to the NodeObjectType in the umbracoNode table</remarks>
         [DataMember(Name = "parentObjectType", IsRequired = true)]
-        public Guid ParentObjectType { get; set; }
+        public Guid? ParentObjectType { get; set; }
 
         /// <summary>
         /// Gets or sets the Parent's object type name.
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         /// <remarks>Corresponds to the NodeObjectType in the umbracoNode table</remarks>
         [DataMember(Name = "childObjectType", IsRequired = true)]
-        public Guid ChildObjectType { get; set; }
+        public Guid? ChildObjectType { get; set; }
 
         /// <summary>
         /// Gets or sets the Child's object type name.
@@ -46,13 +46,6 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "childObjectTypeName")]
         [ReadOnly(true)]
         public string ChildObjectTypeName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the relations associated with this relation type.
-        /// </summary>
-        [DataMember(Name = "relations")]
-        [ReadOnly(true)]
-        public IEnumerable<RelationDisplay> Relations { get; set; }
 
         /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.

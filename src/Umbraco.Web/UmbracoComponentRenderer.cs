@@ -27,12 +27,14 @@ namespace Umbraco.Web
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IMacroRenderer _macroRenderer;
         private readonly ITemplateRenderer _templateRenderer;
+        private readonly HtmlLocalLinkParser _linkParser;
 
-        public UmbracoComponentRenderer(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer, ITemplateRenderer templateRenderer)
+        public UmbracoComponentRenderer(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer, ITemplateRenderer templateRenderer, HtmlLocalLinkParser linkParser)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _macroRenderer = macroRenderer;
             _templateRenderer = templateRenderer ?? throw new ArgumentNullException(nameof(templateRenderer));
+            _linkParser = linkParser;
         }
 
         /// <summary>

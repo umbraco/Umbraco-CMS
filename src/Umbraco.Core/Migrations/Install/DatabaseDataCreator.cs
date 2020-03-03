@@ -151,6 +151,8 @@ namespace Umbraco.Core.Migrations.Install
             _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.Domains, Name = "Domains" });
             _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.KeyValues, Name = "KeyValues" });
             _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.Languages, Name = "Languages" });
+
+            _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.MainDom, Name = "MainDom" });
         }
 
         private void CreateContentTypeData()
@@ -310,14 +312,27 @@ namespace Umbraco.Core.Migrations.Install
         private void CreateRelationTypeData()
         {
             var relationType = new RelationTypeDto { Id = 1, Alias = Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias, ChildObjectType = Constants.ObjectTypes.Document, ParentObjectType = Constants.ObjectTypes.Document, Dual = true, Name = Constants.Conventions.RelationTypes.RelateDocumentOnCopyName };
-            relationType.UniqueId = (relationType.Alias + "____" + relationType.Name).ToGuid();
+            relationType.UniqueId = CreateUniqueRelationTypeId(relationType.Alias, relationType.Name);
             _database.Insert(Constants.DatabaseSchema.Tables.RelationType, "id", false, relationType);
             relationType = new RelationTypeDto { Id = 2, Alias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias, ChildObjectType = Constants.ObjectTypes.Document, ParentObjectType = Constants.ObjectTypes.Document, Dual = false, Name = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName };
-            relationType.UniqueId = (relationType.Alias + "____" + relationType.Name).ToGuid();
+            relationType.UniqueId = CreateUniqueRelationTypeId(relationType.Alias, relationType.Name);
             _database.Insert(Constants.DatabaseSchema.Tables.RelationType, "id", false, relationType);
             relationType = new RelationTypeDto { Id = 3, Alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias, ChildObjectType = Constants.ObjectTypes.Media, ParentObjectType = Constants.ObjectTypes.Media, Dual = false, Name = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName };
-            relationType.UniqueId = (relationType.Alias + "____" + relationType.Name).ToGuid();
+            relationType.UniqueId = CreateUniqueRelationTypeId(relationType.Alias, relationType.Name);
             _database.Insert(Constants.DatabaseSchema.Tables.RelationType, "id", false, relationType);
+
+            relationType = new RelationTypeDto { Id = 4, Alias = Constants.Conventions.RelationTypes.RelatedMediaAlias, ChildObjectType = null, ParentObjectType = null, Dual = false, Name = Constants.Conventions.RelationTypes.RelatedMediaName };
+            relationType.UniqueId = CreateUniqueRelationTypeId(relationType.Alias, relationType.Name);
+            _database.Insert(Constants.DatabaseSchema.Tables.RelationType, "id", false, relationType);
+
+            relationType = new RelationTypeDto { Id = 5, Alias = Constants.Conventions.RelationTypes.RelatedDocumentAlias, ChildObjectType = null, ParentObjectType = null, Dual = false, Name = Constants.Conventions.RelationTypes.RelatedDocumentName };
+            relationType.UniqueId = CreateUniqueRelationTypeId(relationType.Alias, relationType.Name);
+            _database.Insert(Constants.DatabaseSchema.Tables.RelationType, "id", false, relationType);
+        }
+
+        internal static Guid CreateUniqueRelationTypeId(string alias, string name)
+        {
+            return (alias + "____" + name).ToGuid();
         }
 
         private void CreateKeyValueData()

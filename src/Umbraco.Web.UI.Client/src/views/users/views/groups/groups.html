@@ -8,7 +8,7 @@
         <umb-editor-sub-header-content-left ng-if="vm.selection.length === 0">
             <umb-button
                 type="button"
-                button-style="action"
+                button-style="outline"
                 action="vm.createUserGroup()"
                 label="Create Group"
                 label-key="actions_createGroup">
@@ -18,18 +18,10 @@
         <umb-editor-sub-header-content-right ng-if="vm.selection.length === 0">
 
             <umb-editor-sub-header-section>
-            <div class="form-search -no-margin-bottom pull-right">
-                <div class="inner-addon left-addon">
-                    <i class="icon icon-search"></i>
-                    <input class="form-control search-input"
-                        type="text"
-                        localize="placeholder"
-                        placeholder="@placeholders_filter"
-                        ng-model="vm.filter"
-                        prevent-enter-submit
-                        no-dirty-check>
-                </div>
-            </div>
+
+                <umb-mini-search model="vm.filter">
+                </umb-mini-search>
+
             </umb-editor-sub-header-section>
 
         </umb-editor-sub-header-content-right>

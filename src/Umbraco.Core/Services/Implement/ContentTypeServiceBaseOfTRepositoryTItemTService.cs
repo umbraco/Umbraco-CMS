@@ -321,6 +321,15 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public bool HasContainerInPath(params int[] ids)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                // can use same repo for both content and media
+                return Repository.HasContainerInPath(ids);
+            }
+        }
+
         public IEnumerable<TItem> GetDescendants(int id, bool andSelf)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -369,6 +378,15 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.ReadLock(ReadLockIds);
                 return Repository.Count(Query<TItem>());
+            }
+        }
+
+        public bool HasContentNodes(int id)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(ReadLockIds);
+                return Repository.HasContentNodes(id);
             }
         }
 
