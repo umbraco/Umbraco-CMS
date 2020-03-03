@@ -235,6 +235,7 @@ namespace Umbraco.Web
         public IEnumerable<IPublishedContent> Content(params GuidUdi[] ids) => _publishedContentQuery.Content(ids);
 
         private IEnumerable<IPublishedContent> ContentForObjects(IEnumerable<object> ids) => _publishedContentQuery.Content(ids);
+        private IPublishedContent Content(object id) => _publishedContentQuery.Content(id);
 
         /// <summary>
         /// Gets content items from the cache.
