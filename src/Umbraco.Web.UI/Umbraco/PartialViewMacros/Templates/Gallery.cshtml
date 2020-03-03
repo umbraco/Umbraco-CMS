@@ -26,7 +26,7 @@
     <div class="row">
         @foreach (var mediaId in mediaIds.Split(','))
         {
-            var media = Umbraco.Media(mediaId);
+            var media = Current.PublishedContentQuery.Media(mediaId);
 
             @* a single image *@
             if (media.IsDocumentType("Image"))
