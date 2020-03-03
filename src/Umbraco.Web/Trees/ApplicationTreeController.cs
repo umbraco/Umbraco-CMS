@@ -38,8 +38,8 @@ namespace Umbraco.Web.Trees
 
         public ApplicationTreeController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger,
-            IRuntimeState runtimeState, ITreeService treeService, ISectionService sectionService, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper, publishedUrlProvider)
+            IRuntimeState runtimeState, ITreeService treeService, ISectionService sectionService, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
             _treeService = treeService;
             _sectionService = sectionService;

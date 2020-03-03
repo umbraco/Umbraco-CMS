@@ -144,7 +144,6 @@ namespace Umbraco.Tests.Routing
             var routeData = new RouteData() {Route = route};
             var umbracoContext = GetUmbracoContext("~/dummy-page", template.Id, routeData, true);
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
-            var httpContextAccessor = TestHelper.GetHttpContextAccessor(httpContext);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             frequest.PublishedContent = umbracoContext.Content.GetById(1172);
@@ -160,8 +159,7 @@ namespace Umbraco.Tests.Routing
                         umbracoContextAccessor,
                         Factory.GetInstance<ServiceContext>(),
                         Factory.GetInstance<AppCaches>(),
-                        Factory.GetInstance<IProfilingLogger>(),
-                        new UmbracoHelper(Mock.Of<IPublishedContent>(), Mock.Of<ITagQuery>(), Mock.Of<ICultureDictionaryFactory>(), Mock.Of<IUmbracoComponentRenderer>(), Mock.Of<IPublishedContentQuery>()));
+                        Factory.GetInstance<IProfilingLogger>());
                 }), ShortStringHelper);
 
             handler.GetHandlerForRoute(httpContext.Request.RequestContext, frequest);
@@ -198,8 +196,8 @@ namespace Umbraco.Tests.Routing
         /// </summary>
         public class CustomDocumentController : RenderMvcController
         {
-            public CustomDocumentController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
-                : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, umbracoHelper)
+            public CustomDocumentController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
+                : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
             {
             }
 

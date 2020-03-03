@@ -13,12 +13,18 @@ namespace Umbraco.Web
     /// </summary>
     public interface IPublishedContentQuery
     {
+
+
+
         IPublishedContent Content(int id);
         IPublishedContent Content(Guid id);
         IPublishedContent Content(Udi id);
+        IPublishedContent Content(object id);
         IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars);
         IEnumerable<IPublishedContent> Content(IEnumerable<int> ids);
         IEnumerable<IPublishedContent> Content(IEnumerable<Guid> ids);
+
+        IEnumerable<IPublishedContent> Content(IEnumerable<object> ids);
         IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars);
         IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars);
         IEnumerable<IPublishedContent> ContentAtRoot();
@@ -26,7 +32,10 @@ namespace Umbraco.Web
         IPublishedContent Media(int id);
         IPublishedContent Media(Guid id);
         IPublishedContent Media(Udi id);
+
+        IPublishedContent Media(object id);
         IEnumerable<IPublishedContent> Media(IEnumerable<int> ids);
+        IEnumerable<IPublishedContent> Media(IEnumerable<object> ids);
         IEnumerable<IPublishedContent> Media(IEnumerable<Guid> ids);
         IEnumerable<IPublishedContent> MediaAtRoot();
 
