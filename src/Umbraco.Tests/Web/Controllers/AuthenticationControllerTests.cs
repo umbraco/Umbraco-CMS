@@ -61,7 +61,7 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async System.Threading.Tasks.Task GetCurrentUser_Fips()
         {
-            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor)
             {
                 //setup some mocks
                 var userServiceMock = Mock.Get(ServiceContext.UserService);
@@ -87,7 +87,6 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IUmbracoSettingsSection>(),
                     Factory.GetInstance<IIOHelper>(),

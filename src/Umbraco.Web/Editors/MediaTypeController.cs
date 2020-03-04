@@ -51,13 +51,12 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
             IEntityService entityService,
             IPublishedUrlProvider publishedUrlProvider,
             EditorValidatorCollection editorValidatorCollection)
-            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider, editorValidatorCollection)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider, editorValidatorCollection)
         {
             _shortStringHelper = shortStringHelper;
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));

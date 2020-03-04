@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Configuration.UmbracoSettings;
+﻿using Umbraco.Core.Configuration;
+using Umbraco.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Core.Composing.CompositionExtensions
 {

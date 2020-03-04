@@ -1,4 +1,6 @@
-﻿namespace Umbraco.ModelsBuilder.Embedded.Configuration
+﻿using Umbraco.Core.Configuration;
+
+namespace Umbraco.Configuration
 {
     /// <summary>
     /// Provides extensions for the <see cref="ModelsMode"/> enumeration.

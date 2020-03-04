@@ -15,9 +15,9 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
 {
     public class TestRunner
     {
-        private readonly Func<HttpRequestMessage, IUmbracoContextAccessor, UmbracoHelper, ApiController> _controllerFactory;
+        private readonly Func<HttpRequestMessage, IUmbracoContextAccessor, ApiController> _controllerFactory;
 
-        public TestRunner(Func<HttpRequestMessage, IUmbracoContextAccessor, UmbracoHelper, ApiController> controllerFactory)
+        public TestRunner(Func<HttpRequestMessage, IUmbracoContextAccessor, ApiController> controllerFactory)
         {
             _controllerFactory = controllerFactory;
         }

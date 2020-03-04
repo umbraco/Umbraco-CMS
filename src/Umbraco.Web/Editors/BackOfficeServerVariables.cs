@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Web;
-using System.Web.Configuration;
 using System.Web.Mvc;
 using ClientDependency.Core.Config;
-using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -41,8 +38,20 @@ namespace Umbraco.Web.Editors
         private readonly TreeCollection _treeCollection;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IRuntimeSettings _settings;
 
-        internal BackOfficeServerVariables(UrlHelper urlHelper, IRuntimeState runtimeState, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, TreeCollection treeCollection, IHttpContextAccessor httpContextAccessor, IHostingEnvironment hostingEnvironment)
+        internal BackOfficeServerVariables(
+            UrlHelper urlHelper,
+            IRuntimeState runtimeState,
+            UmbracoFeatures features,
+            IGlobalSettings globalSettings,
+            IUmbracoVersion umbracoVersion,
+            IUmbracoSettingsSection umbracoSettingsSection,
+            IIOHelper ioHelper,
+            TreeCollection treeCollection,
+            IHttpContextAccessor httpContextAccessor,
+            IHostingEnvironment hostingEnvironment,
+            IRuntimeSettings settings)
         {
             _urlHelper = urlHelper;
             _runtimeState = runtimeState;
@@ -54,6 +63,7 @@ namespace Umbraco.Web.Editors
             _treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));
             _httpContextAccessor = httpContextAccessor;
             _hostingEnvironment = hostingEnvironment;
+            _settings = settings;
         }
 
         /// <summary>
@@ -473,11 +483,9 @@ namespace Umbraco.Web.Editors
             return app;
         }
 
-        private static string GetMaxRequestLength()
+        private string GetMaxRequestLength()
         {
-            return ConfigurationManager.GetSection("system.web/httpRuntime") is HttpRuntimeSection section
-                ? section.MaxRequestLength.ToString()
-                : string.Empty;
+            return _settings.MaxRequestLength.HasValue ? _settings.MaxRequestLength.Value.ToString() : string.Empty;
         }
     }
 }

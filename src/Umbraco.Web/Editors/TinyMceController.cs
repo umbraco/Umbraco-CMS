@@ -42,13 +42,12 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             UmbracoMapper umbracoMapper,
             IShortStringHelper shortStringHelper,
             IUmbracoSettingsSection umbracoSettingsSection,
             IIOHelper ioHelper,
             IPublishedUrlProvider publishedUrlProvider)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper, publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));

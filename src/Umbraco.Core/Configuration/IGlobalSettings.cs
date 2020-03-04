@@ -95,5 +95,6 @@
         bool DisableElectionForSingleServer { get; }
         string RegisterType { get; }
         string DatabaseFactoryServerVersion { get; }
+        string MainDomLock { get; }
     }
 }

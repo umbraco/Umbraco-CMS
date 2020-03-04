@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Request;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
@@ -82,7 +83,7 @@ namespace Umbraco.Web.Compose
     {
         private object _locker = new object();
         private readonly DatabaseServerRegistrar _registrar;
-        private readonly BatchedDatabaseServerMessenger _messenger;
+        private readonly IBatchedDatabaseServerMessenger _messenger;
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
         private readonly IServerRegistrationService _registrationService;
@@ -91,13 +92,23 @@ namespace Umbraco.Web.Compose
         private bool _started;
         private IBackgroundTask[] _tasks;
         private IndexRebuilder _indexRebuilder;
+        private readonly IRequestAccessor _requestAccessor;
 
-        public DatabaseServerRegistrarAndMessengerComponent(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerMessenger serverMessenger, IServerRegistrationService registrationService, ILogger logger, IHostingEnvironment hostingEnvironment, IndexRebuilder indexRebuilder)
+        public DatabaseServerRegistrarAndMessengerComponent(
+            IRuntimeState runtime,
+            IServerRegistrar serverRegistrar,
+            IServerMessenger serverMessenger,
+            IServerRegistrationService registrationService,
+            ILogger logger,
+            IHostingEnvironment hostingEnvironment,
+            IndexRebuilder indexRebuilder,
+            IRequestAccessor requestAccessor)
         {
             _runtime = runtime;
             _logger = logger;
             _registrationService = registrationService;
             _indexRebuilder = indexRebuilder;
+            _requestAccessor = requestAccessor;
 
             // create task runner for DatabaseServerRegistrar
             _registrar = serverRegistrar as DatabaseServerRegistrar;
@@ -108,7 +119,7 @@ namespace Umbraco.Web.Compose
             }
 
             // create task runner for BatchedDatabaseServerMessenger
-            _messenger = serverMessenger as BatchedDatabaseServerMessenger;
+            _messenger = serverMessenger as IBatchedDatabaseServerMessenger;
             if (_messenger != null)
             {
                 _processTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerInstProcess",
@@ -120,7 +131,7 @@ namespace Umbraco.Web.Compose
         {
             //We will start the whole process when a successful request is made
             if (_registrar != null || _messenger != null)
-                UmbracoModule.RouteAttempt += RegisterBackgroundTasksOnce;
+                _requestAccessor.RouteAttempt += RegisterBackgroundTasksOnce;
 
             // must come last, as it references some _variables
             _messenger?.Startup();
@@ -137,7 +148,7 @@ namespace Umbraco.Web.Compose
         /// <remarks>
         /// We require this because:
         /// - ApplicationContext.UmbracoApplicationUrl is initialized by UmbracoModule in BeginRequest
-        /// - RegisterServer is called on UmbracoModule.RouteAttempt which is triggered in ProcessRequest
+        /// - RegisterServer is called on _requestAccessor.RouteAttempt which is triggered in ProcessRequest
         ///      we are safe, UmbracoApplicationUrl has been initialized
         /// </remarks>
         private void RegisterBackgroundTasksOnce(object sender, RoutableAttemptEventArgs e)
@@ -146,7 +157,7 @@ namespace Umbraco.Web.Compose
             {
                 case EnsureRoutableOutcome.IsRoutable:
                 case EnsureRoutableOutcome.NotDocumentRequest:
-                    UmbracoModule.RouteAttempt -= RegisterBackgroundTasksOnce;
+                    _requestAccessor.RouteAttempt -= RegisterBackgroundTasksOnce;
                     RegisterBackgroundTasks();
                     break;
             }
@@ -196,11 +207,11 @@ namespace Umbraco.Web.Compose
 
         private class InstructionProcessTask : RecurringTaskBase
         {
-            private readonly DatabaseServerMessenger _messenger;
+            private readonly IDatabaseServerMessenger _messenger;
             private readonly ILogger _logger;
 
             public InstructionProcessTask(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-                DatabaseServerMessenger messenger, ILogger logger)
+                IDatabaseServerMessenger messenger, ILogger logger)
                 : base(runner, delayMilliseconds, periodMilliseconds)
             {
                 _messenger = messenger;

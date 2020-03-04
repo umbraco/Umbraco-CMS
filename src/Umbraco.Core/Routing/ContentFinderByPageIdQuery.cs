@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Web.Routing
+﻿using Umbraco.Core.Request;
+
+namespace Umbraco.Web.Routing
 {
     /// <summary>
     /// This looks up a document by checking for the umbPageId of a request/query string
@@ -9,17 +11,17 @@
     /// </remarks>
     public class ContentFinderByPageIdQuery : IContentFinder
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IRequestAccessor _requestAccessor;
 
-        public ContentFinderByPageIdQuery(IHttpContextAccessor httpContextAccessor)
+        public ContentFinderByPageIdQuery(IRequestAccessor requestAccessor)
         {
-            _httpContextAccessor = httpContextAccessor;
+            _requestAccessor = requestAccessor;
         }
 
         public bool TryFindContent(IPublishedRequest frequest)
         {
             int pageId;
-            if (int.TryParse(_httpContextAccessor.GetRequiredHttpContext().Request["umbPageID"], out pageId))
+            if (int.TryParse(_requestAccessor.GetRequestValue("umbPageID"), out pageId))
             {
                 var doc = frequest.UmbracoContext.Content.GetById(pageId);
 

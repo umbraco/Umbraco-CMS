@@ -144,6 +144,7 @@ namespace Umbraco.Tests.PublishedContent
             _source = new TestDataSource(kits);
 
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var settings = Mock.Of<INuCacheSettings>();
 
 
             // at last, create the complete NuCache snapshot service!
@@ -169,7 +170,8 @@ namespace Umbraco.Tests.PublishedContent
                 typeFinder,
                 hostingEnvironment,
                 new MockShortStringHelper(),
-                TestHelper.IOHelper);
+                TestHelper.IOHelper,
+                settings);
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

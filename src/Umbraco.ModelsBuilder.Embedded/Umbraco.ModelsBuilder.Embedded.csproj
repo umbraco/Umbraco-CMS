@@ -59,10 +59,6 @@
     <Compile Include="Building\TypeModel.cs" />
     <Compile Include="Compose\DisabledModelsBuilderComponent.cs" />
     <Compile Include="ConfigsExtensions.cs" />
-    <Compile Include="Configuration\IModelsBuilderConfig.cs" />
-    <Compile Include="Configuration\ModelsBuilderConfig.cs" />
-    <Compile Include="Configuration\ModelsMode.cs" />
-    <Compile Include="Configuration\ModelsModeExtensions.cs" />
     <Compile Include="BackOffice\DashboardReport.cs" />
     <Compile Include="ImplementPropertyTypeAttribute.cs" />
     <Compile Include="ModelsBuilderAssemblyAttribute.cs" />
@@ -119,6 +115,5 @@
       <Version>5.2.7</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

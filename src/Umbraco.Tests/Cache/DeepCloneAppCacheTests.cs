@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Web;
 using Moq;
@@ -20,14 +21,17 @@ namespace Umbraco.Tests.Cache
     public class DeepCloneAppCacheTests : RuntimeAppCacheTests
     {
         private DeepCloneAppCache _provider;
+        private ObjectCacheAppCache _memberCache;
 
-        protected override int GetTotalItemCount => HttpRuntime.Cache.Count;
+        protected override int GetTotalItemCount => _memberCache.MemoryCache.Count();
 
         public override void Setup()
         {
             base.Setup();
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
-            _provider = new DeepCloneAppCache(new WebCachingAppCache(HttpRuntime.Cache, typeFinder));
+            _memberCache = new ObjectCacheAppCache(typeFinder);
+
+            _provider = new DeepCloneAppCache(_memberCache);
         }
 
         internal override IAppCache AppCache => _provider;

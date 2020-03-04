@@ -1,4 +1,4 @@
-﻿namespace Umbraco.ModelsBuilder.Embedded.Configuration
+﻿namespace Umbraco.Core.Configuration
 {
     public interface IModelsBuilderConfig
     {

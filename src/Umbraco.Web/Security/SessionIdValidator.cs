@@ -10,7 +10,7 @@ using Microsoft.Owin.Security.Cookies;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Security;
+
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Security

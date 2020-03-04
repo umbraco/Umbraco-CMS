@@ -53,6 +53,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IIOHelper _ioHelper;
+        private readonly INuCacheSettings _config;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -90,7 +91,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ITypeFinder typeFinder,
             IHostingEnvironment hostingEnvironment,
             IShortStringHelper shortStringHelper,
-            IIOHelper ioHelper)
+            IIOHelper ioHelper,
+            INuCacheSettings config)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -111,6 +113,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _hostingEnvironment = hostingEnvironment;
             _shortStringHelper = shortStringHelper;
             _ioHelper = ioHelper;
+            _config = config;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -197,8 +200,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _localMediaDbExists = File.Exists(localMediaDbPath);
 
             // if both local databases exist then GetTree will open them, else new databases will be created
-            _localContentDb = BTree.GetTree(localContentDbPath, _localContentDbExists);
-            _localMediaDb = BTree.GetTree(localMediaDbPath, _localMediaDbExists);
+            _localContentDb = BTree.GetTree(localContentDbPath, _localContentDbExists, _config);
+            _localMediaDb = BTree.GetTree(localMediaDbPath, _localMediaDbExists, _config);
 
             _logger.Info<PublishedSnapshotService>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", _localContentDbExists, _localMediaDbExists);
         }

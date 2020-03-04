@@ -1,5 +1,4 @@
 ﻿using Umbraco.Core.Configuration;
-using Umbraco.ModelsBuilder.Embedded.Configuration;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {

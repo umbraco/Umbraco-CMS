@@ -38,12 +38,11 @@ namespace Umbraco.Web.Trees
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             UmbracoMapper umbracoMapper,
             IPublishedUrlProvider publishedUrlProvider,
             IMenuItemCollectionFactory menuItemCollectionFactory,
             IMediaTypeService mediaTypeService)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper, publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
             _treeSearcher = treeSearcher;
             _menuItemCollectionFactory = menuItemCollectionFactory;

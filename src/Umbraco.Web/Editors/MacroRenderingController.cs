@@ -48,7 +48,6 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
             IUmbracoComponentRenderer componentRenderer,
@@ -63,7 +62,6 @@ namespace Umbraco.Web.Editors
                 appCaches,
                 logger,
                 runtimeState,
-                umbracoHelper,
                 shortStringHelper,
                 umbracoMapper,
                 publishedUrlProvider)
