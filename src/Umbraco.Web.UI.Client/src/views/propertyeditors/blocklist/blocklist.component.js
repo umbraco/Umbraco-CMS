@@ -19,8 +19,14 @@
 
     function BlockListController($scope, $interpolate, editorService, clipboardService, localizationService, overlayService, blockEditorService, contentResource, eventsService) {
         
-        var modelObject;
         var unsubscribe = [];
+        var modelObject;
+        
+        // Property actions:
+        var copyAllBlocksAction;
+        var deleteAllBlocksAction;
+
+
         var vm = this;
 
         vm.moveFocusToBlock = null;
@@ -44,8 +50,6 @@
         eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
 
 
-        var copyAllBlocksAction;
-        var deleteAllBlocksAction;
 
 
         vm.$onInit = function() {
