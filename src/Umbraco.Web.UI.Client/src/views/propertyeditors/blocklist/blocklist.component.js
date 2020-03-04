@@ -32,8 +32,8 @@
         vm.moveFocusToBlock = null;
         vm.showCopy = clipboardService.isSupported();
 
-        vm.layout = [];// Property models layout object specific to this Block Editor.
-        vm.blocks = [];// Runtime model of editing models, needs to be synced to property model on form submit.
+        vm.layout = [];// The layout object specific to this Block Editor, will be a direct reference from Property Model.
+        vm.blocks = [];// Runtime list of block models, needs to be synced to property model on form submit.
         vm.availableBlockTypes = [];// Available block entries of this property editor.
 
         var labels = {};
@@ -93,16 +93,25 @@
         function loaded() {
 
             vm.layout = modelObject.getLayout();
-            mapToBlocks();
+
+            // maps layout entries to editor friendly models.
+            vm.layout.forEach(entry => {
+                var block = getBlockModel(entry);
+                if(block !== null) {
+                    vm.blocks.push(block);
+                }
+            });
 
             vm.availableContentTypes = modelObject.getAvailableAliasesForBlockContent();
             vm.availableBlockTypes = modelObject.getAvailableBlocksForItemPicker();
 
+            $scope.$apply();
+
         }
 
 
-        function getEditingModel(entry) {
-            var block = modelObject.getEditingModel(entry);
+        function getBlockModel(entry) {
+            var block = modelObject.getBlockModel(entry);
 
             if (block === null) return null;
 
@@ -111,50 +120,6 @@
             return block;
         }
 
-        /**
-         * Maps property model to the runtime editing model (blocks).
-         */
-        function mapToBlocks() {
-            // clear blocks.
-            vm.blocks = [];
-
-            // make all blocks.
-            vm.layout.forEach(entry => {
-                var block = getEditingModel(entry);
-                if(block !== null) {
-                    vm.blocks.push(block);
-                }
-            });
-
-            $scope.$apply();
-        }
-
-        /**
-         * Maps content from runtime editing model (blocks) to the property model.
-         * Does not take care of ordering, we need the sort-UI to sync that, on the fly.
-         */
-        /*
-        function mapToContent() {
-
-            // sync data from blocks to content models.
-            vm.blocks.forEach(block => {
-                modelObject.setDataFromEditingModel(block);
-            });
-        }
-        */
-
-        /*
-        function sync() {
-            // to avoid deep watches of block editors we use an event for those instead?
-            // Lets inform container of this property editor that we updated.
-            $scope.$emit("blockEditorValueUpdated");
-        }
-        */
-        /*
-        function syncBlockData(block) {
-            modelObject.setDataFromEditingModel(block);
-        }
-        */
 
         function addNewBlock(index, contentTypeAlias) {
 
@@ -164,19 +129,19 @@
                 return false;
             }
 
-            // make editing object
-            var blockEditingObject = getEditingModel(layoutEntry);
-            if (blockEditingObject === null) {
+            // make block model
+            var blockModel = getBlockModel(layoutEntry);
+            if (blockModel === null) {
                 return false;
             }
             
             // add layout entry at the decired location in layout.
             vm.layout.splice(index, 0, layoutEntry);
 
-            // apply editing model at decired location in editing model.
-            vm.blocks.splice(index, 0, blockEditingObject);
+            // apply block model at decired location in blocks.
+            vm.blocks.splice(index, 0, blockModel);
             
-            vm.moveFocusToBlock = blockEditingObject;
+            vm.moveFocusToBlock = blockModel;
 
             return true;
 
@@ -215,7 +180,7 @@
                 submit: function(elementEditorModel) {
                     blockModel.content = elementEditorModel.content;
                     // TODO, investigate if we need to call a sync, for this scenario to work.. Concern is regarding wether the property-value watcher will pick this up.
-                    //modelObject.setDataFromEditingModel(block);
+                    //modelObject.setDataFromBlockModel(block);
                     editorService.close();
                 },
                 close: function() {
@@ -344,19 +309,19 @@
                 return false;
             }
 
-            // make editing object
-            var blockEditingObject = getEditingModel(layoutEntry);
-            if (blockEditingObject === null) {
+            // make block model
+            var blockModel = getBlockModel(layoutEntry);
+            if (blockModel === null) {
                 return false;
             }
             
-            // add layout entry at the decired location in layout.
+            // insert layout entry at the decired location in layout.
             vm.layout.splice(index, 0, layoutEntry);
 
-            // apply editing model at decired location in editing model.
-            vm.blocks.splice(index, 0, blockEditingObject);
+            // insert block model at the decired location in blocks.
+            vm.blocks.splice(index, 0, blockModel);
             
-            vm.moveFocusToBlock = blockEditingObject;
+            vm.moveFocusToBlock = blockModel;
 
             return true;
 

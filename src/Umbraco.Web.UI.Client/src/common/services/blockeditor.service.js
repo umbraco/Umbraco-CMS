@@ -134,10 +134,11 @@
             },
 
             /**
-             * Retrieve editing model of a layout entry
+             * Retrieve editor friendly model of a block.
+             * @param {Object} layoutEntry the layout entry to build the block model from.
              * @return {Object} Scaffolded Block Content object.
              */
-            getEditingModel: function(layoutEntry) {
+            getBlockModel: function(layoutEntry) {
 
                 var udi = layoutEntry.udi;
 
@@ -150,9 +151,9 @@
                     return null;
                 }
 
-                var editingModel = {};
-                editingModel.config = angular.copy(blockConfiguration);
-                editingModel.labelInterpolator = $interpolate(editingModel.config.label);
+                var blockModel = {};
+                blockModel.config = angular.copy(blockConfiguration);
+                blockModel.labelInterpolator = $interpolate(blockModel.config.label);
 
                 var scaffold = this.getScaffoldFor(blockConfiguration.contentTypeAlias);
                 if(scaffold === null) {
@@ -160,30 +161,30 @@
                 }
 
                 // make basics from scaffold
-                editingModel.content = angular.copy(scaffold);
-                editingModel.content.udi = udi;
+                blockModel.content = angular.copy(scaffold);
+                blockModel.content.udi = udi;
 
-                mapToElementTypeModel(editingModel.content, contentModel);
+                mapToElementTypeModel(blockModel.content, contentModel);
 
-                editingModel.contentModel = contentModel;
-                editingModel.layoutModel = layoutEntry;
+                blockModel.contentModel = contentModel;
+                blockModel.layoutModel = layoutEntry;
 
                 // TODO: settings
 
-                return editingModel;
+                return blockModel;
 
             },
 
 
             /**
-             * Retrieve editing model of a layout entry
+             * Retrieve block model of a layout entry
              * @return {Object} Scaffolded Block Content object.
              */
-            setDataFromEditingModel: function(editingModel) {
+            setDataFromBlockModel: function(blockModel) {
 
-                var udi = editingModel.content.key;
+                var udi = blockModel.content.key;
 
-                mapToPropertyModel(editingModel.content, editingModel.contentModel);
+                mapToPropertyModel(blockModel.content, blockModel.contentModel);
 
                 // TODO: sync settings to layout entry.
 
@@ -269,9 +270,6 @@
 
                 mapToPropertyModel(elementTypeContentModel, contentModel);
 
-                console.log(elementTypeContentModel)
-                console.log(contentModel)
-
                 return layoutEntry;
 
             }
@@ -281,24 +279,24 @@
             createModelObject: function(propertyModelValue, propertyEditorAlias, blockConfigurations) {
                 return new BlockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations);
             },
-            getBlockLabel: function(blockModelObject) {
+            getBlockLabel: function(blockModel) {
 
                 // TODO: we should do something about this for performance.
     
                 var vars = new Object();
                 
-                var variant = blockModelObject.content.variants[0];
+                var variant = blockModel.content.variants[0];
                 var tab = variant.tabs[0];
                 // TODO: need to look up all tabs...
                 for(const property of tab.properties) {
                     vars[property.alias] = property.value;
                 }
     
-                if(blockModelObject.labelInterpolator) {
-                    return blockModelObject.labelInterpolator(vars);
+                if(blockModel.labelInterpolator) {
+                    return blockModel.labelInterpolator(vars);
                 }
     
-                return blockModelObject.contentTypeName;
+                return blockModel.contentTypeName;
             }
         }
     }
