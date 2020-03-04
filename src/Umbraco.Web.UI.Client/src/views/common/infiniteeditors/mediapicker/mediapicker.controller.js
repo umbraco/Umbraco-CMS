@@ -300,9 +300,7 @@ angular.module("umbraco")
                             });
                         } else {
                             var image = $scope.images[$scope.images.length - 1];
-                            $scope.target = image;
-                            $scope.target.url = mediaHelper.resolveFile(image);
-                            selectMedia(image);
+                            clickHandler(image);
                         }
                     });
                 });
