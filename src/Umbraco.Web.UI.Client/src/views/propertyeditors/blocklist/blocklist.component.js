@@ -21,7 +21,7 @@
         
         var unsubscribe = [];
         var modelObject;
-        
+
         // Property actions:
         var copyAllBlocksAction;
         var deleteAllBlocksAction;
@@ -31,7 +31,6 @@
 
         vm.moveFocusToBlock = null;
         vm.showCopy = clipboardService.isSupported();
-        vm.showPaste = false;
 
         vm.layout = [];// Property models layout object specific to this Block Editor.
         vm.blocks = [];// Runtime model of editing models, needs to be synced to property model on form submit.
@@ -44,10 +43,6 @@
             labels.content_createEmpty = data[1];
         });
 
-        function checkAbilityToPasteContent() {
-            vm.showPaste = clipboardService.hasEntriesOfType("elementType", vm.availableContentTypes) || clipboardService.hasEntriesOfType("elementTypeArray", vm.availableContentTypes);
-        }
-        eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
 
 
 
@@ -102,8 +97,6 @@
 
             vm.availableContentTypes = modelObject.getAvailableAliasesForBlockContent();
             vm.availableBlockTypes = modelObject.getAvailableBlocksForItemPicker();
-
-            checkAbilityToPasteContent();
 
         }
 
