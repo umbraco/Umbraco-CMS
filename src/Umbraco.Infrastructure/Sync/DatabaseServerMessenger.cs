@@ -26,7 +26,7 @@ namespace Umbraco.Core.Sync
     // but only processes instructions coming from remote servers,
     // thus ensuring that instructions run only once
     //
-    public class DatabaseServerMessenger : ServerMessengerBase
+    public class DatabaseServerMessenger : ServerMessengerBase, IDatabaseServerMessenger
     {
         private readonly IRuntimeState _runtime;
         private readonly ManualResetEvent _syncIdle;
@@ -125,10 +125,6 @@ namespace Umbraco.Core.Sync
             // the service will *not* be able to properly handle our notifications anymore
             const int weight = 10;
 
-
-            //TODO Why do we have interface if we expect to be exact type!!!?
-            // if (!(_runtime is RuntimeState runtime))
-            //     throw new NotSupportedException($"Unsupported IRuntimeState implementation {_runtime.GetType().FullName}, expecting {typeof(RuntimeState).FullName}.");
 
             var registered = _runtime.MainDom.Register(
                 () =>

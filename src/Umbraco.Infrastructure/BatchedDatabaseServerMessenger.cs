@@ -1,21 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
-using Umbraco.Web.Composing;
-using System.ComponentModel;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
+using Umbraco.Core.Request;
 
 namespace Umbraco.Web
 {
@@ -29,19 +25,30 @@ namespace Umbraco.Web
     {
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IRequestCache _requestCache;
+        private readonly IRequestAccessor _requestAccessor;
 
         public BatchedDatabaseServerMessenger(
-            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, DatabaseServerMessengerOptions options, IHostingEnvironment hostingEnvironment, CacheRefresherCollection cacheRefreshers, IRequestCache requestCache)
+            IRuntimeState runtime,
+            IUmbracoDatabaseFactory databaseFactory,
+            IScopeProvider scopeProvider,
+            ISqlContext sqlContext,
+            IProfilingLogger proflog,
+            DatabaseServerMessengerOptions options,
+            IHostingEnvironment hostingEnvironment,
+            CacheRefresherCollection cacheRefreshers,
+            IRequestCache requestCache,
+            IRequestAccessor requestAccessor)
             : base(runtime, scopeProvider, sqlContext, proflog, true, options, hostingEnvironment, cacheRefreshers)
         {
             _databaseFactory = databaseFactory;
             _requestCache = requestCache;
+            _requestAccessor = requestAccessor;
         }
 
         // invoked by DatabaseServerRegistrarAndMessengerComponent
-        internal void Startup()
+        public void Startup()
         {
-            UmbracoModule.EndRequest += UmbracoModule_EndRequest;
+            _requestAccessor.EndRequest += UmbracoModule_EndRequest;
 
             if (_databaseFactory.CanConnect == false)
             {
@@ -104,7 +111,7 @@ namespace Umbraco.Web
 
         protected ICollection<RefreshInstructionEnvelope> GetBatch(bool create)
         {
-            var key = typeof (BatchedDatabaseServerMessenger).Name;
+            var key = nameof(BatchedDatabaseServerMessenger);
 
             if (!_requestCache.IsAvailable) return null;
 

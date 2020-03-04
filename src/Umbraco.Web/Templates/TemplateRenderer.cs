@@ -2,16 +2,15 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
-using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.Templates
 {
@@ -46,10 +45,11 @@ namespace Umbraco.Web.Templates
         {
             if (writer == null) throw new ArgumentNullException(nameof(writer));
 
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             // instantiate a request and process
             // important to use CleanedUmbracoUrl - lowercase path-only version of the current url, though this isn't going to matter
             // terribly much for this implementation since we are just creating a doc content request to modify it's properties manually.
-            var contentRequest = _publishedRouter.CreateRequest(_umbracoContextAccessor.UmbracoContext);
+            var contentRequest = _publishedRouter.CreateRequest(umbracoContext);
 
             var doc = contentRequest.UmbracoContext.Content.GetById(pageId);
 
@@ -62,7 +62,7 @@ namespace Umbraco.Web.Templates
             //in some cases the UmbracoContext will not have a PublishedRequest assigned to it if we are not in the
             //execution of a front-end rendered page. In this case set the culture to the default.
             //set the culture to the same as is currently rendering
-            if (_umbracoContextAccessor.UmbracoContext.PublishedRequest == null)
+            if (umbracoContext.PublishedRequest == null)
             {
                 var defaultLanguage = _languageService.GetAllLanguages().FirstOrDefault();
                 contentRequest.Culture = defaultLanguage == null
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Templates
             }
             else
             {
-                contentRequest.Culture = _umbracoContextAccessor.UmbracoContext.PublishedRequest.Culture;
+                contentRequest.Culture = umbracoContext.PublishedRequest.Culture;
             }
 
             //set the doc that was found by id

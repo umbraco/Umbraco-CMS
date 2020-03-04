@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
-using Umbraco.Web.Security;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Models
@@ -28,7 +25,7 @@ namespace Umbraco.Web.Models
             MemberProperties = new List<UmbracoProperty>();
             if (doLookup && Current.UmbracoContext != null)
             {
-                var helper = Current.Factory.GetInstance<MembershipHelper>();
+                var helper = Current.MembershipHelper;
                 var model = helper.GetCurrentMemberProfileModel();
                 MemberProperties = model.MemberProperties;
             }
