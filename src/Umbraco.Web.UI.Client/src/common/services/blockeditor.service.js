@@ -280,20 +280,11 @@
                 return new BlockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations);
             },
             getBlockLabel: function(blockModel) {
-
-                // TODO: we should do something about this for performance.
     
-                var vars = new Object();
                 
-                var variant = blockModel.content.variants[0];
-                var tab = variant.tabs[0];
-                // TODO: need to look up all tabs...
-                for(const property of tab.properties) {
-                    vars[property.alias] = property.value;
-                }
-    
                 if(blockModel.labelInterpolator) {
-                    return blockModel.labelInterpolator(vars);
+                    // We are just using the contentModel, since its a key/value object that is live synced. (if we need to add additional vars, we could make a shallow copy and apply those.)
+                    return blockModel.labelInterpolator(blockModel.contentModel);
                 }
     
                 return blockModel.contentTypeName;
