@@ -14,7 +14,24 @@
                 >
                 </button>
 
-                <block-list-property-editor-block block="blockItem" block-editor-api="vm.blockEditorApi" focus-this-block="false">
+                <block-list-property-editor-block block="blockItem" focus-this-block="vm.moveFocusToBlock === blockItem" block-editor-api="vm.blockEditorApi" show-copy="vm.showCopy" class="umb-block-list__block">
+                    <div class="umb-block-list__block--content" ng-if="blockItem.view" ng-include="blockItem.view">
+                    </div>
+
+                    <div class="umb-block-list__block--actions">
+                        <button type="button" class="btn-reset action --copy" localize="title" title="actions_copy" ng-click="vm.blockEditorApi.requestCopyBlock(blockItem);" ng-if="vm.showCopy">
+                            <i class="icon icon-documents" aria-hidden="true"></i>
+                            <span class="sr-only">
+                                <localize key="general_copy">Copy</localize>
+                            </span>
+                        </button>
+                        <button type="button" class="btn-reset action --delete" localize="title" title="actions_delete" ng-click="vm.blockEditorApi.requestDeleteBlock(blockItem);">
+                            <i class="icon icon-trash" aria-hidden="true"></i>
+                            <span class="sr-only">
+                                <localize key="general_delete">Delete</localize>
+                            </span>
+                        </button>
+                    </div>
                 </block-list-property-editor-block>
 
             </div>

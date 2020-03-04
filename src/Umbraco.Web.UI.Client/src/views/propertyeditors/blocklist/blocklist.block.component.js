@@ -4,12 +4,15 @@
         .module("umbraco")
         .component("blockListPropertyEditorBlock", {
             templateUrl: "views/propertyeditors/blocklist/blocklist.block.component.html",
+            transclude: true,
             controller: BlockListBlockController,
             controllerAs: "vm",
             bindings: {
                 block: "=",
-                blockEditorApi: "=",
-                focusThisBlock: "<?"
+                blockEditorApi: "<",
+                focusThisBlock: "<?",
+                class: "@",
+                showCopy: "@?"
             }
         });
 
@@ -30,7 +33,9 @@
                     var prop = tab.properties[p];
 
                     // Sadly we need to deep watch, cause its our only way to make sure that complex values gets synced. Alternative solution would be to sync on a broadcasted event, fired on Save and Copy eventually more.
-                    unsubscribe.push($scope.$watch("vm.block.content.variants[0].tabs["+t+"].properties["+p+"].value", createPropWatcher(prop), true));
+                    // But to minimize the watch we only watch the value of properties. But because we are deep watching it means that we are watching everything of nested block editors, so this would only have a performance improvement for first levels of block editors.
+                    // New thoughts, since the value of a property editors is just a pointer (if not primative) then we could properly live without deep watching? cause they reference the same?.. Lets investigate..
+                    unsubscribe.push($scope.$watch("vm.block.content.variants[0].tabs["+t+"].properties["+p+"].value", createPropWatcher(prop)));
                 }
             }
         }
@@ -42,7 +47,7 @@
                 // sync data:
                 vm.block.contentModel[prop.alias] = prop.value;
 
-                vm.blockEditorApi.sync();
+                //vm.blockEditorApi.sync();
 
                 // update label:
                 updateLabel();

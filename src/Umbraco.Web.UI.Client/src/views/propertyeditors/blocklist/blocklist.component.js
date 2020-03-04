@@ -12,58 +12,94 @@
                 propertyForm: "="
             },
             require: {
-                umbProperty: "?^umbProperty"
+                umbProperty: "?^umbProperty",
+                umbVariantContent: '?^^umbVariantContent'
             }
         });
 
-    function BlockListController($scope, $interpolate, editorService, clipboardService, localizationService, overlayService, blockEditorService, contentResource) {
+    function BlockListController($scope, $interpolate, editorService, clipboardService, localizationService, overlayService, blockEditorService, contentResource, eventsService) {
         
         var modelObject;
         var unsubscribe = [];
         var vm = this;
 
         vm.moveFocusToBlock = null;
+        vm.showCopy = clipboardService.isSupported();
+        vm.showPaste = false;
+
+        vm.layout = [];// Property models layout object specific to this Block Editor.
+        vm.blocks = [];// Runtime model of editing models, needs to be synced to property model on form submit.
+        vm.availableBlockTypes = [];// Available block entries of this property editor.
+
+        var labels = {};
+        vm.labels = labels;
+        localizationService.localizeMany(["grid_addElement", "content_createEmpty"]).then(function (data) {
+            labels.grid_addElement = data[0];
+            labels.content_createEmpty = data[1];
+        });
+
+        function checkAbilityToPasteContent() {
+            vm.showPaste = clipboardService.hasEntriesOfType("elementType", vm.availableContentTypes) || clipboardService.hasEntriesOfType("elementTypeArray", vm.availableContentTypes);
+        }
+        eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
+
+
+        var copyAllBlocksAction;
+        var deleteAllBlocksAction;
+
 
         vm.$onInit = function() {
 
             vm.validationLimit = vm.model.config.validationLimit;
-    
+            
             vm.model.value = vm.model.value || {};
     
             modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks);
             modelObject.loadScaffolding(contentResource).then(loaded);
-    
-            vm.layout = [];// Property models layout object specific to this Block Editor.
-            vm.blocks = [];// Runtime model of editing models, needs to be synced to property model on form submit.
-            vm.availableBlockTypes = [];// Available block entries of this property editor.
 
-            var copyAllEntriesAction = {
+            copyAllBlocksAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
                 labelTokens: [vm.model.label],
                 icon: "documents",
-                method: function () {},
+                method: requestCopyAllBlocks,
                 isDisabled: true
             }
-    
+            deleteAllBlocksAction = {
+                labelKey: 'clipboard_labelForRemoveAllEntries',
+                labelTokens: [],
+                icon: 'trash',
+                method: requestDeleteAllBlocks,
+                isDisabled: true
+            }
+
             var propertyActions = [
-                copyAllEntriesAction
+                copyAllBlocksAction,
+                deleteAllBlocksAction
             ];
             
-            if (this.umbProperty) {
-                this.umbProperty.setPropertyActions(propertyActions);
+            if (vm.umbProperty) {
+                vm.umbProperty.setPropertyActions(propertyActions);
             }
         };
 
         
 
-
+        
+        function setDirty() {
+            if (vm.propertyForm) {
+                vm.propertyForm.$setDirty();
+            }
+        }
         
         function loaded() {
 
             vm.layout = modelObject.getLayout();
             mapToBlocks();
 
+            vm.availableContentTypes = modelObject.getAvailableAliasesForBlockContent();
             vm.availableBlockTypes = modelObject.getAvailableBlocksForItemPicker();
+
+            checkAbilityToPasteContent();
 
         }
 
@@ -117,36 +153,35 @@
             $scope.$emit("blockEditorValueUpdated");
         }
         */
-
+        /*
         function syncBlockData(block) {
             modelObject.setDataFromEditingModel(block);
         }
-
-        function setDirty() {
-            if (vm.propertyForm) {
-                vm.propertyForm.$setDirty();
-            }
-        }
+        */
 
         function addNewBlock(index, contentTypeAlias) {
 
             // Create layout entry. (not added to property model jet.)
-            var layoutEntry = modelObject.createLayoutEntry(contentTypeAlias);
+            var layoutEntry = modelObject.create(contentTypeAlias);
+            if (layoutEntry === null) {
+                return false;
+            }
 
             // make editing object
             var blockEditingObject = getEditingModel(layoutEntry);
-
-            if (blockEditingObject !== null) {
-            
-                // add layout entry at the decired location in layout.
-                vm.layout.splice(index, 0, layoutEntry);
-
-                // apply editing model at decired location in editing model.
-                vm.blocks.splice(index, 0, blockEditingObject);
-                
-                vm.moveFocusToBlock = blockEditingObject;
-
+            if (blockEditingObject === null) {
+                return false;
             }
+            
+            // add layout entry at the decired location in layout.
+            vm.layout.splice(index, 0, layoutEntry);
+
+            // apply editing model at decired location in editing model.
+            vm.blocks.splice(index, 0, blockEditingObject);
+            
+            vm.moveFocusToBlock = blockEditingObject;
+
+            return true;
 
         }
 
@@ -157,18 +192,22 @@
             if(index !== -1) {
                 vm.blocks.splice(index, 1);
 
-                var layoutIndex = this.layout.findIndex(entry => entry.udi === block.udi);
+                var layoutIndex = vm.layout.findIndex(entry => entry.udi === block.udi);
                 if(layoutIndex !== -1) {
-                    vm.layout.splice(layoutIndex, 1);
+                    vm.layout.splice(index, 1);
                 }
 
-                this.modelObject.removeContentByUdi(block.udi);
+                modelObject.removeContentByUdi(block.udi);
             }
+        }
+
+        function deleteAllBlocks() {
+            vm.blocks.forEach(deleteBlock);
         }
 
         function editBlock(blockModel) {
 
-            // TODO: make a clone to ensure edits arent made directly.
+            // make a clone to avoid editing model directly.
             var blockContentModelClone = angular.copy(blockModel.content);
             
             var elementEditorModel = {
@@ -178,6 +217,8 @@
                 size: blockModel.config.overlaySize || "medium",
                 submit: function(elementEditorModel) {
                     blockModel.content = elementEditorModel.content;
+                    // TODO, investigate if we need to call a sync, for this scenario to work.. Concern is regarding wether the property-value watcher will pick this up.
+                    //modelObject.setDataFromEditingModel(block);
                     editorService.close();
                 },
                 close: function() {
@@ -201,13 +242,26 @@
             }
 
             vm.blockTypePicker = {
-                show: true,
+                show: false,
                 size: vm.availableBlockTypes.length < 7 ? "small" : "medium",
                 filter: vm.availableBlockTypes.length > 12 ? true : false,
                 orderBy: "$index",
                 view: "itempicker",
                 event: $event,
                 availableItems: vm.availableBlockTypes,
+                clickPasteItem: function(item) {
+                    if (item.type === "elementTypeArray") {
+                        var indexIncrementor = 0;
+                        item.data.forEach(function (entry) {
+                            if (requestPasteFromClipboard(createIndex + indexIncrementor, entry)) {
+                                indexIncrementor++;
+                            }
+                        });
+                    } else {
+                        requestPasteFromClipboard(createIndex, item.data);
+                    }
+                    vm.blockTypePicker.close();
+                },
                 submit: function (model) {
                     if (model && model.selectedItem) {
                         addNewBlock(createIndex, model.selectedItem.alias);
@@ -220,12 +274,97 @@
                 }
             };
 
+            vm.blockTypePicker.pasteItems = [];
+
+            var singleEntriesForPaste = clipboardService.retriveEntriesOfType("elementType", vm.availableContentTypes);
+            singleEntriesForPaste.forEach(function (entry) {
+                vm.blockTypePicker.pasteItems.push({
+                    type: "elementType",
+                    name: entry.label,
+                    data: entry.data,
+                    icon: entry.icon
+                });
+            });
+            
+            var arrayEntriesForPaste = clipboardService.retriveEntriesOfType("elementTypeArray", vm.availableContentTypes);
+            arrayEntriesForPaste.forEach(function (entry) {
+                vm.blockTypePicker.pasteItems.push({
+                    type: "elementTypeArray",
+                    name: entry.label,
+                    data: entry.data,
+                    icon: entry.icon
+                });
+            });
+
+            vm.blockTypePicker.title = vm.blockTypePicker.pasteItems.length > 0 ? labels.grid_addElement : labels.content_createEmpty;
+
+            vm.blockTypePicker.clickClearPaste = function ($event) {
+                $event.stopPropagation();
+                $event.preventDefault();
+                clipboardService.clearEntriesOfType("elementType", vm.availableContentTypes);
+                clipboardService.clearEntriesOfType("elementTypeArray", vm.availableContentTypes);
+                vm.blockTypePicker.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
+            };
+
+            vm.blockTypePicker.show = true;
+
         };
 
         function requestCopyBlock(block) {
-            console.log("copy still needs to be done.")
+            clipboardService.copy("elementTypeArray", block.content.contentTypeAlias, block.content, block.label);
         }
-        function requestDeleteBlock (block) {
+
+        var requestCopyAllBlocks = function() {
+            
+            // list aliases
+            var aliases = vm.blocks.map(block => block.content.contentTypeAlias);
+
+            // remove dublicates
+            aliases = aliases.filter((item, index) => aliases.indexOf(item) === index);
+            
+            var contentNodeName = "";
+            if(vm.umbVariantContent) {
+                contentNodeName = vm.umbVariantContent.editor.content.name;
+            }
+
+            var elementTypesToCopy = vm.blocks.map(block => block.content);
+
+            localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function(localizedLabel) {
+                clipboardService.copyArray("elementTypeArray", aliases, elementTypesToCopy, localizedLabel, "icon-thumbnail-list", vm.model.id);
+            });
+        }
+        function requestCopyBlock(block) {
+            clipboardService.copy("elementType", block.content.contentTypeAlias, block.content, block.label);
+        }
+        function requestPasteFromClipboard(index, pasteEntry) {
+            
+            if (pasteEntry === undefined) {
+                return false;
+            }
+
+            var layoutEntry = modelObject.createFromElementType(pasteEntry);
+            if (layoutEntry === null) {
+                return false;
+            }
+
+            // make editing object
+            var blockEditingObject = getEditingModel(layoutEntry);
+            if (blockEditingObject === null) {
+                return false;
+            }
+            
+            // add layout entry at the decired location in layout.
+            vm.layout.splice(index, 0, layoutEntry);
+
+            // apply editing model at decired location in editing model.
+            vm.blocks.splice(index, 0, blockEditingObject);
+            
+            vm.moveFocusToBlock = blockEditingObject;
+
+            return true;
+
+        }
+        function requestDeleteBlock(block) {
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "contentTypeEditor_yesDelete"]).then(function (data) {
                 const overlay = {
                     title: data[0],
@@ -243,8 +382,22 @@
                 overlayService.confirmDelete(overlay);
             });
         }
+        function requestDeleteAllBlocks() {
+            localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(function (data) {
+                overlayService.confirmDelete({
+                    title: data[1],
+                    content: data[0],
+                    close: function () {
+                        overlayService.close();
+                    },
+                    submit: function () {
+                        deleteAllBlocks();
+                        overlayService.close();
+                    }
+                });
+            });
+        }
 
-        vm.showCopy = clipboardService.isSupported();
 
         var runtimeSortVars = {};
 
@@ -289,12 +442,17 @@
             editBlock: editBlock,
             requestCopyBlock: requestCopyBlock,
             requestDeleteBlock: requestDeleteBlock,
-            deleteBlock: deleteBlock,
-            syncBlockData: syncBlockData
+            deleteBlock: deleteBlock
         }
 
 
-        function validateLimits() {
+        function onAmountOfBlocksChanged() {
+
+            // enable/disable property actions
+            copyAllBlocksAction.isDisabled = vm.blocks.length === 0;
+            deleteAllBlocksAction.isDisabled = vm.blocks.length === 0;
+
+            // validate limits:
             if (vm.validationLimit.min !== null) {
                 if (vm.blocks.length < vm.validationLimit.min) {
                     vm.propertyForm.minCount.$setValidity("minCount", false);
@@ -314,24 +472,8 @@
 
 
 
-        // TODO: We need to investigate if we can do a specific watch on each block, so we dont re-render all blocks.
+        unsubscribe.push($scope.$watch(() => vm.blocks.length, onAmountOfBlocksChanged));
         /*
-        unsubscribe.push($scope.$watch("vm.blocks[0]", onBlocksUpdated, true));
-        function onBlocksUpdated(newVal, oldVal) {
-            
-            console.log("blocks update", oldVal, " > ", newVal);
-            //setDirty();
-
-            var labelIndex = 1;
-            for(const block of vm.blocks) {
-                block.label = blockEditorService.getBlockLabel(block, labelIndex++);
-            }
-        }
-        */
-
-
-        unsubscribe.push($scope.$watch(() => vm.blocks.length, validateLimits));
-/*
         unsubscribe.push($scope.$on("formSubmitting", function (ev, args) {
 
             console.log("formSubmitting is happening, we need to make sure sub property editors are synced first.")
@@ -340,7 +482,7 @@
 
             //sync();
         }));
-*/
+        */
         $scope.$on("$destroy", function () {
             for (const subscription of unsubscribe) {
                 subscription();

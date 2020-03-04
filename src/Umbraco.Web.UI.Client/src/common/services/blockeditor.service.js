@@ -5,9 +5,13 @@
     function blockEditorService($interpolate, udiService) {
 
 
-        function mapToEditingModel(editingModel, contentModel) {
+        /**
+         * Simple mapping from property model content entry to editing model,
+         * needs to stay simple to avoid deep watching.
+         */
+        function mapToElementTypeModel(elementTypeModel, contentModel) {
 
-            var variant = editingModel.variants[0];
+            var variant = elementTypeModel.variants[0];
             
             for (var t = 0; t < variant.tabs.length; t++) {
                 var tab = variant.tabs[t];
@@ -21,9 +25,13 @@
             }
         }
 
-        function mapToPropertyModel(editingModel, contentModel) {
+        /**
+         * Simple mapping from elementTypeModel to property model content entry,
+         * needs to stay simple to avoid deep watching.
+         */
+        function mapToPropertyModel(elementTypeModel, contentModel) {
             
-            var variant = editingModel.variants[0];
+            var variant = elementTypeModel.variants[0];
             
             for (var t = 0; t < variant.tabs.length; t++) {
                 var tab = variant.tabs[t];
@@ -31,7 +39,7 @@
                 for (var p = 0; p < tab.properties.length; p++) {
                     var prop = tab.properties[p];
                     if (prop.value) {
-                        contentModel[prop.propertyAlias] = prop.value;
+                        contentModel[prop.alias] = prop.value;
                     }
                 }
             }
@@ -95,12 +103,19 @@
                 return Promise.all(tasks);
             },
 
+            /**
+             * Retrive a list of aliases that are available for content of blocks in this property editor, does not contain aliases of block settings.
+             * @return {Array} array of strings representing alias.
+             */
+            getAvailableAliasesForBlockContent: function() {
+                return this.blockConfigurations.map(blockConfiguration => blockConfiguration.contentTypeAlias);
+            },
+
             getAvailableBlocksForItemPicker: function() {
 
                 var blocks = [];
 
                 this.blockConfigurations.forEach(blockConfiguration => {
-
                     var scaffold = this.getScaffoldFor(blockConfiguration.contentTypeAlias);
                     if(scaffold) {
                         blocks.push({
@@ -148,7 +163,7 @@
                 editingModel.content = angular.copy(scaffold);
                 editingModel.content.udi = udi;
 
-                mapToEditingModel(editingModel.content, contentModel);
+                mapToElementTypeModel(editingModel.content, contentModel);
 
                 editingModel.contentModel = contentModel;
                 editingModel.layoutModel = layoutEntry;
@@ -168,17 +183,15 @@
 
                 var udi = editingModel.content.key;
 
-                var contentModel = this.getContentByUdi(udi);
-
-                mapToPropertyModel(editingModel.content, contentModel);
+                mapToPropertyModel(editingModel.content, editingModel.contentModel);
 
                 // TODO: sync settings to layout entry.
 
             },
 
             /**
-             * Retrieve layout data
-             * @return layout object.
+             * Retrieve the layout object for this specific property editor.
+             * @return {Object} Layout object.
              */
             getLayout: function() {
                 if (!this.value.layout[this.propertyEditorAlias]) {
@@ -188,13 +201,16 @@
             },
             
             /**
-             * Create layout entry
-             * @param {object} blockConfiguration 
-             * @return layout entry, to be added in the layout.
+             * Create a empty layout entry
+             * @param {Object} blockConfiguration
+             * @return {Object} Layout entry object, to be inserted at a decired location in the layout object.
              */
-            createLayoutEntry: function(contentTypeAlias) {
+            create: function(contentTypeAlias) {
                 
                 var blockConfiguration = this.getBlockConfiguration(contentTypeAlias);
+                if(blockConfiguration === null) {
+                    return null;
+                }
 
                 var entry = {
                     udi: this.createContent(contentTypeAlias)
@@ -222,16 +238,42 @@
             // private
             removeContent: function(entry) {
                 const index = this.value.data.indexOf(entry)
-                if (index > -1) {
+                if (index !== -1) {
                     this.value.splice(index, 1);
                 }
             },
 
             removeContentByUdi: function(udi) {
                 const index = this.value.data.findIndex(o => o.udi === udi);
-                if (index > -1) {
+                if (index !== -1) {
                     this.value.splice(index, 1);
                 }
+            },
+
+            /**
+             * Insert data from ElementType Model
+             * @return {Object} Layout entry object, to be inserted at a decired location in the layout object.
+             */
+            createFromElementType: function(elementTypeContentModel) {
+
+                elementTypeContentModel = angular.copy(elementTypeContentModel);
+
+                var contentTypeAlias = elementTypeContentModel.contentTypeAlias;
+
+                var layoutEntry = this.create(contentTypeAlias);
+                if(layoutEntry === null) {
+                    return null;
+                }
+
+                var contentModel = this.getContentByUdi(layoutEntry.udi);
+
+                mapToPropertyModel(elementTypeContentModel, contentModel);
+
+                console.log(elementTypeContentModel)
+                console.log(contentModel)
+
+                return layoutEntry;
+
             }
         }
 

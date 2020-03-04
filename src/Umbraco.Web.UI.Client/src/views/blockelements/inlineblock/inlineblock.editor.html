@@ -1,10 +1,10 @@
 <div class="blockelement-inlineblock-editor" ng-class="{'--open': bc.isOpen}" ng-controller="Umbraco.PropertyEditors.BlockEditor.InlineBlockEditor as bc">
-    <button type="button" class="btn-reset umb-outline blockelement__draggable-element" ng-click="bc.openBlock(block)" focus-when="{{vm.focusThis}}">
+    <button type="button" class="btn-reset umb-outline blockelement__draggable-element" ng-click="bc.openBlock(blockItem)" focus-when="{{blockvm.focusThis}}">
         <span class="caret"></span>
-        <i class="icon {{vm.block.content.icon}}"></i>
-        <span>{{vm.block.label}}</span>
+        <i class="icon {{blockItem.content.icon}}"></i>
+        <span>{{blockItem.label}}</span>
     </button>
     <div class="blockelement-inlineblock-editor__inner" ng-if="bc.isOpen === true">
-        <umb-element-content-editor content="vm.block.content"></umb-element-content-editor>
+        <umb-element-content-editor content="blockItem.content"></umb-element-content-editor>
     </div>
 </div>
