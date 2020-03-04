@@ -100,6 +100,7 @@ namespace Umbraco.Web.Scheduling
             {
                 case EnsureRoutableOutcome.IsRoutable:
                 case EnsureRoutableOutcome.NotDocumentRequest:
+                    _requestAccessor.RouteAttempt -= RegisterBackgroundTasksOnce;
                     RegisterBackgroundTasks();
                     break;
             }

@@ -139,7 +139,6 @@ namespace Umbraco.Web.Runtime
             // also, if not level.Run, we cannot really use the helper (during upgrade...)
             // so inject a "void" helper (not exactly pretty but...)
             if (composition.RuntimeState.Level == RuntimeLevel.Run)
-            if (composition.RuntimeState.Level == RuntimeLevel.Run)
                 composition.Register<UmbracoHelper>(factory =>
                 {
                     var umbCtx = factory.GetInstance<IUmbracoContext>();

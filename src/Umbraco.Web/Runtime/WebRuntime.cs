@@ -9,7 +9,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
-using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Logging;
 using Current = Umbraco.Web.Composing.Current;
@@ -29,7 +28,6 @@ namespace Umbraco.Web.Runtime
         /// </summary>
         /// <param name="umbracoApplication"></param>
         public WebRuntime(
-            UmbracoApplicationBase umbracoApplication,
             Configs configs,
             IUmbracoVersion umbracoVersion,
             IIOHelper ioHelper,
