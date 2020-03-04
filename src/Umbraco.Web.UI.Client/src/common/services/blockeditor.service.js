@@ -91,7 +91,7 @@
                     }
                 });
 
-                // remove dublicates.
+                // removing dublicates.
                 scaffoldAliases = scaffoldAliases.filter((value, index, self) => self.indexOf(value) === index);
 
                 scaffoldAliases.forEach((elementTypeAlias => {
@@ -142,7 +142,7 @@
 
                 var udi = layoutEntry.udi;
 
-                var contentModel = this.getContentByUdi(udi);
+                var contentModel = this._getContentByUdi(udi);
 
                 var blockConfiguration = this.getBlockConfiguration(contentModel.contentTypeAlias);
 
@@ -214,7 +214,7 @@
                 }
 
                 var entry = {
-                    udi: this.createContent(contentTypeAlias)
+                    udi: this._createContent(contentTypeAlias)
                 }
 
                 if (blockConfiguration.settingsElementTypeAlias != null) {
@@ -222,33 +222,6 @@
                 }
                 
                 return entry;
-            },
-
-            getContentByUdi: function(udi) {
-                return this.value.data.find(entry => entry.udi === udi);
-            },
-            // private
-            createContent: function(elementTypeAlias) {
-                var content = {
-                    contentTypeAlias: elementTypeAlias,
-                    udi: udiService.create("element")
-                };
-                this.value.data.push(content);
-                return content.udi;
-            },
-            // private
-            removeContent: function(entry) {
-                const index = this.value.data.indexOf(entry)
-                if (index !== -1) {
-                    this.value.splice(index, 1);
-                }
-            },
-
-            removeContentByUdi: function(udi) {
-                const index = this.value.data.findIndex(o => o.udi === udi);
-                if (index !== -1) {
-                    this.value.splice(index, 1);
-                }
             },
 
             /**
@@ -266,12 +239,40 @@
                     return null;
                 }
 
-                var contentModel = this.getContentByUdi(layoutEntry.udi);
+                var contentModel = this._getContentByUdi(layoutEntry.udi);
 
                 mapToPropertyModel(elementTypeContentModel, contentModel);
 
                 return layoutEntry;
 
+            },
+
+            // private
+            _createContent: function(elementTypeAlias) {
+                var content = {
+                    contentTypeAlias: elementTypeAlias,
+                    udi: udiService.create("element")
+                };
+                this.value.data.push(content);
+                return content.udi;
+            },
+            // private
+            _getContentByUdi: function(udi) {
+                return this.value.data.find(entry => entry.udi === udi);
+            },
+            
+            removeContent: function(entry) {
+                const index = this.value.data.indexOf(entry)
+                if (index !== -1) {
+                    this.value.splice(index, 1);
+                }
+            },
+
+            removeContentByUdi: function(udi) {
+                const index = this.value.data.findIndex(o => o.udi === udi);
+                if (index !== -1) {
+                    this.value.splice(index, 1);
+                }
             }
         }
 
