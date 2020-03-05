@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using Examine;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -25,11 +26,36 @@ namespace Umbraco.Web
         //
         private static IPublishedValueFallback PublishedValueFallback => Current.PublishedValueFallback;
         private static IPublishedSnapshot PublishedSnapshot => Current.PublishedSnapshot;
-        private static UmbracoContext UmbracoContext => Current.UmbracoContext;
+        private static IUmbracoContext UmbracoContext => Current.UmbracoContext;
         private static ISiteDomainHelper SiteDomainHelper => Current.Factory.GetInstance<ISiteDomainHelper>();
         private static IVariationContextAccessor VariationContextAccessor => Current.VariationContextAccessor;
         private static IExamineManager ExamineManager => Current.Factory.GetInstance<IExamineManager>();
         private static IUserService UserService => Current.Services.UserService;
+
+
+        #region Creator/Writer Names
+
+        public static string CreatorName(this IPublishedContent content, IUserService userService)
+        {
+            return userService.GetProfileById(content.CreatorId)?.Name;
+        }
+
+        public static string WriterName(this IPublishedContent content, IUserService userService)
+        {
+            return userService.GetProfileById(content.WriterId)?.Name;
+        }
+
+        public static string CreatorName(this IPublishedContent content)
+        {
+            return content.GetCreatorName(UserService);
+        }
+
+        public static string WriterName(this IPublishedContent content)
+        {
+            return content.GetWriterName(UserService);
+        }
+
+        #endregion
 
         #region Template
 
@@ -50,8 +76,8 @@ namespace Umbraco.Web
                 Current.Configs.Settings().WebRouting.DisableAlternativeTemplates,
                 Current.Configs.Settings().WebRouting.ValidateAlternativeTemplates,
                 templateId);
-
         }
+
         public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias)
         {
             return content.IsAllowedTemplate(
@@ -284,7 +310,7 @@ namespace Umbraco.Web
         {
             return parentNodes.DescendantsOrSelf<T>(VariationContextAccessor, culture);
         }
-        
+
         public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, string culture = null)
         {
             return content.Descendants(VariationContextAccessor, culture);
@@ -683,55 +709,31 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region Writer and creator
-
-        public static string CreatorName(this IPublishedContent content)
-        {
-            return content.GetCreatorName(UserService);
-        }
-
-        public static string WriterName(this IPublishedContent content)
-        {
-            return content.GetWriterName(UserService);
-        }
-
-        #endregion
 
         #region Url
 
         /// <summary>
-        /// Gets the url of the content item.
-        /// </summary>
-        /// <remarks>
-        /// <para>If the content item is a document, then this method returns the url of the
-        /// document. If it is a media, then this methods return the media url for the
-        /// 'umbracoFile' property. Use the MediaUrl() method to get the media url for other
-        /// properties.</para>
-        /// <para>The value of this property is contextual. It depends on the 'current' request uri,
-        /// if any. In addition, when the content type is multi-lingual, this is the url for the
-        /// specified culture. Otherwise, it is the invariant url.</para>
-        /// </remarks>
-        public static string Url(this IPublishedContent content, string culture = null, UrlMode mode = UrlMode.Default)
-        {
-            var umbracoContext = Composing.Current.UmbracoContext;
+             /// Gets the url of the content item.
+             /// </summary>
+             /// <remarks>
+             /// <para>If the content item is a document, then this method returns the url of the
+             /// document. If it is a media, then this methods return the media url for the
+             /// 'umbracoFile' property. Use the MediaUrl() method to get the media url for other
+             /// properties.</para>
+             /// <para>The value of this property is contextual. It depends on the 'current' request uri,
+             /// if any. In addition, when the content type is multi-lingual, this is the url for the
+             /// specified culture. Otherwise, it is the invariant url.</para>
+             /// </remarks>
+             public static string Url(this IPublishedContent content, string culture = null, UrlMode mode = UrlMode.Default)
+             {
+                var umbracoContext = Current.UmbracoContext;
 
-            if (umbracoContext == null)
-                throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext is null.");
-            if (umbracoContext.UrlProvider == null)
-                throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext.UrlProvider is null.");
+                if (umbracoContext == null)
+                    throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext is null.");
 
-            switch (content.ContentType.ItemType)
-            {
-                case PublishedItemType.Content:
-                    return umbracoContext.UrlProvider.GetUrl(content, mode, culture);
+                return content.Url(Current.PublishedUrlProvider, culture, mode);
+             }
 
-                case PublishedItemType.Media:
-                    return umbracoContext.UrlProvider.GetMediaUrl(content, mode, culture, Constants.Conventions.Media.File);
-
-                default:
-                    throw new NotSupportedException();
-            }
-        }
 
         #endregion
     }

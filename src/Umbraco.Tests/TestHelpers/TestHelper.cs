@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Web;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -31,6 +32,7 @@ using Umbraco.Net;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Hosting;
+using Umbraco.Web.Routing;
 using File = System.IO.File;
 
 namespace Umbraco.Tests.TestHelpers
@@ -100,6 +102,10 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IIOHelper IOHelper { get; } = new IOHelper(GetHostingEnvironment());
         public static IMainDom MainDom { get; } = new MainDom(Mock.Of<ILogger>(), GetHostingEnvironment(), new MainDomSemaphoreLock(Mock.Of<ILogger>(), GetHostingEnvironment()));
+        public static UriUtility UriUtility { get; } = new UriUtility(GetHostingEnvironment());
+
+        public static IWebRoutingSection WebRoutingSection => SettingsForTests.GetDefaultUmbracoSettings().WebRouting;
+
         /// <summary>
         /// Maps the given <paramref name="relativePath"/> making it rooted on <see cref="CurrentAssemblyDirectory"/>. <paramref name="relativePath"/> must start with <code>~/</code>
         /// </summary>
@@ -342,6 +348,32 @@ namespace Umbraco.Tests.TestHelpers
         public static IRequestCache GetRequestCache()
         {
             return new DictionaryAppCache();
+        }
+
+        public static IHttpContextAccessor GetHttpContextAccessor(HttpContextBase httpContextBase = null)
+        {
+            if (httpContextBase is null)
+            {
+                var httpContextMock = new Mock<HttpContextBase>();
+
+                httpContextMock.Setup(x => x.DisposeOnPipelineCompleted(It.IsAny<IDisposable>()))
+                    .Returns(Mock.Of<ISubscriptionToken>());
+
+                httpContextBase = httpContextMock.Object;
+            }
+
+            var mock = new Mock<IHttpContextAccessor>();
+
+            mock.Setup(x => x.HttpContext).Returns(httpContextBase);
+
+            return mock.Object;
+        }
+
+        public static IPublishedUrlProvider GetPublishedUrlProvider()
+        {
+            var mock = new Mock<IPublishedUrlProvider>();
+
+            return mock.Object;
         }
     }
 }

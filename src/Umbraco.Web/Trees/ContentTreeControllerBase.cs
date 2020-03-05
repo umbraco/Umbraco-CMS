@@ -12,7 +12,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
-using System.Globalization;
 using Umbraco.Core.Models.Entities;
 using System.Web.Http.ModelBinding;
 using Umbraco.Web.Actions;
@@ -22,14 +21,29 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Mapping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Trees
 {
-    public abstract class ContentTreeControllerBase : TreeController
+    public abstract class ContentTreeControllerBase : TreeController, ITreeNodeController
     {
+        public IMenuItemCollectionFactory MenuItemCollectionFactory { get; }
 
-        protected ContentTreeControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper)
+
+        protected ContentTreeControllerBase(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider,
+            IMenuItemCollectionFactory menuItemCollectionFactory)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
+            MenuItemCollectionFactory = menuItemCollectionFactory;
         }
 
         protected ContentTreeControllerBase()
@@ -365,7 +379,12 @@ namespace Umbraco.Web.Trees
                 var startNodes = Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes);
                 //if any of these start nodes' parent is current, then we need to render children normally so we need to switch some logic and tell
                 // the UI that this node does have children and that it isn't a container
-                if (startNodes.Any(x => x.ParentId == e.Id))
+
+                if (startNodes.Any(x =>
+                {
+                    var pathParts = x.Path.Split(',');
+                    return pathParts.Contains(e.Id.ToInvariantString());
+                }))
                 {
                     renderChildren = true;
                 }
@@ -418,7 +437,7 @@ namespace Umbraco.Web.Trees
                     deleteAllowed = perms.FirstOrDefault(x => x.Contains(deleteAction.Letter)) != null;
                 }
 
-                var menu = new MenuItemCollection();
+                var menu = MenuItemCollectionFactory.Create();
                 // only add empty recycle bin if the current user is allowed to delete by default
                 if (deleteAllowed)
                 {

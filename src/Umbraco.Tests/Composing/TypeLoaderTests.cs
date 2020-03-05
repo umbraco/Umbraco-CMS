@@ -196,7 +196,7 @@ AnotherContentFinder
         [Test]
         public void Create_Cached_Plugin_File()
         {
-            var types = new[] { typeof(TypeLoader), typeof(TypeLoaderTests), typeof(UmbracoContext) };
+            var types = new[] { typeof(TypeLoader), typeof(TypeLoaderTests), typeof(IUmbracoContext) };
 
             var typeList1 = new TypeLoader.TypeList(typeof(object), null);
             foreach (var type in types) typeList1.Add(type);
@@ -275,7 +275,7 @@ AnotherContentFinder
         public void GetDataEditors()
         {
             var types = _typeLoader.GetDataEditors();
-            Assert.AreEqual(38, types.Count());
+            Assert.AreEqual(39, types.Count());
         }
 
         /// <summary>

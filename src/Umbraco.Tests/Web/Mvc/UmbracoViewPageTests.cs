@@ -404,7 +404,7 @@ namespace Umbraco.Tests.Web.Mvc
             return context;
         }
 
-        protected UmbracoContext GetUmbracoContext(ILogger logger, IUmbracoSettingsSection umbracoSettings, string url, int templateId, RouteData routeData = null, bool setSingleton = false)
+        protected IUmbracoContext GetUmbracoContext(ILogger logger, IUmbracoSettingsSection umbracoSettings, string url, int templateId, RouteData routeData = null, bool setSingleton = false)
         {
             var svcCtx = GetServiceContext();
 
@@ -435,18 +435,18 @@ namespace Umbraco.Tests.Web.Mvc
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;
 
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor(http);
             var globalSettings = TestObjects.GetGlobalSettings();
 
             var ctx = new UmbracoContext(
-                http,
+                httpContextAccessor,
                 _service,
-                new WebSecurity(http, Current.Services.UserService, globalSettings, IOHelper),
-                TestObjects.GetUmbracoSettings(),
-                Enumerable.Empty<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, globalSettings, IOHelper),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             //if (setSingleton)
             //{

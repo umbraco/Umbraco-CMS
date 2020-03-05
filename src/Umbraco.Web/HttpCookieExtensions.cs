@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Web;
 using Microsoft.Owin;
 using Umbraco.Core;
+using Umbraco.Core.Cookie;
 
 namespace Umbraco.Web
 {
@@ -97,34 +98,18 @@ namespace Umbraco.Web
             return null;
         }
 
-        public static string GetPreviewCookieValue(this HttpRequestBase request)
+        public static string GetPreviewCookieValue(this ICookieManager cookieManager)
         {
-            return request.GetCookieValue(Constants.Web.PreviewCookieName);
+            return cookieManager.GetCookieValue(Constants.Web.PreviewCookieName);
         }
-
-        public static string GetPreviewCookieValue(this HttpRequest request)
-        {
-            return new HttpRequestWrapper(request).GetPreviewCookieValue();
-        }
-
         /// <summary>
         /// Does a preview cookie exist ?
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public static bool HasPreviewCookie(this HttpRequestBase request)
+        public static bool HasPreviewCookie(this ICookieManager cookieManager)
         {
-            return request.Cookies[Constants.Web.PreviewCookieName] != null;
-        }
-
-        /// <summary>
-        /// Does a preview cookie exist ?
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public static bool HasPreviewCookie(this HttpRequest request)
-        {
-            return new HttpRequestWrapper(request).HasPreviewCookie();
+            return cookieManager.HasCookie(Constants.Web.PreviewCookieName);
         }
 
         /// <summary>

@@ -31,6 +31,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -53,8 +54,6 @@ namespace Umbraco.Tests.TestHelpers
         protected PublishedContentTypeCache ContentTypesCache { get; private set; }
 
         protected override ISqlSyntaxProvider SqlSyntax => GetSyntaxProvider();
-
-        protected ServiceContext ServiceContext => Current.Services;
         protected IVariationContextAccessor VariationContextAccessor => new TestVariationContextAccessor();
 
         internal ScopeProvider ScopeProvider => Current.ScopeProvider as ScopeProvider;
@@ -80,6 +79,9 @@ namespace Umbraco.Tests.TestHelpers
             Composition.WithCollectionBuilder<DataEditorCollectionBuilder>()
                 .Clear()
                 .Add(() => Composition.TypeLoader.GetDataEditors());
+
+            Composition.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
+                .Add(Composition.TypeLoader.GetUmbracoApiControllers());
 
             Composition.RegisterUnique(f =>
             {
@@ -155,14 +157,7 @@ namespace Umbraco.Tests.TestHelpers
             return @"Datasource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;";
         }
 
-        protected FakeHttpContextFactory GetHttpContextFactory(string url, RouteData routeData = null)
-        {
-            var factory = routeData != null
-                            ? new FakeHttpContextFactory(url, routeData)
-                            : new FakeHttpContextFactory(url);
 
-            return factory;
-        }
 
         /// <summary>
         /// Creates the SqlCe database if required
@@ -357,7 +352,7 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        protected UmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null, IEnumerable<IMediaUrlProvider> mediaUrlProviders = null, IGlobalSettings globalSettings = null, IPublishedSnapshotService snapshotService = null)
+        protected IUmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false,  IGlobalSettings globalSettings = null, IPublishedSnapshotService snapshotService = null)
         {
             // ensure we have a PublishedCachesService
             var service = snapshotService ?? PublishedSnapshotService as XmlPublishedSnapshotService;
@@ -376,18 +371,17 @@ namespace Umbraco.Tests.TestHelpers
             }
 
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
-
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor(httpContext);
             var umbracoContext = new UmbracoContext(
-                httpContext,
+                httpContextAccessor,
                 service,
-                new WebSecurity(httpContext, Factory.GetInstance<IUserService>(),
+                new WebSecurity(httpContextAccessor, Factory.GetInstance<IUserService>(),
                     Factory.GetInstance<IGlobalSettings>(), IOHelper),
-                umbracoSettings ?? Factory.GetInstance<IUmbracoSettingsSection>(),
-                urlProviders ?? Enumerable.Empty<IUrlProvider>(),
-                mediaUrlProviders ?? Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings ?? Factory.GetInstance<IGlobalSettings>(),
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;

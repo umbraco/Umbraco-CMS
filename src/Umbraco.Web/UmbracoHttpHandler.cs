@@ -14,16 +14,15 @@ namespace Umbraco.Web
         private UrlHelper _url;
 
         protected UmbracoHttpHandler()
-            : this(Current.UmbracoContextAccessor, Current.UmbracoHelper, Current.Services, Current.ProfilingLogger)
+            : this(Current.UmbracoContextAccessor, Current.Services, Current.ProfilingLogger)
         { }
 
-        protected UmbracoHttpHandler(IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper umbracoHelper, ServiceContext service, IProfilingLogger plogger)
+        protected UmbracoHttpHandler(IUmbracoContextAccessor umbracoContextAccessor,ServiceContext service, IProfilingLogger plogger)
         {
             UmbracoContextAccessor = umbracoContextAccessor;
             Logger = plogger;
             ProfilingLogger = plogger;
             Services = service;
-            Umbraco = umbracoHelper;
         }
 
         public abstract void ProcessRequest(HttpContext context);
@@ -46,11 +45,6 @@ namespace Umbraco.Web
         public IUmbracoContextAccessor UmbracoContextAccessor { get; }
 
         /// <summary>
-        /// Gets the Umbraco helper.
-        /// </summary>
-        public UmbracoHelper Umbraco { get; }
-
-        /// <summary>
         /// Gets the services context.
         /// </summary>
         public ServiceContext Services { get; }
@@ -58,7 +52,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the web security helper.
         /// </summary>
-        public WebSecurity Security => UmbracoContextAccessor.UmbracoContext.Security;
+        public IWebSecurity Security => UmbracoContextAccessor.UmbracoContext.Security;
 
         /// <summary>
         /// Gets the Url helper.

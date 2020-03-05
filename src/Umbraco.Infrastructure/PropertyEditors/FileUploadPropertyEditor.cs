@@ -19,7 +19,7 @@ namespace Umbraco.Web.PropertyEditors
         "fileupload",
         Group = Constants.PropertyEditors.Groups.Media,
         Icon = "icon-download-alt")]
-    public class FileUploadPropertyEditor : DataEditor, IDataEditorWithMediaPath
+    public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IContentSection _contentSection;
@@ -52,7 +52,16 @@ namespace Umbraco.Web.PropertyEditors
             return editor;
         }
 
-        public string GetMediaPath(object value) => value?.ToString();
+        public bool TryGetMediaPath(string alias, object value, out string mediaPath)
+        {
+            if (alias == Alias)
+            {
+                mediaPath = value?.ToString();
+                return true;
+            }
+            mediaPath = null;
+            return false;
+        }
 
         /// <summary>
         /// Gets a value indicating whether a property is an upload field.

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,14 +6,16 @@ using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Cookie;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Request;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Web.Security;
+using Umbraco.Core.Session;
 
 namespace Umbraco.Web.Macros
 {
@@ -27,9 +28,26 @@ namespace Umbraco.Web.Macros
         private readonly AppCaches _appCaches;
         private readonly IMacroService _macroService;
         private readonly IIOHelper _ioHelper;
-        private readonly IUserService _userService;
+        private readonly ICookieManager _cookieManager;
+        private readonly IMemberUserKeyProvider _memberUserKeyProvider;
+        private readonly ISessionManager _sessionManager;
+        private readonly IRequestAccessor _requestAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public MacroRenderer(IProfilingLogger plogger, IUmbracoContextAccessor umbracoContextAccessor, IContentSection contentSection, ILocalizedTextService textService, AppCaches appCaches, IMacroService macroService, IUserService userService, IIOHelper ioHelper)
+
+        public MacroRenderer(
+            IProfilingLogger plogger,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IContentSection contentSection,
+            ILocalizedTextService textService,
+            AppCaches appCaches,
+            IMacroService macroService,
+            IIOHelper ioHelper,
+            ICookieManager cookieManager,
+            IMemberUserKeyProvider memberUserKeyProvider,
+            ISessionManager sessionManager,
+            IRequestAccessor requestAccessor,
+             IHttpContextAccessor httpContextAccessor)
         {
             _plogger = plogger ?? throw new ArgumentNullException(nameof(plogger));
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -38,7 +56,11 @@ namespace Umbraco.Web.Macros
             _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
             _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _cookieManager = cookieManager;
+            _memberUserKeyProvider = memberUserKeyProvider;
+            _sessionManager = sessionManager;
+            _requestAccessor = requestAccessor;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         #region MacroContent cache
@@ -58,12 +80,9 @@ namespace Umbraco.Web.Macros
             {
                 object key = 0;
 
-                if (_umbracoContextAccessor.UmbracoContext.HttpContext?.User?.Identity?.IsAuthenticated ?? false)
+                if (_umbracoContextAccessor.UmbracoContext.Security.IsAuthenticated())
                 {
-                    //ugh, membershipproviders :(
-                    var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-                    var member = MembershipProviderExtensions.GetCurrentUser(provider);
-                    key = member?.ProviderUserKey ?? 0;
+                    key = _memberUserKeyProvider.GetMemberProviderUserKey() ?? 0;
                 }
 
                 id.AppendFormat("m{0}-", key);
@@ -107,10 +126,6 @@ namespace Umbraco.Web.Macros
                 }
             }
 
-            // this is legacy and I'm not sure what exactly it is supposed to do
-            if (macroContent.Control != null)
-                macroContent.Control.ID = macroContent.ControlId;
-
             return macroContent;
         }
 
@@ -126,15 +141,9 @@ namespace Umbraco.Web.Macros
             // do not cache if it should cache by member and there's not member
             if (model.CacheByMember)
             {
-                var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-                var member = MembershipProviderExtensions.GetCurrentUser(provider);
-                var key = member?.ProviderUserKey;
-                if (key == null) return;
+                var key = _memberUserKeyProvider.GetMemberProviderUserKey();
+                if (key is null) return;
             }
-
-            // this is legacy and I'm not sure what exactly it is supposed to do
-            if (macroContent.Control != null)
-                macroContent.ControlId = macroContent.Control.ID;
 
             // remember when we cache the content
             macroContent.Date = DateTime.Now;
@@ -150,23 +159,12 @@ namespace Umbraco.Web.Macros
         }
 
         // gets the macro source file name
-        // null if the macro is not file-based
+        // null if the macro is not file-based, or not supported
         internal static string GetMacroFileName(MacroModel model)
         {
-            string filename;
+            string filename = model.MacroSource; // partial views are saved with their full virtual path
 
-            switch (model.MacroType)
-            {
-                case MacroTypes.PartialView:
-                    filename = model.MacroSource; // partial views are saved with their full virtual path
-                    break;
-                default:
-                    // not file-based, or not supported
-                    filename = null;
-                    break;
-            }
-
-            return filename;
+            return string.IsNullOrEmpty(filename) ? null : filename;
         }
 
         // gets the macro source file
@@ -205,24 +203,22 @@ namespace Umbraco.Web.Macros
             if (m == null)
                 throw new InvalidOperationException("No macro found by alias " + macroAlias);
 
-            var page = new PublishedContentHashtableConverter(content, _userService);
-
             var macro = new MacroModel(m);
 
             UpdateMacroModelProperties(macro, macroParams);
-            return Render(macro, content, page.Elements);
+            return Render(macro, content);
         }
 
-        private MacroContent Render(MacroModel macro, IPublishedContent content, IDictionary pageElements)
+        private MacroContent Render(MacroModel macro, IPublishedContent content)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
 
-            var macroInfo = $"Render Macro: {macro.Name}, type: {macro.MacroType}, cache: {macro.CacheDuration}";
+            var macroInfo = $"Render Macro: {macro.Name}, cache: {macro.CacheDuration}";
             using (_plogger.DebugDuration<MacroRenderer>(macroInfo, "Rendered Macro."))
             {
                 // parse macro parameters ie replace the special [#key], [$key], etc. syntaxes
                 foreach (var prop in macro.Properties)
-                    prop.Value = ParseAttribute(pageElements, prop.Value);
+                    prop.Value = ParseAttribute(prop.Value);
 
                 macro.CacheIdentifier = GetContentCacheIdentifier(macro, content.Id);
 
@@ -329,22 +325,11 @@ namespace Umbraco.Web.Macros
 
             var textService = _textService;
 
-            switch (model.MacroType)
-            {
-                case MacroTypes.PartialView:
-                    return ExecuteMacroWithErrorWrapper(model,
-                        $"Executing PartialView: MacroSource=\"{model.MacroSource}\".",
-                        "Executed PartialView.",
-                        () => ExecutePartialView(model, content),
-                        () => textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.MacroSource }));
-
-                default:
-                    return ExecuteMacroWithErrorWrapper(model,
-                        $"Execute macro with unsupported type \"{model.MacroType}\".",
-                        "Executed.",
-                        () => { throw new Exception("Unsupported macro type."); },
-                        () => textService.Localize("errors/macroErrorUnsupportedType"));
-            }
+            return ExecuteMacroWithErrorWrapper(model,
+                          $"Executing PartialView: MacroSource=\"{model.MacroSource}\".",
+                          "Executed PartialView.",
+                          () => ExecutePartialView(model, content),
+                          () => textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.MacroSource }));
         }
 
 
@@ -358,7 +343,7 @@ namespace Umbraco.Web.Macros
         /// <returns>The text output of the macro execution.</returns>
         private MacroContent ExecutePartialView(MacroModel macro, IPublishedContent content)
         {
-            var engine = new PartialViewMacroEngine();
+            var engine = new PartialViewMacroEngine(_umbracoContextAccessor, _httpContextAccessor, _ioHelper);
             return engine.Execute(macro, content);
         }
 
@@ -366,12 +351,10 @@ namespace Umbraco.Web.Macros
 
         #region Execution helpers
 
-        // parses attribute value looking for [@requestKey], [%sessionKey], [#pageElement], [$recursiveValue]
+        // parses attribute value looking for [@requestKey], [%sessionKey]
         // supports fallbacks eg "[@requestKey],[%sessionKey],1234"
-        private string ParseAttribute(IDictionary pageElements, string attributeValue)
+        private string ParseAttribute(string attributeValue)
         {
-            if (pageElements == null) throw new ArgumentNullException(nameof(pageElements));
-
             // check for potential querystring/cookie variables
             attributeValue = attributeValue.Trim();
             if (attributeValue.StartsWith("[") == false)
@@ -383,7 +366,7 @@ namespace Umbraco.Web.Macros
             // like [1,2,3] which we don't want to parse - however the last one can be a literal, so
             // don't check on the last one which can be just anything - check all previous tokens
 
-            char[] validTypes = { '@', '%', '#', '$' };
+            char[] validTypes = { '@', '%' };
             if (tokens.Take(tokens.Length - 1).Any(x =>
                 x.Length < 4 // ie "[?x]".Length - too short
                 || x[0] != '[' // starts with [
@@ -392,8 +375,6 @@ namespace Umbraco.Web.Macros
             {
                 return attributeValue;
             }
-
-            var context = _umbracoContextAccessor.UmbracoContext.HttpContext;
 
             foreach (var token in tokens)
             {
@@ -412,20 +393,12 @@ namespace Umbraco.Web.Macros
                 switch (type)
                 {
                     case '@':
-                        attributeValue = context?.Request[name];
+                        attributeValue = _requestAccessor.GetRequestValue(name);
                         break;
                     case '%':
-                        attributeValue = context?.Session[name]?.ToString();
+                        attributeValue = _sessionManager.GetSessionValue(name)?.ToString();
                         if (string.IsNullOrEmpty(attributeValue))
-                            attributeValue = context?.Request.GetCookieValue(name);
-                        break;
-                    case '#':
-                        attributeValue = pageElements[name]?.ToString();
-                        break;
-                    case '$':
-                        attributeValue = pageElements[name]?.ToString();
-                        if (string.IsNullOrEmpty(attributeValue))
-                            attributeValue = ParseAttributeOnParents(pageElements, name);
+                            attributeValue = _cookieManager.GetCookieValue(name);
                         break;
                 }
 
@@ -435,26 +408,6 @@ namespace Umbraco.Web.Macros
             }
 
             return attributeValue;
-        }
-
-        private string ParseAttributeOnParents(IDictionary pageElements, string name)
-        {
-            if (pageElements == null) throw new ArgumentNullException(nameof(pageElements));
-            // this was, and still is, an ugly piece of nonsense
-
-            var value = string.Empty;
-            var cache = _umbracoContextAccessor.UmbracoContext.Content;
-
-            var splitpath = (string[])pageElements["splitpath"];
-            for (var i = splitpath.Length - 1; i > 0; i--) // at 0 we have root (-1)
-            {
-                var content = cache.GetById(int.Parse(splitpath[i]));
-                if (content == null) continue;
-                value = content.Value(name)?.ToString();
-                if (string.IsNullOrEmpty(value) == false) break;
-            }
-
-            return value;
         }
 
         #endregion

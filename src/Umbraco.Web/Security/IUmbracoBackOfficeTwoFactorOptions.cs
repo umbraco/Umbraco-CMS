@@ -7,6 +7,6 @@ namespace Umbraco.Web.Security
     /// </summary>
     public interface IUmbracoBackOfficeTwoFactorOptions
     {
-        string GetTwoFactorView(IOwinContext owinContext, UmbracoContext umbracoContext, string username);
+        string GetTwoFactorView(IOwinContext owinContext, IUmbracoContext umbracoContext, string username);
     }
 }

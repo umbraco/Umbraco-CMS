@@ -10,14 +10,18 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Request;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -27,6 +31,7 @@ namespace Umbraco.Tests.TestHelpers
     {
         protected override void Compose()
         {
+            base.Compose();
             base.Compose();
 
             Composition.RegisterUnique<IPublishedValueFallback, PublishedValueFallback>();
@@ -95,10 +100,16 @@ namespace Umbraco.Tests.TestHelpers
                 contentFinders ?? new ContentFinderCollection(Enumerable.Empty<IContentFinder>()),
                 new TestLastChanceFinder(),
                 new TestVariationContextAccessor(),
-                container?.TryGetInstance<ServiceContext>() ?? ServiceContext.CreatePartial(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()),
                 container?.TryGetInstance<IUmbracoSettingsSection>() ?? Current.Factory.GetInstance<IUmbracoSettingsSection>(),
-                Mock.Of<IUserService>());
+                Mock.Of<IPublishedUrlProvider>(),
+                Mock.Of<IRequestAccessor>(),
+                container?.GetInstance<IPublishedValueFallback>() ?? Current.Factory.GetInstance<IPublishedValueFallback>(),
+                container?.GetInstance<IPublicAccessChecker>()?? Current.Factory.GetInstance<IPublicAccessChecker>(),
+                container?.GetInstance<IFileService>()?? Current.Factory.GetInstance<IFileService>(),
+                container?.GetInstance<IContentTypeService>() ?? Current.Factory.GetInstance<IContentTypeService>(),
+                container?.GetInstance<IPublicAccessService>() ?? Current.Factory.GetInstance<IPublicAccessService>()
+            );
         }
     }
 }

@@ -33,7 +33,7 @@ namespace Umbraco.Web.Editors.Filters
             _paramName = paramName;
         }
 
-        private UmbracoContext GetUmbracoContext()
+        private IUmbracoContext GetUmbracoContext()
         {
             return _umbracoContextAccessor?.UmbracoContext ?? Composing.Current.UmbracoContext;
         }

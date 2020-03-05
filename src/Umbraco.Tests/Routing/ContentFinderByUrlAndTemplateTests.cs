@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Routing
         {
             var template = new Template(ShortStringHelper, alias, alias);
             template.Content = ""; // else saving throws with a dirty internal error
-            Current.Services.FileService.SaveTemplate(template);
+            ServiceContext.FileService.SaveTemplate(template);
             return template;
         }
 
@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext(urlAsString, template1.Id, globalSettings:globalSettings.Object);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
-            var lookup = new ContentFinderByUrlAndTemplate(Logger, ServiceContext.FileService);
+            var lookup = new ContentFinderByUrlAndTemplate(Logger, ServiceContext.FileService, TestObjects.GetUmbracoSettings(), ServiceContext.ContentTypeService);
 
             var result = lookup.TryFindContent(frequest);
 

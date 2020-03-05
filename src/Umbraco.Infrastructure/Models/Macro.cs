@@ -40,7 +40,7 @@ namespace Umbraco.Core.Models
         /// <param name="cacheByMember"></param>
         /// <param name="dontRender"></param>
         /// <param name="macroSource"></param>
-        public Macro(IShortStringHelper shortStringHelper, int id, Guid key, bool useInEditor, int cacheDuration, string @alias, string name, bool cacheByPage, bool cacheByMember, bool dontRender, string macroSource, MacroTypes macroType)
+        public Macro(IShortStringHelper shortStringHelper, int id, Guid key, bool useInEditor, int cacheDuration, string @alias, string name, bool cacheByPage, bool cacheByMember, bool dontRender, string macroSource)
             : this(shortStringHelper)
         {
             Id = id;
@@ -53,7 +53,6 @@ namespace Umbraco.Core.Models
             CacheByMember = cacheByMember;
             DontRender = dontRender;
             MacroSource = macroSource;
-            MacroType = macroType;
         }
 
         /// <summary>
@@ -69,7 +68,6 @@ namespace Umbraco.Core.Models
         /// <param name="macroSource"></param>
         public Macro(IShortStringHelper shortStringHelper, string @alias, string name,
             string macroSource,
-            MacroTypes macroType,
             bool cacheByPage = false,
             bool cacheByMember = false,
             bool dontRender = true,
@@ -85,7 +83,6 @@ namespace Umbraco.Core.Models
             CacheByMember = cacheByMember;
             DontRender = dontRender;
             MacroSource = macroSource;
-            MacroType = macroType;
         }
 
         private string _alias;
@@ -96,7 +93,6 @@ namespace Umbraco.Core.Models
         private bool _cacheByMember;
         private bool _dontRender;
         private string _macroSource;
-        private MacroTypes _macroType = MacroTypes.Unknown;
         private MacroPropertyCollection _properties;
         private List<string> _addedProperties;
         private List<string> _removedProperties;
@@ -245,16 +241,6 @@ namespace Umbraco.Core.Models
         {
             get => _macroSource;
             set => SetPropertyValueAndDetectChanges(value, ref _macroSource, nameof(MacroSource));
-        }
-
-        /// <summary>
-        /// Gets or set the path to the Partial View to render
-        /// </summary>
-        [DataMember]
-        public MacroTypes MacroType
-        {
-            get => _macroType;
-            set => SetPropertyValueAndDetectChanges(value, ref _macroType, nameof(MacroType));
         }
 
         /// <summary>

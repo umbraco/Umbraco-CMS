@@ -7,6 +7,7 @@ using System.Web.Routing;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using Umbraco.Tests.Testing.Objects.Accessors;
@@ -26,16 +27,17 @@ namespace Umbraco.Tests.Web
         [Test]
         public void RouteDataExtensions_GetUmbracoContext()
         {
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor();
+
             var umbCtx = new UmbracoContext(
-                Mock.Of<HttpContextBase>(),
+                httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
-                TestObjects.GetUmbracoSettings(),
-                new List<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, TestObjects.GetGlobalSettings(), IOHelper),
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
 
@@ -46,16 +48,17 @@ namespace Umbraco.Tests.Web
         [Test]
         public void ControllerContextExtensions_GetUmbracoContext_From_RouteValues()
         {
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor();
+
             var umbCtx = new UmbracoContext(
-                Mock.Of<HttpContextBase>(),
+                httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
-                TestObjects.GetUmbracoSettings(),
-                new List<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, TestObjects.GetGlobalSettings(), IOHelper),
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
@@ -76,16 +79,17 @@ namespace Umbraco.Tests.Web
         [Test]
         public void ControllerContextExtensions_GetUmbracoContext_From_Current()
         {
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor();
+
             var umbCtx = new UmbracoContext(
-                Mock.Of<HttpContextBase>(),
+                httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
-                TestObjects.GetUmbracoSettings(),
-                new List<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, TestObjects.GetGlobalSettings(), IOHelper),
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             var httpContext = Mock.Of<HttpContextBase>();
 

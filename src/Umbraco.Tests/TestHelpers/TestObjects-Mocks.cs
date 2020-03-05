@@ -109,9 +109,8 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         /// <returns>An Umbraco context.</returns>
         /// <remarks>This should be the minimum Umbraco context.</remarks>
-        public UmbracoContext GetUmbracoContextMock(IUmbracoContextAccessor accessor = null)
+        public IUmbracoContext GetUmbracoContextMock(IUmbracoContextAccessor accessor = null)
         {
-            var httpContext = Mock.Of<HttpContextBase>();
 
             var publishedSnapshotMock = new Mock<IPublishedSnapshot>();
             publishedSnapshotMock.Setup(x => x.Members).Returns(Mock.Of<IPublishedMemberCache>());
@@ -120,26 +119,25 @@ namespace Umbraco.Tests.TestHelpers
             publishedSnapshotServiceMock.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedSnapshot);
             var publishedSnapshotService = publishedSnapshotServiceMock.Object;
 
-            var umbracoSettings = GetUmbracoSettings();
             var globalSettings = GetGlobalSettings();
-            var urlProviders = new UrlProviderCollection(Enumerable.Empty<IUrlProvider>());
-            var mediaUrlProviders = new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>());
 
             if (accessor == null) accessor = new TestUmbracoContextAccessor();
+
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor();
 
             var umbracoContextFactory = new UmbracoContextFactory(
                 accessor,
                 publishedSnapshotService,
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                umbracoSettings,
                 globalSettings,
-                urlProviders,
-                mediaUrlProviders,
                 Mock.Of<IUserService>(),
-                TestHelper.IOHelper);
+                TestHelper.IOHelper,
+                TestHelper.UriUtility,
+                httpContextAccessor,
+                new AspNetCookieManager(httpContextAccessor));
 
-            return umbracoContextFactory.EnsureUmbracoContext(httpContext).UmbracoContext;
+            return umbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
         }
 
         public IUmbracoSettingsSection GetUmbracoSettings()
@@ -337,5 +335,7 @@ namespace Umbraco.Tests.TestHelpers
         }
 
         #endregion
+
+
     }
 }

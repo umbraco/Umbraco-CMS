@@ -4,13 +4,14 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Web;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
@@ -18,6 +19,7 @@ namespace Umbraco.Tests.Routing
     [TestFixture]
     public class UrlsProviderWithDomainsTests : UrlRoutingTestBase
     {
+        private IUmbracoContextAccessor UmbracoContextAccessor { get; } = new TestUmbracoContextAccessor();
         protected override void Compose()
         {
             base.Compose();
@@ -181,16 +183,17 @@ namespace Umbraco.Tests.Routing
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
 
-            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[]
-            {
-                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
-            }, globalSettings:globalSettings.Object);
+            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings:globalSettings.Object);
+            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
+            var urlProvider = new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object,
+                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+            var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             SetDomains1();
 
             var currentUri = new Uri(currentUrl);
             var mode = absolute ? UrlMode.Absolute : UrlMode.Auto;
-            var result = umbracoContext.UrlProvider.GetUrl(nodeId, mode, current: currentUri);
+            var result = publishedUrlProvider.GetUrl(nodeId, mode, current: currentUri);
             Assert.AreEqual(expected, result);
         }
 
@@ -210,20 +213,21 @@ namespace Umbraco.Tests.Routing
         public void Get_Url_SimpleWithSchemeAndPath(int nodeId, string currentUrl, bool absolute, string expected)
         {
             var settings = SettingsForTests.GenerateMockUmbracoSettings();
-            
+
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
 
-            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[]
-            {
-                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
-            }, globalSettings:globalSettings.Object);
+            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings:globalSettings.Object);
+            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
+            var urlProvider = new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object,
+                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+            var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             SetDomains2();
 
             var currentUri = new Uri(currentUrl);
             var mode = absolute ? UrlMode.Absolute : UrlMode.Auto;
-            var result = umbracoContext.UrlProvider.GetUrl(nodeId, mode, current : currentUri);
+            var result = publishedUrlProvider.GetUrl(nodeId, mode, current : currentUri);
             Assert.AreEqual(expected, result);
         }
 
@@ -239,16 +243,17 @@ namespace Umbraco.Tests.Routing
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
 
-            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[]
-            {
-                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
-            }, globalSettings:globalSettings.Object);
+            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings:globalSettings.Object);
+            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
+            var urlProvider = new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object,
+                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+            var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             SetDomains3();
 
             var currentUri = new Uri(currentUrl);
             var mode = absolute ? UrlMode.Absolute : UrlMode.Auto;
-            var result = umbracoContext.UrlProvider.GetUrl(nodeId, mode, current : currentUri);
+            var result = publishedUrlProvider.GetUrl(nodeId, mode, current : currentUri);
             Assert.AreEqual(expected, result);
         }
 
@@ -266,20 +271,21 @@ namespace Umbraco.Tests.Routing
         public void Get_Url_NestedDomains(int nodeId, string currentUrl, bool absolute, string expected)
         {
             var settings = SettingsForTests.GenerateMockUmbracoSettings();
-            
+
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
 
-            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[]
-            {
-                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
-            }, globalSettings:globalSettings.Object);
+            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings:globalSettings.Object);
+            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
+            var urlProvider = new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object,
+                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+            var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             SetDomains4();
 
             var currentUri = new Uri(currentUrl);
             var mode = absolute ? UrlMode.Absolute : UrlMode.Auto;
-            var result = umbracoContext.UrlProvider.GetUrl(nodeId, mode, current : currentUri);
+            var result = publishedUrlProvider.GetUrl(nodeId, mode, current : currentUri);
             Assert.AreEqual(expected, result);
         }
 
@@ -287,29 +293,30 @@ namespace Umbraco.Tests.Routing
         public void Get_Url_DomainsAndCache()
         {
             var settings = SettingsForTests.GenerateMockUmbracoSettings();
-            
+
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
 
-            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[]
-            {
-                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
-            }, globalSettings:globalSettings.Object);
+            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings:globalSettings.Object);
+            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
+            var urlProvider = new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object,
+                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+            var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             SetDomains4();
 
             string ignore;
-            ignore = umbracoContext.UrlProvider.GetUrl(1001, UrlMode.Auto, current: new Uri("http://domain1.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(10011, UrlMode.Auto, current: new Uri("http://domain1.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(100111, UrlMode.Auto, current: new Uri("http://domain1.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(10012, UrlMode.Auto, current: new Uri("http://domain1.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(100121, UrlMode.Auto, current: new Uri("http://domain1.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(10013, UrlMode.Auto, current: new Uri("http://domain1.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(1002, UrlMode.Auto, current: new Uri("http://domain1.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(1001, UrlMode.Auto, current: new Uri("http://domain2.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(10011, UrlMode.Auto, current: new Uri("http://domain2.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(100111, UrlMode.Auto, current: new Uri("http://domain2.com"));
-            ignore = umbracoContext.UrlProvider.GetUrl(1002, UrlMode.Auto, current: new Uri("http://domain2.com"));
+            ignore = publishedUrlProvider.GetUrl(1001, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = publishedUrlProvider.GetUrl(10011, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = publishedUrlProvider.GetUrl(100111, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = publishedUrlProvider.GetUrl(10012, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = publishedUrlProvider.GetUrl(100121, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = publishedUrlProvider.GetUrl(10013, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = publishedUrlProvider.GetUrl(1002, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = publishedUrlProvider.GetUrl(1001, UrlMode.Auto, current: new Uri("http://domain2.com"));
+            ignore = publishedUrlProvider.GetUrl(10011, UrlMode.Auto, current: new Uri("http://domain2.com"));
+            ignore = publishedUrlProvider.GetUrl(100111, UrlMode.Auto, current: new Uri("http://domain2.com"));
+            ignore = publishedUrlProvider.GetUrl(1002, UrlMode.Auto, current: new Uri("http://domain2.com"));
 
             var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
@@ -328,15 +335,15 @@ namespace Umbraco.Tests.Routing
             CheckRoute(cachedRoutes, cachedIds, 1002, "/1002");
 
             // use the cache
-            Assert.AreEqual("/", umbracoContext.UrlProvider.GetUrl(1001, UrlMode.Auto, current: new Uri("http://domain1.com")));
-            Assert.AreEqual("/en/", umbracoContext.UrlProvider.GetUrl(10011, UrlMode.Auto, current: new Uri("http://domain1.com")));
-            Assert.AreEqual("/en/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111, UrlMode.Auto, current: new Uri("http://domain1.com")));
-            Assert.AreEqual("/fr/", umbracoContext.UrlProvider.GetUrl(10012, UrlMode.Auto, current: new Uri("http://domain1.com")));
-            Assert.AreEqual("/fr/1001-2-1/", umbracoContext.UrlProvider.GetUrl(100121, UrlMode.Auto, current: new Uri("http://domain1.com")));
-            Assert.AreEqual("/1001-3/", umbracoContext.UrlProvider.GetUrl(10013, UrlMode.Auto, current: new Uri("http://domain1.com")));
-            Assert.AreEqual("/1002/", umbracoContext.UrlProvider.GetUrl(1002, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/", publishedUrlProvider.GetUrl(1001, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/en/", publishedUrlProvider.GetUrl(10011, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/en/1001-1-1/", publishedUrlProvider.GetUrl(100111, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/fr/", publishedUrlProvider.GetUrl(10012, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/fr/1001-2-1/", publishedUrlProvider.GetUrl(100121, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/1001-3/", publishedUrlProvider.GetUrl(10013, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/1002/", publishedUrlProvider.GetUrl(1002, UrlMode.Auto, current: new Uri("http://domain1.com")));
 
-            Assert.AreEqual("http://domain1.com/fr/1001-2-1/", umbracoContext.UrlProvider.GetUrl(100121, UrlMode.Auto, current: new Uri("http://domain2.com")));
+            Assert.AreEqual("http://domain1.com/fr/1001-2-1/", publishedUrlProvider.GetUrl(100121, UrlMode.Auto, current: new Uri("http://domain2.com")));
         }
 
         private static void CheckRoute(IDictionary<int, string> routes, IDictionary<string, int> ids, int id, string route)
@@ -350,24 +357,25 @@ namespace Umbraco.Tests.Routing
         public void Get_Url_Relative_Or_Absolute()
         {
             var settings = SettingsForTests.GenerateMockUmbracoSettings();
-            
+
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
 
-            var umbracoContext = GetUmbracoContext("http://domain1.com/test", 1111, umbracoSettings: settings, urlProviders: new[]
-            {
-                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
-            }, globalSettings:globalSettings.Object);
+            var umbracoContext = GetUmbracoContext("http://domain1.com/test", 1111, globalSettings:globalSettings.Object);
+            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
+            var urlProvider = new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object,
+                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+            var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             SetDomains4();
 
-            Assert.AreEqual("/en/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111));
-            Assert.AreEqual("http://domain3.com/en/1003-1-1/", umbracoContext.UrlProvider.GetUrl(100311));
+            Assert.AreEqual("/en/1001-1-1/", publishedUrlProvider.GetUrl(100111));
+            Assert.AreEqual("http://domain3.com/en/1003-1-1/", publishedUrlProvider.GetUrl(100311));
 
-            umbracoContext.UrlProvider.Mode = UrlMode.Absolute;
+            publishedUrlProvider.Mode = UrlMode.Absolute;
 
-            Assert.AreEqual("http://domain1.com/en/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111));
-            Assert.AreEqual("http://domain3.com/en/1003-1-1/", umbracoContext.UrlProvider.GetUrl(100311));
+            Assert.AreEqual("http://domain1.com/en/1001-1-1/", publishedUrlProvider.GetUrl(100111));
+            Assert.AreEqual("http://domain3.com/en/1003-1-1/", publishedUrlProvider.GetUrl(100311));
         }
 
         [Test]
@@ -378,23 +386,35 @@ namespace Umbraco.Tests.Routing
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
 
-            var umbracoContext = GetUmbracoContext("http://domain1.com/en/test", 1111, umbracoSettings: settings, urlProviders: new[]
-            {
-                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
-            }, globalSettings:globalSettings.Object);
+            var umbracoContext = GetUmbracoContext("http://domain1.com/en/test", 1111, globalSettings:globalSettings.Object);
+            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
+            var urlProvider = new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object,
+                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+            var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             SetDomains5();
 
-            var url = umbracoContext.UrlProvider.GetUrl(100111, UrlMode.Absolute);
+            var url = publishedUrlProvider.GetUrl(100111, UrlMode.Absolute);
             Assert.AreEqual("http://domain1.com/en/1001-1-1/", url);
 
-            var result = umbracoContext.UrlProvider.GetOtherUrls(100111).ToArray();
+            var result = publishedUrlProvider.GetOtherUrls(100111).ToArray();
 
             foreach (var x in result) Console.WriteLine(x);
 
             Assert.AreEqual(2, result.Length);
             Assert.AreEqual(result[0].Text, "http://domain1b.com/en/1001-1-1/");
             Assert.AreEqual(result[1].Text, "http://domain1a.com/en/1001-1-1/");
+        }
+
+        private IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext, DefaultUrlProvider urlProvider)
+        {
+            return new UrlProvider(
+                new TestUmbracoContextAccessor(umbracoContext),
+                TestHelper.WebRoutingSection,
+                new UrlProviderCollection(new []{urlProvider}),
+                new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
+                Mock.Of<IVariationContextAccessor>()
+            );
         }
     }
 }

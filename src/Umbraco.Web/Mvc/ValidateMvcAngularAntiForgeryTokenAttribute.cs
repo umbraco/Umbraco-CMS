@@ -44,7 +44,7 @@ namespace Umbraco.Web.Mvc
                     headers.Add(new KeyValuePair<string, List<string>>(key, new List<string> { filterContext.HttpContext.Request.Headers[key] }));
                 }
             }
-            var cookie = filterContext.HttpContext.Request.Cookies[AngularAntiForgeryHelper.CsrfValidationCookieName];
+            var cookie = filterContext.HttpContext.Request.Cookies[Core.Constants.Web.CsrfValidationCookieName];
             if (AngularAntiForgeryHelper.ValidateHeaders(
                 headers.Select(x => new KeyValuePair<string, IEnumerable<string>>(x.Key, x.Value)).ToArray(),
                 cookie == null ? "" : cookie.Value,

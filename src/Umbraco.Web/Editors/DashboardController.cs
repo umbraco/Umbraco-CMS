@@ -21,6 +21,7 @@ using Umbraco.Core.Dashboards;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Services;
 using Umbraco.Core.Mapping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
 {
@@ -49,11 +50,11 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             IDashboardService dashboardService,
-            UmbracoHelper umbracoHelper,
             IUmbracoVersion umbracoVersion,
             IShortStringHelper shortStringHelper,
-            UmbracoMapper umbracoMapper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper)
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper,publishedUrlProvider)
         {
             _dashboardService = dashboardService;
             _umbracoVersion = umbracoVersion;

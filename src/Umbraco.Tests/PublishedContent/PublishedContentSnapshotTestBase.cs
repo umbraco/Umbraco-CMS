@@ -56,7 +56,7 @@ namespace Umbraco.Tests.PublishedContent
                     .ToList());
         }
 
-        private UmbracoContext GetUmbracoContext()
+        private IUmbracoContext GetUmbracoContext()
         {
             RouteData routeData = null;
 
@@ -68,16 +68,17 @@ namespace Umbraco.Tests.PublishedContent
             var globalSettings = TestObjects.GetGlobalSettings();
 
             var httpContext = GetHttpContextFactory("http://umbraco.local/", routeData).HttpContext;
+
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor(httpContext);
             var umbracoContext = new UmbracoContext(
-                httpContext,
+                httpContextAccessor,
                 publishedSnapshotService.Object,
-                new WebSecurity(httpContext, Current.Services.UserService, globalSettings, IOHelper),
-                TestObjects.GetUmbracoSettings(),
-                Enumerable.Empty<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, globalSettings, IOHelper),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             return umbracoContext;
         }

@@ -18,10 +18,12 @@ using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Net;
 using Umbraco.Web.JavaScript;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using File = System.IO.File;
@@ -38,6 +40,7 @@ namespace Umbraco.Web.Editors
 
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IIOHelper _ioHelper;
+        private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
 
         public PackageInstallController(
             IGlobalSettings globalSettings,
@@ -47,15 +50,17 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             IShortStringHelper shortStringHelper,
             IUmbracoVersion umbracoVersion,
             UmbracoMapper umbracoMapper,
-            IIOHelper ioHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
+            IIOHelper ioHelper,
+            IPublishedUrlProvider publishedUrlProvider,
+            IUmbracoApplicationLifetime umbracoApplicationLifetime)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _umbracoVersion = umbracoVersion;
             _ioHelper = ioHelper;
+            _umbracoApplicationLifetime = umbracoApplicationLifetime;
         }
 
         /// <summary>
@@ -119,8 +124,8 @@ namespace Umbraco.Web.Editors
             model.LicenseUrl = ins.LicenseUrl;
             model.Readme = ins.Readme;
             model.ConflictingMacroAliases = ins.Warnings.ConflictingMacros.ToDictionary(x => x.Name, x => x.Alias);
-            model.ConflictingStyleSheetNames = ins.Warnings.ConflictingStylesheets.ToDictionary(x => x.Name, x => x.Alias); ;
-            model.ConflictingTemplateAliases = ins.Warnings.ConflictingTemplates.ToDictionary(x => x.Name, x => x.Alias); ;
+            model.ConflictingStyleSheetNames = ins.Warnings.ConflictingStylesheets.ToDictionary(x => x.Name, x => x.Alias);
+            model.ConflictingTemplateAliases = ins.Warnings.ConflictingTemplates.ToDictionary(x => x.Name, x => x.Alias);
             model.ContainsUnsecureFiles = ins.Warnings.UnsecureFiles.Any();
             model.Url = ins.Url;
             model.Version = ins.Version;
@@ -323,7 +328,7 @@ namespace Umbraco.Web.Editors
             var installedFiles = Services.PackagingService.InstallCompiledPackageFiles(definition, zipFile, Security.GetUserId().ResultOr(0));
 
             //set a restarting marker and reset the app pool
-            UmbracoApplication.Restart(Request.TryGetHttpContext().Result);
+            _umbracoApplicationLifetime.Restart();
 
             model.IsRestarting = true;
 
@@ -335,12 +340,8 @@ namespace Umbraco.Web.Editors
         {
             if (model.IsRestarting == false) return model;
 
-            //check for the key, if it's not there we're are restarted
-            if (Request.TryGetHttpContext().Result.Application.AllKeys.Contains("AppPoolRestarting") == false)
-            {
-                //reset it
-                model.IsRestarting = false;
-            }
+            model.IsRestarting = _umbracoApplicationLifetime.IsRestarting;
+
             return model;
         }
 

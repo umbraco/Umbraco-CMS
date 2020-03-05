@@ -1,5 +1,6 @@
 ﻿using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Web.Features;
 using Umbraco.Web.Trees;
@@ -9,7 +10,7 @@ namespace Umbraco.Web.Editors
 
     public class BackOfficeModel
     {
-        public BackOfficeModel(UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, TreeCollection treeCollection)
+        public BackOfficeModel(UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, TreeCollection treeCollection, IHttpContextAccessor httpContextAccessor, IHostingEnvironment hostingEnvironment, IRuntimeSettings runtimeSettings)
         {
             Features = features;
             GlobalSettings = globalSettings;
@@ -17,6 +18,9 @@ namespace Umbraco.Web.Editors
             UmbracoSettingsSection = umbracoSettingsSection;
             IOHelper = ioHelper;
             TreeCollection = treeCollection;
+            HttpContextAccessor = httpContextAccessor;
+            HostingEnvironment = hostingEnvironment;
+            RuntimeSettings = runtimeSettings;
         }
 
         public UmbracoFeatures Features { get; }
@@ -25,5 +29,8 @@ namespace Umbraco.Web.Editors
         public IUmbracoSettingsSection UmbracoSettingsSection { get; }
         public IIOHelper IOHelper { get; }
         public TreeCollection TreeCollection { get; }
+        public IHttpContextAccessor HttpContextAccessor { get; }
+        public IHostingEnvironment HostingEnvironment { get; }
+        public IRuntimeSettings RuntimeSettings { get; set; }
     }
 }

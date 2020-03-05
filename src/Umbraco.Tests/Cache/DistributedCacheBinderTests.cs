@@ -10,6 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
@@ -41,7 +42,7 @@ namespace Umbraco.Tests.Cache
             // we should really refactor events entirely - in the meantime, let it be an UmbracoTestBase ;(
             //var testObjects = new TestObjects(null);
             //var serviceContext = testObjects.GetServiceContextMock();
-            var serviceContext = Current.Services;
+            var serviceContext = ServiceContext;
 
             var definitions = new IEventDefinition[]
             {
@@ -149,21 +150,23 @@ namespace Umbraco.Tests.Cache
             var definitions = new IEventDefinition[]
             {
                 // works because that event definition maps to an empty handler
-                new EventDefinition<IContentTypeService, SaveEventArgs<IContentType>>(null, Current.Services.ContentTypeService, new SaveEventArgs<IContentType>(Enumerable.Empty<IContentType>()), "Saved"),
+                new EventDefinition<IContentTypeService, SaveEventArgs<IContentType>>(null, ServiceContext.ContentTypeService, new SaveEventArgs<IContentType>(Enumerable.Empty<IContentType>()), "Saved"),
 
             };
+
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor();
 
             var umbracoContextFactory = new UmbracoContextFactory(
                 new TestUmbracoContextAccessor(),
                 Mock.Of<IPublishedSnapshotService>(),
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                TestObjects.GetUmbracoSettings(),
                 TestObjects.GetGlobalSettings(),
-                new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
-                new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IUserService>(),
-                IOHelper);
+                IOHelper,
+                UriUtility,
+                httpContextAccessor,
+                new AspNetCookieManager(httpContextAccessor));
 
             // just assert it does not throw
             var refreshers = new DistributedCacheBinder(null, umbracoContextFactory, null);

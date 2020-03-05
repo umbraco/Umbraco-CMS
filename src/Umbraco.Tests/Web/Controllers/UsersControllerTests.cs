@@ -36,6 +36,7 @@ using Umbraco.Web.Models.ContentEditing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Web.Controllers
 {
@@ -61,9 +62,9 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async System.Threading.Tasks.Task Save_User()
         {
-            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor)
             {
-                var userServiceMock = Mock.Get(Current.Services.UserService);
+                var userServiceMock = Mock.Get(ServiceContext.UserService);
 
                 userServiceMock.Setup(service => service.Save(It.IsAny<IUser>(), It.IsAny<bool>()))
                     .Callback((IUser u, bool raiseEvents) =>
@@ -85,13 +86,14 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
                     Factory.GetInstance<IMediaFileSystem>(),
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IUmbracoSettingsSection>(),
                     Factory.GetInstance<IIOHelper>(),
-                    Factory.GetInstance<IImageUrlGenerator>()
+                    Factory.GetInstance<IImageUrlGenerator>(),
+                    Factory.GetInstance<IPublishedUrlProvider>()
+
                 );
                 return usersController;
             }
@@ -146,7 +148,7 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async System.Threading.Tasks.Task GetPagedUsers_Empty()
         {
-            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor)
             {
                 var usersController = new UsersController(
                     Factory.GetInstance<IGlobalSettings>(),
@@ -156,14 +158,14 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
                     Factory.GetInstance<IMediaFileSystem>(),
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IUmbracoSettingsSection>(),
                     Factory.GetInstance<IIOHelper>(),
-                    Factory.GetInstance<IImageUrlGenerator>()
-                    );
+                    Factory.GetInstance<IImageUrlGenerator>(),
+                    Factory.GetInstance<IPublishedUrlProvider>()
+                );
                 return usersController;
             }
 
@@ -179,10 +181,10 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async System.Threading.Tasks.Task GetPagedUsers_10()
         {
-            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor)
             {
                 //setup some mocks
-                var userServiceMock = Mock.Get(Current.Services.UserService);
+                var userServiceMock = Mock.Get(ServiceContext.UserService);
                 var users = MockedUser.CreateMulipleUsers(10);
                 long outVal = 10;
                 userServiceMock.Setup(service => service.GetAll(
@@ -198,13 +200,13 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
                     Factory.GetInstance<IMediaFileSystem>(),
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IUmbracoSettingsSection>(),
                     Factory.GetInstance<IIOHelper>(),
-                    Factory.GetInstance<IImageUrlGenerator>()
+                    Factory.GetInstance<IImageUrlGenerator>(),
+                    Factory.GetInstance<IPublishedUrlProvider>()
                 );
                 return usersController;
             }
@@ -261,10 +263,10 @@ namespace Umbraco.Tests.Web.Controllers
             Action<Tuple<HttpResponseMessage, string>> verification,
             object routeDefaults = null, string url = null)
         {
-            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor)
             {
                 //setup some mocks
-                var userServiceMock = Mock.Get(Current.Services.UserService);
+                var userServiceMock = Mock.Get(ServiceContext.UserService);
                 userServiceSetup(userServiceMock);
 
                 var usersController = new UsersController(
@@ -275,13 +277,13 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
                     Factory.GetInstance<IMediaFileSystem>(),
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IUmbracoSettingsSection>(),
                     Factory.GetInstance<IIOHelper>(),
-                    Factory.GetInstance<IImageUrlGenerator>()
+                    Factory.GetInstance<IImageUrlGenerator>(),
+                    Factory.GetInstance<IPublishedUrlProvider>()
                 );
                 return usersController;
             }

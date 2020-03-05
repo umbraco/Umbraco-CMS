@@ -34,6 +34,7 @@ using Umbraco.Web.Models.ContentEditing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Web.Controllers
 {
@@ -60,10 +61,10 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async System.Threading.Tasks.Task GetCurrentUser_Fips()
         {
-            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor)
             {
                 //setup some mocks
-                var userServiceMock = Mock.Get(Current.Services.UserService);
+                var userServiceMock = Mock.Get(ServiceContext.UserService);
                 userServiceMock.Setup(service => service.GetUserById(It.IsAny<int>()))
                     .Returns(() => null);
 
@@ -86,10 +87,11 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IUmbracoSettingsSection>(),
-                    Factory.GetInstance<IIOHelper>());
+                    Factory.GetInstance<IIOHelper>(),
+                    Factory.GetInstance<IPublishedUrlProvider>()
+                    );
                 return usersController;
             }
 

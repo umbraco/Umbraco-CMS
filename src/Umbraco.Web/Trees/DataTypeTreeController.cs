@@ -18,6 +18,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Mapping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Trees
 {
@@ -28,10 +29,24 @@ namespace Umbraco.Web.Trees
     public class DataTypeTreeController : TreeController, ISearchableTree
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
+        private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
 
-        public DataTypeTreeController(UmbracoTreeSearcher treeSearcher, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper)
+        public DataTypeTreeController(
+            UmbracoTreeSearcher treeSearcher,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider,
+            IMenuItemCollectionFactory menuItemCollectionFactory)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
             _treeSearcher = treeSearcher;
+            _menuItemCollectionFactory = menuItemCollectionFactory;
         }
 
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
@@ -115,7 +130,7 @@ namespace Umbraco.Web.Trees
 
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
-            var menu = new MenuItemCollection();
+            var menu = _menuItemCollectionFactory.Create();
 
             if (id == Constants.System.RootString)
             {

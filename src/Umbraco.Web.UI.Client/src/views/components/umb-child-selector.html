@@ -19,18 +19,20 @@
         <div class="umb-child-selector__child" ng-repeat="selectedChild in selectedChildren">
             <div class="umb-child-selector__child-description">
                 <div class="umb-child-selector__child-icon-holder">
-                    <i class="umb-child-selector__child-icon {{ selectedChild.icon }}"></i>
+                    <i class="umb-child-selector__child-icon {{selectedChild.icon}}" aria-hidden="true"></i>
                 </div>
-                <span class="umb-child-selector__child-name"> {{ selectedChild.name }}</span>
+                <span class="umb-child-selector__child-name">{{selectedChild.name}}</span>
             </div>
             <div class="umb-child-selector__child-actions">
-                <i class="umb-child-selector__child-remove icon-trash" ng-click="removeChild(selectedChild, $index)"></i>
+                <button type="button" class="umb-child-selector__child-remove" ng-click="removeChild(selectedChild, $index)">
+                    <i class="icon-trash" aria-hidden="true"></i>
+                </button>
             </div>
         </div>
 
-        <a href="" class="umb-child-selector__child -placeholder" ng-click="addChild($event)" hotkey="alt+shift+c">
+        <button type="button" class="umb-child-selector__child -placeholder unsortable" ng-click="addChild($event)" hotkey="alt+shift+c">
             <div class="umb-child-selector__child-name -blue"><strong><localize key="shortcuts_addChild">Add Child</localize></strong></div>
-        </a>
+        </button>
 
     </div>
 

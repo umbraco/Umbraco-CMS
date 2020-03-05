@@ -5,6 +5,7 @@ using System.Web;
 using Microsoft.Owin;
 using Microsoft.Owin.Infrastructure;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Security;
@@ -24,19 +25,21 @@ namespace Umbraco.Web.Security
         private readonly IRuntimeState _runtime;
         private readonly IGlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
+        private readonly IRequestCache _requestCache;
         private readonly string[] _explicitPaths;
         private readonly string _getRemainingSecondsPath;
 
-        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtime, IGlobalSettings globalSettings, IIOHelper ioHelper)
-            : this(umbracoContextAccessor, runtime, globalSettings, ioHelper,null)
+        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtime, IGlobalSettings globalSettings, IIOHelper ioHelper, IRequestCache requestCache)
+            : this(umbracoContextAccessor, runtime, globalSettings, ioHelper,requestCache, null)
         { }
 
-        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtime, IGlobalSettings globalSettings, IIOHelper ioHelper, IEnumerable<string> explicitPaths)
+        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtime, IGlobalSettings globalSettings, IIOHelper ioHelper, IRequestCache requestCache, IEnumerable<string> explicitPaths)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _runtime = runtime;
             _globalSettings = globalSettings;
             _ioHelper = ioHelper;
+            _requestCache = requestCache;
             _explicitPaths = explicitPaths?.ToArray();
             _getRemainingSecondsPath = $"{globalSettings.Path}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds";
         }
@@ -89,8 +92,6 @@ namespace Umbraco.Web.Security
                 return false;
 
             var request = owinContext.Request;
-            var httpContext = owinContext.TryGetHttpContext();
-
             //check the explicit paths
             if (_explicitPaths != null)
             {
@@ -102,7 +103,7 @@ namespace Umbraco.Web.Security
 
             if (//check the explicit flag
                 (checkForceAuthTokens && owinContext.Get<bool?>(Constants.Security.ForceReAuthFlag) != null)
-                || (checkForceAuthTokens && httpContext.Success && httpContext.Result.Items[Constants.Security.ForceReAuthFlag] != null)
+                || (checkForceAuthTokens && _requestCache.IsAvailable && _requestCache.Get(Constants.Security.ForceReAuthFlag) != null)
                 //check back office
                 || request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, _globalSettings, _ioHelper)
                 //check installer

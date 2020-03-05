@@ -1,22 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Web;
-using System.Web.Hosting;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Cookie;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
     /// <summary>
-    /// Creates and manages <see cref="UmbracoContext"/> instances.
+    /// Creates and manages <see cref="IUmbracoContext"/> instances.
     /// </summary>
     public class UmbracoContextFactory : IUmbracoContextFactory
     {
@@ -27,32 +23,41 @@ namespace Umbraco.Web
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
-        private readonly IUmbracoSettingsSection _umbracoSettings;
         private readonly IGlobalSettings _globalSettings;
-        private readonly UrlProviderCollection _urlProviders;
-        private readonly MediaUrlProviderCollection _mediaUrlProviders;
         private readonly IUserService _userService;
         private readonly IIOHelper _ioHelper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICookieManager _cookieManager;
+        private readonly UriUtility _uriUtility;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoContextFactory"/> class.
         /// </summary>
-        public UmbracoContextFactory(IUmbracoContextAccessor umbracoContextAccessor, IPublishedSnapshotService publishedSnapshotService, IVariationContextAccessor variationContextAccessor, IDefaultCultureAccessor defaultCultureAccessor, IUmbracoSettingsSection umbracoSettings, IGlobalSettings globalSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IUserService userService, IIOHelper ioHelper)
+        public UmbracoContextFactory(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IPublishedSnapshotService publishedSnapshotService,
+            IVariationContextAccessor variationContextAccessor,
+            IDefaultCultureAccessor defaultCultureAccessor,
+            IGlobalSettings globalSettings,
+            IUserService userService,
+            IIOHelper ioHelper,
+            UriUtility uriUtility,
+            IHttpContextAccessor httpContextAccessor,
+            ICookieManager cookieManager)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             _defaultCultureAccessor = defaultCultureAccessor ?? throw new ArgumentNullException(nameof(defaultCultureAccessor));
-
-            _umbracoSettings = umbracoSettings ?? throw new ArgumentNullException(nameof(umbracoSettings));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
-            _urlProviders = urlProviders ?? throw new ArgumentNullException(nameof(urlProviders));
-            _mediaUrlProviders = mediaUrlProviders ?? throw new ArgumentNullException(nameof(mediaUrlProviders));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _ioHelper = ioHelper;
+            _uriUtility = uriUtility;
+            _httpContextAccessor = httpContextAccessor;
+            _cookieManager = cookieManager;
         }
 
-        private UmbracoContext CreateUmbracoContext(HttpContextBase httpContext)
+        private IUmbracoContext CreateUmbracoContext()
         {
             // make sure we have a variation context
             if (_variationContextAccessor.VariationContext == null)
@@ -65,23 +70,20 @@ namespace Umbraco.Web
                 _variationContextAccessor.VariationContext = new VariationContext(_defaultCultureAccessor.DefaultCulture);
             }
 
+            var webSecurity = new WebSecurity(_httpContextAccessor, _userService, _globalSettings, _ioHelper);
 
-            var webSecurity = new WebSecurity(httpContext, _userService, _globalSettings, _ioHelper);
-
-            return new UmbracoContext(httpContext, _publishedSnapshotService, webSecurity, _umbracoSettings, _urlProviders, _mediaUrlProviders, _globalSettings, _variationContextAccessor, _ioHelper);
+            return new UmbracoContext(_httpContextAccessor, _publishedSnapshotService, webSecurity, _globalSettings, _variationContextAccessor, _ioHelper, _uriUtility, _cookieManager);
         }
 
         /// <inheritdoc />
-        public UmbracoContextReference EnsureUmbracoContext(HttpContextBase httpContext = null)
+        public UmbracoContextReference EnsureUmbracoContext()
         {
             var currentUmbracoContext = _umbracoContextAccessor.UmbracoContext;
             if (currentUmbracoContext != null)
                 return new UmbracoContextReference(currentUmbracoContext, false, _umbracoContextAccessor);
 
 
-            httpContext = httpContext ?? new HttpContextWrapper(HttpContext.Current ?? new HttpContext(new SimpleWorkerRequest("null.aspx", "", NullWriterInstance)));
-
-            var umbracoContext = CreateUmbracoContext(httpContext);
+            var umbracoContext = CreateUmbracoContext();
             _umbracoContextAccessor.UmbracoContext = umbracoContext;
 
             return new UmbracoContextReference(umbracoContext, true, _umbracoContextAccessor);

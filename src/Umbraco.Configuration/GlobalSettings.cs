@@ -254,27 +254,7 @@ namespace Umbraco.Core.Configuration
             ConfigurationManager.RefreshSection("appSettings");
         }
 
-        /// <summary>
-        /// Removes a setting from the configuration file.
-        /// </summary>
-        /// <param name="key">Key of the setting to be removed.</param>
-        public static void RemoveSetting(string key, IIOHelper ioHelper)
-        {
-            var fileName = ioHelper.MapPath(string.Format("{0}/web.config", ioHelper.Root));
-            var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
-
-            var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();
-            var setting = appSettings.Descendants("add").FirstOrDefault(s => s.Attribute("key").Value == key);
-
-            if (setting != null)
-            {
-                setting.Remove();
-                xml.Save(fileName, SaveOptions.DisableFormatting);
-                ConfigurationManager.RefreshSection("appSettings");
-            }
-        }
-
-
+  
         /// <summary>
         /// Gets the time out in minutes.
         /// </summary>
@@ -401,6 +381,10 @@ namespace Umbraco.Core.Configuration
 
         private string _databaseFactoryServerVersion;
         public string DatabaseFactoryServerVersion => GetterWithDefaultValue(Constants.AppSettings.Debug.DatabaseFactoryServerVersion, string.Empty, ref _databaseFactoryServerVersion);
+
+        private string _mainDomLock;
+
+        public string MainDomLock => GetterWithDefaultValue(Constants.AppSettings.MainDomLock, string.Empty, ref _mainDomLock);
 
         private T GetterWithDefaultValue<T>(string appSettingKey, T defaultValue, ref T backingField)
         {

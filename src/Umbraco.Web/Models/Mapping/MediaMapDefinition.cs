@@ -15,24 +15,24 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Declares model mappings for media.
     /// </summary>
-    internal class MediaMapDefinition : IMapDefinition
+    public class MediaMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;
-        private readonly ILogger _logger;
+        private readonly CommonTreeNodeMapper _commonTreeNodeMapper;
         private readonly IMediaService _mediaService;
         private readonly IMediaTypeService _mediaTypeService;
-        private readonly PropertyEditorCollection _propertyEditorCollection;
+        private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
         private readonly TabsAndPropertiesMapper<IMedia> _tabsAndPropertiesMapper;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
-        public MediaMapDefinition(ICultureDictionary cultureDictionary, ILogger logger, CommonMapper commonMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
-            ILocalizedTextService localizedTextService, PropertyEditorCollection propertyEditorCollection, IUmbracoSettingsSection umbracoSettingsSection, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+        public MediaMapDefinition(ICultureDictionary cultureDictionary, CommonMapper commonMapper, CommonTreeNodeMapper commonTreeNodeMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
+            ILocalizedTextService localizedTextService, MediaUrlGeneratorCollection mediaUrlGenerators, IUmbracoSettingsSection umbracoSettingsSection, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
         {
-            _logger = logger;
             _commonMapper = commonMapper;
+            _commonTreeNodeMapper = commonTreeNodeMapper;
             _mediaService = mediaService;
             _mediaTypeService = mediaTypeService;
-            _propertyEditorCollection = propertyEditorCollection;
+            _mediaUrlGenerators = mediaUrlGenerators;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
 
             _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IMedia>(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider);
@@ -64,7 +64,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Id = source.Id;
             target.IsChildOfListView = DetermineIsChildOfListView(source);
             target.Key = source.Key;
-            target.MediaLink = string.Join(",", source.GetUrls(_umbracoSettingsSection.Content, _logger, _propertyEditorCollection));
+            target.MediaLink = string.Join(",", source.GetUrls(_umbracoSettingsSection.Content, _mediaUrlGenerators));
             target.Name = source.Name;
             target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
@@ -73,7 +73,7 @@ namespace Umbraco.Web.Models.Mapping
             target.State = null;
             target.Tabs = _tabsAndPropertiesMapper.Map(source, context);
             target.Trashed = source.Trashed;
-            target.TreeNodeUrl = _commonMapper.GetTreeNodeUrl<MediaTreeController>(source);
+            target.TreeNodeUrl = _commonTreeNodeMapper.GetTreeNodeUrl<MediaTreeController>(source);
             target.Udi = Udi.Create(Constants.UdiEntityType.Media, source.Key);
             target.UpdateDate = source.UpdateDate;
             target.VariesByCulture = source.ContentType.VariesByCulture();

@@ -69,9 +69,10 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
-            IShortStringHelper shortStringHelper, UmbracoMapper umbracoMapper)
-            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
@@ -409,7 +410,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public HttpResponseMessage GetNiceUrl(int id)
         {
-            var url = UmbracoContext.Url(id);
+            var url = PublishedUrlProvider.GetUrl(id);
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(url, Encoding.UTF8, "text/plain");
             return response;
@@ -422,7 +423,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public HttpResponseMessage GetNiceUrl(Guid id)
         {
-            var url = UmbracoContext.Url(id);
+            var url = PublishedUrlProvider.GetUrl(id);
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(url, Encoding.UTF8, "text/plain");
             return response;
@@ -1669,7 +1670,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public DomainSave PostSaveLanguageAndDomains(DomainSave model)
         {
-            foreach(var domain in model.Domains)
+            foreach (var domain in model.Domains)
             {
                 try
                 {
@@ -2186,7 +2187,10 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private ContentItemDisplay MapToDisplay(IContent content)
         {
-            var display = Mapper.Map<ContentItemDisplay>(content);
+            var display = Mapper.Map<ContentItemDisplay>(content, context =>
+            {
+                context.Items["CurrentUser"] = Security.CurrentUser;
+            });
             display.AllowPreview = display.AllowPreview && content.Trashed == false && content.ContentType.IsElement == false;
             return display;
         }

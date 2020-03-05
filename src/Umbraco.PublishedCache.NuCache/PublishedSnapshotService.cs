@@ -12,6 +12,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Install;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -26,6 +27,7 @@ using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Install;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
@@ -50,7 +52,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ITypeFinder _typeFinder;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IFilePermissionHelper _filePermissionHelper;
+        private readonly IIOHelper _ioHelper;
+        private readonly INuCacheSettings _config;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -88,7 +91,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ITypeFinder typeFinder,
             IHostingEnvironment hostingEnvironment,
             IShortStringHelper shortStringHelper,
-            IFilePermissionHelper filePermissionHelper)
+            IIOHelper ioHelper,
+            INuCacheSettings config)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -108,7 +112,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _typeFinder = typeFinder;
             _hostingEnvironment = hostingEnvironment;
             _shortStringHelper = shortStringHelper;
-            _filePermissionHelper = filePermissionHelper;
+            _ioHelper = ioHelper;
+            _config = config;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -195,8 +200,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _localMediaDbExists = File.Exists(localMediaDbPath);
 
             // if both local databases exist then GetTree will open them, else new databases will be created
-            _localContentDb = BTree.GetTree(localContentDbPath, _localContentDbExists);
-            _localMediaDb = BTree.GetTree(localMediaDbPath, _localMediaDbExists);
+            _localContentDb = BTree.GetTree(localContentDbPath, _localContentDbExists, _config);
+            _localMediaDb = BTree.GetTree(localMediaDbPath, _localMediaDbExists, _config);
 
             _logger.Info<PublishedSnapshotService>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", _localContentDbExists, _localMediaDbExists);
         }
@@ -362,7 +367,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override bool EnsureEnvironment(out IEnumerable<string> errors)
         {
             // must have app_data and be able to write files into it
-            var ok = _filePermissionHelper.TryCreateDirectory(GetLocalFilesPath());
+            var ok = _ioHelper.TryCreateDirectory(GetLocalFilesPath());
             errors = ok ? Enumerable.Empty<string>() : new[] { "NuCache local files." };
             return ok;
         }
@@ -1307,7 +1312,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var member = args.Entity;
 
             // refresh the edited data
-            OnRepositoryRefreshed(db, member, true);
+            OnRepositoryRefreshed(db, member, false);
         }
 
         private void OnRepositoryRefreshed(IUmbracoDatabase db, IContentBase content, bool published)

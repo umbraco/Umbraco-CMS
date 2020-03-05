@@ -5,6 +5,7 @@ using System.Web.Routing;
 using System.Web.WebPages;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Composing;
 
@@ -15,35 +16,22 @@ namespace Umbraco.Web.Macros
     /// </summary>
     public class PartialViewMacroEngine
     {
-        private readonly Func<HttpContextBase> _getHttpContext;
-        private readonly Func<UmbracoContext> _getUmbracoContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IIOHelper _ioHelper;
+        private readonly Func<IUmbracoContext> _getUmbracoContext;
 
-        public PartialViewMacroEngine()
+        public PartialViewMacroEngine(IUmbracoContextAccessor umbracoContextAccessor, IHttpContextAccessor httpContextAccessor, IIOHelper ioHelper)
         {
-            _getHttpContext = () =>
-            {
-                if (HttpContext.Current == null)
-                    throw new InvalidOperationException($"The {GetType()} cannot execute with a null HttpContext.Current reference.");
-                return new HttpContextWrapper(HttpContext.Current);
-            };
+            _httpContextAccessor = httpContextAccessor;
+            _ioHelper = ioHelper;
 
             _getUmbracoContext = () =>
             {
-                if (Current.UmbracoContext == null)
+                var context = umbracoContextAccessor.UmbracoContext;
+                if (context == null)
                     throw new InvalidOperationException($"The {GetType()} cannot execute with a null UmbracoContext.Current reference.");
-                return Current.UmbracoContext;
+                return context;
             };
-        }
-
-        /// <summary>
-        /// Constructor generally used for unit testing
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="umbracoContext"> </param>
-        internal PartialViewMacroEngine(HttpContextBase httpContext, UmbracoContext umbracoContext)
-        {
-            _getHttpContext = () => httpContext;
-            _getUmbracoContext = () => umbracoContext;
         }
 
         public bool Validate(string code, string tempFileName, IPublishedContent currentPage, out string errorMessage)
@@ -68,7 +56,7 @@ namespace Umbraco.Web.Macros
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (macro.MacroSource.IsNullOrWhiteSpace()) throw new ArgumentException("The MacroSource property of the macro object cannot be null or empty");
 
-            var http = _getHttpContext();
+            var httpContext = _httpContextAccessor.GetRequiredHttpContext();
             var umbCtx = _getUmbracoContext();
             var routeVals = new RouteData();
             routeVals.Values.Add("controller", "PartialViewMacro");
@@ -79,13 +67,14 @@ namespace Umbraco.Web.Macros
             var viewContext = new ViewContext { ViewData = new ViewDataDictionary() };
             //try and extract the current view context from the route values, this would be set in the UmbracoViewPage or in
             // the UmbracoPageResult if POSTing to an MVC controller but rendering in Webforms
-            if (http.Request.RequestContext.RouteData.DataTokens.ContainsKey(Mvc.Constants.DataTokenCurrentViewContext))
+            if (httpContext.Request.RequestContext.RouteData.DataTokens.ContainsKey(Mvc.Constants.DataTokenCurrentViewContext))
             {
-                viewContext = (ViewContext)http.Request.RequestContext.RouteData.DataTokens[Mvc.Constants.DataTokenCurrentViewContext];
+                viewContext = (ViewContext)httpContext.Request.RequestContext.RouteData.DataTokens[Mvc.Constants.DataTokenCurrentViewContext];
             }
             routeVals.DataTokens.Add("ParentActionViewContext", viewContext);
 
-            var request = new RequestContext(http, routeVals);
+            var request = new RequestContext(httpContext, routeVals);
+
             string output;
             using (var controller = new PartialViewMacroController(macro, content))
             {
@@ -103,7 +92,7 @@ namespace Umbraco.Web.Macros
 
         private string GetVirtualPathFromPhysicalPath(string physicalPath)
         {
-            var rootpath = _getHttpContext().Server.MapPath("~/");
+            var rootpath = _ioHelper.MapPath("~/");
             physicalPath = physicalPath.Replace(rootpath, "");
             physicalPath = physicalPath.Replace("\\", "/");
             return "~/" + physicalPath;

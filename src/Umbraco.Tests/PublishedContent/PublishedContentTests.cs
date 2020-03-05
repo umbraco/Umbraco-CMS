@@ -23,6 +23,7 @@ using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Templates;
 using Umbraco.Web.Models;
+using Umbraco.Web.Routing;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.PublishedContent
@@ -49,15 +50,16 @@ namespace Umbraco.Tests.PublishedContent
             var mediaFileService = Mock.Of<IMediaFileSystem>();
             var contentTypeBaseServiceProvider = Mock.Of<IContentTypeBaseServiceProvider>();
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
-            var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor);
-            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, logger, IOHelper, mediaService, contentTypeBaseServiceProvider, mediaFileService, ShortStringHelper);
-            var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor);
+            var publishedUrlProvider = Mock.Of<IPublishedUrlProvider>();
+            var imageSourceParser = new HtmlImageSourceParser(publishedUrlProvider);
+            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, logger, IOHelper, mediaService, contentTypeBaseServiceProvider, mediaFileService, ShortStringHelper, publishedUrlProvider);
+            var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor, publishedUrlProvider);
             var localizationService = Mock.Of<ILocalizationService>();
 
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new VoidEditor(logger, Mock.Of<IDataTypeService>(), localizationService, LocalizedTextService, ShortStringHelper)) { Id = 1 },
                 new DataType(new TrueFalsePropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService)) { Id = 1001 },
-                new DataType(new RichTextPropertyEditor(logger, mediaService, contentTypeBaseServiceProvider, umbracoContextAccessor, Mock.Of<IDataTypeService>(),  localizationService, imageSourceParser, linkParser, pastedImages, ShortStringHelper, IOHelper, LocalizedTextService, Mock.Of<IImageUrlGenerator>())) { Id = 1002 },
+                new DataType(new RichTextPropertyEditor(logger,umbracoContextAccessor, Mock.Of<IDataTypeService>(),  localizationService, imageSourceParser, linkParser, pastedImages, ShortStringHelper, IOHelper, LocalizedTextService, Mock.Of<IImageUrlGenerator>())) { Id = 1002 },
                 new DataType(new IntegerPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, ShortStringHelper, LocalizedTextService)) { Id = 1003 },
                 new DataType(new TextboxPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService)) { Id = 1004 },
                 new DataType(new MediaPickerPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService)) { Id = 1005 });

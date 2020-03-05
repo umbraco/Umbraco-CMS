@@ -10,10 +10,10 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="controllerContext">The controller context.</param>
         /// <returns>The Umbraco context.</returns>
-        public static UmbracoContext GetUmbracoContext(this ControllerContext controllerContext)
+        public static IUmbracoContext GetUmbracoContext(this ControllerContext controllerContext)
         {
             var o = controllerContext.GetDataTokenInViewContextHierarchy(Core.Constants.Web.UmbracoContextDataToken);
-            return o != null ? o as UmbracoContext : Current.UmbracoContext;
+            return o != null ? o as IUmbracoContext : Current.UmbracoContext;
         }
 
         /// <summary>

@@ -23,7 +23,7 @@ namespace Umbraco.Web
         //
         // besides, for tests, Current support setting a fallback without even a container
         //
-        // Update to this comment 8/2/2020: issue as been ameliorated by creating extensions methods in Umbraco.Abstractions
+        // Update to this comment 8/2/2020: issue as been ameliorated by creating extensions methods in Umbraco.Core
         // that accept the dependencies as arguments for many of these extension methods, and can be used within the Umbraco code-base.
         // For site developers, the "friendly" extension methods using service location have been maintained, delegating to the ones that
         // take the dependencies as parameters.
@@ -114,14 +114,12 @@ namespace Umbraco.Web
         /// </remarks>
         public static string MediaUrl(this IPublishedContent content, string culture = null, UrlMode mode = UrlMode.Default, string propertyAlias = Constants.Conventions.Media.File)
         {
-            var umbracoContext = Composing.Current.UmbracoContext;
+            var publishedUrlProvider = Current.PublishedUrlProvider;
 
-            if (umbracoContext == null)
-                throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext is null.");
-            if (umbracoContext.UrlProvider == null)
-                throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext.UrlProvider is null.");
+            if (publishedUrlProvider== null)
+                throw new InvalidOperationException("Cannot resolve a Url when Current.PublishedUrlProvider is null.");
 
-            return umbracoContext.UrlProvider.GetMediaUrl(content, mode, culture, propertyAlias);
+            return publishedUrlProvider.GetMediaUrl(content, mode, culture, propertyAlias);
         }
 
         #endregion

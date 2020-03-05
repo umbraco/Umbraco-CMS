@@ -1,6 +1,7 @@
 ﻿@using System.Web.Mvc.Html
 @using ClientDependency.Core.Mvc
 @using Umbraco.Web
+@using Umbraco.Web.Composing
 @using Umbraco.Web.Controllers
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
@@ -12,7 +13,7 @@
         var registerModel = Members.CreateRegistrationModel("Custom Member");
     *@
 
-    var registerModel = Members.CreateRegistrationModel();
+    var registerModel = Current.MembershipHelper.CreateRegistrationModel();
 
     @*
         Configurable here:

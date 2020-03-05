@@ -7,7 +7,12 @@ using System.Net.Http.Formatting;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Security;
 using Umbraco.Web.Actions;
@@ -15,6 +20,7 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Web.Security;
@@ -31,14 +37,30 @@ namespace Umbraco.Web.Trees
     [PluginController("UmbracoTrees")]
     [CoreTree]
     [SearchableTree("searchResultFormatter", "configureMemberResult")]
-    public class MemberTreeController : TreeController, ISearchableTree
+    public class MemberTreeController : TreeController, ISearchableTree, ITreeNodeController
     {
-        public MemberTreeController(UmbracoTreeSearcher treeSearcher)
-        {
-            _treeSearcher = treeSearcher;
-        }
+
 
         private readonly UmbracoTreeSearcher _treeSearcher;
+        private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
+
+        public MemberTreeController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider,
+            UmbracoTreeSearcher treeSearcher,
+            IMenuItemCollectionFactory menuItemCollectionFactory)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
+        {
+            _treeSearcher = treeSearcher;
+            _menuItemCollectionFactory = menuItemCollectionFactory;
+        }
 
         /// <summary>
         /// Gets an individual tree node
@@ -111,7 +133,7 @@ namespace Umbraco.Web.Trees
 
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
-            var menu = new MenuItemCollection();
+            var menu = _menuItemCollectionFactory.Create();
 
             if (id == Constants.System.RootString)
             {

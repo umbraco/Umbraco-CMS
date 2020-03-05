@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using Umbraco.ModelsBuilder.Embedded.Configuration;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.ModelsBuilder.Embedded

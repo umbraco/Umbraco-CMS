@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper);
 
-                var macro = new Macro(ShortStringHelper, "test1", "Test", "~/views/macropartials/test.cshtml", MacroTypes.PartialView);
+                var macro = new Macro(ShortStringHelper, "test1", "Test", "~/views/macropartials/test.cshtml");
                 ;
 
                 Assert.Throws<SqlCeException>(() => repository.Save(macro));
@@ -168,7 +168,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper);
 
                 // Act
-                var macro = new Macro(ShortStringHelper, "test", "Test", "~/views/macropartials/test.cshtml", MacroTypes.PartialView);
+                var macro = new Macro(ShortStringHelper, "test", "Test", "~/views/macropartials/test.cshtml");
                 macro.Properties.Add(new MacroProperty("test", "Test", 0, "test"));
                 repository.Save(macro);
 
@@ -289,7 +289,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper);
 
-                var macro = new Macro(ShortStringHelper, "newmacro", "A new macro", "~/views/macropartials/test1.cshtml", MacroTypes.PartialView);
+                var macro = new Macro(ShortStringHelper, "newmacro", "A new macro", "~/views/macropartials/test1.cshtml");
                 macro.Properties.Add(new MacroProperty("blah1", "New1", 4, "test.editor"));
 
                 repository.Save(macro);
@@ -314,7 +314,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper);
 
-                var macro = new Macro(ShortStringHelper, "newmacro", "A new macro", "~/views/macropartials/test1.cshtml", MacroTypes.PartialView);
+                var macro = new Macro(ShortStringHelper, "newmacro", "A new macro", "~/views/macropartials/test1.cshtml");
                 macro.Properties.Add(new MacroProperty("blah1", "New1", 4, "test.editor"));
                 repository.Save(macro);
 
@@ -338,7 +338,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper);
 
-                var macro = new Macro(ShortStringHelper, "newmacro", "A new macro", "~/views/macropartials/test1.cshtml", MacroTypes.PartialView);
+                var macro = new Macro(ShortStringHelper, "newmacro", "A new macro", "~/views/macropartials/test1.cshtml");
                 var prop1 = new MacroProperty("blah1", "New1", 4, "test.editor");
                 var prop2 = new MacroProperty("blah2", "New2", 3, "test.editor");
 
@@ -424,9 +424,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper);
 
-                repository.Save(new Macro(ShortStringHelper, "test1", "Test1", "~/views/macropartials/test1.cshtml", MacroTypes.PartialView));
-                repository.Save(new Macro(ShortStringHelper, "test2", "Test2", "~/views/macropartials/test2.cshtml", MacroTypes.PartialView));
-                repository.Save(new Macro(ShortStringHelper, "test3", "Tet3", "~/views/macropartials/test3.cshtml", MacroTypes.PartialView));
+                repository.Save(new Macro(ShortStringHelper, "test1", "Test1", "~/views/macropartials/test1.cshtml"));
+                repository.Save(new Macro(ShortStringHelper, "test2", "Test2", "~/views/macropartials/test2.cshtml"));
+                repository.Save(new Macro(ShortStringHelper, "test3", "Tet3", "~/views/macropartials/test3.cshtml"));
                 scope.Complete();
             }
 

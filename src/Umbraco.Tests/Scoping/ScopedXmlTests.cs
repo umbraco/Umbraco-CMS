@@ -89,7 +89,7 @@ namespace Umbraco.Tests.Scoping
 
             // create document type, document
             var contentType = new ContentType(ShortStringHelper, -1) { Alias = "CustomDocument", Name = "Custom Document" };
-            Current.Services.ContentTypeService.Save(contentType);
+            ServiceContext.ContentTypeService.Save(contentType);
             var item = new Content("name", -1, contentType);
 
             // wire cache refresher
@@ -126,9 +126,9 @@ namespace Umbraco.Tests.Scoping
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                Current.Services.ContentService.SaveAndPublish(item); // should create an xml clone
+                ServiceContext.ContentService.SaveAndPublish(item); // should create an xml clone
                 item.Name = "changed";
-                Current.Services.ContentService.SaveAndPublish(item); // should re-use the xml clone
+                ServiceContext.ContentService.SaveAndPublish(item); // should re-use the xml clone
 
                 // this should never change
                 Assert.AreEqual(beforeOuterXml, beforeXml.OuterXml);
@@ -203,7 +203,7 @@ namespace Umbraco.Tests.Scoping
 
             // create document type
             var contentType = new ContentType(ShortStringHelper,-1) { Alias = "CustomDocument", Name = "Custom Document" };
-            Current.Services.ContentTypeService.Save(contentType);
+            ServiceContext.ContentTypeService.Save(contentType);
 
             // wire cache refresher
             _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>());
@@ -225,12 +225,12 @@ namespace Umbraco.Tests.Scoping
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                Current.Services.ContentService.SaveAndPublish(item);
+                ServiceContext.ContentService.SaveAndPublish(item);
 
                 for (var i = 0; i < count; i++)
                 {
                     var temp = new Content("content_" + i, -1, contentType);
-                    Current.Services.ContentService.SaveAndPublish(temp);
+                    ServiceContext.ContentService.SaveAndPublish(temp);
                     ids[i] = temp.Id;
                 }
 

@@ -26,7 +26,9 @@ using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 using Umbraco.Web.Services;
+using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Composing
@@ -108,11 +110,14 @@ namespace Umbraco.Web.Composing
 
         #region Web Getters
 
-        public static UmbracoContext UmbracoContext
+        public static IUmbracoContext UmbracoContext
             => UmbracoContextAccessor.UmbracoContext;
 
         public static UmbracoHelper UmbracoHelper
             => Factory.GetInstance<UmbracoHelper>();
+
+        public static IUmbracoComponentRenderer UmbracoComponentRenderer
+            => Factory.GetInstance<IUmbracoComponentRenderer>();
 
         public static DistributedCache DistributedCache
             => Factory.GetInstance<DistributedCache>();
@@ -259,6 +264,11 @@ namespace Umbraco.Web.Composing
         public static IHostingEnvironment HostingEnvironment => Factory.GetInstance<IHostingEnvironment>();
         public static IIpResolver IpResolver => Factory.GetInstance<IIpResolver>();
         public static IUmbracoVersion UmbracoVersion => Factory.GetInstance<IUmbracoVersion>();
+        public static IPublishedUrlProvider PublishedUrlProvider => Factory.GetInstance<IPublishedUrlProvider>();
+        public static IMenuItemCollectionFactory MenuItemCollectionFactory => Factory.GetInstance<IMenuItemCollectionFactory>();
+        public static MembershipHelper MembershipHelper  => Factory.GetInstance<MembershipHelper>();
+        public static IUmbracoApplicationLifetime UmbracoApplicationLifetime  => Factory.GetInstance<IUmbracoApplicationLifetime>();
+        public static IPublishedContentQuery PublishedContentQuery  => Factory.GetInstance<IPublishedContentQuery>();
 
         #endregion
     }

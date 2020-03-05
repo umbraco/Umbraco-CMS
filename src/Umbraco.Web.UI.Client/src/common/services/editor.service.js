@@ -169,6 +169,7 @@ When building a custom infinite editor view you can use the same components as a
         let editorsKeyboardShorcuts = [];
         var editors = [];
         var isEnabled = true;
+        var lastElementInFocus = null;
         
         
         // events for backdrop
@@ -261,6 +262,12 @@ When building a custom infinite editor view you can use the same components as a
             */
             unbindKeyboardShortcuts();
 
+            // if this is the first editor layer, save the currently focused element
+            // so we can re-apply focus to it once all the editor layers are closed 
+            if (editors.length === 0) {
+                lastElementInFocus = document.activeElement;
+            }
+
             // set flag so we know when the editor is open in "infinite mode"
             editor.infiniteMode = true;
 
@@ -301,6 +308,10 @@ When building a custom infinite editor view you can use the same components as a
             $timeout(function() {
                 // rebind keyboard shortcuts for the new editor in focus
                 rebindKeyboardShortcuts();
+
+                if (editors.length === 0 && lastElementInFocus) {
+                    lastElementInFocus.focus();
+                }
             }, 0);
 
         }
@@ -514,7 +525,7 @@ When building a custom infinite editor view you can use the same components as a
 
         function rollback(editor) {
             editor.view = "views/common/infiniteeditors/rollback/rollback.html";
-            if (!editor.size) editor.size = "small";
+            if (!editor.size) editor.size = "medium";
             open(editor);
         }
 
@@ -773,7 +784,7 @@ When building a custom infinite editor view you can use the same components as a
          * @methodOf umbraco.services.editorService
          *
          * @description
-         * Opens the user group picker in infinite editing, the submit callback returns the saved template
+         * Opens the template editor in infinite editing, the submit callback returns the saved template
          * @param {Object} editor rendering options
          * @param {String} editor.id The template id
          * @param {Callback} editor.submit Submits the editor

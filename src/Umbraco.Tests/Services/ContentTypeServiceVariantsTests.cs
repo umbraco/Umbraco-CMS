@@ -20,6 +20,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.Strings;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PublishedCache;
@@ -56,9 +57,9 @@ namespace Umbraco.Tests.Services
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-            var filePermissionHelper = Mock.Of<IFilePermissionHelper>();
 
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var settings = Mock.Of<INuCacheSettings>();
 
             return new PublishedSnapshotService(
                 options,
@@ -80,7 +81,8 @@ namespace Umbraco.Tests.Services
                 typeFinder,
                 hostingEnvironment,
                 new MockShortStringHelper(),
-                filePermissionHelper);
+                IOHelper,
+                settings);
         }
 
         public class LocalServerMessenger : ServerMessengerBase

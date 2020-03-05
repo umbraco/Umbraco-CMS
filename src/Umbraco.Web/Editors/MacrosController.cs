@@ -22,6 +22,7 @@ using Umbraco.Core.Mapping;
 using System.Web.Http.Controllers;
 using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
 {
@@ -46,12 +47,12 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
             ParameterEditorCollection parameterEditorCollection,
-            IIOHelper ioHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
+            IIOHelper ioHelper,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _parameterEditorCollection = parameterEditorCollection;
             _ioHelper = ioHelper;
@@ -106,8 +107,7 @@ namespace Umbraco.Web.Editors
                 {
                     Alias = alias,
                     Name = name,
-                    MacroSource = string.Empty,
-                    MacroType = MacroTypes.PartialView
+                    MacroSource = string.Empty
                 };
 
                 _macroService.Save(macro, this.Security.CurrentUser.Id);
@@ -221,7 +221,6 @@ namespace Umbraco.Web.Editors
             macro.DontRender = !macroDisplay.RenderInEditor;
             macro.UseInEditor = macroDisplay.UseInEditor;
             macro.MacroSource = macroDisplay.View;
-            macro.MacroType = MacroTypes.PartialView;
             macro.Properties.ReplaceAll(macroDisplay.Parameters.Select((x,i) => new MacroProperty(x.Key, x.Label, i, x.Editor)));
 
             try

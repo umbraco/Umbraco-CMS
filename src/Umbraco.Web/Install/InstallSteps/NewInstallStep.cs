@@ -6,15 +6,12 @@ using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
-using Umbraco.Web.Models.Identity;
-using Umbraco.Web.Security;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Cookie;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -29,26 +26,26 @@ namespace Umbraco.Web.Install.InstallSteps
     [InstallSetupStep(InstallationType.NewInstall, "User", 20, "")]
     internal class NewInstallStep : InstallSetupStep<UserModel>
     {
-        private readonly HttpContextBase _http;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserService _userService;
         private readonly DatabaseBuilder _databaseBuilder;
         private static HttpClient _httpClient;
         private readonly IGlobalSettings _globalSettings;
         private readonly IUserPasswordConfiguration _passwordConfiguration;
-        private readonly BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
         private readonly IConnectionStrings _connectionStrings;
+        private readonly ICookieManager _cookieManager;
 
-        public NewInstallStep(HttpContextBase http, IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration, IUmbracoSettingsSection umbracoSettingsSection, IConnectionStrings connectionStrings)
+        public NewInstallStep(IHttpContextAccessor httpContextAccessor, IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration, IUmbracoSettingsSection umbracoSettingsSection, IConnectionStrings connectionStrings, ICookieManager cookieManager)
         {
-            _http = http;
-            _userService = userService;
-            _databaseBuilder = databaseBuilder;
-            _globalSettings = globalSettings;
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
+            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
             _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
-            _userManager = _http.GetOwinContext().GetBackOfficeUserManager();
+            _cookieManager = cookieManager;
         }
 
         public override async Task<InstallSetupResult> ExecuteAsync(UserModel user)
@@ -59,15 +56,16 @@ namespace Umbraco.Web.Install.InstallSteps
                 throw new InvalidOperationException("Could not find the super user!");
             }
 
-            var membershipUser = await _userManager.FindByIdAsync(Constants.Security.SuperUserId);
+            var userManager = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().GetBackOfficeUserManager();
+            var membershipUser = await userManager.FindByIdAsync(Constants.Security.SuperUserId);
             if (membershipUser == null)
             {
                 throw new InvalidOperationException($"No user found in membership provider with id of {Constants.Security.SuperUserId}.");
             }
 
             //To change the password here we actually need to reset it since we don't have an old one to use to change
-            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(membershipUser.Id);
-            var resetResult = await _userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
+            var resetToken = await userManager.GeneratePasswordResetTokenAsync(membershipUser.Id);
+            var resetResult = await userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
             if (!resetResult.Succeeded)
             {
                 throw new InvalidOperationException("Could not reset password: " + string.Join(", ", resetResult.Errors));
@@ -138,7 +136,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             // In this one case when it's a brand new install and nothing has been configured, make sure the
             // back office cookie is cleared so there's no old cookies lying around causing problems
-            _http.ExpireCookie(_umbracoSettingsSection.Security.AuthCookieName);
+            _cookieManager.ExpireCookie(_umbracoSettingsSection.Security.AuthCookieName);
 
                 return true;
         }

@@ -10,6 +10,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Install;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -143,8 +144,8 @@ namespace Umbraco.Tests.PublishedContent
             _source = new TestDataSource(kits);
 
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var settings = Mock.Of<INuCacheSettings>();
 
-            var filePermissionHelper = Mock.Of<IFilePermissionHelper>();
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
@@ -169,7 +170,8 @@ namespace Umbraco.Tests.PublishedContent
                 typeFinder,
                 hostingEnvironment,
                 new MockShortStringHelper(),
-                filePermissionHelper);
+                TestHelper.IOHelper,
+                settings);
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
@@ -971,7 +973,7 @@ namespace Umbraco.Tests.PublishedContent
             documents = snapshot.Content.GetById(2).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N9", "N8", "N7");
 
-            
+
         }
 
         [Test]

@@ -15,6 +15,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.Templates;
 using Umbraco.Web.Models;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -43,16 +44,15 @@ namespace Umbraco.Tests.PublishedContent
 
             var converters = Factory.GetInstance<PropertyValueConverterCollection>();
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
+            var publishedUrlProvider = Mock.Of<IPublishedUrlProvider>();
             var logger = Mock.Of<ILogger>();
 
-            var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor);
-            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, logger, IOHelper,  Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>(), Mock.Of<IMediaFileSystem>(), ShortStringHelper);
-            var localLinkParser = new HtmlLocalLinkParser(umbracoContextAccessor);
+            var imageSourceParser = new HtmlImageSourceParser(publishedUrlProvider);
+            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, logger, IOHelper,  Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>(), Mock.Of<IMediaFileSystem>(), ShortStringHelper, publishedUrlProvider);
+            var localLinkParser = new HtmlLocalLinkParser(umbracoContextAccessor, publishedUrlProvider);
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new RichTextPropertyEditor(
                     Mock.Of<ILogger>(),
-                    Mock.Of<IMediaService>(),
-                    Mock.Of<IContentTypeBaseServiceProvider>(),
                     Mock.Of<IUmbracoContextAccessor>(),
                     Mock.Of<IDataTypeService>(),
                     Mock.Of<ILocalizationService>(),

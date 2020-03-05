@@ -1,31 +1,29 @@
 ﻿using System;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Web
 {
     internal class HttpContextUmbracoContextAccessor : IUmbracoContextAccessor
     {
+        private readonly IRequestCache _requestCache;
         private const string HttpContextItemKey = "Umbraco.Web.UmbracoContext";
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public HttpContextUmbracoContextAccessor(IHttpContextAccessor httpContextAccessor)
+        public HttpContextUmbracoContextAccessor(IRequestCache requestCache)
         {
-            _httpContextAccessor = httpContextAccessor;
+            _requestCache = requestCache;
         }
 
-        public UmbracoContext UmbracoContext
+        public IUmbracoContext UmbracoContext
         {
             get
             {
-                var httpContext = _httpContextAccessor.HttpContext;
-                if (httpContext == null) throw new Exception("oops:httpContext");
-                return (UmbracoContext) httpContext.Items[HttpContextItemKey];
+                if (!_requestCache.IsAvailable) throw new InvalidOperationException("No request cache available");
+                return (IUmbracoContext) _requestCache.Get(HttpContextItemKey);
             }
-
             set
             {
-                var httpContext = _httpContextAccessor.HttpContext;
-                if (httpContext == null) throw new Exception("oops:httpContext");
-                httpContext.Items[HttpContextItemKey] = value;
+                if (!_requestCache.IsAvailable)  throw new InvalidOperationException("No request cache available");
+                _requestCache.Set(HttpContextItemKey, value);
             }
         }
     }

@@ -26,18 +26,18 @@
     <div class="row">
         @foreach (var mediaId in mediaIds.Split(','))
         {
-            var media = Umbraco.Media(mediaId);
+            var media = Current.PublishedContentQuery.Media(mediaId);
 
             @* a single image *@
             if (media.IsDocumentType("Image"))
             {
-                @Render(media);
+                @Render(media)
             }
 
             @* a folder with images under it *@
             foreach (var image in media.Children(Current.VariationContextAccessor))
             {
-                @Render(image);
+                @Render(image)
             }
         }
     </div>

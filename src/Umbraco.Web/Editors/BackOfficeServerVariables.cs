@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Web;
-using System.Web.Configuration;
 using System.Web.Mvc;
 using ClientDependency.Core.Config;
-using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -21,6 +18,7 @@ using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Trees;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Editors
@@ -34,25 +32,38 @@ namespace Umbraco.Web.Editors
         private readonly IRuntimeState _runtimeState;
         private readonly UmbracoFeatures _features;
         private readonly IGlobalSettings _globalSettings;
-        private readonly HttpContextBase _httpContext;
-        private readonly IOwinContext _owinContext;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
         private readonly IIOHelper _ioHelper;
         private readonly TreeCollection _treeCollection;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IRuntimeSettings _settings;
 
-        internal BackOfficeServerVariables(UrlHelper urlHelper, IRuntimeState runtimeState, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, TreeCollection treeCollection)
+        internal BackOfficeServerVariables(
+            UrlHelper urlHelper,
+            IRuntimeState runtimeState,
+            UmbracoFeatures features,
+            IGlobalSettings globalSettings,
+            IUmbracoVersion umbracoVersion,
+            IUmbracoSettingsSection umbracoSettingsSection,
+            IIOHelper ioHelper,
+            TreeCollection treeCollection,
+            IHttpContextAccessor httpContextAccessor,
+            IHostingEnvironment hostingEnvironment,
+            IRuntimeSettings settings)
         {
             _urlHelper = urlHelper;
             _runtimeState = runtimeState;
             _features = features;
             _globalSettings = globalSettings;
-            _httpContext = _urlHelper.RequestContext.HttpContext;
-            _owinContext = _httpContext.GetOwinContext();
             _umbracoVersion = umbracoVersion;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));
+            _httpContextAccessor = httpContextAccessor;
+            _hostingEnvironment = hostingEnvironment;
+            _settings = settings;
         }
 
         /// <summary>
@@ -368,7 +379,7 @@ namespace Umbraco.Web.Editors
                     }
                 },
                 {
-                    "isDebuggingEnabled", _httpContext.IsDebuggingEnabled
+                    "isDebuggingEnabled", _hostingEnvironment.IsDebugMode
                 },
                 {
                     "application", GetApplicationState()
@@ -377,7 +388,7 @@ namespace Umbraco.Web.Editors
                     "externalLogins", new Dictionary<string, object>
                     {
                         {
-                            "providers", _owinContext.Authentication.GetExternalAuthenticationTypes()
+                            "providers", _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().Authentication.GetExternalAuthenticationTypes()
                                 .Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
                                 .Select(p => new
                                 {
@@ -464,7 +475,7 @@ namespace Umbraco.Web.Editors
             app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{ClientDependencySettings.Instance.Version}".GenerateHash());
 
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
-            app.Add("applicationPath", _httpContext.Request.ApplicationPath.EnsureEndsWith('/'));
+            app.Add("applicationPath", _httpContextAccessor.GetRequiredHttpContext().Request.ApplicationPath.EnsureEndsWith('/'));
 
             //add the server's GMT time offset in minutes
             app.Add("serverTimeOffset", Convert.ToInt32(DateTimeOffset.Now.Offset.TotalMinutes));
@@ -472,11 +483,9 @@ namespace Umbraco.Web.Editors
             return app;
         }
 
-        private static string GetMaxRequestLength()
+        private string GetMaxRequestLength()
         {
-            return ConfigurationManager.GetSection("system.web/httpRuntime") is HttpRuntimeSection section
-                ? section.MaxRequestLength.ToString()
-                : string.Empty;
+            return _settings.MaxRequestLength.HasValue ? _settings.MaxRequestLength.Value.ToString() : string.Empty;
         }
     }
 }
