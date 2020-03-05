@@ -21,37 +21,95 @@
 
     }));
 
-    var simpleBlockConfigurationMock = {contentTypeAlias: "testAlias", label:"Test", settingsElementTypeAlias: null, view: "testview.html"};
+
+    var blockConfigurationMock = {contentTypeAlias: "testAlias", label:"Test label", settingsElementTypeAlias: null, view: "testview.html"};
+
+    var propertyModelMock = {
+        layout: {
+            "Umbraco.TestBlockEditor": [
+                {
+                    udi: 1234
+                }
+            ]
+        },
+        data: [
+            {
+                udi: 1234,
+                contentTypeAlias: "testAlias",
+                testvalue: "myTestValue"
+            }
+        ]
+    };
 
     describe('init blockEditoModelObject', function () {
         
         it('fail if no model value', function () {
             function createWithNoModelValue() {
-                blockEditorService.createModelObject(null, "test", []);
+                blockEditorService.createModelObject(null, "Umbraco.TestBlockEditor", []);
             }
             expect(createWithNoModelValue).toThrow();
         });
 
         it('return a object, with methods', function () {
-            var modelObject = blockEditorService.createModelObject({}, "test", []);
+            var modelObject = blockEditorService.createModelObject({}, "Umbraco.TestBlockEditor", []);
 
             expect(modelObject).not.toBeUndefined();
             expect(modelObject.loadScaffolding).not.toBeUndefined();
         });
 
         it('getBlockConfiguration provide the requested block configurtion', function () {
-            var modelObject = blockEditorService.createModelObject({}, "test", [simpleBlockConfigurationMock]);
+            var modelObject = blockEditorService.createModelObject({}, "Umbraco.TestBlockEditor", [blockConfigurationMock]);
             
-            expect(modelObject.getBlockConfiguration(simpleBlockConfigurationMock.contentTypeAlias).label).toBe(simpleBlockConfigurationMock.label);
+            expect(modelObject.getBlockConfiguration(blockConfigurationMock.contentTypeAlias).label).toBe(blockConfigurationMock.label);
         });
         
         it('loadScaffolding provides data for itemPicker', function (done) {
-            var modelObject = blockEditorService.createModelObject({}, "test", [simpleBlockConfigurationMock]);
+            var modelObject = blockEditorService.createModelObject({}, "Umbraco.TestBlockEditor", [blockConfigurationMock]);
             
-            var pendingPromise = modelObject.loadScaffolding().then(() => {
+            modelObject.loadScaffolding().then(() => {
                 var itemPickerOptions = modelObject.getAvailableBlocksForItemPicker();
                 expect(itemPickerOptions.length).toBe(1);
-                expect(itemPickerOptions[0].alias).toBe(simpleBlockConfigurationMock.contentTypeAlias);
+                expect(itemPickerOptions[0].alias).toBe(blockConfigurationMock.contentTypeAlias);
+                done();
+            });
+            
+        });
+        
+        it('getLayoutEntry has right values', function (done) {
+
+            
+            var modelObject = blockEditorService.createModelObject(propertyModelMock, "Umbraco.TestBlockEditor", [blockConfigurationMock]);
+            
+            modelObject.loadScaffolding().then(() => {
+                
+                var layout = modelObject.getLayout();
+
+                expect(layout).not.toBeUndefined();
+                expect(layout.length).toBe(1);
+                expect(layout[0]).toBe(propertyModelMock.layout["Umbraco.TestBlockEditor"][0]);
+                expect(layout[0].udi).toBe(propertyModelMock.layout["Umbraco.TestBlockEditor"][0].udi);
+
+                done();
+            });
+            
+        });
+        
+        it('getBlockModel provide value', function (done) {
+
+            
+            var modelObject = blockEditorService.createModelObject(propertyModelMock, "Umbraco.TestBlockEditor", [blockConfigurationMock]);
+            
+            modelObject.loadScaffolding().then(() => {
+                
+                var layout = modelObject.getLayout();
+                expect(layout).not.toBeUndefined();
+
+                var blockModel = modelObject.getBlockModel(layout[0]);
+
+                expect(blockModel).not.toBeUndefined();
+                expect(blockModel[0].udi).toBe(propertyModelMock.data[0].udi);
+                expect(blockModel[0].testvalue).toBe(propertyModelMock.data[0].testvalue);
+
                 done();
             });
             
