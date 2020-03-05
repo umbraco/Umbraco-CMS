@@ -103,6 +103,13 @@ module.exports = function (config) {
         // CLI --browsers Chrome,Firefox,Safari
         browsers: ['ChromeHeadless'],
 
+        customLaunchers: {
+            ChromeDebugging: {
+                base: 'Chrome',
+                flags: ['--remote-debugging-port=9333']
+            }
+        },
+
         // allow waiting a bit longer, some machines require this
 
         browserNoActivityTimeout: 100000,     // default 10,000ms

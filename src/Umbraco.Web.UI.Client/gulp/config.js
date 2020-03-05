@@ -9,6 +9,10 @@ module.exports = {
         dev: {
             sourcemaps: true,
             embedtemplates: false
+        },
+        test: {
+            sourcemaps: false,
+            embedtemplates: true
         }
     },
     sources: {

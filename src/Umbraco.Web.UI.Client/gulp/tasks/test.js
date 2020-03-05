@@ -23,6 +23,7 @@ function runUnitTestServer() {
         autoWatch: true,
         port: 9999,
         singleRun: false,
+        browsers: ['ChromeDebugging'],
         keepalive: true
     })
     .start();
