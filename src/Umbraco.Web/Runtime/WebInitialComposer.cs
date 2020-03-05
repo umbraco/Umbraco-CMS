@@ -203,8 +203,12 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentFinderByUrl>()
                 .Append<ContentFinderByIdPath>()
                 //.Append<ContentFinderByUrlAndTemplate>() // disabled, this is an odd finder
-                .Append<ContentFinderByUrlAlias>()
-                .Append<ContentFinderByRedirectUrl>();
+                .Append<ContentFinderByUrlAlias>();
+                //only append ContentFinderByRedirectUrl if RedirectUrlTracking is not disabled
+                if (!composition.Configs.Settings().WebRouting.DisableRedirectUrlTracking)
+                {
+                  composition.ContentFinders().Append<ContentFinderByRedirectUrl>();
+                }
 
             composition.RegisterUnique<ISiteDomainHelper, SiteDomainHelper>();
 
