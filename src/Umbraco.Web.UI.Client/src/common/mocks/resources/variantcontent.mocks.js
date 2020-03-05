@@ -16,8 +16,8 @@ angular.module('umbraco.mocks').
         node.id = 0;
         node.parentId = parentId;
 
-        node.tabs.forEach(function(tab){
-            tab.properties.forEach(function( property){
+        node.tabs.forEach(function(tab) {
+            tab.properties.forEach(function(property) {
                 property.value = "";
             });
         });
