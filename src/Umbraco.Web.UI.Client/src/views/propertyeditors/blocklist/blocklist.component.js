@@ -54,7 +54,7 @@
             vm.model.value = vm.model.value || {};
     
             modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks);
-            modelObject.loadScaffolding().then(loaded);
+            modelObject.loadScaffolding().then(onLoaded);
 
             copyAllBlocksAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
@@ -90,7 +90,7 @@
             }
         }
         
-        function loaded() {
+        function onLoaded() {
 
             vm.layout = modelObject.getLayout();
 
@@ -105,7 +105,7 @@
             vm.availableContentTypes = modelObject.getAvailableAliasesForBlockContent();
             vm.availableBlockTypes = modelObject.getAvailableBlocksForItemPicker();
 
-            $scope.$apply();
+            $scope.$evalAsync();
 
         }
 
@@ -375,7 +375,7 @@
             scroll: true,
             start: function (ev, ui) {
                 runtimeSortVars.moveFromIndex = ui.item.index();
-                $scope.$apply(function () {
+                $scope.$evalAsync(function () {
                     vm.sorting = true;
                 });
             },
@@ -394,7 +394,7 @@
                     vm.layout.splice(moveToIndex, 0, movedEntry);
                 }
 
-                $scope.$apply(function () {
+                $scope.$evalAsync(function () {
                     vm.sorting = false;
                 });
             }

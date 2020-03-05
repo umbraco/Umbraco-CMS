@@ -14,7 +14,7 @@
                 >
                 </button>
 
-                <block-list-property-editor-block block="blockItem" focus-this-block="vm.moveFocusToBlock === blockItem" block-editor-api="vm.blockEditorApi" show-copy="vm.showCopy" class="umb-block-list__block">
+                <block-editor-block block="blockItem" focus-this-block="vm.moveFocusToBlock === blockItem" block-editor-api="vm.blockEditorApi" show-copy="vm.showCopy" class="umb-block-list__block">
                     <div class="umb-block-list__block--content" ng-if="blockItem.view" ng-include="blockItem.view">
                     </div>
 
@@ -32,7 +32,7 @@
                             </span>
                         </button>
                     </div>
-                </block-list-property-editor-block>
+                </block-editor-block>
 
             </div>
         </div>

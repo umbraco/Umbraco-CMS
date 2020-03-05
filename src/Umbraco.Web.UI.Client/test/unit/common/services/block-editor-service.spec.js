@@ -1,14 +1,18 @@
 ﻿describe('blockEditorService tests', function () {
 
-    var blockEditorService, contentResource;
+    var blockEditorService, contentResource, $rootScope, $componentController;
 
     beforeEach(module('umbraco.services'));
     beforeEach(module('umbraco.resources'));
     beforeEach(module('umbraco.mocks'));
+    beforeEach(module('umbraco'));
     
-    beforeEach(inject(function ($injector, mocksUtils) {
+    beforeEach(inject(function ($injector, mocksUtils, _$rootScope_, _$componentController_) {
 
         mocksUtils.disableAuth();
+
+        $rootScope = _$rootScope_;
+        $componentController = _$componentController_;
 
         contentResource = $injector.get("contentResource");
         spyOn(contentResource, "getScaffold").and.callFake(
@@ -36,7 +40,7 @@
             {
                 udi: 1234,
                 contentTypeAlias: "testAlias",
-                testvalue: "myTestValue"
+                testproperty: "myTestValue"
             }
         ]
     };
@@ -75,7 +79,7 @@
             
         });
         
-        it('getLayoutEntry has right values', function (done) {
+        it('getLayoutEntry has values', function (done) {
 
             
             var modelObject = blockEditorService.createModelObject(propertyModelMock, "Umbraco.TestBlockEditor", [blockConfigurationMock]);
@@ -94,7 +98,7 @@
             
         });
         
-        it('getBlockModel provide value', function (done) {
+        it('getBlockModel has values', function (done) {
 
             
             var modelObject = blockEditorService.createModelObject(propertyModelMock, "Umbraco.TestBlockEditor", [blockConfigurationMock]);
@@ -102,13 +106,76 @@
             modelObject.loadScaffolding().then(() => {
                 
                 var layout = modelObject.getLayout();
-                expect(layout).not.toBeUndefined();
 
                 var blockModel = modelObject.getBlockModel(layout[0]);
 
                 expect(blockModel).not.toBeUndefined();
-                expect(blockModel[0].udi).toBe(propertyModelMock.data[0].udi);
-                expect(blockModel[0].testvalue).toBe(propertyModelMock.data[0].testvalue);
+                expect(blockModel.contentModel.udi).toBe(propertyModelMock.data[0].udi);
+                expect(blockModel.content.variants[0].tabs[0].properties[0].value).toBe(propertyModelMock.data[0].testproperty);
+
+                done();
+            });
+            
+        });
+
+        
+        it('getBlockModel syncs primative values', function (done) {
+
+            var propertyModel = angular.copy(propertyModelMock);
+
+            var modelObject = blockEditorService.createModelObject(propertyModel, "Umbraco.TestBlockEditor", [blockConfigurationMock]);
+            
+            modelObject.loadScaffolding().then(() => {
+                
+                var layout = modelObject.getLayout();
+
+                var blockModel = modelObject.getBlockModel(layout[0]);
+
+                blockEditorBlockComponenet = $componentController("blockEditorBlock", null, {"block": blockModel, "blockEditorApi": {}, "class": "testClass"});
+                blockEditorBlockComponenet.$onInit();
+
+                blockModel.content.variants[0].tabs[0].properties[0].value = "anotherTestValue";
+
+                $rootScope.$digest();// invoke angularJS Store.
+
+                expect(blockModel.contentModel).toBe(propertyModel.data[0]);
+                expect(blockModel.contentModel.testproperty).toBe("anotherTestValue");
+                expect(propertyModel.data[0].testproperty).toBe("anotherTestValue");
+
+                //
+
+                done();
+            });
+            
+        });
+
+        
+        it('getBlockModel syncs values of object', function (done) {
+
+            var propertyModel = angular.copy(propertyModelMock);
+
+            var complexValue = {"list": ["A", "B", "C"]};
+            propertyModel.data[0].testproperty = complexValue;
+
+
+            var modelObject = blockEditorService.createModelObject(propertyModel, "Umbraco.TestBlockEditor", [blockConfigurationMock]);
+            
+            modelObject.loadScaffolding().then(() => {
+                
+                var layout = modelObject.getLayout();
+
+                var blockModel = modelObject.getBlockModel(layout[0]);
+
+                blockEditorBlockComponenet = $componentController("blockEditorBlock", null, {"block": blockModel, "blockEditorApi": {}, "class": "testClass"});
+                blockEditorBlockComponenet.$onInit();
+
+                blockModel.content.variants[0].tabs[0].properties[0].value.list[0] = "AA";
+                blockModel.content.variants[0].tabs[0].properties[0].value.list.push("D");
+
+                $rootScope.$digest();// invoke angularJS Store.
+
+                expect(propertyModel.data[0].testproperty.list[0]).toBe("AA");
+                expect(propertyModel.data[0].testproperty.list.length).toBe(4);
 
                 done();
             });

@@ -16,25 +16,25 @@
     position: relative;
     width: 100%;
 
-    .umb-block-list__block--head {
+    /*.umb-block-list__block--head {
         opacity: 0;
         transition: opacity 120ms;
-    }
-    .umb-block-list__block--actions {
+    }*/
+    > ng-transclude > .umb-block-list__block--actions {
         opacity: 0;
         transition: opacity 120ms;
     }
 
     &:hover, &:focus, &:focus-within {
-        .umb-block-list__block--head {
+        /*.umb-block-list__block--head {
             opacity: 1;
-        }
+        }*/
         
-        .umb-block-list__block--actions {
+        > ng-transclude > .umb-block-list__block--actions {
             opacity: 1;
         }
     }
-
+    /*
     &:focus, &:focus-within {
         .umb-block-list__block--head {
             &::before {
@@ -42,8 +42,9 @@
             }
         }
     }
+    */
 }
-
+/*
 .umb-block-list__block--head {
     position: absolute;
     top: 0;
@@ -77,7 +78,7 @@
 label.umb-block-list__block--head {
     cursor: grab;
 }
-
+*/
 .umb-block-list__block--actions {
     position: absolute;
     top: 10px;

@@ -313,6 +313,7 @@ angular.module('umbraco.mocks').
                                     label: "Content",
                                     id: 2,
                                     properties: [
+                                        { alias: "testproperty", label: "Test property", view: "textbox", value: "asdfghjk" },
                                         { alias: "valTest", label: "Validation test", view: "validationtest", value: "asdfasdf" },
                                         { alias: "bodyText", label: "Body Text", description: "Here you enter the primary article contents", view: "rte", value: "<p>askjdkasj lasjd</p>", config: {} },
                                         { alias: "textarea", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
