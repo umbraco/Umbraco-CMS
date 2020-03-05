@@ -2,7 +2,7 @@
     'use strict';
 
 
-    function blockEditorService($interpolate, udiService) {
+    function blockEditorService($interpolate, udiService, contentResource) {
 
 
         /**
@@ -79,7 +79,7 @@
                 return this.blockConfigurations.find(bc => bc.contentTypeAlias === alias);
             },
 
-            loadScaffolding: function(contentResource) {
+            loadScaffolding: function() {
                 var tasks = [];
 
                 var scaffoldAliases = [];

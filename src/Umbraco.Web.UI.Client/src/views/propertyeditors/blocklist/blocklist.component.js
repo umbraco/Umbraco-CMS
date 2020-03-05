@@ -54,7 +54,7 @@
             vm.model.value = vm.model.value || {};
     
             modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks);
-            modelObject.loadScaffolding(contentResource).then(loaded);
+            modelObject.loadScaffolding().then(loaded);
 
             copyAllBlocksAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",

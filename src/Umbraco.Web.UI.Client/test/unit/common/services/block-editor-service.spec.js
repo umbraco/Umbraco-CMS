@@ -1,33 +1,34 @@
 ﻿describe('blockEditorService tests', function () {
 
-    var blockEditorService, $rootScope, $httpBackend, varaintMocks, contentResource;
+    var blockEditorService, contentResource;
 
     beforeEach(module('umbraco.services'));
+    beforeEach(module('umbraco.resources'));
     beforeEach(module('umbraco.mocks'));
     
     beforeEach(inject(function ($injector, mocksUtils) {
 
         mocksUtils.disableAuth();
 
-        blockEditorService = $injector.get('blockEditorService'); 
-        $rootScope = $injector.get('$rootScope');
-        $httpBackend = $injector.get('$httpBackend');
-        varaintMocks = $injector.get("variantContentMocks");
-        varaintMocks.register();
-        contentResource = $injector.get('contentResource');
+        contentResource = $injector.get("contentResource");
+        spyOn(contentResource, "getScaffold").and.callFake(
+            function () {
+                return Promise.resolve(mocksUtils.getMockVariantContent(1234))
+            }
+        );
+
+        blockEditorService = $injector.get('blockEditorService');
 
     }));
 
-
     var simpleBlockConfigurationMock = {contentTypeAlias: "testAlias", label:"Test", settingsElementTypeAlias: null, view: "testview.html"};
-
 
     describe('init blockEditoModelObject', function () {
         
         it('fail if no model value', function () {
             function createWithNoModelValue() {
                 blockEditorService.createModelObject(null, "test", []);
-            }  
+            }
             expect(createWithNoModelValue).toThrow();
         });
 
@@ -44,22 +45,18 @@
             expect(modelObject.getBlockConfiguration(simpleBlockConfigurationMock.contentTypeAlias).label).toBe(simpleBlockConfigurationMock.label);
         });
         
-        it('loadScaffolding provides data for itemPicker', function () {
+        it('loadScaffolding provides data for itemPicker', function (done) {
             var modelObject = blockEditorService.createModelObject({}, "test", [simpleBlockConfigurationMock]);
             
-            var itemPickerOptions;
-
-            var pendingPromise = modelObject.loadScaffolding(contentResource).then(() => {
-                itemPickerOptions = modelObject.getAvailableBlocksForItemPicker();
+            var pendingPromise = modelObject.loadScaffolding().then(() => {
+                var itemPickerOptions = modelObject.getAvailableBlocksForItemPicker();
+                expect(itemPickerOptions.length).toBe(1);
+                expect(itemPickerOptions[0].alias).toBe(simpleBlockConfigurationMock.contentTypeAlias);
+                done();
             });
-
-            $rootScope.$digest();
-            $httpBackend.flush();
-            
-            expect(itemPickerOptions.length).toBe(1);
-
             
         });
+
 
   });
 

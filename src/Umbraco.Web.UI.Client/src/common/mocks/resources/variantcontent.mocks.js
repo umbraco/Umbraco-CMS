@@ -1,31 +1,31 @@
 angular.module('umbraco.mocks').
-  factory('variantContentMocks', ['$httpBackend', 'mocksUtils', function ($httpBackend, mocksUtils) {
-      'use strict';
-      
-      function returnEmptyVariantNode(status, data, headers) {
+    factory('variantContentMocks', ['$httpBackend', 'mocksUtils', function ($httpBackend, mocksUtils) {
+    'use strict';
 
-          if (!mocksUtils.checkAuth()) {
-              return [401, null, null];
-          }
+    function returnEmptyVariantNode(status, data, headers) {
 
-          var response = returnVariantNodebyId(200, "", null);
-          var node = response[1];
-          var parentId = mocksUtils.getParameterByName(data, "parentId") || 1234;
+        if (!mocksUtils.checkAuth()) {
+            return [401, null, null];
+        }
 
-          node.name = "";
-          node.id = 0;
-          node.parentId = parentId;
+        var response = returnVariantNodebyId(200, "", null);
+        var node = response[1];
+        var parentId = mocksUtils.getParameterByName(data, "parentId") || 1234;
 
-          $(node.tabs).each(function(i,tab){
-              $(tab.properties).each(function(i, property){
-                  property.value = "";
-              });
-          });
+        node.name = "";
+        node.id = 0;
+        node.parentId = parentId;
 
-          return response;
-      }
+        node.tabs.forEach(function(tab){
+            tab.properties.forEach(function( property){
+                property.value = "";
+            });
+        });
 
-      function returnVariantNodebyId(status, data, headers) {
+        return response;
+    }
+
+    function returnVariantNodebyId(status, data, headers) {
 
         if (!mocksUtils.checkAuth()) {
             return [401, null, null];

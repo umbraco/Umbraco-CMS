@@ -295,6 +295,7 @@ angular.module('umbraco.mocks').
                     updater: { name: "Per Ploug Krogslund", id: 1 },
                     path: "-1,1234,2455",
                     allowedActions: ["U", "H", "A"],
+                    contentTypeAlias: "testAlias", 
                     variants: [
                         {
                             name: "",
