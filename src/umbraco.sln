@@ -117,6 +117,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Examine.Lucene", "U
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.BackOffice", "Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj", "{9B95EEF7-63FE-4432-8C63-166BE9C1A929}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.UI.NetCore", "Umbraco.Web.UI.NetCore\Umbraco.Web.UI.NetCore.csproj", "{DCDFE97C-5630-4F6F-855D-8AEEB96556A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.Website", "Umbraco.Web.Website\Umbraco.Web.Website.csproj", "{5A246D54-3109-4D2B-BE7D-FC0787D126AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -177,6 +181,14 @@ Global
 		{9B95EEF7-63FE-4432-8C63-166BE9C1A929}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B95EEF7-63FE-4432-8C63-166BE9C1A929}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B95EEF7-63FE-4432-8C63-166BE9C1A929}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCDFE97C-5630-4F6F-855D-8AEEB96556A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCDFE97C-5630-4F6F-855D-8AEEB96556A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCDFE97C-5630-4F6F-855D-8AEEB96556A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCDFE97C-5630-4F6F-855D-8AEEB96556A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A246D54-3109-4D2B-BE7D-FC0787D126AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A246D54-3109-4D2B-BE7D-FC0787D126AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A246D54-3109-4D2B-BE7D-FC0787D126AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A246D54-3109-4D2B-BE7D-FC0787D126AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

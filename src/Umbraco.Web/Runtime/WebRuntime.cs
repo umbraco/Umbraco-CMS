@@ -26,7 +26,6 @@ namespace Umbraco.Web.Runtime
         /// <summary>
         /// Initializes a new instance of the <see cref="WebRuntime"/> class.
         /// </summary>
-        /// <param name="umbracoApplication"></param>
         public WebRuntime(
             Configs configs,
             IUmbracoVersion umbracoVersion,
@@ -39,6 +38,7 @@ namespace Umbraco.Web.Runtime
             IMainDom mainDom):
             base(configs, umbracoVersion, ioHelper, logger, profiler ,new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom)
         {
+
             Profiler = GetWebProfiler();
         }
 
