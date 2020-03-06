@@ -36,7 +36,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Trees;
 using Umbraco.Core.Composing.CompositionExtensions;
-using Umbraco.Core.Exceptions;
+using Umbraco.Core.Composing.LightInject;
 using Umbraco.Core.Mapping;
 using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.Sections;
@@ -435,7 +435,7 @@ namespace Umbraco.Tests.Testing
                     }
                 }
             }
-            catch (ResolveUnregisteredDependencyException)
+            catch (LightInjectException)
             {
                 // This occurs in some of the TearDown methods that attempt to resolve things after factory cleared.
             }

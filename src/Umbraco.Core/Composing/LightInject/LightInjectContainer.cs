@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using LightInject;
-using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Composing.LightInject
 {
@@ -65,16 +64,21 @@ namespace Umbraco.Core.Composing.LightInject
                 if (!type.IsInterface)
                     return false;
 
+                const string umbracoNamespacePrefix = "Umbraco.";
+
                 // The fallback factory method only applies to types in Umbraco namespaces
-                return type.FullName?.StartsWith("Umbraco", StringComparison.OrdinalIgnoreCase) ?? false;
+                return type.FullName?.StartsWith(umbracoNamespacePrefix, StringComparison.OrdinalIgnoreCase) ?? false;
             }
 
             // Explicitly registering a fallback factory method prevents ServiceContainer.GetEmitMethod
             // from scanning the Umbraco assemblies for composition roots.
             container.RegisterFallback(
                 PreventScanForUmbracoCompositionRootsPredicate,
-                request => throw new ResolveUnregisteredDependencyException(request.ServiceType)
-            );
+                request =>
+                {
+                    var msg = $"Unable to resolve type: {request.ServiceType.FullName}";
+                    throw new LightInjectException(msg);
+                });
 
             // see notes in MixedLightInjectScopeManagerProvider
             container.ScopeManagerProvider = new MixedLightInjectScopeManagerProvider();

@@ -7,7 +7,6 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.LightInject;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -152,7 +151,7 @@ namespace Umbraco.Tests.Composing
 
             var factory = composition.CreateFactory();
 
-            Assert.Throws<ResolveUnregisteredDependencyException>(
+            Assert.Throws<LightInjectException>(
                 () => factory.GetInstance<INeverGotRegistered>()
             );
 
