@@ -422,24 +422,16 @@ namespace Umbraco.Tests.Testing
             // ensures we don't leak an opened database connection
             // which would lock eg SqlCe .sdf files
 
-            try
+            var instance = Factory?.TryGetInstance<IScopeProvider>();
+            if (instance is ScopeProvider scopeProvider)
             {
-                var instance = Factory?.TryGetInstance<IScopeProvider>();
-                if (instance is ScopeProvider scopeProvider)
+                Scope scope;
+                while ((scope = scopeProvider.AmbientScope) != null)
                 {
-                    Scope scope;
-                    while ((scope = scopeProvider.AmbientScope) != null)
-                    {
-                        scope.Reset();
-                        scope.Dispose();
-                    }
+                    scope.Reset();
+                    scope.Dispose();
                 }
             }
-            catch (LightInjectException)
-            {
-                // This occurs in some of the TearDown methods that attempt to resolve things after factory cleared.
-            }
-        
 
             Current.Reset(); // disposes the factory
 

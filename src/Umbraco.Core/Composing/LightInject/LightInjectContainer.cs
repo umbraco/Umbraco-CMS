@@ -74,11 +74,7 @@ namespace Umbraco.Core.Composing.LightInject
             // from scanning the Umbraco assemblies for composition roots.
             container.RegisterFallback(
                 PreventScanForUmbracoCompositionRootsPredicate,
-                request =>
-                {
-                    var msg = $"Unable to resolve type: {request.ServiceType.FullName}";
-                    throw new LightInjectException(msg);
-                });
+                request => null);
 
             // see notes in MixedLightInjectScopeManagerProvider
             container.ScopeManagerProvider = new MixedLightInjectScopeManagerProvider();

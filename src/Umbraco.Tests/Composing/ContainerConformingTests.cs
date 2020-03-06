@@ -4,7 +4,6 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.LightInject;
 
 namespace Umbraco.Tests.Composing
 {
@@ -67,7 +66,7 @@ namespace Umbraco.Tests.Composing
 
             var factory = register.CreateFactory();
 
-            Assert.Throws<LightInjectException>(() => factory.TryGetInstance<IThing>());
+            Assert.IsNull(factory.TryGetInstance<IThing>());
         }
 
         [Test]
@@ -141,7 +140,7 @@ namespace Umbraco.Tests.Composing
             var things = factory.GetInstance<IEnumerable<IThing>>();
             Assert.AreEqual(2, things.Count());
 
-            Assert.Throws<LightInjectException>(() => factory.TryGetInstance<IThing>());
+            Assert.IsNull(factory.TryGetInstance<IThing>());
         }
 
         [Test]
@@ -186,7 +185,7 @@ namespace Umbraco.Tests.Composing
             var things = factory.GetInstance<IEnumerable<IThing>>();
             Assert.AreEqual(2, things.Count());
 
-            Assert.Throws<LightInjectException>(() => factory.TryGetInstance<IThing>());
+            Assert.IsNull(factory.TryGetInstance<IThing>());
         }
 
         [Test]
@@ -204,7 +203,7 @@ namespace Umbraco.Tests.Composing
             //Assert.AreEqual(2, things.Count());
             Assert.AreEqual(1, things.Count()); // well, yes they are unique?
 
-            Assert.Throws<LightInjectException>(() => factory.TryGetInstance<IThing>());
+            Assert.IsNull(factory.TryGetInstance<IThing>());
         }
 
         [Test]

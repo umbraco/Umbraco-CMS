@@ -150,10 +150,7 @@ namespace Umbraco.Tests.Composing
             composers.Compose();
 
             var factory = composition.CreateFactory();
-
-            Assert.Throws<LightInjectException>(
-                () => factory.GetInstance<INeverGotRegistered>()
-            );
+            Assert.IsNull(factory.GetInstance<INeverGotRegistered>());
 
             Mock.Get(mockedAssemblyScanner)
                 .Verify(scanner => scanner.Scan(
