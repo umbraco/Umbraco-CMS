@@ -15,6 +15,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         private readonly HtmlLocalLinkParser _localLinkParser;
         private readonly HtmlUrlParser _urlParser;
 
+        [Obsolete("Use ctor defining all dependencies instead")]
+        public MarkdownEditorValueConverter()
+            : this(Current.Factory.GetInstance<HtmlLocalLinkParser>(), Current.Factory.GetInstance<HtmlUrlParser>())
+        {
+        }
+
         public MarkdownEditorValueConverter(HtmlLocalLinkParser localLinkParser, HtmlUrlParser urlParser)
         {
             _localLinkParser = localLinkParser;
@@ -25,7 +31,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             => Constants.PropertyEditors.Aliases.MarkdownEditor == propertyType.EditorAlias;
 
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-            => typeof (IHtmlString);
+            => typeof(IHtmlString);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Snapshot;

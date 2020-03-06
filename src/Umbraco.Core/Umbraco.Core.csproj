@@ -143,6 +143,8 @@
     <Compile Include="Models\UpgradeResult.cs" />
     <Compile Include="Persistence\Repositories\Implement\UpgradeCheckRepository.cs" />
     <Compile Include="Persistence\Repositories\IUpgradeCheckRepository.cs" />
+    <Compile Include="Models\IImageUrlGenerator.cs" />
+    <Compile Include="Models\ImageUrlGenerationOptions.cs" />
     <Compile Include="Runtime\IMainDomLock.cs" />
     <Compile Include="Runtime\MainDomSemaphoreLock.cs" />
     <Compile Include="Runtime\SqlMainDomLock.cs" />

@@ -55,7 +55,7 @@ ul.sections {
             transition: opacity .1s linear, box-shadow .1s;
         }
 
-        &.current a {
+        &.current > a {
             color: @ui-active;
 
             &::after {
@@ -74,6 +74,13 @@ ul.sections {
                 margin: 0 5px 0 0;
                 opacity: 0.6;
                 transition: opacity .1s linear;
+            }
+
+            &.current {
+                i {
+                    opacity: 1;
+                    background: @ui-active;
+                }
             }
 
             &:hover i {

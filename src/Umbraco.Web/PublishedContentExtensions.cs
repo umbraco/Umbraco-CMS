@@ -28,6 +28,20 @@ namespace Umbraco.Web
         private static UmbracoContext UmbracoContext => Current.UmbracoContext;
         private static ISiteDomainHelper SiteDomainHelper => Current.Factory.GetInstance<ISiteDomainHelper>();
 
+        #region Creator/Writer Names
+
+        public static string CreatorName(this IPublishedContent content, IUserService userService)
+        {
+            return userService.GetProfileById(content.CreatorId)?.Name;
+        }
+
+        public static string WriterName(this IPublishedContent content, IUserService userService)
+        {
+            return userService.GetProfileById(content.WriterId)?.Name;
+        }
+
+        #endregion
+
         #region IsComposedOf
 
         /// <summary>
