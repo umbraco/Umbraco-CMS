@@ -8,7 +8,7 @@
         ng-model="vm.firstProperty.value"
         ng-keypress="vm.submitOnEnter($event)"
         ng-blur="vm.onBlur()"
-        focus-when="{{blockvm.focusThis}}"
+        focus-when="{{vm.moveFocusToBlock === block}}"
     >
     </textarea>
 

@@ -58,7 +58,7 @@
         function mapElementTypeValues(fromModel, toModel) {
             var fromVariant = fromModel.variants[0];
             var toVariant = toModel.variants[0];
-            
+
             for (var t = 0; t < fromVariant.tabs.length; t++) {
                 var fromTab = fromVariant.tabs[t];
                 var toTab = toVariant.tabs[t];
@@ -72,12 +72,39 @@
         }
 
 
+        function getBlockLabel(blockModel) {
+            if(blockModel.labelInterpolator) {
+                // We are just using the contentModel, since its a key/value object that is live synced. (if we need to add additional vars, we could make a shallow copy and apply those.)
+                return blockModel.labelInterpolator(blockModel.contentModel);
+            }
+            return blockModel.contentTypeName;
+        }
+
+
+        /**
+         * Used to create a scoped watcher for a property on a blockModel.
+         */
+        function createPropWatcher(blockModel, prop)  {
+
+            return function() {
+
+                // sync data:
+                blockModel.contentModel[prop.alias] = prop.value;
+
+                // regenerate label.
+                // TODO: could use a debounce.
+                blockModel.label = getBlockLabel(blockModel);
+            }
+
+        }
+
+
         /**
         * @ngdoc factory
         * @name umbraco.factory.BlockEditorModelObject
         * @description A model object used to handle Block Editor data.
         **/
-        function BlockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations) {
+        function BlockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations, propertyScope) {
 
             if (!propertyModelValue) {
                 throw new Error("propertyModelValue cannot be undefined, to ensure we keep the binding to the angular model we need minimum an empty object.");
@@ -92,6 +119,13 @@
             this.blockConfigurations = blockConfigurations;
 
             this.scaffolds = [];
+
+            this.watchers = [];
+
+            this.isolatedScope = propertyScope.$new(true);
+            this.isolatedScope.blockModels = {};
+            
+            this.isolatedScope.$on("$destroy", this.onDestroyed.bind(this));
 
         };
         
@@ -164,17 +198,23 @@
 
                 var udi = layoutEntry.udi;
 
-                var contentModel = this._getContentByUdi(udi);
+                var contentModel = this._getDataByUdi(udi);
+
+                if (contentModel === null) {
+                    console.error("Couldnt find content model of "+udi)
+                    return null;
+                }
 
                 var blockConfiguration = this.getBlockConfiguration(contentModel.contentTypeAlias);
 
                 if (blockConfiguration === null) {
+                    console.error("The block entry of "+udi+" is not begin initialized cause its contentTypeAlias is not allowed for this PropertyEditor")
                     // This is not an allowed block type, therefor we return null;
                     return null;
                 }
 
                 var blockModel = {};
-                blockModel.key = String.CreateGuid();
+                blockModel.key = String.CreateGuid().replace(/-/g, "");
                 blockModel.config = angular.copy(blockConfiguration);
                 blockModel.labelInterpolator = $interpolate(blockModel.config.label);
 
@@ -191,10 +231,47 @@
 
                 blockModel.contentModel = contentModel;
                 blockModel.layoutModel = layoutEntry;
+                blockModel.watchers = [];
 
                 // TODO: settings
 
+                // Add blockModel to our isolated scope to enable watching its values:
+                this.isolatedScope.blockModels["_"+blockModel.key] = blockModel;
+
+                // Start watching each property value.
+                var variant = blockModel.content.variants[0];
+                for (var t = 0; t < variant.tabs.length; t++) {
+                    var tab = variant.tabs[t];
+                    for (var p = 0; p < tab.properties.length; p++) {
+                        var prop = tab.properties[p];
+
+                        // Watch value of property since this is the only value we want to keep synced.
+                        // Do notice that it is not performing a deep watch, meaning that we are only watching primatives and changes directly to the object of property-value.
+                        // But we like to sync non-primative values as well! Yes, and this does happen, just not through this code, but through the nature of JavaScript. 
+                        // Non-primative values act as references to the same data and are therefor synced.
+                        blockModel.watchers.push(this.isolatedScope.$watch("blockModels._"+blockModel.key+".content.variants[0].tabs["+t+"].properties["+p+"].value", createPropWatcher(blockModel, prop)));
+                    }
+                }
+
                 return blockModel;
+
+            },
+
+
+            removeDataAndDestroyModel: function(blockModel) {
+                this.destroyBlockModel(blockModel);
+                this.removeDataByUdi(blockModel.content.udi);
+            },
+
+            destroyBlockModel: function(blockModel) {
+
+                // remove property value watchers:
+                for (const w of blockModel.watchers) {
+                    w();
+                }
+                
+                // remove model from isolatedScope.
+                delete this.isolatedScope.blockModels[blockModel.key];
 
             },
 
@@ -237,7 +314,7 @@
                 }
 
                 var entry = {
-                    udi: this._createContent(contentTypeAlias)
+                    udi: this._createDataEntry(contentTypeAlias)
                 }
 
                 if (blockConfiguration.settingsElementTypeAlias != null) {
@@ -262,7 +339,10 @@
                     return null;
                 }
 
-                var contentModel = this._getContentByUdi(layoutEntry.udi);
+                var contentModel = this._getDataByUdi(layoutEntry.udi);
+                if(contentModel === null) {
+                    return null;
+                }
 
                 mapToPropertyModel(elementTypeContentModel, contentModel);
 
@@ -271,7 +351,7 @@
             },
 
             // private
-            _createContent: function(elementTypeAlias) {
+            _createDataEntry: function(elementTypeAlias) {
                 var content = {
                     contentTypeAlias: elementTypeAlias,
                     udi: udiService.create("element")
@@ -280,40 +360,38 @@
                 return content.udi;
             },
             // private
-            _getContentByUdi: function(udi) {
-                return this.value.data.find(entry => entry.udi === udi);
+            _getDataByUdi: function(udi) {
+                return this.value.data.find(entry => entry.udi === udi) || null;
             },
-            
-            removeContent: function(entry) {
-                const index = this.value.data.indexOf(entry)
+
+            removeDataByUdi: function(udi) {
+                const index = this.value.data.findIndex(o => o.udi === udi);
                 if (index !== -1) {
-                    this.value.splice(index, 1);
+                    this.value.data.splice(index, 1);
                 }
             },
 
-            removeContentByUdi: function(udi) {
-                const index = this.value.data.findIndex(o => o.udi === udi);
-                if (index !== -1) {
-                    this.value.splice(index, 1);
+            onDestroyed: function() {
+
+                for (const key in this.isolatedScope.blockModels) {
+                    this.destroyBlockModel(this.isolatedScope.blockModels[key]);
                 }
+                
+                delete this.value;
+                delete this.propertyEditorAlias;
+                delete this.blockConfigurations;
+                delete this.scaffolds;
+                delete this.watchers;
+                delete this.isolatedScope;
             }
         }
 
         return {
-            createModelObject: function(propertyModelValue, propertyEditorAlias, blockConfigurations) {
-                return new BlockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations);
+            createModelObject: function(propertyModelValue, propertyEditorAlias, blockConfigurations, propertyScope) {
+                return new BlockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations, propertyScope);
             },
             mapElementTypeValues: mapElementTypeValues, 
-            getBlockLabel: function(blockModel) {
-    
-                
-                if(blockModel.labelInterpolator) {
-                    // We are just using the contentModel, since its a key/value object that is live synced. (if we need to add additional vars, we could make a shallow copy and apply those.)
-                    return blockModel.labelInterpolator(blockModel.contentModel);
-                }
-    
-                return blockModel.contentTypeName;
-            }
+            getBlockLabel: getBlockLabel
         }
     }
 

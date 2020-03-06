@@ -51,15 +51,13 @@
 
             vm.validationLimit = vm.model.config.validationLimit;
             
-            console.log("Model TESTS:", vm.model.value === null, typeof vm.model.value !== 'object')
-
             // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
-            if(vm.model.value === null || typeof vm.model.value !== 'object') {// testing if we have null or undefined value or if the value is set to another type than Object.
+            if(typeof vm.model.value !== 'object' || vm.model.value === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
                 vm.model.value = {};
             }
             
             // Create Model Object, to manage our data for this Block Editor.
-            modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks);
+            modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, $scope);
             modelObject.loadScaffolding().then(onLoaded);
 
             copyAllBlocksAction = {
@@ -161,16 +159,20 @@
         
 
         function deleteBlock(block) {
+
             var index = vm.blocks.indexOf(block);
             if(index !== -1) {
-                vm.blocks.splice(index, 1);
 
-                var layoutIndex = layout.findIndex(entry => entry.udi === block.udi);
+                var layoutIndex = layout.findIndex(entry => entry.udi === block.content.udi);
                 if(layoutIndex !== -1) {
-                    vm.layout.splice(index, 1);
+                    layout.splice(index, 1);
+                } else {
+                    throw new Error("Could not find layout entry of block with udi: "+block.content.udi)
                 }
 
-                modelObject.removeContentByUdi(block.udi);
+                vm.blocks.splice(index, 1);
+
+                modelObject.removeDataAndDestroyModel(block);
             }
         }
 
@@ -189,6 +191,7 @@
                 view: "views/common/infiniteeditors/elementeditor/elementeditor.html",
                 size: blockModel.config.overlaySize || "medium",
                 submit: function(elementEditorModel) {
+                    // To ensure syncronization gets tricked we transfer
                     blockEditorService.mapElementTypeValues(elementEditorModel.content, blockModel.content)
                     editorService.close();
                 },
@@ -397,7 +400,7 @@
                 var moveFromIndex = runtimeSortVars.moveFromIndex;
                 var moveToIndex = ui.item.index();
 
-                if (moveToIndex > -1 && moveFromIndex !== moveToIndex) {
+                if (moveToIndex !== -1 && moveFromIndex !== moveToIndex) {
                     var movedEntry = layout[moveFromIndex];
                     layout.splice(moveFromIndex, 1);
                     layout.splice(moveToIndex, 0, movedEntry);
@@ -424,19 +427,19 @@
             deleteAllBlocksAction.isDisabled = vm.blocks.length === 0;
 
             // validate limits:
-            if (vm.validationLimit.min !== null) {
-                if (vm.blocks.length < vm.validationLimit.min) {
+            if (vm.propertyForm) {
+                if (vm.validationLimit.min !== null && vm.blocks.length < vm.validationLimit.min) {
                     vm.propertyForm.minCount.$setValidity("minCount", false);
                 }
                 else {
                     vm.propertyForm.minCount.$setValidity("minCount", true);
                 }
-            }
-            if (vm.validationLimit.max !== null && vm.blocks.length > vm.validationLimit.max) {
-                vm.propertyForm.maxCount.$setValidity("maxCount", false);
-            }
-            else {
-                vm.propertyForm.maxCount.$setValidity("maxCount", true);
+                if (vm.validationLimit.max !== null && vm.blocks.length > vm.validationLimit.max) {
+                    vm.propertyForm.maxCount.$setValidity("maxCount", false);
+                }
+                else {
+                    vm.propertyForm.maxCount.$setValidity("maxCount", true);
+                }
             }
         }
 

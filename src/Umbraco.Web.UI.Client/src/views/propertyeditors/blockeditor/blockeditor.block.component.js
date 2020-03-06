@@ -17,7 +17,7 @@
         });
 
     function BlockEditorBlockBlockController($scope, blockEditorService) {
-        
+        /*
         var unsubscribe = [];
         var vm = this;
 
@@ -63,7 +63,7 @@
                 subscription();
             }
         });
-
+        */
 
     }
 
