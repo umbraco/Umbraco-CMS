@@ -90,7 +90,7 @@ namespace Umbraco.Core.Packaging
         {
             var packagesXml = EnsureStorage(out _);
             if (packagesXml?.Root == null)
-                yield break;;
+                yield break;
 
             foreach (var packageXml in packagesXml.Root.Elements("package"))
                 yield return _parser.ToPackageDefinition(packageXml);
@@ -518,7 +518,6 @@ namespace Umbraco.Core.Packaging
         private XElement GetStylesheetXml(string name, bool includeProperties)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
-;
             var sts = _fileService.GetStylesheetByName(name);
             if (sts == null) return null;
             var stylesheetXml = new XElement("Stylesheet");

@@ -1,0 +1,71 @@
+﻿using System.Linq;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
+using Umbraco.Core.Security;
+using Umbraco.Web.Install.Models;
+
+namespace Umbraco.Web.Install.InstallSteps
+{
+    [InstallSetupStep(InstallationType.NewInstall,
+        "ConfigureMachineKey", "machinekey", 2,
+        "Updating some security settings...",
+        PerformsAppRestart = true)]
+    public class ConfigureMachineKey : InstallSetupStep<bool?>
+    {
+        private readonly IIOHelper _ioHelper;
+        private readonly IMachineKeyConfig _machineKeyConfig;
+
+        public ConfigureMachineKey(IIOHelper ioHelper, IMachineKeyConfig machineKeyConfig)
+        {
+            _ioHelper = ioHelper;
+            _machineKeyConfig = machineKeyConfig;
+        }
+
+        public override string View => HasMachineKey() == false ? base.View : "";
+
+        /// <summary>
+        /// Don't display the view or execute if a machine key already exists
+        /// </summary>
+        /// <returns></returns>
+        private bool HasMachineKey()
+        {
+            return _machineKeyConfig.HasMachineKey;
+        }
+
+        /// <summary>
+        /// The step execution method
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public override Task<InstallSetupResult> ExecuteAsync(bool? model)
+        {
+            if (model.HasValue && model.Value == false) return Task.FromResult<InstallSetupResult>(null);
+
+            //install the machine key
+            var fileName = _ioHelper.MapPath($"{_ioHelper.Root}/web.config");
+            var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
+
+            // we only want to get the element that is under the root, (there may be more under <location> tags we don't want them)
+            var systemWeb = xml.Root.Element("system.web");
+
+            // Update appSetting if it exists, or else create a new appSetting for the given key and value
+            var machineKey = systemWeb.Descendants("machineKey").FirstOrDefault();
+            if (machineKey != null) return Task.FromResult<InstallSetupResult>(null);
+
+            var generator = new MachineKeyGenerator();
+            var generatedSection = generator.GenerateConfigurationBlock();
+            systemWeb.Add(XElement.Parse(generatedSection));
+
+            xml.Save(fileName, SaveOptions.DisableFormatting);
+
+            return Task.FromResult<InstallSetupResult>(null);
+        }
+
+        public override bool RequiresExecution(bool? model)
+        {
+            return HasMachineKey() == false;
+        }
+    }
+}

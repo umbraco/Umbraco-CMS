@@ -70,7 +70,7 @@
 
         <!-- Dom element not found error -->
         <div ng-if="elementNotFound && !loadingStep">
-            <umb-tour-step class="tc">
+            <umb-tour-step class="tc" on-close="model.endTour()">
                 <umb-tour-step-header>
                     <h4 class="bold color-red">Oh, we got lost!</h4>
                 </umb-tour-step-header>

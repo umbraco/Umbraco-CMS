@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Web;
 using System.Web.Security;
 using Examine;
 using Microsoft.AspNet.SignalR;
@@ -7,13 +6,11 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Cookie;
-using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Install;
 using Umbraco.Core.Migrations.PostMigrations;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Runtime;
@@ -49,6 +46,10 @@ using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Examine;
 using Umbraco.Core.Models;
+using Umbraco.Core.Request;
+using Umbraco.Core.Session;
+using Umbraco.Web.AspNet;
+using Umbraco.Web.AspNet;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Runtime
@@ -64,14 +65,23 @@ namespace Umbraco.Web.Runtime
 
             composition.Register<UmbracoInjectedModule>();
             composition.Register<IIpResolver, AspNetIpResolver>();
-            composition.Register<ISessionIdResolver, AspNetSessionIdResolver>();
+
+            composition.Register<IUserAgentProvider, AspNetUserAgentProvider>();
+            composition.Register<AspNetSessionManager>(Lifetime.Singleton);
+            composition.Register<ISessionIdResolver>(factory => factory.GetInstance<AspNetSessionManager>(), Lifetime.Singleton);
+            composition.Register<ISessionManager>(factory => factory.GetInstance<AspNetSessionManager>(), Lifetime.Singleton);
+
+            composition.Register<IRequestAccessor, AspNetRequestAccessor>(Lifetime.Singleton);
+
             composition.Register<IHostingEnvironment, AspNetHostingEnvironment>();
             composition.Register<IBackOfficeInfo, AspNetBackOfficeInfo>();
+            composition.Register<IUmbracoApplicationLifetime, AspNetUmbracoApplicationLifetime>(Lifetime.Singleton);
             composition.Register<IPasswordHasher, AspNetPasswordHasher>();
             composition.Register<IFilePermissionHelper, FilePermissionHelper>(Lifetime.Singleton);
 
             composition.RegisterUnique<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
             composition.RegisterUnique<ICookieManager, AspNetCookieManager>();
+
 
             composition.ComposeWebMappingProfiles();
 
@@ -85,6 +95,8 @@ namespace Umbraco.Web.Runtime
             composition.Register(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetInstance<IMemberService>()));
             composition.Register<MembershipHelper>(Lifetime.Request);
             composition.Register<IPublishedMemberCache>(factory => factory.GetInstance<IUmbracoContext>().PublishedSnapshot.Members);
+            composition.RegisterUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
+            composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
 
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
@@ -115,6 +127,7 @@ namespace Umbraco.Web.Runtime
 
             composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
             composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
+
             composition.RegisterUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 
             composition.RegisterUnique<HtmlLocalLinkParser>();
@@ -129,8 +142,7 @@ namespace Umbraco.Web.Runtime
                 composition.Register<UmbracoHelper>(factory =>
                 {
                     var umbCtx = factory.GetInstance<IUmbracoContext>();
-                    return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null,
-                        factory.GetInstance<ITagQuery>(), factory.GetInstance<ICultureDictionaryFactory>(),
+                    return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null, factory.GetInstance<ICultureDictionaryFactory>(),
                         factory.GetInstance<IUmbracoComponentRenderer>(), factory.GetInstance<IPublishedContentQuery>());
                 });
             else

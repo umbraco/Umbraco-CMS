@@ -134,8 +134,11 @@
     <Compile Include="AppBuilderExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="AspNet\AspNetHostingEnvironment.cs" />
+    <Compile Include="AspNet\AspNetRequestAccessor.cs" />
+    <Compile Include="AspNet\AspNetSessionManager.cs" />
+    <Compile Include="AspNet\AspNetUserAgentProvider.cs" />
     <Compile Include="AspNet\FrameworkMarchal.cs" />
-    <Compile Include="Cache\WebCachingAppCache.cs" />
+    <Compile Include="AspNet\AspNetUmbracoApplicationLifetime.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
@@ -160,14 +163,14 @@
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
     <Compile Include="Install\ChangesMonitor.cs" />
-    <Compile Include="Install\InstallSteps\StarterKitDownloadStep.cs" />
-    <Compile Include="Install\InstallSteps\StarterKitInstallStep.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
     <Compile Include="Logging\OwinLoggerFactory.cs" />
     <Compile Include="Logging\WebProfiler.cs" />
     <Compile Include="Logging\WebProfilerComponent.cs" />
     <Compile Include="Logging\WebProfilerComposer.cs" />
     <Compile Include="Logging\WebProfilerProvider.cs" />
+    <Compile Include="Macros\MacroRenderer.cs" />
+    <Compile Include="Macros\MemberUserKeyProvider.cs" />
     <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
@@ -187,12 +190,9 @@
     <Compile Include="AspNet\AspNetHttpContextAccessor.cs" />
     <Compile Include="AspNet\AspNetIpResolver.cs" />
     <Compile Include="AspNet\AspNetPasswordHasher.cs" />
-    <Compile Include="AspNet\AspNetSessionIdResolver.cs" />
     <Compile Include="Profiling\WebProfilingController.cs" />
     <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
-    <Compile Include="Scheduling\SchedulerComponent.cs" />
-    <Compile Include="Scheduling\SchedulerComposer.cs" />
     <Compile Include="Security\BackOfficeUserStore.cs" />
     <Compile Include="Security\BackOfficeUserValidator.cs" />
     <Compile Include="Security\ConfiguredPasswordValidator.cs" />
@@ -202,6 +202,7 @@
     <Compile Include="Security\MembershipProviderBase.cs" />
     <Compile Include="Security\MembershipProviderExtensions.cs" />
     <Compile Include="Security\PasswordSecurity.cs" />
+    <Compile Include="Security\PublicAccessChecker.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
     <Compile Include="Security\UmbracoEmailMessage.cs" />
     <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
@@ -216,7 +217,6 @@
     <Compile Include="ViewDataExtensions.cs" />
     <Compile Include="WebApi\Filters\AdminUsersAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\OnlyLocalRequestsAttribute.cs" />
-    <Compile Include="Routing\RedirectTrackingComposer.cs" />
     <Compile Include="Runtime\WebInitialComposer.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
@@ -272,11 +272,9 @@
     <Compile Include="Composing\CompositionExtensions\WebMappingProfiles.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="Install\InstallStepCollection.cs" />
-    <Compile Include="Install\InstallSteps\ConfigureMachineKey.cs" />
     <Compile Include="Editors\MemberGroupController.cs" />
     <Compile Include="Composing\CompositionExtensions\Controllers.cs" />
     <Compile Include="HealthCheck\HealthCheckController.cs" />
-    <Compile Include="Macros\MacroRenderer.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Composing\ModuleInjector.cs" />
     <Compile Include="Mvc\FilteredControllerFactoryCollection.cs" />
@@ -308,7 +306,6 @@
     <Compile Include="Editors\Filters\MediaItemSaveValidationAttribute.cs" />
     <Compile Include="Editors\Filters\MemberSaveValidationAttribute.cs" />
     <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
-    <Compile Include="WebApi\UmbracoApiControllerTypeCollection.cs" />
     <Compile Include="WebApi\UmbracoApiControllerTypeCollectionBuilder.cs" />
     <Compile Include="WebApi\UnhandedExceptionLoggerConfigurationAttribute.cs" />
     <Compile Include="WebApi\UnhandledExceptionLogger.cs" />
@@ -325,7 +322,6 @@
     <Compile Include="Mvc\UmbracoRequireHttpsAttribute.cs" />
     <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
-    <Compile Include="Routing\RedirectTrackingComponent.cs" />
     <Compile Include="Editors\RedirectUrlManagementController.cs" />
     <Compile Include="DefaultEventMessagesFactory.cs" />
     <Compile Include="Security\ExternalSignInAutoLinkOptions.cs" />
@@ -346,7 +342,6 @@
     <Compile Include="IUmbracoComponentRenderer.cs" />
     <Compile Include="Mvc\ProfilingView.cs" />
     <Compile Include="Mvc\ProfilingViewEngine.cs" />
-    <Compile Include="BatchedDatabaseServerMessenger.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Controllers\UmbProfileController.cs" />
@@ -361,7 +356,6 @@
     <Compile Include="Editors\RelationController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
     <Compile Include="Editors\TemplateQueryController.cs" />
-    <Compile Include="Install\InstallSteps\SetUmbracoVersionStep.cs" />
     <Compile Include="Install\InstallSteps\NewInstallStep.cs" />
     <Compile Include="Install\UmbracoInstallArea.cs" />
     <Compile Include="Install\Controllers\InstallApiController.cs" />
@@ -457,7 +451,6 @@
     <Compile Include="HttpRequestExtensions.cs" />
     <Compile Include="HttpUrlHelperExtensions.cs" />
     <Compile Include="Install\FilePermissionHelper.cs" />
-    <Compile Include="Install\InstallHelper.cs" />
     <Compile Include="Install\HttpInstallAuthorizeAttribute.cs" />
     <Compile Include="Macros\PartialViewMacroController.cs" />
     <Compile Include="Macros\PartialViewMacroEngine.cs" />
@@ -531,9 +524,6 @@
     <Compile Include="Mvc\PluginControllerMetadata.cs" />
     <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
-    <Compile Include="Routing\ContentFinderByPageIdQuery.cs" />
-    <Compile Include="Routing\PublishedRouter.cs" />
-    <Compile Include="Compose\DatabaseServerRegistrarAndMessengerComponent.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Trees\PartialViewMacrosTreeController.cs" />
     <Compile Include="Trees\PartialViewsTreeController.cs" />
@@ -558,7 +548,6 @@
     <Compile Include="WebApi\Filters\UmbracoUserTimeoutFilterAttribute.cs" />
     <Compile Include="Runtime\WebRuntime.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
-    <Compile Include="Routing\ContentFinderByIdPath.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

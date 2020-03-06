@@ -1,9 +1,6 @@
-﻿using System;
-using System.ComponentModel;
-using System.Net.Mail;
+﻿using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
-using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Security
 {

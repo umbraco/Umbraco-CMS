@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,10 +11,11 @@ using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Request;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Web.Security;
+using Umbraco.Core.Session;
 
 namespace Umbraco.Web.Macros
 {
@@ -29,10 +29,25 @@ namespace Umbraco.Web.Macros
         private readonly IMacroService _macroService;
         private readonly IIOHelper _ioHelper;
         private readonly ICookieManager _cookieManager;
-        private readonly IUserService _userService;
+        private readonly IMemberUserKeyProvider _memberUserKeyProvider;
+        private readonly ISessionManager _sessionManager;
+        private readonly IRequestAccessor _requestAccessor;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public MacroRenderer(IProfilingLogger plogger, IUmbracoContextAccessor umbracoContextAccessor, IContentSection contentSection, ILocalizedTextService textService, AppCaches appCaches, IMacroService macroService, IUserService userService, IHttpContextAccessor httpContextAccessor, IIOHelper ioHelper, ICookieManager cookieManager)
+
+        public MacroRenderer(
+            IProfilingLogger plogger,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IContentSection contentSection,
+            ILocalizedTextService textService,
+            AppCaches appCaches,
+            IMacroService macroService,
+            IIOHelper ioHelper,
+            ICookieManager cookieManager,
+            IMemberUserKeyProvider memberUserKeyProvider,
+            ISessionManager sessionManager,
+            IRequestAccessor requestAccessor,
+             IHttpContextAccessor httpContextAccessor)
         {
             _plogger = plogger ?? throw new ArgumentNullException(nameof(plogger));
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -42,7 +57,9 @@ namespace Umbraco.Web.Macros
             _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _cookieManager = cookieManager;
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _memberUserKeyProvider = memberUserKeyProvider;
+            _sessionManager = sessionManager;
+            _requestAccessor = requestAccessor;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -63,12 +80,9 @@ namespace Umbraco.Web.Macros
             {
                 object key = 0;
 
-                if (_httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false)
+                if (_umbracoContextAccessor.UmbracoContext.Security.IsAuthenticated())
                 {
-                    //ugh, membershipproviders :(
-                    var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-                    var member = MembershipProviderExtensions.GetCurrentUser(provider);
-                    key = member?.ProviderUserKey ?? 0;
+                    key = _memberUserKeyProvider.GetMemberProviderUserKey() ?? 0;
                 }
 
                 id.AppendFormat("m{0}-", key);
@@ -127,10 +141,8 @@ namespace Umbraco.Web.Macros
             // do not cache if it should cache by member and there's not member
             if (model.CacheByMember)
             {
-                var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-                var member = MembershipProviderExtensions.GetCurrentUser(provider);
-                var key = member?.ProviderUserKey;
-                if (key == null) return;
+                var key = _memberUserKeyProvider.GetMemberProviderUserKey();
+                if (key is null) return;
             }
 
             // remember when we cache the content
@@ -331,7 +343,7 @@ namespace Umbraco.Web.Macros
         /// <returns>The text output of the macro execution.</returns>
         private MacroContent ExecutePartialView(MacroModel macro, IPublishedContent content)
         {
-            var engine = new PartialViewMacroEngine();
+            var engine = new PartialViewMacroEngine(_umbracoContextAccessor, _httpContextAccessor, _ioHelper);
             return engine.Execute(macro, content);
         }
 
@@ -364,8 +376,6 @@ namespace Umbraco.Web.Macros
                 return attributeValue;
             }
 
-            var context = _httpContextAccessor.HttpContext;
-
             foreach (var token in tokens)
             {
                 var isToken = token.Length > 4 && token[0] == '[' && token[token.Length - 1] == ']' && validTypes.Contains(token[1]);
@@ -383,10 +393,10 @@ namespace Umbraco.Web.Macros
                 switch (type)
                 {
                     case '@':
-                        attributeValue = context?.Request[name];
+                        attributeValue = _requestAccessor.GetRequestValue(name);
                         break;
                     case '%':
-                        attributeValue = context?.Session[name]?.ToString();
+                        attributeValue = _sessionManager.GetSessionValue(name)?.ToString();
                         if (string.IsNullOrEmpty(attributeValue))
                             attributeValue = _cookieManager.GetCookieValue(name);
                         break;

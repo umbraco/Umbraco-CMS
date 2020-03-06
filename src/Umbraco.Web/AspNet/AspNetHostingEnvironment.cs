@@ -26,11 +26,8 @@ namespace Umbraco.Web.Hosting
             ApplicationId = HostingEnvironment.ApplicationID;
             ApplicationPhysicalPath = HostingEnvironment.ApplicationPhysicalPath;
             ApplicationVirtualPath = HostingEnvironment.ApplicationVirtualPath;
-            CurrentDomainId = AppDomain.CurrentDomain.Id;
             IISVersion = HttpRuntime.IISVersion;
         }
-
-        public int CurrentDomainId { get; }
 
         public string SiteName { get; }
         public string ApplicationId { get; }
@@ -49,11 +46,6 @@ namespace Umbraco.Web.Hosting
         }
 
         public string ToAbsolute(string virtualPath, string root) => VirtualPathUtility.ToAbsolute(virtualPath, root);
-        public void LazyRestartApplication()
-        {
-            HttpRuntime.UnloadAppDomain();
-        }
-
         public void RegisterObject(IRegisteredObject registeredObject)
         {
             var wrapped = new RegisteredObjectWrapper(registeredObject);

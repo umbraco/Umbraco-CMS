@@ -202,6 +202,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         }
 
         public abstract IsolationLevel DefaultIsolationLevel { get; }
+        public abstract string DbProvider { get; }
 
         public virtual IEnumerable<string> GetTablesInSchema(IDatabase db)
         {

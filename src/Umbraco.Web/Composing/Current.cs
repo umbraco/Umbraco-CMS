@@ -116,6 +116,9 @@ namespace Umbraco.Web.Composing
         public static UmbracoHelper UmbracoHelper
             => Factory.GetInstance<UmbracoHelper>();
 
+        public static IUmbracoComponentRenderer UmbracoComponentRenderer
+            => Factory.GetInstance<IUmbracoComponentRenderer>();
+
         public static DistributedCache DistributedCache
             => Factory.GetInstance<DistributedCache>();
 
@@ -263,7 +266,9 @@ namespace Umbraco.Web.Composing
         public static IUmbracoVersion UmbracoVersion => Factory.GetInstance<IUmbracoVersion>();
         public static IPublishedUrlProvider PublishedUrlProvider => Factory.GetInstance<IPublishedUrlProvider>();
         public static IMenuItemCollectionFactory MenuItemCollectionFactory => Factory.GetInstance<IMenuItemCollectionFactory>();
-        public static MembershipHelper MembershipHelper => Factory.GetInstance<MembershipHelper>();
+        public static MembershipHelper MembershipHelper  => Factory.GetInstance<MembershipHelper>();
+        public static IUmbracoApplicationLifetime UmbracoApplicationLifetime  => Factory.GetInstance<IUmbracoApplicationLifetime>();
+        public static IPublishedContentQuery PublishedContentQuery  => Factory.GetInstance<IPublishedContentQuery>();
 
         #endregion
     }

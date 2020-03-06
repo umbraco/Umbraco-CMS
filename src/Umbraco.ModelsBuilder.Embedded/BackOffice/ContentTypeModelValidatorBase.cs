@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.ModelsBuilder.Embedded.Configuration;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
 

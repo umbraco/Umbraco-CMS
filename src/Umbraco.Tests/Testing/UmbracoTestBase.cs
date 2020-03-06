@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Web.Routing;
+using System.Web.Security;
 using System.Xml.Linq;
 using Examine;
 using Moq;
@@ -51,12 +52,15 @@ using Umbraco.Web.Templates;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Request;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
+using Umbraco.Tests.LegacyXmlPublishedCache;
+using Umbraco.Web.AspNet;
 using Umbraco.Web.Install;
 using Umbraco.Web.Security;
+using Umbraco.Web.Security.Providers;
 using Umbraco.Web.Trees;
 using Current = Umbraco.Web.Composing.Current;
 namespace Umbraco.Tests.Testing
@@ -203,6 +207,18 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(ipResolver);
             Composition.RegisterUnique<IPasswordHasher, AspNetPasswordHasher>();
             Composition.RegisterUnique(TestHelper.ShortStringHelper);
+            Composition.RegisterUnique<IRequestAccessor, AspNetRequestAccessor>();
+            Composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
+
+
+            var memberService = Mock.Of<IMemberService>();
+            var memberTypeService = Mock.Of<IMemberTypeService>();
+            var membershipProvider = new MembersMembershipProvider(memberService, memberTypeService, Mock.Of<IUmbracoVersion>(), TestHelper.GetHostingEnvironment(), TestHelper.GetIpResolver());
+            var membershipHelper = new MembershipHelper(Mock.Of<IHttpContextAccessor>(), Mock.Of<IPublishedMemberCache>(), membershipProvider, Mock.Of<RoleProvider>(), memberService, memberTypeService, Mock.Of<IPublicAccessService>(), AppCaches.Disabled, logger, ShortStringHelper, Mock.Of<IEntityService>());
+
+            Composition.RegisterUnique(membershipHelper);
+
+
 
 
             TestObjects = new TestObjects(register);

@@ -24,7 +24,7 @@ namespace Umbraco.Web.Mvc
         private readonly string _dataTokenName;
         private IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly int? _contentId;
-        private UmbracoHelper _helper;
+        private IPublishedContentQuery _publishedContentQuery;
 
         /// <summary>
         /// Constructor - can be used for testing
@@ -74,10 +74,7 @@ namespace Umbraco.Web.Mvc
         // TODO: try lazy property injection?
         private IPublishedRouter PublishedRouter => Current.Factory.GetInstance<IPublishedRouter>();
 
-        /// <summary>
-        /// Exposes an UmbracoHelper
-        /// </summary>
-        protected UmbracoHelper Umbraco => _helper ?? (_helper = Current.Factory.GetInstance<UmbracoHelper>());
+        private IPublishedContentQuery PublishedContentQuery => _publishedContentQuery ?? (_publishedContentQuery = Current.Factory.GetInstance<IPublishedContentQuery>());
 
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
@@ -103,7 +100,7 @@ namespace Umbraco.Web.Mvc
         {
             if (_contentId.HasValue)
             {
-                var content = Umbraco.Content(_contentId);
+                var content = PublishedContentQuery.Content(_contentId.Value);
                 if (content == null)
                 {
                     throw new InvalidOperationException("Could not resolve content with id " + _contentId);

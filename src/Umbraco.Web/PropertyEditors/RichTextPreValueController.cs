@@ -33,13 +33,12 @@ namespace Umbraco.Web.PropertyEditors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             IShortStringHelper shortStringHelper,
             IIOHelper ioHelper,
             UmbracoMapper umbracoMapper,
             IPublishedUrlProvider publishedUrlProvider
             )
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _ioHelper = ioHelper;
         }

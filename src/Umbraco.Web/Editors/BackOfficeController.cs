@@ -53,6 +53,7 @@ namespace Umbraco.Web.Editors
         private readonly TreeCollection _treeCollection;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IRuntimeSettings _runtimeSettings;
 
         public BackOfficeController(
             IManifestParser manifestParser,
@@ -63,15 +64,16 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger profilingLogger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             IUmbracoVersion umbracoVersion,
             IGridConfig gridConfig,
             IUmbracoSettingsSection umbracoSettingsSection,
             IIOHelper ioHelper,
             TreeCollection treeCollection,
             IHostingEnvironment hostingEnvironment,
-            IHttpContextAccessor httpContextAccessor)
-            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, umbracoHelper)
+            IHttpContextAccessor httpContextAccessor,
+            IRuntimeSettings settings)
+            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
+
         {
             _manifestParser = manifestParser;
             _features = features;
@@ -83,6 +85,7 @@ namespace Umbraco.Web.Editors
             _treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));
             _hostingEnvironment = hostingEnvironment;
             _httpContextAccessor = httpContextAccessor;
+            _runtimeSettings = settings;
         }
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
@@ -98,8 +101,8 @@ namespace Umbraco.Web.Editors
         public async Task<ActionResult> Default()
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _umbracoSettingsSection,_ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment)),
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _umbracoSettingsSection, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment)));
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _umbracoSettingsSection,_ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings)),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _umbracoSettingsSection, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings)));
         }
 
         [HttpGet]
@@ -182,7 +185,7 @@ namespace Umbraco.Web.Editors
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
                 //The default view to render when there is no external login info or errors
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _umbracoSettingsSection, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment)),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _umbracoSettingsSection, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings)),
                 //The ActionResult to perform if external login is successful
                 () => Redirect("/"));
         }
@@ -289,7 +292,7 @@ namespace Umbraco.Web.Editors
         [MinifyJavaScriptResult(Order = 1)]
         public JavaScriptResult ServerVariables()
         {
-            var serverVars = new BackOfficeServerVariables(Url, _runtimeState, _features, GlobalSettings, _umbracoVersion, _umbracoSettingsSection, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment);
+            var serverVars = new BackOfficeServerVariables(Url, _runtimeState, _features, GlobalSettings, _umbracoVersion, _umbracoSettingsSection, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings);
 
             //cache the result if debugging is disabled
             var result = _hostingEnvironment.IsDebugMode

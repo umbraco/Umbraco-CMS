@@ -54,12 +54,11 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
             IUmbracoSettingsSection umbracoSettingsSection,
             IPublishedUrlProvider publishedUrlProvider)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _propertyEditors = propertyEditors;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
@@ -446,7 +445,7 @@ namespace Umbraco.Web.Editors
             {
                 var propertyEditor = propertyEditors.SingleOrDefault(x => x.Alias == dataType.Alias);
                 if (propertyEditor != null)
-                    dataType.HasPrevalues = propertyEditor.GetConfigurationEditor().Fields.Any(); ;
+                    dataType.HasPrevalues = propertyEditor.GetConfigurationEditor().Fields.Any();
             }
 
             var grouped = dataTypes

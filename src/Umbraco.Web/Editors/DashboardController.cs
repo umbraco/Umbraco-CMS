@@ -50,12 +50,11 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             IDashboardService dashboardService,
-            UmbracoHelper umbracoHelper,
             IUmbracoVersion umbracoVersion,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
             IPublishedUrlProvider publishedUrlProvider)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper,publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper,publishedUrlProvider)
         {
             _dashboardService = dashboardService;
             _umbracoVersion = umbracoVersion;
