@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading;
 using LightInject;
 
 namespace Umbraco.Core.Composing.LightInject
 {
+
     /// <summary>
     /// Implements DI with LightInject.
     /// </summary>
@@ -32,36 +32,7 @@ namespace Umbraco.Core.Composing.LightInject
         /// </summary>
         protected static ServiceContainer CreateServiceContainer()
         {
-            var container = new ServiceContainer(new ContainerOptions { EnablePropertyInjection = false });
-
-            // note: the block below is disabled, as it is too LightInject-specific
-            //
-            // supports annotated constructor injections
-            // eg to specify the service name on some services
-            //container.EnableAnnotatedConstructorInjection();
-
-            // note: the block below is disabled, we do not allow property injection at all anymore
-            //       (see options in CreateServiceContainer)
-            //
-            // from the docs: "LightInject considers all read/write properties a dependency, but implements
-            // a loose strategy around property dependencies, meaning that it will NOT throw an exception
-            // in the case of an unresolved property dependency."
-            //
-            // in Umbraco we do NOT want to do property injection by default, so we have to disable it.
-            // from the docs, the following line will cause the container to "now only try to inject
-            // dependencies for properties that is annotated with the InjectAttribute."
-            //
-            // could not find it documented, but tests & code review shows that LightInject considers a
-            // property to be "injectable" when its setter exists and is not static, nor private, nor
-            // it is an index property. which means that eg protected or internal setters are OK.
-            //Container.EnableAnnotatedPropertyInjection();
-
-            // ensure that we do *not* scan assemblies
-            // we explicitly RegisterFrom our own composition roots and don't want them scanned
-            container.AssemblyScanner = new AssemblyScanner(/*container.AssemblyScanner*/);
-
-            // see notes in MixedLightInjectScopeManagerProvider
-            container.ScopeManagerProvider = new MixedLightInjectScopeManagerProvider();
+            var container = new UmbracoServiceContainer(new ContainerOptions { EnablePropertyInjection = false });
 
             // note: the block below is disabled, because it does not work, because collection builders
             //       are singletons, and constructor dependencies don't work on singletons, see
@@ -251,18 +222,7 @@ namespace Umbraco.Core.Composing.LightInject
             smp.EnablePerWebRequestScope();
         }
 
-        private class AssemblyScanner : IAssemblyScanner
-        {
-            public void Scan(Assembly assembly, IServiceRegistry serviceRegistry, Func<ILifetime> lifetime, Func<Type, Type, bool> shouldRegister, Func<Type, Type, string> serviceNameProvider)
-            {
-                // nothing - we don't want LightInject to scan
-            }
-
-            public void Scan(Assembly assembly, IServiceRegistry serviceRegistry)
-            {
-                // nothing - we don't want LightInject to scan
-            }
-        }
+       
 
         #endregion
     }
