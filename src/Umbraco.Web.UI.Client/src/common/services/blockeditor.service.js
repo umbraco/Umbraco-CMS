@@ -152,6 +152,7 @@
                 }
 
                 var blockModel = {};
+                blockModel.key = String.CreateGuid();
                 blockModel.config = angular.copy(blockConfiguration);
                 blockModel.labelInterpolator = $interpolate(blockModel.config.label);
 

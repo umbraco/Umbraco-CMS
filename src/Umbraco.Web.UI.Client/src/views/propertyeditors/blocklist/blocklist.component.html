@@ -5,7 +5,7 @@
 
         <div ui-sortable="vm.sortableOptions" ng-model="vm.blocks">
 
-            <div ng-repeat="blockItem in vm.blocks">
+            <div ng-repeat="blockItem in vm.blocks track by blockItem.key">
 
                 <button
                     type="button"
