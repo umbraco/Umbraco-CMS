@@ -49,6 +49,28 @@
             contentModel[alias] = value;
         }
 
+        /**
+         * Map property values from an ElementTypeModel to another ElementTypeModel.
+         * Used to tricker watchers for synchronization.
+         * @param {Object} fromModel ElementTypeModel to recive property values from.
+         * @param {Object} toModel ElementTypeModel to recive property values from.
+         */
+        function mapElementTypeValues(fromModel, toModel) {
+            var fromVariant = fromModel.variants[0];
+            var toVariant = toModel.variants[0];
+            
+            for (var t = 0; t < fromVariant.tabs.length; t++) {
+                var fromTab = fromVariant.tabs[t];
+                var toTab = toVariant.tabs[t];
+
+                for (var p = 0; p < fromTab.properties.length; p++) {
+                    var fromProp = fromTab.properties[p];
+                    var toProp = toTab.properties[p];
+                    toProp.value = fromProp.value;
+                }
+            }
+        }
+
 
         /**
         * @ngdoc factory
@@ -281,6 +303,7 @@
             createModelObject: function(propertyModelValue, propertyEditorAlias, blockConfigurations) {
                 return new BlockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations);
             },
+            mapElementTypeValues: mapElementTypeValues, 
             getBlockLabel: function(blockModel) {
     
                 

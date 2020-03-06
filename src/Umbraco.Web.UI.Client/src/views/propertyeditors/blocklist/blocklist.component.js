@@ -32,7 +32,7 @@
         vm.moveFocusToBlock = null;
         vm.showCopy = clipboardService.isSupported();
 
-        vm.layout = [];// The layout object specific to this Block Editor, will be a direct reference from Property Model.
+        var layout = [];// The layout object specific to this Block Editor, will be a direct reference from Property Model.
         vm.blocks = [];// Runtime list of block models, needs to be synced to property model on form submit.
         vm.availableBlockTypes = [];// Available block entries of this property editor.
 
@@ -51,8 +51,14 @@
 
             vm.validationLimit = vm.model.config.validationLimit;
             
-            vm.model.value = vm.model.value || {};
-    
+            console.log("Model TESTS:", vm.model.value === null, typeof vm.model.value !== 'object')
+
+            // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
+            if(vm.model.value === null || typeof vm.model.value !== 'object') {// testing if we have null or undefined value or if the value is set to another type than Object.
+                vm.model.value = {};
+            }
+            
+            // Create Model Object, to manage our data for this Block Editor.
             modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks);
             modelObject.loadScaffolding().then(onLoaded);
 
@@ -92,10 +98,11 @@
         
         function onLoaded() {
 
-            vm.layout = modelObject.getLayout();
+            // Store a reference to the layout model, because we need to maintain this model.
+            layout = modelObject.getLayout();
 
-            // maps layout entries to editor friendly models.
-            vm.layout.forEach(entry => {
+            // maps layout entries to editor friendly models aka. BlockModels.
+            layout.forEach(entry => {
                 var block = getBlockModel(entry);
                 if(block !== null) {
                     vm.blocks.push(block);
@@ -115,6 +122,7 @@
 
             if (block === null) return null;
 
+            // Lets apply fallback views, and make the view available directly on the blockModel.
             block.view = block.config.view || vm.model.config.useInlineEditingAsDefault ? "views/blockelements/inlineblock/inlineblock.editor.html" : "views/blockelements/labelblock/labelblock.editor.html";
 
             return block;
@@ -135,12 +143,15 @@
                 return false;
             }
             
+            // If we reach this line, we are good to add the layoutEntry and blockModel to our models.
+
             // add layout entry at the decired location in layout.
-            vm.layout.splice(index, 0, layoutEntry);
+            layout.splice(index, 0, layoutEntry);
 
             // apply block model at decired location in blocks.
             vm.blocks.splice(index, 0, blockModel);
             
+            // lets move focus to this new block.
             vm.moveFocusToBlock = blockModel;
 
             return true;
@@ -154,7 +165,7 @@
             if(index !== -1) {
                 vm.blocks.splice(index, 1);
 
-                var layoutIndex = vm.layout.findIndex(entry => entry.udi === block.udi);
+                var layoutIndex = layout.findIndex(entry => entry.udi === block.udi);
                 if(layoutIndex !== -1) {
                     vm.layout.splice(index, 1);
                 }
@@ -178,9 +189,7 @@
                 view: "views/common/infiniteeditors/elementeditor/elementeditor.html",
                 size: blockModel.config.overlaySize || "medium",
                 submit: function(elementEditorModel) {
-                    blockModel.content = elementEditorModel.content;
-                    // TODO, investigate if we need to call a sync, for this scenario to work.. Concern is regarding wether the property-value watcher will pick this up.
-                    //modelObject.setDataFromBlockModel(block);
+                    blockEditorService.mapElementTypeValues(elementEditorModel.content, blockModel.content)
                     editorService.close();
                 },
                 close: function() {
@@ -316,7 +325,7 @@
             }
             
             // insert layout entry at the decired location in layout.
-            vm.layout.splice(index, 0, layoutEntry);
+            layout.splice(index, 0, layoutEntry);
 
             // insert block model at the decired location in blocks.
             vm.blocks.splice(index, 0, blockModel);
@@ -389,9 +398,9 @@
                 var moveToIndex = ui.item.index();
 
                 if (moveToIndex > -1 && moveFromIndex !== moveToIndex) {
-                    var movedEntry = vm.layout[moveFromIndex];
-                    vm.layout.splice(moveFromIndex, 1);
-                    vm.layout.splice(moveToIndex, 0, movedEntry);
+                    var movedEntry = layout[moveFromIndex];
+                    layout.splice(moveFromIndex, 1);
+                    layout.splice(moveToIndex, 0, movedEntry);
                 }
 
                 $scope.$evalAsync(function () {
@@ -435,16 +444,7 @@
 
 
         unsubscribe.push($scope.$watch(() => vm.blocks.length, onAmountOfBlocksChanged));
-        /*
-        unsubscribe.push($scope.$on("formSubmitting", function (ev, args) {
-
-            console.log("formSubmitting is happening, we need to make sure sub property editors are synced first.")
-
-            console.log(vm.layout, vm.model.value);
-
-            //sync();
-        }));
-        */
+        
         $scope.$on("$destroy", function () {
             for (const subscription of unsubscribe) {
                 subscription();
