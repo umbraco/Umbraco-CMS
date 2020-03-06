@@ -67,7 +67,7 @@
     <key alias="save">Salvar</key>
     <key alias="saveAndPublish">Salvar e publicar</key>
     <key alias="saveToPublish">Salvar e mandar para aprovação</key>
-    <key alias="showPage">Prévia</key>
+    <key alias="saveAndPreview">Prévia</key>
     <key alias="styleChoose">Escolha estilo</key>
     <key alias="styleShow">Mostrar estilos</key>
     <key alias="tableInsert">Inserir tabela</key>

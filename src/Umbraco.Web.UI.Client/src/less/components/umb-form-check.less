@@ -1,5 +1,8 @@
-@checkboxWidth: 16px;
-@checkboxHeight: 16px;
+@checkboxWidth: 18px;
+@checkboxHeight: 18px;
+label.umb-form-check--checkbox{
+    margin:3px 0;
+}
 
 .umb-form-check {
     display: flex;
@@ -10,11 +13,11 @@
     cursor: pointer !important;
 
     .umb-form-check__symbol {
-        margin-top: 1px;
+        margin-top: 4px;
         margin-right: 10px;
     }
     .umb-form-check__info {
-
+        margin-left:20px;
     }
     
 
@@ -95,6 +98,10 @@
     &__state {
         display: flex;
         height: 18px;
+        position: absolute;
+        margin-top: 2px;
+        top: 0;
+        left: -1px;
     }
 
     &__check {

@@ -178,7 +178,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>For generic properties, the value is <c>null</c>.</remarks>
         [DataMember]
-        internal Lazy<int> PropertyGroupId
+        public Lazy<int> PropertyGroupId
         {
             get => _propertyGroupId;
             set => SetPropertyValueAndDetectChanges(value, ref _propertyGroupId, nameof(PropertyGroupId));

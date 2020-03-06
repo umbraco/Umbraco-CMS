@@ -85,7 +85,7 @@
     <key alias="save">Kaydet</key>
     <key alias="saveAndPublish">Kaydet ve Yayınla</key>
     <key alias="saveToPublish">Kaydet ve Onay için gönder</key>
-    <key alias="showPage">Önizle</key>
+    <key alias="saveAndPreview">Önizle</key>
     <key alias="showPageDisabled">Önizleme kapalı, Atanmış şablon yok</key>
     <key alias="styleChoose">Stili seçin</key>
     <key alias="styleShow">Stilleri Göster</key>
