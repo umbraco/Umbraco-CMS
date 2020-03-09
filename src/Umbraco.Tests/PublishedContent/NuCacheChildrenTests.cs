@@ -143,7 +143,7 @@ namespace Umbraco.Tests.PublishedContent
             // create a data source for NuCache
             _source = new TestDataSource(kits);
 
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly.GetName().Name));
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly));
             var settings = Mock.Of<INuCacheSettings>();
 
 

@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Cache
         public override void Setup()
         {
             base.Setup();
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly.GetName().Name));
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly));
             _provider = new ObjectCacheAppCache(typeFinder);
         }
 

@@ -370,7 +370,7 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         /// <returns></returns>
         protected virtual ITypeFinder GetTypeFinder()
-            => new TypeFinder(Logger, new DefaultUmbracoAssemblyProvider(Assembly.GetEntryAssembly()?.GetName()?.Name));
+            => new TypeFinder(Logger, new DefaultUmbracoAssemblyProvider(Assembly.GetEntryAssembly()));
 
 
         /// <summary>

@@ -103,7 +103,8 @@ namespace Umbraco.Core.Composing
         /// NOTE the comma vs period... comma delimits the name in an Assembly FullName property so if it ends with comma then its an exact name match
         /// NOTE this means that "foo." will NOT exclude "foo.dll" but only "foo.*.dll"
         /// </remarks>
-        private static readonly string[] KnownAssemblyExclusionFilter = {
+        internal static readonly string[] KnownAssemblyExclusionFilter = {
+            "mscorlib",
             "Antlr3.",
             "AutoMapper,",
             "AutoMapper.",
@@ -539,7 +540,7 @@ namespace Umbraco.Core.Composing
     }
 
     /// <summary>
-    /// Provides a list of loaded assemblies that can be scanned
+    /// Provides a list of assemblies that can be scanned
     /// </summary>
     public interface IAssemblyProvider
     {
@@ -547,238 +548,77 @@ namespace Umbraco.Core.Composing
     }
 
     /// <summary>
-    /// Discovers assemblies that are part of the Umbraco application using the DependencyContext.
+    /// Returns a list of scannable assemblies based on an entry point assembly and it's references
     /// </summary>
     /// <remarks>
-    /// Happily "borrowed" from aspnet: https://github.com/aspnet/Mvc/blob/230a13d0e13e4c7e192bc6623762bfd4cde726ef/src/Microsoft.AspNetCore.Mvc.Core/Internal/DefaultAssemblyPartDiscoveryProvider.cs
-    /// 
-    /// TODO: Happily borrow their unit tests too
+    /// This will recursively search through the entry point's assemblies and Umbraco's core assemblies (Core/Web) and their references
+    /// to create a list of scannable assemblies based on whether they themselves or their transitive dependencies reference Umbraco core assemblies.
     /// </remarks>
     public class DefaultUmbracoAssemblyProvider : IAssemblyProvider
     {
-        private readonly string _entryPointAssemblyName;
+        private readonly Assembly _entryPointAssembly;
+        private static readonly string[] UmbracoCoreAssemblyNames = new[] { "Umbraco.Core", "Umbraco.Web" };
 
-        public DefaultUmbracoAssemblyProvider(string entryPointAssemblyName)
+        public DefaultUmbracoAssemblyProvider(Assembly entryPointAssembly)
         {
-            if (string.IsNullOrWhiteSpace(entryPointAssemblyName))
-                throw new ArgumentException($"{entryPointAssemblyName} cannot be null or empty", nameof(entryPointAssemblyName));
-
-            _entryPointAssemblyName = entryPointAssemblyName;
+            _entryPointAssembly = entryPointAssembly ?? throw new ArgumentNullException(nameof(entryPointAssembly));
         }
 
         public IEnumerable<Assembly> Assemblies
         {
             get
             {
-                var finder = new FindAssembliesWithReferencesTo(new[] { _entryPointAssemblyName }, new[] { "Umbraco.Core" });
+                var finder = new FindAssembliesWithReferencesTo(new[] { _entryPointAssembly }, UmbracoCoreAssemblyNames, true);
                 foreach(var found in finder.Find())
                 {
-                    yield return Assembly.Load(found);
+                    yield return found;
                 }
             }
         }
-
-        //public IEnumerable<Assembly> Assemblies => DiscoverAssemblyParts(_entryPointAssemblyName);
-
-        //internal static HashSet<string> ReferenceAssemblies { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        //{
-        //    "Umbraco.Core",
-        //    "Umbraco.Web"
-        //};
-
-        //internal static IEnumerable<Assembly> DiscoverAssemblyParts(string entryPointAssemblyName)
-        //{
-        //    var entryAssembly = Assembly.Load(new AssemblyName(entryPointAssemblyName));
-        //    var context = DependencyContext.Load(entryAssembly);
-
-        //    var candidates = GetCandidateAssemblies(entryAssembly, context);
-
-        //    return candidates;
-        //}
-
-        //internal static IEnumerable<Assembly> GetCandidateAssemblies(Assembly entryAssembly, DependencyContext dependencyContext)
-        //{
-        //    if (dependencyContext == null)
-        //    {
-        //        // Use the entry assembly as the sole candidate.
-        //        return new[] { entryAssembly };
-        //    }
-
-        //    //includeRefLibs == true - so that Umbraco.Core is also returned!
-        //    return GetCandidateLibraries(dependencyContext, includeRefLibs: true)
-        //        .SelectMany(library => library.GetDefaultAssemblyNames(dependencyContext))
-        //        .Select(Assembly.Load);
-        //}
-
-        ///// <summary>
-        ///// Returns a list of libraries that references the assemblies in <see cref="ReferenceAssemblies"/>.       
-        ///// </summary>
-        ///// <param name="dependencyContext"></param>
-        ///// <param name="includeRefLibs">
-        ///// True to also include libs in the ReferenceAssemblies list
-        ///// </param>
-        ///// <returns></returns>
-        //internal static IEnumerable<RuntimeLibrary> GetCandidateLibraries(DependencyContext dependencyContext, bool includeRefLibs)
-        //{
-        //    if (ReferenceAssemblies == null)
-        //    {
-        //        return Enumerable.Empty<RuntimeLibrary>();
-        //    }
-
-        //    var candidatesResolver = new CandidateResolver(dependencyContext.RuntimeLibraries, ReferenceAssemblies, includeRefLibs);
-        //    return candidatesResolver.GetCandidates();
-        //}
-
-        //private class CandidateResolver
-        //{
-        //    private readonly bool _includeRefLibs;
-        //    private readonly IDictionary<string, Dependency> _dependencies;
-
-        //    /// <summary>
-        //    /// Constructor
-        //    /// </summary>
-        //    /// <param name="dependencies"></param>
-        //    /// <param name="referenceAssemblies"></param>
-        //    /// <param name="includeRefLibs">
-        //    /// True to also include libs in the ReferenceAssemblies list
-        //    /// </param>
-        //    public CandidateResolver(IEnumerable<RuntimeLibrary> dependencies, ISet<string> referenceAssemblies, bool includeRefLibs)
-        //    {
-        //        _includeRefLibs = includeRefLibs;
-
-        //        _dependencies = dependencies
-        //            .ToDictionary(d => d.Name, d => CreateDependency(d, referenceAssemblies), StringComparer.OrdinalIgnoreCase);
-        //    }
-
-        //    /// <summary>
-        //    /// Create a Dependency
-        //    /// </summary>
-        //    /// <param name="library"></param>
-        //    /// <param name="referenceAssemblies"></param>            
-        //    /// <returns></returns>
-        //    private static Dependency CreateDependency(RuntimeLibrary library, ISet<string> referenceAssemblies)
-        //    {
-        //        var classification = DependencyClassification.Unknown;
-        //        if (referenceAssemblies.Contains(library.Name))
-        //        {
-        //            classification = DependencyClassification.UmbracoReference;
-        //        }
-
-        //        return new Dependency(library, classification);
-        //    }
-
-        //    private DependencyClassification ComputeClassification(string dependency)
-        //    {
-        //        Debug.Assert(_dependencies.ContainsKey(dependency));
-
-        //        var candidateEntry = _dependencies[dependency];
-        //        if (candidateEntry.Classification != DependencyClassification.Unknown)
-        //        {
-        //            return candidateEntry.Classification;
-        //        }
-        //        else
-        //        {
-        //            var classification = DependencyClassification.NotCandidate;
-        //            foreach (var candidateDependency in candidateEntry.Library.Dependencies)
-        //            {
-        //                var dependencyClassification = ComputeClassification(candidateDependency.Name);
-        //                if (dependencyClassification == DependencyClassification.Candidate ||
-        //                    dependencyClassification == DependencyClassification.UmbracoReference)
-        //                {
-        //                    classification = DependencyClassification.Candidate;
-        //                    break;
-        //                }
-        //            }
-
-        //            candidateEntry.Classification = classification;
-
-        //            return classification;
-        //        }
-        //    }
-
-        //    public IEnumerable<RuntimeLibrary> GetCandidates()
-        //    {
-        //        foreach (var dependency in _dependencies)
-        //        {
-        //            var classification = ComputeClassification(dependency.Key);
-        //            if (classification == DependencyClassification.Candidate ||
-        //                    //if the flag is set, also ensure to include any UmbracoReference classifications
-        //                    (_includeRefLibs && classification == DependencyClassification.UmbracoReference))
-        //            {
-        //                yield return dependency.Value.Library;
-        //            }
-        //        }
-        //    }
-
-        //    private class Dependency
-        //    {
-        //        public Dependency(RuntimeLibrary library, DependencyClassification classification)
-        //        {
-        //            Library = library;
-        //            Classification = classification;
-        //        }
-
-        //        public RuntimeLibrary Library { get; }
-
-        //        public DependencyClassification Classification { get; set; }
-
-        //        public override string ToString()
-        //        {
-        //            return $"Library: {Library.Name}, Classification: {Classification}";
-        //        }
-        //    }
-
-        //    private enum DependencyClassification
-        //    {
-        //        Unknown = 0,
-        //        Candidate = 1,
-        //        NotCandidate = 2,
-        //        UmbracoReference = 3
-        //    }
-        //}
     }
 
     /// <summary>
     /// Resolves assemblies that reference one of the specified "targetAssemblies" either directly or transitively.
     /// </summary>
-    public class ReferenceResolver
+    /// <remarks>
+    /// Borrowed and modified from https://github.com/dotnet/aspnetcore-tooling/blob/master/src/Razor/src/Microsoft.NET.Sdk.Razor/ReferenceResolver.cs
+    /// </remarks>
+    internal class ReferenceResolver
     {
-        private readonly HashSet<string> _mvcAssemblies;
-        private readonly IReadOnlyList<AssemblyItem> _assemblyItems;
-        private readonly Dictionary<AssemblyItem, Classification> _classifications;
+        private readonly HashSet<string> _umbracoAssemblies;
+        private readonly IReadOnlyList<Assembly> _assemblyItems;
+        private readonly Dictionary<Assembly, Classification> _classifications;
+        private readonly List<Assembly> _lookup = new List<Assembly>();
 
-        public ReferenceResolver(IReadOnlyList<string> targetAssemblies, IReadOnlyList<AssemblyItem> assemblyItems)
+        public ReferenceResolver(IReadOnlyList<string> targetAssemblies, IReadOnlyList<Assembly> assemblyItems)
         {
-            _mvcAssemblies = new HashSet<string>(targetAssemblies, StringComparer.Ordinal);
+            _umbracoAssemblies = new HashSet<string>(targetAssemblies, StringComparer.Ordinal);
             _assemblyItems = assemblyItems;
-            _classifications = new Dictionary<AssemblyItem, Classification>();
+            _classifications = new Dictionary<Assembly, Classification>();
 
-            Lookup = new Dictionary<string, AssemblyItem>(StringComparer.Ordinal);
             foreach (var item in assemblyItems)
             {
-                Lookup[item.AssemblyName] = item;
+                _lookup.Add(item);
             }
         }
 
-        protected Dictionary<string, AssemblyItem> Lookup { get; }
-
-        public IReadOnlyList<string> ResolveAssemblies()
+        public IEnumerable<Assembly> ResolveAssemblies()
         {
-            var applicationParts = new List<string>();
+            var applicationParts = new List<Assembly>();
 
             foreach (var item in _assemblyItems)
             {
                 var classification = Resolve(item);
-                if (classification == Classification.ReferencesMvc)
+                if (classification == Classification.ReferencesUmbraco || classification == Classification.IsUmbraco)
                 {
-                    applicationParts.Add(item.AssemblyName);
+                    applicationParts.Add(item);
                 }
             }
 
             return applicationParts;
         }
 
-        private Classification Resolve(AssemblyItem assemblyItem)
+        private Classification Resolve(Assembly assemblyItem)
         {
             if (_classifications.TryGetValue(assemblyItem, out var classification))
             {
@@ -789,37 +629,21 @@ namespace Umbraco.Core.Composing
             classification = Classification.Unknown;
             _classifications[assemblyItem] = classification;
 
-            if (assemblyItem.Path == null)
+            if (_umbracoAssemblies.Contains(assemblyItem.GetName().Name))
             {
-                // We encountered a dependency that isn't part of this assembly's dependency set. We'll see if it happens to be an MVC assembly
-                // since that's the only useful determination we can make given the assembly name.
-                classification = _mvcAssemblies.Contains(assemblyItem.AssemblyName) ?
-                    Classification.IsMvc :
-                    Classification.DoesNotReferenceMvc;
-            }
-            else if (assemblyItem.IsFrameworkReference)
-            {
-                // We do not allow transitive references to MVC via a framework reference to count.
-                // e.g. depending on Microsoft.AspNetCore.SomeThingNewThatDependsOnMvc would not result in an assembly being treated as
-                // referencing MVC.
-                classification = _mvcAssemblies.Contains(assemblyItem.AssemblyName) ?
-                    Classification.IsMvc :
-                    Classification.DoesNotReferenceMvc;
-            }
-            else if (_mvcAssemblies.Contains(assemblyItem.AssemblyName))
-            {
-                classification = Classification.IsMvc;
+                classification = Classification.IsUmbraco;
             }
             else
             {
-                classification = Classification.DoesNotReferenceMvc;
-                foreach (var reference in GetReferences(assemblyItem.Path))
+                classification = Classification.DoesNotReferenceUmbraco;
+                foreach (var reference in GetReferences(assemblyItem))
                 {
+                    // recurse
                     var referenceClassification = Resolve(reference);
 
-                    if (referenceClassification == Classification.IsMvc || referenceClassification == Classification.ReferencesMvc)
+                    if (referenceClassification == Classification.IsUmbraco || referenceClassification == Classification.ReferencesUmbraco)
                     {
-                        classification = Classification.ReferencesMvc;
+                        classification = Classification.ReferencesUmbraco;
                         break;
                     }
                 }
@@ -830,139 +654,82 @@ namespace Umbraco.Core.Composing
             return classification;
         }
 
-        protected virtual IReadOnlyList<AssemblyItem> GetReferences(string file)
-        {
-            try
+        protected virtual IEnumerable<Assembly> GetReferences(Assembly assembly)
+        {            
+            foreach (var referenceName in assembly.GetReferencedAssemblies())
             {
-                if (!File.Exists(file))
+                // don't include if this is excluded
+                if (TypeFinder.KnownAssemblyExclusionFilter.Any(f => referenceName.FullName.StartsWith(f)))
+                    continue;
+
+                var reference = Assembly.Load(referenceName);
+                if (!_lookup.Contains(reference))
                 {
-                    throw new ReferenceAssemblyNotFoundException(file);
-                }
+                    // A dependency references an item that isn't referenced by this project.
+                    // We'll construct an item for so that we can calculate the classification based on it's name.
 
-                using var peReader = new PEReader(File.OpenRead(file));
-                if (!peReader.HasMetadata)
-                {
-                    return Array.Empty<AssemblyItem>(); // not a managed assembly
-                }
+                    _lookup.Add(reference);
 
-                var metadataReader = peReader.GetMetadataReader();
-
-                var references = new List<AssemblyItem>();
-                foreach (var handle in metadataReader.AssemblyReferences)
-                {
-                    var reference = metadataReader.GetAssemblyReference(handle);
-                    var referenceName = metadataReader.GetString(reference.Name);
-
-                    if (!Lookup.TryGetValue(referenceName, out var assemblyItem))
-                    {
-                        // A dependency references an item that isn't referenced by this project.
-                        // We'll construct an item for so that we can calculate the classification based on it's name.
-                        assemblyItem = new AssemblyItem
-                        {
-                            AssemblyName = referenceName,
-                        };
-
-                        Lookup[referenceName] = assemblyItem;
-                    }
-
-                    references.Add(assemblyItem);
-                }
-
-                return references;
+                    yield return reference;
+                }                
             }
-            catch (BadImageFormatException)
-            {
-                // not a PE file, or invalid metadata
-            }
-
-            return Array.Empty<AssemblyItem>(); // not a managed assembly
         }
 
         protected enum Classification
         {
             Unknown,
-            DoesNotReferenceMvc,
-            ReferencesMvc,
-            IsMvc,
+            DoesNotReferenceUmbraco,
+            ReferencesUmbraco,
+            IsUmbraco,
         }
     }
 
-    public class AssemblyItem
+
+    /// <summary>
+    /// Finds Assemblies from the entry point assemblies, it's dependencies and it's transitive dependencies that reference that targetAssemblyNames
+    /// </summary>
+    /// <remarkes>
+    /// borrowed and modified from here https://github.com/dotnet/aspnetcore-tooling/blob/master/src/Razor/src/Microsoft.NET.Sdk.Razor/FindAssembliesWithReferencesTo.cs
+    /// </remarkes>
+    internal class FindAssembliesWithReferencesTo 
     {
-        public string Path { get; set; }
+        private readonly Assembly[] _referenceAssemblies;
+        private readonly string[] _targetAssemblies;
+        private readonly bool _includeTargets;
 
-        public bool IsFrameworkReference { get; set; }
-
-        public string AssemblyName { get; set; }
-    }
-
-    internal class ReferenceAssemblyNotFoundException : Exception
-    {
-        public ReferenceAssemblyNotFoundException(string fileName)
-        {
-            FileName = fileName;
-        }
-
-        public string FileName { get; }
-    }
-
-    // borrowed from here https://github.com/dotnet/aspnetcore-tooling/blob/master/src/Razor/src/Microsoft.NET.Sdk.Razor/FindAssembliesWithReferencesTo.cs
-    public class FindAssembliesWithReferencesTo 
-    {
-        private readonly string[] _referenceAssemblies;
-        private readonly string[] _targetAssemblyNames;
-
-        public FindAssembliesWithReferencesTo(string[] referenceAssemblies, string[] targetAssemblyNames)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="referenceAssemblies">Entry point assemblies</param>
+        /// <param name="targetAssemblyNames">Used to check if the entry point or it's transitive assemblies reference these assembly names</param>
+        /// <param name="includeTargets">If true will also use the target assembly names as entry point assemblies</param>
+        public FindAssembliesWithReferencesTo(Assembly[] referenceAssemblies, string[] targetAssemblyNames, bool includeTargets)
         {
             _referenceAssemblies = referenceAssemblies;
-            _targetAssemblyNames = targetAssemblyNames;
+            _targetAssemblies = targetAssemblyNames;
+            _includeTargets = includeTargets;
         }
 
-        public IEnumerable<string> Find()
+        public IEnumerable<Assembly> Find()
         {
-            var referenceItems = new List<AssemblyItem>();
-            foreach (var item in _referenceAssemblies)
+            var referenceItems = new List<Assembly>();
+            foreach (var assembly in _referenceAssemblies)
             {
-                //var assemblyName = new AssemblyName(item).Name;
-                var assembly = Assembly.Load(item);
-                referenceItems.Add(new AssemblyItem
+                referenceItems.Add(assembly);
+            }
+
+            if (_includeTargets)
+            {
+                foreach(var target in _targetAssemblies)
                 {
-                    AssemblyName = assembly.GetName().Name, //assemblyName,
-                    IsFrameworkReference = false,
-                    Path = GetAssemblyLocation(assembly)
-                });
+                    referenceItems.Add(Assembly.Load(target));
+                }
             }
 
-            var provider = new ReferenceResolver(_targetAssemblyNames, referenceItems);
-            try
-            {
-                var assemblyNames = provider.ResolveAssemblies();
-                return assemblyNames.ToArray();
-            }
-            catch (ReferenceAssemblyNotFoundException ex)
-            {
-                throw;
-                //// Print a warning and return. We cannot produce a correct document at this point.
-                //var warning = "Reference assembly {0} could not be found. This is typically caused by build errors in referenced projects.";
-                //Log.LogWarning(null, "RAZORSDK1007", null, null, 0, 0, 0, 0, warning, ex.FileName);
-                //return true;
-            }
-            catch (Exception ex)
-            {
-                throw;
-                //Log.LogErrorFromException(ex);
-            }
+            var provider = new ReferenceResolver(_targetAssemblies, referenceItems);
+            var assemblyNames = provider.ResolveAssemblies();
+            return assemblyNames.ToList();
         }
 
-        internal static string GetAssemblyLocation(Assembly assembly)
-        {
-            if (Uri.TryCreate(assembly.CodeBase, UriKind.Absolute, out var result) &&
-                result.IsFile && string.IsNullOrWhiteSpace(result.Fragment))
-            {
-                return result.LocalPath;
-            }
-
-            return assembly.Location;
-        }
     }
 }

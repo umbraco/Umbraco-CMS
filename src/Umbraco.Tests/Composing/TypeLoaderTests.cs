@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Composing
         public void Initialize()
         {
             // this ensures it's reset
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly.GetName().Name));
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly));
             _typeLoader = new TypeLoader(TestHelper.IOHelper, typeFinder, NoAppCache.Instance,
                 new DirectoryInfo(TestHelper.IOHelper.MapPath("~/App_Data/TEMP")),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()), false,
