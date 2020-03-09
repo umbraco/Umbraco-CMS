@@ -46,14 +46,12 @@ namespace Umbraco.Core.Composing
             var assemblies = new HashSet<Assembly>(_assemblies);
 
             // Get the unique directories of the assemblies
-            var assemblyLocations = GetAssemblyLocations(assemblies).ToList();
+            var assemblyLocations = GetAssemblyFolders(assemblies).ToList();
 
             // Load in each assembly in the directory of the entry assembly to be included in the search
             // for Umbraco dependencies/transitive dependencies
-            foreach(var location in assemblyLocations)
-            {
-                var dir = Path.GetDirectoryName(location);
-                
+            foreach(var dir in assemblyLocations)
+            {   
                 foreach(var dll in Directory.EnumerateFiles(dir, "*.dll"))
                 {
                     var assemblyName = AssemblyName.GetAssemblyName(dll);
@@ -85,9 +83,9 @@ namespace Umbraco.Core.Composing
         }
 
 
-        private IEnumerable<string> GetAssemblyLocations(IEnumerable<Assembly> assemblies)
+        private IEnumerable<string> GetAssemblyFolders(IEnumerable<Assembly> assemblies)
         {
-            return assemblies.Select(x => GetAssemblyLocation(x).ToLowerInvariant()).Distinct();
+            return assemblies.Select(x => Path.GetDirectoryName(GetAssemblyLocation(x)).ToLowerInvariant()).Distinct();
         }
 
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Mvc/Mvc.Core/src/ApplicationParts/RelatedAssemblyAttribute.cs
@@ -102,25 +100,30 @@ namespace Umbraco.Core.Composing
             return assembly.Location;
         }
 
-        private Classification Resolve(Assembly assemblyItem)
+        private Classification Resolve(Assembly assembly)
         {
-            if (_classifications.TryGetValue(assemblyItem, out var classification))
+            if (_classifications.TryGetValue(assembly, out var classification))
             {
                 return classification;
             }
 
             // Initialize the dictionary with a value to short-circuit recursive references.
             classification = Classification.Unknown;
-            _classifications[assemblyItem] = classification;
-
-            if (_umbracoAssemblies.Contains(assemblyItem.GetName().Name))
+            _classifications[assembly] = classification;
+            
+            if (TypeFinder.KnownAssemblyExclusionFilter.Any(f => assembly.FullName.StartsWith(f, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                // if its part of the filter it doesn't reference umbraco
+                classification = Classification.DoesNotReferenceUmbraco;
+            }                
+            else if (_umbracoAssemblies.Contains(assembly.GetName().Name))
             {
                 classification = Classification.IsUmbraco;
             }
             else
             {
                 classification = Classification.DoesNotReferenceUmbraco;
-                foreach (var reference in GetReferences(assemblyItem))
+                foreach (var reference in GetReferences(assembly))
                 {
                     // recurse
                     var referenceClassification = Resolve(reference);
@@ -134,7 +137,7 @@ namespace Umbraco.Core.Composing
             }
 
             Debug.Assert(classification != Classification.Unknown);
-            _classifications[assemblyItem] = classification;
+            _classifications[assembly] = classification;
             return classification;
         }
 
@@ -147,15 +150,15 @@ namespace Umbraco.Core.Composing
                     continue;
 
                 var reference = Assembly.Load(referenceName);
+
                 if (!_lookup.Contains(reference))
                 {
                     // A dependency references an item that isn't referenced by this project.
-                    // We'll construct an item for so that we can calculate the classification based on it's name.
+                    // We'll add this reference so that we can calculate the classification.
 
-                    _lookup.Add(reference);
-
-                    yield return reference;
-                }                
+                    _lookup.Add(reference);                    
+                }
+                yield return reference;
             }
         }
 

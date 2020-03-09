@@ -94,7 +94,9 @@ namespace Umbraco.Core.Composing
         /// NOTE this means that "foo." will NOT exclude "foo.dll" but only "foo.*.dll"
         /// </remarks>
         internal static readonly string[] KnownAssemblyExclusionFilter = {
-            "mscorlib",
+            "mscorlib,",
+            "netstandard,",
+            "System,",
             "Antlr3.",
             "AutoMapper,",
             "AutoMapper.",
@@ -148,6 +150,7 @@ namespace Umbraco.Core.Composing
             "ImageProcessor",
             "MiniProfiler.",
             "Owin,",
+            "SQLite",
         };
 
         /// <summary>

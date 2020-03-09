@@ -45,7 +45,9 @@ namespace Umbraco.Tests.TestHelpers
 
         public static ITypeFinder GetTypeFinder()
         {
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(typeof(TestHelper).Assembly));
+            
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>(),                
+                new DefaultUmbracoAssemblyProvider(typeof(TestHelper).Assembly));
             return typeFinder;
         }
 

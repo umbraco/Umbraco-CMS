@@ -125,6 +125,10 @@ namespace Umbraco.Tests.Runtimes
 
             }
 
+            // override because we cannot use Assembly.GetEntryAssembly in Nunit tests since that is always null
+            protected override ITypeFinder GetTypeFinder()
+                => new TypeFinder(Logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly));
+
             // must override the database factory
             // else BootFailedException because U cannot connect to the configured db
             protected internal override IUmbracoDatabaseFactory GetDatabaseFactory()

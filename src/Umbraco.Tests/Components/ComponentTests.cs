@@ -378,7 +378,8 @@ namespace Umbraco.Tests.Components
             var composition = new Composition(register, typeLoader, Mock.Of<IProfilingLogger>(),
                 MockRuntimeState(RuntimeLevel.Run), Configs, TestHelper.IOHelper, AppCaches.NoCache);
 
-            var types = typeLoader.GetTypes<IComposer>().Where(x => x.FullName.StartsWith("Umbraco.Core.") || x.FullName.StartsWith("Umbraco.Web"));
+            var allComposers = typeLoader.GetTypes<IComposer>().ToList();
+            var types = allComposers.Where(x => x.FullName.StartsWith("Umbraco.Core.") || x.FullName.StartsWith("Umbraco.Web")).ToList();
             var composers = new Composers(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<IProfilingLogger>());
             var requirements = composers.GetRequirements();
             var report = Composers.GetComposersReport(requirements);
