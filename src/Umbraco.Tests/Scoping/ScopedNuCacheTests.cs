@@ -85,7 +85,7 @@ namespace Umbraco.Tests.Scoping
             var memberRepository = Mock.Of<IMemberRepository>();
             var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly));
+            var typeFinder = TestHelper.GetTypeFinder();
             var settings = Mock.Of<INuCacheSettings>();
 
             return new PublishedSnapshotService(

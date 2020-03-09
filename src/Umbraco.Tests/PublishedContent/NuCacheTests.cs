@@ -184,7 +184,7 @@ namespace Umbraco.Tests.PublishedContent
             // create a variation accessor
             _variationAccesor = new TestVariationContextAccessor();
 
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly));
+            var typeFinder = TestHelper.GetTypeFinder();
             var settings = Mock.Of<INuCacheSettings>();
 
             // at last, create the complete NuCache snapshot service!

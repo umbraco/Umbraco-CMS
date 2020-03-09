@@ -22,6 +22,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Models
 {
@@ -269,7 +270,8 @@ namespace Umbraco.Tests.Models
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
 
-            var runtimeCache = new ObjectCacheAppCache(new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly)));
+            var typeFinder = TestHelper.GetTypeFinder();
+            var runtimeCache = new ObjectCacheAppCache(typeFinder);
             runtimeCache.Insert(content.Id.ToString(CultureInfo.InvariantCulture), () => content);
 
             var proflog = GetTestProfilingLogger();

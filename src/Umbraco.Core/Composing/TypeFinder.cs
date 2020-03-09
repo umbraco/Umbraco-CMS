@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Metadata;
-using System.Reflection.PortableExecutable;
 using System.Security;
 using System.Text;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Composing
@@ -20,11 +15,6 @@ namespace Umbraco.Core.Composing
     {
         private readonly ILogger _logger;
         private readonly IAssemblyProvider _assemblyProvider;
-
-        //public TypeFinder(ILogger logger, ITypeFinderConfig typeFinderConfig = null)
-        //    : this(logger, new DefaultUmbracoAssemblyProvider(Assembly.GetEntryAssembly()?.GetName()?.Name), typeFinderConfig)
-        //{
-        //}
 
         public TypeFinder(ILogger logger, IAssemblyProvider assemblyProvider, ITypeFinderConfig typeFinderConfig = null)
         {
@@ -151,7 +141,9 @@ namespace Umbraco.Core.Composing
             "WebDriver,",
             "itextsharp,",
             "mscorlib,",
-            "nunit.framework,",
+            "NUnit,",
+            "NUnit3TestAdapter,",
+            "Selenium.",
         };
 
         /// <summary>
@@ -444,292 +436,6 @@ namespace Umbraco.Core.Composing
         }
 
         #endregion
-
-    }
-
-    /// <summary>
-    /// lazily load a reference to all local assemblies and gac assemblies
-    /// </summary>
-    /// <remarks>
-    /// This is a modified version of: http://www.dominicpettifer.co.uk/Blog/44/how-to-get-a-reference-to-all-assemblies-in-the--bin-folder
-    /// 
-    /// We do this because we cannot use AppDomain.Current.GetAssemblies() as this will return only assemblies that have been
-    /// loaded in the CLR, not all assemblies.
-    /// See these threads:
-    /// http://issues.umbraco.org/issue/U5-198
-    /// http://stackoverflow.com/questions/3552223/asp-net-appdomain-currentdomain-getassemblies-assemblies-missing-after-app
-    /// http://stackoverflow.com/questions/2477787/difference-between-appdomain-getassemblies-and-buildmanager-getreferencedassembl
-    /// </remarks>
-    public class BruteForceAssemblyProvider : IAssemblyProvider
-    {
-        public BruteForceAssemblyProvider()
-        {
-            _allAssemblies = new Lazy<HashSet<Assembly>>(() =>
-            {
-                HashSet<Assembly> assemblies = null;
-                try
-                {
-                    //NOTE: we cannot use AppDomain.CurrentDomain.GetAssemblies() because this only returns assemblies that have
-                    // already been loaded in to the app domain, instead we will look directly into the bin folder and load each one.
-                    var binFolder = GetRootDirectorySafe();
-                    var binAssemblyFiles = Directory.GetFiles(binFolder, "*.dll", SearchOption.TopDirectoryOnly).ToList();                    
-                    assemblies = new HashSet<Assembly>();
-                    foreach (var a in binAssemblyFiles)
-                    {
-                        try
-                        {
-                            var assName = AssemblyName.GetAssemblyName(a);
-                            var ass = Assembly.Load(assName);
-                            assemblies.Add(ass);
-                        }
-                        catch (Exception e)
-                        {
-                            if (e is SecurityException || e is BadImageFormatException)
-                            {
-                                //swallow these exceptions
-                            }
-                            else
-                            {
-                                throw;
-                            }
-                        }
-                    }
-
-                    //Since we are only loading in the /bin assemblies above, we will also load in anything that's already loaded (which will include gac items)
-                    foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
-                    {
-                        assemblies.Add(a);
-                    }
-                }
-                catch (InvalidOperationException e)
-                {
-                    if (e.InnerException is SecurityException == false)
-                        throw;
-                }
-
-                return assemblies;
-            });
-        }
-
-        private readonly Lazy<HashSet<Assembly>> _allAssemblies;
-        private string _rootDir = string.Empty;
-
-        public IEnumerable<Assembly> Assemblies => _allAssemblies.Value;
-
-        // FIXME - this is only an interim change, once the IIOHelper stuff is merged we should use IIOHelper here
-        private string GetRootDirectorySafe()
-        {
-            if (string.IsNullOrEmpty(_rootDir) == false)
-            {
-                return _rootDir;
-            }
-
-            var codeBase = Assembly.GetExecutingAssembly().CodeBase;
-            var uri = new Uri(codeBase);
-            var path = uri.LocalPath;
-            var baseDirectory = Path.GetDirectoryName(path);
-            if (string.IsNullOrEmpty(baseDirectory))
-                throw new PanicException("No root directory could be resolved.");
-
-            _rootDir = baseDirectory.Contains("bin")
-                ? baseDirectory.Substring(0, baseDirectory.LastIndexOf("bin", StringComparison.OrdinalIgnoreCase) - 1)
-                : baseDirectory;
-
-            return _rootDir;
-        }
-    }
-
-    /// <summary>
-    /// Provides a list of assemblies that can be scanned
-    /// </summary>
-    public interface IAssemblyProvider
-    {
-        IEnumerable<Assembly> Assemblies { get; }
-    }
-
-    /// <summary>
-    /// Returns a list of scannable assemblies based on an entry point assembly and it's references
-    /// </summary>
-    /// <remarks>
-    /// This will recursively search through the entry point's assemblies and Umbraco's core assemblies (Core/Web) and their references
-    /// to create a list of scannable assemblies based on whether they themselves or their transitive dependencies reference Umbraco core assemblies.
-    /// </remarks>
-    public class DefaultUmbracoAssemblyProvider : IAssemblyProvider
-    {
-        private readonly Assembly _entryPointAssembly;
-        private static readonly string[] UmbracoCoreAssemblyNames = new[] { "Umbraco.Core", "Umbraco.Web" };
-
-        public DefaultUmbracoAssemblyProvider(Assembly entryPointAssembly)
-        {
-            _entryPointAssembly = entryPointAssembly ?? throw new ArgumentNullException(nameof(entryPointAssembly));
-        }
-
-        public IEnumerable<Assembly> Assemblies
-        {
-            get
-            {
-                var finder = new FindAssembliesWithReferencesTo(new[] { _entryPointAssembly }, UmbracoCoreAssemblyNames, true);
-                foreach(var found in finder.Find())
-                {
-                    yield return found;
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// Resolves assemblies that reference one of the specified "targetAssemblies" either directly or transitively.
-    /// </summary>
-    /// <remarks>
-    /// Borrowed and modified from https://github.com/dotnet/aspnetcore-tooling/blob/master/src/Razor/src/Microsoft.NET.Sdk.Razor/ReferenceResolver.cs
-    /// </remarks>
-    internal class ReferenceResolver
-    {
-        private readonly HashSet<string> _umbracoAssemblies;
-        private readonly IReadOnlyList<Assembly> _assemblyItems;
-        private readonly Dictionary<Assembly, Classification> _classifications;
-        private readonly List<Assembly> _lookup = new List<Assembly>();
-
-        public ReferenceResolver(IReadOnlyList<string> targetAssemblies, IReadOnlyList<Assembly> assemblyItems)
-        {
-            _umbracoAssemblies = new HashSet<string>(targetAssemblies, StringComparer.Ordinal);
-            _assemblyItems = assemblyItems;
-            _classifications = new Dictionary<Assembly, Classification>();
-
-            foreach (var item in assemblyItems)
-            {
-                _lookup.Add(item);
-            }
-        }
-
-        public IEnumerable<Assembly> ResolveAssemblies()
-        {
-            var applicationParts = new List<Assembly>();
-
-            foreach (var item in _assemblyItems)
-            {
-                var classification = Resolve(item);
-                if (classification == Classification.ReferencesUmbraco || classification == Classification.IsUmbraco)
-                {
-                    applicationParts.Add(item);
-                }
-            }
-
-            return applicationParts;
-        }
-
-        private Classification Resolve(Assembly assemblyItem)
-        {
-            if (_classifications.TryGetValue(assemblyItem, out var classification))
-            {
-                return classification;
-            }
-
-            // Initialize the dictionary with a value to short-circuit recursive references.
-            classification = Classification.Unknown;
-            _classifications[assemblyItem] = classification;
-
-            if (_umbracoAssemblies.Contains(assemblyItem.GetName().Name))
-            {
-                classification = Classification.IsUmbraco;
-            }
-            else
-            {
-                classification = Classification.DoesNotReferenceUmbraco;
-                foreach (var reference in GetReferences(assemblyItem))
-                {
-                    // recurse
-                    var referenceClassification = Resolve(reference);
-
-                    if (referenceClassification == Classification.IsUmbraco || referenceClassification == Classification.ReferencesUmbraco)
-                    {
-                        classification = Classification.ReferencesUmbraco;
-                        break;
-                    }
-                }
-            }
-
-            Debug.Assert(classification != Classification.Unknown);
-            _classifications[assemblyItem] = classification;
-            return classification;
-        }
-
-        protected virtual IEnumerable<Assembly> GetReferences(Assembly assembly)
-        {            
-            foreach (var referenceName in assembly.GetReferencedAssemblies())
-            {
-                // don't include if this is excluded
-                if (TypeFinder.KnownAssemblyExclusionFilter.Any(f => referenceName.FullName.StartsWith(f)))
-                    continue;
-
-                var reference = Assembly.Load(referenceName);
-                if (!_lookup.Contains(reference))
-                {
-                    // A dependency references an item that isn't referenced by this project.
-                    // We'll construct an item for so that we can calculate the classification based on it's name.
-
-                    _lookup.Add(reference);
-
-                    yield return reference;
-                }                
-            }
-        }
-
-        protected enum Classification
-        {
-            Unknown,
-            DoesNotReferenceUmbraco,
-            ReferencesUmbraco,
-            IsUmbraco,
-        }
-    }
-
-
-    /// <summary>
-    /// Finds Assemblies from the entry point assemblies, it's dependencies and it's transitive dependencies that reference that targetAssemblyNames
-    /// </summary>
-    /// <remarkes>
-    /// borrowed and modified from here https://github.com/dotnet/aspnetcore-tooling/blob/master/src/Razor/src/Microsoft.NET.Sdk.Razor/FindAssembliesWithReferencesTo.cs
-    /// </remarkes>
-    internal class FindAssembliesWithReferencesTo 
-    {
-        private readonly Assembly[] _referenceAssemblies;
-        private readonly string[] _targetAssemblies;
-        private readonly bool _includeTargets;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="referenceAssemblies">Entry point assemblies</param>
-        /// <param name="targetAssemblyNames">Used to check if the entry point or it's transitive assemblies reference these assembly names</param>
-        /// <param name="includeTargets">If true will also use the target assembly names as entry point assemblies</param>
-        public FindAssembliesWithReferencesTo(Assembly[] referenceAssemblies, string[] targetAssemblyNames, bool includeTargets)
-        {
-            _referenceAssemblies = referenceAssemblies;
-            _targetAssemblies = targetAssemblyNames;
-            _includeTargets = includeTargets;
-        }
-
-        public IEnumerable<Assembly> Find()
-        {
-            var referenceItems = new List<Assembly>();
-            foreach (var assembly in _referenceAssemblies)
-            {
-                referenceItems.Add(assembly);
-            }
-
-            if (_includeTargets)
-            {
-                foreach(var target in _targetAssemblies)
-                {
-                    referenceItems.Add(Assembly.Load(target));
-                }
-            }
-
-            var provider = new ReferenceResolver(_targetAssemblies, referenceItems);
-            var assemblyNames = provider.ResolveAssemblies();
-            return assemblyNames.ToList();
-        }
 
     }
 }

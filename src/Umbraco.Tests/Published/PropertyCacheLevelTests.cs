@@ -127,7 +127,7 @@ namespace Umbraco.Tests.Published
 
             var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", CreatePropertyTypes);
 
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly));
+            var typeFinder = TestHelper.GetTypeFinder();
             var elementsCache = new FastDictionaryAppCache(typeFinder);
             var snapshotCache = new FastDictionaryAppCache(typeFinder);
 
