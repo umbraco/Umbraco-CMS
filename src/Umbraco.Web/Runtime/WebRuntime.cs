@@ -92,7 +92,7 @@ namespace Umbraco.Web.Runtime
 
         #region Getters
 
-        protected override ITypeFinder GetTypeFinder() => _typeFinder ?? (_typeFinder = new BuildManagerTypeFinder(IOHelper, HostingEnvironment, Logger, new BuildManagerTypeFinder.TypeFinderConfig(new TypeFinderSettings())));
+        //protected override ITypeFinder GetTypeFinder() => _typeFinder ?? (_typeFinder = new BuildManagerTypeFinder(IOHelper, HostingEnvironment, Logger, new BuildManagerTypeFinder.TypeFinderConfig(new TypeFinderSettings())));
 
         protected override AppCaches GetAppCaches() => new AppCaches(
                 // we need to have the dep clone runtime cache provider to ensure

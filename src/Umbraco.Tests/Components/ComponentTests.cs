@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Components
             var mock = new Mock<IFactory>();
 
             var logger = Mock.Of<ILogger>();
-            var typeFinder = new TypeFinder(logger);
+            var typeFinder = new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(typeof(ComponentTests).Assembly.GetName().Name));
             var f = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())), TestHelper.GetConfigs(), TestHelper.DbProviderFactoryCreator);
             var fs = new FileSystems(mock.Object, logger, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings());
             var coreDebug = Mock.Of<ICoreDebug>();
@@ -371,7 +371,7 @@ namespace Umbraco.Tests.Components
         public void AllComposers()
         {
             var ioHelper = TestHelper.IOHelper;
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly.GetName().Name));
             var typeLoader = new TypeLoader(ioHelper, typeFinder, AppCaches.Disabled.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
 
             var register = MockRegister();

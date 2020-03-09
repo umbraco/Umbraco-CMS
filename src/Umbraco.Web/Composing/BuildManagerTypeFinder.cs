@@ -27,7 +27,8 @@ namespace Umbraco.Web.Composing
             IIOHelper ioHelper,
             IHostingEnvironment hostingEnvironment,
             ILogger logger,
-            ITypeFinderConfig typeFinderConfig = null) : base(logger, typeFinderConfig)
+            IAssemblyProvider assemblyProvider,
+            ITypeFinderConfig typeFinderConfig = null) : base(logger, assemblyProvider, typeFinderConfig)
         {
             if (ioHelper == null) throw new ArgumentNullException(nameof(ioHelper));
             if (hostingEnvironment == null) throw new ArgumentNullException(nameof(hostingEnvironment));
@@ -60,6 +61,8 @@ namespace Umbraco.Web.Composing
                                 logger.Error(typeof(TypeFinder), ex, "Could not load assembly App_Code");
                             }
                         }
+
+                        return assemblies;
                     }
                 }
                 catch (InvalidOperationException e)

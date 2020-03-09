@@ -171,7 +171,7 @@ namespace Umbraco.Tests.Testing
             var proflogger = new ProfilingLogger(logger, profiler);
             IOHelper = TestHelper.IOHelper;
 
-            TypeFinder = new TypeFinder(logger);
+            TypeFinder = new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly.GetName().Name));
             var appCaches = GetAppCaches();
             var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
             var settings = SettingsForTests.GetDefaultUmbracoSettings();

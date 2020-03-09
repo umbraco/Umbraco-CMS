@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -369,7 +370,7 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         /// <returns></returns>
         protected virtual ITypeFinder GetTypeFinder()
-            => new TypeFinder(Logger);
+            => new TypeFinder(Logger, new DefaultUmbracoAssemblyProvider(Assembly.GetEntryAssembly()?.GetName()?.Name));
 
 
         /// <summary>

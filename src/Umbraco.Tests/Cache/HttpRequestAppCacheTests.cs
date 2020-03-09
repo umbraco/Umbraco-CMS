@@ -16,7 +16,7 @@ namespace Umbraco.Tests.Cache
         public override void Setup()
         {
             base.Setup();
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly.GetName().Name));
             _ctx = new FakeHttpContextFactory("http://localhost/test");
             _appCache = new HttpRequestAppCache(() => _ctx.HttpContext.Items, typeFinder);
         }

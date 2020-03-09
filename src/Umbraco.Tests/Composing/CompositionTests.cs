@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Composing
                 .Returns(() => factoryFactory?.Invoke(mockedFactory));
 
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly.GetName().Name));
             var ioHelper = TestHelper.IOHelper;
             var typeLoader = new TypeLoader(ioHelper, typeFinder, Mock.Of<IAppPolicyCache>(), new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), logger);
             var composition = new Composition(mockedRegister, typeLoader, logger, Mock.Of<IRuntimeState>(), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);

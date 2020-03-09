@@ -40,7 +40,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         {
             if (_factory != null) return _factory(requestContext);
 
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly.GetName().Name));
             var types = typeFinder.FindClassesOfType<ControllerBase>(new[] { Assembly.GetExecutingAssembly() });
 
             var controllerTypes = types.Where(x => x.Name.Equals(controllerName + "Controller", StringComparison.InvariantCultureIgnoreCase));

@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 using System.Security;
 using System.Text;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Composing
@@ -18,90 +19,25 @@ namespace Umbraco.Core.Composing
     public class TypeFinder : ITypeFinder
     {
         private readonly ILogger _logger;
+        private readonly IAssemblyProvider _assemblyProvider;
 
-        public TypeFinder(ILogger logger, ITypeFinderConfig typeFinderConfig = null)
+        //public TypeFinder(ILogger logger, ITypeFinderConfig typeFinderConfig = null)
+        //    : this(logger, new DefaultUmbracoAssemblyProvider(Assembly.GetEntryAssembly()?.GetName()?.Name), typeFinderConfig)
+        //{
+        //}
+
+        public TypeFinder(ILogger logger, IAssemblyProvider assemblyProvider, ITypeFinderConfig typeFinderConfig = null)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _assembliesAcceptingLoadExceptions = typeFinderConfig?.AssembliesAcceptingLoadExceptions.Where(x => !x.IsNullOrWhiteSpace()).ToArray() ?? Array.Empty<string>();
-            _allAssemblies = new Lazy<HashSet<Assembly>>(() =>
-            {
-                HashSet<Assembly> assemblies = null;
-                try
-                {
-                    //NOTE: we cannot use AppDomain.CurrentDomain.GetAssemblies() because this only returns assemblies that have
-                    // already been loaded in to the app domain, instead we will look directly into the bin folder and load each one.
-                    var binFolder = GetRootDirectorySafe();
-                    var binAssemblyFiles = Directory.GetFiles(binFolder, "*.dll", SearchOption.TopDirectoryOnly).ToList();
-                    //var binFolder = Assembly.GetExecutingAssembly().GetAssemblyFile().Directory;
-                    //var binAssemblyFiles = Directory.GetFiles(binFolder.FullName, "*.dll", SearchOption.TopDirectoryOnly).ToList();
-                    assemblies = new HashSet<Assembly>();
-                    foreach (var a in binAssemblyFiles)
-                    {
-                        try
-                        {
-                            var assName = AssemblyName.GetAssemblyName(a);
-                            var ass = Assembly.Load(assName);
-                            assemblies.Add(ass);
-                        }
-                        catch (Exception e)
-                        {
-                            if (e is SecurityException || e is BadImageFormatException)
-                            {
-                                //swallow these exceptions
-                            }
-                            else
-                            {
-                                throw;
-                            }
-                        }
-                    }
-
-                    //Since we are only loading in the /bin assemblies above, we will also load in anything that's already loaded (which will include gac items)
-                    foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
-                    {
-                        assemblies.Add(a);
-                    }
-                }
-                catch (InvalidOperationException e)
-                {
-                    if (e.InnerException is SecurityException == false)
-                        throw;
-                }
-
-                return assemblies;
-            });
+            _assemblyProvider = assemblyProvider;
+            _assembliesAcceptingLoadExceptions = typeFinderConfig?.AssembliesAcceptingLoadExceptions.Where(x => !x.IsNullOrWhiteSpace()).ToArray() ?? Array.Empty<string>();           
         }
 
-        //Lazy access to the all assemblies list
-        private readonly Lazy<HashSet<Assembly>> _allAssemblies;
         private volatile HashSet<Assembly> _localFilteredAssemblyCache;
         private readonly object _localFilteredAssemblyCacheLocker = new object();
         private readonly List<string> _notifiedLoadExceptionAssemblies = new List<string>();
-        private static readonly ConcurrentDictionary<string, Type> TypeNamesCache= new ConcurrentDictionary<string, Type>();
-        private string _rootDir = "";
+        private static readonly ConcurrentDictionary<string, Type> TypeNamesCache= new ConcurrentDictionary<string, Type>();        
         private readonly string[] _assembliesAcceptingLoadExceptions;
-
-        // FIXME - this is only an interim change, once the IIOHelper stuff is merged we should use IIOHelper here
-        private string GetRootDirectorySafe()
-        {
-            if (string.IsNullOrEmpty(_rootDir) == false)
-            {
-                return _rootDir;
-            }
-
-            var codeBase = Assembly.GetExecutingAssembly().CodeBase;
-            var uri = new Uri(codeBase);
-            var path = uri.LocalPath;
-            var baseDirectory = Path.GetDirectoryName(path);
-            if (string.IsNullOrEmpty(baseDirectory))
-                throw new PanicException("No root directory could be resolved.");
-
-            _rootDir = baseDirectory.Contains("bin")
-                ? baseDirectory.Substring(0, baseDirectory.LastIndexOf("bin", StringComparison.OrdinalIgnoreCase) - 1)
-                : baseDirectory;
-
-            return _rootDir;
-        }
 
         private bool AcceptsLoadExceptions(Assembly a)
         {
@@ -119,22 +55,8 @@ namespace Umbraco.Core.Composing
             });
         }
 
-        /// <summary>
-        /// lazily load a reference to all assemblies and only local assemblies.
-        /// This is a modified version of: http://www.dominicpettifer.co.uk/Blog/44/how-to-get-a-reference-to-all-assemblies-in-the--bin-folder
-        /// </summary>
-        /// <remarks>
-        /// We do this because we cannot use AppDomain.Current.GetAssemblies() as this will return only assemblies that have been
-        /// loaded in the CLR, not all assemblies.
-        /// See these threads:
-        /// http://issues.umbraco.org/issue/U5-198
-        /// http://stackoverflow.com/questions/3552223/asp-net-appdomain-currentdomain-getassemblies-assemblies-missing-after-app
-        /// http://stackoverflow.com/questions/2477787/difference-between-appdomain-getassemblies-and-buildmanager-getreferencedassembl
-        /// </remarks>
-        private IEnumerable<Assembly> GetAllAssemblies()
-        {
-            return _allAssemblies.Value;
-        }
+
+        private IEnumerable<Assembly> GetAllAssemblies() => _assemblyProvider.Assemblies;
 
         /// <inheritdoc />
         public IEnumerable<Assembly> AssembliesToScan
@@ -522,6 +444,525 @@ namespace Umbraco.Core.Composing
 
         #endregion
 
+    }
 
+    /// <summary>
+    /// lazily load a reference to all local assemblies and gac assemblies
+    /// </summary>
+    /// <remarks>
+    /// This is a modified version of: http://www.dominicpettifer.co.uk/Blog/44/how-to-get-a-reference-to-all-assemblies-in-the--bin-folder
+    /// 
+    /// We do this because we cannot use AppDomain.Current.GetAssemblies() as this will return only assemblies that have been
+    /// loaded in the CLR, not all assemblies.
+    /// See these threads:
+    /// http://issues.umbraco.org/issue/U5-198
+    /// http://stackoverflow.com/questions/3552223/asp-net-appdomain-currentdomain-getassemblies-assemblies-missing-after-app
+    /// http://stackoverflow.com/questions/2477787/difference-between-appdomain-getassemblies-and-buildmanager-getreferencedassembl
+    /// </remarks>
+    public class BruteForceAssemblyProvider : IAssemblyProvider
+    {
+        public BruteForceAssemblyProvider()
+        {
+            _allAssemblies = new Lazy<HashSet<Assembly>>(() =>
+            {
+                HashSet<Assembly> assemblies = null;
+                try
+                {
+                    //NOTE: we cannot use AppDomain.CurrentDomain.GetAssemblies() because this only returns assemblies that have
+                    // already been loaded in to the app domain, instead we will look directly into the bin folder and load each one.
+                    var binFolder = GetRootDirectorySafe();
+                    var binAssemblyFiles = Directory.GetFiles(binFolder, "*.dll", SearchOption.TopDirectoryOnly).ToList();                    
+                    assemblies = new HashSet<Assembly>();
+                    foreach (var a in binAssemblyFiles)
+                    {
+                        try
+                        {
+                            var assName = AssemblyName.GetAssemblyName(a);
+                            var ass = Assembly.Load(assName);
+                            assemblies.Add(ass);
+                        }
+                        catch (Exception e)
+                        {
+                            if (e is SecurityException || e is BadImageFormatException)
+                            {
+                                //swallow these exceptions
+                            }
+                            else
+                            {
+                                throw;
+                            }
+                        }
+                    }
+
+                    //Since we are only loading in the /bin assemblies above, we will also load in anything that's already loaded (which will include gac items)
+                    foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+                    {
+                        assemblies.Add(a);
+                    }
+                }
+                catch (InvalidOperationException e)
+                {
+                    if (e.InnerException is SecurityException == false)
+                        throw;
+                }
+
+                return assemblies;
+            });
+        }
+
+        private readonly Lazy<HashSet<Assembly>> _allAssemblies;
+        private string _rootDir = string.Empty;
+
+        public IEnumerable<Assembly> Assemblies => _allAssemblies.Value;
+
+        // FIXME - this is only an interim change, once the IIOHelper stuff is merged we should use IIOHelper here
+        private string GetRootDirectorySafe()
+        {
+            if (string.IsNullOrEmpty(_rootDir) == false)
+            {
+                return _rootDir;
+            }
+
+            var codeBase = Assembly.GetExecutingAssembly().CodeBase;
+            var uri = new Uri(codeBase);
+            var path = uri.LocalPath;
+            var baseDirectory = Path.GetDirectoryName(path);
+            if (string.IsNullOrEmpty(baseDirectory))
+                throw new PanicException("No root directory could be resolved.");
+
+            _rootDir = baseDirectory.Contains("bin")
+                ? baseDirectory.Substring(0, baseDirectory.LastIndexOf("bin", StringComparison.OrdinalIgnoreCase) - 1)
+                : baseDirectory;
+
+            return _rootDir;
+        }
+    }
+
+    /// <summary>
+    /// Provides a list of loaded assemblies that can be scanned
+    /// </summary>
+    public interface IAssemblyProvider
+    {
+        IEnumerable<Assembly> Assemblies { get; }
+    }
+
+    /// <summary>
+    /// Discovers assemblies that are part of the Umbraco application using the DependencyContext.
+    /// </summary>
+    /// <remarks>
+    /// Happily "borrowed" from aspnet: https://github.com/aspnet/Mvc/blob/230a13d0e13e4c7e192bc6623762bfd4cde726ef/src/Microsoft.AspNetCore.Mvc.Core/Internal/DefaultAssemblyPartDiscoveryProvider.cs
+    /// 
+    /// TODO: Happily borrow their unit tests too
+    /// </remarks>
+    public class DefaultUmbracoAssemblyProvider : IAssemblyProvider
+    {
+        private readonly string _entryPointAssemblyName;
+
+        public DefaultUmbracoAssemblyProvider(string entryPointAssemblyName)
+        {
+            if (string.IsNullOrWhiteSpace(entryPointAssemblyName))
+                throw new ArgumentException($"{entryPointAssemblyName} cannot be null or empty", nameof(entryPointAssemblyName));
+
+            _entryPointAssemblyName = entryPointAssemblyName;
+        }
+
+        public IEnumerable<Assembly> Assemblies
+        {
+            get
+            {
+                var finder = new FindAssembliesWithReferencesTo(new[] { _entryPointAssemblyName }, new[] { "Umbraco.Core" });
+                foreach(var found in finder.Find())
+                {
+                    yield return Assembly.Load(found);
+                }
+            }
+        }
+
+        //public IEnumerable<Assembly> Assemblies => DiscoverAssemblyParts(_entryPointAssemblyName);
+
+        //internal static HashSet<string> ReferenceAssemblies { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        //{
+        //    "Umbraco.Core",
+        //    "Umbraco.Web"
+        //};
+
+        //internal static IEnumerable<Assembly> DiscoverAssemblyParts(string entryPointAssemblyName)
+        //{
+        //    var entryAssembly = Assembly.Load(new AssemblyName(entryPointAssemblyName));
+        //    var context = DependencyContext.Load(entryAssembly);
+
+        //    var candidates = GetCandidateAssemblies(entryAssembly, context);
+
+        //    return candidates;
+        //}
+
+        //internal static IEnumerable<Assembly> GetCandidateAssemblies(Assembly entryAssembly, DependencyContext dependencyContext)
+        //{
+        //    if (dependencyContext == null)
+        //    {
+        //        // Use the entry assembly as the sole candidate.
+        //        return new[] { entryAssembly };
+        //    }
+
+        //    //includeRefLibs == true - so that Umbraco.Core is also returned!
+        //    return GetCandidateLibraries(dependencyContext, includeRefLibs: true)
+        //        .SelectMany(library => library.GetDefaultAssemblyNames(dependencyContext))
+        //        .Select(Assembly.Load);
+        //}
+
+        ///// <summary>
+        ///// Returns a list of libraries that references the assemblies in <see cref="ReferenceAssemblies"/>.       
+        ///// </summary>
+        ///// <param name="dependencyContext"></param>
+        ///// <param name="includeRefLibs">
+        ///// True to also include libs in the ReferenceAssemblies list
+        ///// </param>
+        ///// <returns></returns>
+        //internal static IEnumerable<RuntimeLibrary> GetCandidateLibraries(DependencyContext dependencyContext, bool includeRefLibs)
+        //{
+        //    if (ReferenceAssemblies == null)
+        //    {
+        //        return Enumerable.Empty<RuntimeLibrary>();
+        //    }
+
+        //    var candidatesResolver = new CandidateResolver(dependencyContext.RuntimeLibraries, ReferenceAssemblies, includeRefLibs);
+        //    return candidatesResolver.GetCandidates();
+        //}
+
+        //private class CandidateResolver
+        //{
+        //    private readonly bool _includeRefLibs;
+        //    private readonly IDictionary<string, Dependency> _dependencies;
+
+        //    /// <summary>
+        //    /// Constructor
+        //    /// </summary>
+        //    /// <param name="dependencies"></param>
+        //    /// <param name="referenceAssemblies"></param>
+        //    /// <param name="includeRefLibs">
+        //    /// True to also include libs in the ReferenceAssemblies list
+        //    /// </param>
+        //    public CandidateResolver(IEnumerable<RuntimeLibrary> dependencies, ISet<string> referenceAssemblies, bool includeRefLibs)
+        //    {
+        //        _includeRefLibs = includeRefLibs;
+
+        //        _dependencies = dependencies
+        //            .ToDictionary(d => d.Name, d => CreateDependency(d, referenceAssemblies), StringComparer.OrdinalIgnoreCase);
+        //    }
+
+        //    /// <summary>
+        //    /// Create a Dependency
+        //    /// </summary>
+        //    /// <param name="library"></param>
+        //    /// <param name="referenceAssemblies"></param>            
+        //    /// <returns></returns>
+        //    private static Dependency CreateDependency(RuntimeLibrary library, ISet<string> referenceAssemblies)
+        //    {
+        //        var classification = DependencyClassification.Unknown;
+        //        if (referenceAssemblies.Contains(library.Name))
+        //        {
+        //            classification = DependencyClassification.UmbracoReference;
+        //        }
+
+        //        return new Dependency(library, classification);
+        //    }
+
+        //    private DependencyClassification ComputeClassification(string dependency)
+        //    {
+        //        Debug.Assert(_dependencies.ContainsKey(dependency));
+
+        //        var candidateEntry = _dependencies[dependency];
+        //        if (candidateEntry.Classification != DependencyClassification.Unknown)
+        //        {
+        //            return candidateEntry.Classification;
+        //        }
+        //        else
+        //        {
+        //            var classification = DependencyClassification.NotCandidate;
+        //            foreach (var candidateDependency in candidateEntry.Library.Dependencies)
+        //            {
+        //                var dependencyClassification = ComputeClassification(candidateDependency.Name);
+        //                if (dependencyClassification == DependencyClassification.Candidate ||
+        //                    dependencyClassification == DependencyClassification.UmbracoReference)
+        //                {
+        //                    classification = DependencyClassification.Candidate;
+        //                    break;
+        //                }
+        //            }
+
+        //            candidateEntry.Classification = classification;
+
+        //            return classification;
+        //        }
+        //    }
+
+        //    public IEnumerable<RuntimeLibrary> GetCandidates()
+        //    {
+        //        foreach (var dependency in _dependencies)
+        //        {
+        //            var classification = ComputeClassification(dependency.Key);
+        //            if (classification == DependencyClassification.Candidate ||
+        //                    //if the flag is set, also ensure to include any UmbracoReference classifications
+        //                    (_includeRefLibs && classification == DependencyClassification.UmbracoReference))
+        //            {
+        //                yield return dependency.Value.Library;
+        //            }
+        //        }
+        //    }
+
+        //    private class Dependency
+        //    {
+        //        public Dependency(RuntimeLibrary library, DependencyClassification classification)
+        //        {
+        //            Library = library;
+        //            Classification = classification;
+        //        }
+
+        //        public RuntimeLibrary Library { get; }
+
+        //        public DependencyClassification Classification { get; set; }
+
+        //        public override string ToString()
+        //        {
+        //            return $"Library: {Library.Name}, Classification: {Classification}";
+        //        }
+        //    }
+
+        //    private enum DependencyClassification
+        //    {
+        //        Unknown = 0,
+        //        Candidate = 1,
+        //        NotCandidate = 2,
+        //        UmbracoReference = 3
+        //    }
+        //}
+    }
+
+    /// <summary>
+    /// Resolves assemblies that reference one of the specified "targetAssemblies" either directly or transitively.
+    /// </summary>
+    public class ReferenceResolver
+    {
+        private readonly HashSet<string> _mvcAssemblies;
+        private readonly IReadOnlyList<AssemblyItem> _assemblyItems;
+        private readonly Dictionary<AssemblyItem, Classification> _classifications;
+
+        public ReferenceResolver(IReadOnlyList<string> targetAssemblies, IReadOnlyList<AssemblyItem> assemblyItems)
+        {
+            _mvcAssemblies = new HashSet<string>(targetAssemblies, StringComparer.Ordinal);
+            _assemblyItems = assemblyItems;
+            _classifications = new Dictionary<AssemblyItem, Classification>();
+
+            Lookup = new Dictionary<string, AssemblyItem>(StringComparer.Ordinal);
+            foreach (var item in assemblyItems)
+            {
+                Lookup[item.AssemblyName] = item;
+            }
+        }
+
+        protected Dictionary<string, AssemblyItem> Lookup { get; }
+
+        public IReadOnlyList<string> ResolveAssemblies()
+        {
+            var applicationParts = new List<string>();
+
+            foreach (var item in _assemblyItems)
+            {
+                var classification = Resolve(item);
+                if (classification == Classification.ReferencesMvc)
+                {
+                    applicationParts.Add(item.AssemblyName);
+                }
+            }
+
+            return applicationParts;
+        }
+
+        private Classification Resolve(AssemblyItem assemblyItem)
+        {
+            if (_classifications.TryGetValue(assemblyItem, out var classification))
+            {
+                return classification;
+            }
+
+            // Initialize the dictionary with a value to short-circuit recursive references.
+            classification = Classification.Unknown;
+            _classifications[assemblyItem] = classification;
+
+            if (assemblyItem.Path == null)
+            {
+                // We encountered a dependency that isn't part of this assembly's dependency set. We'll see if it happens to be an MVC assembly
+                // since that's the only useful determination we can make given the assembly name.
+                classification = _mvcAssemblies.Contains(assemblyItem.AssemblyName) ?
+                    Classification.IsMvc :
+                    Classification.DoesNotReferenceMvc;
+            }
+            else if (assemblyItem.IsFrameworkReference)
+            {
+                // We do not allow transitive references to MVC via a framework reference to count.
+                // e.g. depending on Microsoft.AspNetCore.SomeThingNewThatDependsOnMvc would not result in an assembly being treated as
+                // referencing MVC.
+                classification = _mvcAssemblies.Contains(assemblyItem.AssemblyName) ?
+                    Classification.IsMvc :
+                    Classification.DoesNotReferenceMvc;
+            }
+            else if (_mvcAssemblies.Contains(assemblyItem.AssemblyName))
+            {
+                classification = Classification.IsMvc;
+            }
+            else
+            {
+                classification = Classification.DoesNotReferenceMvc;
+                foreach (var reference in GetReferences(assemblyItem.Path))
+                {
+                    var referenceClassification = Resolve(reference);
+
+                    if (referenceClassification == Classification.IsMvc || referenceClassification == Classification.ReferencesMvc)
+                    {
+                        classification = Classification.ReferencesMvc;
+                        break;
+                    }
+                }
+            }
+
+            Debug.Assert(classification != Classification.Unknown);
+            _classifications[assemblyItem] = classification;
+            return classification;
+        }
+
+        protected virtual IReadOnlyList<AssemblyItem> GetReferences(string file)
+        {
+            try
+            {
+                if (!File.Exists(file))
+                {
+                    throw new ReferenceAssemblyNotFoundException(file);
+                }
+
+                using var peReader = new PEReader(File.OpenRead(file));
+                if (!peReader.HasMetadata)
+                {
+                    return Array.Empty<AssemblyItem>(); // not a managed assembly
+                }
+
+                var metadataReader = peReader.GetMetadataReader();
+
+                var references = new List<AssemblyItem>();
+                foreach (var handle in metadataReader.AssemblyReferences)
+                {
+                    var reference = metadataReader.GetAssemblyReference(handle);
+                    var referenceName = metadataReader.GetString(reference.Name);
+
+                    if (!Lookup.TryGetValue(referenceName, out var assemblyItem))
+                    {
+                        // A dependency references an item that isn't referenced by this project.
+                        // We'll construct an item for so that we can calculate the classification based on it's name.
+                        assemblyItem = new AssemblyItem
+                        {
+                            AssemblyName = referenceName,
+                        };
+
+                        Lookup[referenceName] = assemblyItem;
+                    }
+
+                    references.Add(assemblyItem);
+                }
+
+                return references;
+            }
+            catch (BadImageFormatException)
+            {
+                // not a PE file, or invalid metadata
+            }
+
+            return Array.Empty<AssemblyItem>(); // not a managed assembly
+        }
+
+        protected enum Classification
+        {
+            Unknown,
+            DoesNotReferenceMvc,
+            ReferencesMvc,
+            IsMvc,
+        }
+    }
+
+    public class AssemblyItem
+    {
+        public string Path { get; set; }
+
+        public bool IsFrameworkReference { get; set; }
+
+        public string AssemblyName { get; set; }
+    }
+
+    internal class ReferenceAssemblyNotFoundException : Exception
+    {
+        public ReferenceAssemblyNotFoundException(string fileName)
+        {
+            FileName = fileName;
+        }
+
+        public string FileName { get; }
+    }
+
+    // borrowed from here https://github.com/dotnet/aspnetcore-tooling/blob/master/src/Razor/src/Microsoft.NET.Sdk.Razor/FindAssembliesWithReferencesTo.cs
+    public class FindAssembliesWithReferencesTo 
+    {
+        private readonly string[] _referenceAssemblies;
+        private readonly string[] _targetAssemblyNames;
+
+        public FindAssembliesWithReferencesTo(string[] referenceAssemblies, string[] targetAssemblyNames)
+        {
+            _referenceAssemblies = referenceAssemblies;
+            _targetAssemblyNames = targetAssemblyNames;
+        }
+
+        public IEnumerable<string> Find()
+        {
+            var referenceItems = new List<AssemblyItem>();
+            foreach (var item in _referenceAssemblies)
+            {
+                //var assemblyName = new AssemblyName(item).Name;
+                var assembly = Assembly.Load(item);
+                referenceItems.Add(new AssemblyItem
+                {
+                    AssemblyName = assembly.GetName().Name, //assemblyName,
+                    IsFrameworkReference = false,
+                    Path = GetAssemblyLocation(assembly)
+                });
+            }
+
+            var provider = new ReferenceResolver(_targetAssemblyNames, referenceItems);
+            try
+            {
+                var assemblyNames = provider.ResolveAssemblies();
+                return assemblyNames.ToArray();
+            }
+            catch (ReferenceAssemblyNotFoundException ex)
+            {
+                throw;
+                //// Print a warning and return. We cannot produce a correct document at this point.
+                //var warning = "Reference assembly {0} could not be found. This is typically caused by build errors in referenced projects.";
+                //Log.LogWarning(null, "RAZORSDK1007", null, null, 0, 0, 0, 0, warning, ex.FileName);
+                //return true;
+            }
+            catch (Exception ex)
+            {
+                throw;
+                //Log.LogErrorFromException(ex);
+            }
+        }
+
+        internal static string GetAssemblyLocation(Assembly assembly)
+        {
+            if (Uri.TryCreate(assembly.CodeBase, UriKind.Absolute, out var result) &&
+                result.IsFile && string.IsNullOrWhiteSpace(result.Fragment))
+            {
+                return result.LocalPath;
+            }
+
+            return assembly.Location;
+        }
     }
 }
