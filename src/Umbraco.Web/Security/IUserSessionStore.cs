@@ -14,4 +14,10 @@ namespace Umbraco.Core.Security
     {
         Task<bool> ValidateSessionIdAsync(int userId, string sessionId);
     }
+
+    public interface IUserSessionStore2<TUser, in TKey> : Microsoft.AspNetCore.Identity.IUserStore<TUser>, IDisposable
+        where TUser : class
+    {
+        Task<bool> ValidateSessionIdAsync(int userId, string sessionId);
+    }
 }
