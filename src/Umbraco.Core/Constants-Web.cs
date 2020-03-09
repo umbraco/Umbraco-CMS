@@ -34,7 +34,11 @@
             /// The header name that angular uses to pass in the token to validate the cookie
             /// </summary>
             public const string AngularHeadername = "X-UMB-XSRF-TOKEN";
-            
+
+            /// <summary>
+            /// The route name of the page shown when Umbraco has no published content.
+            /// </summary>
+            public const string NoContentRouteName = "umbraco-no-content";
         }
     }
 }

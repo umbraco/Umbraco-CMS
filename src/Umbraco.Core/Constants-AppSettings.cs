@@ -116,6 +116,11 @@ namespace Umbraco.Core
             public const string DisableElectionForSingleServer = "Umbraco.Core.DisableElectionForSingleServer";
 
             /// <summary>
+            /// Gets the path to the razor file used when no published content is available.
+            /// </summary>
+            public const string NoNodesViewPath = "Umbraco.Core.NoNodesViewPath";
+
+            /// <summary>
             /// Debug specific web.config AppSetting keys for Umbraco
             /// </summary>
             /// <remarks>
