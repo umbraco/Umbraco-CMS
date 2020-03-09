@@ -142,8 +142,12 @@ namespace Umbraco.Core.Composing
             "itextsharp,",
             "mscorlib,",
             "NUnit,",
-            "NUnit3TestAdapter,",
+            "NUnit.",
+            "NUnit3.",
             "Selenium.",
+            "ImageProcessor",
+            "MiniProfiler.",
+            "Owin,",
         };
 
         /// <summary>
