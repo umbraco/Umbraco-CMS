@@ -48,11 +48,11 @@ namespace Umbraco.Tests.PropertyEditors
         private BlockListConfiguration ConfigForMany() => new BlockListConfiguration
         {
             Blocks = new[] {
-                    new BlockListConfiguration.ElementType
+                    new BlockListConfiguration.BlockConfiguration
                     {
                         Alias = "Test1"
                     },
-                    new BlockListConfiguration.ElementType
+                    new BlockListConfiguration.BlockConfiguration
                     {
                         Alias = "Test2"
                     }
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.PropertyEditors
         private BlockListConfiguration ConfigForSingle() => new BlockListConfiguration
         {
             Blocks = new[] {
-                    new BlockListConfiguration.ElementType
+                    new BlockListConfiguration.BlockConfiguration
                     {
                         Alias = "Test1"
                     }
