@@ -94,7 +94,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the membership helper.
         /// </summary>
-        [Obsolete("Inject and use an instance of " + nameof(Security.MembershipHelper) + " in the constructor instead")]
+        [Obsolete("Inject and use an instance of " + nameof(Security.MembershipHelper) + " in the constructor instead. In views you can use @Members.")]
         public MembershipHelper MembershipHelper => Ensure(_membershipHelper);
 
         /// <summary>
