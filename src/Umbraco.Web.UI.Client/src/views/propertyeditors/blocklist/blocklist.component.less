@@ -16,69 +16,18 @@
     position: relative;
     width: 100%;
 
-    /*.umb-block-list__block--head {
-        opacity: 0;
-        transition: opacity 120ms;
-    }*/
     > ng-transclude > .umb-block-list__block--actions {
         opacity: 0;
         transition: opacity 120ms;
     }
 
     &:hover, &:focus, &:focus-within {
-        /*.umb-block-list__block--head {
-            opacity: 1;
-        }*/
         
         > ng-transclude > .umb-block-list__block--actions {
             opacity: 1;
         }
     }
-    /*
-    &:focus, &:focus-within {
-        .umb-block-list__block--head {
-            &::before {
-                background-color: @blueMid;
-            }
-        }
-    }
-    */
 }
-/*
-.umb-block-list__block--head {
-    position: absolute;
-    top: 0;
-    left: -180px;// 160px from control-header + 20px from spacing.
-    bottom: 0;
-    width: 180px;// 160px from control-header + 20px from spacing.
-    user-select: none;
-    padding-top: 6px;
-    padding-right: 14px;
-    box-sizing: border-box;
-    color: @gray-5;
-    background-color: rgba(255, 255, 255, .96);
-    box-shadow: 0 0 6px 6px rgba(255, 255, 255, .96);
-    text-align: right;
-    &::before {
-        content: '';
-        position: absolute;
-        top: 6px;
-        bottom: 6px;
-        right: 4px;
-        width: 1px;
-        background-color: @gray-10;
-    }
-
-    small {
-        text-align: left;
-        margin-left: 4px;
-        margin-bottom: 4px;
-    }
-}
-label.umb-block-list__block--head {
-    cursor: grab;
-}
-*/
 .umb-block-list__block--actions {
     position: absolute;
     top: 10px;
@@ -182,24 +131,6 @@ label.umb-block-list__block--head {
         }
     }
 }
-/*
-.umb-block-list__block--create-bar {
-    button {
-        display: inline-block;
-        width: 120px;
-        height: 120px;
-        border-radius: @baseBorderRadius;
-        text-align: center;
-        font-size: 12px;
-        i {
-            font-size: 30px;
-            line-height: 20px;
-            margin-bottom: 10px;
-            display: block;
-        }
-    }
-}
-*/
 .umb-block-list__create-button {
     display: flex;
     width: 100%;
