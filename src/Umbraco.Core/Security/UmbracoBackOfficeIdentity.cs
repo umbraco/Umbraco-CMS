@@ -42,6 +42,7 @@ namespace Umbraco.Core.Security
         /// <param name="securityStamp"></param>
         /// <param name="allowedApps"></param>
         /// <param name="roles"></param>
+        [Obsolete]
         public UmbracoBackOfficeIdentity(int userId, string username, string realName,
             IEnumerable<int> startContentNodes, IEnumerable<int> startMediaNodes, string culture,
             string sessionId, string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
@@ -72,6 +73,7 @@ namespace Umbraco.Core.Security
         /// <param name="securityStamp"></param>
         /// <param name="allowedApps"></param>
         /// <param name="roles"></param>
+        [Obsolete]
         public UmbracoBackOfficeIdentity(ClaimsIdentity childIdentity,
             int userId, string username, string realName,
             IEnumerable<int> startContentNodes, IEnumerable<int> startMediaNodes, string culture,
@@ -86,7 +88,57 @@ namespace Umbraco.Core.Security
             Actor = childIdentity;
             AddRequiredClaims(userId, username, realName, startContentNodes, startMediaNodes, culture, sessionId, securityStamp, allowedApps, roles);
         }
-
+        /// <summary>
+        /// Creates a new UmbracoBackOfficeIdentity
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="username"></param>
+        /// <param name="realName"></param>
+        /// <param name="culture"></param>
+        /// <param name="sessionId"></param>
+        /// <param name="securityStamp"></param>
+        /// <param name="allowedApps"></param>
+        /// <param name="roles"></param>
+        public UmbracoBackOfficeIdentity(int userId, string username, string realName,
+             string culture,string sessionId, string securityStamp,
+             IEnumerable<string> allowedApps, IEnumerable<string> roles)
+            : base(Enumerable.Empty<Claim>(), Constants.Security.BackOfficeAuthenticationType) //this ctor is used to ensure the IsAuthenticated property is true
+        {
+            if (allowedApps == null) throw new ArgumentNullException(nameof(allowedApps));
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
+            if (string.IsNullOrWhiteSpace(realName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(realName));
+            if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
+            if (string.IsNullOrWhiteSpace(sessionId)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(sessionId));
+            if (string.IsNullOrWhiteSpace(securityStamp)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(securityStamp));
+            AddRequiredClaims(userId, username, realName, null, null, culture, sessionId, securityStamp, allowedApps, roles);
+        }
+        /// <summary>
+        /// Creates a new UmbracoBackOfficeIdentity
+        /// </summary>
+        /// <param name="childIdentity">
+        /// The original identity created by the ClaimsIdentityFactory
+        /// </param>
+        /// <param name="userId"></param>
+        /// <param name="username"></param>
+        /// <param name="realName"></param>
+        /// <param name="culture"></param>
+        /// <param name="sessionId"></param>
+        /// <param name="securityStamp"></param>
+        /// <param name="allowedApps"></param>
+        /// <param name="roles"></param>
+        public UmbracoBackOfficeIdentity(ClaimsIdentity childIdentity,
+            int userId, string username, string realName, string culture,
+            string sessionId, string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
+        : base(childIdentity.Claims, Constants.Security.BackOfficeAuthenticationType)
+        {
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
+            if (string.IsNullOrWhiteSpace(realName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(realName));
+            if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
+            if (string.IsNullOrWhiteSpace(sessionId)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(sessionId));
+            if (string.IsNullOrWhiteSpace(securityStamp)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(securityStamp));
+            Actor = childIdentity;
+            AddRequiredClaims(userId, username, realName, null, null, culture, sessionId, securityStamp, allowedApps, roles);
+        }
         /// <summary>
         /// Create a back office identity based on an existing claims identity
         /// </summary>
@@ -120,8 +172,6 @@ namespace Umbraco.Core.Security
             ClaimTypes.NameIdentifier, //id
             ClaimTypes.Name,  //username
             ClaimTypes.GivenName,
-            Constants.Security.StartContentNodeIdClaimType,
-            Constants.Security.StartMediaNodeIdClaimType,
             ClaimTypes.Locality,
             Constants.Security.SessionIdClaimType,
             Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType
@@ -148,7 +198,7 @@ namespace Umbraco.Core.Security
             {
                 foreach (var startContentNode in startContentNodes)
                 {
-                    AddClaim(new Claim(Constants.Security.StartContentNodeIdClaimType, startContentNode.ToInvariantString(), ClaimValueTypes.Integer32, Issuer, Issuer, this));    
+                    AddClaim(new Claim(Constants.Security.StartContentNodeIdClaimType, startContentNode.ToInvariantString(), ClaimValueTypes.Integer32, Issuer, Issuer, this));
                 }
             }
 
@@ -192,7 +242,7 @@ namespace Umbraco.Core.Security
             }
 
         }
-        
+
         /// <inheritdoc />
         /// <summary>
         /// Gets the type of authenticated identity.
@@ -202,7 +252,7 @@ namespace Umbraco.Core.Security
         /// </returns>
         public override string AuthenticationType => Issuer;
 
-        private int[] _startContentNodes;   
+        private int[] _startContentNodes;
         public int[] StartContentNodes => _startContentNodes ?? (_startContentNodes = FindAll(x => x.Type == Constants.Security.StartContentNodeIdClaimType).Select(app => int.TryParse(app.Value, out var i) ? i : default).Where(x => x != default).ToArray());
 
         private int[] _startMediaNodes;
@@ -234,6 +284,6 @@ namespace Umbraco.Core.Security
         public string SecurityStamp => this.FindFirstValue(Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType);
 
         public string[] Roles => this.FindAll(x => x.Type == DefaultRoleClaimType).Select(role => role.Value).ToArray();
-        
+
     }
 }
