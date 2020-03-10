@@ -17,7 +17,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
         /// </summary>
-        /// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
+        /// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         /// <remarks>If successful, also assigns the template.</remarks>
         public override bool TryFindContent(PublishedContentRequest docRequest)
@@ -43,16 +43,24 @@ namespace Umbraco.Web.Routing
 
                     var route = docRequest.HasDomain ? (docRequest.Domain.RootNodeId.ToString() + path) : path;
                     node = FindContent(docRequest, route);
-
-                    if (node.IsAllowedTemplate(template.Id))
+                    //not guaranteed to find a node - just because last portion of url contains a template alias, doesn't mean remaining part of the url is a published node
+                    if (node != null)
                     {
-                        docRequest.TemplateModel = template;
+                        if (node.IsAllowedTemplate(template.Id))
+                        {
+                            docRequest.TemplateModel = template;
+                        }
+                        else
+                        {
+                            LogHelper.Warn<ContentFinderByNiceUrlAndTemplate>("Configuration settings prevent template \"{0}\" from showing for node \"{1}\"", () => templateAlias, () => node.Id);
+                            docRequest.PublishedContent = null;
+                            node = null;
+                        }
                     }
                     else
                     {
-                        LogHelper.Warn<ContentFinderByNiceUrlAndTemplate>("Configuration settings prevent template \"{0}\" from showing for node \"{1}\"", () => templateAlias, () => node.Id);
+                        LogHelper.Debug<ContentFinderByNiceUrlAndTemplate>("Attempt to find content by alternative template alias: \"{0}\" triggered because end portion of url matched template alias, but no node exists for the url without the alt template alias at the route: \"{1}\"", () => templateAlias, () => route);
                         docRequest.PublishedContent = null;
-                        node = null;
                     }
                 }
                 else
