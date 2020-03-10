@@ -44,7 +44,7 @@ namespace Umbraco.Web.Routing
                     var route = docRequest.HasDomain ? (docRequest.Domain.RootNodeId.ToString() + path) : path;
                     node = FindContent(docRequest, route);
                     //not guaranteed to find a node - just because last portion of url contains a template alias, doesn't mean remaining part of the url is a published node
-                    if (node !=null)
+                    if (node != null)
                     {
                         if (node.IsAllowedTemplate(template.Id))
                         {
