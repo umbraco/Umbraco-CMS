@@ -29,6 +29,12 @@
      * Facade to angular.equals
      */
     const equals = (a, b) => angular.equals(a, b);
+    
+    /**
+     * Facade to angular.extend
+     * Use this with Angular objects, for vanilla JS objects, use Object.assign()
+     */
+    const extend = (dst, src) => angular.extend(dst, src);
 
     /**
      * Equivalent to angular.isFunction
@@ -65,6 +71,7 @@
         copy: copy,
         isArray: isArray,
         equals: equals,
+        extend: extend,
         isFunction: isFunction,
         isUndefined: isUndefined,
         isDefined: isDefined,
