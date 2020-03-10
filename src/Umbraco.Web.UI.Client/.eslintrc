@@ -19,7 +19,7 @@
         "tinyMCE": false,
         "FileReader": false,
         "Umbraco": false,
-        "umb": false,
+        "Utilities": false,
         "window": false,
         "LazyLoad": false,
         "ActiveXObject": false,
