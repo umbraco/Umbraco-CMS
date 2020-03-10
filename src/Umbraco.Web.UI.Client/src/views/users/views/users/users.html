@@ -124,7 +124,7 @@
                         <span class="caret"></span>
                     </a>
                     <umb-dropdown class="pull-right" ng-if="vm.page.showStatusFilter" on-close="vm.page.showStatusFilter = false;">
-                        <umb-dropdown-item ng-repeat="userState in vm.userStatesFilter | filter:{ count: '!0', key: '!All'}" style="padding: 8px 20px 8px 16px;">
+                        <umb-dropdown-item ng-repeat="userState in vm.userStatesFilter | filter:{key: '!All'}" ng-show="userState.count > 0" style="padding: 8px 20px 8px 16px;">
                             <div class="flex items-center">
                                 <input
                                     id="state-{{$index}}"
