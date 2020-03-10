@@ -94,7 +94,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
         //
         private static void WriteGeneratedCodeAttribute(StringBuilder sb, string tabs)
         {
-            sb.AppendFormat("{0}[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"Umbraco.ModelsBuilder\", \"{1}\")]\n", tabs, ApiVersion.Current.Version);
+            sb.AppendFormat("{0}[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"Umbraco.ModelsBuilder.Embedded\", \"{1}\")]\n", tabs, ApiVersion.Current.Version);
         }
 
         private void WriteContentType(StringBuilder sb, TypeModel type)

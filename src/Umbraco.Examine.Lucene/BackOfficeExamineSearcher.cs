@@ -6,8 +6,6 @@ using System.Text.RegularExpressions;
 using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.Models.ContentEditing;
