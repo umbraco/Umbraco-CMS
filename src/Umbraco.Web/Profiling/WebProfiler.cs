@@ -3,6 +3,7 @@ using System.Threading;
 using System.Web;
 using StackExchange.Profiling;
 using StackExchange.Profiling.SqlFormatters;
+using StackExchange.Profiling.Storage;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
@@ -32,6 +33,7 @@ namespace Umbraco.Web.Profiling
             MiniProfiler.Settings.SqlFormatter = new SqlServerFormatter();
             MiniProfiler.Settings.StackMaxLength = 5000;
             MiniProfiler.Settings.ProfilerProvider = _provider;
+            MiniProfiler.Settings.Storage = new HttpRuntimeCacheStorage(TimeSpan.FromMinutes(30));
 
             //Binds to application events to enable the MiniProfiler with a real HttpRequest
             UmbracoApplicationBase.ApplicationInit += UmbracoApplicationApplicationInit;
@@ -82,7 +84,7 @@ namespace Umbraco.Web.Profiling
             if (isBootRequest)
                 _provider.EndBootRequest();
             if (isBootRequest || ShouldProfile(sender))
-                Stop();
+                Stop(!GlobalSettings.DebugMode);
         }
 
         private bool ShouldProfile(object sender)

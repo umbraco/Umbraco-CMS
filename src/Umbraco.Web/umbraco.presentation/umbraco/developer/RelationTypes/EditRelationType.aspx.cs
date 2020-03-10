@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.BasePages;
@@ -105,9 +106,9 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 
 							readOnlyRelation.Id = reader.GetInt("id");
 							readOnlyRelation.ParentId = reader.GetInt("parentId");
-							readOnlyRelation.ParentText = reader.GetString("parentText");
+							readOnlyRelation.ParentText = HttpUtility.HtmlEncode(reader.GetString("parentText"));
 							readOnlyRelation.ChildId = reader.GetInt("childId");
-							readOnlyRelation.ChildText = reader.GetString("childText");
+							readOnlyRelation.ChildText = HttpUtility.HtmlEncode(reader.GetString("childText"));
 							readOnlyRelation.RelType = reader.GetInt("relType");
 							readOnlyRelation.DateTime = reader.GetDateTime("datetime");
 							readOnlyRelation.Comment = reader.GetString("comment");
