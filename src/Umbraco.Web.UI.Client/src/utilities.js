@@ -16,10 +16,9 @@
     const noop = () => { };
 
     /**
-     * Equivalent to angular.copy
-     * Abstraction of underscore.clone
+     * Facade to angular.copy
      */
-    const copy = val => _.clone(val);
+    const copy = val => angular.copy(val);
 
     /**
      * Equivalent to angular.isArray
@@ -27,10 +26,9 @@
     const isArray = val => Array.isArray(val) || val instanceof Array;
 
     /**
-     * Equivalent to angular.equals
-     * Abstraction of underscore.isEqual
+     * Facade to angular.equals
      */
-    const equals = (a, b) => _.isEqual(a, b);
+    const equals = (a, b) => angular.equals(a, b);
 
     /**
      * Equivalent to angular.isFunction
