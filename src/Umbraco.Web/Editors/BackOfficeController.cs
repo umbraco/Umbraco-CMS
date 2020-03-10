@@ -178,7 +178,7 @@ namespace Umbraco.Web.Editors
                 // in the back office requres the delimiter to be a '_' so we'll just replace it
                 .ToDictionary(key => key.Key.Replace("/", "_"), val => val.Value);
             var formatting = GlobalSettings.DebugMode ? Formatting.Indented : Formatting.None;
-            return new JsonNetResult { Data = textForCulture, Formatting = formatting };
+            return new JsonNetResult { Data = textForCulture, Formatting = Formatting.Indented };
         }
 
         /// <summary>
@@ -231,7 +231,7 @@ namespace Umbraco.Web.Editors
                     () => getResult(),
                     new TimeSpan(0, 10, 0));
             var formatting = GlobalSettings.DebugMode ? Formatting.Indented : Formatting.None;
-            return new JsonNetResult { Data = result, Formatting = formatting };
+            return new JsonNetResult { Data = result, Formatting = Formatting.Indented };
         }
 
         [UmbracoAuthorize(Order = 0)]
@@ -245,7 +245,7 @@ namespace Umbraco.Web.Editors
                 new DirectoryInfo(Server.MapPath(SystemDirectories.Config)),
                 HttpContext.IsDebuggingEnabled);
             var formatting = GlobalSettings.DebugMode ? Formatting.Indented : Formatting.None;
-            return new JsonNetResult { Data = gridConfig.EditorsConfig.Editors, Formatting = formatting };
+            return new JsonNetResult { Data = gridConfig.EditorsConfig.Editors, Formatting = Formatting.Indented };
         }
 
         

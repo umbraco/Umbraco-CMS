@@ -135,6 +135,9 @@ namespace Umbraco.Web
 
         public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
         {
+            if (content == null)
+                return false;
+
             if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == true)
                 return content.TemplateId == templateId;
 

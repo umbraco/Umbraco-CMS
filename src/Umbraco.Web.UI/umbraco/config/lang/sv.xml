@@ -182,10 +182,11 @@
     <key alias="visit">Besök</key>
   </area>
   <area alias="prompt">
-    <key alias="stay">Stay</key>
-    <key alias="discardChanges">Discard changes</key>
-    <key alias="unsavedChanges">You have unsaved changes</key>
-    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+    <key alias="stay">Stanna</key>
+    <key alias="discardChanges">Avfärda ändringar</key>
+    <key alias="unsavedChanges">Du har inte sparat dina ändringar</key>
+    <key alias="unsavedChangesWarning">Är du säker på att du vill navigera bort från denna sida? - du har inte sparat dina ändringar</key>
+    <key alias="confirmUnpublish">Avpublicering kommer att ta bort denna sida och alla dess ättlingar från hemsidan.</key>
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
