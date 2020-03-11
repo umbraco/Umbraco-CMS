@@ -21,8 +21,6 @@ namespace Umbraco.Web.Runtime
     /// <remarks>On top of CoreRuntime, handles all of the web-related runtime aspects of Umbraco.</remarks>
     public class WebRuntime : CoreRuntime
     {
-        private BuildManagerTypeFinder _typeFinder;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="WebRuntime"/> class.
         /// </summary>
@@ -91,8 +89,6 @@ namespace Umbraco.Web.Runtime
         }
 
         #region Getters
-
-        //protected override ITypeFinder GetTypeFinder() => _typeFinder ?? (_typeFinder = new BuildManagerTypeFinder(IOHelper, HostingEnvironment, Logger, new BuildManagerTypeFinder.TypeFinderConfig(new TypeFinderSettings())));
 
         protected override AppCaches GetAppCaches() => new AppCaches(
                 // we need to have the dep clone runtime cache provider to ensure

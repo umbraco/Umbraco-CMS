@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Composing
 {
+
     /// <inheritdoc cref="ITypeFinder"/>
     public class TypeFinder : ITypeFinder
     {
@@ -212,6 +213,11 @@ namespace Umbraco.Core.Composing
         /// <returns></returns>
         public virtual Type GetTypeByName(string name)
         {
+
+            //NOTE: This will not find types in dynamic assemblies unless those assemblies are already loaded
+            //into the appdomain.
+
+
             // This is exactly what the BuildManager does, if the type is an assembly qualified type
             // name it will find it.
             if (TypeNameContainsAssembly(name))

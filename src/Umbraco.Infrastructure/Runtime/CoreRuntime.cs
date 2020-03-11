@@ -370,6 +370,8 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         /// <returns></returns>
         protected virtual ITypeFinder GetTypeFinder()
+            // TODO: Currently we are not passing in any TypeFinderConfig (with ITypeFinderSettings) which we should do, however
+            // this is not critical right now and would require loading in some config before boot time so just leaving this as-is for now.
             => new TypeFinder(Logger, new DefaultUmbracoAssemblyProvider(Assembly.GetEntryAssembly()));
 
 
