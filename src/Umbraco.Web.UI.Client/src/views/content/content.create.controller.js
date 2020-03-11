@@ -22,10 +22,14 @@ function contentCreateController($scope,
     function initialize() {
         $scope.loading = true;
         $scope.allowedTypes = null;
-        $scope.countTypes = contentTypeResource.getCount;
         
         var getAllowedTypes = contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function (data) {
             $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
+            if ($scope.allowedTypes.length === 0) {
+                contentTypeResource.getCount().then(function(count) {
+                    $scope.countTypes = count;
+                });
+            }
         });
         var getCurrentUser = authResource.getCurrentUser().then(function (currentUser) {
             if (currentUser.allowedSections.indexOf("settings") > -1) {

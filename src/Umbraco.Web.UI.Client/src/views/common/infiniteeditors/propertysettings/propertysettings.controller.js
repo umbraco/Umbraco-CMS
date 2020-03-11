@@ -57,7 +57,8 @@
                 "validation_validateAsEmail", 
                 "validation_validateAsNumber", 
                 "validation_validateAsUrl", 
-                "validation_enterCustomValidation"
+                "validation_enterCustomValidation",
+                "validation_fieldIsMandatory"
             ];
 
             localizationService.localizeMany(labels)
@@ -67,6 +68,7 @@
                     vm.labels.validateAsNumber = data[1];
                     vm.labels.validateAsUrl = data[2];
                     vm.labels.customValidation = data[3];
+                    vm.labels.fieldIsMandatory = data[4];
 
                     vm.validationTypes = [
                         {

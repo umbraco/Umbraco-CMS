@@ -22,6 +22,7 @@ using Umbraco.Tests.Testing;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Templates;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -53,7 +54,7 @@ namespace Umbraco.Tests.PublishedContent
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new VoidEditor(logger)) { Id = 1 },
                 new DataType(new TrueFalsePropertyEditor(logger)) { Id = 1001 },
-                new DataType(new RichTextPropertyEditor(logger, umbracoContextAccessor, imageSourceParser, linkParser, pastedImages)) { Id = 1002 },
+                new DataType(new RichTextPropertyEditor(logger, umbracoContextAccessor, imageSourceParser, linkParser, pastedImages, Mock.Of<IImageUrlGenerator>())) { Id = 1002 },
                 new DataType(new IntegerPropertyEditor(logger)) { Id = 1003 },
                 new DataType(new TextboxPropertyEditor(logger)) { Id = 1004 },
                 new DataType(new MediaPickerPropertyEditor(logger)) { Id = 1005 });
