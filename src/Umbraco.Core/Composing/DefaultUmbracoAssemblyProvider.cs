@@ -29,6 +29,12 @@ namespace Umbraco.Core.Composing
             _entryPointAssembly = entryPointAssembly ?? throw new ArgumentNullException(nameof(entryPointAssembly));
         }
 
+        // TODO: It would be worth investigating a netcore3 version of this which would use
+        // var allAssemblies = System.Runtime.Loader.AssemblyLoadContext.All.SelectMany(x => x.Assemblies);
+        // that will still only resolve Assemblies that are already loaded but it would also make it possible to
+        // query dynamically generated assemblies once they are added. It would also provide the ability to probe
+        // assembly locations that are not in the same place as the entry point assemblies.
+
         public IEnumerable<Assembly> Assemblies
         {
             get
