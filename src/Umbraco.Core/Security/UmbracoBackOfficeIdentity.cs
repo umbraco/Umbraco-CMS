@@ -42,7 +42,7 @@ namespace Umbraco.Core.Security
         /// <param name="securityStamp"></param>
         /// <param name="allowedApps"></param>
         /// <param name="roles"></param>
-        [Obsolete]
+        [Obsolete("Start Nodes for Media and Content are not anymore read from cookie in backoffice")]
         public UmbracoBackOfficeIdentity(int userId, string username, string realName,
             IEnumerable<int> startContentNodes, IEnumerable<int> startMediaNodes, string culture,
             string sessionId, string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
@@ -73,7 +73,7 @@ namespace Umbraco.Core.Security
         /// <param name="securityStamp"></param>
         /// <param name="allowedApps"></param>
         /// <param name="roles"></param>
-        [Obsolete]
+        [Obsolete("Start Nodes for Media and Content are not anymore read from cookie in backoffice")]
         public UmbracoBackOfficeIdentity(ClaimsIdentity childIdentity,
             int userId, string username, string realName,
             IEnumerable<int> startContentNodes, IEnumerable<int> startMediaNodes, string culture,

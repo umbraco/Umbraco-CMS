@@ -48,8 +48,9 @@ namespace Umbraco.Core
             /// providers need to be setup differently and each auth type for the back office will be prefixed with this value
             /// </remarks>
             public const string BackOfficeExternalAuthenticationTypePrefix = "Umbraco.";
-
+            [Obsolete("Start Content Nodes Claims are not anymore in use")]
             public const string StartContentNodeIdClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/startcontentnode";
+            [Obsolete("Start Media Nodes Claims are not anymore in use")]
             public const string StartMediaNodeIdClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/startmedianode";
             public const string AllowedApplicationsClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/allowedapp";
             public const string SessionIdClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/sessionid";
