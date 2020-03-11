@@ -16,6 +16,13 @@ namespace Umbraco.Core.Composing
     {
         private readonly ILogger _logger;
         private readonly IAssemblyProvider _assemblyProvider;
+        private volatile HashSet<Assembly> _localFilteredAssemblyCache;
+        private readonly object _localFilteredAssemblyCacheLocker = new object();
+        private readonly List<string> _notifiedLoadExceptionAssemblies = new List<string>();
+        private static readonly ConcurrentDictionary<string, Type> TypeNamesCache = new ConcurrentDictionary<string, Type>();
+        private readonly string[] _assembliesAcceptingLoadExceptions;
+
+        internal bool QueryWithReferencingAssemblies = true;
 
         public TypeFinder(ILogger logger, IAssemblyProvider assemblyProvider, ITypeFinderConfig typeFinderConfig = null)
         {
@@ -23,12 +30,6 @@ namespace Umbraco.Core.Composing
             _assemblyProvider = assemblyProvider;
             _assembliesAcceptingLoadExceptions = typeFinderConfig?.AssembliesAcceptingLoadExceptions.Where(x => !x.IsNullOrWhiteSpace()).ToArray() ?? Array.Empty<string>();           
         }
-
-        private volatile HashSet<Assembly> _localFilteredAssemblyCache;
-        private readonly object _localFilteredAssemblyCacheLocker = new object();
-        private readonly List<string> _notifiedLoadExceptionAssemblies = new List<string>();
-        private static readonly ConcurrentDictionary<string, Type> TypeNamesCache= new ConcurrentDictionary<string, Type>();        
-        private readonly string[] _assembliesAcceptingLoadExceptions;
 
         private bool AcceptsLoadExceptions(Assembly a)
         {
@@ -268,18 +269,24 @@ namespace Umbraco.Core.Composing
             var stack = new Stack<Assembly>();
             stack.Push(attributeType.Assembly);
 
+            if (!QueryWithReferencingAssemblies)
+            {
+                foreach (var a in candidateAssemblies)
+                    stack.Push(a);
+            }
+
             while (stack.Count > 0)
             {
                 var assembly = stack.Pop();
 
-                Type[] assemblyTypes = null;
+                IReadOnlyList<Type> assemblyTypes = null;
                 if (assembly != attributeType.Assembly || attributeAssemblyIsCandidate)
                 {
                     // get all assembly types that can be assigned to baseType
                     try
                     {
                         assemblyTypes = GetTypesWithFormattedException(assembly)
-                            .ToArray(); // in try block
+                            .ToList(); // in try block
                     }
                     catch (TypeLoadException ex)
                     {
@@ -299,10 +306,13 @@ namespace Umbraco.Core.Composing
                 if (assembly != attributeType.Assembly && assemblyTypes.Where(attributeType.IsAssignableFrom).Any() == false)
                     continue;
 
-                foreach (var referencing in TypeHelper.GetReferencingAssemblies(assembly, candidateAssemblies))
+                if (QueryWithReferencingAssemblies)
                 {
-                    candidateAssemblies.Remove(referencing);
-                    stack.Push(referencing);
+                    foreach (var referencing in TypeHelper.GetReferencingAssemblies(assembly, candidateAssemblies))
+                    {
+                        candidateAssemblies.Remove(referencing);
+                        stack.Push(referencing);
+                    }
                 }
             }
 
@@ -333,19 +343,25 @@ namespace Umbraco.Core.Composing
             var stack = new Stack<Assembly>();
             stack.Push(baseType.Assembly);
 
+            if (!QueryWithReferencingAssemblies)
+            {
+                foreach (var a in candidateAssemblies)
+                    stack.Push(a);
+            }
+
             while (stack.Count > 0)
             {
                 var assembly = stack.Pop();
 
                 // get all assembly types that can be assigned to baseType
-                Type[] assemblyTypes = null;
+                IReadOnlyList<Type> assemblyTypes = null;
                 if (assembly != baseType.Assembly || baseTypeAssemblyIsCandidate)
                 {
                     try
                     {
                         assemblyTypes = GetTypesWithFormattedException(assembly)
                             .Where(baseType.IsAssignableFrom)
-                            .ToArray(); // in try block
+                            .ToList(); // in try block
                     }
                     catch (TypeLoadException ex)
                     {
@@ -365,10 +381,13 @@ namespace Umbraco.Core.Composing
                 if (assembly != baseType.Assembly && assemblyTypes.All(x => x.IsSealed))
                     continue;
 
-                foreach (var referencing in TypeHelper.GetReferencingAssemblies(assembly, candidateAssemblies))
+                if (QueryWithReferencingAssemblies)
                 {
-                    candidateAssemblies.Remove(referencing);
-                    stack.Push(referencing);
+                    foreach (var referencing in TypeHelper.GetReferencingAssemblies(assembly, candidateAssemblies))
+                    {
+                        candidateAssemblies.Remove(referencing);
+                        stack.Push(referencing);
+                    }
                 }
             }
 

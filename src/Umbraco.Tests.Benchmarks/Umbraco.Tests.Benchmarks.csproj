@@ -61,6 +61,7 @@
     <Compile Include="SqlTemplatesBenchmark.cs" />
     <Compile Include="StringReplaceManyBenchmarks.cs" />
     <Compile Include="TryConvertToBenchmarks.cs" />
+    <Compile Include="TypeFinderBenchmarks.cs" />
     <Compile Include="XmlBenchmarks.cs" />
   </ItemGroup>
   <ItemGroup>
