@@ -22,6 +22,7 @@ namespace Umbraco.Core.Composing
         private static readonly ConcurrentDictionary<string, Type> TypeNamesCache = new ConcurrentDictionary<string, Type>();
         private readonly string[] _assembliesAcceptingLoadExceptions;
 
+        // used for benchmark tests
         internal bool QueryWithReferencingAssemblies = true;
 
         public TypeFinder(ILogger logger, IAssemblyProvider assemblyProvider, ITypeFinderConfig typeFinderConfig = null)
