@@ -37,6 +37,7 @@ namespace Umbraco.Web.Editors
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
         private IRuntimeSettings _runtimeSettings;
+        private readonly ISecuritySettings _securitySettings;
 
         public PreviewController(
             UmbracoFeatures features,
@@ -51,7 +52,8 @@ namespace Umbraco.Web.Editors
             IHttpContextAccessor httpContextAccessor,
             IHostingEnvironment hostingEnvironment,
             ICookieManager cookieManager,
-            IRuntimeSettings settings)
+            IRuntimeSettings settings,
+            ISecuritySettings securitySettings)
         {
             _features = features;
             _globalSettings = globalSettings;
@@ -66,6 +68,7 @@ namespace Umbraco.Web.Editors
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
             _runtimeSettings = settings;
+            _securitySettings = securitySettings;
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
@@ -74,7 +77,7 @@ namespace Umbraco.Web.Editors
         {
             var availableLanguages = _localizationService.GetAllLanguages();
 
-            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _umbracoSettingsSection, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings);
+            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _umbracoSettingsSection, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {

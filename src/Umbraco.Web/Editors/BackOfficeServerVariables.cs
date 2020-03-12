@@ -39,6 +39,7 @@ namespace Umbraco.Web.Editors
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeSettings _settings;
+        private readonly ISecuritySettings _securitySettings;
 
         internal BackOfficeServerVariables(
             UrlHelper urlHelper,
@@ -51,7 +52,8 @@ namespace Umbraco.Web.Editors
             TreeCollection treeCollection,
             IHttpContextAccessor httpContextAccessor,
             IHostingEnvironment hostingEnvironment,
-            IRuntimeSettings settings)
+            IRuntimeSettings settings,
+            ISecuritySettings securitySettings)
         {
             _urlHelper = urlHelper;
             _runtimeState = runtimeState;
@@ -64,6 +66,7 @@ namespace Umbraco.Web.Editors
             _httpContextAccessor = httpContextAccessor;
             _hostingEnvironment = hostingEnvironment;
             _settings = settings;
+            _securitySettings = securitySettings;
         }
 
         /// <summary>
@@ -360,10 +363,10 @@ namespace Umbraco.Web.Editors
                             "maxFileSize",
                             GetMaxRequestLength()
                         },
-                        {"keepUserLoggedIn", _umbracoSettingsSection.Security.KeepUserLoggedIn},
-                        {"usernameIsEmail", _umbracoSettingsSection.Security.UsernameIsEmail},
+                        {"keepUserLoggedIn", _securitySettings.KeepUserLoggedIn},
+                        {"usernameIsEmail", _securitySettings.UsernameIsEmail},
                         {"cssPath", _ioHelper.ResolveUrl(globalSettings.UmbracoCssPath).TrimEnd('/')},
-                        {"allowPasswordReset", _umbracoSettingsSection.Security.AllowPasswordReset},
+                        {"allowPasswordReset", _securitySettings.AllowPasswordReset},
                         {"loginBackgroundImage",  _umbracoSettingsSection.Content.LoginBackgroundImage},
                         {"showUserInvite", EmailSender.CanSendRequiredEmail(globalSettings)},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail(globalSettings)},

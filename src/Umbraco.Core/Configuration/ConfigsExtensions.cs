@@ -28,6 +28,15 @@ namespace Umbraco.Core
         public static IUmbracoSettingsSection Settings(this Configs configs)
             => configs.GetConfig<IUmbracoSettingsSection>();
 
+        public static ISecuritySettings Security(this Configs configs)
+            => configs.GetConfig<ISecuritySettings>();
+
+
+        public static IUserPasswordConfiguration UserPasswordConfiguration(this Configs configs)
+            => configs.GetConfig<IUserPasswordConfiguration>();
+        public static IMemberPasswordConfiguration MemberPasswordConfiguration(this Configs configs)
+            => configs.GetConfig<IMemberPasswordConfiguration>();
+
         public static IRequestHandlerSettings RequestHandler(this Configs configs)
             => configs.GetConfig<IRequestHandlerSettings>();
 
@@ -42,24 +51,6 @@ namespace Umbraco.Core
 
         public static ICoreDebug CoreDebug(this Configs configs)
             => configs.GetConfig<ICoreDebug>();
-
-        public static IUserPasswordConfiguration UserPasswordConfiguration(this Configs configs)
-            => configs.GetConfig<IUserPasswordConfiguration>();
-
-        public static IMemberPasswordConfiguration MemberPasswordConfiguration(this Configs configs)
-            => configs.GetConfig<IMemberPasswordConfiguration>();
-
-        public static void AddPasswordConfigurations(this Configs configs)
-        {
-            configs.Add<IUserPasswordConfiguration>(() =>
-            {
-                return new UserPasswordConfiguration(configs.Settings().Security.UserPasswordConfiguration);
-            });
-            configs.Add<IMemberPasswordConfiguration>(() =>
-            {
-                return new MemberPasswordConfiguration(configs.Settings().Security.MemberPasswordConfiguration);
-            });
-        }
 
         public static void AddCoreConfigs(this Configs configs, IIOHelper ioHelper)
         {

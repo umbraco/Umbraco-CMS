@@ -24,6 +24,9 @@ namespace Umbraco.Core.Configuration
         public IKeepAliveSettings KeepAliveSettings { get; } = new KeepAliveSettings();
         public IWebRoutingSettings WebRoutingSettings { get; } = new WebRoutingSettings();
         public IRequestHandlerSettings RequestHandlerSettings { get; } = new RequestHandlerSettings();
+        public ISecuritySettings SecuritySettings { get; } = new SecuritySettings();
+        public IUserPasswordConfiguration UserPasswordConfigurationSettings { get; } = new UserPasswordConfigurationSettings();
+        public IMemberPasswordConfiguration MemberPasswordConfigurationSettings { get; } = new MemberPasswordConfigurationSettings();
 
         public IUmbracoSettingsSection UmbracoSettings { get; }
 
@@ -35,10 +38,6 @@ namespace Umbraco.Core.Configuration
 
             configs.Add<IUmbracoSettingsSection>("umbracoConfiguration/settings");
             configs.Add<IHealthChecks>("umbracoConfiguration/HealthChecks");
-
-            // Password configuration is held within IUmbracoSettingsSection from umbracoConfiguration/settings but we'll add explicitly
-            // so it can be independently retrieved in classes that need it.
-            configs.AddPasswordConfigurations();
 
             configs.Add(() => CoreDebug);
             configs.Add(() => MachineKeyConfig);
@@ -58,6 +57,9 @@ namespace Umbraco.Core.Configuration
             configs.Add<IKeepAliveSettings>(() => KeepAliveSettings);
             configs.Add<IWebRoutingSettings>(() => WebRoutingSettings);
             configs.Add<IRequestHandlerSettings>(() => RequestHandlerSettings);
+            configs.Add<ISecuritySettings>(() => SecuritySettings);
+            configs.Add<IUserPasswordConfiguration>(() => UserPasswordConfigurationSettings);
+            configs.Add<IMemberPasswordConfiguration>(() => MemberPasswordConfigurationSettings);
 
             configs.AddCoreConfigs(ioHelper);
             return configs;

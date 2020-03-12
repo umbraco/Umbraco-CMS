@@ -416,6 +416,9 @@ namespace Umbraco.Tests.Testing
             Composition.Configs.Add(SettingsForTests.GetDefaultHostingSettings);
             Composition.Configs.Add(SettingsForTests.GenerateMockRequestHandlerSettings);
             Composition.Configs.Add(SettingsForTests.GenerateMockWebRoutingSettings);
+            Composition.Configs.Add(SettingsForTests.GenerateMockSecuritySettings);
+            Composition.Configs.Add(SettingsForTests.GenerateMockUserPasswordConfiguration);
+            Composition.Configs.Add(SettingsForTests.GenerateMockMemberPasswordConfiguration);
 
             //Composition.Configs.Add<IUserPasswordConfiguration>(() => new DefaultUserPasswordConfig());
         }

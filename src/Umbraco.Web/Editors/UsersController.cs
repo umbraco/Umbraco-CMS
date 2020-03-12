@@ -50,6 +50,7 @@ namespace Umbraco.Web.Editors
         private readonly IIOHelper _ioHelper;
         private readonly ISqlContext _sqlContext;
         private readonly IImageUrlGenerator _imageUrlGenerator;
+        private readonly ISecuritySettings _securitySettings;
 
         public UsersController(
             IGlobalSettings globalSettings,
@@ -65,7 +66,8 @@ namespace Umbraco.Web.Editors
             IUmbracoSettingsSection umbracoSettingsSection,
             IIOHelper ioHelper,
             IImageUrlGenerator imageUrlGenerator,
-            IPublishedUrlProvider publishedUrlProvider)
+            IPublishedUrlProvider publishedUrlProvider,
+            ISecuritySettings securitySettings)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _mediaFileSystem = mediaFileSystem;
@@ -73,6 +75,7 @@ namespace Umbraco.Web.Editors
             _ioHelper = ioHelper;
             _sqlContext = sqlContext;
             _imageUrlGenerator = imageUrlGenerator;
+            _securitySettings = securitySettings;
         }
 
         /// <summary>
@@ -230,7 +233,7 @@ namespace Umbraco.Web.Editors
             // so to do that here, we'll need to check if this current user is an admin and if not we should exclude all user who are
             // also admins
 
-            var hideDisabledUsers = _umbracoSettingsSection.Security.HideDisabledUsersInBackoffice;
+            var hideDisabledUsers = _securitySettings.HideDisabledUsersInBackoffice;
             var excludeUserGroups = new string[0];
             var isAdmin = Security.CurrentUser.IsAdmin();
             if (isAdmin == false)
@@ -288,7 +291,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
 
-            if (_umbracoSettingsSection.Security.UsernameIsEmail)
+            if (_securitySettings.UsernameIsEmail)
             {
                 //ensure they are the same if we're using it
                 userSave.Username = userSave.Email;
@@ -380,7 +383,7 @@ namespace Umbraco.Web.Editors
             }
 
             IUser user;
-            if (_umbracoSettingsSection.Security.UsernameIsEmail)
+            if (_securitySettings.UsernameIsEmail)
             {
                 //ensure it's the same
                 userSave.Username = userSave.Email;
@@ -454,7 +457,7 @@ namespace Umbraco.Web.Editors
             if (user != null && (extraCheck == null || extraCheck(user)))
             {
                 ModelState.AddModelError(
-                    _umbracoSettingsSection.Security.UsernameIsEmail ? "Email" : "Username",
+                    _securitySettings.UsernameIsEmail ? "Email" : "Username",
                     "A user with the username already exists");
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
@@ -574,7 +577,7 @@ namespace Umbraco.Web.Editors
 
             // if the found user has their email for username, we want to keep this synced when changing the email.
             // we have already cross-checked above that the email isn't colliding with anything, so we can safely assign it here.
-            if (_umbracoSettingsSection.Security.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
+            if (_securitySettings.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
             {
                 userSave.Username = userSave.Email;
             }

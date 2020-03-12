@@ -15,7 +15,6 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             // register others
 
             composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
-            composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Security);
 
             return composition;
         }

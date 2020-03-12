@@ -45,18 +45,8 @@ namespace Umbraco.Tests.TestHelpers
             var settings = new Mock<IUmbracoSettingsSection>();
 
             var content = new Mock<IContentSection>();
-            var security = new Mock<ISecuritySection>();
-            var requestHandler = new Mock<IRequestHandlerSettings>();
-            var logging = new Mock<ILoggingSettings>();
-            var routing = new Mock<IWebRoutingSettings>();
-
-            var userPasswordConfig = new Mock<IUserPasswordConfigurationSection>();
-            var memberPasswordConfig = new Mock<IMemberPasswordConfigurationSection>();
-            security.Setup(x => x.UserPasswordConfiguration).Returns(userPasswordConfig.Object);
-            security.Setup(x => x.MemberPasswordConfiguration).Returns(memberPasswordConfig.Object);
 
             settings.Setup(x => x.Content).Returns(content.Object);
-            settings.Setup(x => x.Security).Returns(security.Object);
 
             //Now configure some defaults - the defaults in the config section classes do NOT pertain to the mocked data!!
             settings.Setup(x => x.Content.ImageAutoFillProperties).Returns(ContentImagingElement.GetDefaultImageAutoFillProperties());
@@ -182,6 +172,27 @@ namespace Umbraco.Tests.TestHelpers
             mock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
             mock.Setup(x => x.TryConvertUrlsToAscii).Returns(false);
             mock.Setup(x => x.CharCollection).Returns(RequestHandlerElement.GetDefaultCharReplacements);
+
+            return mock.Object;
+        }
+
+        public static ISecuritySettings GenerateMockSecuritySettings()
+        {
+            var security = new Mock<ISecuritySettings>();
+
+            return security.Object;
+        }
+
+        public static IUserPasswordConfiguration GenerateMockUserPasswordConfiguration()
+        {
+            var mock = new Mock<IUserPasswordConfiguration>();
+
+            return mock.Object;
+        }
+
+        public static IMemberPasswordConfiguration GenerateMockMemberPasswordConfiguration()
+        {
+            var mock = new Mock<IMemberPasswordConfiguration>();
 
             return mock.Object;
         }

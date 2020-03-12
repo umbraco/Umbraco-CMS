@@ -92,7 +92,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IUmbracoSettingsSection>(),
                     Factory.GetInstance<IIOHelper>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
-                    Factory.GetInstance<IPublishedUrlProvider>()
+                    Factory.GetInstance<IPublishedUrlProvider>(),
+                    Factory.GetInstance<ISecuritySettings>()
 
                 );
                 return usersController;
@@ -164,7 +165,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IUmbracoSettingsSection>(),
                     Factory.GetInstance<IIOHelper>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
-                    Factory.GetInstance<IPublishedUrlProvider>()
+                    Factory.GetInstance<IPublishedUrlProvider>(),
+                    Factory.GetInstance<ISecuritySettings>()
                 );
                 return usersController;
             }
@@ -206,7 +208,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IUmbracoSettingsSection>(),
                     Factory.GetInstance<IIOHelper>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
-                    Factory.GetInstance<IPublishedUrlProvider>()
+                    Factory.GetInstance<IPublishedUrlProvider>(),
+                    Factory.GetInstance<ISecuritySettings>()
                 );
                 return usersController;
             }
@@ -283,7 +286,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IUmbracoSettingsSection>(),
                     Factory.GetInstance<IIOHelper>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
-                    Factory.GetInstance<IPublishedUrlProvider>()
+                    Factory.GetInstance<IPublishedUrlProvider>(),
+                    Factory.GetInstance<ISecuritySettings>()
                 );
                 return usersController;
             }

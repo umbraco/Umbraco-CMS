@@ -29,6 +29,7 @@ namespace Umbraco.Web
         protected IUmbracoContextAccessor UmbracoContextAccessor => Current.UmbracoContextAccessor;
         protected IGlobalSettings GlobalSettings => Current.Configs.Global();
         protected IUmbracoSettingsSection UmbracoSettings => Current.Configs.Settings();
+        protected ISecuritySettings SecuritySettings => Current.Configs.Security();
         protected IUserPasswordConfiguration UserPasswordConfig => Current.Configs.UserPasswordConfiguration();
         protected IRuntimeState RuntimeState => Current.RuntimeState;
         protected ServiceContext Services => Current.Services;
@@ -104,9 +105,9 @@ namespace Umbraco.Web
             // Ensure owin is configured for Umbraco back office authentication.
             // Front-end OWIN cookie configuration must be declared after this code.
             app
-                .UseUmbracoBackOfficeCookieAuthentication(UmbracoContextAccessor, RuntimeState, Services.UserService, GlobalSettings, UmbracoSettings.Security, IOHelper, RequestCache, PipelineStage.Authenticate, UmbracoSettings)
+                .UseUmbracoBackOfficeCookieAuthentication(UmbracoContextAccessor, RuntimeState, Services.UserService, GlobalSettings, SecuritySettings, IOHelper, RequestCache, PipelineStage.Authenticate)
                 .UseUmbracoBackOfficeExternalCookieAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, IOHelper, RequestCache, PipelineStage.Authenticate)
-                .UseUmbracoPreviewAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, UmbracoSettings.Security, IOHelper, RequestCache, PipelineStage.Authorize);
+                .UseUmbracoPreviewAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, SecuritySettings, IOHelper, RequestCache, PipelineStage.Authorize);
         }
 
         public static event EventHandler<OwinMiddlewareConfiguredEventArgs> MiddlewareConfigured;

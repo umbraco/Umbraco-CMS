@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using NUnit.Framework;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Tests.TestHelpers;
 
@@ -38,5 +39,8 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         protected ILoggingSettings LoggingSettings => Settings.Logging;
         protected IWebRoutingSettings WebRoutingSettings => Settings.WebRouting;
         protected IRequestHandlerSettings RequestHandlerSettings => Settings.RequestHandler;
+        protected ISecuritySettings SecuritySettings => Settings.Security;
+        protected IUserPasswordConfiguration UserPasswordConfiguration => Settings.Security.UserPasswordConfiguration;
+        protected IMemberPasswordConfiguration MemberPasswordConfiguration => Settings.Security.MemberPasswordConfiguration;
     }
 }

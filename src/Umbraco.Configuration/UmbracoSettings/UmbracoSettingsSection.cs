@@ -26,7 +26,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         internal KeepAliveElement KeepAlive => (KeepAliveElement)this["keepAlive"];
 
         IContentSection IUmbracoSettingsSection.Content => Content;
-
-        ISecuritySection IUmbracoSettingsSection.Security => Security;
     }
 }

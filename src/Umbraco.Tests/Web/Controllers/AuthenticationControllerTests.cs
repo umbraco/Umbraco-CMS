@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     Factory.GetInstance<UmbracoMapper>(),
-                    Factory.GetInstance<IUmbracoSettingsSection>(),
+                    Factory.GetInstance<ISecuritySettings>(),
                     Factory.GetInstance<IIOHelper>(),
                     Factory.GetInstance<IPublishedUrlProvider>()
                     );
