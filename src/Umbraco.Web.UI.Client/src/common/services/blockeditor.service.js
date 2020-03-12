@@ -82,12 +82,10 @@
 
 
         /**
-         * Used to create a scoped watcher for a property on a blockModel.
+         * Used to create a scoped watcher for a content property on a blockModel.
          */
-        function createPropWatcher(blockModel, prop)  {
-
+        function createContentModelPropWatcher(blockModel, prop)  {
             return function() {
-
                 // sync data:
                 blockModel.contentModel[prop.alias] = prop.value;
 
@@ -95,7 +93,16 @@
                 // TODO: could use a debounce.
                 blockModel.label = getBlockLabel(blockModel);
             }
+        }
 
+        /**
+         * Used to create a scoped watcher for a settings property on a blockModel.
+         */
+        function createSettingsModelPropWatcher(blockModel, prop)  {
+            return function() {
+                // sync data:
+                blockModel.layoutModel.settings[prop.alias] = prop.value;
+            }
         }
 
 
@@ -143,7 +150,7 @@
                 this.blockConfigurations.forEach(blockConfiguration => {
                     scaffoldAliases.push(blockConfiguration.contentTypeAlias);
                     if (blockConfiguration.settingsElementTypeAlias != null) {
-                        scaffoldAliases.push(elementType.settingsElementTypeAlias);
+                        scaffoldAliases.push(blockConfiguration.settingsElementTypeAlias);
                     }
                 });
 
@@ -233,7 +240,12 @@
                 blockModel.layoutModel = layoutEntry;
                 blockModel.watchers = [];
 
-                // TODO: settings
+                // TODO: implement settings
+
+                // create ElementTypeModel of settings
+                // store ElementTypeModel in blockModel.settings
+                // setup watchers for mapping
+
 
                 // Add blockModel to our isolated scope to enable watching its values:
                 this.isolatedScope.blockModels["_"+blockModel.key] = blockModel;
@@ -249,7 +261,7 @@
                         // Do notice that it is not performing a deep watch, meaning that we are only watching primatives and changes directly to the object of property-value.
                         // But we like to sync non-primative values as well! Yes, and this does happen, just not through this code, but through the nature of JavaScript. 
                         // Non-primative values act as references to the same data and are therefor synced.
-                        blockModel.watchers.push(this.isolatedScope.$watch("blockModels._"+blockModel.key+".content.variants[0].tabs["+t+"].properties["+p+"].value", createPropWatcher(blockModel, prop)));
+                        blockModel.watchers.push(this.isolatedScope.$watch("blockModels._"+blockModel.key+".content.variants[0].tabs["+t+"].properties["+p+"].value", createContentModelPropWatcher(blockModel, prop)));
                     }
                 }
 
@@ -286,7 +298,8 @@
 
                 mapToPropertyModel(blockModel.content, blockModel.contentModel);
 
-                // TODO: sync settings to layout entry.
+                // TODO: implement settings, sync settings to layout entry.
+                // mapToPropertyModel(blockModel.settings, blockModel.layoutModel.settings)
 
             },
 
@@ -318,7 +331,7 @@
                 }
 
                 if (blockConfiguration.settingsElementTypeAlias != null) {
-                    // TODO: Settings.
+                    entry.settings = {};
                 }
                 
                 return entry;

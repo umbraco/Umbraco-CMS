@@ -1,11 +1,14 @@
 //used for the media picker dialog
 angular.module("umbraco")
-.controller("Umbraco.Editors.ElementEditorController",
+.controller("Umbraco.Editors.BlockEditorController",
     function ($scope) {
 
         var vm = this;
 
         vm.content = $scope.model.content;
+
+        // TODO: implement settings — do notice that settings is optional.
+        //vm.settings = $scope.model.settings;
 
         vm.title = $scope.model.title;
 

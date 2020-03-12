@@ -16,6 +16,7 @@
     <key alias="createGroup">Opret gruppe</key>
     <key alias="delete">Slet</key>
     <key alias="disable">Deaktivér</key>
+    <key alias="editSettings">Edit settings</key>
     <key alias="emptyRecycleBin">Tøm papirkurv</key>
     <key alias="enable">Aktivér</key>
     <key alias="exportDocumentType">Eksportér dokumenttype</key>

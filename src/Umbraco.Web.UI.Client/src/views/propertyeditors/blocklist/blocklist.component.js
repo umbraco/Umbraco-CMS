@@ -123,6 +123,9 @@
             // Lets apply fallback views, and make the view available directly on the blockModel.
             block.view = block.config.view || vm.model.config.useInlineEditingAsDefault ? "views/blockelements/inlineblock/inlineblock.editor.html" : "views/blockelements/labelblock/labelblock.editor.html";
 
+            block.showSettings = block.config.settingsElementTypeAlias != null;
+            console.log(block)
+
             return block;
         }
 
@@ -184,15 +187,20 @@
 
             // make a clone to avoid editing model directly.
             var blockContentModelClone = angular.copy(blockModel.content);
+
+            // TODO: implement settings
+            // Settings should be available as a tab in this overlay:
+            //var blockSettingsModelClone = angular.copy(blockModel.settings);
             
-            var elementEditorModel = {
+            var blockEditorModel = {
                 content: blockContentModelClone,
+                //settings: blockSettingsModelClone,
                 title: blockModel.label,
-                view: "views/common/infiniteeditors/elementeditor/elementeditor.html",
+                view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
                 size: blockModel.config.overlaySize || "medium",
-                submit: function(elementEditorModel) {
+                submit: function(blockEditorModel) {
                     // To ensure syncronization gets tricked we transfer
-                    blockEditorService.mapElementTypeValues(elementEditorModel.content, blockModel.content)
+                    blockEditorService.mapElementTypeValues(blockEditorModel.content, blockModel.content)
                     editorService.close();
                 },
                 close: function() {
@@ -201,7 +209,7 @@
             };
 
             // open property settings editor
-            editorService.open(elementEditorModel);
+            editorService.open(blockEditorModel);
         }
 
         vm.showCreateDialog = showCreateDialog;
@@ -244,7 +252,7 @@
                 },
                 close: function () {
                     vm.blockTypePicker.show = false;
-                    vm.blockTypePicker = null;
+                    delete vm.blockTypePicker;
                 }
             };
 
@@ -372,6 +380,21 @@
             });
         }
 
+        function openSettingsForBlock() {
+            alert("settings not implemented jet.");
+        }
+
+
+
+        vm.blockEditorApi = {
+            editBlock: editBlock,
+            requestCopyBlock: requestCopyBlock,
+            requestDeleteBlock: requestDeleteBlock,
+            deleteBlock: deleteBlock,
+            openSettingsForBlock: openSettingsForBlock
+        }
+
+
 
         var runtimeSortVars = {};
 
@@ -411,13 +434,6 @@
                 });
             }
         };
-
-        vm.blockEditorApi = {
-            editBlock: editBlock,
-            requestCopyBlock: requestCopyBlock,
-            requestDeleteBlock: requestDeleteBlock,
-            deleteBlock: deleteBlock
-        }
 
 
         function onAmountOfBlocksChanged() {

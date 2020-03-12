@@ -19,6 +19,12 @@
                     </div>
 
                     <div class="umb-block-list__block--actions">
+                        <button type="button" class="btn-reset action --copy" localize="title" title="actions_editSettings" ng-click="vm.blockEditorApi.openSettingsForBlock(block);" ng-if="block.showSettings === true">
+                            <i class="icon icon-settings" aria-hidden="true"></i>
+                            <span class="sr-only">
+                                <localize key="general_settings">Settings</localize>
+                            </span>
+                        </button>
                         <button type="button" class="btn-reset action --copy" localize="title" title="actions_copy" ng-click="vm.blockEditorApi.requestCopyBlock(block);" ng-if="vm.showCopy">
                             <i class="icon icon-documents" aria-hidden="true"></i>
                             <span class="sr-only">

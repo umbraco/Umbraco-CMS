@@ -1,6 +1,6 @@
-<div class="umb-element-editor"  ng-controller="Umbraco.Editors.ElementEditorController as vm">
+<div class="umb-block-editor"  ng-controller="Umbraco.Editors.BlockEditorController as vm">
 
-    <ng-form name="elementTypeForm" val-form-manager>
+    <ng-form name="blockForm" val-form-manager>
         <umb-editor-view ng-if="!page.loading">
 
             <umb-editor-header
@@ -14,7 +14,15 @@
 
             <div class="umb-editor-container umb-panel-body umb-scrollable row-fluid">
 
-                <!-- Missing Deleted Message Bar (Displayed when viewing node in recycle bin) -->
+                <!-- Missing Deleted Message Bar (Displayed when viewing node in recycle bin), but Blocks dosnt go into trash-bin, so does not make sense currently
+                    <div ng-show="vm.content.trashed" class="umb-editor--trashed-message">
+                        <i class="icon icon-trash"></i> <localize key="content_nodeIsInTrash">This item is in the Recycle Bin</localize>
+                    </div>
+                -->
+
+                <!-- Missing content apps? — but i'm not sure content apps will or can work for ElementTypes? -->
+
+                <!-- TODO: implement settings -->
 
                 <div class="umb-pane">
                     <div class="umb-editor-sub-views" val-sub-view>
