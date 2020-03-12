@@ -96,7 +96,7 @@ namespace Umbraco.Tests.Runtimes
 
             private static Configs GetConfigs()
             {
-                var configs = new ConfigsFactory().Create(_ioHelper);
+                var configs = new ConfigsFactory().Create(_ioHelper, _logger);
                 configs.Add(SettingsForTests.GetDefaultGlobalSettings);
                 configs.Add(SettingsForTests.GenerateMockContentSettings);
                 configs.Add(SettingsForTests.GetDefaultHostingSettings);

@@ -4,6 +4,7 @@ using Umbraco.Configuration.Implementations;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Configuration
 {
@@ -29,7 +30,7 @@ namespace Umbraco.Core.Configuration
         public IMemberPasswordConfiguration MemberPasswordConfigurationSettings { get; } = new MemberPasswordConfigurationSettings();
         public IContentSettings ContentSettings { get; } = new ContentSettings();
 
-        public Configs Create(IIOHelper ioHelper)
+        public Configs Create(IIOHelper ioHelper, ILogger logger)
         {
             var configs =  new Configs(section => ConfigurationManager.GetSection(section));
             configs.Add<IGlobalSettings>(() => new GlobalSettings(ioHelper));
@@ -39,7 +40,7 @@ namespace Umbraco.Core.Configuration
 
             configs.Add(() => CoreDebug);
             configs.Add(() => MachineKeyConfig);
-            configs.Add<IConnectionStrings>(() => new ConnectionStrings(ioHelper));
+            configs.Add<IConnectionStrings>(() => new ConnectionStrings(ioHelper, logger));
             configs.Add<IModelsBuilderConfig>(() => new ModelsBuilderConfig(ioHelper));
 
 

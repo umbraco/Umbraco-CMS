@@ -50,7 +50,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static Configs GetConfigs()
         {
-            return GetConfigsFactory().Create(IOHelper);
+            return GetConfigsFactory().Create(IOHelper, Mock.Of<ILogger>());
         }
         public static IRuntimeState GetRuntimeState()
         {
