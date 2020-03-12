@@ -61,7 +61,7 @@ namespace Umbraco.Web
 
         // maps an internal umbraco uri to a public uri
         // ie with virtual directory, .aspx if required...
-        public Uri UriFromUmbraco(Uri uri, IGlobalSettings globalSettings, IRequestHandlerSection requestConfig)
+        public Uri UriFromUmbraco(Uri uri, IGlobalSettings globalSettings, IRequestHandlerSettings requestConfig)
         {
             var path = uri.GetSafeAbsolutePath();
 

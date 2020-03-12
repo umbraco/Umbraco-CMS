@@ -7,7 +7,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IContentSection Content { get; }
 
         ISecuritySection Security { get; }
-
-        IRequestHandlerSection RequestHandler { get; }
     }
 }

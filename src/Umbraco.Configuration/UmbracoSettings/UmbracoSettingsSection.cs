@@ -28,7 +28,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IContentSection IUmbracoSettingsSection.Content => Content;
 
         ISecuritySection IUmbracoSettingsSection.Security => Security;
-
-        IRequestHandlerSection IUmbracoSettingsSection.RequestHandler => RequestHandler;
     }
 }

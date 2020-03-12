@@ -23,6 +23,7 @@ namespace Umbraco.Core.Configuration
         public ILoggingSettings LoggingSettings { get; } = new LoggingSettings();
         public IKeepAliveSettings KeepAliveSettings { get; } = new KeepAliveSettings();
         public IWebRoutingSettings WebRoutingSettings { get; } = new WebRoutingSettings();
+        public IRequestHandlerSettings RequestHandlerSettings { get; } = new RequestHandlerSettings();
 
         public IUmbracoSettingsSection UmbracoSettings { get; }
 
@@ -56,6 +57,7 @@ namespace Umbraco.Core.Configuration
             configs.Add<ILoggingSettings>(() => LoggingSettings);
             configs.Add<IKeepAliveSettings>(() => KeepAliveSettings);
             configs.Add<IWebRoutingSettings>(() => WebRoutingSettings);
+            configs.Add<IRequestHandlerSettings>(() => RequestHandlerSettings);
 
             configs.AddCoreConfigs(ioHelper);
             return configs;

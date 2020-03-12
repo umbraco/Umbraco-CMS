@@ -28,6 +28,9 @@ namespace Umbraco.Core
         public static IUmbracoSettingsSection Settings(this Configs configs)
             => configs.GetConfig<IUmbracoSettingsSection>();
 
+        public static IRequestHandlerSettings RequestHandler(this Configs configs)
+            => configs.GetConfig<IRequestHandlerSettings>();
+
         public static IWebRoutingSettings WebRouting(this Configs configs)
             => configs.GetConfig<IWebRoutingSettings>();
 

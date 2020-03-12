@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Routing
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
-            var settings = SettingsForTests.GenerateMockUmbracoSettings();
+            var settings = SettingsForTests.GenerateMockRequestHandlerSettings();
 
             SetDomains1();
 
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Routing
             // get the nice url for 100111
             var umbracoContext = GetUmbracoContext(url, 9999, globalSettings:globalSettings.Object);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
-            var urlProvider = new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object,
+            var urlProvider = new DefaultUrlProvider(settings, Logger, globalSettings.Object,
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 

@@ -37,5 +37,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
 
         protected ILoggingSettings LoggingSettings => Settings.Logging;
         protected IWebRoutingSettings WebRoutingSettings => Settings.WebRouting;
+        protected IRequestHandlerSettings RequestHandlerSettings => Settings.RequestHandler;
     }
 }

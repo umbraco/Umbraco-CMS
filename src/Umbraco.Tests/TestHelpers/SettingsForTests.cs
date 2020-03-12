@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Configuration;
+using System.Linq;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -45,7 +46,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var content = new Mock<IContentSection>();
             var security = new Mock<ISecuritySection>();
-            var requestHandler = new Mock<IRequestHandlerSection>();
+            var requestHandler = new Mock<IRequestHandlerSettings>();
             var logging = new Mock<ILoggingSettings>();
             var routing = new Mock<IWebRoutingSettings>();
 
@@ -56,13 +57,11 @@ namespace Umbraco.Tests.TestHelpers
 
             settings.Setup(x => x.Content).Returns(content.Object);
             settings.Setup(x => x.Security).Returns(security.Object);
-            settings.Setup(x => x.RequestHandler).Returns(requestHandler.Object);
 
             //Now configure some defaults - the defaults in the config section classes do NOT pertain to the mocked data!!
             settings.Setup(x => x.Content.ImageAutoFillProperties).Returns(ContentImagingElement.GetDefaultImageAutoFillProperties());
             settings.Setup(x => x.Content.ImageFileTypes).Returns(ContentImagingElement.GetDefaultImageFileTypes());
-            settings.Setup(x => x.RequestHandler.AddTrailingSlash).Returns(true);
-            settings.Setup(x => x.RequestHandler.CharCollection).Returns(RequestHandlerElement.GetDefaultCharReplacements());
+
 
             return settings.Object;
         }
@@ -168,9 +167,21 @@ namespace Umbraco.Tests.TestHelpers
         {
             var mock = new Mock<IWebRoutingSettings>();
 
-            mock.Setup(x => x.TrySkipIisCustomErrors).Returns(false);
+            mock.Setup(x => x.DisableRedirectUrlTracking).Returns(false);
             mock.Setup(x => x.InternalRedirectPreservesTemplate).Returns(false);
             mock.Setup(x => x.UrlProviderMode).Returns(UrlMode.Auto.ToString());
+
+            return mock.Object;
+        }
+
+        public static IRequestHandlerSettings GenerateMockRequestHandlerSettings()
+        {
+            var mock = new Mock<IRequestHandlerSettings>();
+
+            mock.Setup(x => x.AddTrailingSlash).Returns(true);
+            mock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
+            mock.Setup(x => x.TryConvertUrlsToAscii).Returns(false);
+            mock.Setup(x => x.CharCollection).Returns(RequestHandlerElement.GetDefaultCharReplacements);
 
             return mock.Object;
         }

@@ -14,13 +14,13 @@ namespace Umbraco.Web.Routing
     public class AliasUrlProvider : IUrlProvider
     {
         private readonly IGlobalSettings _globalSettings;
-        private readonly IRequestHandlerSection _requestConfig;
+        private readonly IRequestHandlerSettings _requestConfig;
         private readonly ISiteDomainHelper _siteDomainHelper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly UriUtility _uriUtility;
         private readonly IPublishedValueFallback _publishedValueFallback;
 
-        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig, ISiteDomainHelper siteDomainHelper, UriUtility uriUtility, IPublishedValueFallback publishedValueFallback, IUmbracoContextAccessor umbracoContextAccessor)
+        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSettings requestConfig, ISiteDomainHelper siteDomainHelper, UriUtility uriUtility, IPublishedValueFallback publishedValueFallback, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _globalSettings = globalSettings;
             _requestConfig = requestConfig;
