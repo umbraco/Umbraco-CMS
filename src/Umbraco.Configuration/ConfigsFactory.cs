@@ -27,8 +27,7 @@ namespace Umbraco.Core.Configuration
         public ISecuritySettings SecuritySettings { get; } = new SecuritySettings();
         public IUserPasswordConfiguration UserPasswordConfigurationSettings { get; } = new UserPasswordConfigurationSettings();
         public IMemberPasswordConfiguration MemberPasswordConfigurationSettings { get; } = new MemberPasswordConfigurationSettings();
-
-        public IUmbracoSettingsSection UmbracoSettings { get; }
+        public IContentSettings ContentSettings { get; } = new ContentSettings();
 
         public Configs Create(IIOHelper ioHelper)
         {
@@ -36,7 +35,6 @@ namespace Umbraco.Core.Configuration
             configs.Add<IGlobalSettings>(() => new GlobalSettings(ioHelper));
             configs.Add(() => HostingSettings);
 
-            configs.Add<IUmbracoSettingsSection>("umbracoConfiguration/settings");
             configs.Add<IHealthChecks>("umbracoConfiguration/HealthChecks");
 
             configs.Add(() => CoreDebug);
@@ -60,6 +58,7 @@ namespace Umbraco.Core.Configuration
             configs.Add<ISecuritySettings>(() => SecuritySettings);
             configs.Add<IUserPasswordConfiguration>(() => UserPasswordConfigurationSettings);
             configs.Add<IMemberPasswordConfiguration>(() => MemberPasswordConfigurationSettings);
+            configs.Add<IContentSettings>(() => ContentSettings);
 
             configs.AddCoreConfigs(ioHelper);
             return configs;

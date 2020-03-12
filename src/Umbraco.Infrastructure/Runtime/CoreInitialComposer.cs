@@ -44,7 +44,6 @@ namespace Umbraco.Core.Runtime
 
             // composers
             composition
-                .ComposeConfiguration()
                 .ComposeRepositories()
                 .ComposeServices()
                 .ComposeCoreMappingProfiles()

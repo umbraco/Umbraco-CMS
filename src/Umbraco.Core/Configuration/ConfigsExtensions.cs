@@ -25,8 +25,8 @@ namespace Umbraco.Core
         public static IConnectionStrings ConnectionStrings(this Configs configs)
             => configs.GetConfig<IConnectionStrings>();
 
-        public static IUmbracoSettingsSection Settings(this Configs configs)
-            => configs.GetConfig<IUmbracoSettingsSection>();
+        public static IContentSettings Content(this Configs configs)
+            => configs.GetConfig<IContentSettings>();
 
         public static ISecuritySettings Security(this Configs configs)
             => configs.GetConfig<ISecuritySettings>();

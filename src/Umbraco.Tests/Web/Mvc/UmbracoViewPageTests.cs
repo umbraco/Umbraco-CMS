@@ -385,11 +385,7 @@ namespace Umbraco.Tests.Web.Mvc
 
         ViewContext GetViewContext()
         {
-            var settings = SettingsForTests.GetDefaultUmbracoSettings();
-            var logger = Mock.Of<ILogger>();
-            var umbracoContext = GetUmbracoContext(
-                logger, settings,
-                "/dang", 0);
+            var umbracoContext = GetUmbracoContext("/dang", 0);
 
             var publishedRouter = BaseWebTest.CreatePublishedRouter(SettingsForTests.GenerateMockWebRoutingSettings());
             var frequest = publishedRouter.CreateRequest(umbracoContext,  new Uri("http://localhost/dang"));
@@ -404,7 +400,7 @@ namespace Umbraco.Tests.Web.Mvc
             return context;
         }
 
-        protected IUmbracoContext GetUmbracoContext(ILogger logger, IUmbracoSettingsSection umbracoSettings, string url, int templateId, RouteData routeData = null, bool setSingleton = false)
+        protected IUmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null, bool setSingleton = false)
         {
             var svcCtx = GetServiceContext();
 

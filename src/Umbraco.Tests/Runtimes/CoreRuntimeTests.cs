@@ -98,7 +98,7 @@ namespace Umbraco.Tests.Runtimes
             {
                 var configs = new ConfigsFactory().Create(_ioHelper);
                 configs.Add(SettingsForTests.GetDefaultGlobalSettings);
-                configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+                configs.Add(SettingsForTests.GenerateMockContentSettings);
                 configs.Add(SettingsForTests.GetDefaultHostingSettings);
                 return configs;
             }
@@ -208,7 +208,7 @@ namespace Umbraco.Tests.Runtimes
 
             public void Compose(Composition composition)
             {
-                composition.Register(factory => SettingsForTests.GetDefaultUmbracoSettings());
+                composition.Register(factory => SettingsForTests.GenerateMockContentSettings());
                 composition.RegisterUnique<IExamineManager, TestExamineManager>();
                 composition.Components().Append<TestComponent>();
 

@@ -411,7 +411,6 @@ namespace Umbraco.Tests.Testing
 
         protected virtual void ComposeSettings()
         {
-            Composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
             Composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
             Composition.Configs.Add(SettingsForTests.GetDefaultHostingSettings);
             Composition.Configs.Add(SettingsForTests.GenerateMockRequestHandlerSettings);
@@ -419,6 +418,7 @@ namespace Umbraco.Tests.Testing
             Composition.Configs.Add(SettingsForTests.GenerateMockSecuritySettings);
             Composition.Configs.Add(SettingsForTests.GenerateMockUserPasswordConfiguration);
             Composition.Configs.Add(SettingsForTests.GenerateMockMemberPasswordConfiguration);
+            Composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
 
             //Composition.Configs.Add<IUserPasswordConfiguration>(() => new DefaultUserPasswordConfig());
         }
@@ -431,10 +431,6 @@ namespace Umbraco.Tests.Testing
 
             // default Datalayer/Repositories/SQL/Database/etc...
             Composition.ComposeRepositories();
-
-            // register basic stuff that might need to be there for some container resolvers to work
-            Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
-            Composition.RegisterUnique(factory => factory.GetInstance<IWebRoutingSettings>());
 
             Composition.RegisterUnique<IExamineManager, ExamineManager>();
 

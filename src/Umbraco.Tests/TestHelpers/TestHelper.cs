@@ -56,7 +56,6 @@ namespace Umbraco.Tests.TestHelpers
         {
             return new RuntimeState(
                 Mock.Of<ILogger>(),
-                Mock.Of<IUmbracoSettingsSection>(),
                 Mock.Of<IGlobalSettings>(),
                 new Lazy<IMainDom>(),
                 new Lazy<IServerRegistrar>(),

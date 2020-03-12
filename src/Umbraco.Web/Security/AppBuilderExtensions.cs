@@ -42,7 +42,7 @@ namespace Umbraco.Web.Security
         public static void ConfigureUserManagerForUmbracoBackOffice(this IAppBuilder app,
             ServiceContext services,
             UmbracoMapper mapper,
-            IContentSection contentSettings,
+            IContentSettings contentSettings,
             IGlobalSettings globalSettings,
             // TODO: This could probably be optional?
             IPasswordConfiguration passwordConfiguration,
@@ -81,7 +81,7 @@ namespace Umbraco.Web.Security
         /// <param name="ipResolver"></param>
         public static void ConfigureUserManagerForUmbracoBackOffice(this IAppBuilder app,
             IRuntimeState runtimeState,
-            IContentSection contentSettings,
+            IContentSettings contentSettings,
             IGlobalSettings globalSettings,
             BackOfficeUserStore customUserStore,
             // TODO: This could probably be optional?
@@ -154,8 +154,7 @@ namespace Umbraco.Web.Security
             IGlobalSettings globalSettings,
             ISecuritySettings securitySettings,
             IIOHelper ioHelper,
-            IRequestCache requestCache,
-            IUmbracoSettingsSection umbracoSettingsSection)
+            IRequestCache requestCache)
         {
             return app.UseUmbracoBackOfficeCookieAuthentication(umbracoContextAccessor, runtimeState, userService, globalSettings, securitySettings, ioHelper, requestCache, PipelineStage.Authenticate);
         }

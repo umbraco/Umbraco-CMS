@@ -11,14 +11,14 @@ namespace Umbraco.Web.Editors
     public class BackOfficeModel
     {
         public BackOfficeModel(UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion,
-            IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, TreeCollection treeCollection,
+            IContentSettings contentSettings, IIOHelper ioHelper, TreeCollection treeCollection,
             IHttpContextAccessor httpContextAccessor, IHostingEnvironment hostingEnvironment,
             IRuntimeSettings runtimeSettings, ISecuritySettings securitySettings)
         {
             Features = features;
             GlobalSettings = globalSettings;
             UmbracoVersion = umbracoVersion;
-            UmbracoSettingsSection = umbracoSettingsSection;
+            ContentSettings = contentSettings;
             IOHelper = ioHelper;
             TreeCollection = treeCollection;
             HttpContextAccessor = httpContextAccessor;
@@ -30,7 +30,7 @@ namespace Umbraco.Web.Editors
         public UmbracoFeatures Features { get; }
         public IGlobalSettings GlobalSettings { get; }
         public IUmbracoVersion UmbracoVersion { get; }
-        public IUmbracoSettingsSection UmbracoSettingsSection { get; }
+        public IContentSettings ContentSettings { get; }
         public IIOHelper IOHelper { get; }
         public TreeCollection TreeCollection { get; }
         public IHttpContextAccessor HttpContextAccessor { get; }

@@ -46,7 +46,7 @@ namespace Umbraco.Web.Editors
     public class UsersController : UmbracoAuthorizedJsonController
     {
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IContentSettings _contentSettings;
         private readonly IIOHelper _ioHelper;
         private readonly ISqlContext _sqlContext;
         private readonly IImageUrlGenerator _imageUrlGenerator;
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Editors
             IMediaFileSystem mediaFileSystem,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
-            IUmbracoSettingsSection umbracoSettingsSection,
+            IContentSettings contentSettings,
             IIOHelper ioHelper,
             IImageUrlGenerator imageUrlGenerator,
             IPublishedUrlProvider publishedUrlProvider,
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Editors
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _mediaFileSystem = mediaFileSystem;
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _ioHelper = ioHelper;
             _sqlContext = sqlContext;
             _imageUrlGenerator = imageUrlGenerator;
@@ -96,10 +96,10 @@ namespace Umbraco.Web.Editors
         [AdminUsersAuthorize]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
-            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, _mediaFileSystem, ShortStringHelper, _umbracoSettingsSection, _ioHelper, _imageUrlGenerator, id);
+            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, _mediaFileSystem, ShortStringHelper, _contentSettings, _ioHelper, _imageUrlGenerator, id);
         }
 
-        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, IImageUrlGenerator imageUrlGenerator, int id)
+        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IContentSettings contentSettings, IIOHelper ioHelper, IImageUrlGenerator imageUrlGenerator, int id)
         {
             if (request.Content.IsMimeMultipartContent() == false)
             {
@@ -134,7 +134,7 @@ namespace Umbraco.Web.Editors
             var safeFileName = fileName.ToSafeFileName(shortStringHelper);
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
-            if (umbracoSettingsSection.Content.DisallowedUploadFiles.Contains(ext) == false)
+            if (contentSettings.DisallowedUploadFiles.Contains(ext) == false)
             {
                 //generate a path of known data, we don't want this path to be guessable
                 user.Avatar = "UserAvatars/" + (user.Id + safeFileName).GenerateHash<SHA1>() + "." + ext;

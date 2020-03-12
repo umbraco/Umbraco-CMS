@@ -30,7 +30,7 @@ namespace Umbraco.Web.Editors
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizationService _localizationService;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IContentSettings _contentSettings;
         private readonly IIOHelper _ioHelper;
         private readonly TreeCollection _treeCollection;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -46,7 +46,7 @@ namespace Umbraco.Web.Editors
             IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizationService localizationService,
             IUmbracoVersion umbracoVersion,
-            IUmbracoSettingsSection umbracoSettingsSection,
+            IContentSettings contentSettings,
             IIOHelper ioHelper,
             TreeCollection treeCollection,
             IHttpContextAccessor httpContextAccessor,
@@ -61,7 +61,7 @@ namespace Umbraco.Web.Editors
             _umbracoContextAccessor = umbracoContextAccessor;
             _localizationService = localizationService;
             _umbracoVersion = umbracoVersion;
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _treeCollection = treeCollection;
             _httpContextAccessor = httpContextAccessor;
@@ -77,7 +77,7 @@ namespace Umbraco.Web.Editors
         {
             var availableLanguages = _localizationService.GetAllLanguages();
 
-            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _umbracoSettingsSection, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings);
+            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _contentSettings, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {

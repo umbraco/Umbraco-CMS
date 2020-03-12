@@ -28,7 +28,7 @@ namespace Umbraco.Web
     {
         protected IUmbracoContextAccessor UmbracoContextAccessor => Current.UmbracoContextAccessor;
         protected IGlobalSettings GlobalSettings => Current.Configs.Global();
-        protected IUmbracoSettingsSection UmbracoSettings => Current.Configs.Settings();
+        protected IContentSettings ContentSettings => Current.Configs.Content();
         protected ISecuritySettings SecuritySettings => Current.Configs.Security();
         protected IUserPasswordConfiguration UserPasswordConfig => Current.Configs.UserPasswordConfiguration();
         protected IRuntimeState RuntimeState => Current.RuntimeState;
@@ -90,7 +90,7 @@ namespace Umbraco.Web
             app.ConfigureUserManagerForUmbracoBackOffice(
                 Services,
                 Mapper,
-                UmbracoSettings.Content,
+                ContentSettings,
                 GlobalSettings,
                 UserPasswordConfig,
                 IpResolver);

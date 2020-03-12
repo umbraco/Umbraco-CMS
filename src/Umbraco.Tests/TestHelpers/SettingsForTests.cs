@@ -40,20 +40,15 @@ namespace Umbraco.Tests.TestHelpers
         /// Returns generated settings which can be stubbed to return whatever values necessary
         /// </summary>
         /// <returns></returns>
-        public static IUmbracoSettingsSection GenerateMockUmbracoSettings()
+        public static IContentSettings GenerateMockContentSettings()
         {
-            var settings = new Mock<IUmbracoSettingsSection>();
 
-            var content = new Mock<IContentSection>();
-
-            settings.Setup(x => x.Content).Returns(content.Object);
+            var content = new Mock<IContentSettings>();
 
             //Now configure some defaults - the defaults in the config section classes do NOT pertain to the mocked data!!
-            settings.Setup(x => x.Content.ImageAutoFillProperties).Returns(ContentImagingElement.GetDefaultImageAutoFillProperties());
-            settings.Setup(x => x.Content.ImageFileTypes).Returns(ContentImagingElement.GetDefaultImageFileTypes());
-
-
-            return settings.Object;
+            content.Setup(x => x.ImageAutoFillProperties).Returns(ContentImagingElement.GetDefaultImageAutoFillProperties());
+            content.Setup(x => x.ImageFileTypes).Returns(ContentImagingElement.GetDefaultImageFileTypes());
+            return content.Object;
         }
 
         //// from appSettings
@@ -105,7 +100,6 @@ namespace Umbraco.Tests.TestHelpers
             _defaultGlobalSettings = null;
         }
 
-        private static IUmbracoSettingsSection _defaultUmbracoSettings;
         private static IGlobalSettings _defaultGlobalSettings;
         private static IHostingSettings _defaultHostingSettings;
 
@@ -135,22 +129,6 @@ namespace Umbraco.Tests.TestHelpers
                     settings.DebugMode == false
             );
             return config;
-        }
-
-        internal static IUmbracoSettingsSection GetDefaultUmbracoSettings()
-        {
-            if (_defaultUmbracoSettings == null)
-            {
-                // TODO: Just make this mocks instead of reading from the config
-
-                var config = new FileInfo(TestHelper.MapPathForTest("~/Configurations/UmbracoSettings/web.config"));
-
-                var fileMap = new ExeConfigurationFileMap { ExeConfigFilename = config.FullName };
-                var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
-                _defaultUmbracoSettings = configuration.GetSection("umbracoConfiguration/defaultSettings") as UmbracoSettingsSection;
-            }
-
-            return _defaultUmbracoSettings;
         }
 
         public static IWebRoutingSettings GenerateMockWebRoutingSettings()

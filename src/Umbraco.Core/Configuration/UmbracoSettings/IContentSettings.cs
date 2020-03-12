@@ -3,7 +3,7 @@ using Umbraco.Core.Macros;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public interface IContentSection : IUmbracoConfigurationSection
+    public interface IContentSettings : IUmbracoConfigurationSection
     {
         string NotificationEmailAddress { get; }
 

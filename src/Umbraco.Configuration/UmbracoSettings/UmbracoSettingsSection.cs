@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class UmbracoSettingsSection : ConfigurationSection, IUmbracoSettingsSection
+    internal class UmbracoSettingsSection : ConfigurationSection
     {
         [ConfigurationProperty("backOffice")]
         public BackOfficeElement BackOffice => (BackOfficeElement)this["backOffice"];
@@ -24,7 +24,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         [ConfigurationProperty("keepAlive")]
         internal KeepAliveElement KeepAlive => (KeepAliveElement)this["keepAlive"];
-
-        IContentSection IUmbracoSettingsSection.Content => Content;
     }
 }

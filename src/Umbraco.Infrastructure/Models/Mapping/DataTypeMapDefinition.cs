@@ -15,13 +15,13 @@ namespace Umbraco.Web.Models.Mapping
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly ILogger _logger;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IContentSettings _contentSettings;
 
-        public DataTypeMapDefinition(PropertyEditorCollection propertyEditors, ILogger logger, IUmbracoSettingsSection umbracoSettingsSection)
+        public DataTypeMapDefinition(PropertyEditorCollection propertyEditors, ILogger logger, IContentSettings contentSettings)
         {
             _propertyEditors = propertyEditors;
             _logger = logger;
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
         private static readonly int[] SystemIds =
@@ -128,9 +128,8 @@ namespace Umbraco.Web.Models.Mapping
 
         private IEnumerable<PropertyEditorBasic> MapAvailableEditors(IDataType source, MapperContext context)
         {
-            var contentSection = _umbracoSettingsSection.Content;
             var properties = _propertyEditors
-                .Where(x => !x.IsDeprecated || contentSection.ShowDeprecatedPropertyEditors || source.EditorAlias == x.Alias)
+                .Where(x => !x.IsDeprecated || _contentSettings.ShowDeprecatedPropertyEditors || source.EditorAlias == x.Alias)
                 .OrderBy(x => x.Name);
             return context.MapEnumerable<IDataEditor, PropertyEditorBasic>(properties);
         }

@@ -32,8 +32,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
 
             Assert.IsNotNull(Settings);
         }
-
-        protected IUmbracoSettingsSection SettingsSection => Settings;
         private UmbracoSettingsSection Settings { get; set; }
 
         protected ILoggingSettings LoggingSettings => Settings.Logging;
@@ -42,5 +40,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         protected ISecuritySettings SecuritySettings => Settings.Security;
         protected IUserPasswordConfiguration UserPasswordConfiguration => Settings.Security.UserPasswordConfiguration;
         protected IMemberPasswordConfiguration MemberPasswordConfiguration => Settings.Security.MemberPasswordConfiguration;
+        protected IContentSettings ContentSettings => Settings.Content;
     }
 }

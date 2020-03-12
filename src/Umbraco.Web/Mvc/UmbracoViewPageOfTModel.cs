@@ -23,7 +23,7 @@ namespace Umbraco.Web.Mvc
     public abstract class UmbracoViewPage<TModel> : WebViewPage<TModel>
     {
         private readonly IGlobalSettings _globalSettings;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IContentSettings _contentSettings;
 
         private IUmbracoContext _umbracoContext;
         private UmbracoHelper _helper;
@@ -106,17 +106,17 @@ namespace Umbraco.Web.Mvc
                 Current.Factory.GetInstance<ServiceContext>(),
                 Current.Factory.GetInstance<AppCaches>(),
                 Current.Factory.GetInstance<IGlobalSettings>(),
-                Current.Factory.GetInstance<IUmbracoSettingsSection>()
+                Current.Factory.GetInstance<IContentSettings>()
             )
         {
         }
 
-        protected UmbracoViewPage(ServiceContext services, AppCaches appCaches, IGlobalSettings globalSettings, IUmbracoSettingsSection umbracoSettingsSection)
+        protected UmbracoViewPage(ServiceContext services, AppCaches appCaches, IGlobalSettings globalSettings, IContentSettings contentSettings)
         {
             Services = services;
             AppCaches = appCaches;
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
         // view logic below:
@@ -214,7 +214,7 @@ namespace Umbraco.Web.Mvc
                         {
                             // creating previewBadge markup
                             markupToInject =
-                                string.Format(_umbracoSettingsSection.Content.PreviewBadge,
+                                string.Format(_contentSettings.PreviewBadge,
                                     Current.IOHelper.ResolveUrl(_globalSettings.UmbracoPath),
                                     Server.UrlEncode(HttpContext.Current.Request.Url?.PathAndQuery),
                                     Current.UmbracoContext.PublishedRequest.PublishedContent.Id);

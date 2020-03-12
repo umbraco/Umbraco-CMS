@@ -112,7 +112,7 @@ namespace Umbraco.Tests.Scoping
                 settings);
         }
 
-        protected IUmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)
+        protected IUmbracoContext GetUmbracoContextNu(string url, RouteData routeData = null, bool setSingleton = false)
         {
             // ensure we have a PublishedSnapshotService
             var service = PublishedSnapshotService as PublishedSnapshotService;
