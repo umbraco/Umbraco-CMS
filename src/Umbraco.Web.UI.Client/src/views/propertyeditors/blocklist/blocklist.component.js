@@ -124,7 +124,6 @@
             block.view = block.config.view || vm.model.config.useInlineEditingAsDefault ? "views/blockelements/inlineblock/inlineblock.editor.html" : "views/blockelements/labelblock/labelblock.editor.html";
 
             block.showSettings = block.config.settingsElementTypeAlias != null;
-            console.log(block)
 
             return block;
         }
