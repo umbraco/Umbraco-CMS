@@ -9,6 +9,8 @@ namespace Umbraco.Core.Composing
     /// </summary>
     public static class RegisterFactory
     {
+        //TODO This needs to die
+
         // cannot use typeof().AssemblyQualifiedName on the web container - we don't reference it
         // a normal Umbraco site should run on the web container, but an app may run on the core one
         private const string CoreLightInjectContainerTypeName = "Umbraco.Core.Composing.LightInject.LightInjectContainer,Umbraco.Core";
