@@ -31,10 +31,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         IRequestHandlerSection IUmbracoSettingsSection.RequestHandler => RequestHandler;
 
-        IBackOfficeSection IUmbracoSettingsSection.BackOffice => BackOffice;
-
-        ILoggingSection IUmbracoSettingsSection.Logging => Logging;
-
         IWebRoutingSection IUmbracoSettingsSection.WebRouting => WebRouting;
 
         IKeepAliveSection IUmbracoSettingsSection.KeepAlive => KeepAlive;

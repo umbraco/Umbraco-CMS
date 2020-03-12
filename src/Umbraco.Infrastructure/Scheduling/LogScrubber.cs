@@ -13,12 +13,12 @@ namespace Umbraco.Web.Scheduling
     {
         private readonly IRuntimeState _runtime;
         private readonly IAuditService _auditService;
-        private readonly IUmbracoSettingsSection _settings;
+        private readonly ILoggingSettings _settings;
         private readonly IProfilingLogger _logger;
         private readonly IScopeProvider _scopeProvider;
 
         public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IAuditService auditService, IUmbracoSettingsSection settings, IScopeProvider scopeProvider, IProfilingLogger logger)
+            IRuntimeState runtime, IAuditService auditService, ILoggingSettings settings, IScopeProvider scopeProvider, IProfilingLogger logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
@@ -29,13 +29,13 @@ namespace Umbraco.Web.Scheduling
         }
 
         // maximum age, in minutes
-        private int GetLogScrubbingMaximumAge(IUmbracoSettingsSection settings)
+        private int GetLogScrubbingMaximumAge(ILoggingSettings settings)
         {
             var maximumAge = 24 * 60; // 24 hours, in minutes
             try
             {
-                if (settings.Logging.MaxLogAge > -1)
-                    maximumAge = settings.Logging.MaxLogAge;
+                if (settings.MaxLogAge > -1)
+                    maximumAge = settings.MaxLogAge;
             }
             catch (Exception ex)
             {
@@ -45,7 +45,7 @@ namespace Umbraco.Web.Scheduling
 
         }
 
-        public static int GetLogScrubbingInterval(IUmbracoSettingsSection settings, ILogger logger)
+        public static int GetLogScrubbingInterval()
         {
             const int interval = 4 * 60 * 60 * 1000; // 4 hours, in milliseconds
             return interval;

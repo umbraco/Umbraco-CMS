@@ -39,6 +39,7 @@ namespace Umbraco.Web.Scheduling
         private readonly IIOHelper _ioHelper;
         private readonly IServerMessenger _serverMessenger;
         private readonly IRequestAccessor _requestAccessor;
+        private readonly ILoggingSettings _loggingSettings;
 
         private BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
         private BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
@@ -56,7 +57,8 @@ namespace Umbraco.Web.Scheduling
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger logger,
             IHostingEnvironment hostingEnvironment, IHealthChecks healthChecksConfig,
-            IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, IServerMessenger serverMessenger, IRequestAccessor requestAccessor)
+            IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, IServerMessenger serverMessenger, IRequestAccessor requestAccessor,
+            ILoggingSettings loggingSettings)
         {
             _runtime = runtime;
             _contentService = contentService;
@@ -69,10 +71,11 @@ namespace Umbraco.Web.Scheduling
             _healthChecks = healthChecks;
             _notifications = notifications;
             _healthChecksConfig = healthChecksConfig ?? throw new ArgumentNullException(nameof(healthChecksConfig));
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _umbracoSettingsSection = umbracoSettingsSection;
             _ioHelper = ioHelper;
             _serverMessenger = serverMessenger;
             _requestAccessor = requestAccessor;
+            _loggingSettings = loggingSettings;
         }
 
         public void Initialize()
@@ -121,7 +124,7 @@ namespace Umbraco.Web.Scheduling
                 }
 
                 tasks.Add(RegisterScheduledPublishing());
-                tasks.Add(RegisterLogScrubber(settings));
+                tasks.Add(RegisterLogScrubber(_loggingSettings));
                 tasks.Add(RegisterTempFileCleanup());
 
                 var healthCheckConfig = _healthChecksConfig;
@@ -176,11 +179,11 @@ namespace Umbraco.Web.Scheduling
             return task;
         }
 
-        private IBackgroundTask RegisterLogScrubber(IUmbracoSettingsSection settings)
+        private IBackgroundTask RegisterLogScrubber(ILoggingSettings settings)
         {
             // log scrubbing
             // install on all, will only run on non-replica servers
-            var task = new LogScrubber(_scrubberRunner, DefaultDelayMilliseconds, LogScrubber.GetLogScrubbingInterval(settings, _logger), _runtime, _auditService, settings, _scopeProvider, _logger);
+            var task = new LogScrubber(_scrubberRunner, DefaultDelayMilliseconds, LogScrubber.GetLogScrubbingInterval(), _runtime, _auditService, settings, _scopeProvider, _logger);
             _scrubberRunner.TryAdd(task);
             return task;
         }

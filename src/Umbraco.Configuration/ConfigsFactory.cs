@@ -1,5 +1,6 @@
 using System.Configuration;
 using Umbraco.Configuration;
+using Umbraco.Configuration.Implementations;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -18,6 +19,8 @@ namespace Umbraco.Core.Configuration
         public IRuntimeSettings RuntimeSettings { get; } = new RuntimeSettings();
         public IActiveDirectorySettings ActiveDirectorySettings { get; } = new ActiveDirectorySettings();
         public IExceptionFilterSettings ExceptionFilterSettings { get; } = new ExceptionFilterSettings();
+        public ITourSettings TourSettings { get; } = new TourSettings();
+        public ILoggingSettings LoggingSettings { get; } = new LoggingSettings();
 
         public IUmbracoSettingsSection UmbracoSettings { get; }
 
@@ -46,6 +49,9 @@ namespace Umbraco.Core.Configuration
             configs.Add<IRuntimeSettings>(() => RuntimeSettings);
             configs.Add<IActiveDirectorySettings>(() => ActiveDirectorySettings);
             configs.Add<IExceptionFilterSettings>(() => ExceptionFilterSettings);
+
+            configs.Add<ITourSettings>(() => TourSettings);
+            configs.Add<ILoggingSettings>(() => LoggingSettings);
 
             configs.AddCoreConfigs(ioHelper);
             return configs;

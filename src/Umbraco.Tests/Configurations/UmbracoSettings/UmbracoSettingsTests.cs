@@ -22,16 +22,19 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Debug.WriteLine("Testing defaults? {0}", TestingDefaults);
             if (TestingDefaults)
             {
-                SettingsSection = configuration.GetSection("umbracoConfiguration/defaultSettings") as UmbracoSettingsSection;
+                Settings = configuration.GetSection("umbracoConfiguration/defaultSettings") as UmbracoSettingsSection;
             }
             else
             {
-                SettingsSection = configuration.GetSection("umbracoConfiguration/settings") as UmbracoSettingsSection;
+                Settings = configuration.GetSection("umbracoConfiguration/settings") as UmbracoSettingsSection;
             }
 
-            Assert.IsNotNull(SettingsSection);
+            Assert.IsNotNull(Settings);
         }
 
-        protected IUmbracoSettingsSection SettingsSection { get; private set; }
+        protected IUmbracoSettingsSection SettingsSection => Settings;
+        private UmbracoSettingsSection Settings { get; set; }
+
+        protected ILoggingSettings LoggingSettings => Settings.Logging;
     }
 }

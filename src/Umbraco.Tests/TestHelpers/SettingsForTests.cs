@@ -45,7 +45,7 @@ namespace Umbraco.Tests.TestHelpers
             var content = new Mock<IContentSection>();
             var security = new Mock<ISecuritySection>();
             var requestHandler = new Mock<IRequestHandlerSection>();
-            var logging = new Mock<ILoggingSection>();
+            var logging = new Mock<ILoggingSettings>();
             var routing = new Mock<IWebRoutingSection>();
 
             var userPasswordConfig = new Mock<IUserPasswordConfigurationSection>();
@@ -56,7 +56,6 @@ namespace Umbraco.Tests.TestHelpers
             settings.Setup(x => x.Content).Returns(content.Object);
             settings.Setup(x => x.Security).Returns(security.Object);
             settings.Setup(x => x.RequestHandler).Returns(requestHandler.Object);
-            settings.Setup(x => x.Logging).Returns(logging.Object);
             settings.Setup(x => x.WebRouting).Returns(routing.Object);
 
             //Now configure some defaults - the defaults in the config section classes do NOT pertain to the mocked data!!
