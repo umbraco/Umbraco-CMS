@@ -174,9 +174,9 @@ namespace Umbraco.Tests.Testing
             TypeFinder = new TypeFinder(logger);
             var appCaches = GetAppCaches();
             var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
-            var settings = SettingsForTests.GetDefaultUmbracoSettings();
+            var settings = SettingsForTests.GenerateMockWebRoutingSettings();
 
-            IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, settings, logger);
+            IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, logger, settings);
             IIpResolver ipResolver = new AspNetIpResolver();
             UmbracoVersion = new UmbracoVersion(globalSettings);
 
@@ -321,7 +321,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IPublishedUrlProvider>(factory =>
                 new UrlProvider(
                     factory.GetInstance<IUmbracoContextAccessor>(),
-                    TestObjects.GetUmbracoSettings().WebRouting,
+                    SettingsForTests.GenerateMockWebRoutingSettings(),
                     new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                     new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                     factory.GetInstance<IVariationContextAccessor>()
@@ -428,7 +428,7 @@ namespace Umbraco.Tests.Testing
 
             // register basic stuff that might need to be there for some container resolvers to work
             Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
-            Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().WebRouting);
+            Composition.RegisterUnique(factory => factory.GetInstance<IWebRoutingSettings>());
 
             Composition.RegisterUnique<IExamineManager, ExamineManager>();
 

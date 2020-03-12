@@ -102,7 +102,7 @@ namespace Umbraco.Tests.Routing
         {
             return new UrlProvider(
                 new TestUmbracoContextAccessor(umbracoContext),
-                TestHelper.WebRoutingSection,
+                TestHelper.WebRoutingSettings,
                 new UrlProviderCollection(new []{urlProvider}),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IVariationContextAccessor>()

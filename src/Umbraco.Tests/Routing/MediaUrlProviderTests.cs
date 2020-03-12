@@ -153,7 +153,7 @@ namespace Umbraco.Tests.Routing
         {
             return new UrlProvider(
                 new TestUmbracoContextAccessor(umbracoContext),
-                TestHelper.WebRoutingSection,
+                TestHelper.WebRoutingSettings,
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 new MediaUrlProviderCollection(new []{_mediaUrlProvider}),
                 Mock.Of<IVariationContextAccessor>()

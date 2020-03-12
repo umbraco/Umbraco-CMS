@@ -22,6 +22,7 @@ namespace Umbraco.Core.Configuration
         public ITourSettings TourSettings { get; } = new TourSettings();
         public ILoggingSettings LoggingSettings { get; } = new LoggingSettings();
         public IKeepAliveSettings KeepAliveSettings { get; } = new KeepAliveSettings();
+        public IWebRoutingSettings WebRoutingSettings { get; } = new WebRoutingSettings();
 
         public IUmbracoSettingsSection UmbracoSettings { get; }
 
@@ -54,6 +55,7 @@ namespace Umbraco.Core.Configuration
             configs.Add<ITourSettings>(() => TourSettings);
             configs.Add<ILoggingSettings>(() => LoggingSettings);
             configs.Add<IKeepAliveSettings>(() => KeepAliveSettings);
+            configs.Add<IWebRoutingSettings>(() => WebRoutingSettings);
 
             configs.AddCoreConfigs(ioHelper);
             return configs;

@@ -26,17 +26,17 @@ namespace Umbraco.Web.Templates
         private readonly IPublishedRouter _publishedRouter;
         private readonly IFileService _fileService;
         private readonly ILocalizationService _languageService;
-        private readonly IWebRoutingSection _webRoutingSection;
+        private readonly IWebRoutingSettings _webRoutingSettings;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public TemplateRenderer(IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, IFileService fileService, ILocalizationService textService, IWebRoutingSection webRoutingSection, IShortStringHelper shortStringHelper, IHttpContextAccessor httpContextAccessor)
+        public TemplateRenderer(IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, IFileService fileService, ILocalizationService textService, IWebRoutingSettings webRoutingSettings, IShortStringHelper shortStringHelper, IHttpContextAccessor httpContextAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _languageService = textService ?? throw new ArgumentNullException(nameof(textService));
-            _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection));
+            _webRoutingSettings = webRoutingSettings ?? throw new ArgumentNullException(nameof(webRoutingSettings));
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
             _httpContextAccessor = httpContextAccessor;
         }
@@ -77,7 +77,7 @@ namespace Umbraco.Web.Templates
             //set the doc that was found by id
             contentRequest.PublishedContent = doc;
             //set the template, either based on the AltTemplate found or the standard template of the doc
-            var templateId = _webRoutingSection.DisableAlternativeTemplates || !altTemplateId.HasValue
+            var templateId = _webRoutingSettings.DisableAlternativeTemplates || !altTemplateId.HasValue
                 ? doc.TemplateId
                 : altTemplateId.Value;
             if (templateId.HasValue)

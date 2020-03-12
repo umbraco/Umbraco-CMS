@@ -30,7 +30,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         ISecuritySection IUmbracoSettingsSection.Security => Security;
 
         IRequestHandlerSection IUmbracoSettingsSection.RequestHandler => RequestHandler;
-
-        IWebRoutingSection IUmbracoSettingsSection.WebRouting => WebRouting;
     }
 }

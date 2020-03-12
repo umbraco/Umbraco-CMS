@@ -68,7 +68,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IBackOfficeInfo GetBackOfficeInfo()
         {
-            return new AspNetBackOfficeInfo(SettingsForTests.GenerateMockGlobalSettings(), TestHelper.IOHelper, SettingsForTests.GenerateMockUmbracoSettings(), Mock.Of<ILogger>());
+            return new AspNetBackOfficeInfo(SettingsForTests.GenerateMockGlobalSettings(), TestHelper.IOHelper, Mock.Of<ILogger>(), SettingsForTests.GenerateMockWebRoutingSettings());
         }
 
         public static IConfigsFactory GetConfigsFactory()
@@ -104,7 +104,7 @@ namespace Umbraco.Tests.TestHelpers
         public static IMainDom MainDom { get; } = new MainDom(Mock.Of<ILogger>(), GetHostingEnvironment(), new MainDomSemaphoreLock(Mock.Of<ILogger>(), GetHostingEnvironment()));
         public static UriUtility UriUtility { get; } = new UriUtility(GetHostingEnvironment());
 
-        public static IWebRoutingSection WebRoutingSection => SettingsForTests.GetDefaultUmbracoSettings().WebRouting;
+        public static IWebRoutingSettings WebRoutingSettings => SettingsForTests.GenerateMockWebRoutingSettings();
 
         /// <summary>
         /// Maps the given <paramref name="relativePath"/> making it rooted on <see cref="CurrentAssemblyDirectory"/>. <paramref name="relativePath"/> must start with <code>~/</code>

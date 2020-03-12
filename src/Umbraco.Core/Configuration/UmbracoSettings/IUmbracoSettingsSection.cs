@@ -9,7 +9,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         ISecuritySection Security { get; }
 
         IRequestHandlerSection RequestHandler { get; }
-
-        IWebRoutingSection WebRouting { get; }
     }
 }

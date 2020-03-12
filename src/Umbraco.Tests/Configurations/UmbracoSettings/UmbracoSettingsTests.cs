@@ -36,5 +36,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         private UmbracoSettingsSection Settings { get; set; }
 
         protected ILoggingSettings LoggingSettings => Settings.Logging;
+        protected IWebRoutingSettings WebRoutingSettings => Settings.WebRouting;
     }
 }

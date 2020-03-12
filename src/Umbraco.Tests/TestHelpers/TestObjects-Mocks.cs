@@ -146,9 +146,8 @@ namespace Umbraco.Tests.TestHelpers
             // FIXME: Shouldn't we use the default ones so they are the same instance for each test?
 
             var umbracoSettingsMock = new Mock<IUmbracoSettingsSection>();
-            var webRoutingSectionMock = new Mock<IWebRoutingSection>();
+            var webRoutingSectionMock = new Mock<IWebRoutingSettings>();
             webRoutingSectionMock.Setup(x => x.UrlProviderMode).Returns(UrlMode.Auto.ToString());
-            umbracoSettingsMock.Setup(x => x.WebRouting).Returns(webRoutingSectionMock.Object);
             return umbracoSettingsMock.Object;
         }
 

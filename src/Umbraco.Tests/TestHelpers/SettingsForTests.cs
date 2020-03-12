@@ -6,6 +6,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -46,7 +47,7 @@ namespace Umbraco.Tests.TestHelpers
             var security = new Mock<ISecuritySection>();
             var requestHandler = new Mock<IRequestHandlerSection>();
             var logging = new Mock<ILoggingSettings>();
-            var routing = new Mock<IWebRoutingSection>();
+            var routing = new Mock<IWebRoutingSettings>();
 
             var userPasswordConfig = new Mock<IUserPasswordConfigurationSection>();
             var memberPasswordConfig = new Mock<IMemberPasswordConfigurationSection>();
@@ -56,14 +57,12 @@ namespace Umbraco.Tests.TestHelpers
             settings.Setup(x => x.Content).Returns(content.Object);
             settings.Setup(x => x.Security).Returns(security.Object);
             settings.Setup(x => x.RequestHandler).Returns(requestHandler.Object);
-            settings.Setup(x => x.WebRouting).Returns(routing.Object);
 
             //Now configure some defaults - the defaults in the config section classes do NOT pertain to the mocked data!!
             settings.Setup(x => x.Content.ImageAutoFillProperties).Returns(ContentImagingElement.GetDefaultImageAutoFillProperties());
             settings.Setup(x => x.Content.ImageFileTypes).Returns(ContentImagingElement.GetDefaultImageFileTypes());
             settings.Setup(x => x.RequestHandler.AddTrailingSlash).Returns(true);
             settings.Setup(x => x.RequestHandler.CharCollection).Returns(RequestHandlerElement.GetDefaultCharReplacements());
-            settings.Setup(x => x.WebRouting.UrlProviderMode).Returns("Auto");
 
             return settings.Object;
         }
@@ -163,6 +162,17 @@ namespace Umbraco.Tests.TestHelpers
             }
 
             return _defaultUmbracoSettings;
+        }
+
+        public static IWebRoutingSettings GenerateMockWebRoutingSettings()
+        {
+            var mock = new Mock<IWebRoutingSettings>();
+
+            mock.Setup(x => x.TrySkipIisCustomErrors).Returns(false);
+            mock.Setup(x => x.InternalRedirectPreservesTemplate).Returns(false);
+            mock.Setup(x => x.UrlProviderMode).Returns(UrlMode.Auto.ToString());
+
+            return mock.Object;
         }
     }
 }

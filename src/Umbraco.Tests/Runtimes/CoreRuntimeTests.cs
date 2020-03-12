@@ -82,7 +82,7 @@ namespace Umbraco.Tests.Runtimes
         // test application
         public class TestUmbracoApplication : UmbracoApplicationBase
         {
-            public TestUmbracoApplication() : base(_logger, _configs, _ioHelper, _profiler, new AspNetHostingEnvironment(_hostingSettings), new AspNetBackOfficeInfo(_globalSettings, _ioHelper, _settings, _logger))
+            public TestUmbracoApplication() : base(_logger, _configs, _ioHelper, _profiler, new AspNetHostingEnvironment(_hostingSettings), new AspNetBackOfficeInfo(_globalSettings, _ioHelper,  _logger, _settings))
             {
             }
 
@@ -92,7 +92,7 @@ namespace Umbraco.Tests.Runtimes
             private static readonly Configs _configs = GetConfigs();
             private static readonly IGlobalSettings _globalSettings = _configs.Global();
             private static readonly IHostingSettings _hostingSettings = _configs.Hosting();
-            private static readonly IUmbracoSettingsSection _settings = _configs.Settings();
+            private static readonly IWebRoutingSettings _settings = _configs.WebRouting();
 
             private static Configs GetConfigs()
             {
