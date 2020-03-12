@@ -21,6 +21,7 @@ namespace Umbraco.Core.Configuration
         public IExceptionFilterSettings ExceptionFilterSettings { get; } = new ExceptionFilterSettings();
         public ITourSettings TourSettings { get; } = new TourSettings();
         public ILoggingSettings LoggingSettings { get; } = new LoggingSettings();
+        public IKeepAliveSettings KeepAliveSettings { get; } = new KeepAliveSettings();
 
         public IUmbracoSettingsSection UmbracoSettings { get; }
 
@@ -52,6 +53,7 @@ namespace Umbraco.Core.Configuration
 
             configs.Add<ITourSettings>(() => TourSettings);
             configs.Add<ILoggingSettings>(() => LoggingSettings);
+            configs.Add<IKeepAliveSettings>(() => KeepAliveSettings);
 
             configs.AddCoreConfigs(ioHelper);
             return configs;

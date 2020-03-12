@@ -11,7 +11,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IRequestHandlerSection RequestHandler { get; }
 
         IWebRoutingSection WebRouting { get; }
-
-        IKeepAliveSection KeepAlive { get; }
     }
 }

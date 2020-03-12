@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class KeepAliveElement : ConfigurationElement, IKeepAliveSection
+    internal class KeepAliveElement : ConfigurationElement, IKeepAliveSettings
     {
         [ConfigurationProperty("disableKeepAliveTask", DefaultValue = "false")]
         public bool DisableKeepAliveTask => (bool)base["disableKeepAliveTask"];

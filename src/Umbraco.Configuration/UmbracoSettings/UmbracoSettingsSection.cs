@@ -32,7 +32,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IRequestHandlerSection IUmbracoSettingsSection.RequestHandler => RequestHandler;
 
         IWebRoutingSection IUmbracoSettingsSection.WebRouting => WebRouting;
-
-        IKeepAliveSection IUmbracoSettingsSection.KeepAlive => KeepAlive;
     }
 }

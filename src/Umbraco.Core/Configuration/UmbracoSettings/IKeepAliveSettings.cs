@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public interface IKeepAliveSection : IUmbracoConfigurationSection
+    public interface IKeepAliveSettings : IUmbracoConfigurationSection
     {
         bool DisableKeepAliveTask { get; }
         string KeepAlivePingUrl { get; }
