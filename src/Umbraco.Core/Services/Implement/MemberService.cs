@@ -1020,6 +1020,16 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public IEnumerable<string> GetAllRoles(int memberId)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MemberTree);
+                var result = _memberGroupRepository.GetMemberGroupsForMember(memberId);
+                return result.Select(x => x.Name).Distinct();
+            }
+        }
+
         public IEnumerable<int> GetAllRolesIDs()
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
