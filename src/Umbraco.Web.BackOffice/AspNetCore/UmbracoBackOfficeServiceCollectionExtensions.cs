@@ -32,18 +32,27 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         /// </remarks>
         public static IServiceCollection AddUmbracoCore(this IServiceCollection services)
         {
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-            CreateCompositionRoot(services);
-
             if (!UmbracoServiceProviderFactory.IsActive)
                 throw new InvalidOperationException("Ensure to add UseUmbraco() in your Program.cs after ConfigureWebHostDefaults to enable Umbraco's service provider factory");
 
             var umbContainer = UmbracoServiceProviderFactory.UmbracoContainer;
 
+            return services.AddUmbracoCore(umbContainer, Assembly.GetEntryAssembly());
+        }
+
+        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IRegister umbContainer, Assembly entryAssembly)
+        {
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            CreateCompositionRoot(services);
+
             // TODO: Get rid of this 'Current' requirement
             var globalSettings = Current.Configs.Global();
             var umbracoVersion = new UmbracoVersion(globalSettings);
+
+            // TODO: Currently we are not passing in any TypeFinderConfig (with ITypeFinderSettings) which we should do, however
+            // this is not critical right now and would require loading in some config before boot time so just leaving this as-is for now.
+            var typeFinder = new TypeFinder(Current.Logger, new DefaultUmbracoAssemblyProvider(entryAssembly));
 
             var coreRuntime = GetCoreRuntime(
                 Current.Configs,
@@ -52,7 +61,8 @@ namespace Umbraco.Web.BackOffice.AspNetCore
                 Current.Logger,
                 Current.Profiler,
                 Current.HostingEnvironment,
-                Current.BackOfficeInfo);
+                Current.BackOfficeInfo,
+                typeFinder);
 
             var factory = coreRuntime.Boot(umbContainer);
 
@@ -60,7 +70,8 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         }
 
         private static IRuntime GetCoreRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger,
-            IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+            IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
+            ITypeFinder typeFinder)
         {
             var connectionStringConfig = configs.ConnectionStrings()[Constants.System.UmbracoConnectionName];
             var dbProviderFactoryCreator = new SqlServerDbProviderFactoryCreator(
@@ -75,10 +86,6 @@ namespace Umbraco.Web.BackOffice.AspNetCore
 
             var mainDom = new MainDom(logger, hostingEnvironment, mainDomLock);
 
-            // TODO: Currently we are not passing in any TypeFinderConfig (with ITypeFinderSettings) which we should do, however
-            // this is not critical right now and would require loading in some config before boot time so just leaving this as-is for now.
-            var typeFinder = new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(Assembly.GetEntryAssembly()));
-
             var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetCoreBootPermissionsChecker(),
                 hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom, typeFinder);
 
@@ -87,11 +94,13 @@ namespace Umbraco.Web.BackOffice.AspNetCore
 
         private static void CreateCompositionRoot(IServiceCollection services)
         {
+            // TODO: This isn't the best to have to resolve the services now but to avoid this will
+            // require quite a lot of re-work. 
             var serviceProvider = services.BuildServiceProvider();
 
-            var httpContextAccessor = serviceProvider.GetService<IHttpContextAccessor>();
-            var webHostEnvironment = serviceProvider.GetService<IWebHostEnvironment>();
-            var hostApplicationLifetime = serviceProvider.GetService<IHostApplicationLifetime>();
+            var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
+            var webHostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
+            var hostApplicationLifetime = serviceProvider.GetRequiredService<IHostApplicationLifetime>();
 
             var configFactory = new ConfigsFactory();
 

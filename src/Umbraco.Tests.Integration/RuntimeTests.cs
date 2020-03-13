@@ -1,4 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using LightInject;
+using LightInject.Microsoft.DependencyInjection;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Linq;
@@ -41,6 +47,36 @@ namespace Umbraco.Tests.Integration
             Assert.IsTrue(MyComposer.IsComposed);
 
             Assertions.AssertContainer(umbracoContainer.Container, reportOnly: true); // TODO Change that to false eventually when we clean up the container
+        }
+
+        [Test]
+        public void AddUmbracoBackOffice()
+        {
+            var testHelper = new TestHelper();
+
+            // MSDI
+            var services = new ServiceCollection();
+            // These services are required
+            services.AddSingleton<IHttpContextAccessor>(x => testHelper.GetHttpContextAccessor());
+            services.AddSingleton<IWebHostEnvironment>(x => testHelper.GetWebHostEnvironment());
+            services.AddSingleton<IHostApplicationLifetime>(x => Mock.Of<IHostApplicationLifetime>());
+
+            // LightInject / Umbraco
+            var container = new ServiceContainer(ContainerOptions.Default.Clone().WithMicrosoftSettings().WithAspNetCoreSettings());
+            var serviceProviderFactory = new UmbracoServiceProviderFactory(container);
+            var umbracoContainer = serviceProviderFactory.GetContainer();
+
+            // Add it!
+            services.AddUmbracoCore(umbracoContainer, GetType().Assembly);
+
+            // assert results
+            var runtimeState = umbracoContainer.GetInstance<IRuntimeState>();
+            var mainDom = umbracoContainer.GetInstance<IMainDom>();
+
+            Assert.IsTrue(mainDom.IsMainDom);
+            Assert.IsNull(runtimeState.BootFailedException);
+            Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
+            Assert.IsTrue(MyComposer.IsComposed);
         }
 
         [RuntimeLevel(MinLevel = RuntimeLevel.Install)]
