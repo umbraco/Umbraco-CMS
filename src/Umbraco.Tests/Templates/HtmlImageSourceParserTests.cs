@@ -1,7 +1,6 @@
 ﻿using Umbraco.Core.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Templates;
 using Umbraco.Web;
 using Umbraco.Core.Models.PublishedContent;
@@ -14,6 +13,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core;
 using System.Diagnostics;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Common;
 
 namespace Umbraco.Tests.Templates
 {

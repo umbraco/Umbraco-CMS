@@ -13,10 +13,10 @@ using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Tests.Common;
 
 namespace Umbraco.Tests.Routing
 {
@@ -34,8 +34,8 @@ namespace Umbraco.Tests.Routing
 
         protected override void ComposeSettings()
         {
-            Composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
-            Composition.Configs.Add(SettingsForTests.GenerateMockGlobalSettings);
+            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
+            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockGlobalSettings);
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Routing
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
-            var requestHandlerSettings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var requestHandlerSettings = TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings();
 
             var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings.Object);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Routing
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
-            var requestHandlerSettings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var requestHandlerSettings = TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings();
 
 
             var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings.Object);
@@ -152,7 +152,7 @@ namespace Umbraco.Tests.Routing
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(true);
 
-            var requestHandlerSettings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var requestHandlerSettings = TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings();
             var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings.Object);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(requestHandlerSettings, Logger, globalSettings.Object,
@@ -171,7 +171,7 @@ namespace Umbraco.Tests.Routing
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
-            var requestHandlerSettings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var requestHandlerSettings = TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings();
 
 
             var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
@@ -219,7 +219,7 @@ namespace Umbraco.Tests.Routing
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
-            var requestHandlerSettings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var requestHandlerSettings = TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings();
 
             var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
             var publishedContent = new SolidPublishedContent(contentType) { Id = 1234 };
@@ -275,7 +275,7 @@ namespace Umbraco.Tests.Routing
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
-            var requestHandlerSettings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var requestHandlerSettings = TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings();
 
             var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
             var publishedContent = new SolidPublishedContent(contentType) { Id = 1234 };
@@ -326,7 +326,7 @@ namespace Umbraco.Tests.Routing
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
-            var requestHandlerSettings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var requestHandlerSettings = TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings();
 
 
             var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, globalSettings: globalSettings.Object);
@@ -347,7 +347,7 @@ namespace Umbraco.Tests.Routing
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
-            var requestHandlerSettings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var requestHandlerSettings = TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings();
 
             var urlProvider = new DefaultUrlProvider(requestHandlerSettings, Logger, globalSettings.Object,
                 new SiteDomainHelper(), UmbracoContextAccessor, UriUtility);
