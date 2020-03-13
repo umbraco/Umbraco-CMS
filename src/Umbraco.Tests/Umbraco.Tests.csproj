@@ -222,7 +222,6 @@
     <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
     <Compile Include="Testing\Objects\Accessors\NoHttpContextAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestExamineManager.cs" />
-    <Compile Include="Testing\Objects\Accessors\TestVariationContextAccessor.cs" />
     <Compile Include="Testing\ContentBaseExtensions.cs" />
     <Compile Include="Testing\Objects\Accessors\TestDefaultCultureAccessor.cs" />
     <Compile Include="Testing\Objects\TestUmbracoContextFactory.cs" />
@@ -585,6 +584,10 @@
     <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj">
       <Project>{f6de8da0-07cc-4ef2-8a59-2bc81dbb3830}</Project>
       <Name>Umbraco.PublishedCache.NuCache</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj">
+      <Project>{a499779c-1b3b-48a8-b551-458e582e6e96}</Project>
+      <Name>Umbraco.Tests.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>

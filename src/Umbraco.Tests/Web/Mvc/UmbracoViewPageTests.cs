@@ -17,6 +17,7 @@ using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Tests.Common;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
@@ -387,7 +388,7 @@ namespace Umbraco.Tests.Web.Mvc
         {
             var umbracoContext = GetUmbracoContext("/dang", 0);
 
-            var publishedRouter = BaseWebTest.CreatePublishedRouter(SettingsForTests.GenerateMockWebRoutingSettings());
+            var publishedRouter = BaseWebTest.CreatePublishedRouter(TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings());
             var frequest = publishedRouter.CreateRequest(umbracoContext,  new Uri("http://localhost/dang"));
 
             frequest.Culture = CultureInfo.InvariantCulture;

@@ -15,7 +15,7 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-
+using Umbraco.Tests.Common;
 
 namespace Umbraco.Tests.Security
 {

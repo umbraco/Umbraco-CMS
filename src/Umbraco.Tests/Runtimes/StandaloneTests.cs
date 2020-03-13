@@ -36,6 +36,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Runtime;
 using File = System.IO.File;
 using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Tests.Common;
 
 namespace Umbraco.Tests.Runtimes
 {
@@ -120,8 +121,8 @@ namespace Umbraco.Tests.Runtimes
                 .Append<DistributedCacheBinderComponent>();
 
             // configure
-            composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
-            composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
+            composition.Configs.Add(TestHelpers.SettingsForTests.GetDefaultGlobalSettings);
+            composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
 
             // create and register the factory
             Current.Factory = factory = composition.CreateFactory();
@@ -159,7 +160,7 @@ namespace Umbraco.Tests.Runtimes
                 var scopeProvider = factory.GetInstance<IScopeProvider>();
                 using (var scope = scopeProvider.CreateScope())
                 {
-                    var creator = new DatabaseSchemaCreator(scope.Database, logger, umbracoVersion, SettingsForTests.GetDefaultGlobalSettings());
+                    var creator = new DatabaseSchemaCreator(scope.Database, logger, umbracoVersion, TestHelpers.SettingsForTests.GetDefaultGlobalSettings());
                     creator.InitializeDatabaseSchema();
                     scope.Complete();
                 }

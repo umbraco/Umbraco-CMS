@@ -63,6 +63,8 @@ using Umbraco.Web.Security;
 using Umbraco.Web.Security.Providers;
 using Umbraco.Web.Trees;
 using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Tests.Common;
+
 namespace Umbraco.Tests.Testing
 {
     /// <summary>
@@ -138,7 +140,7 @@ namespace Umbraco.Tests.Testing
 
         protected virtual IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
 
-        protected IHostingEnvironment HostingEnvironment { get; } = new AspNetHostingEnvironment(SettingsForTests.GetDefaultHostingSettings());
+        protected IHostingEnvironment HostingEnvironment { get; } = new AspNetHostingEnvironment(TestHelpers.SettingsForTests.GetDefaultHostingSettings());
         protected IIpResolver IpResolver => Factory.GetInstance<IIpResolver>();
         protected IBackOfficeInfo BackOfficeInfo => Factory.GetInstance<IBackOfficeInfo>();
         protected AppCaches AppCaches => Factory.GetInstance<AppCaches>();
@@ -173,8 +175,8 @@ namespace Umbraco.Tests.Testing
 
             TypeFinder = new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly));
             var appCaches = GetAppCaches();
-            var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
-            var settings = SettingsForTests.GenerateMockWebRoutingSettings();
+            var globalSettings = TestHelpers.SettingsForTests.GetDefaultGlobalSettings();
+            var settings = TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings();
 
             IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, logger, settings);
             IIpResolver ipResolver = new AspNetIpResolver();
@@ -321,7 +323,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IPublishedUrlProvider>(factory =>
                 new UrlProvider(
                     factory.GetInstance<IUmbracoContextAccessor>(),
-                    SettingsForTests.GenerateMockWebRoutingSettings(),
+                    TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings(),
                     new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                     new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                     factory.GetInstance<IVariationContextAccessor>()
@@ -411,14 +413,14 @@ namespace Umbraco.Tests.Testing
 
         protected virtual void ComposeSettings()
         {
-            Composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
-            Composition.Configs.Add(SettingsForTests.GetDefaultHostingSettings);
-            Composition.Configs.Add(SettingsForTests.GenerateMockRequestHandlerSettings);
-            Composition.Configs.Add(SettingsForTests.GenerateMockWebRoutingSettings);
-            Composition.Configs.Add(SettingsForTests.GenerateMockSecuritySettings);
-            Composition.Configs.Add(SettingsForTests.GenerateMockUserPasswordConfiguration);
-            Composition.Configs.Add(SettingsForTests.GenerateMockMemberPasswordConfiguration);
-            Composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
+            Composition.Configs.Add(TestHelpers.SettingsForTests.GetDefaultGlobalSettings);
+            Composition.Configs.Add(TestHelpers.SettingsForTests.GetDefaultHostingSettings);
+            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings);
+            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings);
+            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockSecuritySettings);
+            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockUserPasswordConfiguration);
+            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockMemberPasswordConfiguration);
+            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
 
             //Composition.Configs.Add<IUserPasswordConfiguration>(() => new DefaultUserPasswordConfig());
         }
@@ -548,7 +550,7 @@ namespace Umbraco.Tests.Testing
 
             // reset all other static things that should not be static ;(
             UriUtility.ResetAppDomainAppVirtualPath(HostingEnvironment);
-            SettingsForTests.Reset(); // FIXME: should it be optional?
+            TestHelpers.SettingsForTests.Reset(); // FIXME: should it be optional?
 
             // clear static events
             DocumentRepository.ClearScopeEvents();

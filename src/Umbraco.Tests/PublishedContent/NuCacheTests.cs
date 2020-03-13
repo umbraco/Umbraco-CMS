@@ -18,6 +18,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Common;
 using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
@@ -55,7 +56,7 @@ namespace Umbraco.Tests.PublishedContent
             var configs = TestHelper.GetConfigs();
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);
             var globalSettings = new GlobalSettings(TestHelper.IOHelper);
-            configs.Add(SettingsForTests.GenerateMockContentSettings);
+            configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
             configs.Add<IGlobalSettings>(() => globalSettings);
 
             var publishedModelFactory = new NoopPublishedModelFactory();

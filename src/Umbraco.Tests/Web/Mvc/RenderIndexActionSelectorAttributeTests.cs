@@ -13,6 +13,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing.Objects.Accessors;

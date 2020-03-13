@@ -24,6 +24,7 @@ using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.Security.Providers;
+using Umbraco.Tests.Common;
 
 namespace Umbraco.Tests.Services
 {
