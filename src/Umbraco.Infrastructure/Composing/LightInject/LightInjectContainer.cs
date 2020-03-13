@@ -21,6 +21,8 @@ namespace Umbraco.Core.Composing.LightInject
             Container = ConfigureContainer(container);
         }
 
+        //TODO: The Create methods can die when net framework is gone
+
         /// <summary>
         /// Creates a new instance of the <see cref="LightInjectContainer"/> class.
         /// </summary>

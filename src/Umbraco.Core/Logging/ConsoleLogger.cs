@@ -1,7 +1,6 @@
 ﻿using System;
-using Umbraco.Core.Logging;
 
-namespace Umbraco.Tests.TestHelpers
+namespace Umbraco.Core.Logging
 {
     public class ConsoleLogger : ILogger
     {

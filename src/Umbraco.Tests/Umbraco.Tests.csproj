@@ -84,7 +84,7 @@
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.8.14</Version>
     </PackageReference>
-    <PackageReference Include="LightInject" Version="5.4.0" />
+    <PackageReference Include="LightInject" Version="6.3.2" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.2" />
@@ -210,7 +210,6 @@
     <Compile Include="Services\CachedDataTypeServiceTests.cs" />
     <Compile Include="Services\ConsentServiceTests.cs" />
     <Compile Include="Services\SectionServiceTests.cs" />
-    <Compile Include="TestHelpers\ConsoleLogger.cs" />
     <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingExtensions.cs" />
     <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingMiddleware.cs" />
     <Compile Include="TestHelpers\ControllerTesting\SpecificAssemblyResolver.cs" />

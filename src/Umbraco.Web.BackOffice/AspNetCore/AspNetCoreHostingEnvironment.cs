@@ -83,9 +83,10 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             }
         }
 
-
+        // TODO: This may need to take into account ~/ paths which means the ApplicationVirtualPath and is this the content root or web root?
         public string MapPath(string path) => Path.Combine(_webHostEnvironment.WebRootPath, path);
 
+        // TODO: Need to take into account 'root' here
         public string ToAbsolute(string virtualPath, string root)
         {
             if (Uri.TryCreate(virtualPath, UriKind.Absolute, out _))

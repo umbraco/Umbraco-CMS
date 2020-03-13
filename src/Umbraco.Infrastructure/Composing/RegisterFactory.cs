@@ -1,5 +1,9 @@
-﻿using System;
+﻿using LightInject;
+using LightInject.Microsoft.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Reflection;
+using Umbraco.Core.Composing.LightInject;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Composing
@@ -9,7 +13,19 @@ namespace Umbraco.Core.Composing
     /// </summary>
     public static class RegisterFactory
     {
-        //TODO This needs to die
+        /// <summary>
+        /// Creates a new <see cref="IRegister"/> based on an existing MSDI IServiceCollection
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IRegister CreateFrom(IServiceCollection services, out IServiceProvider serviceProvider)
+        {
+            var liContainer = new ServiceContainer(ContainerOptions.Default.WithMicrosoftSettings());
+            serviceProvider = liContainer.CreateServiceProvider(services);
+            return new LightInjectContainer(liContainer);
+        }
+
+        //TODO: The following can die when net framework is gone
 
         // cannot use typeof().AssemblyQualifiedName on the web container - we don't reference it
         // a normal Umbraco site should run on the web container, but an app may run on the core one
