@@ -1,5 +1,7 @@
 ﻿using LightInject;
+using LightInject.Microsoft.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -26,7 +28,10 @@ namespace Umbraco.Tests.Integration
             var msdiServiceProvider = services.BuildServiceProvider();
 
             // LightInject / Umbraco
-            var umbracoContainer = (LightInjectContainer)RegisterFactory.CreateFrom(services, out var lightInjectServiceProvider);
+            var container = new ServiceContainer(ContainerOptions.Default.Clone().WithMicrosoftSettings().WithAspNetCoreSettings());
+            var serviceProviderFactory = new UmbracoServiceProviderFactory(container);
+            var umbracoContainer = serviceProviderFactory.GetContainer();
+            serviceProviderFactory.CreateBuilder(services); // called during Host Builder, needed to capture services
 
             // Dependencies needed for creating composition/register essentials
             var testHelper = new TestHelper();           
@@ -42,7 +47,8 @@ namespace Umbraco.Tests.Integration
                 testHelper.AppCaches, umbracoDatabaseFactory, typeLoader, runtimeState, testHelper.GetTypeFinder(),
                 testHelper.IOHelper, testHelper.GetUmbracoVersion(), dbProviderFactoryCreator);
 
-            // Resolve
+            // Cross wire - this would be called by the Host Builder at the very end of ConfigureServices
+            var lightInjectServiceProvider = serviceProviderFactory.CreateServiceProvider(umbracoContainer.Container);
 
             // From MSDI
             var foo1 = msdiServiceProvider.GetService<Foo>();

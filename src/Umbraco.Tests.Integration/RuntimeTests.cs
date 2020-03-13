@@ -10,6 +10,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Common.Composing;
 using Umbraco.Tests.Integration.Implementations;
+using Umbraco.Web.BackOffice.AspNetCore;
 
 namespace Umbraco.Tests.Integration
 {
@@ -19,20 +20,19 @@ namespace Umbraco.Tests.Integration
         [Test]
         public void BootCoreRuntime()
         {
-            // MSDI
-            var services = new ServiceCollection();
-
             // LightInject / Umbraco
-            var umbracoContainer = (LightInjectContainer)RegisterFactory.CreateFrom(services, out var lightInjectServiceProvider);
+            var container = new ServiceContainer(ContainerOptions.Default.Clone().WithMicrosoftSettings().WithAspNetCoreSettings());
+            var serviceProviderFactory = new UmbracoServiceProviderFactory(container);
+            var umbracoContainer = serviceProviderFactory.GetContainer();            
 
-            // Dependencies needed for Core Runtime
+            // Create the core runtime
             var testHelper = new TestHelper();
-
             var coreRuntime = new CoreRuntime(testHelper.GetConfigs(), testHelper.GetUmbracoVersion(),
                 testHelper.IOHelper, testHelper.Logger, testHelper.Profiler, testHelper.UmbracoBootPermissionChecker,
                 testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo(), testHelper.DbProviderFactoryCreator,
                 testHelper.MainDom, testHelper.GetTypeFinder());
 
+            // boot it!
             var factory = coreRuntime.Boot(umbracoContainer);
 
             Assert.IsTrue(coreRuntime.MainDom.IsMainDom);

@@ -10,6 +10,7 @@
       <PackageReference Include="LightInject" Version="6.3.2" />
       <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
       <PackageReference Include="LightInject.Microsoft.DependencyInjection" Version="3.3.0" />
+      <PackageReference Include="LightInject.Microsoft.Hosting" Version="1.2.0" />
       <PackageReference Include="Markdown" Version="2.2.1" />
       <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.2" />
@@ -57,6 +58,9 @@
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
             <_Parameter1>Umbraco.Tests.Benchmarks</_Parameter1>
         </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+            <_Parameter1>Umbraco.Tests.Integration</_Parameter1>
+        </AssemblyAttribute>
     </ItemGroup>
 
     <ItemGroup>
@@ -65,10 +69,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Composing\Microsoft\" />
     </ItemGroup>
 
 </Project>
