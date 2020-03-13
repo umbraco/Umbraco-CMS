@@ -28,11 +28,14 @@ namespace Umbraco.Tests.Common
     public abstract class TestHelperBase
     {
         private readonly ITypeFinder _typeFinder;
+        private readonly IConfigsFactory _configsFactory;
         private UriUtility _uriUtility;
         private IIOHelper _ioHelper;
+        private Configs _configs;
 
         public TestHelperBase(Assembly entryAssembly)
         {
+            _configsFactory = new ConfigsFactory();
             SettingsForTests = new SettingsForTests();
             MainDom = new SimpleMainDom();
             _typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(entryAssembly));
@@ -47,7 +50,9 @@ namespace Umbraco.Tests.Common
 
         public Configs GetConfigs()
         {
-            return GetConfigsFactory().Create(IOHelper, Mock.Of<ILogger>());
+            if (_configs == null)
+                _configs = GetConfigsFactory().Create(IOHelper, Mock.Of<ILogger>());
+            return _configs;
         }
         public IRuntimeState GetRuntimeState()
         {
@@ -64,10 +69,7 @@ namespace Umbraco.Tests.Common
 
         public abstract IBackOfficeInfo GetBackOfficeInfo();
 
-        public IConfigsFactory GetConfigsFactory()
-        {
-            return new ConfigsFactory();
-        }
+        public IConfigsFactory GetConfigsFactory() => _configsFactory;
 
         /// <summary>
         /// Gets the current assembly directory.
