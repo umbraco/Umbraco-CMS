@@ -82,9 +82,9 @@ namespace Umbraco.Core.Composing
         /// If the assembly of the assignTypeFrom Type is in the App_Code assembly, then we return nothing since things cannot
         /// reference that assembly, same with the global.asax assembly.
         /// </remarks>
-        public static Assembly[] GetReferencingAssemblies(Assembly assembly, IEnumerable<Assembly> assemblies)
+        public static IReadOnlyList<Assembly> GetReferencingAssemblies(Assembly assembly, IEnumerable<Assembly> assemblies)
         {
-            if (assembly.IsAppCodeAssembly() || assembly.IsGlobalAsaxAssembly())
+            if (assembly.IsDynamic || assembly.IsAppCodeAssembly() || assembly.IsGlobalAsaxAssembly())
                 return EmptyAssemblies;
 
 
@@ -92,7 +92,7 @@ namespace Umbraco.Core.Composing
             // should only be scanning those assemblies because any other assembly will definitely not
             // contain sub type's of the one we're currently looking for
             var name = assembly.GetName().Name;
-            return assemblies.Where(x => x == assembly || HasReference(x, name)).ToArray();
+            return assemblies.Where(x => x == assembly || HasReference(x, name)).ToList();
         }
 
         /// <summary>

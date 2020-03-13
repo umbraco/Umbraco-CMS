@@ -13,6 +13,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Tests.Collections;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.Tests.Cache
@@ -28,7 +29,7 @@ namespace Umbraco.Tests.Cache
         public override void Setup()
         {
             base.Setup();
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeFinder = TestHelper.GetTypeFinder();
             _memberCache = new ObjectCacheAppCache(typeFinder);
 
             _provider = new DeepCloneAppCache(_memberCache);

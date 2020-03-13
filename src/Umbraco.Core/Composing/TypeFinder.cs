@@ -1,106 +1,35 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Text;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Composing
 {
+
     /// <inheritdoc cref="ITypeFinder"/>
     public class TypeFinder : ITypeFinder
     {
         private readonly ILogger _logger;
-
-        public TypeFinder(ILogger logger, ITypeFinderConfig typeFinderConfig = null)
-        {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _assembliesAcceptingLoadExceptions = typeFinderConfig?.AssembliesAcceptingLoadExceptions.Where(x => !x.IsNullOrWhiteSpace()).ToArray() ?? Array.Empty<string>();
-            _allAssemblies = new Lazy<HashSet<Assembly>>(() =>
-            {
-                HashSet<Assembly> assemblies = null;
-                try
-                {
-                    //NOTE: we cannot use AppDomain.CurrentDomain.GetAssemblies() because this only returns assemblies that have
-                    // already been loaded in to the app domain, instead we will look directly into the bin folder and load each one.
-                    var binFolder = GetRootDirectorySafe();
-                    var binAssemblyFiles = Directory.GetFiles(binFolder, "*.dll", SearchOption.TopDirectoryOnly).ToList();
-                    //var binFolder = Assembly.GetExecutingAssembly().GetAssemblyFile().Directory;
-                    //var binAssemblyFiles = Directory.GetFiles(binFolder.FullName, "*.dll", SearchOption.TopDirectoryOnly).ToList();
-                    assemblies = new HashSet<Assembly>();
-                    foreach (var a in binAssemblyFiles)
-                    {
-                        try
-                        {
-                            var assName = AssemblyName.GetAssemblyName(a);
-                            var ass = Assembly.Load(assName);
-                            assemblies.Add(ass);
-                        }
-                        catch (Exception e)
-                        {
-                            if (e is SecurityException || e is BadImageFormatException)
-                            {
-                                //swallow these exceptions
-                            }
-                            else
-                            {
-                                throw;
-                            }
-                        }
-                    }
-
-                    //Since we are only loading in the /bin assemblies above, we will also load in anything that's already loaded (which will include gac items)
-                    foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
-                    {
-                        assemblies.Add(a);
-                    }
-                }
-                catch (InvalidOperationException e)
-                {
-                    if (e.InnerException is SecurityException == false)
-                        throw;
-                }
-
-                return assemblies;
-            });
-        }
-
-        //Lazy access to the all assemblies list
-        private readonly Lazy<HashSet<Assembly>> _allAssemblies;
+        private readonly IAssemblyProvider _assemblyProvider;
         private volatile HashSet<Assembly> _localFilteredAssemblyCache;
         private readonly object _localFilteredAssemblyCacheLocker = new object();
         private readonly List<string> _notifiedLoadExceptionAssemblies = new List<string>();
-        private static readonly ConcurrentDictionary<string, Type> TypeNamesCache= new ConcurrentDictionary<string, Type>();
-        private string _rootDir = "";
+        private static readonly ConcurrentDictionary<string, Type> TypeNamesCache = new ConcurrentDictionary<string, Type>();
         private readonly string[] _assembliesAcceptingLoadExceptions;
 
-        // FIXME - this is only an interim change, once the IIOHelper stuff is merged we should use IIOHelper here
-        private string GetRootDirectorySafe()
+        // used for benchmark tests
+        internal bool QueryWithReferencingAssemblies = true;
+
+        public TypeFinder(ILogger logger, IAssemblyProvider assemblyProvider, ITypeFinderConfig typeFinderConfig = null)
         {
-            if (string.IsNullOrEmpty(_rootDir) == false)
-            {
-                return _rootDir;
-            }
-
-            var codeBase = Assembly.GetExecutingAssembly().CodeBase;
-            var uri = new Uri(codeBase);
-            var path = uri.LocalPath;
-            var baseDirectory = Path.GetDirectoryName(path);
-            if (string.IsNullOrEmpty(baseDirectory))
-                throw new PanicException("No root directory could be resolved.");
-
-            _rootDir = baseDirectory.Contains("bin")
-                ? baseDirectory.Substring(0, baseDirectory.LastIndexOf("bin", StringComparison.OrdinalIgnoreCase) - 1)
-                : baseDirectory;
-
-            return _rootDir;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _assemblyProvider = assemblyProvider;
+            _assembliesAcceptingLoadExceptions = typeFinderConfig?.AssembliesAcceptingLoadExceptions.Where(x => !x.IsNullOrWhiteSpace()).ToArray() ?? Array.Empty<string>();           
         }
 
         private bool AcceptsLoadExceptions(Assembly a)
@@ -119,22 +48,8 @@ namespace Umbraco.Core.Composing
             });
         }
 
-        /// <summary>
-        /// lazily load a reference to all assemblies and only local assemblies.
-        /// This is a modified version of: http://www.dominicpettifer.co.uk/Blog/44/how-to-get-a-reference-to-all-assemblies-in-the--bin-folder
-        /// </summary>
-        /// <remarks>
-        /// We do this because we cannot use AppDomain.Current.GetAssemblies() as this will return only assemblies that have been
-        /// loaded in the CLR, not all assemblies.
-        /// See these threads:
-        /// http://issues.umbraco.org/issue/U5-198
-        /// http://stackoverflow.com/questions/3552223/asp-net-appdomain-currentdomain-getassemblies-assemblies-missing-after-app
-        /// http://stackoverflow.com/questions/2477787/difference-between-appdomain-getassemblies-and-buildmanager-getreferencedassembl
-        /// </remarks>
-        private IEnumerable<Assembly> GetAllAssemblies()
-        {
-            return _allAssemblies.Value;
-        }
+
+        private IEnumerable<Assembly> GetAllAssemblies() => _assemblyProvider.Assemblies;
 
         /// <inheritdoc />
         public IEnumerable<Assembly> AssembliesToScan
@@ -181,7 +96,10 @@ namespace Umbraco.Core.Composing
         /// NOTE the comma vs period... comma delimits the name in an Assembly FullName property so if it ends with comma then its an exact name match
         /// NOTE this means that "foo." will NOT exclude "foo.dll" but only "foo.*.dll"
         /// </remarks>
-        private static readonly string[] KnownAssemblyExclusionFilter = {
+        internal static readonly string[] KnownAssemblyExclusionFilter = {
+            "mscorlib,",
+            "netstandard,",
+            "System,",
             "Antlr3.",
             "AutoMapper,",
             "AutoMapper.",
@@ -228,7 +146,14 @@ namespace Umbraco.Core.Composing
             "WebDriver,",
             "itextsharp,",
             "mscorlib,",
-            "nunit.framework,",
+            "NUnit,",
+            "NUnit.",
+            "NUnit3.",
+            "Selenium.",
+            "ImageProcessor",
+            "MiniProfiler.",
+            "Owin,",
+            "SQLite",
         };
 
         /// <summary>
@@ -290,6 +215,11 @@ namespace Umbraco.Core.Composing
         /// <returns></returns>
         public virtual Type GetTypeByName(string name)
         {
+
+            //NOTE: This will not find types in dynamic assemblies unless those assemblies are already loaded
+            //into the appdomain.
+
+
             // This is exactly what the BuildManager does, if the type is an assembly qualified type
             // name it will find it.
             if (TypeNameContainsAssembly(name))
@@ -340,18 +270,24 @@ namespace Umbraco.Core.Composing
             var stack = new Stack<Assembly>();
             stack.Push(attributeType.Assembly);
 
+            if (!QueryWithReferencingAssemblies)
+            {
+                foreach (var a in candidateAssemblies)
+                    stack.Push(a);
+            }
+
             while (stack.Count > 0)
             {
                 var assembly = stack.Pop();
 
-                Type[] assemblyTypes = null;
+                IReadOnlyList<Type> assemblyTypes = null;
                 if (assembly != attributeType.Assembly || attributeAssemblyIsCandidate)
                 {
                     // get all assembly types that can be assigned to baseType
                     try
                     {
                         assemblyTypes = GetTypesWithFormattedException(assembly)
-                            .ToArray(); // in try block
+                            .ToList(); // in try block
                     }
                     catch (TypeLoadException ex)
                     {
@@ -371,10 +307,13 @@ namespace Umbraco.Core.Composing
                 if (assembly != attributeType.Assembly && assemblyTypes.Where(attributeType.IsAssignableFrom).Any() == false)
                     continue;
 
-                foreach (var referencing in TypeHelper.GetReferencingAssemblies(assembly, candidateAssemblies))
+                if (QueryWithReferencingAssemblies)
                 {
-                    candidateAssemblies.Remove(referencing);
-                    stack.Push(referencing);
+                    foreach (var referencing in TypeHelper.GetReferencingAssemblies(assembly, candidateAssemblies))
+                    {
+                        candidateAssemblies.Remove(referencing);
+                        stack.Push(referencing);
+                    }
                 }
             }
 
@@ -405,19 +344,25 @@ namespace Umbraco.Core.Composing
             var stack = new Stack<Assembly>();
             stack.Push(baseType.Assembly);
 
+            if (!QueryWithReferencingAssemblies)
+            {
+                foreach (var a in candidateAssemblies)
+                    stack.Push(a);
+            }
+
             while (stack.Count > 0)
             {
                 var assembly = stack.Pop();
 
                 // get all assembly types that can be assigned to baseType
-                Type[] assemblyTypes = null;
+                IReadOnlyList<Type> assemblyTypes = null;
                 if (assembly != baseType.Assembly || baseTypeAssemblyIsCandidate)
                 {
                     try
                     {
                         assemblyTypes = GetTypesWithFormattedException(assembly)
                             .Where(baseType.IsAssignableFrom)
-                            .ToArray(); // in try block
+                            .ToList(); // in try block
                     }
                     catch (TypeLoadException ex)
                     {
@@ -437,10 +382,13 @@ namespace Umbraco.Core.Composing
                 if (assembly != baseType.Assembly && assemblyTypes.All(x => x.IsSealed))
                     continue;
 
-                foreach (var referencing in TypeHelper.GetReferencingAssemblies(assembly, candidateAssemblies))
+                if (QueryWithReferencingAssemblies)
                 {
-                    candidateAssemblies.Remove(referencing);
-                    stack.Push(referencing);
+                    foreach (var referencing in TypeHelper.GetReferencingAssemblies(assembly, candidateAssemblies))
+                    {
+                        candidateAssemblies.Remove(referencing);
+                        stack.Push(referencing);
+                    }
                 }
             }
 
@@ -521,7 +469,6 @@ namespace Umbraco.Core.Composing
         }
 
         #endregion
-
 
     }
 }

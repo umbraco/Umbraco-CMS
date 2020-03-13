@@ -43,6 +43,14 @@ namespace Umbraco.Tests.TestHelpers
     public static class TestHelper
     {
 
+        public static ITypeFinder GetTypeFinder()
+        {
+            
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>(),                
+                new DefaultUmbracoAssemblyProvider(typeof(TestHelper).Assembly));
+            return typeFinder;
+        }
+
         public static TypeLoader GetMockedTypeLoader()
         {
             return new TypeLoader(IOHelper, Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());

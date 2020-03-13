@@ -247,7 +247,7 @@ namespace Umbraco.Tests.TestHelpers
                 databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers), TestHelper.GetConfigs(), TestHelper.DbProviderFactoryCreator);
             }
 
-            typeFinder = typeFinder ?? new TypeFinder(logger);
+            typeFinder = typeFinder ?? new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly));
             fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings());
             var coreDebug = Current.Configs.CoreDebug();
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
