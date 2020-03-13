@@ -1030,7 +1030,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public IEnumerable<int> GetAllRolesIDs()
+        public IEnumerable<int> GetAllRolesIds()
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -1038,7 +1038,7 @@ namespace Umbraco.Core.Services.Implement
                 return _memberGroupRepository.GetMany().Select(x => x.Id).Distinct();
             }
         }
-        public IEnumerable<int> GetAllRolesIDs(int memberId)
+        public IEnumerable<int> GetAllRolesIds(int memberId)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
