@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Routing
         [TestCase(10011, "https://domain1.com", false, "/1001-1/")]
         public void Get_Url_SimpleDomain(int nodeId, string currentUrl, bool absolute, string expected)
         {
-            var settings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var settings = TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings();
 
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
@@ -212,7 +212,7 @@ namespace Umbraco.Tests.Routing
         [TestCase(10011, "https://domain1.com", false, "http://domain1.com/foo/1001-1/")]
         public void Get_Url_SimpleWithSchemeAndPath(int nodeId, string currentUrl, bool absolute, string expected)
         {
-            var settings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var settings = TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings();
 
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
@@ -238,7 +238,7 @@ namespace Umbraco.Tests.Routing
         [TestCase(1002, "http://domain1.com", false, "/1002/")]
         public void Get_Url_DeepDomain(int nodeId, string currentUrl, bool absolute, string expected)
         {
-            var settings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var settings = TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings();
 
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
@@ -270,7 +270,7 @@ namespace Umbraco.Tests.Routing
         [TestCase(100321, "http://domain3.com", false, "/fr/1003-2-1/")]
         public void Get_Url_NestedDomains(int nodeId, string currentUrl, bool absolute, string expected)
         {
-            var settings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var settings = TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings();
 
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
@@ -292,7 +292,7 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Get_Url_DomainsAndCache()
         {
-            var settings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var settings = TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings();
 
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
@@ -356,7 +356,7 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Get_Url_Relative_Or_Absolute()
         {
-            var settings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var settings = TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings();
 
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
@@ -381,7 +381,7 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Get_Url_Alternate()
         {
-            var settings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var settings = TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings();
 
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains

@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Routing
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
-            var settings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var settings = TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings();
 
             SetDomains1();
 
