@@ -33,8 +33,9 @@ namespace Umbraco.Web.Runtime
             IHostingEnvironment hostingEnvironment,
             IBackOfficeInfo backOfficeInfo,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IMainDom mainDom):
-            base(configs, umbracoVersion, ioHelper, logger, profiler ,new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom)
+            IMainDom mainDom,
+            ITypeFinder typeFinder):
+            base(configs, umbracoVersion, ioHelper, logger, profiler ,new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom, typeFinder)
         {
 
             Profiler = GetWebProfiler();

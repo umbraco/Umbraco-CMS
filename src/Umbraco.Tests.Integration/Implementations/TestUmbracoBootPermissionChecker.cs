@@ -1,6 +1,6 @@
 ﻿using Umbraco.Core.Runtime;
 
-namespace Umbraco.Tests.Integration.Infrastructure
+namespace Umbraco.Tests.Integration.Implementations
 {
     public class TestUmbracoBootPermissionChecker : IUmbracoBootPermissionChecker
     {

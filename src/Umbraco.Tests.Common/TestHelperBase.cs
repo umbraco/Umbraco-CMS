@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -12,7 +13,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Runtime;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
@@ -27,21 +27,18 @@ namespace Umbraco.Tests.Common
     /// </summary>
     public abstract class TestHelperBase
     {
-        public TestHelperBase()
+        private readonly ITypeFinder _typeFinder;
+        private UriUtility _uriUtility;
+        private IIOHelper _ioHelper;
+
+        public TestHelperBase(Assembly entryAssembly)
         {
             SettingsForTests = new SettingsForTests();
-            IOHelper = new IOHelper(GetHostingEnvironment());
-            MainDom = new MainDom(Mock.Of<ILogger>(), GetHostingEnvironment(), new MainDomSemaphoreLock(Mock.Of<ILogger>(), GetHostingEnvironment()));
-            UriUtility = new UriUtility(GetHostingEnvironment());            
+            MainDom = new SimpleMainDom();
+            _typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(entryAssembly));
         }
 
-        public ITypeFinder GetTypeFinder()
-        {
-            
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>(),                
-                new DefaultUmbracoAssemblyProvider(typeof(TestHelperBase).Assembly));
-            return typeFinder;
-        }
+        public ITypeFinder GetTypeFinder() => _typeFinder;
 
         public TypeLoader GetMockedTypeLoader()
         {
@@ -93,12 +90,29 @@ namespace Umbraco.Tests.Common
         public abstract IDbProviderFactoryCreator DbProviderFactoryCreator { get; }
         public abstract IBulkSqlInsertProvider BulkSqlInsertProvider { get; }
         public abstract IMarchal Marchal { get; }
-        public ICoreDebug CoreDebug { get; } =  new CoreDebug();
+        public ICoreDebug CoreDebug { get; } = new CoreDebug();
 
+        public IIOHelper IOHelper
+        {
+            get
+            {
+                if (_ioHelper == null)
+                    _ioHelper = new IOHelper(GetHostingEnvironment());
+                return _ioHelper;
+            }
+        }
 
-        public IIOHelper IOHelper { get; }
         public IMainDom MainDom { get; }
-        public UriUtility UriUtility { get; }
+        public UriUtility UriUtility
+        {
+            get
+            {
+                if (_uriUtility == null)
+                    _uriUtility = new UriUtility(GetHostingEnvironment());
+                return _uriUtility;
+            }
+        }
+
         public SettingsForTests SettingsForTests { get; }
         public IWebRoutingSettings WebRoutingSettings => SettingsForTests.GenerateMockWebRoutingSettings();
 

@@ -120,14 +120,10 @@ namespace Umbraco.Tests.Runtimes
         public class TestRuntime : CoreRuntime
         {
             public TestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
-                :base(configs, umbracoVersion, ioHelper, logger,  profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom)
+                :base(configs, umbracoVersion, ioHelper, logger,  profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder())
             {
 
             }
-
-            // override because we cannot use Assembly.GetEntryAssembly in Nunit tests since that is always null
-            protected override ITypeFinder GetTypeFinder()
-                => new TypeFinder(Logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly));
 
             // must override the database factory
             // else BootFailedException because U cannot connect to the configured db

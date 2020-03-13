@@ -15,7 +15,7 @@ namespace Umbraco.Core.IO
 
         public IOHelper(IHostingEnvironment hostingEnvironment)
         {
-            _hostingEnvironment = hostingEnvironment;
+            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
         }
 
         /// <summary>

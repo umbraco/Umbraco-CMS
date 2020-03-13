@@ -2,7 +2,7 @@
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 
-namespace Umbraco.Tests.Integration.Infrastructure
+namespace Umbraco.Tests.Integration.Implementations
 {
     public class TestDbProviderFactoryCreator : IDbProviderFactoryCreator
     {

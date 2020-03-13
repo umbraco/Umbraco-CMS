@@ -15,6 +15,7 @@ namespace Umbraco.Web
 
         public UriUtility(IHostingEnvironment hostingEnvironment)
         {
+            if (hostingEnvironment is null) throw new ArgumentNullException(nameof(hostingEnvironment));
             ResetAppDomainAppVirtualPath(hostingEnvironment);
         }
 
