@@ -10,8 +10,8 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Services;
 using Umbraco.Tests.LegacyXmlPublishedCache;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
+using Umbraco.Tests.Common;
 
 namespace Umbraco.Tests.Routing
 {

@@ -223,7 +223,6 @@
     <Compile Include="Testing\Objects\Accessors\NoHttpContextAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestExamineManager.cs" />
     <Compile Include="Testing\ContentBaseExtensions.cs" />
-    <Compile Include="Testing\Objects\Accessors\TestDefaultCultureAccessor.cs" />
     <Compile Include="Testing\Objects\TestUmbracoContextFactory.cs" />
     <Compile Include="Testing\TestDatabase.cs" />
     <Compile Include="Testing\TestingTests\NUnitTests.cs" />
@@ -239,10 +238,8 @@
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="Testing\UmbracoTestOptions.cs" />
     <Compile Include="CoreThings\TryConvertToTests.cs" />
-    <Compile Include="Testing\Objects\Accessors\TestPublishedSnapshotAccessor.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
-    <Compile Include="Testing\Objects\Accessors\TestUmbracoContextAccessor.cs" />
     <Compile Include="CoreThings\UdiTests.cs" />
     <Compile Include="UmbracoExamine\RandomIdRamDirectory.cs" />
     <Compile Include="UmbracoExamine\UmbracoContentValueSetValidatorTests.cs" />

@@ -16,7 +16,6 @@ using Umbraco.Core.Strings;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Tests.Common;
 using Umbraco.Web;
 using Umbraco.Web.Models;

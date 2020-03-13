@@ -27,7 +27,6 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.Composing;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Macros;

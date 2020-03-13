@@ -35,7 +35,6 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Services;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.PublishedCache;
