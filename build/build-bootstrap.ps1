@@ -64,11 +64,6 @@
     $params = "-OutputDirectory", $scriptTemp, "-Verbosity", "quiet", "-PreRelease"
     &$nuget install Umbraco.Build @params
     if (-not $?) { throw "Failed to download Umbraco.Build." }
-	
-	# dependency is necessary since upgrading to VS 16.4.5
-	$params = "-OutputDirectory", $scriptTemp, "-Verbosity", "quiet", "-Version", "4.7.0"
-	&$nuget install NuGet.Versioning @params
-	if (-not $?) { throw "Failed to download NuGet.Versioning." }
   }
 
   # ensure we have the build system
