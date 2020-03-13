@@ -42,7 +42,7 @@ namespace Umbraco.Core.Configuration
             configs.Add(() => CoreDebug);
             configs.Add(() => MachineKeyConfig);
             configs.Add<IConnectionStrings>(() => new ConnectionStrings(ioHelper, logger));
-            configs.Add<IModelsBuilderConfig>(() => new ModelsBuilderConfig(ioHelper));
+            configs.Add<IModelsBuilderConfig>(() => new ModelsBuilderConfig());
 
 
             configs.Add<IIndexCreatorSettings>(() => IndexCreatorSettings);

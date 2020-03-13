@@ -13,7 +13,7 @@ namespace Umbraco.Configuration
     /// </summary>
     public class ModelsBuilderConfig : IModelsBuilderConfig
     {
-        private readonly IIOHelper _ioHelper;
+
         private const string Prefix = "Umbraco.ModelsBuilder.";
         private object _modelsModelLock;
         private bool _modelsModelConfigured;
@@ -23,15 +23,13 @@ namespace Umbraco.Configuration
         private bool _flagOutOfDateModels;
 
 
-        public string DefaultModelsDirectory => _ioHelper.MapPath("~/App_Data/Models");
+        public string DefaultModelsDirectory => "~/App_Data/Models";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ModelsBuilderConfig"/> class.
         /// </summary>
-        public ModelsBuilderConfig(IIOHelper ioHelper)
+        public ModelsBuilderConfig()
         {
-            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
-
             // giant kill switch, default: false
             // must be explicitely set to true for anything else to happen
             Enable = ConfigurationManager.AppSettings[Prefix + "Enable"] == "true";
@@ -59,9 +57,7 @@ namespace Umbraco.Configuration
             value = ConfigurationManager.AppSettings[Prefix + "ModelsDirectory"];
             if (!string.IsNullOrWhiteSpace(value))
             {
-                var root = _ioHelper.MapPath("~/");
-                if (root == null)
-                    throw new ConfigurationErrorsException("Could not determine root directory.");
+                var root = "~/";
 
                 // GetModelsDirectory will ensure that the path is safe
                 ModelsDirectory = GetModelsDirectory(root, value, AcceptUnsafeModelsDirectory);
@@ -81,7 +77,7 @@ namespace Umbraco.Configuration
         /// <summary>
         /// Initializes a new instance of the <see cref="ModelsBuilderConfig"/> class.
         /// </summary>
-        public ModelsBuilderConfig(IIOHelper ioHelper,
+        public ModelsBuilderConfig(
             bool enable = false,
             ModelsMode modelsMode = ModelsMode.Nothing,
             string modelsNamespace = null,
@@ -91,7 +87,6 @@ namespace Umbraco.Configuration
             bool acceptUnsafeModelsDirectory = false,
             int debugLevel = 0)
         {
-            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             Enable = enable;
             _modelsMode = modelsMode;
 
