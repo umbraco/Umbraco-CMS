@@ -175,6 +175,12 @@ namespace Umbraco.Web.Models.Mapping
 
             target.Name = source.Values.ContainsKey(UmbracoExamineFieldNames.NodeNameFieldName) ? source.Values[UmbracoExamineFieldNames.NodeNameFieldName] : "[no name]";
 
+            var culture = context.GetCulture();
+            if(culture.IsNullOrWhiteSpace() == false)
+            {
+                target.Name = source.Values.ContainsKey($"nodeName_{culture}") ? source.Values[$"nodeName_{culture}"] : target.Name;
+            }
+
             if (source.Values.TryGetValue(UmbracoExamineFieldNames.UmbracoFileFieldName, out var umbracoFile))
             {
                 if (umbracoFile != null)

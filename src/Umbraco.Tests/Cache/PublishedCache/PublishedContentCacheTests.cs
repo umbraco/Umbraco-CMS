@@ -57,7 +57,6 @@ namespace Umbraco.Tests.Cache.PublishedCache
 
             _httpContextFactory = new FakeHttpContextFactory("~/Home");
 
-            var umbracoSettings = Factory.GetInstance<IUmbracoSettingsSection>();
             var globalSettings = Factory.GetInstance<IGlobalSettings>();
             var umbracoContextAccessor = Factory.GetInstance<IUmbracoContextAccessor>();
 

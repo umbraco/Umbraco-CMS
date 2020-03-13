@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-    function ($scope, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage) {
+    function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage) {
 
             var vm = this;
             
@@ -306,9 +306,7 @@ angular.module("umbraco")
                             });
                         } else {
                             var image = $scope.images[$scope.images.length - 1];
-                            $scope.target = image;
-                            $scope.target.url = mediaHelper.resolveFile(image);
-                            selectMedia(image);
+                            clickHandler(image);
                         }
                     });
                 });
@@ -324,7 +322,7 @@ angular.module("umbraco")
 
                 // also make sure the node is not trashed
                 if (nodePath.indexOf($scope.startNodeId.toString()) !== -1 && node.trashed === false) {
-                    gotoFolder({ id: $scope.lastOpenedNode, name: "Media", icon: "icon-folder", path: node.path });
+                    gotoFolder({ id: $scope.lastOpenedNode || $scope.startNodeId, name: "Media", icon: "icon-folder", path: node.path });
                     return true;
                 } else {
                     gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });

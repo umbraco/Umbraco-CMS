@@ -22,7 +22,7 @@ namespace Umbraco.Web.Mvc
             base.OnActionExecuted(filterContext);
 
             filterContext.HttpContext.Response.StatusCode = (int)_statusCode;
-            filterContext.HttpContext.Response.TrySkipIisCustomErrors = Current.Configs.Settings().WebRouting.TrySkipIisCustomErrors;
+            filterContext.HttpContext.Response.TrySkipIisCustomErrors = Current.Configs.WebRouting().TrySkipIisCustomErrors;
         }
     }
 }

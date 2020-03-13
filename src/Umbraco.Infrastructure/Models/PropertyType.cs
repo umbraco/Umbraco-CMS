@@ -168,6 +168,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [DataMember]
+        [DoNotClone]
         public Lazy<int> PropertyGroupId
         {
             get => _propertyGroupId;

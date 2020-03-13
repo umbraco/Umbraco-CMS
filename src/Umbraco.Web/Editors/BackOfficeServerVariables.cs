@@ -33,12 +33,13 @@ namespace Umbraco.Web.Editors
         private readonly UmbracoFeatures _features;
         private readonly IGlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IContentSettings _contentSettings;
         private readonly IIOHelper _ioHelper;
         private readonly TreeCollection _treeCollection;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeSettings _settings;
+        private readonly ISecuritySettings _securitySettings;
 
         internal BackOfficeServerVariables(
             UrlHelper urlHelper,
@@ -46,24 +47,26 @@ namespace Umbraco.Web.Editors
             UmbracoFeatures features,
             IGlobalSettings globalSettings,
             IUmbracoVersion umbracoVersion,
-            IUmbracoSettingsSection umbracoSettingsSection,
+            IContentSettings contentSettings,
             IIOHelper ioHelper,
             TreeCollection treeCollection,
             IHttpContextAccessor httpContextAccessor,
             IHostingEnvironment hostingEnvironment,
-            IRuntimeSettings settings)
+            IRuntimeSettings settings,
+            ISecuritySettings securitySettings)
         {
             _urlHelper = urlHelper;
             _runtimeState = runtimeState;
             _features = features;
             _globalSettings = globalSettings;
             _umbracoVersion = umbracoVersion;
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));
             _httpContextAccessor = httpContextAccessor;
             _hostingEnvironment = hostingEnvironment;
             _settings = settings;
+            _securitySettings = securitySettings;
         }
 
         /// <summary>
@@ -346,25 +349,25 @@ namespace Umbraco.Web.Editors
                         {"appPluginsPath", _ioHelper.ResolveUrl(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
                             "imageFileTypes",
-                            string.Join(",", _umbracoSettingsSection.Content.ImageFileTypes)
+                            string.Join(",", _contentSettings.ImageFileTypes)
                         },
                         {
                             "disallowedUploadFiles",
-                            string.Join(",", _umbracoSettingsSection.Content.DisallowedUploadFiles)
+                            string.Join(",", _contentSettings.DisallowedUploadFiles)
                         },
                         {
                             "allowedUploadFiles",
-                            string.Join(",", _umbracoSettingsSection.Content.AllowedUploadFiles)
+                            string.Join(",", _contentSettings.AllowedUploadFiles)
                         },
                         {
                             "maxFileSize",
                             GetMaxRequestLength()
                         },
-                        {"keepUserLoggedIn", _umbracoSettingsSection.Security.KeepUserLoggedIn},
-                        {"usernameIsEmail", _umbracoSettingsSection.Security.UsernameIsEmail},
+                        {"keepUserLoggedIn", _securitySettings.KeepUserLoggedIn},
+                        {"usernameIsEmail", _securitySettings.UsernameIsEmail},
                         {"cssPath", _ioHelper.ResolveUrl(globalSettings.UmbracoCssPath).TrimEnd('/')},
-                        {"allowPasswordReset", _umbracoSettingsSection.Security.AllowPasswordReset},
-                        {"loginBackgroundImage",  _umbracoSettingsSection.Content.LoginBackgroundImage},
+                        {"allowPasswordReset", _securitySettings.AllowPasswordReset},
+                        {"loginBackgroundImage", _contentSettings.LoginBackgroundImage},
                         {"showUserInvite", EmailSender.CanSendRequiredEmail(globalSettings)},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail(globalSettings)},
                     }

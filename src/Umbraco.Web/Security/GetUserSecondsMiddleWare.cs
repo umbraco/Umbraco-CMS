@@ -24,14 +24,14 @@ namespace Umbraco.Web.Security
     {
         private readonly UmbracoBackOfficeCookieAuthOptions _authOptions;
         private readonly IGlobalSettings _globalSettings;
-        private readonly ISecuritySection _security;
+        private readonly ISecuritySettings _security;
         private readonly ILogger _logger;
 
         public GetUserSecondsMiddleWare(
             OwinMiddleware next,
             UmbracoBackOfficeCookieAuthOptions authOptions,
             IGlobalSettings globalSettings,
-            ISecuritySection security,
+            ISecuritySettings security,
             ILogger logger)
             : base(next)
         {

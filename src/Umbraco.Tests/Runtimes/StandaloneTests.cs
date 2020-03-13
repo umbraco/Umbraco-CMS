@@ -70,7 +70,7 @@ namespace Umbraco.Tests.Runtimes
             var mainDom = new SimpleMainDom();
             var umbracoVersion = TestHelper.GetUmbracoVersion();
             var backOfficeInfo = TestHelper.GetBackOfficeInfo();
-            var runtimeState = new RuntimeState(logger, null, null, new Lazy<IMainDom>(() => mainDom), new Lazy<IServerRegistrar>(() => factory.GetInstance<IServerRegistrar>()), umbracoVersion, hostingEnvironment, backOfficeInfo);
+            var runtimeState = new RuntimeState(logger, null, new Lazy<IMainDom>(() => mainDom), new Lazy<IServerRegistrar>(() => factory.GetInstance<IServerRegistrar>()), umbracoVersion, hostingEnvironment, backOfficeInfo);
             var configs = TestHelper.GetConfigs();
             var variationContextAccessor = TestHelper.VariationContextAccessor;
 
@@ -121,7 +121,7 @@ namespace Umbraco.Tests.Runtimes
 
             // configure
             composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
-            composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+            composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
 
             // create and register the factory
             Current.Factory = factory = composition.CreateFactory();

@@ -2,6 +2,6 @@
 {
     public interface IBackOfficeSection
     {
-        ITourSection Tours { get; }
+        ITourSettings Tours { get; }
     }
 }

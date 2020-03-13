@@ -23,7 +23,7 @@ namespace Umbraco.Web.Macros
     {
         private readonly IProfilingLogger _plogger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly IContentSection _contentSection;
+        private readonly IContentSettings _contentSettings;
         private readonly ILocalizedTextService _textService;
         private readonly AppCaches _appCaches;
         private readonly IMacroService _macroService;
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Macros
         public MacroRenderer(
             IProfilingLogger plogger,
             IUmbracoContextAccessor umbracoContextAccessor,
-            IContentSection contentSection,
+            IContentSettings contentSettings,
             ILocalizedTextService textService,
             AppCaches appCaches,
             IMacroService macroService,
@@ -51,7 +51,7 @@ namespace Umbraco.Web.Macros
         {
             _plogger = plogger ?? throw new ArgumentNullException(nameof(plogger));
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
-            _contentSection = contentSection ?? throw new ArgumentNullException(nameof(contentSection));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _textService = textService;
             _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
             _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
@@ -284,7 +284,7 @@ namespace Umbraco.Web.Macros
                     Alias = macro.Alias,
                     MacroSource = macro.MacroSource,
                     Exception = e,
-                    Behaviour = _contentSection.MacroErrorBehaviour
+                    Behaviour = _contentSettings.MacroErrorBehaviour
                 };
 
                 switch (macroErrorEventArgs.Behaviour)

@@ -12,14 +12,14 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class DefaultUrlProvider : IUrlProvider
     {
-        private readonly IRequestHandlerSection _requestSettings;
+        private readonly IRequestHandlerSettings _requestSettings;
         private readonly ILogger _logger;
         private readonly IGlobalSettings _globalSettings;
         private readonly ISiteDomainHelper _siteDomainHelper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly UriUtility _uriUtility;
 
-        public DefaultUrlProvider(IRequestHandlerSection requestSettings, ILogger logger, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper, IUmbracoContextAccessor umbracoContextAccessor, UriUtility uriUtility)
+        public DefaultUrlProvider(IRequestHandlerSettings requestSettings, ILogger logger, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper, IUmbracoContextAccessor umbracoContextAccessor, UriUtility uriUtility)
         {
             _requestSettings = requestSettings;
             _logger = logger;

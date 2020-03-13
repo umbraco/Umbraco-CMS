@@ -55,7 +55,7 @@ namespace Umbraco.Tests.PublishedContent
             var configs = TestHelper.GetConfigs();
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);
             var globalSettings = new GlobalSettings(TestHelper.IOHelper);
-            configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
+            configs.Add(SettingsForTests.GenerateMockContentSettings);
             configs.Add<IGlobalSettings>(() => globalSettings);
 
             var publishedModelFactory = new NoopPublishedModelFactory();

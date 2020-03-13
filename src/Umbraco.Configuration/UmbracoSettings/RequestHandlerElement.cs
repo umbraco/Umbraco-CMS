@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class RequestHandlerElement : UmbracoConfigurationElement, IRequestHandlerSection
+    internal class RequestHandlerElement : UmbracoConfigurationElement, IRequestHandlerSettings
     {
         [ConfigurationProperty("addTrailingSlash")]
         public InnerTextConfigurationElement<bool> AddTrailingSlash => GetOptionalTextElement("addTrailingSlash", true);
@@ -85,12 +85,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             return collection;
         }
 
-        bool IRequestHandlerSection.AddTrailingSlash => AddTrailingSlash;
+        bool IRequestHandlerSettings.AddTrailingSlash => AddTrailingSlash;
 
-        bool IRequestHandlerSection.ConvertUrlsToAscii => UrlReplacing.ConvertUrlsToAscii.InvariantEquals("true");
+        bool IRequestHandlerSettings.ConvertUrlsToAscii => UrlReplacing.ConvertUrlsToAscii.InvariantEquals("true");
 
-        bool IRequestHandlerSection.TryConvertUrlsToAscii => UrlReplacing.ConvertUrlsToAscii.InvariantEquals("try");
+        bool IRequestHandlerSettings.TryConvertUrlsToAscii => UrlReplacing.ConvertUrlsToAscii.InvariantEquals("try");
 
-        IEnumerable<IChar> IRequestHandlerSection.CharCollection => UrlReplacing.CharCollection;
+        IEnumerable<IChar> IRequestHandlerSettings.CharCollection => UrlReplacing.CharCollection;
     }
 }

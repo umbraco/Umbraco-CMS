@@ -82,7 +82,7 @@ namespace Umbraco.Tests.Runtimes
         // test application
         public class TestUmbracoApplication : UmbracoApplicationBase
         {
-            public TestUmbracoApplication() : base(_logger, _configs, _ioHelper, _profiler, new AspNetHostingEnvironment(_hostingSettings), new AspNetBackOfficeInfo(_globalSettings, _ioHelper, _settings, _logger))
+            public TestUmbracoApplication() : base(_logger, _configs, _ioHelper, _profiler, new AspNetHostingEnvironment(_hostingSettings), new AspNetBackOfficeInfo(_globalSettings, _ioHelper,  _logger, _settings))
             {
             }
 
@@ -92,13 +92,13 @@ namespace Umbraco.Tests.Runtimes
             private static readonly Configs _configs = GetConfigs();
             private static readonly IGlobalSettings _globalSettings = _configs.Global();
             private static readonly IHostingSettings _hostingSettings = _configs.Hosting();
-            private static readonly IUmbracoSettingsSection _settings = _configs.Settings();
+            private static readonly IWebRoutingSettings _settings = _configs.WebRouting();
 
             private static Configs GetConfigs()
             {
-                var configs = new ConfigsFactory().Create(_ioHelper);
+                var configs = new ConfigsFactory().Create(_ioHelper, _logger);
                 configs.Add(SettingsForTests.GetDefaultGlobalSettings);
-                configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+                configs.Add(SettingsForTests.GenerateMockContentSettings);
                 configs.Add(SettingsForTests.GetDefaultHostingSettings);
                 return configs;
             }
@@ -212,7 +212,7 @@ namespace Umbraco.Tests.Runtimes
 
             public void Compose(Composition composition)
             {
-                composition.Register(factory => SettingsForTests.GetDefaultUmbracoSettings());
+                composition.Register(factory => SettingsForTests.GenerateMockContentSettings());
                 composition.RegisterUnique<IExamineManager, TestExamineManager>();
                 composition.Components().Append<TestComponent>();
 

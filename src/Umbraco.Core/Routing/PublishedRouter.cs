@@ -19,13 +19,12 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class PublishedRouter : IPublishedRouter
     {
-        private readonly IWebRoutingSection _webRoutingSection;
+        private readonly IWebRoutingSettings _webRoutingSettings;
         private readonly ContentFinderCollection _contentFinders;
         private readonly IContentLastChanceFinder _contentLastChanceFinder;
         private readonly IProfilingLogger _profilingLogger;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly ILogger _logger;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IRequestAccessor _requestAccessor;
         private readonly IPublishedValueFallback _publishedValueFallback;
@@ -38,12 +37,11 @@ namespace Umbraco.Web.Routing
         /// Initializes a new instance of the <see cref="PublishedRouter"/> class.
         /// </summary>
         public PublishedRouter(
-            IWebRoutingSection webRoutingSection,
+            IWebRoutingSettings webRoutingSettings,
             ContentFinderCollection contentFinders,
             IContentLastChanceFinder contentLastChanceFinder,
             IVariationContextAccessor variationContextAccessor,
             IProfilingLogger proflog,
-            IUmbracoSettingsSection umbracoSettingsSection,
             IPublishedUrlProvider publishedUrlProvider,
             IRequestAccessor requestAccessor,
             IPublishedValueFallback publishedValueFallback,
@@ -52,13 +50,12 @@ namespace Umbraco.Web.Routing
             IContentTypeService contentTypeService,
             IPublicAccessService publicAccessService)
         {
-            _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection));
+            _webRoutingSettings = webRoutingSettings ?? throw new ArgumentNullException(nameof(webRoutingSettings));
             _contentFinders = contentFinders ?? throw new ArgumentNullException(nameof(contentFinders));
             _contentLastChanceFinder = contentLastChanceFinder ?? throw new ArgumentNullException(nameof(contentLastChanceFinder));
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             _logger = proflog;
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
             _publishedUrlProvider = publishedUrlProvider;
             _requestAccessor = requestAccessor;
             _publishedValueFallback = publishedValueFallback;
@@ -71,7 +68,7 @@ namespace Umbraco.Web.Routing
         /// <inheritdoc />
         public IPublishedRequest CreateRequest(IUmbracoContext umbracoContext, Uri uri = null)
         {
-            return new PublishedRequest(this, umbracoContext, _umbracoSettingsSection, uri ?? umbracoContext.CleanedUmbracoUrl);
+            return new PublishedRequest(this, umbracoContext, _webRoutingSettings, uri ?? umbracoContext.CleanedUmbracoUrl);
         }
 
         #region Request
@@ -628,7 +625,7 @@ namespace Umbraco.Web.Routing
             // does not apply
             // + optionally, apply the alternate template on internal redirects
             var useAltTemplate = request.IsInitialPublishedContent
-                || (_webRoutingSection.InternalRedirectPreservesTemplate && request.IsInternalRedirectPublishedContent);
+                || (_webRoutingSettings.InternalRedirectPreservesTemplate && request.IsInternalRedirectPublishedContent);
             var altTemplate = useAltTemplate
                 ? _requestAccessor.GetRequestValue(Constants.Conventions.Url.AltTemplate)
                 : null;
@@ -670,8 +667,8 @@ namespace Umbraco.Web.Routing
                 if (request.PublishedContent.IsAllowedTemplate(
                     _fileService,
                     _contentTypeService,
-                    _umbracoSettingsSection.WebRouting.DisableAlternativeTemplates,
-                    _umbracoSettingsSection.WebRouting.ValidateAlternativeTemplates,
+                    _webRoutingSettings.DisableAlternativeTemplates,
+                    _webRoutingSettings.ValidateAlternativeTemplates,
                     altTemplate))
                 {
                     // allowed, use

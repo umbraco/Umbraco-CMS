@@ -145,6 +145,8 @@
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
     <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
+    <Compile Include="Models\NoNodesViewModel.cs" />
+    <Compile Include="Mvc\RenderNoContentController.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />

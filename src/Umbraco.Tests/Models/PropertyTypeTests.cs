@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using Newtonsoft.Json;
+using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core.Models;
-using Umbraco.Core.Serialization;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Models
@@ -50,9 +51,9 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.ValidationRegExp, pt.ValidationRegExp);
             Assert.AreEqual(clone.ValueStorageType, pt.ValueStorageType);
 
-            //This double verifies by reflection
+            //This double verifies by reflection (don't test properties marked with [DoNotClone]
             var allProps = clone.GetType().GetProperties();
-            foreach (var propertyInfo in allProps)
+            foreach (var propertyInfo in allProps.Where(p => p.GetCustomAttribute<DoNotCloneAttribute>(false) == null))
             {
                 var expected = propertyInfo.GetValue(pt, null);
                 var actual = propertyInfo.GetValue(clone, null);

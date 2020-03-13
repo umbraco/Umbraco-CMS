@@ -653,10 +653,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var entity = new MediaEntitySlim();
             BuildContentEntity(entity, dto);
 
-            if (dto is MediaEntityDto contentDto)
+            // fill in the media info
+            if (dto is MediaEntityDto mediaEntityDto)
             {
-                // fill in the media info
-                entity.MediaPath = contentDto.MediaPath;
+                entity.MediaPath = mediaEntityDto.MediaPath;
+            }
+            else if (dto is GenericContentEntityDto genericContentEntityDto)
+            {
+                entity.MediaPath = genericContentEntityDto.MediaPath;
             }
 
             return entity;

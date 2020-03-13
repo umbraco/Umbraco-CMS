@@ -1,9 +1,9 @@
 ﻿namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public interface ISecuritySection : IUmbracoConfigurationSection
+    public interface ISecuritySettings : IUmbracoConfigurationSection
     {
         bool KeepUserLoggedIn { get; }
-        
+
         bool HideDisabledUsersInBackoffice { get; }
 
         /// <summary>
@@ -23,9 +23,5 @@
         /// When this is false, the username and email fields will be shown in the user section.
         /// </remarks>
         bool UsernameIsEmail { get; }
-
-        IUserPasswordConfigurationSection UserPasswordConfiguration { get; }
-
-        IMemberPasswordConfigurationSection MemberPasswordConfiguration { get; }
     }
 }

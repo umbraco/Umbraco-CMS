@@ -1,11 +1,13 @@
 ﻿using System.IO;
 using System.Configuration;
+using System.Linq;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -38,35 +40,15 @@ namespace Umbraco.Tests.TestHelpers
         /// Returns generated settings which can be stubbed to return whatever values necessary
         /// </summary>
         /// <returns></returns>
-        public static IUmbracoSettingsSection GenerateMockUmbracoSettings()
+        public static IContentSettings GenerateMockContentSettings()
         {
-            var settings = new Mock<IUmbracoSettingsSection>();
 
-            var content = new Mock<IContentSection>();
-            var security = new Mock<ISecuritySection>();
-            var requestHandler = new Mock<IRequestHandlerSection>();
-            var logging = new Mock<ILoggingSection>();
-            var routing = new Mock<IWebRoutingSection>();
-
-            var userPasswordConfig = new Mock<IUserPasswordConfigurationSection>();
-            var memberPasswordConfig = new Mock<IMemberPasswordConfigurationSection>();
-            security.Setup(x => x.UserPasswordConfiguration).Returns(userPasswordConfig.Object);
-            security.Setup(x => x.MemberPasswordConfiguration).Returns(memberPasswordConfig.Object);
-
-            settings.Setup(x => x.Content).Returns(content.Object);
-            settings.Setup(x => x.Security).Returns(security.Object);
-            settings.Setup(x => x.RequestHandler).Returns(requestHandler.Object);
-            settings.Setup(x => x.Logging).Returns(logging.Object);
-            settings.Setup(x => x.WebRouting).Returns(routing.Object);
+            var content = new Mock<IContentSettings>();
 
             //Now configure some defaults - the defaults in the config section classes do NOT pertain to the mocked data!!
-            settings.Setup(x => x.Content.ImageAutoFillProperties).Returns(ContentImagingElement.GetDefaultImageAutoFillProperties());
-            settings.Setup(x => x.Content.ImageFileTypes).Returns(ContentImagingElement.GetDefaultImageFileTypes());
-            settings.Setup(x => x.RequestHandler.AddTrailingSlash).Returns(true);
-            settings.Setup(x => x.RequestHandler.CharCollection).Returns(RequestHandlerElement.GetDefaultCharReplacements());
-            settings.Setup(x => x.WebRouting.UrlProviderMode).Returns("Auto");
-
-            return settings.Object;
+            content.Setup(x => x.ImageAutoFillProperties).Returns(ContentImagingElement.GetDefaultImageAutoFillProperties());
+            content.Setup(x => x.ImageFileTypes).Returns(ContentImagingElement.GetDefaultImageFileTypes());
+            return content.Object;
         }
 
         //// from appSettings
@@ -118,7 +100,6 @@ namespace Umbraco.Tests.TestHelpers
             _defaultGlobalSettings = null;
         }
 
-        private static IUmbracoSettingsSection _defaultUmbracoSettings;
         private static IGlobalSettings _defaultGlobalSettings;
         private static IHostingSettings _defaultHostingSettings;
 
@@ -150,20 +131,48 @@ namespace Umbraco.Tests.TestHelpers
             return config;
         }
 
-        internal static IUmbracoSettingsSection GetDefaultUmbracoSettings()
+        public static IWebRoutingSettings GenerateMockWebRoutingSettings()
         {
-            if (_defaultUmbracoSettings == null)
-            {
-                // TODO: Just make this mocks instead of reading from the config
+            var mock = new Mock<IWebRoutingSettings>();
 
-                var config = new FileInfo(TestHelper.MapPathForTest("~/Configurations/UmbracoSettings/web.config"));
+            mock.Setup(x => x.DisableRedirectUrlTracking).Returns(false);
+            mock.Setup(x => x.InternalRedirectPreservesTemplate).Returns(false);
+            mock.Setup(x => x.UrlProviderMode).Returns(UrlMode.Auto.ToString());
 
-                var fileMap = new ExeConfigurationFileMap { ExeConfigFilename = config.FullName };
-                var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
-                _defaultUmbracoSettings = configuration.GetSection("umbracoConfiguration/defaultSettings") as UmbracoSettingsSection;
-            }
+            return mock.Object;
+        }
 
-            return _defaultUmbracoSettings;
+        public static IRequestHandlerSettings GenerateMockRequestHandlerSettings()
+        {
+            var mock = new Mock<IRequestHandlerSettings>();
+
+            mock.Setup(x => x.AddTrailingSlash).Returns(true);
+            mock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
+            mock.Setup(x => x.TryConvertUrlsToAscii).Returns(false);
+            mock.Setup(x => x.CharCollection).Returns(RequestHandlerElement.GetDefaultCharReplacements);
+
+            return mock.Object;
+        }
+
+        public static ISecuritySettings GenerateMockSecuritySettings()
+        {
+            var security = new Mock<ISecuritySettings>();
+
+            return security.Object;
+        }
+
+        public static IUserPasswordConfiguration GenerateMockUserPasswordConfiguration()
+        {
+            var mock = new Mock<IUserPasswordConfiguration>();
+
+            return mock.Object;
+        }
+
+        public static IMemberPasswordConfiguration GenerateMockMemberPasswordConfiguration()
+        {
+            var mock = new Mock<IMemberPasswordConfiguration>();
+
+            return mock.Object;
         }
     }
 }

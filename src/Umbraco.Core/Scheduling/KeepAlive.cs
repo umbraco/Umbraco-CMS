@@ -12,16 +12,16 @@ namespace Umbraco.Web.Scheduling
     public class KeepAlive : RecurringTaskBase
     {
         private readonly IRuntimeState _runtime;
-        private readonly IKeepAliveSection _keepAliveSection;
+        private readonly IKeepAliveSettings _keepAliveSettings;
         private readonly IProfilingLogger _logger;
         private static HttpClient _httpClient;
 
         public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IKeepAliveSection keepAliveSection, IProfilingLogger logger)
+            IRuntimeState runtime, IKeepAliveSettings keepAliveSettings, IProfilingLogger logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
-            _keepAliveSection = keepAliveSection;
+            _keepAliveSettings = keepAliveSettings;
             _logger = logger;
             if (_httpClient == null)
                 _httpClient = new HttpClient();
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Scheduling
 
             using (_logger.DebugDuration<KeepAlive>("Keep alive executing", "Keep alive complete"))
             {
-                var keepAlivePingUrl = _keepAliveSection.KeepAlivePingUrl;
+                var keepAlivePingUrl = _keepAliveSettings.KeepAlivePingUrl;
                 try
                 {
                     if (keepAlivePingUrl.Contains("{umbracoApplicationUrl}"))

@@ -1,8 +1,10 @@
 using System.Configuration;
 using Umbraco.Configuration;
+using Umbraco.Configuration.Implementations;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Configuration
 {
@@ -18,25 +20,27 @@ namespace Umbraco.Core.Configuration
         public IRuntimeSettings RuntimeSettings { get; } = new RuntimeSettings();
         public IActiveDirectorySettings ActiveDirectorySettings { get; } = new ActiveDirectorySettings();
         public IExceptionFilterSettings ExceptionFilterSettings { get; } = new ExceptionFilterSettings();
+        public ITourSettings TourSettings { get; } = new TourSettings();
+        public ILoggingSettings LoggingSettings { get; } = new LoggingSettings();
+        public IKeepAliveSettings KeepAliveSettings { get; } = new KeepAliveSettings();
+        public IWebRoutingSettings WebRoutingSettings { get; } = new WebRoutingSettings();
+        public IRequestHandlerSettings RequestHandlerSettings { get; } = new RequestHandlerSettings();
+        public ISecuritySettings SecuritySettings { get; } = new SecuritySettings();
+        public IUserPasswordConfiguration UserPasswordConfigurationSettings { get; } = new UserPasswordConfigurationSettings();
+        public IMemberPasswordConfiguration MemberPasswordConfigurationSettings { get; } = new MemberPasswordConfigurationSettings();
+        public IContentSettings ContentSettings { get; } = new ContentSettings();
 
-        public IUmbracoSettingsSection UmbracoSettings { get; }
-
-        public Configs Create(IIOHelper ioHelper)
+        public Configs Create(IIOHelper ioHelper, ILogger logger)
         {
             var configs =  new Configs(section => ConfigurationManager.GetSection(section));
             configs.Add<IGlobalSettings>(() => new GlobalSettings(ioHelper));
             configs.Add(() => HostingSettings);
 
-            configs.Add<IUmbracoSettingsSection>("umbracoConfiguration/settings");
             configs.Add<IHealthChecks>("umbracoConfiguration/HealthChecks");
-
-            // Password configuration is held within IUmbracoSettingsSection from umbracoConfiguration/settings but we'll add explicitly
-            // so it can be independently retrieved in classes that need it.
-            configs.AddPasswordConfigurations();
 
             configs.Add(() => CoreDebug);
             configs.Add(() => MachineKeyConfig);
-            configs.Add<IConnectionStrings>(() => new ConnectionStrings(ioHelper));
+            configs.Add<IConnectionStrings>(() => new ConnectionStrings(ioHelper, logger));
             configs.Add<IModelsBuilderConfig>(() => new ModelsBuilderConfig(ioHelper));
 
 
@@ -46,6 +50,16 @@ namespace Umbraco.Core.Configuration
             configs.Add<IRuntimeSettings>(() => RuntimeSettings);
             configs.Add<IActiveDirectorySettings>(() => ActiveDirectorySettings);
             configs.Add<IExceptionFilterSettings>(() => ExceptionFilterSettings);
+
+            configs.Add<ITourSettings>(() => TourSettings);
+            configs.Add<ILoggingSettings>(() => LoggingSettings);
+            configs.Add<IKeepAliveSettings>(() => KeepAliveSettings);
+            configs.Add<IWebRoutingSettings>(() => WebRoutingSettings);
+            configs.Add<IRequestHandlerSettings>(() => RequestHandlerSettings);
+            configs.Add<ISecuritySettings>(() => SecuritySettings);
+            configs.Add<IUserPasswordConfiguration>(() => UserPasswordConfigurationSettings);
+            configs.Add<IMemberPasswordConfiguration>(() => MemberPasswordConfigurationSettings);
+            configs.Add<IContentSettings>(() => ContentSettings);
 
             configs.AddCoreConfigs(ioHelper);
             return configs;

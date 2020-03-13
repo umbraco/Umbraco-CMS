@@ -35,10 +35,11 @@ namespace Umbraco.Web.Scheduling
         private readonly HealthCheckNotificationMethodCollection _notifications;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly IHealthChecks _healthChecksConfig;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
         private readonly IIOHelper _ioHelper;
         private readonly IServerMessenger _serverMessenger;
         private readonly IRequestAccessor _requestAccessor;
+        private readonly ILoggingSettings _loggingSettings;
+        private readonly IKeepAliveSettings _keepAliveSettings;
 
         private BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
         private BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
@@ -56,7 +57,8 @@ namespace Umbraco.Web.Scheduling
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger logger,
             IHostingEnvironment hostingEnvironment, IHealthChecks healthChecksConfig,
-            IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, IServerMessenger serverMessenger, IRequestAccessor requestAccessor)
+            IIOHelper ioHelper, IServerMessenger serverMessenger, IRequestAccessor requestAccessor,
+            ILoggingSettings loggingSettings, IKeepAliveSettings keepAliveSettings)
         {
             _runtime = runtime;
             _contentService = contentService;
@@ -69,10 +71,11 @@ namespace Umbraco.Web.Scheduling
             _healthChecks = healthChecks;
             _notifications = notifications;
             _healthChecksConfig = healthChecksConfig ?? throw new ArgumentNullException(nameof(healthChecksConfig));
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
             _ioHelper = ioHelper;
             _serverMessenger = serverMessenger;
             _requestAccessor = requestAccessor;
+            _loggingSettings = loggingSettings;
+            _keepAliveSettings = keepAliveSettings;
         }
 
         public void Initialize()
@@ -111,17 +114,16 @@ namespace Umbraco.Web.Scheduling
             LazyInitializer.EnsureInitialized(ref _tasks, ref _started, ref _locker, () =>
             {
                 _logger.Debug<SchedulerComponent>("Initializing the scheduler");
-                var settings = _umbracoSettingsSection;
 
                 var tasks = new List<IBackgroundTask>();
 
-                if (settings.KeepAlive.DisableKeepAliveTask == false)
+                if (_keepAliveSettings.DisableKeepAliveTask == false)
                 {
-                    tasks.Add(RegisterKeepAlive(settings.KeepAlive));
+                    tasks.Add(RegisterKeepAlive(_keepAliveSettings));
                 }
 
                 tasks.Add(RegisterScheduledPublishing());
-                tasks.Add(RegisterLogScrubber(settings));
+                tasks.Add(RegisterLogScrubber(_loggingSettings));
                 tasks.Add(RegisterTempFileCleanup());
 
                 var healthCheckConfig = _healthChecksConfig;
@@ -132,11 +134,11 @@ namespace Umbraco.Web.Scheduling
             });
         }
 
-        private IBackgroundTask RegisterKeepAlive(IKeepAliveSection keepAliveSection)
+        private IBackgroundTask RegisterKeepAlive(IKeepAliveSettings keepAliveSettings)
         {
             // ping/keepalive
             // on all servers
-            var task = new KeepAlive(_keepAliveRunner, DefaultDelayMilliseconds, FiveMinuteMilliseconds, _runtime, keepAliveSection, _logger);
+            var task = new KeepAlive(_keepAliveRunner, DefaultDelayMilliseconds, FiveMinuteMilliseconds, _runtime, keepAliveSettings, _logger);
             _keepAliveRunner.TryAdd(task);
             return task;
         }
@@ -176,11 +178,11 @@ namespace Umbraco.Web.Scheduling
             return task;
         }
 
-        private IBackgroundTask RegisterLogScrubber(IUmbracoSettingsSection settings)
+        private IBackgroundTask RegisterLogScrubber(ILoggingSettings settings)
         {
             // log scrubbing
             // install on all, will only run on non-replica servers
-            var task = new LogScrubber(_scrubberRunner, DefaultDelayMilliseconds, LogScrubber.GetLogScrubbingInterval(settings, _logger), _runtime, _auditService, settings, _scopeProvider, _logger);
+            var task = new LogScrubber(_scrubberRunner, DefaultDelayMilliseconds, LogScrubber.GetLogScrubbingInterval(), _runtime, _auditService, settings, _scopeProvider, _logger);
             _scrubberRunner.TryAdd(task);
             return task;
         }

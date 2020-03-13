@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Templates
                 umbracoContextAccessor: umbracoContextAccessor);
 
             var publishedUrlProvider = new UrlProvider(umbracoContextAccessor,
-                TestHelper.WebRoutingSection,
+                TestHelper.WebRoutingSettings,
                 new UrlProviderCollection(new []{contentUrlProvider.Object}),
                 new MediaUrlProviderCollection(new []{mediaUrlProvider.Object}),
                 Mock.Of<IVariationContextAccessor>()

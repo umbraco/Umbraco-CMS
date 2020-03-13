@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Routing
             var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Composition.TypeLoader.GetUmbracoApiControllers());
             Composition.RegisterUnique(umbracoApiControllerTypes);
 
-            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefaultUmbracoSettings()));
+            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GenerateMockRequestHandlerSettings()));
         }
 
         public override void TearDown()

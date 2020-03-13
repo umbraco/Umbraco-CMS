@@ -50,7 +50,7 @@ namespace Umbraco.Web.Editors
     [MediaControllerControllerConfiguration]
     public class MediaController : ContentControllerBase
     {
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IContentSettings _contentSettings;
         private readonly IIOHelper _ioHelper;
 
         public MediaController(
@@ -66,14 +66,14 @@ namespace Umbraco.Web.Editors
             IMediaFileSystem mediaFileSystem,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
-            IUmbracoSettingsSection umbracoSettingsSection,
+            IContentSettings contentSettings,
             IIOHelper ioHelper,
             IPublishedUrlProvider publishedUrlProvider)
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _mediaFileSystem = mediaFileSystem;
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
         }
 
@@ -722,13 +722,13 @@ namespace Umbraco.Web.Editors
                 var safeFileName = fileName.ToSafeFileName(ShortStringHelper);
                 var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
-                if (_umbracoSettingsSection.Content.IsFileAllowedForUpload(ext))
+                if (_contentSettings.IsFileAllowedForUpload(ext))
                 {
                     var mediaType = Constants.Conventions.MediaTypes.File;
 
                     if (result.FormData["contentTypeAlias"] == Constants.Conventions.MediaTypes.AutoSelect)
                     {
-                        if (_umbracoSettingsSection.Content.ImageFileTypes.Contains(ext))
+                        if (_contentSettings.ImageFileTypes.Contains(ext))
                         {
                             mediaType = Constants.Conventions.MediaTypes.Image;
                         }

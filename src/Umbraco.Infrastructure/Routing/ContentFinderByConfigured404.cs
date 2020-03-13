@@ -16,14 +16,14 @@ namespace Umbraco.Web.Routing
     {
         private readonly ILogger _logger;
         private readonly IEntityService _entityService;
-        private readonly IContentSection _contentConfigSection;
+        private readonly IContentSettings _contentConfigSettings;
         private readonly IExamineManager _examineManager;
 
-        public ContentFinderByConfigured404(ILogger logger, IEntityService entityService, IContentSection contentConfigSection, IExamineManager examineManager)
+        public ContentFinderByConfigured404(ILogger logger, IEntityService entityService, IContentSettings contentConfigSettings, IExamineManager examineManager)
         {
             _logger = logger;
             _entityService = entityService;
-            _contentConfigSection = contentConfigSection;
+            _contentConfigSettings = contentConfigSettings;
             _examineManager = examineManager;
         }
 
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Routing
             }
 
             var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
-                _contentConfigSection.Error404Collection.ToArray(),
+                _contentConfigSettings.Error404Collection.ToArray(),
                 _entityService,
                 new PublishedContentQuery(frequest.UmbracoContext.PublishedSnapshot, frequest.UmbracoContext.VariationContextAccessor, _examineManager),
                 errorCulture);

@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class SecurityElement : UmbracoConfigurationElement, ISecuritySection
+    internal class SecurityElement : UmbracoConfigurationElement, ISecuritySettings
     {
         [ConfigurationProperty("keepUserLoggedIn")]
         internal InnerTextConfigurationElement<bool> KeepUserLoggedIn => GetOptionalTextElement("keepUserLoggedIn", true);
@@ -38,14 +38,14 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("memberPasswordConfiguration")]
         public MemberPasswordConfigurationElement MemberPasswordConfiguration => (MemberPasswordConfigurationElement)this["memberPasswordConfiguration"];
 
-        bool ISecuritySection.KeepUserLoggedIn => KeepUserLoggedIn;
+        bool ISecuritySettings.KeepUserLoggedIn => KeepUserLoggedIn;
 
-        bool ISecuritySection.HideDisabledUsersInBackoffice => HideDisabledUsersInBackoffice;
+        bool ISecuritySettings.HideDisabledUsersInBackoffice => HideDisabledUsersInBackoffice;
 
         /// <summary>
         /// Used to enable/disable the forgot password functionality on the back office login screen
         /// </summary>
-        bool ISecuritySection.AllowPasswordReset => AllowPasswordReset;
+        bool ISecuritySettings.AllowPasswordReset => AllowPasswordReset;
 
         /// <summary>
         /// A boolean indicating that by default the email address will be the username
@@ -54,14 +54,10 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         /// Even if this is true and the username is different from the email in the database, the username field will still be shown.
         /// When this is false, the username and email fields will be shown in the user section.
         /// </remarks>
-        bool ISecuritySection.UsernameIsEmail => UsernameIsEmail;
+        bool ISecuritySettings.UsernameIsEmail => UsernameIsEmail;
 
-        string ISecuritySection.AuthCookieName => AuthCookieName;
+        string ISecuritySettings.AuthCookieName => AuthCookieName;
 
-        string ISecuritySection.AuthCookieDomain => AuthCookieDomain;
-
-        IUserPasswordConfigurationSection ISecuritySection.UserPasswordConfiguration => UserPasswordConfiguration;
-
-        IMemberPasswordConfigurationSection ISecuritySection.MemberPasswordConfiguration => MemberPasswordConfiguration;
+        string ISecuritySettings.AuthCookieDomain => AuthCookieDomain;
     }
 }

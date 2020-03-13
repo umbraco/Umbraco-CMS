@@ -16,7 +16,7 @@ namespace Umbraco.Web.Routing
     public class PublishedRequest : IPublishedRequest
     {
         private readonly IPublishedRouter _publishedRouter;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IWebRoutingSettings _webRoutingSettings;
 
         private bool _readonly; // after prepared
         private bool _readonlyUri; // after preparing
@@ -33,11 +33,11 @@ namespace Umbraco.Web.Routing
         /// <param name="publishedRouter">The published router.</param>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="uri">The request <c>Uri</c>.</param>
-        internal PublishedRequest(IPublishedRouter publishedRouter, IUmbracoContext umbracoContext, IUmbracoSettingsSection umbracoSettingsSection, Uri uri = null)
+        internal PublishedRequest(IPublishedRouter publishedRouter, IUmbracoContext umbracoContext, IWebRoutingSettings webRoutingSettings, Uri uri = null)
         {
             UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _webRoutingSettings = webRoutingSettings;
             Uri = uri ?? umbracoContext.CleanedUmbracoUrl;
         }
 
@@ -178,7 +178,7 @@ namespace Umbraco.Web.Routing
             IsInternalRedirectPublishedContent = isInternalRedirect;
 
             // must restore the template if it's an internal redirect & the config option is set
-            if (isInternalRedirect && _umbracoSettingsSection.WebRouting.InternalRedirectPreservesTemplate)
+            if (isInternalRedirect && _webRoutingSettings.InternalRedirectPreservesTemplate)
             {
                 // restore
                 TemplateModel = template;
