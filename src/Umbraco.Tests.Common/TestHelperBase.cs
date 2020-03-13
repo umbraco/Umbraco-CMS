@@ -29,10 +29,10 @@ namespace Umbraco.Tests.Common
     {
         public TestHelperBase()
         {
+            SettingsForTests = new SettingsForTests();
             IOHelper = new IOHelper(GetHostingEnvironment());
             MainDom = new MainDom(Mock.Of<ILogger>(), GetHostingEnvironment(), new MainDomSemaphoreLock(Mock.Of<ILogger>(), GetHostingEnvironment()));
-            UriUtility = new UriUtility(GetHostingEnvironment());
-            SettingsForTests = new SettingsForTests(GetUmbracoVersion(), IOHelper);
+            UriUtility = new UriUtility(GetHostingEnvironment());            
         }
 
         public ITypeFinder GetTypeFinder()

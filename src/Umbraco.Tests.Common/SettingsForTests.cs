@@ -9,20 +9,18 @@ namespace Umbraco.Tests.Common
 {
     public class SettingsForTests
     {
-        public SettingsForTests(IUmbracoVersion umbVersion, IIOHelper ioHelper)
+        public SettingsForTests()
         {
-            _umbVersion = umbVersion;
-            _ioHelper = ioHelper;
         }
 
-        public IGlobalSettings GenerateMockGlobalSettings()
+        public IGlobalSettings GenerateMockGlobalSettings(IUmbracoVersion umbVersion, IIOHelper ioHelper)
         {
             var config = Mock.Of<IGlobalSettings>(
                 settings =>
-                    settings.ConfigurationStatus == _umbVersion.SemanticVersion.ToSemanticString() &&
+                    settings.ConfigurationStatus == umbVersion.SemanticVersion.ToSemanticString() &&
                     settings.UseHttps == false &&
                     settings.HideTopLevelNodeFromPath == false &&
-                    settings.Path == _ioHelper.ResolveUrl("~/umbraco") &&
+                    settings.Path == ioHelper.ResolveUrl("~/umbraco") &&
                     settings.TimeOutInMinutes == 20 &&
                     settings.DefaultUILanguage == "en" &&
                     settings.ReservedPaths == (GlobalSettings.StaticReservedPaths + "~/umbraco") &&
@@ -104,14 +102,12 @@ namespace Umbraco.Tests.Common
 
         private IGlobalSettings _defaultGlobalSettings;
         private IHostingSettings _defaultHostingSettings;
-        private readonly IUmbracoVersion _umbVersion;
-        private readonly IIOHelper _ioHelper;
-
-        public IGlobalSettings GetDefaultGlobalSettings()
+        
+        public IGlobalSettings GetDefaultGlobalSettings(IUmbracoVersion umbVersion, IIOHelper ioHelper)
         {
             if (_defaultGlobalSettings == null)
             {
-                _defaultGlobalSettings = GenerateMockGlobalSettings();
+                _defaultGlobalSettings = GenerateMockGlobalSettings(umbVersion, ioHelper);
             }
             return _defaultGlobalSettings;
         }

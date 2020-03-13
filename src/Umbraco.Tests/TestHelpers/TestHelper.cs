@@ -50,7 +50,9 @@ namespace Umbraco.Tests.TestHelpers
             public override IMarchal Marchal { get; } = new FrameworkMarchal();
 
             public override IBackOfficeInfo GetBackOfficeInfo()
-                => new AspNetBackOfficeInfo(SettingsForTests.GenerateMockGlobalSettings(), TestHelper.IOHelper, Mock.Of<ILogger>(), SettingsForTests.GenerateMockWebRoutingSettings());
+                => new AspNetBackOfficeInfo(
+                    SettingsForTests.GenerateMockGlobalSettings(GetUmbracoVersion(), IOHelper),
+                    TestHelper.IOHelper, Mock.Of<ILogger>(), SettingsForTests.GenerateMockWebRoutingSettings());
 
             public override IHostingEnvironment GetHostingEnvironment()
                 => new AspNetHostingEnvironment(SettingsForTests.GetDefaultHostingSettings());
