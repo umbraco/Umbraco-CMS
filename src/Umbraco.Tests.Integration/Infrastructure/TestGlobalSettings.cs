@@ -45,5 +45,7 @@ namespace Umbraco.Tests.Integration.Infrastructure
         public string DatabaseFactoryServerVersion => throw new System.NotImplementedException();
 
         public string MainDomLock => throw new System.NotImplementedException();
+
+        public string NoNodesViewPath => throw new System.NotImplementedException();
     }
 }
