@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Integration
         }
 
         [Test]
-        public void AddUmbracoBackOffice()
+        public void AddUmbracoCore()
         {
             var testHelper = new TestHelper();
 
