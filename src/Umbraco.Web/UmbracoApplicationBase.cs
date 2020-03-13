@@ -40,7 +40,7 @@ namespace Umbraco.Web
                 var hostingEnvironment = new AspNetHostingEnvironment(hostingSettings);
                 var ioHelper = new IOHelper(hostingEnvironment, globalSettings);
                 var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,  new AspNetSessionManager(), () => _factory?.GetInstance<IRequestCache>(), coreDebug, ioHelper, new FrameworkMarchal());
-                var configs = configFactory.Create(ioHelper, logger);
+                var configs = configFactory.Create();
 
                 var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, logger, configFactory.WebRoutingSettings);
                 var profiler = new LogProfiler(logger);

@@ -1,3 +1,5 @@
+using Umbraco.Core.IO;
+
 namespace Umbraco.Core.Configuration
 {
     public interface IConnectionStrings
@@ -7,7 +9,7 @@ namespace Umbraco.Core.Configuration
             get;
         }
 
-        void RemoveConnectionString(string umbracoConnectionName);
-        void SaveConnectionString(string connectionString, string providerName);
+        void RemoveConnectionString(string umbracoConnectionName, IIOHelper ioHelper);
+        void SaveConnectionString(string connectionString, string providerName, IIOHelper ioHelper);
     }
 }

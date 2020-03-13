@@ -146,7 +146,7 @@ namespace Umbraco.Core.Migrations.Install
 
         private void ConfigureEmbeddedDatabaseConnection(IUmbracoDatabaseFactory factory, IIOHelper ioHelper)
         {
-            _connectionStrings.SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
+            _connectionStrings.SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe, ioHelper);
 
             var path = Path.Combine(ioHelper.GetRootDirectorySafe(), "App_Data", "Umbraco.sdf");
             if (File.Exists(path) == false)
@@ -169,7 +169,7 @@ namespace Umbraco.Core.Migrations.Install
         {
             const string providerName = Constants.DbProviderNames.SqlServer;
 
-            _connectionStrings.SaveConnectionString(connectionString, providerName);
+            _connectionStrings.SaveConnectionString(connectionString, providerName, _ioHelper);
             _databaseFactory.Configure(connectionString, providerName);
         }
 
@@ -185,7 +185,7 @@ namespace Umbraco.Core.Migrations.Install
         {
             var connectionString = GetDatabaseConnectionString(server, databaseName, user, password, databaseProvider, out var providerName);
 
-            _connectionStrings.SaveConnectionString(connectionString, providerName);
+            _connectionStrings.SaveConnectionString(connectionString, providerName, _ioHelper);
             _databaseFactory.Configure(connectionString, providerName);
         }
 
@@ -216,7 +216,7 @@ namespace Umbraco.Core.Migrations.Install
         public void ConfigureIntegratedSecurityDatabaseConnection(string server, string databaseName)
         {
             var connectionString = GetIntegratedSecurityDatabaseConnectionString(server, databaseName);
-            _connectionStrings.SaveConnectionString(connectionString, Constants.DbProviderNames.SqlServer);
+            _connectionStrings.SaveConnectionString(connectionString, Constants.DbProviderNames.SqlServer, _ioHelper);
             _databaseFactory.Configure(connectionString, Constants.DbProviderNames.SqlServer);
         }
 

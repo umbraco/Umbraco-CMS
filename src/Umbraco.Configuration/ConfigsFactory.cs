@@ -31,7 +31,7 @@ namespace Umbraco.Core.Configuration
         public IContentSettings ContentSettings { get; } = new ContentSettings();
         public IGlobalSettings GlobalSettings { get; } = new GlobalSettings();
 
-        public Configs Create(IIOHelper ioHelper, ILogger logger)
+        public Configs Create()
         {
             var configs =  new Configs(section => ConfigurationManager.GetSection(section));
             configs.Add<IGlobalSettings>(() => GlobalSettings);
@@ -41,7 +41,7 @@ namespace Umbraco.Core.Configuration
 
             configs.Add(() => CoreDebug);
             configs.Add(() => MachineKeyConfig);
-            configs.Add<IConnectionStrings>(() => new ConnectionStrings(ioHelper, logger));
+            configs.Add<IConnectionStrings>(() => new ConnectionStrings());
             configs.Add<IModelsBuilderConfig>(() => new ModelsBuilderConfig());
 
 

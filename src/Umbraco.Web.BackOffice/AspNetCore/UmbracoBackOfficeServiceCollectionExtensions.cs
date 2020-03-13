@@ -45,7 +45,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment, httpContextAccessor, hostApplicationLifetime);
             var ioHelper = new IOHelper(hostingEnvironment, globalSettings);
             var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,  new AspNetCoreSessionIdResolver(httpContextAccessor), () => services.BuildServiceProvider().GetService<IRequestCache>(), coreDebug, ioHelper, new AspNetCoreMarchal());
-            var configs = configFactory.Create(ioHelper, logger);
+            var configs = configFactory.Create();
 
             var backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
             var profiler = new LogProfiler(logger);

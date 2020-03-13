@@ -65,7 +65,7 @@ namespace Umbraco.Web.Install.InstallSteps
             // Remove legacy umbracoDbDsn configuration setting if it exists and connectionstring also exists
             if (databaseSettings != null)
             {
-                connectionStrings.RemoveConnectionString(Constants.System.UmbracoConnectionName);
+                connectionStrings.RemoveConnectionString(Constants.System.UmbracoConnectionName, ioHelper);
             }
             else
             {

@@ -3,6 +3,7 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Umbraco.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -10,14 +11,6 @@ namespace Umbraco.Core.Configuration
 {
     public class ConnectionStrings : IConnectionStrings
     {
-        private readonly IIOHelper _ioHelper;
-        private readonly ILogger _logger;
-
-        public ConnectionStrings(IIOHelper ioHelper, ILogger logger)
-        {
-            _ioHelper = ioHelper;
-            _logger = logger;
-        }
 
         public ConfigConnectionString this[string key]
         {
@@ -29,9 +22,9 @@ namespace Umbraco.Core.Configuration
             }
         }
 
-        public void RemoveConnectionString(string key)
+        public void RemoveConnectionString(string key, IIOHelper ioHelper)
         {
-            var fileName = _ioHelper.MapPath(string.Format("{0}/web.config", _ioHelper.Root));
+            var fileName = ioHelper.MapPath(string.Format("{0}/web.config", ioHelper.Root));
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
             var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();
@@ -52,7 +45,7 @@ namespace Umbraco.Core.Configuration
         /// <remarks>Saves the ConnectionString in the very nasty 'medium trust'-supportive way.</remarks>
         /// <param name="connectionString">The connection string.</param>
         /// <param name="providerName">The provider name.</param>
-         public void SaveConnectionString(string connectionString, string providerName)
+         public void SaveConnectionString(string connectionString, string providerName, IIOHelper ioHelper)
         {
 
             if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
@@ -62,7 +55,7 @@ namespace Umbraco.Core.Configuration
 
 
             var fileSource = "web.config";
-            var fileName = _ioHelper.MapPath(_ioHelper.Root +"/" + fileSource);
+            var fileName = ioHelper.MapPath(ioHelper.Root +"/" + fileSource);
 
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
             if (xml.Root == null) throw new Exception($"Invalid {fileSource} file (no root).");
@@ -75,7 +68,7 @@ namespace Umbraco.Core.Configuration
             if (configSourceAttribute != null)
             {
                 fileSource = configSourceAttribute.Value;
-                fileName = _ioHelper.MapPath(_ioHelper.Root + "/" + fileSource);
+                fileName = ioHelper.MapPath(ioHelper.Root + "/" + fileSource);
 
                 if (!File.Exists(fileName))
                     throw new Exception($"Invalid configSource \"{fileSource}\" (no such file).");
@@ -103,9 +96,9 @@ namespace Umbraco.Core.Configuration
             }
 
             // save
-            _logger.Info<ConnectionStrings>("Saving connection string to {ConfigFile}.", fileSource);
+            Current.Logger.Info<ConnectionStrings>("Saving connection string to {ConfigFile}.", fileSource);
             xml.Save(fileName, SaveOptions.DisableFormatting);
-            _logger.Info<ConnectionStrings>("Saved connection string to {ConfigFile}.", fileSource);
+            Current.Logger.Info<ConnectionStrings>("Saved connection string to {ConfigFile}.", fileSource);
         }
 
          private static void AddOrUpdateAttribute(XElement element, string name, string value)
