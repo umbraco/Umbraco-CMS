@@ -28,14 +28,15 @@ namespace Umbraco.Core.Configuration
             return _mvcArea;
         }
 
+        //TODO Move to IOHelper
         internal static string GetUmbracoMvcAreaNoCache(this IGlobalSettings globalSettings, IIOHelper ioHelper)
         {
-            if (globalSettings.Path.IsNullOrWhiteSpace())
+            if (ioHelper.BackOfficePath.IsNullOrWhiteSpace())
             {
                 throw new InvalidOperationException("Cannot create an MVC Area path without the umbracoPath specified");
             }
 
-            var path = globalSettings.Path;
+            var path = ioHelper.BackOfficePath;
             if (path.StartsWith(ioHelper.Root)) // beware of TrimStart, see U4-2518
                 path = path.Substring(ioHelper.Root.Length);
             return path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim().ToLower();

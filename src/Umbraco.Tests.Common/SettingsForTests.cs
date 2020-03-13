@@ -1,4 +1,5 @@
 ﻿using Moq;
+using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -13,14 +14,16 @@ namespace Umbraco.Tests.Common
         {
         }
 
-        public IGlobalSettings GenerateMockGlobalSettings(IUmbracoVersion umbVersion, IIOHelper ioHelper)
+        public IGlobalSettings GenerateMockGlobalSettings(IUmbracoVersion umbVersion = null)
         {
+            var semanticVersion = umbVersion?.SemanticVersion ?? new SemVersion(9);
+
             var config = Mock.Of<IGlobalSettings>(
                 settings =>
-                    settings.ConfigurationStatus == umbVersion.SemanticVersion.ToSemanticString() &&
+                    settings.ConfigurationStatus == semanticVersion.ToSemanticString()  &&
                     settings.UseHttps == false &&
                     settings.HideTopLevelNodeFromPath == false &&
-                    settings.Path == ioHelper.ResolveUrl("~/umbraco") &&
+                    settings.Path == "~/umbraco" &&
                     settings.TimeOutInMinutes == 20 &&
                     settings.DefaultUILanguage == "en" &&
                     settings.ReservedPaths == (GlobalSettings.StaticReservedPaths + "~/umbraco") &&
@@ -102,12 +105,12 @@ namespace Umbraco.Tests.Common
 
         private IGlobalSettings _defaultGlobalSettings;
         private IHostingSettings _defaultHostingSettings;
-        
-        public IGlobalSettings GetDefaultGlobalSettings(IUmbracoVersion umbVersion, IIOHelper ioHelper)
+
+        public IGlobalSettings GetDefaultGlobalSettings(IUmbracoVersion umbVersion)
         {
             if (_defaultGlobalSettings == null)
             {
-                _defaultGlobalSettings = GenerateMockGlobalSettings(umbVersion, ioHelper);
+                _defaultGlobalSettings = GenerateMockGlobalSettings(umbVersion);
             }
             return _defaultGlobalSettings;
         }

@@ -49,7 +49,7 @@ namespace Umbraco.Core
             var urlPath = fullUrlPath.TrimStart(appPath).EnsureStartsWith('/');
 
             //check if this is in the umbraco back office
-            var isUmbracoPath = urlPath.InvariantStartsWith(globalSettings.Path.EnsureStartsWith('/').TrimStart(appPath.EnsureStartsWith('/')).EnsureStartsWith('/'));
+            var isUmbracoPath = urlPath.InvariantStartsWith(ioHelper.BackOfficePath.EnsureStartsWith('/').TrimStart(appPath.EnsureStartsWith('/')).EnsureStartsWith('/'));
             //if not, then def not back office
             if (isUmbracoPath == false) return false;
 
@@ -127,12 +127,12 @@ namespace Umbraco.Core
         /// <param name="url"></param>
         /// <param name="globalSettings"></param>
         /// <returns></returns>
-        internal static bool IsDefaultBackOfficeRequest(this Uri url, IGlobalSettings globalSettings)
+        internal static bool IsDefaultBackOfficeRequest(this Uri url, IIOHelper ioHelper)
         {
-            if (url.AbsolutePath.InvariantEquals(globalSettings.Path.TrimEnd("/"))
-                || url.AbsolutePath.InvariantEquals(globalSettings.Path.EnsureEndsWith('/'))
-                || url.AbsolutePath.InvariantEquals(globalSettings.Path.EnsureEndsWith('/') + "Default")
-                || url.AbsolutePath.InvariantEquals(globalSettings.Path.EnsureEndsWith('/') + "Default/"))
+            if (url.AbsolutePath.InvariantEquals(ioHelper.BackOfficePath.TrimEnd("/"))
+                || url.AbsolutePath.InvariantEquals(ioHelper.BackOfficePath.EnsureEndsWith('/'))
+                || url.AbsolutePath.InvariantEquals(ioHelper.BackOfficePath.EnsureEndsWith('/') + "Default")
+                || url.AbsolutePath.InvariantEquals(ioHelper.BackOfficePath.EnsureEndsWith('/') + "Default/"))
             {
                 return true;
             }

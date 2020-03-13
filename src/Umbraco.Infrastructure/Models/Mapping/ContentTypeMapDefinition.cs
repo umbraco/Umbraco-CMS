@@ -191,7 +191,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Icon = source.Icon;
             target.IconFilePath = target.IconIsClass
                 ? string.Empty
-                : $"{_globalSettings.Path.EnsureEndsWith("/")}images/umbraco/{source.Icon}";
+                : $"{_ioHelper.BackOfficePath.EnsureEndsWith("/")}images/umbraco/{source.Icon}";
 
             target.Trashed = source.Trashed;
             target.Id = source.Id;
@@ -497,7 +497,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Icon = source.Icon;
             target.IconFilePath = target.IconIsClass
                 ? string.Empty
-                : $"{_globalSettings.Path.EnsureEndsWith("/")}images/umbraco/{source.Icon}";
+                : $"{_ioHelper.BackOfficePath.EnsureEndsWith("/")}images/umbraco/{source.Icon}";
             target.Id = source.Id;
             target.IsContainer = source.IsContainer;
             target.IsElement = source.IsElement;
@@ -540,7 +540,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Icon = source.Icon;
             target.IconFilePath = target.IconIsClass
                 ? string.Empty
-                : $"{_globalSettings.Path.EnsureEndsWith("/")}images/umbraco/{source.Icon}";
+                : $"{_ioHelper.BackOfficePath.EnsureEndsWith("/")}images/umbraco/{source.Icon}";
             target.Id = source.Id;
             target.IsContainer = source.IsContainer;
             target.IsElement = source.IsElement;

@@ -235,7 +235,7 @@ namespace Umbraco.Web.Security
             var cookieAuthOptions = app.CreateUmbracoCookieAuthOptions(
                 umbracoContextAccessor, globalSettings, runtimeState, securitySettings,
                 //This defines the explicit path read cookies from for this middleware
-                ioHelper, requestCache, new[] {$"{globalSettings.Path}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds"});
+                ioHelper, requestCache, new[] {$"{ioHelper.BackOfficePath}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds"});
             cookieAuthOptions.Provider = cookieOptions.Provider;
 
             //This is a custom middleware, we need to return the user's remaining logged in seconds
@@ -243,7 +243,8 @@ namespace Umbraco.Web.Security
                 cookieAuthOptions,
                 Current.Configs.Global(),
                 Current.Configs.Security(),
-                app.CreateLogger<GetUserSecondsMiddleWare>());
+                app.CreateLogger<GetUserSecondsMiddleWare>(),
+                Current.IOHelper);
 
             //This is required so that we can read the auth ticket format outside of this pipeline
             app.CreatePerOwinContext<UmbracoAuthTicketDataProtector>(

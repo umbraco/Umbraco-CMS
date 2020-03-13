@@ -52,15 +52,13 @@ namespace Umbraco.Core
         public static ICoreDebug CoreDebug(this Configs configs)
             => configs.GetConfig<ICoreDebug>();
 
-        public static void AddCoreConfigs(this Configs configs, IIOHelper ioHelper)
+        public static void AddCoreConfigs(this Configs configs)
         {
-            var configDir = new DirectoryInfo(ioHelper.MapPath(Constants.SystemDirectories.Config));
-
             // GridConfig depends on runtime caches, manifest parsers... and cannot be available during composition
             configs.Add<IGridConfig>(factory => new GridConfig(
                 factory.GetInstance<ILogger>(),
                 factory.GetInstance<AppCaches>(),
-                configDir,
+                new DirectoryInfo(factory.GetInstance<IIOHelper>().MapPath(Constants.SystemDirectories.Config)),
                 factory.GetInstance<IManifestParser>(),
                 factory.GetInstance<IRuntimeState>().Debug));
         }

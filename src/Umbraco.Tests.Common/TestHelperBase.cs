@@ -30,15 +30,15 @@ namespace Umbraco.Tests.Common
         public TestHelperBase()
         {
             SettingsForTests = new SettingsForTests();
-            IOHelper = new IOHelper(GetHostingEnvironment());
+            IOHelper = new IOHelper(GetHostingEnvironment(), SettingsForTests.GenerateMockGlobalSettings());
             MainDom = new MainDom(Mock.Of<ILogger>(), GetHostingEnvironment(), new MainDomSemaphoreLock(Mock.Of<ILogger>(), GetHostingEnvironment()));
-            UriUtility = new UriUtility(GetHostingEnvironment());            
+            UriUtility = new UriUtility(GetHostingEnvironment());
         }
 
         public ITypeFinder GetTypeFinder()
         {
-            
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>(),                
+
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>(),
                 new DefaultUmbracoAssemblyProvider(typeof(TestHelperBase).Assembly));
             return typeFinder;
         }

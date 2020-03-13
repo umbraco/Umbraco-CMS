@@ -41,7 +41,7 @@ namespace Umbraco.Web.Security
             _ioHelper = ioHelper;
             _requestCache = requestCache;
             _explicitPaths = explicitPaths?.ToArray();
-            _getRemainingSecondsPath = $"{globalSettings.Path}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds";
+            _getRemainingSecondsPath = $"{ioHelper.BackOfficePath}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds";
         }
 
         /// <summary>
