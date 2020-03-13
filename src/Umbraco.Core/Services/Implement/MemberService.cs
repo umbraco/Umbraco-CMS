@@ -1020,7 +1020,14 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-
+        public IEnumerable<int> GetAllRolesIDs()
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MemberTree);
+                return _memberGroupRepository.GetMany().Select(x => x.Id).Distinct();
+            }
+        }
         public IEnumerable<int> GetAllRolesIDs(int memberId)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -1040,7 +1047,15 @@ namespace Umbraco.Core.Services.Implement
                 return result.Select(x => x.Name).Distinct();
             }
         }
-
+        public IEnumerable<int> GetAllRolesIds(string username)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MemberTree);
+                var result = _memberGroupRepository.GetMemberGroupsForMember(username);
+                return result.Select(x => x.Id).Distinct();
+            }
+        }
         public IEnumerable<IMember> GetMembersInRole(string roleName)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
