@@ -8,6 +8,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.LightInject;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence;
+using Umbraco.Tests.Common;
 using Umbraco.Tests.Integration.Implementations;
 
 namespace Umbraco.Tests.Integration
@@ -56,6 +57,8 @@ namespace Umbraco.Tests.Integration
             Assert.AreNotSame(foo1, foo2);
             // These are the same because the umbraco container wraps the light inject container
             Assert.AreSame(foo2, foo3);
+
+            Assertions.AssertContainer(umbracoContainer.Container);
         }
 
         private class Foo

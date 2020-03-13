@@ -91,7 +91,7 @@ namespace Umbraco.Core.Composing.LightInject
         /// <summary>
         /// Gets the LightInject container.
         /// </summary>
-        protected ServiceContainer Container { get; }
+        public ServiceContainer Container { get; }
 
         /// <inheritdoc cref="IRegister"/>
         /// <inheritdoc cref="IFactory"/>

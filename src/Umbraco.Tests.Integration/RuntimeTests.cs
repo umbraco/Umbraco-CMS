@@ -1,10 +1,14 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using System;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Composing.LightInject;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Runtime;
+using Umbraco.Tests.Common;
+using Umbraco.Tests.Common.Composing;
 using Umbraco.Tests.Integration.Implementations;
 
 namespace Umbraco.Tests.Integration
@@ -19,7 +23,7 @@ namespace Umbraco.Tests.Integration
             var services = new ServiceCollection();
 
             // LightInject / Umbraco
-            var umbracoContainer = RegisterFactory.CreateFrom(services, out var lightInjectServiceProvider);
+            var umbracoContainer = (LightInjectContainer)RegisterFactory.CreateFrom(services, out var lightInjectServiceProvider);
 
             // Dependencies needed for Core Runtime
             var testHelper = new TestHelper();
@@ -35,17 +39,21 @@ namespace Umbraco.Tests.Integration
             Assert.IsNull(coreRuntime.State.BootFailedException);
             Assert.AreEqual(RuntimeLevel.Install, coreRuntime.State.Level);            
             Assert.IsTrue(MyComposer.IsComposed);
-        }        
-    }
 
-    [RuntimeLevel(MinLevel = RuntimeLevel.Install)]
-    public class MyComposer : IUserComposer
-    {
-        public void Compose(Composition composition)
-        {
-            IsComposed = true;
+            Assertions.AssertContainer(umbracoContainer.Container, reportOnly: true); // TODO Change that to false eventually when we clean up the container
         }
 
-        public static bool IsComposed { get; private set; }
+        [RuntimeLevel(MinLevel = RuntimeLevel.Install)]
+        public class MyComposer : IUserComposer
+        {
+            public void Compose(Composition composition)
+            {
+                IsComposed = true;
+            }
+
+            public static bool IsComposed { get; private set; }
+        }
     }
+
+   
 }

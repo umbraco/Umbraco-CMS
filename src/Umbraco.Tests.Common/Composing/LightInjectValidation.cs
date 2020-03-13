@@ -35,7 +35,7 @@ using ServiceMap = System.Collections.Generic.Dictionary<System.Type, System.Col
     http://twitter.com/bernhardrichter
 ******************************************************************************/
 
-namespace Umbraco.Tests.Composing
+namespace Umbraco.Tests.Common.Composing
 {
     public static class LightInjectValidation
     {
@@ -110,7 +110,6 @@ Ensure that 'NameSpace.IBar' is registered with a lifetime that is equal to or h
         {
             var registration = GetServiceRegistration(serviceMap, validationTarget);
             if (registration == null)
-            {
                 if (validationTarget.ServiceType.IsFunc() || validationTarget.ServiceType.IsLazy())
                 {
                     var serviceType = validationTarget.ServiceType.GenericTypeArguments[0];
@@ -118,17 +117,13 @@ Ensure that 'NameSpace.IBar' is registered with a lifetime that is equal to or h
                     registration = GetServiceRegistration(serviceMap, underlyingvalidationTarget);
 
                     if (registration != null)
-                    {
                         return;
-                    }
 
                     if (serviceMap.ContainsAmbiguousRegistrationFor(serviceType))
-                    {
                         result.Add(new ValidationResult("", ValidationSeverity.Ambiguous, underlyingvalidationTarget));
-                    }
                     else
                     {
-                        string message = string.Format(MissingDeferredDependency, validationTarget.ServiceType, underlyingvalidationTarget.ServiceType);
+                        var message = string.Format(MissingDeferredDependency, validationTarget.ServiceType, underlyingvalidationTarget.ServiceType);
                         result.Add(new ValidationResult(message, ValidationSeverity.MissingDependency, underlyingvalidationTarget));
                     }
                 }
@@ -140,21 +135,14 @@ Ensure that 'NameSpace.IBar' is registered with a lifetime that is equal to or h
                     if (registrations.Any()) return;
 
                     // strict: there has to be at least 1
-                    string message = string.Format(MissingDeferredDependency, validationTarget.ServiceType, underlyingvalidationTarget.ServiceType);
+                    var message = string.Format(MissingDeferredDependency, validationTarget.ServiceType, underlyingvalidationTarget.ServiceType);
                     result.Add(new ValidationResult(message, ValidationSeverity.MissingDependency, underlyingvalidationTarget));
                 }
                 else
-                {
                     if (serviceMap.ContainsAmbiguousRegistrationFor(validationTarget.ServiceType))
-                    {
-                        result.Add(new ValidationResult("", ValidationSeverity.Ambiguous, validationTarget));
-                    }
-                    else
-                    {
-                        result.Add(new ValidationResult("", ValidationSeverity.MissingDependency, validationTarget));
-                    }
-                }
-            }
+                    result.Add(new ValidationResult("", ValidationSeverity.Ambiguous, validationTarget));
+                else
+                    result.Add(new ValidationResult("", ValidationSeverity.MissingDependency, validationTarget));
             else
             {
                 ValidateDisposable(validationTarget, result, registration);
@@ -206,24 +194,16 @@ Ensure that 'NameSpace.IBar' is registered with a lifetime that is equal to or h
         private static ServiceRegistration GetServiceRegistration(ServiceMap serviceMap, ValidationTarget validationTarget)
         {
             if (!serviceMap.TryGetValue(validationTarget.ServiceType, out var registrations))
-            {
                 return null;
-            }
 
             if (registrations.TryGetValue(string.Empty, out var registration))
-            {
                 return registration;
-            }
 
             if (registrations.Count == 1)
-            {
                 return registrations.Values.First();
-            }
 
             if (registrations.TryGetValue(validationTarget.ServiceName, out registration))
-            {
                 return registration;
-            }
 
             return null;
         }
@@ -231,22 +211,16 @@ Ensure that 'NameSpace.IBar' is registered with a lifetime that is equal to or h
         private static string GetLifetimeName(ILifetime lifetime)
         {
             if (lifetime == null)
-            {
                 return "Transient";
-            }
             return lifetime.GetType().Name;
         }
 
         private static int GetLifespan(ILifetime lifetime)
         {
             if (lifetime == null)
-            {
                 return 0;
-            }
             if (LifeSpans.TryGetValue(lifetime.GetType(), out var lifespan))
-            {
                 return lifespan;
-            }
             return 0;
         }
     }
@@ -274,9 +248,7 @@ Ensure that 'NameSpace.IBar' is registered with a lifetime that is equal to or h
 
 
             if (serviceType.GetTypeInfo().IsGenericType && serviceType.GetTypeInfo().ContainsGenericParameters)
-            {
                 ServiceType = serviceType.GetGenericTypeDefinition();
-            }
 
         }
 
@@ -340,9 +312,7 @@ Ensure that 'NameSpace.IBar' is registered with a lifetime that is equal to or h
         public static bool ContainsAmbiguousRegistrationFor(this ServiceMap serviceMap, Type serviceType)
         {
             if (!serviceMap.TryGetValue(serviceType, out var registrations))
-            {
                 return false;
-            }
             return registrations.Count > 1;
         }
     }

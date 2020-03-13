@@ -20,9 +20,9 @@ namespace Umbraco.Core.Composing
         /// <returns></returns>
         public static IRegister CreateFrom(IServiceCollection services, out IServiceProvider serviceProvider)
         {
-            var liContainer = new ServiceContainer(ContainerOptions.Default.WithMicrosoftSettings());
-            serviceProvider = liContainer.CreateServiceProvider(services);
-            return new LightInjectContainer(liContainer);
+            var lightInjectContainer = new ServiceContainer(ContainerOptions.Default.WithMicrosoftSettings());
+            serviceProvider = lightInjectContainer.CreateServiceProvider(services);
+            return new LightInjectContainer(lightInjectContainer);
         }
 
         //TODO: The following can die when net framework is gone
