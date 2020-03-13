@@ -62,7 +62,9 @@ namespace Umbraco.Tests.Runtimes
             var profiler = new LogProfiler(logger);
             var profilingLogger = new ProfilingLogger(logger, profiler);
             var appCaches = AppCaches.Disabled;
-            var databaseFactory = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()), TestHelper.GetConfigs(), TestHelper.DbProviderFactoryCreator);
+            var globalSettings = TestHelper.GetConfigs().Global();
+            var connectionStrings = TestHelper.GetConfigs().ConnectionStrings();
+            var databaseFactory = new UmbracoDatabaseFactory(logger,globalSettings, connectionStrings, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()),  TestHelper.DbProviderFactoryCreator);
             var typeFinder = new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly));
             var ioHelper = TestHelper.IOHelper;
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();

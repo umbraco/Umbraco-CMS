@@ -90,16 +90,17 @@ namespace Umbraco.Tests.Runtimes
             private static readonly IIOHelper _ioHelper = TestHelper.IOHelper;
             private static readonly IProfiler _profiler = new TestProfiler();
             private static readonly Configs _configs = GetConfigs();
-            private static readonly IGlobalSettings _globalSettings = _configs.Global();
-            private static readonly IHostingSettings _hostingSettings = _configs.Hosting();
+            private static readonly IGlobalSettings _globalSettings = SettingsForTests.GetDefaultGlobalSettings();
+            private static readonly IHostingSettings _hostingSettings = SettingsForTests.GetDefaultHostingSettings();
+            private static readonly IContentSettings _contentSettings = SettingsForTests.GenerateMockContentSettings();
             private static readonly IWebRoutingSettings _settings = _configs.WebRouting();
 
             private static Configs GetConfigs()
             {
                 var configs = new ConfigsFactory().Create();
-                configs.Add(SettingsForTests.GetDefaultGlobalSettings);
-                configs.Add(SettingsForTests.GenerateMockContentSettings);
-                configs.Add(SettingsForTests.GetDefaultHostingSettings);
+                configs.Add(() => _globalSettings);
+                configs.Add(() => _contentSettings);
+                configs.Add(() => _hostingSettings);
                 return configs;
             }
 

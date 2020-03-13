@@ -220,11 +220,5 @@ namespace Umbraco.Core.Manifest
 
             return manifest;
         }
-
-        // purely for tests
-        public IEnumerable<GridEditor> ParseGridEditors(string text)
-        {
-            return _jsonSerializer.Deserialize<IEnumerable<GridEditor>>(text);
-        }
     }
 }

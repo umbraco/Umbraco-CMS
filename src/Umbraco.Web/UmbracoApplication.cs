@@ -22,10 +22,13 @@ namespace Umbraco.Web
 
             var dbProviderFactoryCreator = new UmbracoDbProviderFactoryCreator(connectionStringConfig?.ProviderName);
 
+            var globalSettings = configs.Global();
+            var connectionStrings = configs.ConnectionStrings();
+
             // Determine if we should use the sql main dom or the default
-            var appSettingMainDomLock = configs.Global().MainDomLock;
+            var appSettingMainDomLock = globalSettings.MainDomLock;
             var mainDomLock = appSettingMainDomLock == "SqlMainDomLock"
-                ? (IMainDomLock)new SqlMainDomLock(logger, configs, dbProviderFactoryCreator)
+                ? (IMainDomLock)new SqlMainDomLock(logger, globalSettings, connectionStrings, dbProviderFactoryCreator)
                 : new MainDomSemaphoreLock(logger, hostingEnvironment);
 
             var mainDom = new MainDom(logger, hostingEnvironment, mainDomLock);

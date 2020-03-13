@@ -7,7 +7,7 @@ namespace Umbraco.Configuration.Implementations
     {
         private UmbracoSettingsSection _umbracoSettingsSection;
 
-        public UmbracoSettingsSection UmbracoSettingsSection
+        protected UmbracoSettingsSection UmbracoSettingsSection
         {
             get
             {
