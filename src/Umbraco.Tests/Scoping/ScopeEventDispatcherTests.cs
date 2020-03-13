@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Scoping
             composition.WithCollectionBuilder<MapperCollectionBuilder>();
 
             composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
-            composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+            composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
 
             Current.Reset();
             Current.Factory = composition.CreateFactory();

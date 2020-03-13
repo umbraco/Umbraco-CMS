@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public override void MaxLogAge()
         {
-            Assert.IsTrue(SettingsSection.Logging.MaxLogAge == -1);
+            Assert.IsTrue(LoggingSettings.MaxLogAge == -1);
         }
     }
 }

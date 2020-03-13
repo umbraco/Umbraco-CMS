@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class UmbracoSettingsSection : ConfigurationSection, IUmbracoSettingsSection
+    internal class UmbracoSettingsSection : ConfigurationSection
     {
         [ConfigurationProperty("backOffice")]
         public BackOfficeElement BackOffice => (BackOfficeElement)this["backOffice"];
@@ -24,19 +24,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         [ConfigurationProperty("keepAlive")]
         internal KeepAliveElement KeepAlive => (KeepAliveElement)this["keepAlive"];
-
-        IContentSection IUmbracoSettingsSection.Content => Content;
-
-        ISecuritySection IUmbracoSettingsSection.Security => Security;
-
-        IRequestHandlerSection IUmbracoSettingsSection.RequestHandler => RequestHandler;
-
-        IBackOfficeSection IUmbracoSettingsSection.BackOffice => BackOffice;
-
-        ILoggingSection IUmbracoSettingsSection.Logging => Logging;
-
-        IWebRoutingSection IUmbracoSettingsSection.WebRouting => WebRouting;
-
-        IKeepAliveSection IUmbracoSettingsSection.KeepAlive => KeepAlive;
     }
 }

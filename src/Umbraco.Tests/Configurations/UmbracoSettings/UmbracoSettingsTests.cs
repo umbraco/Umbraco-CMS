@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using NUnit.Framework;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Tests.TestHelpers;
 
@@ -22,16 +23,23 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Debug.WriteLine("Testing defaults? {0}", TestingDefaults);
             if (TestingDefaults)
             {
-                SettingsSection = configuration.GetSection("umbracoConfiguration/defaultSettings") as UmbracoSettingsSection;
+                Settings = configuration.GetSection("umbracoConfiguration/defaultSettings") as UmbracoSettingsSection;
             }
             else
             {
-                SettingsSection = configuration.GetSection("umbracoConfiguration/settings") as UmbracoSettingsSection;
+                Settings = configuration.GetSection("umbracoConfiguration/settings") as UmbracoSettingsSection;
             }
 
-            Assert.IsNotNull(SettingsSection);
+            Assert.IsNotNull(Settings);
         }
+        private UmbracoSettingsSection Settings { get; set; }
 
-        protected IUmbracoSettingsSection SettingsSection { get; private set; }
+        protected ILoggingSettings LoggingSettings => Settings.Logging;
+        protected IWebRoutingSettings WebRoutingSettings => Settings.WebRouting;
+        protected IRequestHandlerSettings RequestHandlerSettings => Settings.RequestHandler;
+        protected ISecuritySettings SecuritySettings => Settings.Security;
+        protected IUserPasswordConfiguration UserPasswordConfiguration => Settings.Security.UserPasswordConfiguration;
+        protected IMemberPasswordConfiguration MemberPasswordConfiguration => Settings.Security.MemberPasswordConfiguration;
+        protected IContentSettings ContentSettings => Settings.Content;
     }
 }

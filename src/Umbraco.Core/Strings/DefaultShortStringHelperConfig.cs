@@ -30,7 +30,7 @@ namespace Umbraco.Core.Strings
         public string DefaultCulture { get; set; } = ""; // invariant
 
         public Dictionary<string, string> UrlReplaceCharacters { get; set; }
-        
+
         public DefaultShortStringHelperConfig WithConfig(Config config)
         {
             return WithConfig(DefaultCulture, CleanStringType.RoleMask, config);
@@ -57,16 +57,16 @@ namespace Umbraco.Core.Strings
         /// Sets the default configuration.
         /// </summary>
         /// <returns>The short string helper.</returns>
-        public DefaultShortStringHelperConfig WithDefault(IUmbracoSettingsSection umbracoSettings)
+        public DefaultShortStringHelperConfig WithDefault(IRequestHandlerSettings requestHandlerSettings)
         {
-            UrlReplaceCharacters = umbracoSettings.RequestHandler.CharCollection
+            UrlReplaceCharacters = requestHandlerSettings.CharCollection
                 .Where(x => string.IsNullOrEmpty(x.Char) == false)
                 .ToDictionary(x => x.Char, x => x.Replacement);
 
             var urlSegmentConvertTo = CleanStringType.Utf8;
-            if (umbracoSettings.RequestHandler.ConvertUrlsToAscii)
+            if (requestHandlerSettings.ConvertUrlsToAscii)
                 urlSegmentConvertTo = CleanStringType.Ascii;
-            if (umbracoSettings.RequestHandler.TryConvertUrlsToAscii)
+            if (requestHandlerSettings.TryConvertUrlsToAscii)
                 urlSegmentConvertTo = CleanStringType.TryAscii;
 
             return WithConfig(CleanStringType.UrlSegment, new Config

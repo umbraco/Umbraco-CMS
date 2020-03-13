@@ -85,7 +85,7 @@ namespace Umbraco.Tests.Testing.TestingTests
 
             var theUrlProvider = new UrlProvider(
                 new TestUmbracoContextAccessor(umbracoContext),
-                TestHelper.WebRoutingSection,
+                TestHelper.WebRoutingSettings,
                 new UrlProviderCollection(new [] { urlProvider }),
                 new MediaUrlProviderCollection( Enumerable.Empty<IMediaUrlProvider>())
                 , umbracoContext.VariationContextAccessor);

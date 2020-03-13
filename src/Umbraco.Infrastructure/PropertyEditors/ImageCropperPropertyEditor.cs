@@ -29,17 +29,16 @@ namespace Umbraco.Web.PropertyEditors
     public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator
     {
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly IContentSection _contentSettings;
+        private readonly IContentSettings _contentSettings;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
         private readonly IIOHelper _ioHelper;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
         private readonly UploadAutoFillProperties _autoFillProperties;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageCropperPropertyEditor"/> class.
         /// </summary>
-        public ImageCropperPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSection contentSettings, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService, IUmbracoSettingsSection umbracoSettingsSection)
+        public ImageCropperPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSettings contentSettings, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService)
             : base(logger, dataTypeService, localizationService, localizedTextService,shortStringHelper)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
@@ -47,7 +46,6 @@ namespace Umbraco.Web.PropertyEditors
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
             _ioHelper = ioHelper;
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
 
             // TODO: inject?
             _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, _contentSettings);
@@ -68,7 +66,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates the corresponding property value editor.
         /// </summary>
         /// <returns>The corresponding property value editor.</returns>
-        protected override IDataValueEditor CreateValueEditor() => new ImageCropperPropertyValueEditor(Attribute, Logger, _mediaFileSystem, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, _umbracoSettingsSection);
+        protected override IDataValueEditor CreateValueEditor() => new ImageCropperPropertyValueEditor(Attribute, Logger, _mediaFileSystem, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, _contentSettings);
 
         /// <summary>
         /// Creates the corresponding preValue editor.

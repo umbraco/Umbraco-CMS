@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Scoping
 
         protected override void ComposeSettings()
         {
-            Composition.Configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
+            Composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
             Composition.Configs.Add(SettingsForTests.GenerateMockGlobalSettings);
         }
 

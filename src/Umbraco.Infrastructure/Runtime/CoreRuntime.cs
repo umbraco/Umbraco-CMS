@@ -57,7 +57,7 @@ namespace Umbraco.Core.Runtime
             // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
             // as the second one captures the current value (null) and therefore fails
            _state = new RuntimeState(Logger,
-                Configs.Settings(), Configs.Global(),
+                Configs.Global(),
                 new Lazy<IMainDom>(() => mainDom),
                 new Lazy<IServerRegistrar>(() => _factory.GetInstance<IServerRegistrar>()),
                 UmbracoVersion,HostingEnvironment, BackOfficeInfo)
@@ -171,7 +171,7 @@ namespace Umbraco.Core.Runtime
                 // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
                 // as the second one captures the current value (null) and therefore fails
                 _state = new RuntimeState(Logger,
-                    Configs.Settings(), Configs.Global(),
+                    Configs.Global(),
                     new Lazy<IMainDom>(() => _factory.GetInstance<IMainDom>()),
                     new Lazy<IServerRegistrar>(() => _factory.GetInstance<IServerRegistrar>()),
                     UmbracoVersion, HostingEnvironment, BackOfficeInfo)

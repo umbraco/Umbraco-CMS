@@ -7,9 +7,9 @@ namespace Umbraco.Core.Configuration
     /// </summary>
     public class MemberPasswordConfiguration : PasswordConfiguration, IMemberPasswordConfiguration
     {
-        public MemberPasswordConfiguration(IMemberPasswordConfigurationSection configSection)
-            : base(configSection)
-        {                
+        public MemberPasswordConfiguration(IMemberPasswordConfiguration configSettings)
+            : base(configSettings)
+        {
         }
     }
 }

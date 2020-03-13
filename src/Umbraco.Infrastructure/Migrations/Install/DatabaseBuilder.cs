@@ -28,6 +28,7 @@ namespace Umbraco.Core.Migrations.Install
         private readonly IIOHelper _ioHelper;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
+        private readonly IConnectionStrings _connectionStrings;
 
         private DatabaseSchemaResult _databaseSchemaValidationResult;
 
@@ -44,7 +45,8 @@ namespace Umbraco.Core.Migrations.Install
             IKeyValueService keyValueService,
             IIOHelper ioHelper,
             IUmbracoVersion umbracoVersion,
-            IDbProviderFactoryCreator dbProviderFactoryCreator)
+            IDbProviderFactoryCreator dbProviderFactoryCreator,
+            IConnectionStrings connectionStrings)
         {
             _scopeProvider = scopeProvider;
             _globalSettings = globalSettings;
@@ -56,6 +58,7 @@ namespace Umbraco.Core.Migrations.Install
             _ioHelper = ioHelper;
             _umbracoVersion = umbracoVersion;
             _dbProviderFactoryCreator = dbProviderFactoryCreator;
+            _connectionStrings = connectionStrings;
         }
 
         #region Status
@@ -138,12 +141,12 @@ namespace Umbraco.Core.Migrations.Install
         /// </summary>
         public void ConfigureEmbeddedDatabaseConnection()
         {
-            ConfigureEmbeddedDatabaseConnection(_databaseFactory, _ioHelper, _logger);
+            ConfigureEmbeddedDatabaseConnection(_databaseFactory, _ioHelper);
         }
 
-        private void ConfigureEmbeddedDatabaseConnection(IUmbracoDatabaseFactory factory, IIOHelper ioHelper, ILogger logger)
+        private void ConfigureEmbeddedDatabaseConnection(IUmbracoDatabaseFactory factory, IIOHelper ioHelper)
         {
-            SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe, ioHelper, logger);
+            _connectionStrings.SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
 
             var path = Path.Combine(ioHelper.GetRootDirectorySafe(), "App_Data", "Umbraco.sdf");
             if (File.Exists(path) == false)
@@ -166,7 +169,7 @@ namespace Umbraco.Core.Migrations.Install
         {
             const string providerName = Constants.DbProviderNames.SqlServer;
 
-            SaveConnectionString(connectionString, providerName, _ioHelper, _logger);
+            _connectionStrings.SaveConnectionString(connectionString, providerName);
             _databaseFactory.Configure(connectionString, providerName);
         }
 
@@ -182,7 +185,7 @@ namespace Umbraco.Core.Migrations.Install
         {
             var connectionString = GetDatabaseConnectionString(server, databaseName, user, password, databaseProvider, out var providerName);
 
-            SaveConnectionString(connectionString, providerName, _ioHelper, _logger);
+            _connectionStrings.SaveConnectionString(connectionString, providerName);
             _databaseFactory.Configure(connectionString, providerName);
         }
 
@@ -213,7 +216,7 @@ namespace Umbraco.Core.Migrations.Install
         public void ConfigureIntegratedSecurityDatabaseConnection(string server, string databaseName)
         {
             var connectionString = GetIntegratedSecurityDatabaseConnectionString(server, databaseName);
-            SaveConnectionString(connectionString, Constants.DbProviderNames.SqlServer, _ioHelper, _logger);
+            _connectionStrings.SaveConnectionString(connectionString, Constants.DbProviderNames.SqlServer);
             _databaseFactory.Configure(connectionString, Constants.DbProviderNames.SqlServer);
         }
 
@@ -282,75 +285,8 @@ namespace Umbraco.Core.Migrations.Install
             return server.ToLower().StartsWith("tcp:".ToLower());
         }
 
-        /// <summary>
-        /// Saves the connection string as a proper .net connection string in web.config.
-        /// </summary>
-        /// <remarks>Saves the ConnectionString in the very nasty 'medium trust'-supportive way.</remarks>
-        /// <param name="connectionString">The connection string.</param>
-        /// <param name="providerName">The provider name.</param>
-        /// <param name="logger">A logger.</param>
-        private static void SaveConnectionString(string connectionString, string providerName, IIOHelper ioHelper, ILogger logger)
-        {
-            if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
-            if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(connectionString));
-            if (providerName == null) throw new ArgumentNullException(nameof(providerName));
-            if (string.IsNullOrWhiteSpace(providerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(providerName));
 
-            var fileSource = "web.config";
-            var fileName = ioHelper.MapPath(ioHelper.Root +"/" + fileSource);
 
-            var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
-            if (xml.Root == null) throw new Exception($"Invalid {fileSource} file (no root).");
-
-            var connectionStrings = xml.Root.DescendantsAndSelf("connectionStrings").FirstOrDefault();
-            if (connectionStrings == null) throw new Exception($"Invalid {fileSource} file (no connection strings).");
-
-            // handle configSource
-            var configSourceAttribute = connectionStrings.Attribute("configSource");
-            if (configSourceAttribute != null)
-            {
-                fileSource = configSourceAttribute.Value;
-                fileName = ioHelper.MapPath(ioHelper.Root + "/" + fileSource);
-
-                if (!File.Exists(fileName))
-                    throw new Exception($"Invalid configSource \"{fileSource}\" (no such file).");
-
-                xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
-                if (xml.Root == null) throw new Exception($"Invalid {fileSource} file (no root).");
-
-                connectionStrings = xml.Root.DescendantsAndSelf("connectionStrings").FirstOrDefault();
-                if (connectionStrings == null) throw new Exception($"Invalid {fileSource} file (no connection strings).");
-            }
-
-            // create or update connection string
-            var setting = connectionStrings.Descendants("add").FirstOrDefault(s => s.Attribute("name")?.Value == Constants.System.UmbracoConnectionName);
-            if (setting == null)
-            {
-                connectionStrings.Add(new XElement("add",
-                    new XAttribute("name", Constants.System.UmbracoConnectionName),
-                    new XAttribute("connectionString", connectionString),
-                    new XAttribute("providerName", providerName)));
-            }
-            else
-            {
-                AddOrUpdateAttribute(setting, "connectionString", connectionString);
-                AddOrUpdateAttribute(setting, "providerName", providerName);
-            }
-
-            // save
-            logger.Info<DatabaseBuilder>("Saving connection string to {ConfigFile}.", fileSource);
-            xml.Save(fileName, SaveOptions.DisableFormatting);
-            logger.Info<DatabaseBuilder>("Saved connection string to {ConfigFile}.", fileSource);
-        }
-
-        private static void AddOrUpdateAttribute(XElement element, string name, string value)
-        {
-            var attribute = element.Attribute(name);
-            if (attribute == null)
-                element.Add(new XAttribute(name, value));
-            else
-                attribute.Value = value;
-        }
 
         #endregion
 

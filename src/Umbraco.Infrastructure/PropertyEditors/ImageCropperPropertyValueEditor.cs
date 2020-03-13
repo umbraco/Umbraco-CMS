@@ -22,14 +22,14 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly ILogger _logger;
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IContentSettings _contentSettings;
 
-        public ImageCropperPropertyValueEditor(DataEditorAttribute attribute, ILogger logger, IMediaFileSystem mediaFileSystem, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IUmbracoSettingsSection umbracoSettingsSection)
+        public ImageCropperPropertyValueEditor(DataEditorAttribute attribute, ILogger logger, IMediaFileSystem mediaFileSystem, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IContentSettings contentSettings)
             : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             // process the file
             // no file, invalid file, reject change
-            if (UploadFileTypeValidator.IsValidFileExtension(file.FileName, _umbracoSettingsSection) == false)
+            if (UploadFileTypeValidator.IsValidFileExtension(file.FileName, _contentSettings) == false)
                 return null;
 
             // get the filepath

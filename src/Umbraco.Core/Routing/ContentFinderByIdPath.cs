@@ -18,11 +18,11 @@ namespace Umbraco.Web.Routing
     {
         private readonly ILogger _logger;
         private readonly IRequestAccessor _requestAccessor;
-        private readonly IWebRoutingSection _webRoutingSection;
+        private readonly IWebRoutingSettings _webRoutingSettings;
 
-        public ContentFinderByIdPath(IWebRoutingSection webRoutingSection, ILogger logger, IRequestAccessor requestAccessor)
+        public ContentFinderByIdPath(IWebRoutingSettings webRoutingSettings, ILogger logger, IRequestAccessor requestAccessor)
         {
-            _webRoutingSection = webRoutingSection ?? throw new System.ArgumentNullException(nameof(webRoutingSection));
+            _webRoutingSettings = webRoutingSettings ?? throw new System.ArgumentNullException(nameof(webRoutingSettings));
             _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
             _requestAccessor = requestAccessor;
         }
@@ -36,7 +36,7 @@ namespace Umbraco.Web.Routing
         {
 
             if (frequest.UmbracoContext != null && frequest.UmbracoContext.InPreviewMode == false
-                && _webRoutingSection.DisableFindContentByIdPath)
+                && _webRoutingSettings.DisableFindContentByIdPath)
                 return false;
 
             IPublishedContent node = null;

@@ -7,16 +7,16 @@ namespace Umbraco.Web.Templates
 {
     public sealed class HtmlUrlParser
     {
-        private readonly IContentSection _contentSection;
+        private readonly IContentSettings _contentSettings;
         private readonly IIOHelper _ioHelper;
         private readonly IProfilingLogger _logger;
 
         private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-        public HtmlUrlParser(IContentSection contentSection, IProfilingLogger logger, IIOHelper ioHelper)
+        public HtmlUrlParser(IContentSettings contentSettings, IProfilingLogger logger, IIOHelper ioHelper)
         {
-            _contentSection = contentSection;
+            _contentSettings = contentSettings;
             _ioHelper = ioHelper;
             _logger = logger;
         }
@@ -32,7 +32,7 @@ namespace Umbraco.Web.Templates
         /// </remarks>
         public string EnsureUrls(string text)
         {
-            if (_contentSection.ResolveUrlsFromTextString == false) return text;
+            if (_contentSettings.ResolveUrlsFromTextString == false) return text;
 
             using (var timer = _logger.DebugDuration(typeof(IOHelper), "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
             {
