@@ -1,48 +1,54 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Owin;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models.Identity;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Security
 {
-    // TODO: In v8 we need to change this to use an int? nullable TKey instead, see notes against overridden TwoFactorSignInAsync
-    public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser, int>
+    /// <summary>
+    /// Custom sign in manager due to SignInManager not being .NET Standard.
+    /// Can be removed once the web project moves to .NET Core.
+    /// </summary>
+    public class BackOfficeSignInManager2
     {
+        private readonly BackOfficeUserManager2<BackOfficeIdentityUser> _userManager;
+        private readonly IAuthenticationManager _authenticationManager;
         private readonly ILogger _logger;
-        private readonly IOwinRequest _request;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IOwinRequest _request;
 
-        public BackOfficeSignInManager(UserManager<BackOfficeIdentityUser, int> userManager, IAuthenticationManager authenticationManager, ILogger logger, IGlobalSettings globalSettings, IOwinRequest request)
-            : base(userManager, authenticationManager)
+        public BackOfficeSignInManager2(
+            BackOfficeUserManager2<BackOfficeIdentityUser> userManager,
+            IAuthenticationManager authenticationManager,
+            ILogger logger,
+            IGlobalSettings globalSettings,
+            IOwinRequest request)
         {
-            if (logger == null) throw new ArgumentNullException("logger");
-            if (request == null) throw new ArgumentNullException("request");
-            _logger = logger;
-            _request = request;
-            _globalSettings = globalSettings;
-            AuthenticationType = Constants.Security.BackOfficeAuthenticationType;
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            _authenticationManager = authenticationManager ?? throw new ArgumentNullException(nameof(authenticationManager));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
+            _request = request ?? throw new ArgumentNullException(nameof(request));
         }
 
-        public override Task<ClaimsIdentity> CreateUserIdentityAsync(BackOfficeIdentityUser user)
+        public Task<ClaimsIdentity> CreateUserIdentityAsync(BackOfficeIdentityUser user)
         {
-            return ((BackOfficeUserManager<BackOfficeIdentityUser>)UserManager).GenerateUserIdentityAsync(user);
+            throw new NotImplementedException();
         }
 
-        public static BackOfficeSignInManager Create(IdentityFactoryOptions<BackOfficeSignInManager> options, IOwinContext context, IGlobalSettings globalSettings, ILogger logger)
+        public static BackOfficeSignInManager2 Create(IOwinContext context, IGlobalSettings globalSettings, ILogger logger)
         {
-            return new BackOfficeSignInManager(
-                context.GetBackOfficeUserManager(),
+            return new BackOfficeSignInManager2(
+                context.GetBackOfficeUserManager2(),
                 context.Authentication,
                 logger,
                 globalSettings,
@@ -54,30 +60,33 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <param name="userName"/><param name="password"/><param name="isPersistent"/><param name="shouldLockout"/>
         /// <returns/>
-        public override async Task<SignInStatus> PasswordSignInAsync(string userName, string password, bool isPersistent, bool shouldLockout)
+        public async Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent, bool shouldLockout)
         {
             var result = await PasswordSignInAsyncImpl(userName, password, isPersistent, shouldLockout);
 
-            switch (result)
+            if (result.Succeeded)
             {
-                case SignInStatus.Success:
-                    _logger.WriteCore(TraceEventType.Information, 0,
-                        $"User: {userName} logged in from IP address {_request.RemoteIpAddress}", null, null);
-                    break;
-                case SignInStatus.LockedOut:
-                    _logger.WriteCore(TraceEventType.Information, 0,
-                        $"Login attempt failed for username {userName} from IP address {_request.RemoteIpAddress}, the user is locked", null, null);
-                    break;
-                case SignInStatus.RequiresVerification:
-                    _logger.WriteCore(TraceEventType.Information, 0,
-                        $"Login attempt requires verification for username {userName} from IP address {_request.RemoteIpAddress}", null, null);
-                    break;
-                case SignInStatus.Failure:
-                    _logger.WriteCore(TraceEventType.Information, 0,
-                        $"Login attempt failed for username {userName} from IP address {_request.RemoteIpAddress}", null, null);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                _logger.WriteCore(TraceEventType.Information, 0,
+                    $"User: {userName} logged in from IP address {_request.RemoteIpAddress}", null, null);
+            }
+            else if (result.IsLockedOut)
+            {
+                _logger.WriteCore(TraceEventType.Information, 0,
+                    $"Login attempt failed for username {userName} from IP address {_request.RemoteIpAddress}, the user is locked", null, null);
+            }
+            else if (result.RequiresTwoFactor)
+            {
+                _logger.WriteCore(TraceEventType.Information, 0,
+                    $"Login attempt requires verification for username {userName} from IP address {_request.RemoteIpAddress}", null, null);
+            }
+            else if (!result.Succeeded || result.IsNotAllowed)
+            {
+                _logger.WriteCore(TraceEventType.Information, 0,
+                    $"Login attempt failed for username {userName} from IP address {_request.RemoteIpAddress}", null, null);
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException();
             }
 
             return result;
@@ -91,27 +100,21 @@ namespace Umbraco.Web.Security
         /// <param name="isPersistent"></param>
         /// <param name="shouldLockout"></param>
         /// <returns></returns>
-        private async Task<SignInStatus> PasswordSignInAsyncImpl(string userName, string password, bool isPersistent, bool shouldLockout)
+        private async Task<SignInResult> PasswordSignInAsyncImpl(string userName, string password, bool isPersistent, bool shouldLockout)
         {
-            if (UserManager == null)
-            {
-                return SignInStatus.Failure;
-            }
-
-            var user = await UserManager.FindByNameAsync(userName);
+            var user = await _userManager.FindByNameAsync(userName);
 
             //if the user is null, create an empty one which can be used for auto-linking
-            if (user == null)
-                user = BackOfficeIdentityUser.CreateNew(_globalSettings, userName, null, _globalSettings.DefaultUILanguage);
+            if (user == null) user = BackOfficeIdentityUser.CreateNew(_globalSettings, userName, null, _globalSettings.DefaultUILanguage);
 
             //check the password for the user, this will allow a developer to auto-link
             //an account if they have specified an IBackOfficeUserPasswordChecker
-            if (await UserManager.CheckPasswordAsync(user, password))
+            if (await _userManager.CheckPasswordAsync(user, password))
             {
                 //the underlying call to this will query the user by Id which IS cached!
-                if (await UserManager.IsLockedOutAsync(user.Id))
+                if (await _userManager.IsLockedOutAsync(user))
                 {
-                    return SignInStatus.LockedOut;
+                    return SignInResult.LockedOut;
                 }
 
                 // We need to verify that the user belongs to one or more groups that define content and media start nodes.
@@ -123,11 +126,11 @@ namespace Umbraco.Web.Security
                     {
                         _logger.WriteCore(TraceEventType.Information, 0,
                             $"Login attempt failed for username {userName} from IP address {_request.RemoteIpAddress}, no content and/or media start nodes could be found for any of the user's groups", null, null);
-                        return SignInStatus.Failure;
+                        return SignInResult.Failed;
                     }
                 }
 
-                await UserManager.ResetAccessFailedCountAsync(user.Id);
+                await _userManager.ResetAccessFailedCountAsync(user);
                 return await SignInOrTwoFactor(user, isPersistent);
             }
 
@@ -136,19 +139,18 @@ namespace Umbraco.Web.Security
             if (user.HasIdentity && shouldLockout)
             {
                 // If lockout is requested, increment access failed count which might lock out the user
-                await UserManager.AccessFailedAsync(user.Id);
-                if (await UserManager.IsLockedOutAsync(user.Id))
+                await _userManager.AccessFailedAsync(user);
+                if (await _userManager.IsLockedOutAsync(user))
                 {
                     //at this point we've just locked the user out after too many failed login attempts
 
                     if (requestContext != null)
                     {
                         var backofficeUserManager = requestContext.GetBackOfficeUserManager();
-                        if (backofficeUserManager != null)
-                            backofficeUserManager.RaiseAccountLockedEvent(user.Id);
+                        if (backofficeUserManager != null) backofficeUserManager.RaiseAccountLockedEvent(user.Id);
                     }
 
-                    return SignInStatus.LockedOut;
+                    return SignInResult.LockedOut;
                 }
             }
 
@@ -159,7 +161,7 @@ namespace Umbraco.Web.Security
                     backofficeUserManager.RaiseInvalidLoginAttemptEvent(userName);
             }
 
-            return SignInStatus.Failure;
+            return SignInResult.Failed;
         }
 
         /// <summary>
@@ -168,20 +170,20 @@ namespace Umbraco.Web.Security
         /// <param name="user"></param>
         /// <param name="isPersistent"></param>
         /// <returns></returns>
-        private async Task<SignInStatus> SignInOrTwoFactor(BackOfficeIdentityUser user, bool isPersistent)
+        private async Task<SignInResult> SignInOrTwoFactor(BackOfficeIdentityUser user, bool isPersistent)
         {
             var id = Convert.ToString(user.Id);
-            if (await UserManager.GetTwoFactorEnabledAsync(user.Id)
-                && (await UserManager.GetValidTwoFactorProvidersAsync(user.Id)).Count > 0)
+            if (await _userManager.GetTwoFactorEnabledAsync(user)
+                && (await _userManager.GetValidTwoFactorProvidersAsync(user)).Count > 0)
             {
                 var identity = new ClaimsIdentity(Constants.Security.BackOfficeTwoFactorAuthenticationType);
                 identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, id));
                 identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, user.UserName));
-                AuthenticationManager.SignIn(identity);
-                return SignInStatus.RequiresVerification;
+                _authenticationManager.SignIn(identity);
+                return SignInResult.TwoFactorRequired;
             }
             await SignInAsync(user, isPersistent, false);
-            return SignInStatus.Success;
+            return SignInResult.Success;
         }
 
         /// <summary>
@@ -191,12 +193,12 @@ namespace Umbraco.Web.Security
         /// <param name="isPersistent"></param>
         /// <param name="rememberBrowser"></param>
         /// <returns></returns>
-        public override async Task SignInAsync(BackOfficeIdentityUser user, bool isPersistent, bool rememberBrowser)
+        public async Task SignInAsync(BackOfficeIdentityUser user, bool isPersistent, bool rememberBrowser)
         {
             var userIdentity = await CreateUserIdentityAsync(user);
 
             // Clear any partial cookies from external or two factor partial sign ins
-            AuthenticationManager.SignOut(
+            _authenticationManager.SignOut(
                 Constants.Security.BackOfficeExternalAuthenticationType,
                 Constants.Security.BackOfficeTwoFactorAuthenticationType);
 
@@ -204,8 +206,8 @@ namespace Umbraco.Web.Security
 
             if (rememberBrowser)
             {
-                var rememberBrowserIdentity = AuthenticationManager.CreateTwoFactorRememberBrowserIdentity(ConvertIdToString(user.Id));
-                AuthenticationManager.SignIn(new AuthenticationProperties()
+                var rememberBrowserIdentity = _authenticationManager.CreateTwoFactorRememberBrowserIdentity(ConvertIdToString(user.Id));
+                _authenticationManager.SignIn(new AuthenticationProperties()
                 {
                     IsPersistent = isPersistent,
                     AllowRefresh = true,
@@ -215,7 +217,7 @@ namespace Umbraco.Web.Security
             }
             else
             {
-                AuthenticationManager.SignIn(new AuthenticationProperties()
+                _authenticationManager.SignIn(new AuthenticationProperties()
                 {
                     IsPersistent = isPersistent,
                     AllowRefresh = true,
@@ -229,7 +231,7 @@ namespace Umbraco.Web.Security
             if (user.AccessFailedCount > 0)
                 //we have successfully logged in, reset the AccessFailedCount
                 user.AccessFailedCount = 0;
-            await UserManager.UpdateAsync(user);
+            await _userManager.UpdateAsync(user);
 
             //set the current request's principal to the identity just signed in!
             _request.User = new ClaimsPrincipal(userIdentity);
@@ -248,9 +250,9 @@ namespace Umbraco.Web.Security
         /// <remarks>
         /// Replaces the underlying call which is not flexible and doesn't support a custom cookie
         /// </remarks>
-        public new async Task<int> GetVerifiedUserIdAsync()
+        public async Task<int> GetVerifiedUserIdAsync()
         {
-            var result = await AuthenticationManager.AuthenticateAsync(Constants.Security.BackOfficeTwoFactorAuthenticationType);
+            var result = await _authenticationManager.AuthenticateAsync(Constants.Security.BackOfficeTwoFactorAuthenticationType);
             if (result != null && result.Identity != null && string.IsNullOrEmpty(result.Identity.GetUserId()) == false)
             {
                 return ConvertIdFromString(result.Identity.GetUserId());
@@ -264,14 +266,14 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public async Task<string> GetVerifiedUserNameAsync()
         {
-            var result = await AuthenticationManager.AuthenticateAsync(Constants.Security.BackOfficeTwoFactorAuthenticationType);
+            var result = await _authenticationManager.AuthenticateAsync(Constants.Security.BackOfficeTwoFactorAuthenticationType);
             if (result != null && result.Identity != null && string.IsNullOrEmpty(result.Identity.GetUserName()) == false)
             {
                 return result.Identity.GetUserName();
             }
             return null;
         }
-
+        
         /// <summary>
         /// Two factor verification step
         /// </summary>
@@ -286,32 +288,33 @@ namespace Umbraco.Web.Security
         /// the default(int) value returned by the base class is always a valid user (i.e. the admin) so we just have to duplicate
         /// all of this code to check for int.MinValue
         /// </remarks>
-        public override async Task<SignInStatus> TwoFactorSignInAsync(string provider, string code, bool isPersistent, bool rememberBrowser)
+        public async Task<SignInResult> TwoFactorSignInAsync(string provider, string code, bool isPersistent, bool rememberBrowser)
         {
             var userId = await GetVerifiedUserIdAsync();
             if (userId == int.MinValue)
             {
-                return SignInStatus.Failure;
+                return SignInResult.Failed;
             }
-            var user = await UserManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(ConvertIdToString(userId));
             if (user == null)
             {
-                return SignInStatus.Failure;
+                return SignInResult.Failed;
             }
-            if (await UserManager.IsLockedOutAsync(user.Id))
+            if (await _userManager.IsLockedOutAsync(user))
             {
-                return SignInStatus.LockedOut;
+                return SignInResult.LockedOut;
             }
-            if (await UserManager.VerifyTwoFactorTokenAsync(user.Id, provider, code))
+            if (await _userManager.VerifyTwoFactorTokenAsync(user, provider, code))
             {
                 // When token is verified correctly, clear the access failed count used for lockout
-                await UserManager.ResetAccessFailedCountAsync(user.Id);
+                await _userManager.ResetAccessFailedCountAsync(user);
                 await SignInAsync(user, isPersistent, rememberBrowser);
-                return SignInStatus.Success;
+                return SignInResult.Success;
             }
+
             // If the token is incorrect, record the failure which also may cause the user to be locked out
-            await UserManager.AccessFailedAsync(user.Id);
-            return SignInStatus.Failure;
+            await _userManager.AccessFailedAsync(user);
+            return SignInResult.Failed;
         }
 
         /// <summary>Send a two factor code to a user</summary>
@@ -323,15 +326,29 @@ namespace Umbraco.Web.Security
         /// the default(int) value returned by the base class is always a valid user (i.e. the admin) so we just have to duplicate
         /// all of this code to check for int.MinVale instead.
         /// </remarks>
-        public override async Task<bool> SendTwoFactorCodeAsync(string provider)
+        public async Task<bool> SendTwoFactorCodeAsync(string provider)
         {
-            var userId = await GetVerifiedUserIdAsync();
+            throw new NotImplementedException();
+
+            /*var userId = await GetVerifiedUserIdAsync();
             if (userId == int.MinValue)
                 return false;
 
-            var token = await UserManager.GenerateTwoFactorTokenAsync(userId, provider);
-            var identityResult = await UserManager.NotifyTwoFactorTokenAsync(userId, provider, token);
-            return identityResult.Succeeded;
+            var token = await _userManager.GenerateTwoFactorTokenAsync(userId, provider);
+
+
+            var identityResult = await _userManager.NotifyTwoFactorTokenAsync(userId, provider, token);
+            return identityResult.Succeeded;*/
+        }
+
+        private string ConvertIdToString(int id)
+        {
+            return Convert.ToString(id, CultureInfo.InvariantCulture);
+        }
+
+        private int ConvertIdFromString(string id)
+        {
+            return id == null ? default(int) : (int) Convert.ChangeType(id, typeof(int), CultureInfo.InvariantCulture);
         }
     }
 }
