@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
 using NUnit.Framework;
 using Umbraco.Configuration;
+using Umbraco.Configuration.Legacy;
 using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
 

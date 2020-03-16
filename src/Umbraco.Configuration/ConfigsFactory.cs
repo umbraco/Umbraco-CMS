@@ -1,5 +1,6 @@
 using Umbraco.Configuration;
 using Umbraco.Configuration.Implementations;
+using Umbraco.Configuration.Legacy;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.Implementations;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -9,7 +10,7 @@ namespace Umbraco.Core.Configuration
     public class ConfigsFactory : IConfigsFactory
     {
         public IHostingSettings HostingSettings { get; } = new HostingSettings();
-        public ICoreDebug CoreDebug { get; } = new CoreDebug();
+        public ICoreDebugSettings CoreDebugSettings { get; } = new CoreDebugSettings();
         public IMachineKeyConfig MachineKeyConfig { get; } = new MachineKeyConfig();
         public IIndexCreatorSettings IndexCreatorSettings { get; } = new IndexCreatorSettings();
         public INuCacheSettings NuCacheSettings { get; } = new NuCacheSettings();
@@ -27,7 +28,7 @@ namespace Umbraco.Core.Configuration
         public IMemberPasswordConfiguration MemberPasswordConfigurationSettings { get; } = new MemberPasswordConfigurationSettings();
         public IContentSettings ContentSettings { get; } = new ContentSettings();
         public IGlobalSettings GlobalSettings { get; } = new GlobalSettings();
-        public IHealthChecks HealthChecksSettings { get; } = new HealthChecksSettings();
+        public IHealthChecksSettings HealthChecksSettingsSettings { get; } = new HealthChecksSettingsSettings();
         public IConnectionStrings ConnectionStrings { get; } = new ConnectionStrings();
         public IModelsBuilderConfig ModelsBuilderConfig { get; } = new ModelsBuilderConfig();
 
@@ -37,8 +38,8 @@ namespace Umbraco.Core.Configuration
 
             configs.Add<IGlobalSettings>(() => GlobalSettings);
             configs.Add<IHostingSettings>(() => HostingSettings);
-            configs.Add<IHealthChecks>(() => HealthChecksSettings);
-            configs.Add<ICoreDebug>(() => CoreDebug);
+            configs.Add<IHealthChecksSettings>(() => HealthChecksSettingsSettings);
+            configs.Add<ICoreDebugSettings>(() => CoreDebugSettings);
             configs.Add<IMachineKeyConfig>(() => MachineKeyConfig);
             configs.Add<IConnectionStrings>(() => ConnectionStrings);
             configs.Add<IModelsBuilderConfig>(() => ModelsBuilderConfig);

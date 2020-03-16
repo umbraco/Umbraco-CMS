@@ -34,7 +34,7 @@ namespace Umbraco.Web.Scheduling
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
-        private readonly IHealthChecks _healthChecksConfig;
+        private readonly IHealthChecksSettings _healthChecksSettingsConfig;
         private readonly IIOHelper _ioHelper;
         private readonly IServerMessenger _serverMessenger;
         private readonly IRequestAccessor _requestAccessor;
@@ -56,7 +56,7 @@ namespace Umbraco.Web.Scheduling
             IContentService contentService, IAuditService auditService,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger logger,
-            IHostingEnvironment hostingEnvironment, IHealthChecks healthChecksConfig,
+            IHostingEnvironment hostingEnvironment, IHealthChecksSettings healthChecksSettingsConfig,
             IIOHelper ioHelper, IServerMessenger serverMessenger, IRequestAccessor requestAccessor,
             ILoggingSettings loggingSettings, IKeepAliveSettings keepAliveSettings)
         {
@@ -70,7 +70,7 @@ namespace Umbraco.Web.Scheduling
 
             _healthChecks = healthChecks;
             _notifications = notifications;
-            _healthChecksConfig = healthChecksConfig ?? throw new ArgumentNullException(nameof(healthChecksConfig));
+            _healthChecksSettingsConfig = healthChecksSettingsConfig ?? throw new ArgumentNullException(nameof(healthChecksSettingsConfig));
             _ioHelper = ioHelper;
             _serverMessenger = serverMessenger;
             _requestAccessor = requestAccessor;
@@ -126,7 +126,7 @@ namespace Umbraco.Web.Scheduling
                 tasks.Add(RegisterLogScrubber(_loggingSettings));
                 tasks.Add(RegisterTempFileCleanup());
 
-                var healthCheckConfig = _healthChecksConfig;
+                var healthCheckConfig = _healthChecksSettingsConfig;
                 if (healthCheckConfig.NotificationSettings.Enabled)
                     tasks.Add(RegisterHealthCheckNotifier(healthCheckConfig, _healthChecks, _notifications, _logger));
 
@@ -152,28 +152,28 @@ namespace Umbraco.Web.Scheduling
             return task;
         }
 
-        private IBackgroundTask RegisterHealthCheckNotifier(IHealthChecks healthCheckConfig,
+        private IBackgroundTask RegisterHealthCheckNotifier(IHealthChecksSettings healthCheckSettingsConfig,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IProfilingLogger logger)
         {
             // If first run time not set, start with just small delay after application start
             int delayInMilliseconds;
-            if (string.IsNullOrEmpty(healthCheckConfig.NotificationSettings.FirstRunTime))
+            if (string.IsNullOrEmpty(healthCheckSettingsConfig.NotificationSettings.FirstRunTime))
             {
                 delayInMilliseconds = DefaultDelayMilliseconds;
             }
             else
             {
                 // Otherwise start at scheduled time
-                delayInMilliseconds = DateTime.Now.PeriodicMinutesFrom(healthCheckConfig.NotificationSettings.FirstRunTime) * 60 * 1000;
+                delayInMilliseconds = DateTime.Now.PeriodicMinutesFrom(healthCheckSettingsConfig.NotificationSettings.FirstRunTime) * 60 * 1000;
                 if (delayInMilliseconds < DefaultDelayMilliseconds)
                 {
                     delayInMilliseconds = DefaultDelayMilliseconds;
                 }
             }
 
-            var periodInMilliseconds = healthCheckConfig.NotificationSettings.PeriodInHours * 60 * 60 * 1000;
-            var task = new HealthCheckNotifier(_healthCheckRunner, delayInMilliseconds, periodInMilliseconds, healthChecks, notifications, _runtime, logger, _healthChecksConfig);
+            var periodInMilliseconds = healthCheckSettingsConfig.NotificationSettings.PeriodInHours * 60 * 60 * 1000;
+            var task = new HealthCheckNotifier(_healthCheckRunner, delayInMilliseconds, periodInMilliseconds, healthChecks, notifications, _runtime, logger, _healthChecksSettingsConfig);
             _healthCheckRunner.TryAdd(task);
             return task;
         }

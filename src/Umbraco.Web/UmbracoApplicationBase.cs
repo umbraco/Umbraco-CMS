@@ -34,7 +34,7 @@ namespace Umbraco.Web
                 var configFactory = new ConfigsFactory();
 
                 var hostingSettings = configFactory.HostingSettings;
-                var coreDebug = configFactory.CoreDebug;
+                var coreDebug = configFactory.CoreDebugSettings;
                 var globalSettings = configFactory.GlobalSettings;
 
                 var hostingEnvironment = new AspNetHostingEnvironment(hostingSettings);

@@ -1,7 +1,7 @@
 ﻿using System.Configuration;
 using Umbraco.Core.Configuration;
 
-namespace Umbraco.Configuration
+namespace Umbraco.Configuration.Legacy
 {
     public class RuntimeSettings : IRuntimeSettings
     {
@@ -24,6 +24,6 @@ namespace Umbraco.Configuration
         }
         public int? MaxQueryStringLength { get; }
         public int? MaxRequestLength { get; }
-        
+
     }
 }

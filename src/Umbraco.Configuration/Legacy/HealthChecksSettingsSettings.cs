@@ -4,7 +4,7 @@ using Umbraco.Core.Configuration.HealthChecks;
 
 namespace Umbraco.Core.Configuration.Implementations
 {
-    public class HealthChecksSettings : IHealthChecks
+    public class HealthChecksSettingsSettings : IHealthChecksSettings
     {
         private HealthChecksSection _healthChecksSection;
 

@@ -37,10 +37,10 @@ namespace Umbraco.Core
         public static IWebRoutingSettings WebRouting(this Configs configs)
             => configs.GetConfig<IWebRoutingSettings>();
 
-        public static IHealthChecks HealthChecks(this Configs configs)
-            => configs.GetConfig<IHealthChecks>();
-        public static ICoreDebug CoreDebug(this Configs configs)
-            => configs.GetConfig<ICoreDebug>();
+        public static IHealthChecksSettings HealthChecks(this Configs configs)
+            => configs.GetConfig<IHealthChecksSettings>();
+        public static ICoreDebugSettings CoreDebug(this Configs configs)
+            => configs.GetConfig<ICoreDebugSettings>();
 
     }
 }

@@ -93,7 +93,7 @@ namespace Umbraco.Tests.Common
         public abstract IDbProviderFactoryCreator DbProviderFactoryCreator { get; }
         public abstract IBulkSqlInsertProvider BulkSqlInsertProvider { get; }
         public abstract IMarchal Marchal { get; }
-        public ICoreDebug CoreDebug { get; } =  new CoreDebug();
+        public ICoreDebugSettings CoreDebugSettings { get; } =  new CoreDebugSettings();
 
 
         public IIOHelper IOHelper { get; }
