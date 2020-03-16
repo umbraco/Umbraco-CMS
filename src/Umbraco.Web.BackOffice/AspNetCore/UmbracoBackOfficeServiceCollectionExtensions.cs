@@ -7,6 +7,7 @@ using Umbraco.Composing;
 using Umbraco.Configuration;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
@@ -29,7 +30,9 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var configsFactory = new AspNetCoreConfigsFactory(configuration);
             var configs = configsFactory.Create();
 
-            var settings = configs.GetConfig<IModelsBuilderConfig>();
+            var settings = configs.GetConfig<IHealthChecksSettings>();
+
+
 
             services.CreateCompositionRoot(
                 httpContextAccessor,

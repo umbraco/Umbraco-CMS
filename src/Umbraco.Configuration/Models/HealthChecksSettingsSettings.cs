@@ -48,8 +48,13 @@ namespace Umbraco.Configuration.Models
                 .GetChildren()
                 .ToDictionary(x=>x.Key, x=> (INotificationMethod) new NotificationMethod(x.Key, x));
 
-            public IEnumerable<IDisabledHealthCheck> DisabledChecks =>
-                _configurationSection.GetValue<DisabledHealthCheck[]>("DisabledChecks", Array.Empty<DisabledHealthCheck>());
+            public IEnumerable<IDisabledHealthCheck> DisabledChecks => _configurationSection.GetSection("DisabledChecks").GetChildren().Select(
+                x => new DisabledHealthCheck()
+                {
+                    Id = x.GetValue<Guid>("Id"),
+                    DisabledOn = x.GetValue<DateTime>("DisabledOn"),
+                    DisabledBy = x.GetValue<int>("DisabledBy"),
+                });
         }
 
         private class NotificationMethod : INotificationMethod
