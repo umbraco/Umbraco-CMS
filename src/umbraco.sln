@@ -122,6 +122,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.Website", "Umbraco.Web.Website\Umbraco.Web.Website.csproj", "{5A246D54-3109-4D2B-BE7D-FC0787D126AE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.Integration", "Umbraco.Tests.Integration\Umbraco.Tests.Integration.csproj", "{D6319409-777A-4BD0-93ED-B2DFD805B32C}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.Common", "Umbraco.Tests.Common\Umbraco.Tests.Common.csproj", "{A499779C-1B3B-48A8-B551-458E582E6E96}"
 EndProject
 Global
