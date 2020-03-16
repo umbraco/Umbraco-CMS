@@ -31,8 +31,4 @@
       <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Implementations" />
-    </ItemGroup>
-
 </Project>

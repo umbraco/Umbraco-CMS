@@ -3,6 +3,7 @@ using Umbraco.Configuration.Implementations;
 using Umbraco.Configuration.Legacy;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.Implementations;
+using Umbraco.Core.Configuration.Legacy;
 using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Core.Configuration

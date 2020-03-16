@@ -26,36 +26,6 @@ namespace Umbraco.Configuration.Models
             _configuration = configuration;
         }
 
-        private static string GetModelsDirectory(string root, string config, bool acceptUnsafe)
-        {
-            // making sure it is safe, ie under the website root,
-            // unless AcceptUnsafeModelsDirectory and then everything is OK.
-
-            if (!Path.IsPathRooted(root))
-                throw new ConfigurationErrorsException($"Root is not rooted \"{root}\".");
-
-            if (config.StartsWith("~/"))
-            {
-                var dir = Path.Combine(root, config.TrimStart("~/"));
-
-                // sanitize - GetFullPath will take care of any relative
-                // segments in path, eg '../../foo.tmp' - it may throw a SecurityException
-                // if the combined path reaches illegal parts of the filesystem
-                dir = Path.GetFullPath(dir);
-                root = Path.GetFullPath(root);
-
-                if (!dir.StartsWith(root) && !acceptUnsafe)
-                    throw new ConfigurationErrorsException($"Invalid models directory \"{config}\".");
-
-                return dir;
-            }
-
-            if (acceptUnsafe)
-                return Path.GetFullPath(config);
-
-            throw new ConfigurationErrorsException($"Invalid models directory \"{config}\".");
-        }
-
         /// <summary>
         /// Gets a value indicating whether the whole models experience is enabled.
         /// </summary>
@@ -94,7 +64,8 @@ namespace Umbraco.Configuration.Models
         /// Gets the models directory.
         /// </summary>
         /// <remarks>Default is ~/App_Data/Models but that can be changed.</remarks>
-        public string ModelsDirectory => GetModelsDirectory("~/",_configuration.GetValue("Umbraco:CMS:ModelsBuilder:ModelsDirectory", "~/App_Data/Models"), AcceptUnsafeModelsDirectory);
+        public string ModelsDirectory =>
+            _configuration.GetValue("Umbraco:CMS:ModelsBuilder:ModelsDirectory", "~/App_Data/Models");
 
         /// <summary>
         /// Gets a value indicating whether to accept an unsafe value for ModelsDirectory.

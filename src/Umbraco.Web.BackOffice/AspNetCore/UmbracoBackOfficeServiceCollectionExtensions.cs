@@ -7,7 +7,6 @@ using Umbraco.Composing;
 using Umbraco.Configuration;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
@@ -31,9 +30,6 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var configs = configsFactory.Create();
 
             var settings = configs.GetConfig<IModelsBuilderConfig>();
-
-            var x =settings.ModelsDirectory;
-
 
             services.CreateCompositionRoot(
                 httpContextAccessor,

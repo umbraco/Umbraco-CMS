@@ -3,6 +3,7 @@ using Umbraco.Configuration.Models;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using ConnectionStrings = Umbraco.Configuration.Models.ConnectionStrings;
 using CoreDebugSettings = Umbraco.Configuration.Models.CoreDebugSettings;
 
 namespace Umbraco.Configuration
@@ -38,14 +39,10 @@ namespace Umbraco.Configuration
             configs.Add<IWebRoutingSettings>(() => new WebRoutingSettings(_configuration));
             configs.Add<IIndexCreatorSettings>(() => new IndexCreatorSettings(_configuration));
             configs.Add<IModelsBuilderConfig>(() => new ModelsBuilderConfig(_configuration));
-
-            // configs.Add<IGlobalSettings>(() => GlobalSettings);
-            // configs.Add<IConnectionStrings>(() => ConnectionStrings);
-            // configs.Add<IHostingSettings>(() => HostingSettings);
-            // configs.Add<IMachineKeyConfig>(() => MachineKeyConfig);
-
-
-
+            configs.Add<IHostingSettings>(() => new HostingSettings(_configuration));
+            configs.Add<IGlobalSettings>(() => new GlobalSettings(_configuration));
+            configs.Add<IConnectionStrings>(() => new ConnectionStrings(_configuration));
+            configs.Add<IMachineKeyConfig>(() => new MachineKeyConfig(_configuration));
 
             return configs;
         }
