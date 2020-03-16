@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Security;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models.Membership;
-using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -54,17 +52,17 @@ namespace Umbraco.Web.Security
             }
         }
 
-        private BackOfficeSignInManager _signInManager;
-        private BackOfficeSignInManager SignInManager
+        private BackOfficeSignInManager2 _signInManager;
+        private BackOfficeSignInManager2 SignInManager
         {
             get
             {
                 if (_signInManager == null)
                 {
-                    var mgr = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().Get<BackOfficeSignInManager>();
+                    var mgr = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().Get<BackOfficeSignInManager2>();
                     if (mgr == null)
                     {
-                        throw new NullReferenceException("Could not resolve an instance of " + typeof(BackOfficeSignInManager) + " from the " + typeof(IOwinContext));
+                        throw new NullReferenceException("Could not resolve an instance of " + typeof(BackOfficeSignInManager2) + " from the " + typeof(IOwinContext));
                     }
                     _signInManager = mgr;
                 }
@@ -72,9 +70,9 @@ namespace Umbraco.Web.Security
             }
         }
 
-        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
-        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
-            => _userManager ?? (_userManager = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().GetBackOfficeUserManager());
+        private BackOfficeUserManager2<BackOfficeIdentityUser> _userManager;
+        protected BackOfficeUserManager2<BackOfficeIdentityUser> UserManager
+            => _userManager ?? (_userManager = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().GetBackOfficeUserManager2());
 
         [Obsolete("This needs to be removed, ASP.NET Identity should always be used for this operation, this is currently only used in the installer which needs to be updated")]
         public double PerformLogin(int userId)
@@ -84,7 +82,7 @@ namespace Umbraco.Web.Security
             //ensure it's done for owin too
             owinCtx.Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
 
-            var user = UserManager.FindByIdAsync(userId).Result;
+            var user = UserManager.FindByIdAsync(userId.ToString()).Result;
 
             SignInManager.SignInAsync(user, isPersistent: true, rememberBrowser: false).Wait();
 

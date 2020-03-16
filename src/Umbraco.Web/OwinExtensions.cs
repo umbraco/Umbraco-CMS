@@ -57,10 +57,10 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="owinContext"></param>
         /// <returns></returns>
-        public static BackOfficeSignInManager GetBackOfficeSignInManager(this IOwinContext owinContext)
+        public static BackOfficeSignInManager2 GetBackOfficeSignInManager(this IOwinContext owinContext)
         {
-            return owinContext.Get<BackOfficeSignInManager>()
-                ?? throw new NullReferenceException($"Could not resolve an instance of {typeof (BackOfficeSignInManager)} from the {typeof(IOwinContext)}.");
+            return owinContext.Get<BackOfficeSignInManager2>()
+                ?? throw new NullReferenceException($"Could not resolve an instance of {typeof (BackOfficeSignInManager2)} from the {typeof(IOwinContext)}.");
         }
 
         /// <summary>
@@ -83,13 +83,13 @@ namespace Umbraco.Web
         /// This is required because to extract the user manager we need to user a custom service since owin only deals in generics and
         /// developers could register their own user manager types
         /// </remarks>
-        public static BackOfficeUserManager<BackOfficeIdentityUser> GetBackOfficeUserManager(this IOwinContext owinContext)
+        public static BackOfficeUserManager2<BackOfficeIdentityUser> GetBackOfficeUserManager(this IOwinContext owinContext)
         {
-            var marker = owinContext.Get<IBackOfficeUserManagerMarker>(BackOfficeUserManager.OwinMarkerKey)
+            var marker = owinContext.Get<IBackOfficeUserManagerMarker>(BackOfficeUserManager2.OwinMarkerKey)
                 ?? throw new NullReferenceException($"No {typeof (IBackOfficeUserManagerMarker)}, i.e. no Umbraco back-office, has been registered with Owin.");
 
             return marker.GetManager(owinContext)
-                ?? throw new NullReferenceException($"Could not resolve an instance of {typeof (BackOfficeUserManager<BackOfficeIdentityUser>)} from the {typeof (IOwinContext)}.");
+                ?? throw new NullReferenceException($"Could not resolve an instance of {typeof (BackOfficeUserManager2<BackOfficeIdentityUser>)} from the {typeof (IOwinContext)}.");
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace Umbraco.Web
                 ?? throw new NullReferenceException($"No {typeof (IBackOfficeUserManagerMarker2)}, i.e. no Umbraco back-office, has been registered with Owin.");
 
             return marker.GetManager(owinContext)
-                ?? throw new NullReferenceException($"Could not resolve an instance of {typeof (BackOfficeUserManager<BackOfficeIdentityUser>)} from the {typeof (IOwinContext)}.");
+                ?? throw new NullReferenceException($"Could not resolve an instance of {typeof (BackOfficeUserManager2<BackOfficeIdentityUser>)} from the {typeof (IOwinContext)}.");
         }
 
         // TODO: SB: OWIN DI

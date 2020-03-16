@@ -158,7 +158,8 @@ namespace Umbraco.Web.Editors
         [OverrideAuthorization]
         public async Task<UserDetail> PostSetInvitedUserPassword([FromBody]string newPassword)
         {
-            var result = await UserManager.AddPasswordAsync(Security.GetUserId().ResultOr(0), newPassword);
+            var user = await UserManager.FindByIdAsync(Security.GetUserId().ResultOr(0).ToString());
+            var result = await UserManager.AddPasswordAsync(user, newPassword);
 
             if (result.Succeeded == false)
             {

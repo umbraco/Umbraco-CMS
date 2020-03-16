@@ -2,15 +2,12 @@ using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security.Cookies;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Security;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Security
@@ -88,16 +85,16 @@ namespace Umbraco.Web.Security
             if (validate == false)
                 return true;
 
-            var manager = owinCtx.GetUserManager<BackOfficeUserManager>();
+            var manager = owinCtx.Get<BackOfficeUserManager2>();
             if (manager == null)
                 return false;
 
-            var userId = currentIdentity.GetUserId<int>();
+            var userId = currentIdentity.GetUserId();
             var user = await manager.FindByIdAsync(userId);
             if (user == null)
                 return false;
 
-            var sessionId = currentIdentity.FindFirstValue(Constants.Security.SessionIdClaimType);
+            var sessionId = currentIdentity.FindFirst(Constants.Security.SessionIdClaimType)?.Value;
             if (await manager.ValidateSessionIdAsync(userId, sessionId) == false)
                 return false;
 

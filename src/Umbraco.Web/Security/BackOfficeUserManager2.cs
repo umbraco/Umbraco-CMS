@@ -42,14 +42,6 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager
         /// </summary>
-        /// <param name="options"></param>
-        /// <param name="userService"></param>
-        /// <param name="entityService"></param>
-        /// <param name="externalLoginService"></param>
-        /// <param name="passwordConfiguration"></param>
-        /// <param name="contentSectionConfig"></param>
-        /// <param name="globalSettings"></param>
-        /// <returns></returns>
         public static BackOfficeUserManager2 Create(
             IUserService userService,
             IEntityService entityService,
@@ -85,11 +77,10 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and a custom BackOfficeUserManager instance
         /// </summary>
-        /// <returns></returns>
         public static BackOfficeUserManager2 Create(
             IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
-            IUserStore<BackOfficeIdentityUser> store,
+            IUserStore<BackOfficeIdentityUser> customUserStore,
             IOptions<IdentityOptions> optionsAccessor,
             IPasswordHasher<BackOfficeIdentityUser> passwordHasher,
             IEnumerable<IUserValidator<BackOfficeIdentityUser>> userValidators,
@@ -102,7 +93,7 @@ namespace Umbraco.Web.Security
             return new BackOfficeUserManager2(
                 passwordConfiguration,
                 ipResolver,
-                store,
+                customUserStore,
                 optionsAccessor,
                 passwordHasher,
                 userValidators,
@@ -207,9 +198,9 @@ namespace Umbraco.Web.Security
         /// <param name="userId"></param>
         /// <param name="sessionId"></param>
         /// <returns></returns>
-        public virtual async Task<bool> ValidateSessionIdAsync(int userId, string sessionId)
+        public virtual async Task<bool> ValidateSessionIdAsync(string userId, string sessionId)
         {
-            var userSessionStore = Store as IUserSessionStore2<T, int>;
+            var userSessionStore = Store as IUserSessionStore2<T>;
             //if this is not set, for backwards compat (which would be super rare), we'll just approve it
             if (userSessionStore == null)  return true;
 

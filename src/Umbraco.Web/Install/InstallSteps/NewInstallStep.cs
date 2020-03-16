@@ -56,15 +56,15 @@ namespace Umbraco.Web.Install.InstallSteps
                 throw new InvalidOperationException("Could not find the super user!");
             }
 
-            var userManager = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().GetBackOfficeUserManager();
-            var membershipUser = await userManager.FindByIdAsync(Constants.Security.SuperUserId);
+            var userManager = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().GetBackOfficeUserManager2();
+            var membershipUser = await userManager.FindByIdAsync(Constants.Security.SuperUserId.ToString());
             if (membershipUser == null)
             {
                 throw new InvalidOperationException($"No user found in membership provider with id of {Constants.Security.SuperUserId}.");
             }
 
             //To change the password here we actually need to reset it since we don't have an old one to use to change
-            var resetToken = await userManager.GeneratePasswordResetTokenAsync(membershipUser.Id);
+            var resetToken = await userManager.GeneratePasswordResetTokenAsync(membershipUser);
             var resetResult = await userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
             if (!resetResult.Succeeded)
             {

@@ -28,7 +28,7 @@ namespace Umbraco.Web.Security
             IUserSecurityStampStore<BackOfficeIdentityUser>,
             IUserLockoutStore<BackOfficeIdentityUser>,
             IUserTwoFactorStore<BackOfficeIdentityUser>,
-            IUserSessionStore2<BackOfficeIdentityUser, int>
+            IUserSessionStore2<BackOfficeIdentityUser>
 
     // TODO: This would require additional columns/tables for now people will need to implement this on their own
     //IUserPhoneNumberStore<BackOfficeIdentityUser, int>,
@@ -119,9 +119,9 @@ namespace Umbraco.Web.Security
             // with an external provider so we'll just generate one and prefix it, the
             // prefix will help us determine if the password hasn't actually been specified yet.
             //this will hash the guid with a salt so should be nicely random
-            var aspHasher = new Microsoft.AspNet.Identity.PasswordHasher();
+            var aspHasher = new PasswordHasher<BackOfficeIdentityUser>();
             var emptyPasswordValue = Constants.Security.EmptyPasswordPrefix +
-                                      aspHasher.HashPassword(Guid.NewGuid().ToString("N"));
+                                      aspHasher.HashPassword(user, Guid.NewGuid().ToString("N"));
 
             var userEntity = new User(_globalSettings, user.Name, user.Email, user.UserName, emptyPasswordValue)
             {
@@ -902,12 +902,13 @@ namespace Umbraco.Web.Security
                 throw new ObjectDisposedException(GetType().Name);
         }
 
-        public Task<bool> ValidateSessionIdAsync(int userId, string sessionId)
+        public Task<bool> ValidateSessionIdAsync(string userId, string sessionId)
         {
             Guid guidSessionId;
             if (Guid.TryParse(sessionId, out guidSessionId))
             {
-                return Task.FromResult(_userService.ValidateLoginSession(userId, guidSessionId));
+                // TODO: SB: Normalize string to int conversion
+                return Task.FromResult(_userService.ValidateLoginSession(int.Parse(sessionId), guidSessionId));
             }
             return Task.FromResult(false);
         }

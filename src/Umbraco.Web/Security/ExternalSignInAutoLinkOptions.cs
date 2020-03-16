@@ -1,8 +1,6 @@
 ﻿using System;
-using Microsoft.AspNet.Identity.Owin;
 using Umbraco.Core;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Web.Models.Identity;
 
 namespace Umbraco.Web.Security
@@ -33,22 +31,22 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// A callback executed during account auto-linking and before the user is persisted
         /// </summary>
-        public Action<BackOfficeIdentityUser, ExternalLoginInfo> OnAutoLinking { get; set; }
+        public Action<BackOfficeIdentityUser, ExternalLoginInfo2> OnAutoLinking { get; set; }
 
         /// <summary>
         /// A callback executed during every time a user authenticates using an external login.
         /// returns a boolean indicating if sign in should continue or not.
         /// </summary>
-        public Func<BackOfficeIdentityUser, ExternalLoginInfo, bool> OnExternalLogin { get; set; }
+        public Func<BackOfficeIdentityUser, ExternalLoginInfo2, bool> OnExternalLogin { get; set; }
 
 
-        /// <summary>
+        /// <summary>B
         /// The default User group aliases to use for auto-linking users
         /// </summary>
         /// <param name="umbracoContext"></param>
         /// <param name="loginInfo"></param>
         /// <returns></returns>
-        public string[] GetDefaultUserGroups(IUmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
+        public string[] GetDefaultUserGroups(IUmbracoContext umbracoContext, ExternalLoginInfo2 loginInfo)
         {
             return _defaultUserGroups;
         }
@@ -61,7 +59,7 @@ namespace Umbraco.Web.Security
         ///
         /// For public auth providers this should always be false!!!
         /// </summary>
-        public bool ShouldAutoLinkExternalAccount(IUmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
+        public bool ShouldAutoLinkExternalAccount(IUmbracoContext umbracoContext, ExternalLoginInfo2 loginInfo)
         {
             return _autoLinkExternalAccount;
         }
@@ -71,7 +69,7 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// The default Culture to use for auto-linking users
         /// </summary>
-        public string GetDefaultCulture(IUmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
+        public string GetDefaultCulture(IUmbracoContext umbracoContext, ExternalLoginInfo2 loginInfo)
         {
             return _defaultCulture;
         }

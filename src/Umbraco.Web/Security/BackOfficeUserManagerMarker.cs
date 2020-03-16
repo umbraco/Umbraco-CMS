@@ -1,8 +1,5 @@
 ﻿using System;
-using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Security;
 using Umbraco.Web.Models.Identity;
 
 namespace Umbraco.Web.Security
@@ -14,14 +11,14 @@ namespace Umbraco.Web.Security
     /// </summary>
     /// <typeparam name="TManager"></typeparam>
     /// <typeparam name="TUser"></typeparam>
-    internal class BackOfficeUserManagerMarker<TManager, TUser> : IBackOfficeUserManagerMarker
-        where TManager : BackOfficeUserManager<TUser>
+    internal class BackOfficeUserManagerMarker2<TManager, TUser> : IBackOfficeUserManagerMarker2
+        where TManager : BackOfficeUserManager2<TUser>
         where TUser : BackOfficeIdentityUser
     {
-        public BackOfficeUserManager<BackOfficeIdentityUser> GetManager(IOwinContext owin)
+        public BackOfficeUserManager2<BackOfficeIdentityUser> GetManager(IOwinContext owin)
         {
-            var mgr = owin.Get<TManager>() as BackOfficeUserManager<BackOfficeIdentityUser>;
-            if (mgr == null) throw new InvalidOperationException("Could not cast the registered back office user of type " + typeof(TManager) + " to " + typeof(BackOfficeUserManager<BackOfficeIdentityUser>));
+            var mgr = owin.Get<TManager>() as BackOfficeUserManager2<BackOfficeIdentityUser>;
+            if (mgr == null) throw new InvalidOperationException("Could not cast the registered back office user of type " + typeof(TManager) + " to " + typeof(BackOfficeUserManager2<BackOfficeIdentityUser>));
             return mgr;
         }
     }

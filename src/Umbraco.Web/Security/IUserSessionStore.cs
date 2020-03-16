@@ -1,6 +1,5 @@
-using System;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
 
 namespace Umbraco.Core.Security
 {
@@ -8,16 +7,9 @@ namespace Umbraco.Core.Security
     /// An IUserStore interface part to implement if the store supports validating user session Ids
     /// </summary>
     /// <typeparam name="TUser"></typeparam>
-    /// <typeparam name="TKey"></typeparam>
-    public interface IUserSessionStore<TUser, in TKey> : IUserStore<TUser, TKey>, IDisposable
-        where TUser : class, IUser<TKey>
-    {
-        Task<bool> ValidateSessionIdAsync(int userId, string sessionId);
-    }
-
-    public interface IUserSessionStore2<TUser, in TKey> : Microsoft.AspNetCore.Identity.IUserStore<TUser>, IDisposable
+    public interface IUserSessionStore2<TUser> : IUserStore<TUser>
         where TUser : class
     {
-        Task<bool> ValidateSessionIdAsync(int userId, string sessionId);
+        Task<bool> ValidateSessionIdAsync(string userId, string sessionId); // TODO: SB: Should take a user???
     }
 }

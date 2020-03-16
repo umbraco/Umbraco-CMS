@@ -18,7 +18,7 @@ namespace Umbraco.Web.Security
     /// Custom sign in manager due to SignInManager not being .NET Standard.
     /// Can be removed once the web project moves to .NET Core.
     /// </summary>
-    public class BackOfficeSignInManager2
+    public class BackOfficeSignInManager2 : IDisposable
     {
         private readonly BackOfficeUserManager2<BackOfficeIdentityUser> _userManager;
         private readonly IAuthenticationManager _authenticationManager;
@@ -349,6 +349,11 @@ namespace Umbraco.Web.Security
         private int ConvertIdFromString(string id)
         {
             return id == null ? default(int) : (int) Convert.ChangeType(id, typeof(int), CultureInfo.InvariantCulture);
+        }
+
+        public void Dispose()
+        {
+            _userManager?.Dispose();
         }
     }
 }

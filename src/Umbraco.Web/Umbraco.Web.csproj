@@ -200,13 +200,11 @@
     <Compile Include="Scheduling\SchedulerComposer.cs" />
     <Compile Include="Security\BackOfficeSignInManager2.cs" />
     <Compile Include="Security\BackOfficeUserManager2.cs" />
-    <Compile Include="Security\BackOfficeUserStore.cs" />
+    <Compile Include="Security\BackOfficeUserManagerMarker.cs" />
     <Compile Include="Security\BackOfficeUserStore2.cs" />
-    <Compile Include="Security\BackOfficeUserValidator.cs" />
     <Compile Include="Security\BackOfficeUserValidator2.cs" />
     <Compile Include="Security\ConfiguredPasswordValidator.cs" />
     <Compile Include="Security\EmailService.cs" />
-    <Compile Include="Security\IUserAwarePasswordHasher.cs" />
     <Compile Include="Security\IUserSessionStore.cs" />
     <Compile Include="Security\MembershipProviderBase.cs" />
     <Compile Include="Security\MembershipProviderExtensions.cs" />
@@ -214,7 +212,6 @@
     <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
     <Compile Include="Security\UmbracoEmailMessage.cs" />
     <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
-    <Compile Include="Security\UserAwarePasswordHasher.cs" />
     <Compile Include="Security\UserAwarePasswordHasher2.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="Trees\TreeCollectionBuilder.cs" />
@@ -230,7 +227,6 @@
     <Compile Include="Runtime\WebInitialComposer.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
-    <Compile Include="Security\BackOfficeUserManagerMarker.cs" />
     <Compile Include="Security\BackOfficeUserPasswordCheckerResult.cs" />
     <Compile Include="Security\IBackOfficeUserManagerMarker.cs" />
     <Compile Include="Security\IBackOfficeUserPasswordChecker.cs" />
@@ -247,8 +243,6 @@
     <Compile Include="Mvc\ContainerControllerFactory.cs" />
     <Compile Include="OwinExtensions.cs" />
     <Compile Include="Security\BackOfficeCookieAuthenticationProvider.cs" />
-    <Compile Include="Security\BackOfficeSignInManager.cs" />
-    <Compile Include="Security\BackOfficeUserManager.cs" />
     <Compile Include="Security\SessionIdValidator.cs" />
     <Compile Include="SignalR\PreviewHubComposer.cs" />
     <Compile Include="Trees\FilesTreeController.cs" />

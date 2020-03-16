@@ -11,7 +11,7 @@ namespace Umbraco.Web.Security
     /// </summary>
     internal interface IBackOfficeUserManagerMarker
     {
-        BackOfficeUserManager<BackOfficeIdentityUser> GetManager(IOwinContext owin);
+        BackOfficeUserManager2<BackOfficeIdentityUser> GetManager(IOwinContext owin);
     }
     /// <summary>
     /// This interface is only here due to the fact that IOwinContext Get / Set only work in generics, if they worked

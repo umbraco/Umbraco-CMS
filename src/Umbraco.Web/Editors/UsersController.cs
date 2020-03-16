@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -20,7 +19,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Editors.Filters;
@@ -321,22 +319,17 @@ namespace Umbraco.Web.Editors
                     Request.CreateNotificationValidationErrorResponse(string.Join(", ", created.Errors)));
             }
 
-            //we need to generate a password, however we can only do that if the user manager has a password validator that
-            //we can read values from
-            var passwordValidator = UserManager.PasswordValidator as PasswordValidator;
-            var resetPassword = string.Empty;
-            if (passwordValidator != null)
-            {
-                var password = UserManager.GeneratePassword();
+            string resetPassword;
+            var password = UserManager.GeneratePassword();
 
-                var result = await UserManager.AddPasswordAsync(identityUser.Id, password);
-                if (result.Succeeded == false)
-                {
-                    throw new HttpResponseException(
-                        Request.CreateNotificationValidationErrorResponse(string.Join(", ", created.Errors)));
-                }
-                resetPassword = password;
+            var result = await UserManager.AddPasswordAsync(identityUser, password);
+            if (result.Succeeded == false)
+            {
+                throw new HttpResponseException(
+                    Request.CreateNotificationValidationErrorResponse(string.Join(", ", created.Errors)));
             }
+
+            resetPassword = password;
 
             //now re-look the user back up which will now exist
             var user = Services.UserService.GetByEmail(userSave.Email);
@@ -472,7 +465,8 @@ namespace Umbraco.Web.Editors
 
         private async Task SendUserInviteEmailAsync(UserBasic userDisplay, string from, string fromEmail, IUser to, string message)
         {
-            var token = await UserManager.GenerateEmailConfirmationTokenAsync((int)userDisplay.Id);
+            var user = await UserManager.FindByIdAsync(((int) userDisplay.Id).ToString());
+            var token = await UserManager.GenerateEmailConfirmationTokenAsync(user);
 
             var inviteToken = string.Format("{0}{1}{2}",
                 (int)userDisplay.Id,
@@ -501,7 +495,8 @@ namespace Umbraco.Web.Editors
                 UmbracoUserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
 
-            await UserManager.EmailService.SendAsync(
+            // TODO: SB: EmailService.SendAsync
+            /*await UserManager.EmailService.SendAsync(
                 //send the special UmbracoEmailMessage which configures it's own sender
                 //to allow for events to handle sending the message if no smtp is configured
                 new UmbracoEmailMessage(new EmailSender(GlobalSettings, true))
@@ -509,7 +504,7 @@ namespace Umbraco.Web.Editors
                     Body = emailBody,
                     Destination = userDisplay.Email,
                     Subject = emailSubject
-                });
+                });*/
 
         }
 
@@ -705,22 +700,26 @@ namespace Umbraco.Web.Editors
             if (userIds.Length <= 0)
                 return Request.CreateResponse(HttpStatusCode.OK);
 
+            var user = await UserManager.FindByIdAsync(userIds[0].ToString());
+
             if (userIds.Length == 1)
             {
-                var unlockResult = await UserManager.SetLockoutEndDateAsync(userIds[0], DateTimeOffset.Now);
+                
+
+                var unlockResult = await UserManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now);
                 if (unlockResult.Succeeded == false)
                 {
                     return Request.CreateValidationErrorResponse(
                         string.Format("Could not unlock for user {0} - error {1}", userIds[0], unlockResult.Errors.First()));
                 }
-                var user = await UserManager.FindByIdAsync(userIds[0]);
+
                 return Request.CreateNotificationSuccessResponse(
                     Services.TextService.Localize("speechBubbles/unlockUserSuccess", new[] { user.Name }));
             }
 
             foreach (var u in userIds)
             {
-                var unlockResult = await UserManager.SetLockoutEndDateAsync(u, DateTimeOffset.Now);
+                var unlockResult = await UserManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now);
                 if (unlockResult.Succeeded == false)
                 {
                     return Request.CreateValidationErrorResponse(

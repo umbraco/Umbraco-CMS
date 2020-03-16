@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Microsoft.Owin.Extensions;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
@@ -16,7 +16,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
@@ -34,16 +33,10 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Configure Default Identity User Manager for Umbraco
         /// </summary>
-        /// <param name="app"></param>
-        /// <param name="services"></param>
-        /// <param name="contentSettings"></param>
-        /// <param name="globalSettings"></param>
-        /// <param name="userMembershipProvider"></param>
         public static void ConfigureUserManagerForUmbracoBackOffice(this IAppBuilder app,
             ServiceContext services,
-            UmbracoMapper mapper,
-            IContentSection contentSettings,
             IGlobalSettings globalSettings,
+            UmbracoMapper mapper,
             // TODO: This could probably be optional?
             IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver)
@@ -51,39 +44,37 @@ namespace Umbraco.Web.Security
             if (services == null) throw new ArgumentNullException(nameof(services));
 
             //Configure Umbraco user manager to be created per request
-            app.CreatePerOwinContext<BackOfficeUserManager>(
-                (options, owinContext) => BackOfficeUserManager.Create(
-                    options,
+            app.CreatePerOwinContext<BackOfficeUserManager2>(
+                (options, owinContext) => BackOfficeUserManager2.Create(
                     services.UserService,
                     services.EntityService,
                     services.ExternalLoginService,
-                    mapper,
-                    contentSettings,
                     globalSettings,
+                    mapper,
                     passwordConfiguration,
-                    ipResolver));
+                    ipResolver,
+                    new OptionsWrapper<IdentityOptions>(new IdentityOptions()),
+                    new UserAwarePasswordHasher2<BackOfficeIdentityUser>(new PasswordSecurity(passwordConfiguration)),
+                    new[] {new UserValidator<BackOfficeIdentityUser>(),},
+                    new[] {new PasswordValidator<BackOfficeIdentityUser>()},
+                    new UpperInvariantLookupNormalizer(),
+                    new IdentityErrorDescriber(),
+                    null,
+                    new NullLogger<BackOfficeUserManager2<BackOfficeIdentityUser>>()));
 
-            app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
+            app.SetBackOfficeUserManagerType<BackOfficeUserManager2, BackOfficeIdentityUser>();
 
             //Create a sign in manager per request
-            app.CreatePerOwinContext<BackOfficeSignInManager>((options, context) => BackOfficeSignInManager.Create(options, context, globalSettings, app.CreateLogger<BackOfficeSignInManager>()));
+            app.CreatePerOwinContext<BackOfficeSignInManager2>((options, context) => BackOfficeSignInManager2.Create(context, globalSettings, app.CreateLogger<BackOfficeSignInManager2>()));
         }
 
         /// <summary>
         /// Configure a custom UserStore with the Identity User Manager for Umbraco
         /// </summary>
-        /// <param name="app"></param>
-        /// <param name="runtimeState"></param>
-        /// <param name="globalSettings"></param>
-        /// <param name="userMembershipProvider"></param>
-        /// <param name="customUserStore"></param>
-        /// <param name="contentSettings"></param>
-        /// <param name="ipResolver"></param>
         public static void ConfigureUserManagerForUmbracoBackOffice(this IAppBuilder app,
             IRuntimeState runtimeState,
-            IContentSection contentSettings,
             IGlobalSettings globalSettings,
-            BackOfficeUserStore customUserStore,
+            BackOfficeUserStore2 customUserStore,
             // TODO: This could probably be optional?
             IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver)
@@ -92,22 +83,28 @@ namespace Umbraco.Web.Security
             if (customUserStore == null) throw new ArgumentNullException(nameof(customUserStore));
 
             //Configure Umbraco user manager to be created per request
-            app.CreatePerOwinContext<BackOfficeUserManager>(
-                (options, owinContext) => BackOfficeUserManager.Create(
-                    options,
-                    customUserStore,
-                    contentSettings,
+            app.CreatePerOwinContext<BackOfficeUserManager2>(
+                (options, owinContext) => BackOfficeUserManager2.Create(
                     passwordConfiguration,
                     ipResolver,
-                    globalSettings));
+                    customUserStore,
+                    new OptionsWrapper<IdentityOptions>(new IdentityOptions()),
+                    new UserAwarePasswordHasher2<BackOfficeIdentityUser>(new PasswordSecurity(passwordConfiguration)),
+                    new[] { new Microsoft.AspNetCore.Identity.UserValidator<BackOfficeIdentityUser>(), },
+                    new[] { new PasswordValidator<BackOfficeIdentityUser>() },
+                    new UpperInvariantLookupNormalizer(),
+                    new IdentityErrorDescriber(),
+                    null,
+                    new NullLogger<BackOfficeUserManager2<BackOfficeIdentityUser>>()));
 
-            app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
+            app.SetBackOfficeUserManagerType<BackOfficeUserManager2, BackOfficeIdentityUser>();
 
             //Create a sign in manager per request
-            app.CreatePerOwinContext<BackOfficeSignInManager>((options, context) => BackOfficeSignInManager.Create(options, context, globalSettings, app.CreateLogger(typeof(BackOfficeSignInManager).FullName)));
+            app.CreatePerOwinContext<BackOfficeSignInManager2>((options, context) => BackOfficeSignInManager2.Create(context, globalSettings, app.CreateLogger(typeof(BackOfficeSignInManager2).FullName)));
         }
 
-        /// <summary>
+        // TODO: SB: ConfigureUserManagerForUmbracoBackOffice using IdentityFactoryOptions
+        /*/// <summary>
         /// Configure a custom BackOfficeUserManager for Umbraco
         /// </summary>
         /// <param name="app"></param>
@@ -118,7 +115,7 @@ namespace Umbraco.Web.Security
             IRuntimeState runtimeState,
             IGlobalSettings globalSettings,
             Func<IdentityFactoryOptions<TManager>, IOwinContext, TManager> userManager)
-            where TManager : BackOfficeUserManager<TUser>
+            where TManager : BackOfficeUserManager2<TUser>
             where TUser : BackOfficeIdentityUser
         {
             if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));
@@ -130,9 +127,9 @@ namespace Umbraco.Web.Security
             app.SetBackOfficeUserManagerType<TManager, TUser>();
 
             //Create a sign in manager per request
-            app.CreatePerOwinContext<BackOfficeSignInManager>(
-                (options, context) => BackOfficeSignInManager.Create(options, context, globalSettings, app.CreateLogger(typeof(BackOfficeSignInManager).FullName)));
-        }
+            app.CreatePerOwinContext<BackOfficeSignInManager2>(
+                (options, context) => BackOfficeSignInManager2.Create(context, globalSettings, app.CreateLogger(typeof(BackOfficeSignInManager2).FullName)));
+        }*/
 
         /// <summary>
         /// Ensures that the UmbracoBackOfficeAuthenticationMiddleware is assigned to the pipeline
@@ -190,14 +187,15 @@ namespace Umbraco.Web.Security
 
             authOptions.Provider = new BackOfficeCookieAuthenticationProvider(userService, runtimeState, globalSettings, ioHelper, umbracoSettingsSection)
             {
+                // TODO: SB: SecurityStampValidator
                 // Enables the application to validate the security stamp when the user
                 // logs in. This is a security feature which is used when you
                 // change a password or add an external login to your account.
-                OnValidateIdentity = SecurityStampValidator
-                    .OnValidateIdentity<BackOfficeUserManager, BackOfficeIdentityUser, int>(
+                /*OnValidateIdentity = SecurityStampValidator
+                    .OnValidateIdentity<BackOfficeUserManager2, BackOfficeIdentityUser, int>(
                         TimeSpan.FromMinutes(30),
                         (manager, user) => manager.GenerateUserIdentityAsync(user),
-                        identity => identity.GetUserId<int>()),
+                        identity => identity.GetUserId<int>()),*/
 
             };
 
@@ -268,7 +266,7 @@ namespace Umbraco.Web.Security
         /// differently in the owin context
         /// </remarks>
         private static void SetBackOfficeUserManagerType<TManager, TUser>(this IAppBuilder app)
-            where TManager : BackOfficeUserManager<TUser>
+            where TManager : BackOfficeUserManager2<TUser>
             where TUser : BackOfficeIdentityUser
         {
             if (_markerSet) throw new InvalidOperationException("The back office user manager marker has already been set, only one back office user manager can be configured");
@@ -278,7 +276,7 @@ namespace Umbraco.Web.Security
             // a generic strongly typed instance
             app.Use((context, func) =>
             {
-                context.Set(BackOfficeUserManager.OwinMarkerKey, new BackOfficeUserManagerMarker<TManager, TUser>());
+                context.Set(BackOfficeUserManager2.OwinMarkerKey, new BackOfficeUserManagerMarker2<TManager, TUser>());
                 return func();
             });
         }

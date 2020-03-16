@@ -34,7 +34,7 @@ namespace Umbraco.Web.Editors
             IUser currentUser,
             IUser savingUser,
             ChangingPasswordModel passwordModel,
-            BackOfficeUserManager<BackOfficeIdentityUser> userMgr)
+            BackOfficeUserManager2<BackOfficeIdentityUser> userMgr)
         {
             if (passwordModel == null) throw new ArgumentNullException(nameof(passwordModel));
             if (userMgr == null) throw new ArgumentNullException(nameof(userMgr));
@@ -42,6 +42,13 @@ namespace Umbraco.Web.Editors
             if (passwordModel.NewPassword.IsNullOrWhiteSpace())
             {
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" }) });
+            }
+
+            var backOfficeIdentityUser = await userMgr.FindByIdAsync(savingUser.Id.ToString());
+            if (backOfficeIdentityUser == null)
+            {
+                //this really shouldn't ever happen... but just in case
+                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password could not be verified", new[] { "oldPassword" }) });
             }
 
             //Are we just changing another user's password?
@@ -60,7 +67,7 @@ namespace Umbraco.Web.Editors
                 }
 
                 //ok, we should be able to reset it
-                var resetToken = await userMgr.GeneratePasswordResetTokenAsync(savingUser.Id);
+                var resetToken = await userMgr.GeneratePasswordResetTokenAsync(backOfficeIdentityUser);
 
                 var resetResult = await userMgr.ChangePasswordWithResetAsync(savingUser.Id, resetToken, passwordModel.NewPassword);
 
@@ -74,15 +81,6 @@ namespace Umbraco.Web.Editors
                 return Attempt.Succeed(new PasswordChangedModel());
             }
 
-            //we're changing our own password...
-
-            //get the user
-            var backOfficeIdentityUser = await userMgr.FindByIdAsync(savingUser.Id);
-            if (backOfficeIdentityUser == null)
-            {
-                //this really shouldn't ever happen... but just in case
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password could not be verified", new[] { "oldPassword" }) });
-            }
             //is the old password correct?
             var validateResult = await userMgr.CheckPasswordAsync(backOfficeIdentityUser, passwordModel.OldPassword);
             if (validateResult == false)
@@ -91,7 +89,7 @@ namespace Umbraco.Web.Editors
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Incorrect password", new[] { "oldPassword" }) });
             }
             //can we change to the new password?
-            var changeResult = await userMgr.ChangePasswordAsync(savingUser.Id, passwordModel.OldPassword, passwordModel.NewPassword);
+            var changeResult = await userMgr.ChangePasswordAsync(backOfficeIdentityUser, passwordModel.OldPassword, passwordModel.NewPassword);
             if (changeResult.Succeeded == false)
             {
                 //no, fail with error messages for "password"
