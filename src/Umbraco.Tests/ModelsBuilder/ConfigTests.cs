@@ -3,7 +3,7 @@ using NUnit.Framework;
 using Umbraco.Configuration;
 using Umbraco.Configuration.Legacy;
 using Umbraco.Core;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Tests.ModelsBuilder
 {
@@ -36,7 +36,7 @@ namespace Umbraco.Tests.ModelsBuilder
         [TestCase("c:/path/to/root", "c:/another/path/to/elsewhere", true, "c:\\another\\path\\to\\elsewhere")]
         public void GetModelsDirectoryTests(string root, string config, bool acceptUnsafe, string expected)
         {
-            Assert.AreEqual(expected, ModelsBuilderConfig.GetModelsDirectory(root, config, acceptUnsafe));
+            Assert.AreEqual(expected, ModelsBuilderConfigExtensions.GetModelsDirectory(root, config, acceptUnsafe));
         }
 
         [TestCase("c:/path/to/root", "~/../../dir/models", false)]
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.ModelsBuilder
         {
             Assert.Throws<ConfigurationErrorsException>(() =>
             {
-                var modelsDirectory = ModelsBuilderConfig.GetModelsDirectory(root, config, acceptUnsafe);
+                var modelsDirectory = ModelsBuilderConfigExtensions.GetModelsDirectory(root, config, acceptUnsafe);
             });
         }
     }

@@ -57,10 +57,8 @@ namespace Umbraco.Configuration.Legacy
             value = ConfigurationManager.AppSettings[Prefix + "ModelsDirectory"];
             if (!string.IsNullOrWhiteSpace(value))
             {
-                var root = "~/";
-
                 // GetModelsDirectory will ensure that the path is safe
-                ModelsDirectory = GetModelsDirectory(root, value, AcceptUnsafeModelsDirectory);
+                ModelsDirectory = value;
             }
 
             // default: 0
@@ -98,36 +96,7 @@ namespace Umbraco.Configuration.Legacy
             DebugLevel = debugLevel;
         }
 
-        // internal for tests
-        internal static string GetModelsDirectory(string root, string config, bool acceptUnsafe)
-        {
-            // making sure it is safe, ie under the website root,
-            // unless AcceptUnsafeModelsDirectory and then everything is OK.
 
-            if (!Path.IsPathRooted(root))
-                throw new ConfigurationErrorsException($"Root is not rooted \"{root}\".");
-
-            if (config.StartsWith("~/"))
-            {
-                var dir = Path.Combine(root, config.TrimStart("~/"));
-
-                // sanitize - GetFullPath will take care of any relative
-                // segments in path, eg '../../foo.tmp' - it may throw a SecurityException
-                // if the combined path reaches illegal parts of the filesystem
-                dir = Path.GetFullPath(dir);
-                root = Path.GetFullPath(root);
-
-                if (!dir.StartsWith(root) && !acceptUnsafe)
-                    throw new ConfigurationErrorsException($"Invalid models directory \"{config}\".");
-
-                return dir;
-            }
-
-            if (acceptUnsafe)
-                return Path.GetFullPath(config);
-
-            throw new ConfigurationErrorsException($"Invalid models directory \"{config}\".");
-        }
 
         /// <summary>
         /// Gets a value indicating whether the whole models experience is enabled.
