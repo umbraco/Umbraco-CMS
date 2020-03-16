@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Composing;
 using Umbraco.Configuration;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
@@ -28,11 +29,6 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var configuration = serviceProvider.GetService<IConfiguration>();
 
             var configsFactory = new AspNetCoreConfigsFactory(configuration);
-            var configs = configsFactory.Create();
-
-            var settings = configs.GetConfig<IHealthChecksSettings>();
-
-
 
             services.CreateCompositionRoot(
                 httpContextAccessor,
@@ -51,15 +47,16 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             IHostApplicationLifetime hostApplicationLifetime,
             IConfigsFactory configsFactory)
         {
-            var configFactory = new ConfigsFactory();
-            var hostingSettings = configFactory.HostingSettings;
-            var coreDebug = configFactory.CoreDebugSettings;
-            var globalSettings = configFactory.GlobalSettings;
+            var configs = configsFactory.Create();
+
+            var hostingSettings = configs.Hosting();
+            var coreDebug = configs.CoreDebug();
+            var globalSettings = configs.Global();
 
             var hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment, httpContextAccessor, hostApplicationLifetime);
             var ioHelper = new IOHelper(hostingEnvironment, globalSettings);
             var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,  new AspNetCoreSessionIdResolver(httpContextAccessor), () => services.BuildServiceProvider().GetService<IRequestCache>(), coreDebug, ioHelper, new AspNetCoreMarchal());
-            var configs = configFactory.Create();
+
 
             var backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
             var profiler = new LogProfiler(logger);
