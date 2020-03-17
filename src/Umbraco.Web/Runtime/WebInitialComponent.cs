@@ -7,8 +7,6 @@ using System.Web.Http;
 using System.Web.Http.Dispatcher;
 using System.Web.Mvc;
 using System.Web.Routing;
-using ClientDependency.Core.CompositeFiles.Providers;
-using ClientDependency.Core.Config;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -16,7 +14,6 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Strings;
 using Umbraco.Core.IO;
 using Umbraco.Web.Install;
-using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 
@@ -63,13 +60,6 @@ namespace Umbraco.Web.Runtime
         {
             // setup mvc and webapi services
             SetupMvcAndWebApi();
-
-            // When using a non-web runtime and this component is loaded ClientDependency explodes because it'll
-            // want to access HttpContext.Current, which doesn't exist
-            if (_hostingEnvironment.IsHosted)
-            {
-                ConfigureClientDependency();
-            }
 
             // Disable the X-AspNetMvc-Version HTTP Header
             MvcHandler.DisableMvcResponseHeader = true;
@@ -127,40 +117,6 @@ namespace Umbraco.Web.Runtime
 
             GlobalConfiguration.Configuration.Services.Replace(typeof(IHttpControllerSelector),
                 new NamespaceHttpControllerSelector(GlobalConfiguration.Configuration));
-        }
-
-        private void ConfigureClientDependency()
-        {
-            // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
-            XmlFileMapper.FileMapDefaultFolder = Core.Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ClientDependency";
-            BaseCompositeFileProcessingProvider.UrlTypeDefault = CompositeUrlType.Base64QueryStrings;
-
-            // Now we need to detect if we are running 'Umbraco.Core.LocalTempStorage' as EnvironmentTemp and in that case we want to change the CDF file
-            // location to be there
-            if (_hostingSettings.LocalTempStorageLocation == LocalTempStorage.EnvironmentTemp)
-            {
-                var cachePath = _hostingEnvironment.LocalTempPath;
-
-                //set the file map and composite file default location to the %temp% location
-                BaseCompositeFileProcessingProvider.CompositeFilePathDefaultFolder
-                    = XmlFileMapper.FileMapDefaultFolder
-                    = Path.Combine(cachePath, "ClientDependency");
-            }
-
-            if (_settings.MaxQueryStringLength.HasValue || _settings.MaxRequestLength.HasValue)
-            {
-                //set the max url length for CDF to be the smallest of the max query length, max request length
-                ClientDependency.Core.CompositeFiles.CompositeDependencyHandler.MaxHandlerUrlLength = Math.Min(_settings.MaxQueryStringLength.GetValueOrDefault(), _settings.MaxRequestLength.GetValueOrDefault());
-            }
-
-            //Register a custom renderer - used to process property editor dependencies
-            var renderer = new DependencyPathRenderer();
-            renderer.Initialize("Umbraco.DependencyPathRenderer", new NameValueCollection
-            {
-                { "compositeFileHandlerPath", ClientDependencySettings.Instance.CompositeFileHandlerPath }
-            });
-
-            ClientDependencySettings.Instance.MvcRendererCollection.Add(renderer);
         }
 
         // internal for tests
