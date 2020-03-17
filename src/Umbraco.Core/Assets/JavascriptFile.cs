@@ -7,9 +7,9 @@ namespace Umbraco.Core.Assets
     /// <summary>
     /// Represents a JS asset file
     /// </summary>
-    public class JavascriptFile : AssetFile
+    public class JavaScriptFile : AssetFile
     {
-        public JavascriptFile(string filePath)
+        public JavaScriptFile(string filePath)
             : base(AssetType.Javascript)
         {
             FilePath = filePath;

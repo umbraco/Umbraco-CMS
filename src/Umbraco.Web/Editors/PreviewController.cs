@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
@@ -14,7 +13,6 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
 using Umbraco.Web.JavaScript;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Trees;
@@ -103,8 +101,8 @@ namespace Umbraco.Web.Editors
         [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
         public JavaScriptResult Application()
         {
-            var files = JsInitialization.OptimizeScriptFiles(HttpContext, JsInitialization.GetPreviewInitialization(), _runtimeMinifier);
-            var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco.preview", _globalSettings, _ioHelper);
+            var files = JavaScriptHelper.OptimizeScriptFiles(HttpContext, JavaScriptHelper.GetPreviewInitialization(), _runtimeMinifier);
+            var result = JavaScriptHelper.GetJavascriptInitialization(HttpContext, files, "umbraco.preview", _globalSettings, _ioHelper);
 
             return JavaScript(result);
         }
