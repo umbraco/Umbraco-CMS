@@ -7,6 +7,7 @@
         var contentPickerOpen = false;
 
         vm.page = {};        
+        
         vm.page.rootIcon = "icon-folder";
         vm.userGroup = {};
         vm.labels = {};

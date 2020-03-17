@@ -137,6 +137,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [UserGroupAuthorization("id")]
+        [Obsolete("This method is not recommended as it cause performance degradation with big users lists, use GetUserGroupPaginated")]
         public UserGroupDisplay GetUserGroup(int id)
         {
             var found = Services.UserService.GetUserGroupById(id);
@@ -147,7 +148,18 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
+        [UserGroupAuthorization("id")]
+        public UserGroupDisplay GetUserGroupPaginated(int id, int page)
+        {
+            var found = Services.UserService.GetUserGroupById(id);
+            if (found == null)
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            found.MaxUsers = 10;
+            found.UsersPage = page;
+            var display =  Mapper.Map<UserGroupDisplay>(found);
 
+            return display;
+        }
         [HttpPost]
         [HttpDelete]
         [UserGroupAuthorization("userGroupIds")]

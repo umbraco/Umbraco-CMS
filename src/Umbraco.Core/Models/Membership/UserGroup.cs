@@ -88,6 +88,9 @@ namespace Umbraco.Core.Models.Membership
             set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
+        public int MaxUsers { get; set; } = 0;
+        public int UsersPage { get; set; } = 0;
+
         /// <summary>
         /// The set of default permissions for the user group
         /// </summary>

@@ -20,6 +20,8 @@ namespace Umbraco.Core.Models.Membership
         /// </summary>
         string Name { get; set; }
 
+        int MaxUsers { get; set; }
+        int UsersPage { get; set; }
         /// <summary>
         /// The set of default permissions
         /// </summary>

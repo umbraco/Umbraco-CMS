@@ -87,6 +87,8 @@ namespace Umbraco.Web.Models.Mapping
             target.ClearAllowedSections();
             foreach (var section in source.Sections)
                 target.AddAllowedSection(section);
+            target.MaxUsers = 0;
+            target.UsersPage = 0;
         }
 
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
@@ -219,8 +221,16 @@ namespace Umbraco.Web.Models.Mapping
             MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
 
             //Important! Currently we are never mapping to multiple UserGroupDisplay objects but if we start doing that
-            // this will cause an N+1 and we'll need to change how this works.
-            var users = _userService.GetAllInGroup(source.Id);
+            // this will cause an N+1 and we'll need to change how this works..
+            IEnumerable<IUser> users;
+            if(source.MaxUsers == 0){
+                users = _userService.GetAllInGroup(source.Id);
+            }
+            else
+            {
+                 users = _userService.GetUsersInGroup(source.Id, source.UsersPage, source.MaxUsers, out long usersPages);
+                 target.UsersPages = usersPages;
+            }
             target.Users = context.MapEnumerable<IUser, UserBasic>(users);
 
             //Deal with assigned permissions:

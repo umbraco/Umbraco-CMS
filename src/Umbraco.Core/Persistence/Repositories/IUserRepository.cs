@@ -29,6 +29,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="groupId">Id of group</param>
         IEnumerable<IUser> GetAllInGroup(int groupId);
 
+        IEnumerable<IUser> GetUsersInGroup(int groupId, int page, int maxUsers, out long totalRecords);
         /// <summary>
         /// Gets a list of <see cref="IUser"/> objects not associated with a given group
         /// </summary>
@@ -91,5 +92,6 @@ namespace Umbraco.Core.Persistence.Repositories
         int ClearLoginSessions(int userId);
         int ClearLoginSessions(TimeSpan timespan);
         void ClearLoginSession(Guid sessionId);
+
     }
 }

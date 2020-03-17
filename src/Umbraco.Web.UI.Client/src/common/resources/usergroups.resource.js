@@ -63,7 +63,7 @@
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "userGroupsApiBaseUrl",
-                        "GetUserGroups",
+                        "GetUserGroupPaginated",
                         args)),
                 "Failed to retrieve user groups");
         }

@@ -15,6 +15,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "users")]
         public IEnumerable<UserBasic> Users { get; set; }
+        [DataMember(Name = "usersPages")]
+        public long UsersPages { get; set; }
 
         /// <summary>
         /// The default permissions for the user group organized by permission group name
