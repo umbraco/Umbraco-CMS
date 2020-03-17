@@ -10,6 +10,8 @@ using SixLabors.ImageSharp.Web.Middleware;
 using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 using SixLabors.Memory;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Website.AspNetCore
 {
@@ -17,24 +19,29 @@ namespace Umbraco.Web.Website.AspNetCore
     {
         public static IServiceCollection AddUmbracoWebsite(this IServiceCollection services)
         {
-            services.AddUmbracoImageSharp();
+            var serviceProvider = services.BuildServiceProvider();
+            var configs = serviceProvider.GetService<Configs>();
+            var imagingSettings = configs.Imaging();
+            services.AddUmbracoImageSharp(imagingSettings);
 
             return services;
         }
 
-        public static IServiceCollection AddUmbracoImageSharp(this IServiceCollection services)
+        public static IServiceCollection AddUmbracoImageSharp(this IServiceCollection services, IImagingSettings imagingSettings)
         {
+
+
             services.AddImageSharpCore(
                     options =>
                     {
                         options.Configuration = SixLabors.ImageSharp.Configuration.Default;
-                        options.MaxBrowserCacheDays = 7;
-                        options.MaxCacheDays = 365;
-                        options.CachedNameLength = 8;
+                        options.MaxBrowserCacheDays = imagingSettings.MaxBrowserCacheDays;
+                        options.MaxCacheDays = imagingSettings.MaxCacheDays;
+                        options.CachedNameLength = imagingSettings.CachedNameLength;
                         options.OnParseCommands = context =>
                         {
-                            RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Width, 5000);
-                            RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Height, 5000);
+                            RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Width, imagingSettings.MaxResizeWidth);
+                            RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Height, imagingSettings.MaxResizeHeight);
                         };
                         options.OnBeforeSave = _ => { };
                         options.OnProcessed = _ => { };
@@ -44,7 +51,7 @@ namespace Umbraco.Web.Website.AspNetCore
                 .SetMemoryAllocator(provider => ArrayPoolMemoryAllocator.CreateWithMinimalPooling())
                 .Configure<PhysicalFileSystemCacheOptions>(options =>
                 {
-                    options.CacheFolder = "../app_data/cache";
+                    options.CacheFolder = imagingSettings.CacheFolder;
                 })
                 .SetCache<PhysicalFileSystemCache>()
                 .SetCacheHash<CacheHash>()

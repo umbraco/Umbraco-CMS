@@ -10,6 +10,9 @@ namespace Umbraco.Core
     /// </summary>
     public static class ConfigsExtensions
     {
+
+        public static IImagingSettings Imaging(this Configs configs)
+            => configs.GetConfig<IImagingSettings>();
         public static IGlobalSettings Global(this Configs configs)
             => configs.GetConfig<IGlobalSettings>();
 

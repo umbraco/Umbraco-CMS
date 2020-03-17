@@ -17,6 +17,19 @@ namespace Umbraco.Web.BackOffice.AspNetCore
 {
     public static class UmbracoBackOfficeServiceCollectionExtensions
     {
+        public static IServiceCollection AddUmbracoConfiguration(this IServiceCollection services)
+        {
+            var serviceProvider = services.BuildServiceProvider();
+            var configuration = serviceProvider.GetService<IConfiguration>();
+            var configsFactory = new AspNetCoreConfigsFactory(configuration);
+
+            var configs = configsFactory.Create();
+
+            services.AddSingleton(configs);
+
+            return services;
+        }
+
         public static IServiceCollection AddUmbracoBackOffice(this IServiceCollection services)
         {
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -26,15 +39,13 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var httpContextAccessor = serviceProvider.GetService<IHttpContextAccessor>();
             var webHostEnvironment = serviceProvider.GetService<IWebHostEnvironment>();
             var hostApplicationLifetime = serviceProvider.GetService<IHostApplicationLifetime>();
-            var configuration = serviceProvider.GetService<IConfiguration>();
-
-            var configsFactory = new AspNetCoreConfigsFactory(configuration);
+            var configs = serviceProvider.GetService<Configs>();
 
             services.CreateCompositionRoot(
                 httpContextAccessor,
                 webHostEnvironment,
                 hostApplicationLifetime,
-                configsFactory);
+                configs);
 
             return services;
         }
@@ -45,10 +56,8 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             IHttpContextAccessor httpContextAccessor,
             IWebHostEnvironment webHostEnvironment,
             IHostApplicationLifetime hostApplicationLifetime,
-            IConfigsFactory configsFactory)
+            Configs configs)
         {
-            var configs = configsFactory.Create();
-
             var hostingSettings = configs.Hosting();
             var coreDebug = configs.CoreDebug();
             var globalSettings = configs.Global();
