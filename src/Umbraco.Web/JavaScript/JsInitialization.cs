@@ -3,14 +3,15 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using ClientDependency.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Assets;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Runtime;
 
 namespace Umbraco.Web.JavaScript
 {
@@ -21,10 +22,12 @@ namespace Umbraco.Web.JavaScript
     internal class JsInitialization : AssetInitialization
     {
         private readonly IManifestParser _parser;
+        private readonly IRuntimeMinifier _runtimeMinifier;
 
-        public JsInitialization(IManifestParser parser)
+        public JsInitialization(IManifestParser parser, IRuntimeMinifier runtimeMinifier) : base(runtimeMinifier)
         {
             _parser = parser;
+            _runtimeMinifier = runtimeMinifier;
         }
 
         // deal with javascript functions inside of json (not a supported json syntax)
@@ -86,9 +89,9 @@ namespace Umbraco.Web.JavaScript
                 foreach (var script in additionalJsFiles)
                     scripts.Add(script);
 
-            scripts = new HashSet<string>(OptimizeAssetCollection(scripts, ClientDependencyType.Javascript, httpContext));
+            scripts = new HashSet<string>(OptimizeAssetCollection(scripts, AssetType.Javascript, httpContext, _runtimeMinifier));
 
-            foreach (var script in ScanPropertyEditors(ClientDependencyType.Javascript, httpContext))
+            foreach (var script in ScanPropertyEditors(AssetType.Javascript, httpContext))
                 scripts.Add(script);
 
             return scripts.ToArray();
@@ -99,17 +102,18 @@ namespace Umbraco.Web.JavaScript
         /// </summary>
         /// <param name="httpContext"></param>
         /// <param name="scriptFiles"></param>
+        /// <param name="runtimeMinifier"></param>
         /// <returns></returns>
         /// <remarks>
         /// Used to cache bust and optimize script paths
         /// </remarks>
-        public static IEnumerable<string> OptimizeScriptFiles(HttpContextBase httpContext, IEnumerable<string> scriptFiles)
+        public static IEnumerable<string> OptimizeScriptFiles(HttpContextBase httpContext, IEnumerable<string> scriptFiles, IRuntimeMinifier runtimeMinifier)
         {
             var scripts = new HashSet<string>();
             foreach (var script in scriptFiles)
                 scripts.Add(script);
 
-            scripts = new HashSet<string>(OptimizeAssetCollection(scripts, ClientDependencyType.Javascript, httpContext));
+            scripts = new HashSet<string>(OptimizeAssetCollection(scripts, AssetType.Javascript, httpContext, runtimeMinifier));
 
             return scripts.ToArray();
         }
@@ -140,9 +144,9 @@ namespace Umbraco.Web.JavaScript
             return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString());
         }
 
-        internal static IEnumerable<string> OptimizeTinyMceScriptFiles(HttpContextBase httpContext)
+        internal static IEnumerable<string> OptimizeTinyMceScriptFiles(HttpContextBase httpContext, IRuntimeMinifier runtimeMinifier)
         {
-            return OptimizeScriptFiles(httpContext, GetTinyMceInitialization());
+            return OptimizeScriptFiles(httpContext, GetTinyMceInitialization(), runtimeMinifier);
         }
 
         /// <summary>

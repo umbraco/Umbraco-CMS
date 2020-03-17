@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
-using ClientDependency.Core;
+using Umbraco.Core.Assets;
 using Umbraco.Core.Manifest;
+using Umbraco.Core.Runtime;
 
 namespace Umbraco.Web.JavaScript
 {
     internal class CssInitialization : AssetInitialization
     {
         private readonly IManifestParser _parser;
+        private readonly IRuntimeMinifier _runtimeMinifier;
 
-        public CssInitialization(IManifestParser parser)
+        public CssInitialization(IManifestParser parser, IRuntimeMinifier runtimeMinifier) : base(runtimeMinifier)
         {
             _parser = parser;
+            _runtimeMinifier = runtimeMinifier;
         }
 
         /// <summary>
@@ -29,11 +32,11 @@ namespace Umbraco.Web.JavaScript
         public IEnumerable<string> GetStylesheetFiles(HttpContextBase httpContext)
         {
             var stylesheets = new HashSet<string>();
-            var optimizedManifest = OptimizeAssetCollection(_parser.Manifest.Stylesheets, ClientDependencyType.Css, httpContext);
+            var optimizedManifest = OptimizeAssetCollection(_parser.Manifest.Stylesheets, AssetType.Css, httpContext, _runtimeMinifier);
             foreach (var stylesheet in optimizedManifest)
                 stylesheets.Add(stylesheet);
 
-            foreach (var stylesheet in ScanPropertyEditors(ClientDependencyType.Css, httpContext))
+            foreach (var stylesheet in ScanPropertyEditors(AssetType.Css, httpContext))
                 stylesheets.Add(stylesheet);
 
             return stylesheets.ToArray();

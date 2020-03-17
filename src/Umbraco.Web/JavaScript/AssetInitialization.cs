@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Web;
-using ClientDependency.Core;
-using ClientDependency.Core.Config;
 using Umbraco.Core;
+using Umbraco.Core.Assets;
+using Umbraco.Core.Runtime;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PropertyEditors;
 
@@ -13,7 +12,14 @@ namespace Umbraco.Web.JavaScript
 {
     internal abstract class AssetInitialization
     {
-        protected IEnumerable<string> ScanPropertyEditors(ClientDependencyType assetType, HttpContextBase httpContext)
+        private readonly IRuntimeMinifier _runtimeMinifier;
+
+        public AssetInitialization(IRuntimeMinifier runtimeMinifier)
+        {
+            _runtimeMinifier = runtimeMinifier;
+        }
+
+        protected IEnumerable<string> ScanPropertyEditors(AssetType assetType, HttpContextBase httpContext)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
             var attributes = Current.PropertyEditors
@@ -22,14 +28,10 @@ namespace Umbraco.Web.JavaScript
                     .Select(x => x.DependencyFile)
                     .ToList();
 
-            var renderer = ClientDependencySettings.Instance.MvcRendererCollection["Umbraco.DependencyPathRenderer"];
-            renderer.RegisterDependencies(attributes, new HashSet<IClientDependencyPath>(), out var scripts, out var stylesheets, httpContext);
-
-            var toParse = assetType == ClientDependencyType.Javascript ? scripts : stylesheets;
-            return toParse.Split(new[] { DependencyPathRenderer.Delimiter }, StringSplitOptions.RemoveEmptyEntries);
+            return _runtimeMinifier.GetAssetPaths(assetType, attributes);
         }
 
-        internal static IEnumerable<string> OptimizeAssetCollection(IEnumerable<string> assets, ClientDependencyType assetType, HttpContextBase httpContext)
+        internal static IEnumerable<string> OptimizeAssetCollection(IEnumerable<string> assets, AssetType assetType, HttpContextBase httpContext, IRuntimeMinifier runtimeMinifier)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
 
@@ -42,24 +44,16 @@ namespace Umbraco.Web.JavaScript
                 // like lib/blah/blah.js so we need to turn them into absolutes here
                 if (x.StartsWith("/") == false && Uri.IsWellFormedUriString(x, UriKind.Relative))
                 {
-                    return new BasicFile(assetType) { FilePath = new Uri(requestUrl, x).AbsolutePath };
+                    return new AssetFile(assetType) { FilePath = new Uri(requestUrl, x).AbsolutePath };
                 }
 
-                return assetType == ClientDependencyType.Javascript
+                return assetType == AssetType.Javascript
                     ? new JavascriptFile(x)
-                    : (IClientDependencyFile) new CssFile(x);
+                    : (IAssetFile) new CssFile(x);
             }).ToList();
 
-            // get the output string for these registrations which will be processed by CDF correctly to stagger the output based
-            // on internal vs external resources. The output will be delimited based on our custom Umbraco.Web.UI.JavaScript.DependencyPathRenderer
-            var renderer = ClientDependencySettings.Instance.MvcRendererCollection["Umbraco.DependencyPathRenderer"];
-            renderer.RegisterDependencies(dependencies, new HashSet<IClientDependencyPath>(), out var scripts, out var stylesheets, httpContext);
 
-            var urls = assetType == ClientDependencyType.Javascript
-                ? scripts.Split(new[] { DependencyPathRenderer.Delimiter }, StringSplitOptions.RemoveEmptyEntries)
-                : stylesheets.Split(new[] { DependencyPathRenderer.Delimiter }, StringSplitOptions.RemoveEmptyEntries);
-
-            return urls;
+            return runtimeMinifier.GetAssetPaths(assetType, dependencies);;
         }
     }
 }

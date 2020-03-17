@@ -71,7 +71,7 @@ namespace Umbraco.Web.JavaScript
 
             foreach (var assetFile in attributes)
             {
-                if(!(assetFile is null))
+                if(!((AssetFile)assetFile is null))
                     dependencies.Add(MapAssetFile(assetFile));
             }
 
