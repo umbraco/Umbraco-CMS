@@ -2,7 +2,6 @@ using Umbraco.Configuration;
 using Umbraco.Configuration.Implementations;
 using Umbraco.Configuration.Legacy;
 using Umbraco.Core.Configuration.HealthChecks;
-using Umbraco.Core.Configuration.Implementations;
 using Umbraco.Core.Configuration.Legacy;
 using Umbraco.Core.Configuration.UmbracoSettings;
 
@@ -29,7 +28,7 @@ namespace Umbraco.Core.Configuration
         public IMemberPasswordConfiguration MemberPasswordConfigurationSettings { get; } = new MemberPasswordConfigurationSettings();
         public IContentSettings ContentSettings { get; } = new ContentSettings();
         public IGlobalSettings GlobalSettings { get; } = new GlobalSettings();
-        public IHealthChecksSettings HealthChecksSettingsSettings { get; } = new HealthChecksSettingsSettings();
+        public IHealthChecksSettings HealthChecksSettings { get; } = new HealthChecksSettings();
         public IConnectionStrings ConnectionStrings { get; } = new ConnectionStrings();
         public IModelsBuilderConfig ModelsBuilderConfig { get; } = new ModelsBuilderConfig();
 
@@ -39,7 +38,7 @@ namespace Umbraco.Core.Configuration
 
             configs.Add<IGlobalSettings>(() => GlobalSettings);
             configs.Add<IHostingSettings>(() => HostingSettings);
-            configs.Add<IHealthChecksSettings>(() => HealthChecksSettingsSettings);
+            configs.Add<IHealthChecksSettings>(() => HealthChecksSettings);
             configs.Add<ICoreDebugSettings>(() => CoreDebugSettings);
             configs.Add<IMachineKeyConfig>(() => MachineKeyConfig);
             configs.Add<IConnectionStrings>(() => ConnectionStrings);

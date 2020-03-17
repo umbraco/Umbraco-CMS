@@ -6,10 +6,10 @@ using Umbraco.Core.Configuration.HealthChecks;
 
 namespace Umbraco.Configuration.Models
 {
-    internal class HealthChecksSettingsSettings : IHealthChecksSettings
+    internal class HealthChecksSettings : IHealthChecksSettings
     {
         private readonly IConfiguration _configuration;
-        public HealthChecksSettingsSettings(IConfiguration configuration)
+        public HealthChecksSettings(IConfiguration configuration)
         {
             _configuration = configuration;
         }

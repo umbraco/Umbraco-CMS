@@ -29,7 +29,7 @@ namespace Umbraco.Configuration
             configs.Add<IMemberPasswordConfiguration>(() => new MemberPasswordConfigurationSettings(_configuration));
             configs.Add<IKeepAliveSettings>(() => new KeepAliveSettings(_configuration));
             configs.Add<IContentSettings>(() => new ContentSettings(_configuration));
-            configs.Add<IHealthChecksSettings>(() => new HealthChecksSettingsSettings(_configuration));
+            configs.Add<IHealthChecksSettings>(() => new HealthChecksSettings(_configuration));
             configs.Add<ILoggingSettings>(() => new LoggingSettings(_configuration));
             configs.Add<IExceptionFilterSettings>(() => new ExceptionFilterSettings(_configuration));
             configs.Add<IActiveDirectorySettings>(() => new ActiveDirectorySettings(_configuration));
