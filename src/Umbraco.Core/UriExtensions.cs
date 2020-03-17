@@ -40,7 +40,7 @@ namespace Umbraco.Core
         ///      But if we've got this far we'll just have to assume it's front-end anyways.
         ///
         ///  </remarks>
-        internal static bool IsBackOfficeRequest(this Uri url, string applicationPath, IGlobalSettings globalSettings, IIOHelper ioHelper)
+        internal static bool IsBackOfficeRequest(this Uri url, string applicationPath, IIOHelper ioHelper)
         {
             applicationPath = applicationPath ?? string.Empty;
 
@@ -53,7 +53,7 @@ namespace Umbraco.Core
             //if not, then def not back office
             if (isUmbracoPath == false) return false;
 
-            var mvcArea = globalSettings.GetUmbracoMvcArea(ioHelper);
+            var mvcArea = ioHelper.GetUmbracoMvcArea();
             //if its the normal /umbraco path
             if (urlPath.InvariantEquals("/" + mvcArea)
                 || urlPath.InvariantEquals("/" + mvcArea + "/"))

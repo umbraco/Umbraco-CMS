@@ -389,7 +389,7 @@ namespace Umbraco.Web.Editors
             if (defaultResponse == null) throw new ArgumentNullException("defaultResponse");
             if (externalSignInResponse == null) throw new ArgumentNullException("externalSignInResponse");
 
-            ViewData.SetUmbracoPath(GlobalSettings.GetUmbracoMvcArea(_ioHelper));
+            ViewData.SetUmbracoPath(_ioHelper.GetUmbracoMvcArea());
 
             //check if there is the TempData with the any token name specified, if so, assign to view bag and render the view
             if (ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||

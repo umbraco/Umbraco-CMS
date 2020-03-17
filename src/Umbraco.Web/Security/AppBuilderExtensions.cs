@@ -345,7 +345,7 @@ namespace Umbraco.Web.Security
                 CookieName = Constants.Security.BackOfficeExternalCookieName,
                 ExpireTimeSpan = TimeSpan.FromMinutes(5),
                 //Custom cookie manager so we can filter requests
-                CookieManager = new BackOfficeCookieManager(umbracoContextAccessor, runtimeState, globalSettings, ioHelper, requestCache),
+                CookieManager = new BackOfficeCookieManager(umbracoContextAccessor, runtimeState, ioHelper, requestCache),
                 CookiePath = "/",
                 CookieSecure = globalSettings.UseHttps ? CookieSecureOption.Always : CookieSecureOption.SameAsRequest,
                 CookieHttpOnly = true,
@@ -397,7 +397,7 @@ namespace Umbraco.Web.Security
             if (runtimeState.Level != RuntimeLevel.Run) return app;
 
             var authOptions = app.CreateUmbracoCookieAuthOptions(umbracoContextAccessor, globalSettings, runtimeState, securitySettings, ioHelper, requestCache);
-            app.Use(typeof(PreviewAuthenticationMiddleware),  authOptions, Current.Configs.Global(), ioHelper);
+            app.Use(typeof(PreviewAuthenticationMiddleware),  authOptions, ioHelper);
 
             // This middleware must execute at least on PostAuthentication, by default it is on Authorize
             // The middleware needs to execute after the RoleManagerModule executes which is during PostAuthenticate,

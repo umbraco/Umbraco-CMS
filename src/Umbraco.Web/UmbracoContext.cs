@@ -184,7 +184,7 @@ namespace Umbraco.Web
         {
             var request = GetRequestFromContext();
             if (request?.Url != null
-                && request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, _globalSettings, _ioHelper) == false
+                && request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, _ioHelper) == false
                 && Security.CurrentUser != null)
             {
                 var previewToken = _cookieManager.GetPreviewCookieValue(); // may be null or empty
