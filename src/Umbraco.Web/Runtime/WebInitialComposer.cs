@@ -42,15 +42,12 @@ using Umbraco.Web.SignalR;
 using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
-using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Examine;
 using Umbraco.Core.Models;
 using Umbraco.Core.Request;
 using Umbraco.Core.Session;
 using Umbraco.Web.AspNet;
-using Umbraco.Web.AspNet;
-using Umbraco.Web.JavaScript;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Runtime
@@ -130,7 +127,6 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
 
             composition.RegisterUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
-            composition.RegisterUnique<IRuntimeMinifier, ClientDependencyRuntimeMinifier>();
 
             composition.RegisterUnique<HtmlLocalLinkParser>();
             composition.RegisterUnique<HtmlUrlParser>();
