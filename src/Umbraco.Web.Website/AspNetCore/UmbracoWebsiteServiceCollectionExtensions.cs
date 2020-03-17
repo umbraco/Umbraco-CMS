@@ -17,6 +17,13 @@ namespace Umbraco.Web.Website.AspNetCore
     {
         public static IServiceCollection AddUmbracoWebsite(this IServiceCollection services)
         {
+            services.AddUmbracoImageSharp();
+
+            return services;
+        }
+
+        public static IServiceCollection AddUmbracoImageSharp(this IServiceCollection services)
+        {
             services.AddImageSharpCore(
                     options =>
                     {
@@ -37,8 +44,7 @@ namespace Umbraco.Web.Website.AspNetCore
                 .SetMemoryAllocator(provider => ArrayPoolMemoryAllocator.CreateWithMinimalPooling())
                 .Configure<PhysicalFileSystemCacheOptions>(options =>
                 {
-                    options.CacheFolder = "is-cache";
-
+                    options.CacheFolder = "../app_data/cache";
                 })
                 .SetCache<PhysicalFileSystemCache>()
                 .SetCacheHash<CacheHash>()
@@ -46,7 +52,6 @@ namespace Umbraco.Web.Website.AspNetCore
                 .AddProcessor<ResizeWebProcessor>()
                 .AddProcessor<FormatWebProcessor>()
                 .AddProcessor<BackgroundColorWebProcessor>();
-
 
             return services;
         }
@@ -66,23 +71,4 @@ namespace Umbraco.Web.Website.AspNetCore
         }
     }
 
-    public class UmbracoResizeWebProcessor : ResizeWebProcessor
-    {
-
-        public new FormattedImage Process(FormattedImage image, ILogger logger, IDictionary<string, string> commands)
-        {
-            if(commands.TryGetValue("width", out var command))
-            {
-                if (int.TryParse(command, out var width))
-                {
-                    if (width > 5000)
-                    {
-                        commands.Remove("width");
-                    }
-                }
-            }
-
-            return Process(image, logger, commands);
-        }
-    }
 }
