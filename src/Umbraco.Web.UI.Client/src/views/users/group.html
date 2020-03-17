@@ -155,7 +155,7 @@
                                     <div ng-if="!vm.loading" class="flex justify-center">
                                         <umb-pagination
                                             ng-if="vm.userGroup.usersPages"
-                                            page-number="vm.userGroup.currentUsersPage"
+                                            page-number="vm.userGroup.currentUsersPage+1"
                                             total-pages="vm.userGroup.usersPages"
                                             on-next="vm.changePageNumber"
                                             on-prev="vm.changePageNumber"

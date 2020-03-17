@@ -76,9 +76,10 @@
 
         }
         function changePageNumber(page) {
-       
+            vm.loading = true;
             userGroupsResource.getUserGroup($routeParams.id, page-1).then(function (userGroup) {
                 vm.userGroup = userGroup;
+                vm.loading = false;
             });
         }
         function save() {
