@@ -50,6 +50,7 @@ using Umbraco.Core.Request;
 using Umbraco.Core.Session;
 using Umbraco.Web.AspNet;
 using Umbraco.Web.AspNet;
+using Umbraco.Web.JavaScript;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Runtime
@@ -129,6 +130,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
 
             composition.RegisterUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
+            composition.RegisterUnique<IRuntimeMinifier, ClientDependencyRuntimeMinifier>();
 
             composition.RegisterUnique<HtmlLocalLinkParser>();
             composition.RegisterUnique<HtmlUrlParser>();

@@ -146,6 +146,7 @@
     <Compile Include="Composing\BuildManagerTypeFinder.cs" />
     <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
+    <Compile Include="JavaScript\ClientDependencyRuntimeMinifier.cs" />
     <Compile Include="Models\NoNodesViewModel.cs" />
     <Compile Include="Mvc\RenderNoContentController.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
@@ -193,6 +194,8 @@
     <Compile Include="Profiling\WebProfilingController.cs" />
     <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
+    <Compile Include="Runtime\ClientDependencyComponent.cs" />
+    <Compile Include="Runtime\ClientDependencyComposer.cs" />
     <Compile Include="Security\BackOfficeUserStore.cs" />
     <Compile Include="Security\BackOfficeUserValidator.cs" />
     <Compile Include="Security\ConfiguredPasswordValidator.cs" />
