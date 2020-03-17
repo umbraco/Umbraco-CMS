@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Web.Mvc;
 using ClientDependency.Core;
 using ClientDependency.Core.CompositeFiles;
 using ClientDependency.Core.Config;
 using Umbraco.Core.Assets;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Manifest;
 using Umbraco.Core.Runtime;
 
 namespace Umbraco.Web.JavaScript.CDF
@@ -13,13 +18,23 @@ namespace Umbraco.Web.JavaScript.CDF
     public class ClientDependencyRuntimeMinifier : IRuntimeMinifier
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IIOHelper _ioHelper;
+        private readonly ILogger _logger;
+        private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IManifestParser _manifestParser;
+        private readonly IGlobalSettings _globalSettings;
         private readonly HtmlHelper _htmlHelper;
 
         public string GetHashValue => ClientDependencySettings.Instance.Version.ToString();
 
-        public ClientDependencyRuntimeMinifier(IHttpContextAccessor httpContextAccessor)
+        public ClientDependencyRuntimeMinifier(IHttpContextAccessor httpContextAccessor, IIOHelper ioHelper, ILogger logger, IUmbracoVersion umbracoVersion, IManifestParser manifestParser, IGlobalSettings globalSettings)
         {
             _httpContextAccessor = httpContextAccessor;
+            _ioHelper = ioHelper;
+            _logger = logger;
+            _umbracoVersion = umbracoVersion;
+            _manifestParser = manifestParser;
+            _globalSettings = globalSettings;
             _htmlHelper = new HtmlHelper(new ViewContext(), new ViewPage());
         }
 
@@ -77,6 +92,41 @@ namespace Umbraco.Web.JavaScript.CDF
             var jsMinifier = new JSMin();
 
             return jsMinifier.Minify(reader);
+        }
+
+        public void Reset()
+        {
+            // Update ClientDependency version
+            var clientDependencyConfig = new ClientDependencyConfiguration(_logger, _ioHelper);
+            var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
+                _umbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
+            // Delete ClientDependency temp directories to make sure we get fresh caches
+            var clientDependencyTempFilesDeleted = clientDependencyConfig.ClearTempFiles(_httpContextAccessor.HttpContext);
+        }
+
+        public string GetScriptForBackOffice()
+        {
+            var initJs = new JsInitialization(_manifestParser, this);
+            var initCss = new CssInitialization(_manifestParser, this);
+
+            var httpContext = _httpContextAccessor.GetRequiredHttpContext();
+            var files = initJs.OptimizeBackOfficeScriptFiles(httpContext, JsInitialization.GetDefaultInitialization());
+            var result = JavaScriptHelper.GetJavascriptInitialization(httpContext, files, "umbraco", _globalSettings, _ioHelper);
+            result += initCss.GetStylesheetInitialization(httpContext);
+
+            return result;
+        }
+
+        public IEnumerable<string> GetAssetList()
+        {
+            var initJs = new JsInitialization(_manifestParser, this);
+            var initCss = new CssInitialization(_manifestParser, this);
+            var assets = new List<string>();
+            var httpContext = _httpContextAccessor.GetRequiredHttpContext();
+            assets.AddRange(initJs.OptimizeBackOfficeScriptFiles(httpContext, Enumerable.Empty<string>()));
+            assets.AddRange(initCss.GetStylesheetFiles(httpContext));
+
+            return assets;
         }
 
         private ClientDependencyType MapDependencyTypeValue(AssetType type)

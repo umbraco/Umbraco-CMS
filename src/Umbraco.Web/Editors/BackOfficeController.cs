@@ -243,12 +243,7 @@ namespace Umbraco.Web.Editors
         [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
         public JavaScriptResult Application()
         {
-            var initJs = new JsInitialization(_manifestParser, _runtimeMinifier);
-            var initCss = new CssInitialization(_manifestParser, _runtimeMinifier);
-
-            var files = initJs.OptimizeBackOfficeScriptFiles(HttpContext, JsInitialization.GetDefaultInitialization());
-            var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco", GlobalSettings, _ioHelper);
-            result += initCss.GetStylesheetInitialization(HttpContext);
+            var result = _runtimeMinifier.GetScriptForBackOffice();
 
             return JavaScript(result);
         }
@@ -263,11 +258,8 @@ namespace Umbraco.Web.Editors
         {
             JArray GetAssetList()
             {
-                var initJs = new JsInitialization(_manifestParser, _runtimeMinifier);
-                var initCss = new CssInitialization(_manifestParser, _runtimeMinifier);
-                var assets = new List<string>();
-                assets.AddRange(initJs.OptimizeBackOfficeScriptFiles(HttpContext, Enumerable.Empty<string>()));
-                assets.AddRange(initCss.GetStylesheetFiles(HttpContext));
+                var assets = _runtimeMinifier.GetAssetList();
+
                 return new JArray(assets);
             }
 

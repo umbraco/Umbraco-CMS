@@ -25,5 +25,8 @@ namespace Umbraco.Core.Runtime
         IEnumerable<string> GetAssetPaths(AssetType assetType, List<IAssetFile> attributes);
 
         string Minify(string src);
+        void Reset();
+        string GetScriptForBackOffice();
+        IEnumerable<string> GetAssetList();
     }
 }
