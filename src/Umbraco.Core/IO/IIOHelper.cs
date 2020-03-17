@@ -4,6 +4,9 @@ namespace Umbraco.Core.IO
 {
     public interface IIOHelper
     {
+
+        string BackOfficePath { get; }
+
         bool ForceNotHosted { get; set; }
 
         char DirSepChar { get; }

@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Linq;
 using System.Net.Mail;
 using System.Xml.Linq;
+using Umbraco.Composing;
 using Umbraco.Configuration;
 using Umbraco.Core.IO;
 
@@ -64,7 +65,6 @@ namespace Umbraco.Core.Configuration
     /// </summary>
     public class GlobalSettings : IGlobalSettings
     {
-        private readonly IIOHelper _ioHelper;
 
         // TODO these should not be static
         private static string _reservedPaths;
@@ -73,11 +73,6 @@ namespace Umbraco.Core.Configuration
         //ensure the built on (non-changeable) reserved paths are there at all times
         internal const string StaticReservedPaths = "~/app_plugins/,~/install/,~/mini-profiler-resources/,"; //must end with a comma!
         internal const string StaticReservedUrls = "~/config/splashes/noNodes.aspx,~/.well-known,"; //must end with a comma!
-
-        public GlobalSettings(IIOHelper ioHelper)
-        {
-            _ioHelper = ioHelper;
-        }
 
         /// <summary>
         /// Used in unit testing to reset all config items that were set with property setters (i.e. did not come from config)
@@ -203,15 +198,7 @@ namespace Umbraco.Core.Configuration
         /// Gets the path to umbraco's root directory (/umbraco by default).
         /// </summary>
         /// <value>The path.</value>
-        public string Path
-        {
-            get
-            {
-                return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.Path)
-                    ? _ioHelper.ResolveUrl(ConfigurationManager.AppSettings[Constants.AppSettings.Path])
-                    : string.Empty;
-            }
-        }
+        public string Path => ConfigurationManager.AppSettings[Constants.AppSettings.Path];
 
         /// <summary>
         /// Gets or sets the configuration status. This will return the version number of the currently installed umbraco instance.
@@ -227,7 +214,7 @@ namespace Umbraco.Core.Configuration
             }
             set
             {
-                SaveSetting(Constants.AppSettings.ConfigurationStatus, value, _ioHelper);
+                SaveSetting(Constants.AppSettings.ConfigurationStatus, value, Current.IOHelper); //TODO remove
             }
         }
 
@@ -254,7 +241,7 @@ namespace Umbraco.Core.Configuration
             ConfigurationManager.RefreshSection("appSettings");
         }
 
-  
+
         /// <summary>
         /// Gets the time out in minutes.
         /// </summary>

@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Configuration;
 using Umbraco.Core;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Tests.ModelsBuilder
 {
@@ -12,21 +12,21 @@ namespace Umbraco.Tests.ModelsBuilder
         [Test]
         public void Test1()
         {
-            var config = new ModelsBuilderConfig(TestHelper.IOHelper, modelsNamespace: "test1");
+            var config = new ModelsBuilderConfig(modelsNamespace: "test1");
             Assert.AreEqual("test1", config.ModelsNamespace);
         }
 
         [Test]
         public void Test2()
         {
-            var config = new ModelsBuilderConfig(TestHelper.IOHelper, modelsNamespace: "test2");
+            var config = new ModelsBuilderConfig(modelsNamespace: "test2");
             Assert.AreEqual("test2", config.ModelsNamespace);
         }
 
         [Test]
         public void DefaultModelsNamespace()
         {
-            var config = new ModelsBuilderConfig(TestHelper.IOHelper);
+            var config = new ModelsBuilderConfig();
             Assert.AreEqual(Constants.ModelsBuilder.DefaultModelsNamespace, config.ModelsNamespace);
         }
 
@@ -35,7 +35,7 @@ namespace Umbraco.Tests.ModelsBuilder
         [TestCase("c:/path/to/root", "c:/another/path/to/elsewhere", true, "c:\\another\\path\\to\\elsewhere")]
         public void GetModelsDirectoryTests(string root, string config, bool acceptUnsafe, string expected)
         {
-            Assert.AreEqual(expected, ModelsBuilderConfig.GetModelsDirectory(root, config, acceptUnsafe));
+            Assert.AreEqual(expected, ModelsBuilderConfigExtensions.GetModelsDirectory(root, config, acceptUnsafe));
         }
 
         [TestCase("c:/path/to/root", "~/../../dir/models", false)]
@@ -44,7 +44,7 @@ namespace Umbraco.Tests.ModelsBuilder
         {
             Assert.Throws<ConfigurationErrorsException>(() =>
             {
-                var modelsDirectory = ModelsBuilderConfig.GetModelsDirectory(root, config, acceptUnsafe);
+                var modelsDirectory = ModelsBuilderConfigExtensions.GetModelsDirectory(root, config, acceptUnsafe);
             });
         }
     }

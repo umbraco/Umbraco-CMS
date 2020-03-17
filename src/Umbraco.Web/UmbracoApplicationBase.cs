@@ -35,13 +35,14 @@ namespace Umbraco.Web
 
                 var hostingSettings = configFactory.HostingSettings;
                 var coreDebug = configFactory.CoreDebug;
+                var globalSettings = configFactory.GlobalSettings;
 
                 var hostingEnvironment = new AspNetHostingEnvironment(hostingSettings);
-                var ioHelper = new IOHelper(hostingEnvironment);
+                var ioHelper = new IOHelper(hostingEnvironment, globalSettings);
                 var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,  new AspNetSessionManager(), () => _factory?.GetInstance<IRequestCache>(), coreDebug, ioHelper, new FrameworkMarchal());
-                var configs = configFactory.Create(ioHelper, logger);
+                var configs = configFactory.Create();
 
-                var backOfficeInfo = new AspNetBackOfficeInfo(configs.Global(), ioHelper, logger, configFactory.WebRoutingSettings);
+                var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, logger, configFactory.WebRoutingSettings);
                 var profiler = new LogProfiler(logger);
                 Umbraco.Composing.Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
             }

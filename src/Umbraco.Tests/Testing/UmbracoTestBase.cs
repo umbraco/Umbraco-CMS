@@ -457,11 +457,16 @@ namespace Umbraco.Tests.Testing
                 .AddCoreMappers();
 
             Composition.RegisterUnique<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
+
+            var globalSettings = TestHelper.GetConfigs().Global();
+            var connectionStrings = TestHelper.GetConfigs().ConnectionStrings();
+
             Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(
                 Constants.System.UmbracoConnectionName,
+                globalSettings,
+                connectionStrings,
                 Logger,
                 new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>),
-                TestHelper.GetConfigs(),
                 TestHelper.DbProviderFactoryCreator));
             Composition.RegisterUnique(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 

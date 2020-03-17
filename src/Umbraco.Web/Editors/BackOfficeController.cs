@@ -104,8 +104,8 @@ namespace Umbraco.Web.Editors
         public async Task<ActionResult> Default()
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings,_ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings)),
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings)));
+                () => View(_ioHelper.BackOfficePath.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings,_ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings)),
+                () => View(_ioHelper.BackOfficePath.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings)));
         }
 
         [HttpGet]
@@ -188,7 +188,7 @@ namespace Umbraco.Web.Editors
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
                 //The default view to render when there is no external login info or errors
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings)),
+                () => View(_ioHelper.BackOfficePath.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings)),
                 //The ActionResult to perform if external login is successful
                 () => Redirect("/"));
         }
@@ -389,7 +389,7 @@ namespace Umbraco.Web.Editors
             if (defaultResponse == null) throw new ArgumentNullException("defaultResponse");
             if (externalSignInResponse == null) throw new ArgumentNullException("externalSignInResponse");
 
-            ViewData.SetUmbracoPath(GlobalSettings.GetUmbracoMvcArea(_ioHelper));
+            ViewData.SetUmbracoPath(_ioHelper.GetUmbracoMvcArea());
 
             //check if there is the TempData with the any token name specified, if so, assign to view bag and render the view
             if (ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||

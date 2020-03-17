@@ -88,7 +88,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            return View(_globalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
+            return View(_ioHelper.BackOfficePath.EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
         }
 
         /// <summary>

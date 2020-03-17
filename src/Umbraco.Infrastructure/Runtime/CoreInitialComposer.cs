@@ -1,12 +1,15 @@
 ﻿using System;
+using System.IO;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Migrations;
@@ -169,6 +172,9 @@ namespace Umbraco.Core.Runtime
             // will be injected in controllers when needed to invoke rest endpoints on Our
             composition.RegisterUnique<IInstallationService, InstallationService>();
             composition.RegisterUnique<IUpgradeService, UpgradeService>();
+
+            // Grid config is not a real config file as we know them
+            composition.RegisterUnique<IGridConfig, GridConfig>();
         }
     }
 }

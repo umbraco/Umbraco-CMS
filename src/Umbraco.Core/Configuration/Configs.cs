@@ -13,16 +13,8 @@ namespace Umbraco.Core.Configuration
     /// </remarks>
     public class Configs
     {
-        private readonly Func<string, object> _configSectionResolver;
-
-        public Configs(Func<string, object> configSectionResolver)
-        {
-            _configSectionResolver = configSectionResolver ?? throw new ArgumentNullException(nameof(configSectionResolver));
-        }
-
         private readonly Dictionary<Type, Lazy<object>> _configs = new Dictionary<Type, Lazy<object>>();
         private Dictionary<Type, Action<IRegister>> _registerings = new Dictionary<Type, Action<IRegister>>();
-        private Lazy<IFactory> _factory;
 
         /// <summary>
         /// Gets a configuration.
@@ -53,59 +45,13 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
-        /// Adds a configuration, provided by a factory.
-        /// </summary>
-        public void Add<TConfig>(Func<IFactory, TConfig> configFactory)
-            where TConfig : class
-        {
-            // make sure it is not too late
-            if (_registerings == null)
-                throw new InvalidOperationException("Configurations have already been registered.");
-
-            var typeOfConfig = typeof(TConfig);
-
-            _configs[typeOfConfig] = new Lazy<object>(() =>
-            {
-                if (!(_factory is null)) return _factory.Value.GetInstance<TConfig>();
-                throw new InvalidOperationException($"Cannot get configuration of type {typeOfConfig} during composition.");
-            });
-            _registerings[typeOfConfig] = register => register.Register(configFactory, Lifetime.Singleton);
-        }
-
-        /// <summary>
-        /// Adds a configuration, provided by a configuration section.
-        /// </summary>
-        public void Add<TConfig>(string sectionName)
-            where TConfig : class
-        {
-            Add(() => GetConfig<TConfig>(sectionName));
-        }
-
-        private TConfig GetConfig<TConfig>(string sectionName)
-            where TConfig : class
-        {
-            // note: need to use SafeCallContext here because ConfigurationManager.GetSection ends up getting AppDomain.Evidence
-            // which will want to serialize the call context including anything that is in there - what a mess!
-
-            using (new SafeCallContext())
-            {
-                if ((_configSectionResolver(sectionName) is TConfig config))
-                    return config;
-                var ex = new InvalidOperationException($"Could not get configuration section \"{sectionName}\" from config files.");
-                throw ex;
-            }
-        }
-
-        /// <summary>
         /// Registers configurations in a register.
         /// </summary>
-        public void RegisterWith(IRegister register, Func<IFactory> factory)
+        public void RegisterWith(IRegister register)
         {
             // do it only once
             if (_registerings == null)
                 throw new InvalidOperationException("Configurations have already been registered.");
-
-            _factory = new Lazy<IFactory>(factory);
 
             register.Register(this);
 

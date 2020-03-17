@@ -17,7 +17,5 @@ namespace Umbraco.Core.Manifest
         /// Parses a manifest.
         /// </summary>
         PackageManifest ParseManifest(string text);
-
-        IEnumerable<GridEditor> ParseGridEditors(string text);
     }
 }

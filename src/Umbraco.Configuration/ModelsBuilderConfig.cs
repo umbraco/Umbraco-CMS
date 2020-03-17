@@ -13,7 +13,7 @@ namespace Umbraco.Configuration
     /// </summary>
     public class ModelsBuilderConfig : IModelsBuilderConfig
     {
-        private readonly IIOHelper _ioHelper;
+
         private const string Prefix = "Umbraco.ModelsBuilder.";
         private object _modelsModelLock;
         private bool _modelsModelConfigured;
@@ -23,15 +23,13 @@ namespace Umbraco.Configuration
         private bool _flagOutOfDateModels;
 
 
-        public string DefaultModelsDirectory => _ioHelper.MapPath("~/App_Data/Models");
+        public string DefaultModelsDirectory => "~/App_Data/Models";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ModelsBuilderConfig"/> class.
         /// </summary>
-        public ModelsBuilderConfig(IIOHelper ioHelper)
+        public ModelsBuilderConfig()
         {
-            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
-
             // giant kill switch, default: false
             // must be explicitely set to true for anything else to happen
             Enable = ConfigurationManager.AppSettings[Prefix + "Enable"] == "true";
@@ -59,12 +57,8 @@ namespace Umbraco.Configuration
             value = ConfigurationManager.AppSettings[Prefix + "ModelsDirectory"];
             if (!string.IsNullOrWhiteSpace(value))
             {
-                var root = _ioHelper.MapPath("~/");
-                if (root == null)
-                    throw new ConfigurationErrorsException("Could not determine root directory.");
-
                 // GetModelsDirectory will ensure that the path is safe
-                ModelsDirectory = GetModelsDirectory(root, value, AcceptUnsafeModelsDirectory);
+                ModelsDirectory = value;
             }
 
             // default: 0
@@ -81,7 +75,7 @@ namespace Umbraco.Configuration
         /// <summary>
         /// Initializes a new instance of the <see cref="ModelsBuilderConfig"/> class.
         /// </summary>
-        public ModelsBuilderConfig(IIOHelper ioHelper,
+        public ModelsBuilderConfig(
             bool enable = false,
             ModelsMode modelsMode = ModelsMode.Nothing,
             string modelsNamespace = null,
@@ -91,7 +85,6 @@ namespace Umbraco.Configuration
             bool acceptUnsafeModelsDirectory = false,
             int debugLevel = 0)
         {
-            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             Enable = enable;
             _modelsMode = modelsMode;
 
@@ -103,36 +96,7 @@ namespace Umbraco.Configuration
             DebugLevel = debugLevel;
         }
 
-        // internal for tests
-        internal static string GetModelsDirectory(string root, string config, bool acceptUnsafe)
-        {
-            // making sure it is safe, ie under the website root,
-            // unless AcceptUnsafeModelsDirectory and then everything is OK.
 
-            if (!Path.IsPathRooted(root))
-                throw new ConfigurationErrorsException($"Root is not rooted \"{root}\".");
-
-            if (config.StartsWith("~/"))
-            {
-                var dir = Path.Combine(root, config.TrimStart("~/"));
-
-                // sanitize - GetFullPath will take care of any relative
-                // segments in path, eg '../../foo.tmp' - it may throw a SecurityException
-                // if the combined path reaches illegal parts of the filesystem
-                dir = Path.GetFullPath(dir);
-                root = Path.GetFullPath(root);
-
-                if (!dir.StartsWith(root) && !acceptUnsafe)
-                    throw new ConfigurationErrorsException($"Invalid models directory \"{config}\".");
-
-                return dir;
-            }
-
-            if (acceptUnsafe)
-                return Path.GetFullPath(config);
-
-            throw new ConfigurationErrorsException($"Invalid models directory \"{config}\".");
-        }
 
         /// <summary>
         /// Gets a value indicating whether the whole models experience is enabled.
