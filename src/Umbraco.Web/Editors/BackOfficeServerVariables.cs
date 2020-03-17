@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Web;
 using System.Web.Mvc;
-using ClientDependency.Core.Config;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -20,6 +19,7 @@ using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
+using Umbraco.Core.Runtime;
 
 namespace Umbraco.Web.Editors
 {
@@ -39,6 +39,7 @@ namespace Umbraco.Web.Editors
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeSettings _settings;
+        private readonly IRuntimeMinifier _runtimeMinifier;
 
         internal BackOfficeServerVariables(
             UrlHelper urlHelper,
@@ -51,7 +52,8 @@ namespace Umbraco.Web.Editors
             TreeCollection treeCollection,
             IHttpContextAccessor httpContextAccessor,
             IHostingEnvironment hostingEnvironment,
-            IRuntimeSettings settings)
+            IRuntimeSettings settings,
+            IRuntimeMinifier runtimeMinifier)
         {
             _urlHelper = urlHelper;
             _runtimeState = runtimeState;
@@ -64,6 +66,7 @@ namespace Umbraco.Web.Editors
             _httpContextAccessor = httpContextAccessor;
             _hostingEnvironment = hostingEnvironment;
             _settings = settings;
+            _runtimeMinifier = runtimeMinifier;
         }
 
         /// <summary>
@@ -472,7 +475,7 @@ namespace Umbraco.Web.Editors
             var version = _runtimeState.SemanticVersion.ToSemanticString();
 
             //the value is the hash of the version, cdf version and the configured state
-            app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{ClientDependencySettings.Instance.Version}".GenerateHash());
+            app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{_runtimeMinifier.Version}".GenerateHash());
 
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
             app.Add("applicationPath", _httpContextAccessor.GetRequiredHttpContext().Request.ApplicationPath.EnsureEndsWith('/'));

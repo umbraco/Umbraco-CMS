@@ -110,14 +110,14 @@
         on-login="hideLoginScreen()">
     </umb-login>
 
-    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewData.GetUmbracoPath() }), Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.UmbracoSettingsSection, Model.IOHelper, Model.TreeCollection, Model.HttpContextAccessor, Model.HostingEnvironment, Model.RuntimeSettings)
+    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewData.GetUmbracoPath() }), Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.UmbracoSettingsSection, Model.IOHelper, Model.TreeCollection, Model.HttpContextAccessor, Model.HostingEnvironment, Model.RuntimeSettings, Current.RuntimeMinifier)
 
     <script>
 
         document.angularReady = function(app) {
             @Html.AngularValueExternalLoginInfoScript(ViewData.GetExternalSignInError())
             @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
-            @Html.AngularValueTinyMceAssets()
+            @Html.AngularValueTinyMceAssets(Current.RuntimeMinifier)
 
             //required for the noscript trick
             document.getElementById("mainwrapper").style.display = "inherit";

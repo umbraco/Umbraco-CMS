@@ -7,6 +7,7 @@ using Microsoft.Owin.Security;
 using Newtonsoft.Json;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
+using Umbraco.Core.Runtime;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
@@ -40,9 +41,9 @@ namespace Umbraco.Web
         /// These are the bare minimal server variables that are required for the application to start without being authenticated,
         /// we will load the rest of the server vars after the user is authenticated.
         /// </remarks>
-        public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, TreeCollection treeCollection, IHttpContextAccessor httpContextAccessor, IHostingEnvironment hostingEnvironment, IRuntimeSettings settings)
+        public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, TreeCollection treeCollection, IHttpContextAccessor httpContextAccessor, IHostingEnvironment hostingEnvironment, IRuntimeSettings settings, IRuntimeMinifier runtimeMinifier)
         {
-            var serverVars = new BackOfficeServerVariables(uri, Current.RuntimeState, features, globalSettings, umbracoVersion, umbracoSettingsSection, ioHelper, treeCollection, httpContextAccessor, hostingEnvironment, settings);
+            var serverVars = new BackOfficeServerVariables(uri, Current.RuntimeState, features, globalSettings, umbracoVersion, umbracoSettingsSection, ioHelper, treeCollection, httpContextAccessor, hostingEnvironment, settings, runtimeMinifier);
             var minVars = serverVars.BareMinimumServerVariables();
 
             var str = @"<script type=""text/javascript"">
@@ -126,10 +127,10 @@ namespace Umbraco.Web
             return html.Raw(sb.ToString());
         }
 
-        public static IHtmlString AngularValueTinyMceAssets(this HtmlHelper html)
+        public static IHtmlString AngularValueTinyMceAssets(this HtmlHelper html, IRuntimeMinifier runtimeMinifier)
         {
             var ctx = new HttpContextWrapper(HttpContext.Current);
-            var files = JsInitialization.OptimizeTinyMceScriptFiles(ctx);
+            var files = JsInitialization.OptimizeTinyMceScriptFiles(ctx, runtimeMinifier);
 
             var sb = new StringBuilder();
 

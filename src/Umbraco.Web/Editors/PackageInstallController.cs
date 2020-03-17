@@ -16,6 +16,7 @@ using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Net;
@@ -41,6 +42,7 @@ namespace Umbraco.Web.Editors
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IIOHelper _ioHelper;
         private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
+        private readonly IRuntimeMinifier _runtimeMinifier;
 
         public PackageInstallController(
             IGlobalSettings globalSettings,
@@ -55,12 +57,14 @@ namespace Umbraco.Web.Editors
             UmbracoMapper umbracoMapper,
             IIOHelper ioHelper,
             IPublishedUrlProvider publishedUrlProvider,
-            IUmbracoApplicationLifetime umbracoApplicationLifetime)
+            IUmbracoApplicationLifetime umbracoApplicationLifetime,
+            IRuntimeMinifier runtimeMinifier)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _umbracoVersion = umbracoVersion;
             _ioHelper = ioHelper;
             _umbracoApplicationLifetime = umbracoApplicationLifetime;
+            _runtimeMinifier = runtimeMinifier;
         }
 
         /// <summary>
@@ -381,7 +385,7 @@ namespace Umbraco.Web.Editors
             zipFile.Delete();
 
             //bump cdf to be safe
-            var clientDependencyConfig = new ClientDependencyConfiguration(Logger, _ioHelper);
+            var clientDependencyConfig = new ClientDependencyConfiguration(Logger, _ioHelper, _runtimeMinifier);
             var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
                 _umbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
 

@@ -9,6 +9,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Cookie;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
+using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
@@ -37,6 +38,7 @@ namespace Umbraco.Web.Editors
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
         private IRuntimeSettings _runtimeSettings;
+        private readonly IRuntimeMinifier _runtimeMinifier;
 
         public PreviewController(
             UmbracoFeatures features,
@@ -51,7 +53,8 @@ namespace Umbraco.Web.Editors
             IHttpContextAccessor httpContextAccessor,
             IHostingEnvironment hostingEnvironment,
             ICookieManager cookieManager,
-            IRuntimeSettings settings)
+            IRuntimeSettings settings,
+            IRuntimeMinifier runtimeMinifier)
         {
             _features = features;
             _globalSettings = globalSettings;
@@ -66,6 +69,7 @@ namespace Umbraco.Web.Editors
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
             _runtimeSettings = settings;
+            _runtimeMinifier = runtimeMinifier;
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
@@ -96,7 +100,7 @@ namespace Umbraco.Web.Editors
         [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
         public JavaScriptResult Application()
         {
-            var files = JsInitialization.OptimizeScriptFiles(HttpContext, JsInitialization.GetPreviewInitialization());
+            var files = JsInitialization.OptimizeScriptFiles(HttpContext, JsInitialization.GetPreviewInitialization(), _runtimeMinifier);
             var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco.preview", _globalSettings, _ioHelper);
 
             return JavaScript(result);

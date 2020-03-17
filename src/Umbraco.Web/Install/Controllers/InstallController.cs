@@ -5,6 +5,7 @@ using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Runtime;
 using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
@@ -27,8 +28,17 @@ namespace Umbraco.Web.Install.Controllers
         private readonly IGlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IIOHelper _ioHelper;
+        private readonly IRuntimeMinifier _runtimeMinifier;
 
-        public InstallController(IUmbracoContextAccessor umbracoContextAccessor, InstallHelper installHelper, IRuntimeState runtime, ILogger logger, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper)
+        public InstallController(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            InstallHelper installHelper,
+            IRuntimeState runtime,
+            ILogger logger,
+            IGlobalSettings globalSettings,
+            IUmbracoVersion umbracoVersion,
+            IIOHelper ioHelper,
+            IRuntimeMinifier runtimeMinifier)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _installHelper = installHelper;
@@ -37,6 +47,7 @@ namespace Umbraco.Web.Install.Controllers
             _globalSettings = globalSettings;
             _umbracoVersion = umbracoVersion;
             _ioHelper = ioHelper;
+            _runtimeMinifier = runtimeMinifier;
         }
 
         [HttpGet]
@@ -49,7 +60,7 @@ namespace Umbraco.Web.Install.Controllers
             if (_runtime.Level == RuntimeLevel.Upgrade)
             {
                 // Update ClientDependency version
-                var clientDependencyConfig = new ClientDependencyConfiguration(_logger, _ioHelper);
+                var clientDependencyConfig = new ClientDependencyConfiguration(_logger, _ioHelper, _runtimeMinifier);
                 var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
                     _umbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
                 // Delete ClientDependency temp directories to make sure we get fresh caches

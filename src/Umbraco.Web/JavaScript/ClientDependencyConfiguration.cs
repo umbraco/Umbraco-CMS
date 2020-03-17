@@ -12,6 +12,7 @@ using Semver;
 using Umbraco.Core.IO;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Runtime;
 
 namespace Umbraco.Web.JavaScript
 {
@@ -21,12 +22,14 @@ namespace Umbraco.Web.JavaScript
     public class ClientDependencyConfiguration
     {
         private readonly ILogger _logger;
+        private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly string _fileName;
 
-        public ClientDependencyConfiguration(ILogger logger, IIOHelper ioHelper)
+        public ClientDependencyConfiguration(ILogger logger, IIOHelper ioHelper, IRuntimeMinifier runtimeMinifier)
         {
             if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;
+            _runtimeMinifier = runtimeMinifier;
             _fileName = ioHelper.MapPath(string.Format("{0}/ClientDependency.config", Core.Constants.SystemDirectories.Config));
         }
 
@@ -108,9 +111,9 @@ namespace Umbraco.Web.JavaScript
 
             try
             {
-                var fullPath = XmlFileMapper.FileMapDefaultFolder.StartsWith("~/")
-                    ? currentHttpContext.Server.MapPath(XmlFileMapper.FileMapDefaultFolder)
-                    : XmlFileMapper.FileMapDefaultFolder;
+                var fullPath = _runtimeMinifier.FileMapDefaultFolder.StartsWith("~/")
+                    ? currentHttpContext.Server.MapPath(_runtimeMinifier.FileMapDefaultFolder)
+                    : _runtimeMinifier.FileMapDefaultFolder;
                 if (fullPath != null)
                 {
                     cdfTempDirectories.Add(fullPath);

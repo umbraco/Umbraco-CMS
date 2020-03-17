@@ -29,6 +29,7 @@ using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
+using Umbraco.Core.Runtime;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Editors
@@ -54,6 +55,7 @@ namespace Umbraco.Web.Editors
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IRuntimeSettings _runtimeSettings;
+        private readonly IRuntimeMinifier _runtimeMinifier;
 
         public BackOfficeController(
             IManifestParser manifestParser,
@@ -71,7 +73,8 @@ namespace Umbraco.Web.Editors
             TreeCollection treeCollection,
             IHostingEnvironment hostingEnvironment,
             IHttpContextAccessor httpContextAccessor,
-            IRuntimeSettings settings)
+            IRuntimeSettings settings,
+            IRuntimeMinifier runtimeMinifier)
             : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
 
         {
@@ -86,6 +89,7 @@ namespace Umbraco.Web.Editors
             _hostingEnvironment = hostingEnvironment;
             _httpContextAccessor = httpContextAccessor;
             _runtimeSettings = settings;
+            _runtimeMinifier = runtimeMinifier;
         }
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
@@ -236,8 +240,8 @@ namespace Umbraco.Web.Editors
         [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
         public JavaScriptResult Application()
         {
-            var initJs = new JsInitialization(_manifestParser);
-            var initCss = new CssInitialization(_manifestParser);
+            var initJs = new JsInitialization(_manifestParser, _runtimeMinifier);
+            var initCss = new CssInitialization(_manifestParser, _runtimeMinifier);
 
             var files = initJs.OptimizeBackOfficeScriptFiles(HttpContext, JsInitialization.GetDefaultInitialization());
             var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco", GlobalSettings, _ioHelper);
@@ -256,8 +260,8 @@ namespace Umbraco.Web.Editors
         {
             JArray GetAssetList()
             {
-                var initJs = new JsInitialization(_manifestParser);
-                var initCss = new CssInitialization(_manifestParser);
+                var initJs = new JsInitialization(_manifestParser, _runtimeMinifier);
+                var initCss = new CssInitialization(_manifestParser, _runtimeMinifier);
                 var assets = new List<string>();
                 assets.AddRange(initJs.OptimizeBackOfficeScriptFiles(HttpContext, Enumerable.Empty<string>()));
                 assets.AddRange(initCss.GetStylesheetFiles(HttpContext));
@@ -292,7 +296,7 @@ namespace Umbraco.Web.Editors
         [MinifyJavaScriptResult(Order = 1)]
         public JavaScriptResult ServerVariables()
         {
-            var serverVars = new BackOfficeServerVariables(Url, _runtimeState, _features, GlobalSettings, _umbracoVersion, _umbracoSettingsSection, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings);
+            var serverVars = new BackOfficeServerVariables(Url, _runtimeState, _features, GlobalSettings, _umbracoVersion, _umbracoSettingsSection, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _runtimeMinifier);
 
             //cache the result if debugging is disabled
             var result = _hostingEnvironment.IsDebugMode
