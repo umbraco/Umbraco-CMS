@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Strings
         [TestCase("WhoIsNumber6InTheVillage", "Who Is Number6 In The Village")] // issue is fixed
         public void CompatibleDefaultReplacement(string input, string expected)
         {
-            var helper = new DefaultShortStringHelper(SettingsForTests.GetDefaultUmbracoSettings());
+            var helper = new DefaultShortStringHelper(SettingsForTests.GenerateMockRequestHandlerSettings());
             var output = input.Length < 2 ? input : helper.SplitPascalCasing(input, ' ').ToFirstUpperInvariant();
             Assert.AreEqual(expected, output);
         }

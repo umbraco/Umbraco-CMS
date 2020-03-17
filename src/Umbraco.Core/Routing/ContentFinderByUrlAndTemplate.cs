@@ -17,15 +17,16 @@ namespace Umbraco.Web.Routing
     public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
     {
         private readonly IFileService _fileService;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
-        private readonly IContentTypeService _contentTypeService;
 
-        public ContentFinderByUrlAndTemplate(ILogger logger, IFileService fileService, IUmbracoSettingsSection umbracoSettingsSection, IContentTypeService contentTypeService)
+        private readonly IContentTypeService _contentTypeService;
+        private readonly IWebRoutingSettings _webRoutingSettings;
+
+        public ContentFinderByUrlAndTemplate(ILogger logger, IFileService fileService, IContentTypeService contentTypeService, IWebRoutingSettings webRoutingSettings)
             : base(logger)
         {
             _fileService = fileService;
-            _umbracoSettingsSection = umbracoSettingsSection;
             _contentTypeService = contentTypeService;
+            _webRoutingSettings = webRoutingSettings;
         }
 
         /// <summary>
@@ -75,7 +76,7 @@ namespace Umbraco.Web.Routing
             }
 
             // IsAllowedTemplate deals both with DisableAlternativeTemplates and ValidateAlternativeTemplates settings
-            if (!node.IsAllowedTemplate(_contentTypeService, _umbracoSettingsSection, template.Id))
+            if (!node.IsAllowedTemplate(_contentTypeService, _webRoutingSettings, template.Id))
             {
                 Logger.Warn<ContentFinderByUrlAndTemplate>("Alternative template '{TemplateAlias}' is not allowed on node {NodeId}.", template.Alias, node.Id);
                 frequest.PublishedContent = null; // clear

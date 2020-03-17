@@ -17,13 +17,13 @@ namespace Umbraco.Web.Editors
     public class ImagesController : UmbracoAuthorizedApiController
     {
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly IContentSection _contentSection;
+        private readonly IContentSettings _contentSettings;
         private readonly IImageUrlGenerator _imageUrlGenerator;
 
-        public ImagesController(IMediaFileSystem mediaFileSystem, IContentSection contentSection, IImageUrlGenerator imageUrlGenerator)
+        public ImagesController(IMediaFileSystem mediaFileSystem, IContentSettings contentSettings, IImageUrlGenerator imageUrlGenerator)
         {
             _mediaFileSystem = mediaFileSystem;
-            _contentSection = contentSection;
+            _contentSettings = contentSettings;
             _imageUrlGenerator = imageUrlGenerator;
         }
 
@@ -56,7 +56,7 @@ namespace Umbraco.Web.Editors
             var ext = Path.GetExtension(imagePath);
 
             // we need to check if it is an image by extension
-            if (_contentSection.IsImageFile(ext) == false)
+            if (_contentSettings.IsImageFile(ext) == false)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
 
             //redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file

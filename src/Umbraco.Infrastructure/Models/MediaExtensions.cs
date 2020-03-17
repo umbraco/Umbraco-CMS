@@ -27,9 +27,9 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the urls of a media item.
         /// </summary>
-        public static string[] GetUrls(this IMedia media, IContentSection contentSection, MediaUrlGeneratorCollection mediaUrlGenerators)
+        public static string[] GetUrls(this IMedia media, IContentSettings contentSettings, MediaUrlGeneratorCollection mediaUrlGenerators)
         {
-            return contentSection.ImageAutoFillProperties
+            return contentSettings.ImageAutoFillProperties
                 .Select(field => media.GetUrl(field.Alias, mediaUrlGenerators))
                 .Where(link => string.IsNullOrWhiteSpace(link) == false)
                 .ToArray();

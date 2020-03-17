@@ -31,13 +31,14 @@ namespace Umbraco.Web.Editors
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizationService _localizationService;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IContentSettings _contentSettings;
         private readonly IIOHelper _ioHelper;
         private readonly TreeCollection _treeCollection;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
         private IRuntimeSettings _runtimeSettings;
+        private readonly ISecuritySettings _securitySettings;
         private readonly IRuntimeMinifier _runtimeMinifier;
 
         public PreviewController(
@@ -47,13 +48,14 @@ namespace Umbraco.Web.Editors
             IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizationService localizationService,
             IUmbracoVersion umbracoVersion,
-            IUmbracoSettingsSection umbracoSettingsSection,
+            IContentSettings contentSettings,
             IIOHelper ioHelper,
             TreeCollection treeCollection,
             IHttpContextAccessor httpContextAccessor,
             IHostingEnvironment hostingEnvironment,
             ICookieManager cookieManager,
             IRuntimeSettings settings,
+            ISecuritySettings securitySettings,
             IRuntimeMinifier runtimeMinifier)
         {
             _features = features;
@@ -62,13 +64,14 @@ namespace Umbraco.Web.Editors
             _umbracoContextAccessor = umbracoContextAccessor;
             _localizationService = localizationService;
             _umbracoVersion = umbracoVersion;
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _treeCollection = treeCollection;
             _httpContextAccessor = httpContextAccessor;
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
             _runtimeSettings = settings;
+            _securitySettings = securitySettings;
             _runtimeMinifier = runtimeMinifier;
         }
 
@@ -78,7 +81,7 @@ namespace Umbraco.Web.Editors
         {
             var availableLanguages = _localizationService.GetAllLanguages();
 
-            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _umbracoSettingsSection, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings);
+            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _contentSettings, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {

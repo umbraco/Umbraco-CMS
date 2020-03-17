@@ -5,21 +5,21 @@ namespace Umbraco.Core.Configuration
 {
     public abstract class PasswordConfiguration : IPasswordConfiguration
     {
-        protected PasswordConfiguration(IPasswordConfigurationSection configSection)
+        protected PasswordConfiguration(IPasswordConfiguration configSettings)
         {
-            if (configSection == null)
+            if (configSettings == null)
             {
-                throw new ArgumentNullException(nameof(configSection));
+                throw new ArgumentNullException(nameof(configSettings));
             }
 
-            RequiredLength = configSection.RequiredLength;
-            RequireNonLetterOrDigit = configSection.RequireNonLetterOrDigit;
-            RequireDigit = configSection.RequireDigit;
-            RequireLowercase = configSection.RequireLowercase;
-            RequireUppercase = configSection.RequireUppercase;
-            UseLegacyEncoding = configSection.UseLegacyEncoding;
-            HashAlgorithmType = configSection.HashAlgorithmType;
-            MaxFailedAccessAttemptsBeforeLockout = configSection.MaxFailedAccessAttemptsBeforeLockout;
+            RequiredLength = configSettings.RequiredLength;
+            RequireNonLetterOrDigit = configSettings.RequireNonLetterOrDigit;
+            RequireDigit = configSettings.RequireDigit;
+            RequireLowercase = configSettings.RequireLowercase;
+            RequireUppercase = configSettings.RequireUppercase;
+            UseLegacyEncoding = configSettings.UseLegacyEncoding;
+            HashAlgorithmType = configSettings.HashAlgorithmType;
+            MaxFailedAccessAttemptsBeforeLockout = configSettings.MaxFailedAccessAttemptsBeforeLockout;
         }
 
         public int RequiredLength { get; }

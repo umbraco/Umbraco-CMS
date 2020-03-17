@@ -24,14 +24,15 @@ namespace Umbraco.Web.Routing
     {
         private const string _eventStateKey = "Umbraco.Web.Redirects.RedirectTrackingEventHandler";
 
-        private readonly IUmbracoSettingsSection _umbracoSettings;
+
+        private readonly IWebRoutingSettings _webRoutingSettings;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IRedirectUrlService _redirectUrlService;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
-        public RedirectTrackingComponent(IUmbracoSettingsSection umbracoSettings, IPublishedSnapshotAccessor publishedSnapshotAccessor, IRedirectUrlService redirectUrlService, IVariationContextAccessor variationContextAccessor)
+        public RedirectTrackingComponent(IWebRoutingSettings webRoutingSettings, IPublishedSnapshotAccessor publishedSnapshotAccessor, IRedirectUrlService redirectUrlService, IVariationContextAccessor variationContextAccessor)
         {
-            _umbracoSettings = umbracoSettings;
+            _webRoutingSettings = webRoutingSettings;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _redirectUrlService = redirectUrlService;
             _variationContextAccessor = variationContextAccessor;
@@ -40,7 +41,7 @@ namespace Umbraco.Web.Routing
         public void Initialize()
         {
             // don't let the event handlers kick in if Redirect Tracking is turned off in the config
-            if (_umbracoSettings.WebRouting.DisableRedirectUrlTracking) return;
+            if (_webRoutingSettings.DisableRedirectUrlTracking) return;
 
             ContentService.Publishing += ContentService_Publishing;
             ContentService.Published += ContentService_Published;

@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public interface ILoggingSection : IUmbracoConfigurationSection
+    public interface ILoggingSettings : IUmbracoConfigurationSection
     {
         int MaxLogAge { get; }
     }

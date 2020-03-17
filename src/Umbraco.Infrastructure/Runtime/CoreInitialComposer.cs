@@ -44,7 +44,6 @@ namespace Umbraco.Core.Runtime
 
             // composers
             composition
-                .ComposeConfiguration()
                 .ComposeRepositories()
                 .ComposeServices()
                 .ComposeCoreMappingProfiles()
@@ -139,7 +138,7 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
             composition.RegisterUnique<IShortStringHelper>(factory
-                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetInstance<IUmbracoSettingsSection>())));
+                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetInstance<IRequestHandlerSettings>())));
 
             composition.UrlSegmentProviders()
                 .Append<DefaultUrlSegmentProvider>();

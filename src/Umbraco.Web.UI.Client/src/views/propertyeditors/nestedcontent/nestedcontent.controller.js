@@ -591,8 +591,8 @@
         }
 
         function updatePropertyActionStates() {
-            copyAllEntriesAction.isDisabled = !model.value || model.value.length === 0;
-            removeAllEntriesAction.isDisabled = !model.value || model.value.length === 0;
+            copyAllEntriesAction.isDisabled = !model.value || !model.value.length;
+            removeAllEntriesAction.isDisabled = copyAllEntriesAction.isDisabled;
         }
 
 

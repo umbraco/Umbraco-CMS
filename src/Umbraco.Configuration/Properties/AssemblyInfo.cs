@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 
 // Umbraco Cms
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
+[assembly: InternalsVisibleTo("Umbraco.Tests.Common")]
 [assembly: InternalsVisibleTo("Umbraco.Tests.Benchmarks")]
 
 // Allow this to be mocked in our unit tests

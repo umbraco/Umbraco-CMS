@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public interface IRequestHandlerSection : IUmbracoConfigurationSection
+    public interface IRequestHandlerSettings : IUmbracoConfigurationSection
     {
         bool AddTrailingSlash { get; }
 

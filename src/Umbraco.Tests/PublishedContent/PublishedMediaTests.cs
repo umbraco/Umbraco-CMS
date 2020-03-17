@@ -23,7 +23,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Tests.LegacyXmlPublishedCache;
-using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Tests.Common;
 
 namespace Umbraco.Tests.PublishedContent
 {

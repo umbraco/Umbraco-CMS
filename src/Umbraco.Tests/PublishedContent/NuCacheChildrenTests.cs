@@ -20,10 +20,10 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Common;
 using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
@@ -63,7 +63,7 @@ namespace Umbraco.Tests.PublishedContent
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);
             var globalSettings = new GlobalSettings(TestHelper.IOHelper);
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-            configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
+            configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
             configs.Add<IGlobalSettings>(() => globalSettings);
 
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(IPublishedModelFactory))).Returns(PublishedModelFactory);
@@ -143,7 +143,7 @@ namespace Umbraco.Tests.PublishedContent
             // create a data source for NuCache
             _source = new TestDataSource(kits);
 
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeFinder = TestHelper.GetTypeFinder();
             var settings = Mock.Of<INuCacheSettings>();
 
 

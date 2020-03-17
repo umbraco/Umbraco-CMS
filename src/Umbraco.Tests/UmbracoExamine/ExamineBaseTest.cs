@@ -33,7 +33,7 @@ namespace Umbraco.Tests.UmbracoExamine
         {
             base.Compose();
 
-            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefaultUmbracoSettings()));
+            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GenerateMockRequestHandlerSettings()));
         }
     }
 }

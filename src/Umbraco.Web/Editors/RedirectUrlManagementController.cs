@@ -19,12 +19,12 @@ namespace Umbraco.Web.Editors
     public class RedirectUrlManagementController : UmbracoAuthorizedApiController
     {
         private readonly ILogger _logger;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IWebRoutingSettings _webRoutingSettings;
 
-        public RedirectUrlManagementController(ILogger logger, IUmbracoSettingsSection umbracoSettingsSection)
+        public RedirectUrlManagementController(ILogger logger, IWebRoutingSettings webRoutingSettings)
         {
             _logger = logger;
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _webRoutingSettings = webRoutingSettings;
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public IHttpActionResult GetEnableState()
         {
-            var enabled = _umbracoSettingsSection.WebRouting.DisableRedirectUrlTracking == false;
+            var enabled = _webRoutingSettings.DisableRedirectUrlTracking == false;
             var userIsAdmin = UmbracoContext.Security.CurrentUser.IsAdmin();
             return Ok(new { enabled, userIsAdmin });
         }

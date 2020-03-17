@@ -32,18 +32,18 @@ namespace Umbraco.Web.Install.InstallSteps
         private static HttpClient _httpClient;
         private readonly IGlobalSettings _globalSettings;
         private readonly IUserPasswordConfiguration _passwordConfiguration;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly ISecuritySettings _securitySettings;
         private readonly IConnectionStrings _connectionStrings;
         private readonly ICookieManager _cookieManager;
 
-        public NewInstallStep(IHttpContextAccessor httpContextAccessor, IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration, IUmbracoSettingsSection umbracoSettingsSection, IConnectionStrings connectionStrings, ICookieManager cookieManager)
+        public NewInstallStep(IHttpContextAccessor httpContextAccessor, IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration, ISecuritySettings securitySettings, IConnectionStrings connectionStrings, ICookieManager cookieManager)
         {
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _securitySettings = securitySettings ?? throw new ArgumentNullException(nameof(securitySettings));
             _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
             _cookieManager = cookieManager;
         }
@@ -136,7 +136,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             // In this one case when it's a brand new install and nothing has been configured, make sure the
             // back office cookie is cleared so there's no old cookies lying around causing problems
-            _cookieManager.ExpireCookie(_umbracoSettingsSection.Security.AuthCookieName);
+            _cookieManager.ExpireCookie(_securitySettings.AuthCookieName);
 
                 return true;
         }

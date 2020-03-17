@@ -19,6 +19,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
+using Umbraco.Tests.Common;
 using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -85,7 +86,7 @@ namespace Umbraco.Tests.Scoping
             var memberRepository = Mock.Of<IMemberRepository>();
             var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeFinder = TestHelper.GetTypeFinder();
             var settings = Mock.Of<INuCacheSettings>();
 
             return new PublishedSnapshotService(
@@ -112,7 +113,7 @@ namespace Umbraco.Tests.Scoping
                 settings);
         }
 
-        protected IUmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)
+        protected IUmbracoContext GetUmbracoContextNu(string url, RouteData routeData = null, bool setSingleton = false)
         {
             // ensure we have a PublishedSnapshotService
             var service = PublishedSnapshotService as PublishedSnapshotService;
