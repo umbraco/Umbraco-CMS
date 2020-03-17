@@ -1,20 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Runtime;
-using Umbraco.Web.JavaScript;
+using Umbraco.Web.Runtime;
 
-namespace Umbraco.Web.Runtime
+namespace Umbraco.Web.JavaScript.CDF
 {
     [ComposeAfter(typeof(WebInitialComponent))]
     public sealed class ClientDependencyComponent : IComponent
@@ -26,8 +21,7 @@ namespace Umbraco.Web.Runtime
         public ClientDependencyComponent(
             IHostingSettings hostingSettings,
             IHostingEnvironment hostingEnvironment,
-            IRuntimeSettings settings,
-            IRuntimeMinifier runtimeMinifier)
+            IRuntimeSettings settings)
         {
             _hostingSettings = hostingSettings;
             _hostingEnvironment = hostingEnvironment;

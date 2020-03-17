@@ -7,7 +7,7 @@ using Umbraco.Core.Assets;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Runtime;
 
-namespace Umbraco.Web.JavaScript
+namespace Umbraco.Web.JavaScript.CDF
 {
     internal class CssInitialization : AssetInitialization
     {
@@ -32,7 +32,7 @@ namespace Umbraco.Web.JavaScript
         public IEnumerable<string> GetStylesheetFiles(HttpContextBase httpContext)
         {
             var stylesheets = new HashSet<string>();
-            var optimizedManifest = OptimizeAssetCollection(_parser.Manifest.Stylesheets, AssetType.Css, httpContext, _runtimeMinifier);
+            var optimizedManifest = JavaScriptHelper.OptimizeAssetCollection(_parser.Manifest.Stylesheets, AssetType.Css, httpContext, _runtimeMinifier);
             foreach (var stylesheet in optimizedManifest)
                 stylesheets.Add(stylesheet);
 
