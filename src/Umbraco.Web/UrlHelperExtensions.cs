@@ -146,7 +146,7 @@ namespace Umbraco.Web
             }
             
             var version = Current.RuntimeState.SemanticVersion.ToSemanticString();
-            return $"{version}.{Current.RuntimeMinifier.Version}".GenerateHash();
+            return $"{version}.{Current.RuntimeMinifier.GetHashValue}".GenerateHash();
         }
     }
 }

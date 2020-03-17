@@ -478,7 +478,7 @@ namespace Umbraco.Web.Editors
             var version = _runtimeState.SemanticVersion.ToSemanticString();
 
             //the value is the hash of the version, cdf version and the configured state
-            app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{_runtimeMinifier.Version}".GenerateHash());
+            app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{_runtimeMinifier.GetHashValue}".GenerateHash());
 
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
             app.Add("applicationPath", _httpContextAccessor.GetRequiredHttpContext().Request.ApplicationPath.EnsureEndsWith('/'));

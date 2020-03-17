@@ -7,8 +7,7 @@ namespace Umbraco.Core.Runtime
 {
     public interface IRuntimeMinifier
     {
-        int Version { get; }
-        string FileMapDefaultFolder { get; set; }
+        string GetHashValue { get; }
 
         //return type HtmlHelper
         string RequiresCss(string filePath, string pathNameAlias);

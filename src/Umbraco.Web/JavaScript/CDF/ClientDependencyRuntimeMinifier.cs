@@ -1,37 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
 using ClientDependency.Core;
 using ClientDependency.Core.CompositeFiles;
-using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
 using Umbraco.Core.Assets;
 using Umbraco.Core.Runtime;
 
-namespace Umbraco.Web.JavaScript
+namespace Umbraco.Web.JavaScript.CDF
 {
     public class ClientDependencyRuntimeMinifier : IRuntimeMinifier
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HtmlHelper _htmlHelper;
-        private readonly HttpContextBase _httpContext;
 
-        public int Version => ClientDependencySettings.Instance.Version;
+        public string GetHashValue => ClientDependencySettings.Instance.Version.ToString();
 
-        public string FileMapDefaultFolder
+        public ClientDependencyRuntimeMinifier(IHttpContextAccessor httpContextAccessor)
         {
-            get => XmlFileMapper.FileMapDefaultFolder;
-            set => XmlFileMapper.FileMapDefaultFolder = value;
-        }
-
-        public ClientDependencyRuntimeMinifier()
-        {
+            _httpContextAccessor = httpContextAccessor;
             _htmlHelper = new HtmlHelper(new ViewContext(), new ViewPage());
-            //_httpContext = httpContext;
         }
 
         public string RequiresCss(string filePath, string pathNameAlias)
@@ -76,7 +65,7 @@ namespace Umbraco.Web.JavaScript
             }
 
             var renderer = ClientDependencySettings.Instance.MvcRendererCollection["Umbraco.DependencyPathRenderer"];
-            renderer.RegisterDependencies(dependencies, new HashSet<IClientDependencyPath>(), out var scripts, out var stylesheets, _httpContext);
+            renderer.RegisterDependencies(dependencies, new HashSet<IClientDependencyPath>(), out var scripts, out var stylesheets, _httpContextAccessor.HttpContext);
 
             var toParse = assetType == AssetType.Javascript ? scripts : stylesheets;
             return toParse.Split(new[] { DependencyPathRenderer.Delimiter }, StringSplitOptions.RemoveEmptyEntries);
