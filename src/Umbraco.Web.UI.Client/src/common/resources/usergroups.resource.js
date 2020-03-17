@@ -38,18 +38,18 @@
                 "Failed to save user group");
         }
 
-        function getUserGroup(id) {
+     
+        function getUserGroup(id, page=0) {
 
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "userGroupsApiBaseUrl",
-                        "GetUserGroup",
-                        { id: id })),
+                        "GetUserGroupPaginated",
+                        { id: id, page: page })),
                 "Failed to retrieve data for user group " + id);
 
         }
-
         function getUserGroups(args) {
 
             if (!args) {
@@ -63,7 +63,8 @@
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "userGroupsApiBaseUrl",
-                        "GetUserGroupPaginated",
+                        "GetUserGroups",
+                        
                         args)),
                 "Failed to retrieve user groups");
         }

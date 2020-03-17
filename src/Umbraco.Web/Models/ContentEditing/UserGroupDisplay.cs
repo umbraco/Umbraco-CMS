@@ -29,5 +29,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "assignedPermissions")]
         public IEnumerable<AssignedContentPermissions> AssignedPermissions { get; set; }
+      [DataMember(Name = "currentUsersPage")]
+        public int CurrentUserPage { get; set; }
     }
 }

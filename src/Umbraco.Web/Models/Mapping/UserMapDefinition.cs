@@ -230,6 +230,7 @@ namespace Umbraco.Web.Models.Mapping
             {
                  users = _userService.GetUsersInGroup(source.Id, source.UsersPage, source.MaxUsers, out long usersPages);
                  target.UsersPages = usersPages;
+                 target.CurrentUserPage = source.UsersPage;
             }
             target.Users = context.MapEnumerable<IUser, UserBasic>(users);
 

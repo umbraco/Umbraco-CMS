@@ -23,7 +23,8 @@
         vm.save = save;
         vm.openGranularPermissionsPicker = openGranularPermissionsPicker;
         vm.setPermissionsForNode = setPermissionsForNode;
-
+        vm.changePageNumber = changePageNumber;
+        
         function init() {
 
             vm.loading = true;
@@ -74,7 +75,12 @@
             }
 
         }
-
+        function changePageNumber(page) {
+       
+            userGroupsResource.getUserGroup($routeParams.id, page-1).then(function (userGroup) {
+                vm.userGroup = userGroup;
+            });
+        }
         function save() {
             vm.page.saveButtonState = "busy";
 

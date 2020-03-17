@@ -148,6 +148,7 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
+        [HttpGet]
         [UserGroupAuthorization("id")]
         public UserGroupDisplay GetUserGroupPaginated(int id, int page)
         {
