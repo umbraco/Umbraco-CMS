@@ -59,10 +59,9 @@ namespace Umbraco.Web.Install.Controllers
 
             if (_runtime.Level == RuntimeLevel.Upgrade)
             {
-                // Update ClientDependency version
-                var clientDependencyConfig = new ClientDependencyConfiguration(_logger, _ioHelper, _runtimeMinifier);
-                var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
-                    _umbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
+                // Update ClientDependency version and delete its temp directories to make sure we get fresh caches
+                _runtimeMinifier.Reset();
+
                 // Delete ClientDependency temp directories to make sure we get fresh caches
                 var clientDependencyTempFilesDeleted = clientDependencyConfig.ClearTempFiles(HttpContext);
 

@@ -20,7 +20,6 @@ using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Net;
-using Umbraco.Web.JavaScript;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -385,9 +384,7 @@ namespace Umbraco.Web.Editors
             zipFile.Delete();
 
             //bump cdf to be safe
-            var clientDependencyConfig = new ClientDependencyConfiguration(Logger, _ioHelper, _runtimeMinifier);
-            var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
-                _umbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
+            _runtimeMinifier.Reset();
 
             var redirectUrl = "";
             if (!packageInfo.PackageView.IsNullOrWhiteSpace())
