@@ -31,7 +31,7 @@ namespace Umbraco.Web.Security
 
         public static async Task ValidateSessionAsync(TimeSpan validateInterval, CookieValidateIdentityContext context, IGlobalSettings globalSettings, IIOHelper ioHelper)
         {
-            if (context.Request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, globalSettings, ioHelper) == false)
+            if (context.Request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, ioHelper) == false)
                 return;
 
             var valid = await ValidateSessionAsync(validateInterval, context.OwinContext, context.Options.CookieManager, context.Options.SystemClock, context.Properties.IssuedUtc, context.Identity, globalSettings);
