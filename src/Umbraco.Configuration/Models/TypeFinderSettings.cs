@@ -15,5 +15,4 @@ namespace Umbraco.Configuration.Models
         public string AssembliesAcceptingLoadExceptions =>
             _configuration.GetValue<string>("Umbraco:CMS:TypeFinder:AssembliesAcceptingLoadExceptions");
     }
-
 }

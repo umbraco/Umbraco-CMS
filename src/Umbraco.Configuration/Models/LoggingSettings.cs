@@ -10,6 +10,6 @@ namespace Umbraco.Configuration.Models
         {
             _configuration = configuration;
         }
-        public int MaxLogAge => _configuration.GetValue<int?>("Umbraco:CMS:Logging:MaxLogAge") ?? -1;
+        public int MaxLogAge => _configuration.GetValue("Umbraco:CMS:Logging:MaxLogAge", -1);
     }
 }

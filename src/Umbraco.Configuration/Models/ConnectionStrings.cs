@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 
-
 namespace Umbraco.Configuration.Models
 {
     public class ConnectionStrings : IConnectionStrings
