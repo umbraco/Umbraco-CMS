@@ -17,7 +17,7 @@ namespace Umbraco.Configuration.Models
 
         public ConfigConnectionString this[string key]
         {
-            get => new ConfigConnectionString(_configuration.GetConnectionString(key), "sasd", key);
+            get => new ConfigConnectionString(_configuration.GetConnectionString(key), "System.Data.SqlClient", key);
             set => throw new NotImplementedException();
         }
 
