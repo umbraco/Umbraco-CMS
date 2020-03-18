@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>
@@ -18,17 +20,14 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj" />
+      <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
       <ProjectReference Include="..\Umbraco.Tests.Shared\Umbraco.Tests.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
       <PackageReference Include="NUnit" Version="3.12.0" />
-      <PackageReference Include="NUnit3TestAdapter" Version="3.16.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Umbraco.Core" />
+      <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
     </ItemGroup>
 
 </Project>

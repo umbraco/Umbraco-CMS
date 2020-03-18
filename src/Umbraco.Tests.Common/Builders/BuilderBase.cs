@@ -1,4 +1,4 @@
-namespace Umbraco.Tests.Shared.Builders
+namespace Umbraco.Tests.Common.Builders
 {
     public abstract class BuilderBase<T>
     {

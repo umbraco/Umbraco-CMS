@@ -1,7 +1,7 @@
 using System;
-using Umbraco.Tests.Shared.Builders.Interfaces;
+using Umbraco.Tests.Common.Builders.Interfaces;
 
-namespace Umbraco.Tests.Shared.Builders.Extensions
+namespace Umbraco.Tests.Common.Builders.Extensions
 {
     public static class BuilderExtensions
     {

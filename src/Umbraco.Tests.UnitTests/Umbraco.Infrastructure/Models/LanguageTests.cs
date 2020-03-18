@@ -1,8 +1,7 @@
 ﻿using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
-using Umbraco.Tests.Shared.Builders;
-using Umbraco.Tests.Shared.Builders.Extensions;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
 {

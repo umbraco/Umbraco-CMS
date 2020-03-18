@@ -1,6 +1,6 @@
 using System;
 
-namespace Umbraco.Tests.Shared.Builders.Interfaces
+namespace Umbraco.Tests.Common.Builders.Interfaces
 {
     public interface IWithDeleteDateBuilder
     {

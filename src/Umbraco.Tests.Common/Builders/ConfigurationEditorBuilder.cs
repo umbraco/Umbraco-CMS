@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Umbraco.Core.PropertyEditors;
 
-namespace Umbraco.Tests.Shared.Builders
+namespace Umbraco.Tests.Common.Builders
 {
     public class ConfigurationEditorBuilder<TParent> : ChildBuilderBase<TParent, IConfigurationEditor>
     {

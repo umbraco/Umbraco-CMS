@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
-using Umbraco.Tests.Shared.Builders.Interfaces;
+using Umbraco.Tests.Common.Builders.Interfaces;
 
-namespace Umbraco.Tests.Shared.Builders
+namespace Umbraco.Tests.Common.Builders
 {
     public class DictionaryItemBuilder
         : BuilderBase<DictionaryItem>,

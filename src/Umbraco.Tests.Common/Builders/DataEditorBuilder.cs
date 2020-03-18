@@ -5,7 +5,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
-namespace Umbraco.Tests.Shared.Builders
+namespace Umbraco.Tests.Common.Builders
 {
     public class DataEditorBuilder<TParent> : ChildBuilderBase<TParent, IDataEditor>
     {

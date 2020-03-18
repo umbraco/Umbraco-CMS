@@ -1,6 +1,6 @@
 using Umbraco.Core.Configuration;
 
-namespace Umbraco.Tests.Shared.Builders
+namespace Umbraco.Tests.Common.Builders
 {
     public class GlobalSettingsBuilder : GlobalSettingsBuilder<object>
     {
@@ -10,7 +10,6 @@ namespace Umbraco.Tests.Shared.Builders
     }
 
     public class GlobalSettingsBuilder<TParent> : ChildBuilderBase<TParent, IGlobalSettings>
-
     {
         private string _configurationStatus;
         private string _databaseFactoryServerVersion;
@@ -29,13 +28,19 @@ namespace Umbraco.Tests.Shared.Builders
         private string _umbracoMediaPath;
         private string _umbracoPath;
         private string _umbracoScriptsPath;
+        private string _mainDomLock;
+        private string _noNodesViewPath;
         private bool? _useHttps;
         private int? _versionCheckPeriod;
+        private readonly SmtpSettingsBuilder<GlobalSettingsBuilder<TParent>> _smtpSettingsBuilder;
 
 
         public GlobalSettingsBuilder(TParent parentBuilder) : base(parentBuilder)
         {
+            _smtpSettingsBuilder = new SmtpSettingsBuilder<GlobalSettingsBuilder<TParent>>(this);
         }
+
+        public SmtpSettingsBuilder<GlobalSettingsBuilder<TParent>> AddSmtpSettings() => _smtpSettingsBuilder;
 
         public GlobalSettingsBuilder<TParent> WithConfigurationStatus(string configurationStatus)
         {
@@ -139,6 +144,17 @@ namespace Umbraco.Tests.Shared.Builders
             return this;
         }
 
+        public GlobalSettingsBuilder<TParent> WithMainDomLock(string mainDomLock)
+        {
+            _mainDomLock = mainDomLock;
+            return this;
+        }
+
+        public GlobalSettingsBuilder<TParent> WithNoNodesViewPath(string noNodesViewPath)
+        {
+            _noNodesViewPath = noNodesViewPath;
+            return this;
+        }
         public GlobalSettingsBuilder<TParent> WithVersionCheckPeriod(int versionCheckPeriod)
         {
             _versionCheckPeriod = versionCheckPeriod;
@@ -172,6 +188,9 @@ namespace Umbraco.Tests.Shared.Builders
             var umbracoScriptsPath = _umbracoScriptsPath ?? "~/scripts";
             var versionCheckPeriod = _versionCheckPeriod ?? 0;
             var timeOutInMinutes = _timeOutInMinutes ?? 20;
+            var smtpSettings = _smtpSettingsBuilder.Build();
+            var mainDomLock = _mainDomLock ?? string.Empty;
+            var noNodesViewPath = _noNodesViewPath ?? "~/config/splashes/NoNodes.cshtml";
 
 
             return new TestGlobalSettings
@@ -194,7 +213,10 @@ namespace Umbraco.Tests.Shared.Builders
                 UmbracoMediaPath = umbracoMediaPath,
                 UmbracoScriptsPath = umbracoScriptsPath,
                 VersionCheckPeriod = versionCheckPeriod,
-                TimeOutInMinutes = timeOutInMinutes
+                TimeOutInMinutes = timeOutInMinutes,
+                SmtpSettings = smtpSettings,
+                MainDomLock = mainDomLock,
+                NoNodesViewPath = noNodesViewPath,
             };
         }
 
@@ -214,11 +236,14 @@ namespace Umbraco.Tests.Shared.Builders
             public string UmbracoScriptsPath { get; set; }
             public string UmbracoMediaPath { get; set; }
             public bool IsSmtpServerConfigured { get; set; }
+            public ISmtpSettings SmtpSettings { get; set; }
             public bool InstallMissingDatabase { get; set; }
             public bool InstallEmptyDatabase { get; set; }
             public bool DisableElectionForSingleServer { get; set; }
             public string RegisterType { get; set; }
             public string DatabaseFactoryServerVersion { get; set; }
+            public string MainDomLock { get; set; }
+            public string NoNodesViewPath { get; set; }
         }
     }
 }
