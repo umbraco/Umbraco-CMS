@@ -5,6 +5,7 @@ using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Cookie;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
@@ -290,6 +291,9 @@ namespace Umbraco.Web.Runtime
 
             // replace with web implementation
             composition.RegisterUnique<IPublishedSnapshotRebuilder, Migrations.PostMigrations.PublishedSnapshotRebuilder>();
+
+            // Config manipulator
+            composition.RegisterUnique<IConfigManipulator, XmlConfigManipulator>();
         }
     }
 }

@@ -23,8 +23,17 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly IGlobalSettings _globalSettings;
         private readonly IConnectionStrings _connectionStrings;
         private readonly IIOHelper _ioHelper;
+        private readonly IConfigManipulator _configManipulator;
 
-        public DatabaseUpgradeStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger, IUmbracoVersion umbracoVersion, IGlobalSettings globalSettings, IConnectionStrings connectionStrings, IIOHelper ioHelper)
+        public DatabaseUpgradeStep(
+            DatabaseBuilder databaseBuilder,
+            IRuntimeState runtime,
+            ILogger logger,
+            IUmbracoVersion umbracoVersion,
+            IGlobalSettings globalSettings,
+            IConnectionStrings connectionStrings,
+            IIOHelper ioHelper,
+            IConfigManipulator configManipulator)
         {
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
@@ -33,6 +42,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _globalSettings = globalSettings;
             _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
             _ioHelper = ioHelper;
+            _configManipulator = configManipulator;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
@@ -55,7 +65,7 @@ namespace Umbraco.Web.Install.InstallSteps
                     throw new InstallException("The database failed to upgrade. ERROR: " + result.Message);
                 }
 
-                DatabaseInstallStep.HandleConnectionStrings(_logger, _ioHelper, _connectionStrings);
+                DatabaseInstallStep.HandleConnectionStrings(_logger, _ioHelper, _connectionStrings, _configManipulator);
             }
 
             return Task.FromResult<InstallSetupResult>(null);

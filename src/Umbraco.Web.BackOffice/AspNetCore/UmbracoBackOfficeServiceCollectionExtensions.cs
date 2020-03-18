@@ -8,7 +8,6 @@ using Umbraco.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
@@ -24,7 +23,6 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var configsFactory = new AspNetCoreConfigsFactory(configuration);
 
             var configs = configsFactory.Create();
-
             services.AddSingleton(configs);
 
             return services;
@@ -39,6 +37,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var httpContextAccessor = serviceProvider.GetService<IHttpContextAccessor>();
             var webHostEnvironment = serviceProvider.GetService<IWebHostEnvironment>();
             var hostApplicationLifetime = serviceProvider.GetService<IHostApplicationLifetime>();
+
             var configs = serviceProvider.GetService<Configs>();
 
             services.CreateCompositionRoot(
@@ -62,10 +61,13 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var coreDebug = configs.CoreDebug();
             var globalSettings = configs.Global();
 
-            var hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment, httpContextAccessor, hostApplicationLifetime);
+            var hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment,
+                httpContextAccessor, hostApplicationLifetime);
             var ioHelper = new IOHelper(hostingEnvironment, globalSettings);
-            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,  new AspNetCoreSessionIdResolver(httpContextAccessor), () => services.BuildServiceProvider().GetService<IRequestCache>(), coreDebug, ioHelper, new AspNetCoreMarchal());
-
+            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,
+                new AspNetCoreSessionIdResolver(httpContextAccessor),
+                () => services.BuildServiceProvider().GetService<IRequestCache>(), coreDebug, ioHelper,
+                new AspNetCoreMarchal());
 
             var backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
             var profiler = new LogProfiler(logger);
