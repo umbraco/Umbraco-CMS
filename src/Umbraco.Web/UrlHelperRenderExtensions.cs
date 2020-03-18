@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Composing;
@@ -37,11 +38,11 @@ namespace Umbraco.Web
         /// set to false if using the result of this method for CSS.
         /// </param>
         /// <returns></returns>
-        public static IHtmlString GetCropUrl(this UrlHelper urlHelper, IPublishedContent mediaItem, string cropAlias, bool htmlEncode = true)
+        public static IHtmlString GetCropUrl(this UrlHelper urlHelper, IPublishedContent mediaItem, IImageUrlGenerator imageUrlGenerator, string cropAlias, bool htmlEncode = true)
         {
             if (mediaItem == null) return EmptyHtmlString;
 
-            var url = mediaItem.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true);
+            var url = mediaItem.GetCropUrl(imageUrlGenerator, cropAlias: cropAlias, useCropDimensions: true);
             return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
         }
 
@@ -65,11 +66,11 @@ namespace Umbraco.Web
         /// <returns>
         /// The ImageProcessor.Web Url.
         /// </returns>
-        public static IHtmlString GetCropUrl(this UrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias, string cropAlias, bool htmlEncode = true)
+        public static IHtmlString GetCropUrl(this UrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias, string cropAlias, IImageUrlGenerator imageUrlGenerator, bool htmlEncode = true)
         {
             if (mediaItem == null) return EmptyHtmlString;
 
-            var url = mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true);
+            var url = mediaItem.GetCropUrl(imageUrlGenerator, propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true);
             return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
         }
 
@@ -133,6 +134,7 @@ namespace Umbraco.Web
         /// </returns>
         public static IHtmlString GetCropUrl(this UrlHelper urlHelper,
             IPublishedContent mediaItem,
+            IImageUrlGenerator imageUrlGenerator,
             int? width = null,
             int? height = null,
             string propertyAlias = Umbraco.Core.Constants.Conventions.Media.File,
@@ -150,7 +152,7 @@ namespace Umbraco.Web
         {
             if (mediaItem == null) return EmptyHtmlString;
 
-            var url = mediaItem.GetCropUrl(width, height, propertyAlias, cropAlias, quality, imageCropMode,
+            var url = mediaItem.GetCropUrl(imageUrlGenerator, width, height, propertyAlias, cropAlias, quality, imageCropMode,
                 imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode,
                 upScale);
             return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
@@ -216,6 +218,7 @@ namespace Umbraco.Web
         /// </returns>
         public static IHtmlString GetCropUrl(this UrlHelper urlHelper,
             string imageUrl,
+            IImageUrlGenerator imageUrlGenerator,
             int? width = null,
             int? height = null,
             string imageCropperValue = null,
@@ -231,7 +234,7 @@ namespace Umbraco.Web
             bool upScale = true,
             bool htmlEncode = true)
         {
-            var url = imageUrl.GetCropUrl(width, height, imageCropperValue, cropAlias, quality, imageCropMode,
+            var url = imageUrl.GetCropUrl(imageUrlGenerator, width, height, imageCropperValue, cropAlias, quality, imageCropMode,
                 imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode,
                 upScale);
             return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
@@ -239,6 +242,7 @@ namespace Umbraco.Web
 
         public static IHtmlString GetCropUrl(this UrlHelper urlHelper,
             ImageCropperValue imageCropperValue,
+            IImageUrlGenerator imageUrlGenerator,
             int? width = null,
             int? height = null,
             string cropAlias = null,
@@ -256,7 +260,7 @@ namespace Umbraco.Web
             if (imageCropperValue == null) return EmptyHtmlString;
 
             var imageUrl = imageCropperValue.Src;
-            var url = imageUrl.GetCropUrl(imageCropperValue, width, height, cropAlias, quality, imageCropMode,
+            var url = imageUrl.GetCropUrl(imageUrlGenerator, imageCropperValue, width, height, cropAlias, quality, imageCropMode,
                 imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode,
                 upScale);
             return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);

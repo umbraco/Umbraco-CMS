@@ -105,13 +105,6 @@ namespace Umbraco.Web
             => composition.WithCollectionBuilder<SectionCollectionBuilder>();
 
         /// <summary>
-        /// Gets the backoffice dashboards collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static DashboardCollectionBuilder Dashboards(this Composition composition)
-            => composition.WithCollectionBuilder<DashboardCollectionBuilder>();
-
-        /// <summary>
         /// Gets the backoffice OEmbed Providers collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
@@ -167,37 +160,6 @@ namespace Umbraco.Web
         public static void SetContentLastChanceFinder(this Composition composition, IContentLastChanceFinder finder)
         {
             composition.RegisterUnique(_ => finder);
-        }
-
-        /// <summary>
-        /// Sets the published snapshot service.
-        /// </summary>
-        /// <typeparam name="T">The type of the published snapshot service.</typeparam>
-        /// <param name="composition">The composition.</param>
-        public static void SetPublishedSnapshotService<T>(this Composition composition)
-            where T : IPublishedSnapshotService
-        {
-            composition.RegisterUnique<IPublishedSnapshotService, T>();
-        }
-
-        /// <summary>
-        /// Sets the published snapshot service.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        /// <param name="factory">A function creating a published snapshot service.</param>
-        public static void SetPublishedSnapshotService(this Composition composition, Func<IFactory, IPublishedSnapshotService> factory)
-        {
-            composition.RegisterUnique(factory);
-        }
-
-        /// <summary>
-        /// Sets the published snapshot service.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        /// <param name="service">A published snapshot service.</param>
-        public static void SetPublishedSnapshotService(this Composition composition, IPublishedSnapshotService service)
-        {
-            composition.RegisterUnique(_ => service);
         }
 
         /// <summary>

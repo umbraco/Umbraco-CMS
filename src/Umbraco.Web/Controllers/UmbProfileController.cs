@@ -15,12 +15,18 @@ namespace Umbraco.Web.Controllers
     [MemberAuthorize]
     public class UmbProfileController : SurfaceController
     {
+        private readonly MembershipHelper _membershipHelper;
+
         public UmbProfileController()
         { }
 
-        public UmbProfileController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
-            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger, umbracoHelper)
-        { }
+        public UmbProfileController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory,
+            ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger,
+            MembershipHelper membershipHelper)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger)
+        {
+            _membershipHelper = membershipHelper;
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -32,7 +38,7 @@ namespace Umbraco.Web.Controllers
                 return CurrentUmbracoPage();
             }
 
-            var updateAttempt = Members.UpdateMemberProfile(model);
+            var updateAttempt = _membershipHelper.UpdateMemberProfile(model);
             if (updateAttempt.Success == false)
             {
                 //don't add a field level error, just model level

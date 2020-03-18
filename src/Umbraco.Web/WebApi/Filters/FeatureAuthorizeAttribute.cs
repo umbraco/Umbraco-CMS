@@ -1,6 +1,6 @@
 ﻿using System.Web.Http;
 using System.Web.Http.Controllers;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
 using Umbraco.Core;
 

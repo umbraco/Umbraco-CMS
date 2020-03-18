@@ -3,12 +3,13 @@ using System.Collections.Concurrent;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Mvc
 {
@@ -22,11 +23,11 @@ namespace Umbraco.Web.Mvc
 
         // for debugging purposes
         internal Guid InstanceId { get; } = Guid.NewGuid();
-        
+
         /// <summary>
         /// Gets the Umbraco context.
         /// </summary>
-        public virtual UmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
+        public virtual IUmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
 
         /// <summary>
         /// Gets the database context accessor.
@@ -59,11 +60,6 @@ namespace Umbraco.Web.Mvc
         public IProfilingLogger ProfilingLogger { get; }
 
         /// <summary>
-        /// Gets the membership helper.
-        /// </summary>
-        public MembershipHelper Members => Umbraco.MembershipHelper;
-
-        /// <summary>
         /// Gets the Umbraco helper.
         /// </summary>
         public UmbracoHelper Umbraco { get; }
@@ -80,13 +76,12 @@ namespace Umbraco.Web.Mvc
                   Current.Factory.GetInstance<ServiceContext>(),
                   Current.Factory.GetInstance<AppCaches>(),
                   Current.Factory.GetInstance<ILogger>(),
-                  Current.Factory.GetInstance<IProfilingLogger>(),
-                  Current.Factory.GetInstance<UmbracoHelper>()
+                  Current.Factory.GetInstance<IProfilingLogger>()
             )
         {
         }
 
-        protected PluginController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
+        protected PluginController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
         {
             UmbracoContextAccessor = umbracoContextAccessor;
             DatabaseFactory = databaseFactory;
@@ -94,7 +89,6 @@ namespace Umbraco.Web.Mvc
             AppCaches = appCaches;
             Logger = logger;
             ProfilingLogger = profilingLogger;
-            Umbraco = umbracoHelper;
         }
 
         /// <summary>

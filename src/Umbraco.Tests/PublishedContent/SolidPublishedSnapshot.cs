@@ -5,7 +5,7 @@ using System.Linq;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -167,7 +167,6 @@ namespace Umbraco.Tests.PublishedContent
         {
             // initialize boring stuff
             TemplateId = 0;
-            WriterName = CreatorName = string.Empty;
             WriterId = CreatorId = 0;
             CreateDate = UpdateDate = DateTime.Now;
             Version = Guid.Empty;
@@ -193,8 +192,6 @@ namespace Umbraco.Tests.PublishedContent
         public string Name { get; set; }
         public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _cultures ?? (_cultures = GetCultures());
         public string UrlSegment { get; set; }
-        public string WriterName { get; set; }
-        public string CreatorName { get; set; }
         public int WriterId { get; set; }
         public int CreatorId { get; set; }
         public string Path { get; set; }
@@ -202,7 +199,6 @@ namespace Umbraco.Tests.PublishedContent
         public DateTime UpdateDate { get; set; }
         public Guid Version { get; set; }
         public int Level { get; set; }
-        public string Url { get; set; }
 
         public PublishedItemType ItemType => PublishedItemType.Content;
         public bool IsDraft(string culture = null) => false;

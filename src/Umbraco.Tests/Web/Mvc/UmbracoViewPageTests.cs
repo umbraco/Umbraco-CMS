@@ -7,7 +7,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
@@ -16,7 +16,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Tests.Common;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
@@ -385,13 +385,9 @@ namespace Umbraco.Tests.Web.Mvc
 
         ViewContext GetViewContext()
         {
-            var settings = SettingsForTests.GetDefaultUmbracoSettings();
-            var logger = Mock.Of<ILogger>();
-            var umbracoContext = GetUmbracoContext(
-                logger, settings,
-                "/dang", 0);
+            var umbracoContext = GetUmbracoContext("/dang", 0);
 
-            var publishedRouter = BaseWebTest.CreatePublishedRouter(TestObjects.GetUmbracoSettings().WebRouting);
+            var publishedRouter = BaseWebTest.CreatePublishedRouter(TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings());
             var frequest = publishedRouter.CreateRequest(umbracoContext,  new Uri("http://localhost/dang"));
 
             frequest.Culture = CultureInfo.InvariantCulture;
@@ -404,7 +400,7 @@ namespace Umbraco.Tests.Web.Mvc
             return context;
         }
 
-        protected UmbracoContext GetUmbracoContext(ILogger logger, IUmbracoSettingsSection umbracoSettings, string url, int templateId, RouteData routeData = null, bool setSingleton = false)
+        protected IUmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null, bool setSingleton = false)
         {
             var svcCtx = GetServiceContext();
 
@@ -435,18 +431,18 @@ namespace Umbraco.Tests.Web.Mvc
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;
 
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor(http);
             var globalSettings = TestObjects.GetGlobalSettings();
 
             var ctx = new UmbracoContext(
-                http,
+                httpContextAccessor,
                 _service,
-                new WebSecurity(http, Current.Services.UserService, globalSettings),
-                TestObjects.GetUmbracoSettings(),
-                Enumerable.Empty<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, globalSettings, IOHelper),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             //if (setSingleton)
             //{

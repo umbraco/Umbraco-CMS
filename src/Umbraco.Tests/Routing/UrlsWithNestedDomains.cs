@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -10,6 +10,8 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Services;
 using Umbraco.Tests.LegacyXmlPublishedCache;
+using Umbraco.Web;
+using Umbraco.Tests.Common;
 
 namespace Umbraco.Tests.Routing
 {
@@ -34,18 +36,20 @@ namespace Umbraco.Tests.Routing
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
-            var settings = SettingsForTests.GenerateMockUmbracoSettings();
+            var settings = TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings();
 
             SetDomains1();
 
             const string url = "http://domain1.com/1001-1/1001-1-1";
 
             // get the nice url for 100111
-            var umbracoContext = GetUmbracoContext(url, 9999, umbracoSettings: settings, urlProviders: new []
-            {
-                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
-            }, globalSettings:globalSettings.Object);
-            Assert.AreEqual("http://domain2.com/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111, UrlMode.Absolute));
+            var umbracoContext = GetUmbracoContext(url, 9999, globalSettings:globalSettings.Object);
+            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
+            var urlProvider = new DefaultUrlProvider(settings, Logger, globalSettings.Object,
+                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+            var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
+
+            Assert.AreEqual("http://domain2.com/1001-1-1/", publishedUrlProvider.GetUrl(100111, UrlMode.Absolute));
 
             // check that the proper route has been cached
             var cache = umbracoContext.Content as PublishedContentCache;
@@ -72,8 +76,13 @@ namespace Umbraco.Tests.Routing
             //Assert.AreEqual("1001/1001-1/1001-1-1", cachedRoutes[100111]); // yes
 
             // what's the nice url now?
-            Assert.AreEqual("http://domain2.com/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111)); // good
+            Assert.AreEqual("http://domain2.com/1001-1-1/", publishedUrlProvider.GetUrl(100111)); // good
             //Assert.AreEqual("http://domain1.com/1001-1/1001-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100111, true)); // bad
+        }
+
+        private IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext, object urlProvider)
+        {
+            throw new NotImplementedException();
         }
 
         void SetDomains1()
@@ -84,6 +93,17 @@ namespace Umbraco.Tests.Routing
                 new UmbracoDomain("http://domain2.com/") {Id = 1, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"}
             });
 
+        }
+
+        private IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext, DefaultUrlProvider urlProvider)
+        {
+            return new UrlProvider(
+                new TestUmbracoContextAccessor(umbracoContext),
+                TestHelper.WebRoutingSettings,
+                new UrlProviderCollection(new []{urlProvider}),
+                new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
+                Mock.Of<IVariationContextAccessor>()
+            );
         }
 
         protected override string GetXmlContent(int templateId)

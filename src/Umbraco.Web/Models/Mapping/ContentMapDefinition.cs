@@ -6,6 +6,8 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Routing;
@@ -19,6 +21,7 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;
+        private readonly CommonTreeNodeMapper _commonTreeNodeMapper;
         private readonly ICultureDictionary _cultureDictionary;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IContentService _contentService;
@@ -29,16 +32,22 @@ namespace Umbraco.Web.Models.Mapping
         private readonly ILocalizationService _localizationService;
         private readonly ILogger _logger;
         private readonly IUserService _userService;
+        private readonly IEntityService _entityService;
+        private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IPublishedUrlProvider _publishedUrlProvider;
+        private readonly UriUtility _uriUtility;
         private readonly TabsAndPropertiesMapper<IContent> _tabsAndPropertiesMapper;
         private readonly ContentSavedStateMapper<ContentPropertyDisplay> _stateMapper;
         private readonly ContentBasicSavedStateMapper<ContentPropertyBasic> _basicStateMapper;
         private readonly ContentVariantMapper _contentVariantMapper;
 
-        public ContentMapDefinition(CommonMapper commonMapper, ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService, IContentService contentService, IContentTypeService contentTypeService,
+
+        public ContentMapDefinition(CommonMapper commonMapper, CommonTreeNodeMapper commonTreeNodeMapper, ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService, IContentService contentService, IContentTypeService contentTypeService,
             IFileService fileService, IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, ILocalizationService localizationService, ILogger logger,
-            IUserService userService)
+            IUserService userService, IVariationContextAccessor variationContextAccessor, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, UriUtility uriUtility, IPublishedUrlProvider publishedUrlProvider, IEntityService entityService)
         {
             _commonMapper = commonMapper;
+            _commonTreeNodeMapper = commonTreeNodeMapper;
             _cultureDictionary = cultureDictionary;
             _localizedTextService = localizedTextService;
             _contentService = contentService;
@@ -49,8 +58,12 @@ namespace Umbraco.Web.Models.Mapping
             _localizationService = localizationService;
             _logger = logger;
             _userService = userService;
+            _entityService = entityService;
+            _variationContextAccessor = variationContextAccessor;
+            _uriUtility = uriUtility;
+            _publishedUrlProvider = publishedUrlProvider;
 
-            _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IContent>(cultureDictionary, localizedTextService);
+            _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IContent>(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider);
             _stateMapper = new ContentSavedStateMapper<ContentPropertyDisplay>();
             _basicStateMapper = new ContentBasicSavedStateMapper<ContentPropertyBasic>();
             _contentVariantMapper = new ContentVariantMapper(_localizationService);
@@ -83,7 +96,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Icon = source.ContentType.Icon;
             target.Id = source.Id;
             target.IsBlueprint = source.Blueprint;
-            target.IsChildOfListView = DermineIsChildOfListView(source);
+            target.IsChildOfListView = DetermineIsChildOfListView(source, context);
             target.IsContainer = source.ContentType.IsContainer;
             target.IsElement = source.ContentType.IsElement;
             target.Key = source.Key;
@@ -94,7 +107,7 @@ namespace Umbraco.Web.Models.Mapping
             target.TemplateAlias = GetDefaultTemplate(source);
             target.TemplateId = source.TemplateId ?? default;
             target.Trashed = source.Trashed;
-            target.TreeNodeUrl = _commonMapper.GetTreeNodeUrl<ContentTreeController>(source);
+            target.TreeNodeUrl = _commonTreeNodeMapper.GetTreeNodeUrl<ContentTreeController>(source);
             target.Udi = Udi.Create(source.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, source.Key);
             target.UpdateDate = source.UpdateDate;
             target.Updater = _commonMapper.GetCreator(source, context);
@@ -174,7 +187,7 @@ namespace Umbraco.Web.Models.Mapping
 
             var urls = umbracoContext == null
                 ? new[] { UrlInfo.Message("Cannot generate urls without a current Umbraco Context") }
-                : source.GetContentUrls(_publishedRouter, umbracoContext, _localizationService, _localizedTextService, _contentService, _logger).ToArray();
+                : source.GetContentUrls(_publishedRouter, umbracoContext, _localizationService, _localizedTextService, _contentService, _variationContextAccessor, _logger, _uriUtility, _publishedUrlProvider).ToArray();
 
             return urls;
         }
@@ -214,12 +227,65 @@ namespace Umbraco.Web.Models.Mapping
             return source.CultureInfos.TryGetValue(culture, out var name) && !name.Name.IsNullOrWhiteSpace() ? name.Name : $"({source.Name})";
         }
 
-        private bool DermineIsChildOfListView(IContent source)
+        /// <summary>
+        /// Checks if the content item is a descendant of a list view
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="context"></param>
+        /// <returns>
+        /// Returns true if the content item is a descendant of a list view and where the content is
+        /// not a current user's start node.
+        /// </returns>
+        /// <remarks>
+        /// We must check if it's the current user's start node because in that case we will actually be
+        /// rendering the tree node underneath the list view to visually show context. In this case we return
+        /// false because the item is technically not being rendered as part of a list view but instead as a
+        /// real tree node. If we didn't perform this check then tree syncing wouldn't work correctly.
+        /// </remarks>
+        private bool DetermineIsChildOfListView(IContent source, MapperContext context)
         {
-            // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
+            var userStartNodes = Array.Empty<int>();
+
+            // In cases where a user's start node is below a list view, we will actually render
+            // out the tree to that start node and in that case for that start node, we want to return
+            // false here.
+            if (context.HasItems && context.Items.TryGetValue("CurrentUser", out var usr) && usr is IUser currentUser)
+            {
+                userStartNodes = currentUser.CalculateContentStartNodeIds(_entityService);
+                if (!userStartNodes.Contains(Constants.System.Root))
+                {
+                    // return false if this is the user's actual start node, the node will be rendered in the tree
+                    // regardless of if it's a list view or not
+                    if (userStartNodes.Contains(source.Id))
+                        return false;
+                }
+            }
+
             var parent = _contentService.GetParent(source);
-            return parent != null && (parent.ContentType.IsContainer || _contentTypeService.HasContainerInPath(parent.Path));
+
+            if (parent == null)
+                return false;
+
+            var pathParts = parent.Path.Split(',').Select(x => int.TryParse(x, out var i) ? i : 0).ToList();
+
+            // reduce the path parts so we exclude top level content items that
+            // are higher up than a user's start nodes
+            foreach (var n in userStartNodes)
+            {
+                var index = pathParts.IndexOf(n);
+                if (index != -1)
+                {
+                    // now trim all top level start nodes to the found index
+                    for (var i = 0; i < index; i++)
+                    {
+                        pathParts.RemoveAt(0);
+                    }
+                }
+            }
+
+            return parent.ContentType.IsContainer || _contentTypeService.HasContainerInPath(pathParts.ToArray());
         }
+
 
         private DateTime? GetScheduledDate(IContent source, ContentScheduleAction action, MapperContext context)
         {

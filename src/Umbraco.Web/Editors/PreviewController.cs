@@ -5,6 +5,10 @@ using System.Web.Mvc;
 using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Cookie;
+using Umbraco.Core.Hosting;
+using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
@@ -12,6 +16,7 @@ using Umbraco.Web.JavaScript;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Trees;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
@@ -25,6 +30,14 @@ namespace Umbraco.Web.Editors
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizationService _localizationService;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IContentSettings _contentSettings;
+        private readonly IIOHelper _ioHelper;
+        private readonly TreeCollection _treeCollection;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ICookieManager _cookieManager;
+        private IRuntimeSettings _runtimeSettings;
+        private readonly ISecuritySettings _securitySettings;
 
         public PreviewController(
             UmbracoFeatures features,
@@ -32,7 +45,15 @@ namespace Umbraco.Web.Editors
             IPublishedSnapshotService publishedSnapshotService,
             IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizationService localizationService,
-            IUmbracoVersion umbracoVersion)
+            IUmbracoVersion umbracoVersion,
+            IContentSettings contentSettings,
+            IIOHelper ioHelper,
+            TreeCollection treeCollection,
+            IHttpContextAccessor httpContextAccessor,
+            IHostingEnvironment hostingEnvironment,
+            ICookieManager cookieManager,
+            IRuntimeSettings settings,
+            ISecuritySettings securitySettings)
         {
             _features = features;
             _globalSettings = globalSettings;
@@ -40,6 +61,14 @@ namespace Umbraco.Web.Editors
             _umbracoContextAccessor = umbracoContextAccessor;
             _localizationService = localizationService;
             _umbracoVersion = umbracoVersion;
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _treeCollection = treeCollection;
+            _httpContextAccessor = httpContextAccessor;
+            _hostingEnvironment = hostingEnvironment;
+            _cookieManager = cookieManager;
+            _runtimeSettings = settings;
+            _securitySettings = securitySettings;
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
@@ -48,7 +77,7 @@ namespace Umbraco.Web.Editors
         {
             var availableLanguages = _localizationService.GetAllLanguages();
 
-            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages);
+            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _contentSettings, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {
@@ -59,7 +88,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            return View(_globalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
+            return View(_ioHelper.BackOfficePath.EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
         }
 
         /// <summary>
@@ -71,7 +100,7 @@ namespace Umbraco.Web.Editors
         public JavaScriptResult Application()
         {
             var files = JsInitialization.OptimizeScriptFiles(HttpContext, JsInitialization.GetPreviewInitialization());
-            var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco.preview");
+            var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco.preview", _globalSettings, _ioHelper);
 
             return JavaScript(result);
         }
@@ -98,7 +127,7 @@ namespace Umbraco.Web.Editors
 
         public ActionResult End(string redir = null)
         {
-            var previewToken = Request.GetPreviewCookieValue();
+            var previewToken = _cookieManager.GetPreviewCookieValue();
             var service = Current.PublishedSnapshotService;
             service.ExitPreview(previewToken);
 

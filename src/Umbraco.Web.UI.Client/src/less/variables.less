@@ -75,6 +75,8 @@
 @gray-9:                #E9E9EB;
 @gray-10:               #F3F3F5;
 @gray-11:               #F6F6F7;
+@gray-12:               #F9F9FA;
+@gray-13:               #FBFBFD;
 
 @sand-1:                #DED4CF;// added 2019
 @sand-2:                #EBDED6;// added 2019
@@ -108,6 +110,7 @@
 //@blueLight:               #4f89de;
 @blue:                  #2E8AEA;
 @blueMid:               #2152A3;// updated 2019
+@blueMidLight:          #6ab4f0;
 @blueDark:              #3544b1;// updated 2019
 @blueExtraDark:         #1b264f;// added 2019
 @blueLight:             #ADD8E6;
@@ -115,6 +118,7 @@
 //@orange:              #f79c37;// updated 2019
 @pink:                  #D93F4C;// #C3325F;// update 2019
 @pinkLight:             #f5c1bc;// added 2019
+@pinkExtraLight:        #fee4e1;// added 2020
 @pinkRedLight:          #ff8a89;// added 2019
 @brown:                 #9d8057;// added 2019
 @brownLight:            #e4e0dd;// added 2019
@@ -133,14 +137,18 @@
 @ui-option-type:        @blueExtraDark;
 @ui-option-type-hover:  @blueMid;
 @ui-option:             @white;
-@ui-option-hover:       @sand-7;
+@ui-option-hover:       @gray-12;
 
 @ui-option-disabled-type:        @gray-6;
 @ui-option-disabled-type-hover:  @gray-5;
-@ui-option-disabled-hover:       @sand-7;
+@ui-option-disabled-hover:       @gray-12;
+
+@ui-disabled-type:        @gray-6;
+@ui-disabled-border:        @gray-6;
 
 //@ui-active:           #346ab3;
-@ui-active:             @pinkLight;
+@ui-active:             @pinkExtraLight;
+@ui-active-border:      @pinkLight;
 @ui-active-blur:        @brownLight;
 @ui-active-type:        @blueExtraDark;
 @ui-active-type-hover:  @blueMid;
@@ -149,31 +157,33 @@
 @ui-selected-hover:     ligthen(@sand-5, 10);
 @ui-selected-type:           @blueExtraDark;
 @ui-selected-type-hover:     @blueMid;
-@ui-selected-border:           @pinkLight;
-@ui-selected-border-hover:     darken(@pinkLight, 10);
+@ui-selected-border:           @blueDark;
+@ui-selected-border-hover:     darken(@blueDark, 10);
 
 @ui-light-border:           @pinkLight;
 @ui-light-type:             @gray-4;
 @ui-light-type-hover:       @blueMid;
 
 @ui-light-active-border:      @pinkLight;
-@ui-light-active-type:        @blueExtraDark;
-@ui-light-active-type-hover:  @blueMid;
+@ui-light-active-type:        @blueMid;
+@ui-light-active-type-hover:  @blueMidLight;
 
 
 @ui-action:             @white;
-@ui-action-hover:       @sand-7;
+@ui-action-hover:       @gray-12;
 @ui-action-type:             @blueExtraDark;
 @ui-action-type-hover:       @blueMid;
 @ui-action-border:             @blueExtraDark;
 @ui-action-border-hover:       @blueMid;
 
 @ui-action-discreet:              @white;
-@ui-action-discreet-hover:        @sand-7;
+@ui-action-discreet-hover:        @gray-12;
 @ui-action-discreet-type:         @blueExtraDark;
 @ui-action-discreet-type-hover:   @blueMid;
 @ui-action-discreet-border:         @gray-7;
 @ui-action-discreet-border-hover:   @blueMid;
+
+@ui-outline:                      @blueMidLight;
 
 @type-white:                      @white;
 @type-black:                      @blueNight;
@@ -238,6 +248,7 @@
 @paddingSmall:          2px 10px;  // 26px
 @paddingMini:           0 6px;   // 22px
 
+@propertyEditorLimitedWidth: 800px;
 
 // Disabled this to keep consistency throughout the backoffice UI. Untill a better solution is thought up, this will do.
 @baseBorderRadius:      3px; // 2px;
@@ -255,7 +266,7 @@
 // Buttons
 // -------------------------
 @btnBackground:                     @gray-9;
-@btnBackgroundHighlight:            @gray-9;
+@btnBackgroundHighlight:            @gray-10;
 @btnBorder:                         @gray-9;
 
 @btnPrimaryBackground:              @ui-btn-positive;
@@ -293,7 +304,7 @@
 @inputBackground:               @white;
 @inputBorder:                   @gray-8;
 @inputBorderFocus:              @gray-7;
-@inputBorderTabFocus:           @blueExtraDark;
+@inputBorderTabFocus:           @ui-outline;
 @inputBorderRadius:             0;
 @inputDisabledBackground:       @gray-10;
 @formActionsBackground:         @gray-9;
@@ -448,7 +459,7 @@
 @successBorder:           transparent;
 
 @infoText:                @white;
-@infoBackground:          @turquoise-d1;
+@infoBackground:          @blueDark;
 @infoBorder:              transparent;
 
 @alertBorderRadius:       0;

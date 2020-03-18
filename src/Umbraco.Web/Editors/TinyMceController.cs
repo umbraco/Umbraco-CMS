@@ -6,12 +6,17 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
@@ -25,16 +30,30 @@ namespace Umbraco.Web.Editors
         Constants.Applications.Members)]
     public class TinyMceController : UmbracoAuthorizedApiController
     {
-        private readonly IMediaService _mediaService;
-        private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+        private readonly IIOHelper _ioHelper;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IContentSettings _contentSettings;
 
-        public TinyMceController(IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IShortStringHelper shortStringHelper)
+        public TinyMceController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoMapper umbracoMapper,
+            IShortStringHelper shortStringHelper,
+            IContentSettings contentSettings,
+            IIOHelper ioHelper,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
-            _mediaService = mediaService;
-            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
-            _shortStringHelper = shortStringHelper;
+            _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
         }
+
 
         [HttpPost]
         public async Task<HttpResponseMessage> UploadImage()
@@ -45,10 +64,10 @@ namespace Umbraco.Web.Editors
             }
 
             // Create an unique folder path to help with concurrent users to avoid filename clash
-            var imageTempPath = Current.IOHelper.MapPath(Constants.SystemDirectories.TempImageUploads + "/" + Guid.NewGuid().ToString());
+            var imageTempPath = _ioHelper.MapPath(Constants.SystemDirectories.TempImageUploads + "/" + Guid.NewGuid().ToString());
 
             // Temp folderpath (Files come in as bodypart & will need to move/saved into imgTempPath
-            var folderPath = Current.IOHelper.MapPath(Constants.SystemDirectories.TempFileUploads);
+            var folderPath = _ioHelper.MapPath(Constants.SystemDirectories.TempFileUploads);
 
             // Ensure image temp path exists
             if(Directory.Exists(imageTempPath) == false)
@@ -78,7 +97,7 @@ namespace Umbraco.Web.Editors
             var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
-            if (Current.Configs.Settings().Content.IsFileAllowedForUpload(ext) == false || Current.Configs.Settings().Content.ImageFileTypes.Contains(ext) == false)
+            if (_contentSettings.IsFileAllowedForUpload(ext) == false || _contentSettings.ImageFileTypes.Contains(ext) == false)
             {
                 // Throw some error - to say can't upload this IMG type
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "This is not an image filetype extension that is approved");
@@ -86,8 +105,8 @@ namespace Umbraco.Web.Editors
 
             //var mediaItemName = fileName.ToFriendlyName();
             var currentFile = file.LocalFileName;
-            var newFilePath = imageTempPath +  Current.IOHelper.DirSepChar + safeFileName;
-            var relativeNewFilePath = Current.IOHelper.GetRelativePath(newFilePath);
+            var newFilePath = imageTempPath +  _ioHelper.DirSepChar + safeFileName;
+            var relativeNewFilePath = _ioHelper.GetRelativePath(newFilePath);
 
             try
             {

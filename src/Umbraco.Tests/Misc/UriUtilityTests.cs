@@ -12,6 +12,8 @@ namespace Umbraco.Tests.Misc
     [TestFixture]
     public class UriUtilityTests
     {
+
+        public UriUtility UriUtility { get; } = TestHelper.UriUtility;
         [TearDown]
         public void TearDown()
         {
@@ -75,15 +77,15 @@ namespace Umbraco.Tests.Misc
         {
             var globalConfig = Mock.Get(SettingsForTests.GenerateMockGlobalSettings());
 
-            var settings = SettingsForTests.GenerateMockUmbracoSettings();
-            var requestMock = Mock.Get(settings.RequestHandler);
+            var settings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var requestMock = Mock.Get(settings);
             requestMock.Setup(x => x.AddTrailingSlash).Returns(trailingSlash);
 
             UriUtility.SetAppDomainAppVirtualPath("/");
 
             var expectedUri = NewUri(expectedUrl);
             var sourceUri = NewUri(sourceUrl);
-            var resultUri = UriUtility.UriFromUmbraco(sourceUri, globalConfig.Object, settings.RequestHandler);
+            var resultUri = UriUtility.UriFromUmbraco(sourceUri, globalConfig.Object, settings);
 
             Assert.AreEqual(expectedUri.ToString(), resultUri.ToString());
         }

@@ -20,7 +20,6 @@ namespace Umbraco.Core
     public class RuntimeState : IRuntimeState
     {
         private readonly ILogger _logger;
-        private readonly IUmbracoSettingsSection _settings;
         private readonly IGlobalSettings _globalSettings;
         private readonly ConcurrentHashSet<string> _applicationUrls = new ConcurrentHashSet<string>();
         private readonly Lazy<IMainDom> _mainDom;
@@ -32,13 +31,12 @@ namespace Umbraco.Core
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
         /// </summary>
-        public RuntimeState(ILogger logger, IUmbracoSettingsSection settings, IGlobalSettings globalSettings,
+        public RuntimeState(ILogger logger, IGlobalSettings globalSettings,
             Lazy<IMainDom> mainDom, Lazy<IServerRegistrar> serverRegistrar, IUmbracoVersion umbracoVersion,
             IHostingEnvironment hostingEnvironment,
             IBackOfficeInfo backOfficeInfo)
         {
             _logger = logger;
-            _settings = settings;
             _globalSettings = globalSettings;
             _mainDom = mainDom;
             _serverRegistrar = serverRegistrar;

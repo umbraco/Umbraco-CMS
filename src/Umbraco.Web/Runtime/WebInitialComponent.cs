@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Web.Configuration;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
 using System.Web.Mvc;
@@ -17,12 +15,12 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Strings;
 using Umbraco.Core.IO;
-using Umbraco.Core.Strings;
 using Umbraco.Web.Install;
 using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 
+using Constants = Umbraco.Core.Constants;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Runtime
@@ -37,6 +35,7 @@ namespace Umbraco.Web.Runtime
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IIOHelper _ioHelper;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IRuntimeSettings _settings;
 
         public WebInitialComponent(
             IUmbracoContextAccessor umbracoContextAccessor,
@@ -46,7 +45,8 @@ namespace Umbraco.Web.Runtime
             IGlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IIOHelper ioHelper,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IRuntimeSettings settings)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _surfaceControllerTypes = surfaceControllerTypes;
@@ -56,6 +56,7 @@ namespace Umbraco.Web.Runtime
             _hostingEnvironment = hostingEnvironment;
             _ioHelper = ioHelper;
             _shortStringHelper = shortStringHelper;
+            _settings = settings;
         }
 
         public void Initialize()
@@ -80,7 +81,7 @@ namespace Umbraco.Web.Runtime
             ConfigureGlobalFilters();
 
             // set routes
-            CreateRoutes(_umbracoContextAccessor, _globalSettings, _shortStringHelper, _surfaceControllerTypes, _apiControllerTypes);
+            CreateRoutes(_umbracoContextAccessor, _globalSettings, _shortStringHelper, _surfaceControllerTypes, _apiControllerTypes, _ioHelper);
         }
 
         public void Terminate()
@@ -146,10 +147,10 @@ namespace Umbraco.Web.Runtime
                     = Path.Combine(cachePath, "ClientDependency");
             }
 
-            if (ConfigurationManager.GetSection("system.web/httpRuntime") is HttpRuntimeSection section)
+            if (_settings.MaxQueryStringLength.HasValue || _settings.MaxRequestLength.HasValue)
             {
                 //set the max url length for CDF to be the smallest of the max query length, max request length
-                ClientDependency.Core.CompositeFiles.CompositeDependencyHandler.MaxHandlerUrlLength = Math.Min(section.MaxQueryStringLength, section.MaxRequestLength);
+                ClientDependency.Core.CompositeFiles.CompositeDependencyHandler.MaxHandlerUrlLength = Math.Min(_settings.MaxQueryStringLength.GetValueOrDefault(), _settings.MaxRequestLength.GetValueOrDefault());
             }
 
             //Register a custom renderer - used to process property editor dependencies
@@ -168,9 +169,10 @@ namespace Umbraco.Web.Runtime
             IGlobalSettings globalSettings,
             IShortStringHelper shortStringHelper,
             SurfaceControllerTypeCollection surfaceControllerTypes,
-            UmbracoApiControllerTypeCollection apiControllerTypes)
+            UmbracoApiControllerTypeCollection apiControllerTypes,
+            IIOHelper ioHelper)
         {
-            var umbracoPath = globalSettings.GetUmbracoMvcArea(Current.IOHelper);
+            var umbracoPath = ioHelper.GetUmbracoMvcArea();
 
             // create the front-end route
             var defaultRoute = RouteTable.Routes.MapRoute(
@@ -180,22 +182,34 @@ namespace Umbraco.Web.Runtime
             );
             defaultRoute.RouteHandler = new RenderRouteHandler(umbracoContextAccessor, ControllerBuilder.Current.GetControllerFactory(), shortStringHelper);
 
+            // register no content route
+            RouteNoContentController(umbracoPath);
+
             // register install routes
             RouteTable.Routes.RegisterArea<UmbracoInstallArea>();
 
             // register all back office routes
-            RouteTable.Routes.RegisterArea(new BackOfficeArea(globalSettings));
+            RouteTable.Routes.RegisterArea(new BackOfficeArea(ioHelper));
 
             // plugin controllers must come first because the next route will catch many things
-            RoutePluginControllers(globalSettings, surfaceControllerTypes, apiControllerTypes);
+            RoutePluginControllers(globalSettings, surfaceControllerTypes, apiControllerTypes, ioHelper);
+        }
+
+        private static void RouteNoContentController(string umbracoPath)
+        {
+            RouteTable.Routes.MapRoute(
+                Constants.Web.NoContentRouteName,
+                umbracoPath + "/UmbNoContent",
+                new { controller = "RenderNoContent", action = "Index" });
         }
 
         private static void RoutePluginControllers(
             IGlobalSettings globalSettings,
             SurfaceControllerTypeCollection surfaceControllerTypes,
-            UmbracoApiControllerTypeCollection apiControllerTypes)
+            UmbracoApiControllerTypeCollection apiControllerTypes,
+            IIOHelper ioHelper)
         {
-            var umbracoPath = globalSettings.GetUmbracoMvcArea(Current.IOHelper);
+            var umbracoPath = ioHelper.GetUmbracoMvcArea();
 
             // need to find the plugin controllers and route them
             var pluginControllers = surfaceControllerTypes.Concat(apiControllerTypes).ToArray();
@@ -217,7 +231,7 @@ namespace Umbraco.Web.Runtime
             foreach (var g in groupedAreas)
             {
                 // create & register an area for the controllers (this will throw an exception if all controllers are not in the same area)
-                var pluginControllerArea = new PluginControllerArea(globalSettings, g.Select(PluginController.GetMetadata));
+                var pluginControllerArea = new PluginControllerArea(globalSettings, ioHelper, g.Select(PluginController.GetMetadata));
                 RouteTable.Routes.RegisterArea(pluginControllerArea);
             }
         }
@@ -250,6 +264,5 @@ namespace Umbraco.Web.Runtime
             // make it use our custom/special SurfaceMvcHandler
             route.RouteHandler = new SurfaceRouteHandler();
         }
-
     }
 }

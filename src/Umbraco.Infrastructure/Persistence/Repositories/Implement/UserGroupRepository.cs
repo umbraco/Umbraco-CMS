@@ -32,10 +32,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             _permissionRepository = new PermissionRepository<IContent>(scopeAccessor, appCaches, logger);
         }
 
-        public const string GetByAliasCacheKeyPrefix = "UserGroupRepository_GetByAlias_";
+
         public static string GetByAliasCacheKey(string alias)
         {
-            return GetByAliasCacheKeyPrefix + alias;
+            return CacheKeys.UserGroupGetByAliasCacheKeyPrefix + alias;
         }
 
         public IUserGroup Get(string alias)

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Web.Routing;
 using Moq;
 using Umbraco.Core;
@@ -10,10 +9,8 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-using Umbraco.Core.Composing;
-using Current = Umbraco.Core.Composing.Current;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -23,6 +20,8 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects.Accessors;
+using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Tests.Common;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -58,7 +57,7 @@ namespace Umbraco.Tests.PublishedContent
                     .ToList());
         }
 
-        private UmbracoContext GetUmbracoContext()
+        private IUmbracoContext GetUmbracoContext()
         {
             RouteData routeData = null;
 
@@ -70,16 +69,17 @@ namespace Umbraco.Tests.PublishedContent
             var globalSettings = TestObjects.GetGlobalSettings();
 
             var httpContext = GetHttpContextFactory("http://umbraco.local/", routeData).HttpContext;
+
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor(httpContext);
             var umbracoContext = new UmbracoContext(
-                httpContext,
+                httpContextAccessor,
                 publishedSnapshotService.Object,
-                new WebSecurity(httpContext, Current.Services.UserService, globalSettings),
-                TestObjects.GetUmbracoSettings(),
-                Enumerable.Empty<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, globalSettings, IOHelper),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             return umbracoContext;
         }

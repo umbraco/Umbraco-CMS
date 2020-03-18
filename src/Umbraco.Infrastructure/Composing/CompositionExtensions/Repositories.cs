@@ -47,6 +47,8 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             composition.RegisterUnique<IScriptRepository, ScriptRepository>();
             composition.RegisterUnique<IStylesheetRepository, StylesheetRepository>();
             composition.RegisterUnique<IContentTypeCommonRepository, ContentTypeCommonRepository>();
+            composition.RegisterUnique<IInstallationRepository, InstallationRepository>();
+            composition.RegisterUnique<IUpgradeCheckRepository, UpgradeCheckRepository>();
 
             return composition;
         }

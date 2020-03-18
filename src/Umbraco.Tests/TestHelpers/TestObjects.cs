@@ -22,6 +22,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers.Stubs;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -94,7 +95,7 @@ namespace Umbraco.Tests.TestHelpers
             ILogger logger,
             IIOHelper ioHelper,
             IGlobalSettings globalSettings,
-            IUmbracoSettingsSection umbracoSettings,
+            IContentSettings contentSettings,
             IEventMessagesFactory eventMessagesFactory,
             UrlSegmentProviderCollection urlSegmentProviders,
             TypeLoader typeLoader,
@@ -151,16 +152,16 @@ namespace Umbraco.Tests.TestHelpers
                     logger));
 
             var runtimeState = Mock.Of<IRuntimeState>();
-            var idkMap = new IdkMap(scopeProvider);
+            var idkMap = new IdKeyMap(scopeProvider);
 
             var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
 
             var localizationService = GetLazyService<ILocalizationService>(factory, c => new LocalizationService(scopeProvider, logger, eventMessagesFactory, GetRepo<IDictionaryRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<ILanguageRepository>(c)));
             var userService = GetLazyService<IUserService>(factory, c => new UserService(scopeProvider, logger, eventMessagesFactory, runtimeState, GetRepo<IUserRepository>(c), GetRepo<IUserGroupRepository>(c),globalSettings));
-            var dataTypeService = GetLazyService<IDataTypeService>(factory, c => new DataTypeService(scopeProvider, logger, eventMessagesFactory, GetRepo<IDataTypeRepository>(c), GetRepo<IDataTypeContainerRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IEntityRepository>(c), GetRepo<IContentTypeRepository>(c)));
+            var dataTypeService = GetLazyService<IDataTypeService>(factory, c => new DataTypeService(scopeProvider, logger, eventMessagesFactory, GetRepo<IDataTypeRepository>(c), GetRepo<IDataTypeContainerRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IEntityRepository>(c), GetRepo<IContentTypeRepository>(c), ioHelper, localizedTextService.Value, localizationService.Value, TestHelper.ShortStringHelper));
             var propertyValidationService = new Lazy<IPropertyValidationService>(() => new PropertyValidationService(propertyEditorCollection, dataTypeService.Value));
             var contentService = GetLazyService<IContentService>(factory, c => new ContentService(scopeProvider, logger, eventMessagesFactory, GetRepo<IDocumentRepository>(c), GetRepo<IEntityRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IContentTypeRepository>(c), GetRepo<IDocumentBlueprintRepository>(c), GetRepo<ILanguageRepository>(c), propertyValidationService));
-            var notificationService = GetLazyService<INotificationService>(factory, c => new NotificationService(scopeProvider, userService.Value, contentService.Value, localizationService.Value, logger, ioHelper, GetRepo<INotificationsRepository>(c), globalSettings, umbracoSettings.Content));
+            var notificationService = GetLazyService<INotificationService>(factory, c => new NotificationService(scopeProvider, userService.Value, contentService.Value, localizationService.Value, logger, ioHelper, GetRepo<INotificationsRepository>(c), globalSettings, contentSettings));
             var serverRegistrationService = GetLazyService<IServerRegistrationService>(factory, c => new ServerRegistrationService(scopeProvider, logger, eventMessagesFactory, GetRepo<IServerRegistrationRepository>(c), TestHelper.GetHostingEnvironment()));
             var memberGroupService = GetLazyService<IMemberGroupService>(factory, c => new MemberGroupService(scopeProvider, logger, eventMessagesFactory, GetRepo<IMemberGroupRepository>(c)));
             var memberService = GetLazyService<IMemberService>(factory, c => new MemberService(scopeProvider, logger, eventMessagesFactory, memberGroupService.Value, GetRepo<IMemberRepository>(c), GetRepo<IMemberTypeRepository>(c), GetRepo<IMemberGroupRepository>(c), GetRepo<IAuditRepository>(c)));
@@ -243,12 +244,18 @@ namespace Umbraco.Tests.TestHelpers
                 // mappersBuilder.AddCore();
                 // var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Factory.GetInstance<IMapperCollection>();
-                databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers), TestHelper.GetConfigs(), TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider);
+                databaseFactory = new UmbracoDatabaseFactory(
+                    Constants.System.UmbracoConnectionName,
+                    SettingsForTests.GetDefaultGlobalSettings(),
+                    new ConnectionStrings(),
+                    logger,
+                    new Lazy<IMapperCollection>(() => mappers),
+                    TestHelper.DbProviderFactoryCreator);
             }
 
-            typeFinder = typeFinder ?? new TypeFinder(logger);
+            typeFinder = typeFinder ?? new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly));
             fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings());
-            var coreDebug = Current.Configs.CoreDebug();
+            var coreDebug = TestHelper.CoreDebug;
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
             var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, coreDebug, mediaFileSystem, logger, typeFinder, NoAppCache.Instance);
             return scopeProvider;

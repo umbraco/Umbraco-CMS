@@ -20,10 +20,16 @@ namespace Umbraco.Tests.Routing
 
             var properties = new[]
             {
-                new PublishedPropertyType("umbracoUrlAlias", Constants.DataTypes.Textbox, false, ContentVariation.Nothing,
-                    new PropertyValueConverterCollection(Enumerable.Empty<IPropertyValueConverter>()),
-                    Mock.Of<IPublishedModelFactory>(),
-                    Mock.Of<IPublishedContentTypeFactory>()),
+                new PublishedPropertyType(
+                    propertyTypeAlias:"umbracoUrlAlias",
+                    dataTypeId: Constants.DataTypes.Textbox,
+                    isUserProperty:false,
+                    variations: ContentVariation.Nothing,
+                    propertyValueConverters:new PropertyValueConverterCollection(Enumerable.Empty<IPropertyValueConverter>()),
+                    contentType:Mock.Of<IPublishedContentType>(),
+                    publishedModelFactory:Mock.Of<IPublishedModelFactory>(),
+                    factory:Mock.Of<IPublishedContentTypeFactory>()
+                    )
             };
             _publishedContentType = new PublishedContentType(0, "Doc", PublishedItemType.Content, Enumerable.Empty<string>(), properties, ContentVariation.Nothing);
         }
@@ -57,7 +63,7 @@ namespace Umbraco.Tests.Routing
             if (expectedNode > 0)
                 Assert.AreEqual(expectedCulture, request.Culture.Name);
 
-            var finder = new ContentFinderByUrlAlias(Logger);
+            var finder = new ContentFinderByUrlAlias(Logger, Mock.Of<IPublishedValueFallback>(), VariationContextAccessor);
             var result = finder.TryFindContent(request);
 
             if (expectedNode > 0)

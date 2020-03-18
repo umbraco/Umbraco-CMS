@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
@@ -22,7 +23,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="factoriesAccessor">The factories accessor.</param>
         public MasterControllerFactory(Func<FilteredControllerFactoryCollection> factoriesAccessor)
-            : base(Current.Factory)
+            :  base(new Lazy<IFactory>(() => Current.Factory))
         {
             // note
             // because the MasterControllerFactory needs to be ctored to be assigned to

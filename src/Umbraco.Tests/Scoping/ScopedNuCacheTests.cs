@@ -10,6 +10,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
+using Umbraco.Core.Install;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -18,6 +19,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
+using Umbraco.Tests.Common;
 using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -29,6 +31,7 @@ using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Scoping
 {
@@ -83,7 +86,8 @@ namespace Umbraco.Tests.Scoping
             var memberRepository = Mock.Of<IMemberRepository>();
             var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeFinder = TestHelper.GetTypeFinder();
+            var settings = Mock.Of<INuCacheSettings>();
 
             return new PublishedSnapshotService(
                 options,
@@ -91,41 +95,41 @@ namespace Umbraco.Tests.Scoping
                 runtimeStateMock.Object,
                 ServiceContext,
                 contentTypeFactory,
-                null,
                 publishedSnapshotAccessor,
                 Mock.Of<IVariationContextAccessor>(),
                 ProfilingLogger,
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
-                new DatabaseDataSource(),
+                new DatabaseDataSource(Mock.Of<ILogger>()),
                 Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
-                Mock.Of<IPublishedModelFactory>(),
+                new NoopPublishedModelFactory(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
                 typeFinder,
                 hostingEnvironment,
-                new MockShortStringHelper());
+                new MockShortStringHelper(),
+                IOHelper,
+                settings);
         }
 
-        protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)
+        protected IUmbracoContext GetUmbracoContextNu(string url, RouteData routeData = null, bool setSingleton = false)
         {
             // ensure we have a PublishedSnapshotService
             var service = PublishedSnapshotService as PublishedSnapshotService;
 
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
-
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor(httpContext);
             var globalSettings = TestObjects.GetGlobalSettings();
             var umbracoContext = new UmbracoContext(
-                httpContext,
+                httpContextAccessor,
                 service,
-                new WebSecurity(httpContext, Current.Services.UserService, globalSettings),
-                umbracoSettings ?? SettingsForTests.GetDefaultUmbracoSettings(),
-                urlProviders ?? Enumerable.Empty<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, globalSettings, IOHelper),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility,
+                new AspNetCookieManager(httpContextAccessor));
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
@@ -140,12 +144,12 @@ namespace Umbraco.Tests.Scoping
             var umbracoContext = GetUmbracoContextNu("http://example.com/", setSingleton: true);
 
             // wire cache refresher
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>());
             _distributedCacheBinder.BindEvents(true);
 
             // create document type, document
             var contentType = new ContentType(ShortStringHelper, -1) { Alias = "CustomDocument", Name = "Custom Document" };
-            Current.Services.ContentTypeService.Save(contentType);
+            ServiceContext.ContentTypeService.Save(contentType);
             var item = new Content("name", -1, contentType);
 
             // event handler
@@ -158,26 +162,26 @@ namespace Umbraco.Tests.Scoping
 
                 // during events, due to LiveSnapshot, we see the changes
                 Assert.IsNotNull(e);
-                Assert.AreEqual("changed", e.Name());
+                Assert.AreEqual("changed", e.Name(VariationContextAccessor));
             };
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                Current.Services.ContentService.SaveAndPublish(item);
+                ServiceContext.ContentService.SaveAndPublish(item);
                 scope.Complete();
             }
 
             // been created
             var x = umbracoContext.Content.GetById(item.Id);
             Assert.IsNotNull(x);
-            Assert.AreEqual("name", x.Name());
+            Assert.AreEqual("name", x.Name(VariationContextAccessor));
 
             ContentService.Published += OnPublishedAssert;
 
             using (var scope = ScopeProvider.CreateScope())
             {
                 item.Name = "changed";
-                Current.Services.ContentService.SaveAndPublish(item);
+                ServiceContext.ContentService.SaveAndPublish(item);
 
                 if (complete)
                     scope.Complete();
@@ -192,7 +196,7 @@ namespace Umbraco.Tests.Scoping
             // else changes have been rolled back
             x = umbracoContext.Content.GetById(item.Id);
             Assert.IsNotNull(x);
-            Assert.AreEqual(complete ? "changed" : "name", x.Name());
+            Assert.AreEqual(complete ? "changed" : "name", x.Name(VariationContextAccessor));
         }
     }
 }

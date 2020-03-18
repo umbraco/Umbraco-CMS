@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.AspNet.Identity.Owin;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Models.Identity;
+using Umbraco.Web.Models.Identity;
 
 namespace Umbraco.Web.Security
 {
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Security
         /// <param name="umbracoContext"></param>
         /// <param name="loginInfo"></param>
         /// <returns></returns>
-        public string[] GetDefaultUserGroups(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
+        public string[] GetDefaultUserGroups(IUmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
         {
             return _defaultUserGroups;
         }
@@ -61,7 +61,7 @@ namespace Umbraco.Web.Security
         ///
         /// For public auth providers this should always be false!!!
         /// </summary>
-        public bool ShouldAutoLinkExternalAccount(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
+        public bool ShouldAutoLinkExternalAccount(IUmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
         {
             return _autoLinkExternalAccount;
         }
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// The default Culture to use for auto-linking users
         /// </summary>
-        public string GetDefaultCulture(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
+        public string GetDefaultCulture(IUmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
         {
             return _defaultCulture;
         }

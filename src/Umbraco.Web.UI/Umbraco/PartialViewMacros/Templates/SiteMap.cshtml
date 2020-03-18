@@ -1,3 +1,4 @@
+@using Umbraco.Core
 @using Umbraco.Core.Models.PublishedContent
 @using Umbraco.Web
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
@@ -32,7 +33,7 @@
             @foreach (var item in selection)
             {
                 <li class="level-@item.Level">
-                    <a href="@item.Url">@item.Name</a>
+                    <a href="@item.Url()">@item.Name</a>
 
                     @* Run the traverse helper again for any child pages *@
                     @Traverse(item)

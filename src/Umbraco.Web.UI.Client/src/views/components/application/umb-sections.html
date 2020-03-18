@@ -11,7 +11,7 @@
                 </a>
             </li>
 
-            <li data-element="section-expand" class="expand" ng-class="{ 'open': showTray === true }" ng-show="needTray">
+            <li data-element="section-expand" class="expand" ng-class="{ 'open': showTray === true, current: currentSectionInOverflow() }" ng-show="needTray">
                 <a href="#" ng-click="trayClick()" prevent-default>
                     <span class="section__name"><i></i><i></i><i></i></span>
                 </a>

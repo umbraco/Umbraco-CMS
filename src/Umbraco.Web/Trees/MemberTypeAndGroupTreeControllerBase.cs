@@ -1,8 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Trees;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Trees
 {
@@ -10,6 +18,29 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public abstract class MemberTypeAndGroupTreeControllerBase : TreeController
     {
+        public IMenuItemCollectionFactory MenuItemCollectionFactory { get; }
+
+        protected MemberTypeAndGroupTreeControllerBase()
+        {
+            MenuItemCollectionFactory = Current.MenuItemCollectionFactory;
+        }
+
+        protected MemberTypeAndGroupTreeControllerBase(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider,
+            IMenuItemCollectionFactory menuItemCollectionFactory)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
+        {
+            MenuItemCollectionFactory = menuItemCollectionFactory;
+        }
+
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
@@ -19,7 +50,7 @@ namespace Umbraco.Web.Trees
 
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
-            var menu = new MenuItemCollection();
+            var menu = MenuItemCollectionFactory.Create();
 
             if (id == Constants.System.RootString)
             {

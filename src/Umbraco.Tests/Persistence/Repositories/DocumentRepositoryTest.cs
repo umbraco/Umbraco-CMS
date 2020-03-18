@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             TemplateRepository tr;
             var ctRepository = CreateRepository(scopeAccessor, out contentTypeRepository, out tr);
             var editors = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>()));
-            dtdRepository = new DataTypeRepository(scopeAccessor, appCaches, new Lazy<PropertyEditorCollection>(() => editors), Logger, IOHelper, new Lazy<IDataTypeService>(() => DataTypeService), LocalizedTextService, LocalizationService, ShortStringHelper);
+            dtdRepository = new DataTypeRepository(scopeAccessor, appCaches, new Lazy<PropertyEditorCollection>(() => editors), Logger);
             return ctRepository;
         }
 
@@ -359,7 +359,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository dataTypeDefinitionRepository);
 
-                var editor = new DecimalPropertyEditor(Logger, ShortStringHelper);
+                var editor = new DecimalPropertyEditor(Logger, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper);
                 var dtd = new DataType(editor) { Name = "test", DatabaseType = ValueStorageType.Decimal };
                 dataTypeDefinitionRepository.Save(dtd);
 

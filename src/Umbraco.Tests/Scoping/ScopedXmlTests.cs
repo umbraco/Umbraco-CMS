@@ -5,7 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Scoping
 
         protected override void ComposeSettings()
         {
-            Composition.Configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
+            Composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
             Composition.Configs.Add(SettingsForTests.GenerateMockGlobalSettings);
         }
 
@@ -89,11 +89,11 @@ namespace Umbraco.Tests.Scoping
 
             // create document type, document
             var contentType = new ContentType(ShortStringHelper, -1) { Alias = "CustomDocument", Name = "Custom Document" };
-            Current.Services.ContentTypeService.Save(contentType);
+            ServiceContext.ContentTypeService.Save(contentType);
             var item = new Content("name", -1, contentType);
 
             // wire cache refresher
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>());
             _distributedCacheBinder.BindEvents(true);
 
             // check xml in context = "before"
@@ -126,9 +126,9 @@ namespace Umbraco.Tests.Scoping
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                Current.Services.ContentService.SaveAndPublish(item); // should create an xml clone
+                ServiceContext.ContentService.SaveAndPublish(item); // should create an xml clone
                 item.Name = "changed";
-                Current.Services.ContentService.SaveAndPublish(item); // should re-use the xml clone
+                ServiceContext.ContentService.SaveAndPublish(item); // should re-use the xml clone
 
                 // this should never change
                 Assert.AreEqual(beforeOuterXml, beforeXml.OuterXml);
@@ -203,10 +203,10 @@ namespace Umbraco.Tests.Scoping
 
             // create document type
             var contentType = new ContentType(ShortStringHelper,-1) { Alias = "CustomDocument", Name = "Custom Document" };
-            Current.Services.ContentTypeService.Save(contentType);
+            ServiceContext.ContentTypeService.Save(contentType);
 
             // wire cache refresher
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>());
             _distributedCacheBinder.BindEvents(true);
 
             // check xml in context = "before"
@@ -225,12 +225,12 @@ namespace Umbraco.Tests.Scoping
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                Current.Services.ContentService.SaveAndPublish(item);
+                ServiceContext.ContentService.SaveAndPublish(item);
 
                 for (var i = 0; i < count; i++)
                 {
                     var temp = new Content("content_" + i, -1, contentType);
-                    Current.Services.ContentService.SaveAndPublish(temp);
+                    ServiceContext.ContentService.SaveAndPublish(temp);
                     ids[i] = temp.Id;
                 }
 

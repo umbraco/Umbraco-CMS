@@ -20,8 +20,8 @@ namespace Umbraco.Web.Mvc
         protected SurfaceController()
         { }
 
-        protected SurfaceController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
-            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger, umbracoHelper)
+        protected SurfaceController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger)
         { }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(int pageId)
         {
-            return new RedirectToUmbracoPageResult(pageId,  Current.UmbracoContextAccessor);
+            return new RedirectToUmbracoPageResult(pageId,  Current.PublishedUrlProvider);
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(int pageId, NameValueCollection queryStringValues)
         {
-            return new RedirectToUmbracoPageResult(pageId, queryStringValues,  Current.UmbracoContextAccessor);
+            return new RedirectToUmbracoPageResult(pageId, queryStringValues,  Current.PublishedUrlProvider);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(int pageId, string queryString)
         {
-            return new RedirectToUmbracoPageResult(pageId, queryString,  Current.UmbracoContextAccessor);
+            return new RedirectToUmbracoPageResult(pageId, queryString,  Current.PublishedUrlProvider);
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent)
         {
-            return new RedirectToUmbracoPageResult(publishedContent,  Current.UmbracoContextAccessor);
+            return new RedirectToUmbracoPageResult(publishedContent,  Current.PublishedUrlProvider);
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent, NameValueCollection queryStringValues)
         {
-            return new RedirectToUmbracoPageResult(publishedContent, queryStringValues,  Current.UmbracoContextAccessor);
+            return new RedirectToUmbracoPageResult(publishedContent, queryStringValues,  Current.PublishedUrlProvider);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent, string queryString)
         {
-            return new RedirectToUmbracoPageResult(publishedContent, queryString,  Current.UmbracoContextAccessor);
+            return new RedirectToUmbracoPageResult(publishedContent, queryString,  Current.PublishedUrlProvider);
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToCurrentUmbracoPage()
         {
-            return new RedirectToUmbracoPageResult(CurrentPage,  Current.UmbracoContextAccessor);
+            return new RedirectToUmbracoPageResult(CurrentPage,  Current.PublishedUrlProvider);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToCurrentUmbracoPage(NameValueCollection queryStringValues)
         {
-            return new RedirectToUmbracoPageResult(CurrentPage, queryStringValues,  Current.UmbracoContextAccessor);
+            return new RedirectToUmbracoPageResult(CurrentPage, queryStringValues,  Current.PublishedUrlProvider);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToCurrentUmbracoPage(string queryString)
         {
-            return new RedirectToUmbracoPageResult(CurrentPage, queryString,  Current.UmbracoContextAccessor);
+            return new RedirectToUmbracoPageResult(CurrentPage, queryString,  Current.PublishedUrlProvider);
         }
 
         /// <summary>

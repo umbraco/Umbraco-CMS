@@ -113,7 +113,6 @@ namespace Umbraco.Core.Models.Membership
         private DateTime _lastPasswordChangedDate;
         private DateTime _lastLoginDate;
         private DateTime _lastLockoutDate;
-        private bool _defaultToLiveEditing;
         private IDictionary<string, object> _additionalData;
         private object _additionalDataLock = new object();
 
@@ -319,13 +318,6 @@ namespace Umbraco.Core.Models.Membership
         {
             get => _language;
             set => SetPropertyValueAndDetectChanges(value, ref _language, nameof(Language));
-        }
-
-        [IgnoreDataMember]
-        internal bool DefaultToLiveEditing
-        {
-            get => _defaultToLiveEditing;
-            set => SetPropertyValueAndDetectChanges(value, ref _defaultToLiveEditing, nameof(DefaultToLiveEditing));
         }
 
         /// <summary>

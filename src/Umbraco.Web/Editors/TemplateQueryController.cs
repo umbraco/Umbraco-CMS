@@ -4,10 +4,17 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Models.TemplateQuery;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors
@@ -19,6 +26,28 @@ namespace Umbraco.Web.Editors
     [JsonCamelCaseFormatter]
     public class TemplateQueryController : UmbracoAuthorizedJsonController
     {
+        private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IPublishedContentQuery _publishedContentQuery;
+
+        public TemplateQueryController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            IVariationContextAccessor variationContextAccessor,
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider,
+            IPublishedContentQuery publishedContentQuery)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
+        {
+            _variationContextAccessor = variationContextAccessor;
+            _publishedContentQuery = publishedContentQuery;
+        }
+
         private IEnumerable<OperatorTerm> Terms => new List<OperatorTerm>
         {
                 new OperatorTerm(Services.TextService.Localize("template/is"), Operator.Equals, new [] {"string"}),
@@ -52,7 +81,7 @@ namespace Umbraco.Web.Editors
 
             if (model == null)
             {
-                contents = Umbraco.ContentAtRoot().FirstOrDefault().Children();
+                contents = _publishedContentQuery.ContentAtRoot().FirstOrDefault().Children(_variationContextAccessor);
                 queryExpression.Append("Umbraco.ContentAtRoot().FirstOrDefault().Children()");
             }
             else
@@ -83,7 +112,7 @@ namespace Umbraco.Web.Editors
             IPublishedContent sourceDocument;
             if (model.Source != null && model.Source.Id > 0)
             {
-                sourceDocument = Umbraco.Content(model.Source.Id);
+                sourceDocument = _publishedContentQuery.Content(model.Source.Id);
 
                 if (sourceDocument == null)
                     queryExpression.AppendFormat("Umbraco.Content({0})", model.Source.Id);
@@ -92,7 +121,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                sourceDocument = Umbraco.ContentAtRoot().FirstOrDefault();
+                sourceDocument = _publishedContentQuery.ContentAtRoot().FirstOrDefault();
                 queryExpression.Append("Umbraco.ContentAtRoot().FirstOrDefault()");
             }
 
@@ -110,7 +139,7 @@ namespace Umbraco.Web.Editors
             {
                 contents = sourceDocument == null
                     ? Enumerable.Empty<IPublishedContent>()
-                    : sourceDocument.Children();
+                    : sourceDocument.Children(_variationContextAccessor);
                 queryExpression.Append(".Children()");
             }
 

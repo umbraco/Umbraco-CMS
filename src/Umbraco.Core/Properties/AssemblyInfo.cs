@@ -2,18 +2,12 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Umbraco.Core")]
-[assembly: AssemblyDescription("Umbraco Core")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("Umbraco CMS")]
-
 [assembly: ComVisible(false)]
-[assembly: Guid("130a6b5c-50e7-4df3-a0dd-e9e7eb0b7c5c")]
+[assembly: Guid("DA322714-FB89-4943-92BD-BB122B82F66B")]
 
 // Umbraco Cms
 [assembly: InternalsVisibleTo("Umbraco.Web")]
 [assembly: InternalsVisibleTo("Umbraco.Web.UI")]
-[assembly: InternalsVisibleTo("Umbraco.Examine")]
 [assembly: InternalsVisibleTo("Umbraco.ModelsBuilder.Embedded")]
 
 [assembly: InternalsVisibleTo("Umbraco.Tests")]

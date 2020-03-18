@@ -3,6 +3,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
@@ -68,7 +69,7 @@ namespace Umbraco.Web.Mvc
         internal class OverridenDefaultControllerFactory : ContainerControllerFactory
         {
             public OverridenDefaultControllerFactory()
-                : base(Current.Factory)
+                : base(new Lazy<IFactory>(() => Current.Factory))
             { }
 
             public new IController GetControllerInstance(RequestContext requestContext, Type controllerType)

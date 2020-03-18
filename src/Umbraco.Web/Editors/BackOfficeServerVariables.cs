@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Web;
-using System.Web.Configuration;
 using System.Web.Mvc;
 using ClientDependency.Core.Config;
-using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
@@ -21,6 +17,9 @@ using Umbraco.Web.Profiling;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Trees;
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Editors
 {
@@ -33,19 +32,41 @@ namespace Umbraco.Web.Editors
         private readonly IRuntimeState _runtimeState;
         private readonly UmbracoFeatures _features;
         private readonly IGlobalSettings _globalSettings;
-        private readonly HttpContextBase _httpContext;
-        private readonly IOwinContext _owinContext;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IContentSettings _contentSettings;
+        private readonly IIOHelper _ioHelper;
+        private readonly TreeCollection _treeCollection;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IRuntimeSettings _settings;
+        private readonly ISecuritySettings _securitySettings;
 
-        internal BackOfficeServerVariables(UrlHelper urlHelper, IRuntimeState runtimeState, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion)
+        internal BackOfficeServerVariables(
+            UrlHelper urlHelper,
+            IRuntimeState runtimeState,
+            UmbracoFeatures features,
+            IGlobalSettings globalSettings,
+            IUmbracoVersion umbracoVersion,
+            IContentSettings contentSettings,
+            IIOHelper ioHelper,
+            TreeCollection treeCollection,
+            IHttpContextAccessor httpContextAccessor,
+            IHostingEnvironment hostingEnvironment,
+            IRuntimeSettings settings,
+            ISecuritySettings securitySettings)
         {
             _urlHelper = urlHelper;
             _runtimeState = runtimeState;
             _features = features;
             _globalSettings = globalSettings;
-            _httpContext = _urlHelper.RequestContext.HttpContext;
-            _owinContext = _httpContext.GetOwinContext();
             _umbracoVersion = umbracoVersion;
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));
+            _httpContextAccessor = httpContextAccessor;
+            _hostingEnvironment = hostingEnvironment;
+            _settings = settings;
+            _securitySettings = securitySettings;
         }
 
         /// <summary>
@@ -101,7 +122,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         internal Dictionary<string, object> GetServerVariables()
         {
-            var globalSettings = Current.Configs.Global();
+            var globalSettings = _globalSettings;
             var defaultVals = new Dictionary<string, object>
             {
                 {
@@ -283,7 +304,7 @@ namespace Umbraco.Web.Editors
                                 controller => controller.DeleteById(int.MaxValue))
 						},
                         {
-                            "nuCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<NuCacheStatusController>(
+                            "publishedSnapshotCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedSnapshotCacheStatusController>(
                                 controller => controller.GetStatus())
                         },
                         {
@@ -314,35 +335,39 @@ namespace Umbraco.Web.Editors
                             "tinyMceApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TinyMceController>(
                                 controller => controller.UploadImage())
                         },
+                        {
+                            "imageUrlGeneratorApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImageUrlGeneratorController>(
+                                controller => controller.GetCropUrl(null, null, null, null, null))
+                        },
                     }
                 },
                 {
                     "umbracoSettings", new Dictionary<string, object>
                     {
-                        {"umbracoPath", _globalSettings.Path},
-                        {"mediaPath", Current.IOHelper.ResolveUrl(globalSettings.UmbracoMediaPath).TrimEnd('/')},
-                        {"appPluginsPath", Current.IOHelper.ResolveUrl(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
+                        {"umbracoPath", _ioHelper.BackOfficePath},
+                        {"mediaPath", _ioHelper.ResolveUrl(globalSettings.UmbracoMediaPath).TrimEnd('/')},
+                        {"appPluginsPath", _ioHelper.ResolveUrl(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
                             "imageFileTypes",
-                            string.Join(",", Current.Configs.Settings().Content.ImageFileTypes)
+                            string.Join(",", _contentSettings.ImageFileTypes)
                         },
                         {
                             "disallowedUploadFiles",
-                            string.Join(",", Current.Configs.Settings().Content.DisallowedUploadFiles)
+                            string.Join(",", _contentSettings.DisallowedUploadFiles)
                         },
                         {
                             "allowedUploadFiles",
-                            string.Join(",", Current.Configs.Settings().Content.AllowedUploadFiles)
+                            string.Join(",", _contentSettings.AllowedUploadFiles)
                         },
                         {
                             "maxFileSize",
                             GetMaxRequestLength()
                         },
-                        {"keepUserLoggedIn", Current.Configs.Settings().Security.KeepUserLoggedIn},
-                        {"usernameIsEmail", Current.Configs.Settings().Security.UsernameIsEmail},
-                        {"cssPath", Current.IOHelper.ResolveUrl(globalSettings.UmbracoCssPath).TrimEnd('/')},
-                        {"allowPasswordReset", Current.Configs.Settings().Security.AllowPasswordReset},
-                        {"loginBackgroundImage",  Current.Configs.Settings().Content.LoginBackgroundImage},
+                        {"keepUserLoggedIn", _securitySettings.KeepUserLoggedIn},
+                        {"usernameIsEmail", _securitySettings.UsernameIsEmail},
+                        {"cssPath", _ioHelper.ResolveUrl(globalSettings.UmbracoCssPath).TrimEnd('/')},
+                        {"allowPasswordReset", _securitySettings.AllowPasswordReset},
+                        {"loginBackgroundImage", _contentSettings.LoginBackgroundImage},
                         {"showUserInvite", EmailSender.CanSendRequiredEmail(globalSettings)},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail(globalSettings)},
                     }
@@ -357,7 +382,7 @@ namespace Umbraco.Web.Editors
                     }
                 },
                 {
-                    "isDebuggingEnabled", _httpContext.IsDebuggingEnabled
+                    "isDebuggingEnabled", _hostingEnvironment.IsDebugMode
                 },
                 {
                     "application", GetApplicationState()
@@ -366,7 +391,7 @@ namespace Umbraco.Web.Editors
                     "externalLogins", new Dictionary<string, object>
                     {
                         {
-                            "providers", _owinContext.Authentication.GetExternalAuthenticationTypes()
+                            "providers", _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().Authentication.GetExternalAuthenticationTypes()
                                 .Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
                                 .Select(p => new
                                 {
@@ -413,9 +438,8 @@ namespace Umbraco.Web.Editors
             //
             // do this instead
             // inheriting from TreeControllerBase and marked with TreeAttribute
-            var trees = Current.Factory.GetInstance<TreeCollection>();
 
-            foreach (var tree in trees)
+            foreach (var tree in _treeCollection)
             {
                 var treeType = tree.TreeControllerType;
 
@@ -454,7 +478,7 @@ namespace Umbraco.Web.Editors
             app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{ClientDependencySettings.Instance.Version}".GenerateHash());
 
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
-            app.Add("applicationPath", _httpContext.Request.ApplicationPath.EnsureEndsWith('/'));
+            app.Add("applicationPath", _httpContextAccessor.GetRequiredHttpContext().Request.ApplicationPath.EnsureEndsWith('/'));
 
             //add the server's GMT time offset in minutes
             app.Add("serverTimeOffset", Convert.ToInt32(DateTimeOffset.Now.Offset.TotalMinutes));
@@ -462,11 +486,9 @@ namespace Umbraco.Web.Editors
             return app;
         }
 
-        private static string GetMaxRequestLength()
+        private string GetMaxRequestLength()
         {
-            return ConfigurationManager.GetSection("system.web/httpRuntime") is HttpRuntimeSection section
-                ? section.MaxRequestLength.ToString()
-                : string.Empty;
+            return _settings.MaxRequestLength.HasValue ? _settings.MaxRequestLength.Value.ToString() : string.Empty;
         }
     }
 }

@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.Security
 {
@@ -23,13 +20,15 @@ namespace Umbraco.Web.Security
         private readonly IRuntimeState _runtimeState;
         private readonly IGlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
+        private readonly ISecuritySettings _securitySettings;
 
-        public BackOfficeCookieAuthenticationProvider(IUserService userService, IRuntimeState runtimeState, IGlobalSettings globalSettings, IIOHelper ioHelper)
+        public BackOfficeCookieAuthenticationProvider(IUserService userService, IRuntimeState runtimeState, IGlobalSettings globalSettings, IIOHelper ioHelper, ISecuritySettings securitySettings)
         {
             _userService = userService;
             _runtimeState = runtimeState;
             _globalSettings = globalSettings;
             _ioHelper = ioHelper;
+            _securitySettings = securitySettings;
         }
 
         public override void ResponseSignIn(CookieResponseSignInContext context)
@@ -73,7 +72,7 @@ namespace Umbraco.Web.Security
                 Expires = DateTime.Now.AddYears(-1),
                 Path = "/"
             });
-            context.Response.Cookies.Append(Current.Configs.Settings().Security.AuthCookieName, "", new CookieOptions
+            context.Response.Cookies.Append(_securitySettings.AuthCookieName, "", new CookieOptions
             {
                 Expires = DateTime.Now.AddYears(-1),
                 Path = "/"

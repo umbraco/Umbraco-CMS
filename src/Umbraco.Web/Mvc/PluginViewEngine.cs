@@ -1,9 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Web.Mvc;
-using Lucene.Net.Util;
-using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {
@@ -36,7 +34,6 @@ namespace Umbraco.Web.Mvc
             var viewLocationsArray = new[]
                 {
                     string.Concat(Core.Constants.SystemDirectories.AppPlugins, "/{2}/Views/{1}/{0}.cshtml"),
-                    string.Concat(Core.Constants.SystemDirectories.AppPlugins, "/{2}/Views/{1}/{0}.vbhtml")
                 };
 
             //set all of the area view locations to the plugin folder
@@ -44,7 +41,6 @@ namespace Umbraco.Web.Mvc
                 .Concat(new[]
                     {
                         string.Concat(Core.Constants.SystemDirectories.AppPlugins, "/{2}/Views/Shared/{0}.cshtml"),
-                        string.Concat(Core.Constants.SystemDirectories.AppPlugins, "/{2}/Views/Shared/{0}.vbhtml")
                     })
                 .ToArray();
 
@@ -54,14 +50,10 @@ namespace Umbraco.Web.Mvc
                 {
                     //will be used when we have partial view and child action macros
                     string.Concat(Core.Constants.SystemDirectories.AppPlugins, "/{2}/Views/Partials/{0}.cshtml"),
-                    string.Concat(Core.Constants.SystemDirectories.AppPlugins, "/{2}/Views/Partials/{0}.vbhtml"),
                     string.Concat(Core.Constants.SystemDirectories.AppPlugins, "/{2}/Views/MacroPartials/{0}.cshtml"),
-                    string.Concat(Core.Constants.SystemDirectories.AppPlugins, "/{2}/Views/MacroPartials/{0}.vbhtml"),
                     //for partialsCurrent.
                     string.Concat(Core.Constants.SystemDirectories.AppPlugins, "/{2}/Views/{1}/{0}.cshtml"),
-                    string.Concat(Core.Constants.SystemDirectories.AppPlugins, "/{2}/Views/{1}/{0}.vbhtml"),
                     string.Concat(Core.Constants.SystemDirectories.AppPlugins, "/{2}/Views/Shared/{0}.cshtml"),
-                    string.Concat(Core.Constants.SystemDirectories.AppPlugins, "/{2}/Views/Shared/{0}.vbhtml")
                 };
 
         }

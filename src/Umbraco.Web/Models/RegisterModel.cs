@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Web.Security;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Models
 {
@@ -20,22 +15,16 @@ namespace Umbraco.Web.Models
         /// <returns></returns>
         public static RegisterModel CreateModel()
         {
-            return new RegisterModel(false);
+            return new RegisterModel();
         }
 
-        private RegisterModel(bool doLookup)
+        private RegisterModel()
         {
             MemberTypeAlias = Constants.Conventions.MemberTypes.DefaultAlias;
             UsernameIsEmail = true;
             MemberProperties = new List<UmbracoProperty>();
             LoginOnSuccess = true;
             CreatePersistentLoginCookie = true;
-            if (doLookup && Current.UmbracoContext != null)
-            {
-                var helper = Current.Factory.GetInstance<MembershipHelper>();
-                var model = helper.CreateRegistrationModel(MemberTypeAlias);
-                MemberProperties = model.MemberProperties;
-            }
         }
 
 

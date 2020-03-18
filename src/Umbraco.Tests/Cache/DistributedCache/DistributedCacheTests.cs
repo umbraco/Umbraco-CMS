@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Sync;
-using Umbraco.Tests.Components;
-using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Cache.DistributedCache
 {
@@ -21,22 +16,21 @@ namespace Umbraco.Tests.Cache.DistributedCache
     {
         private Umbraco.Web.Cache.DistributedCache _distributedCache;
 
+        private IServerRegistrar ServerRegistrar { get; set; }
+        private TestServerMessenger ServerMessenger { get; set; }
+
         [SetUp]
         public void Setup()
         {
-            var register = TestHelper.GetRegister();
+            ServerRegistrar =  new TestServerRegistrar();
+            ServerMessenger =  new TestServerMessenger();
 
-            var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var cacheRefresherCollection = new CacheRefresherCollection(new []
+            {
+                new TestCacheRefresher()
+            });
 
-            composition.RegisterUnique<IServerRegistrar>(_ => new TestServerRegistrar());
-            composition.RegisterUnique<IServerMessenger>(_ => new TestServerMessenger());
-
-            composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
-                .Add<TestCacheRefresher>();
-
-            Current.Factory = composition.CreateFactory();
-
-            _distributedCache = new Umbraco.Web.Cache.DistributedCache();
+            _distributedCache = new Umbraco.Web.Cache.DistributedCache(ServerMessenger, cacheRefresherCollection);
         }
 
         [TearDown]
@@ -52,7 +46,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
             {
                 _distributedCache.Refresh(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), i);
             }
-            Assert.AreEqual(10, ((TestServerMessenger)Current.ServerMessenger).IntIdsRefreshed.Count);
+            Assert.AreEqual(10, ServerMessenger.IntIdsRefreshed.Count);
         }
 
         [Test]
@@ -65,7 +59,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
                     x => x.Id,
                     new TestObjectWithId{Id = i});
             }
-            Assert.AreEqual(10, ((TestServerMessenger)Current.ServerMessenger).IntIdsRefreshed.Count);
+            Assert.AreEqual(10, ServerMessenger.IntIdsRefreshed.Count);
         }
 
         [Test]
@@ -75,7 +69,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
             {
                 _distributedCache.Refresh(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), Guid.NewGuid());
             }
-            Assert.AreEqual(11, ((TestServerMessenger)Current.ServerMessenger).GuidIdsRefreshed.Count);
+            Assert.AreEqual(11, ServerMessenger.GuidIdsRefreshed.Count);
         }
 
         [Test]
@@ -85,7 +79,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
             {
                 _distributedCache.Remove(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), i);
             }
-            Assert.AreEqual(12, ((TestServerMessenger)Current.ServerMessenger).IntIdsRemoved.Count);
+            Assert.AreEqual(12, ServerMessenger.IntIdsRemoved.Count);
         }
 
         [Test]
@@ -95,7 +89,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
             {
                 _distributedCache.RefreshAll(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"));
             }
-            Assert.AreEqual(13, ((TestServerMessenger)Current.ServerMessenger).CountOfFullRefreshes);
+            Assert.AreEqual(13, ServerMessenger.CountOfFullRefreshes);
         }
 
         #region internal test classes

@@ -11,34 +11,33 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services;
+using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Validation;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
-using Notification = Umbraco.Web.Models.ContentEditing.Notification;
-using Umbraco.Core.Strings;
+using Umbraco.Core.Mapping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
 {
@@ -51,6 +50,9 @@ namespace Umbraco.Web.Editors
     [MediaControllerControllerConfiguration]
     public class MediaController : ContentControllerBase
     {
+        private readonly IContentSettings _contentSettings;
+        private readonly IIOHelper _ioHelper;
+
         public MediaController(
             ICultureDictionary cultureDictionary,
             PropertyEditorCollection propertyEditors,
@@ -61,13 +63,18 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             IMediaFileSystem mediaFileSystem,
-            IShortStringHelper shortStringHelper)
-            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            IContentSettings contentSettings,
+            IIOHelper ioHelper,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _mediaFileSystem = mediaFileSystem;
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
         }
 
         /// <summary>
@@ -448,7 +455,7 @@ namespace Umbraco.Web.Editors
 
             if (sourceParentID == destinationParentID)
             {
-                return Request.CreateValidationErrorResponse(new SimpleNotificationModel(new Notification("",Services.TextService.Localize("media/moveToSameFolderFailed"),NotificationStyle.Error)));
+                return Request.CreateValidationErrorResponse(new SimpleNotificationModel(new BackOfficeNotification("",Services.TextService.Localize("media/moveToSameFolderFailed"),NotificationStyle.Error)));
             }
             if (moveResult == false)
             {
@@ -638,7 +645,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = Current.IOHelper.MapPath(Constants.SystemDirectories.TempFileUploads);
+            var root = _ioHelper.MapPath(Constants.SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -715,13 +722,13 @@ namespace Umbraco.Web.Editors
                 var safeFileName = fileName.ToSafeFileName(ShortStringHelper);
                 var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
-                if (Current.Configs.Settings().Content.IsFileAllowedForUpload(ext))
+                if (_contentSettings.IsFileAllowedForUpload(ext))
                 {
                     var mediaType = Constants.Conventions.MediaTypes.File;
 
                     if (result.FormData["contentTypeAlias"] == Constants.Conventions.MediaTypes.AutoSelect)
                     {
-                        if (Current.Configs.Settings().Content.ImageFileTypes.Contains(ext))
+                        if (_contentSettings.ImageFileTypes.Contains(ext))
                         {
                             mediaType = Constants.Conventions.MediaTypes.Image;
                         }
@@ -761,7 +768,7 @@ namespace Umbraco.Web.Editors
                 }
                 else
                 {
-                    tempFiles.Notifications.Add(new Notification(
+                    tempFiles.Notifications.Add(new BackOfficeNotification(
                         Services.TextService.Localize("speechBubbles/operationFailedHeader"),
                         Services.TextService.Localize("media/disallowedFileType"),
                         NotificationStyle.Warning));
@@ -852,7 +859,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(Request.CreateResponse(
                     HttpStatusCode.Forbidden,
-                    new SimpleNotificationModel(new Notification(
+                    new SimpleNotificationModel(new BackOfficeNotification(
                         Services.TextService.Localize("speechBubbles/operationFailedHeader"),
                         Services.TextService.Localize("speechBubbles/invalidUserPermissionsText"),
                         NotificationStyle.Warning))));

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Web;
 using System.Web.Helpers;
@@ -8,6 +9,8 @@ using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using System.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
@@ -57,14 +60,14 @@ namespace Umbraco.Web
         /// <remarks>
         /// See: http://issues.umbraco.org/issue/U4-1614
         /// </remarks>
-        public static MvcHtmlString PreviewBadge(this HtmlHelper helper)
+        public static MvcHtmlString PreviewBadge(this HtmlHelper helper, IHttpContextAccessor httpContextAccessor, IGlobalSettings globalSettings, IIOHelper ioHelper, IContentSettings contentSettings)
         {
             if (Current.UmbracoContext.InPreviewMode)
             {
                 var htmlBadge =
-                    String.Format(Current.Configs.Settings().Content.PreviewBadge,
-                                  Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath),
-                                  Current.UmbracoContext.HttpContext.Server.UrlEncode(Current.UmbracoContext.HttpContext.Request.Path),
+                    String.Format(contentSettings.PreviewBadge,
+                                ioHelper.ResolveUrl(globalSettings.UmbracoPath),
+                                  WebUtility.UrlEncode(httpContextAccessor.GetRequiredHttpContext().Request.Path),
                                   Current.UmbracoContext.PublishedRequest.PublishedContent.Id);
                 return new MvcHtmlString(htmlBadge);
             }
@@ -93,7 +96,7 @@ namespace Umbraco.Web
             }
             if (cacheByMember)
             {
-                var helper = Current.Factory.GetInstance<MembershipHelper>();
+                var helper = Current.MembershipHelper;
                 var currentMember = helper.GetCurrentMember();
                 cacheKey.AppendFormat("m{0}-", currentMember?.Id ?? 0);
             }
@@ -102,7 +105,7 @@ namespace Umbraco.Web
                 var contextualKey = contextualKeyBuilder(model, viewData);
                 cacheKey.AppendFormat("c{0}-", contextualKey);
             }
-            return Current.AppCaches.CachedPartialView(htmlHelper, partialViewName, model, cachedSeconds, cacheKey.ToString(), viewData);
+            return Current.AppCaches.CachedPartialView(Current.HostingEnvironment, htmlHelper, partialViewName, model, cachedSeconds, cacheKey.ToString(), viewData);
         }
 
         public static MvcHtmlString EditorFor<T>(this HtmlHelper htmlHelper, string templateName = "", string htmlFieldName = "", object additionalViewData = null)
@@ -862,14 +865,14 @@ namespace Umbraco.Web
         private static readonly HtmlStringUtilities StringUtilities = new HtmlStringUtilities();
 
         /// <summary>
-        /// Replaces text line breaks with HTML line breaks
+        /// HTML encodes the text and replaces text line breaks with HTML line breaks.
         /// </summary>
         /// <param name="helper"></param>
         /// <param name="text">The text.</param>
-        /// <returns>The text with text line breaks replaced with HTML line breaks (<br/>)</returns>
-        public static IHtmlString ReplaceLineBreaksForHtml(this HtmlHelper helper, string text)
+        /// <returns>The HTML encoded text with text line breaks replaced with HTML line breaks (<c>&lt;br /&gt;</c>).</returns>
+        public static IHtmlString ReplaceLineBreaks(this HtmlHelper helper, string text)
         {
-            return StringUtilities.ReplaceLineBreaksForHtml(text);
+            return StringUtilities.ReplaceLineBreaks(text);
         }
 
         /// <summary>

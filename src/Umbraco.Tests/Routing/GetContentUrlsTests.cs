@@ -1,15 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Web;
 using Umbraco.Web.Routing;
+using Umbraco.Tests.Common;
+using SettingsForTests = Umbraco.Tests.TestHelpers.SettingsForTests;
 
 namespace Umbraco.Tests.Routing
 {
@@ -54,7 +59,10 @@ namespace Umbraco.Tests.Routing
             var urls = content.GetContentUrls(publishedRouter,
                 umbContext,
                 GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
-                Logger).ToList();
+                VariationContextAccessor,
+                Logger,
+                UriUtility,
+                PublishedUrlProvider).ToList();
 
             Assert.AreEqual(1, urls.Count);
             Assert.AreEqual("content/itemNotPublished", urls[0].Text);
@@ -70,16 +78,29 @@ namespace Umbraco.Tests.Routing
             content.Path = "-1,1046";
             content.Published = true;
 
-            var umbracoSettings = Current.Configs.Settings();
+            var umbracoSettings = SettingsForTests.GenerateMockRequestHandlerSettings();
 
-            var umbContext = GetUmbracoContext("http://localhost:8000",
-                urlProviders: new []{ new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper()) });
+            var umbContext = GetUmbracoContext("http://localhost:8000");
+            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbContext);
+            var urlProvider = new DefaultUrlProvider(umbracoSettings, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(),
+                umbracoContextAccessor, UriUtility);
+            var publishedUrlProvider = new UrlProvider(
+                umbracoContextAccessor,
+                TestHelper.WebRoutingSettings,
+                new UrlProviderCollection(new []{urlProvider}),
+                new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
+                Mock.Of<IVariationContextAccessor>()
+            );
+
             var publishedRouter = CreatePublishedRouter(Factory,
                 contentFinders:new ContentFinderCollection(new[]{new ContentFinderByUrl(Logger) }));
             var urls = content.GetContentUrls(publishedRouter,
                 umbContext,
                 GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
-                Logger).ToList();
+                VariationContextAccessor,
+                Logger,
+                UriUtility,
+                publishedUrlProvider).ToList();
 
             Assert.AreEqual(1, urls.Count);
             Assert.AreEqual("/home/", urls[0].Text);
@@ -102,16 +123,30 @@ namespace Umbraco.Tests.Routing
             child.Path = "-1,1046,1173";
             child.Published = true;
 
-            var umbracoSettings = Current.Configs.Settings();
+            var umbracoSettings = SettingsForTests.GenerateMockRequestHandlerSettings();
 
-            var umbContext = GetUmbracoContext("http://localhost:8000",
-                urlProviders: new[] { new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper()) });
+
+            var umbContext = GetUmbracoContext("http://localhost:8000");
+            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbContext);
+            var urlProvider = new DefaultUrlProvider(umbracoSettings, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+            var publishedUrlProvider = new UrlProvider(
+                umbracoContextAccessor,
+                TestHelper.WebRoutingSettings,
+                new UrlProviderCollection(new []{urlProvider}),
+                new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
+                Mock.Of<IVariationContextAccessor>()
+            );
+
             var publishedRouter = CreatePublishedRouter(Factory,
                 contentFinders: new ContentFinderCollection(new[] { new ContentFinderByUrl(Logger) }));
             var urls = child.GetContentUrls(publishedRouter,
                 umbContext,
                 GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
-                Logger).ToList();
+                VariationContextAccessor,
+                Logger,
+                UriUtility,
+                publishedUrlProvider
+                ).ToList();
 
             Assert.AreEqual(1, urls.Count);
             Assert.AreEqual("/home/sub1/", urls[0].Text);

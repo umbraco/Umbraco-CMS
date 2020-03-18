@@ -11,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
+using Umbraco.Web.Models.Identity;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Security
@@ -101,7 +102,7 @@ namespace Umbraco.Web.Security
 
             //if the user is null, create an empty one which can be used for auto-linking
             if (user == null)
-                user = BackOfficeIdentityUser.CreateNew(userName, null, _globalSettings.DefaultUILanguage);
+                user = BackOfficeIdentityUser.CreateNew(_globalSettings, userName, null, _globalSettings.DefaultUILanguage);
 
             //check the password for the user, this will allow a developer to auto-link
             //an account if they have specified an IBackOfficeUserPasswordChecker
@@ -111,6 +112,19 @@ namespace Umbraco.Web.Security
                 if (await UserManager.IsLockedOutAsync(user.Id))
                 {
                     return SignInStatus.LockedOut;
+                }
+
+                // We need to verify that the user belongs to one or more groups that define content and media start nodes.
+                // To do so we have to create the user claims identity and validate the calculated start nodes.
+                var userIdentity = await CreateUserIdentityAsync(user);
+                if (userIdentity is UmbracoBackOfficeIdentity backOfficeIdentity)
+                {
+                    if (backOfficeIdentity.StartContentNodes.Length == 0 || backOfficeIdentity.StartMediaNodes.Length == 0)
+                    {
+                        _logger.WriteCore(TraceEventType.Information, 0,
+                            $"Login attempt failed for username {userName} from IP address {_request.RemoteIpAddress}, no content and/or media start nodes could be found for any of the user's groups", null, null);
+                        return SignInStatus.Failure;
+                    }
                 }
 
                 await UserManager.ResetAccessFailedCountAsync(user.Id);

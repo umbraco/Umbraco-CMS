@@ -1,5 +1,5 @@
-﻿using System;
-using System.Web;
+﻿using System.Web;
+using Umbraco.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -9,9 +9,9 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
-using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Logging;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Runtime
 {
@@ -21,15 +21,10 @@ namespace Umbraco.Web.Runtime
     /// <remarks>On top of CoreRuntime, handles all of the web-related runtime aspects of Umbraco.</remarks>
     public class WebRuntime : CoreRuntime
     {
-        private readonly UmbracoApplicationBase _umbracoApplication;
-        private BuildManagerTypeFinder _typeFinder;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="WebRuntime"/> class.
         /// </summary>
-        /// <param name="umbracoApplication"></param>
         public WebRuntime(
-            UmbracoApplicationBase umbracoApplication,
             Configs configs,
             IUmbracoVersion umbracoVersion,
             IIOHelper ioHelper,
@@ -38,11 +33,9 @@ namespace Umbraco.Web.Runtime
             IHostingEnvironment hostingEnvironment,
             IBackOfficeInfo backOfficeInfo,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IBulkSqlInsertProvider bulkSqlInsertProvider,
             IMainDom mainDom):
-            base(configs, umbracoVersion, ioHelper, logger, profiler ,new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, bulkSqlInsertProvider, mainDom)
+            base(configs, umbracoVersion, ioHelper, logger, profiler ,new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom)
         {
-            _umbracoApplication = umbracoApplication;
 
             Profiler = GetWebProfiler();
         }
@@ -81,7 +74,7 @@ namespace Umbraco.Web.Runtime
                     NetworkHelper.MachineName);
                 Logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
 
-                var factory = base.Boot(register);
+                var factory = Current.Factory = base.Boot(register);
 
                 // now (and only now) is the time to switch over to perWebRequest scopes.
                 // up until that point we may not have a request, and scoped services would
@@ -97,12 +90,10 @@ namespace Umbraco.Web.Runtime
 
         #region Getters
 
-        protected override ITypeFinder GetTypeFinder() => _typeFinder ?? (_typeFinder = new BuildManagerTypeFinder(IOHelper, HostingEnvironment, Logger, new BuildManagerTypeFinder.TypeFinderConfig()));
-
         protected override AppCaches GetAppCaches() => new AppCaches(
                 // we need to have the dep clone runtime cache provider to ensure
                 // all entities are cached properly (cloned in and cloned out)
-                new DeepCloneAppCache(new WebCachingAppCache(HttpRuntime.Cache, TypeFinder)),
+                new DeepCloneAppCache(new ObjectCacheAppCache(TypeFinder)),
                 // we need request based cache when running in web-based context
                 new HttpRequestAppCache(() => HttpContext.Current?.Items, TypeFinder),
                 new IsolatedCaches(type =>

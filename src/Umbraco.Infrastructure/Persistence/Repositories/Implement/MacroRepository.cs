@@ -158,7 +158,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(IMacro entity)
         {
             entity.UpdatingEntity();
-;
             var dto = MacroFactory.BuildDto(entity);
 
             Database.Update(dto);

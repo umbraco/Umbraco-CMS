@@ -5,8 +5,7 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Exceptions;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -15,20 +14,18 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
-using Umbraco.Web.Models;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Published
 {
     [TestFixture]
-    public class NestedContentTests
+    public class NestedContentTests : UmbracoTestBase
     {
         private (IPublishedContentType, IPublishedContentType) CreateContentTypes()
         {
-            Current.Reset();
-
             var logger = Mock.Of<ILogger>();
             var profiler = Mock.Of<IProfiler>();
             var proflog = new ProfilingLogger(logger, profiler);

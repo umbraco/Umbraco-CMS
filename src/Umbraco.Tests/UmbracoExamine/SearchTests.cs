@@ -38,8 +38,8 @@ namespace Umbraco.Tests.UmbracoExamine
                         m.SortOrder == (int)x.Attribute("sortOrder") &&
                         m.CreateDate == (DateTime)x.Attribute("createDate") &&
                         m.UpdateDate == (DateTime)x.Attribute("updateDate") &&
-                        m.Name == (string)x.Attribute("nodeName") &&
-                        m.GetCultureName(It.IsAny<string>()) == (string)x.Attribute("nodeName") &&
+                        m.Name == (string)x.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
+                        m.GetCultureName(It.IsAny<string>()) == (string)x.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
                         m.Path == (string)x.Attribute("path") &&
                         m.Properties == new PropertyCollection() &&
                         m.Published == true &&

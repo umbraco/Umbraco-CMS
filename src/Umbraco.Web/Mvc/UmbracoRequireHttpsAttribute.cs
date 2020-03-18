@@ -1,8 +1,6 @@
 ﻿using System.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {

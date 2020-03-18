@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Composing
         public void Initialize()
         {
             // this ensures it's reset
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeFinder = TestHelper.GetTypeFinder();
             _typeLoader = new TypeLoader(TestHelper.IOHelper, typeFinder, NoAppCache.Instance,
                 new DirectoryInfo(TestHelper.IOHelper.MapPath("~/App_Data/TEMP")),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()), false,
@@ -46,7 +46,8 @@ namespace Umbraco.Tests.Composing
                     //typeof(TabPage).Assembly,
                     typeof(System.Web.Mvc.ActionResult).Assembly,
                     typeof(TypeFinder).Assembly,
-                    typeof(UmbracoContext).Assembly
+                    typeof(UmbracoContext).Assembly,
+                    typeof(CheckBoxListPropertyEditor).Assembly
                 });
 
 
@@ -195,7 +196,7 @@ AnotherContentFinder
         [Test]
         public void Create_Cached_Plugin_File()
         {
-            var types = new[] { typeof(TypeLoader), typeof(TypeLoaderTests), typeof(UmbracoContext) };
+            var types = new[] { typeof(TypeLoader), typeof(TypeLoaderTests), typeof(IUmbracoContext) };
 
             var typeList1 = new TypeLoader.TypeList(typeof(object), null);
             foreach (var type in types) typeList1.Add(type);
@@ -274,7 +275,7 @@ AnotherContentFinder
         public void GetDataEditors()
         {
             var types = _typeLoader.GetDataEditors();
-            Assert.AreEqual(37, types.Count());
+            Assert.AreEqual(39, types.Count());
         }
 
         /// <summary>

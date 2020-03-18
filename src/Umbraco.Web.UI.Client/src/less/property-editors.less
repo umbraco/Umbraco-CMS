@@ -249,25 +249,10 @@
 
     transition: all 150ms ease-in-out;
 
-    &:focus,
+    &:active,
     &:hover {
         color: @ui-action-discreet-type-hover;
         border-color: @ui-action-discreet-type-hover;
-    }
-
-    &:focus {
-        outline: none;
-        .tabbing-active &:after {
-            content: '';
-            position: absolute;
-            z-index: 10000;
-            top: -6px;
-            bottom: -6px;
-            left: -6px;
-            right: -6px;
-            border-radius: 3px;
-            box-shadow: 0 0 2px @blueMid, inset 0 0 2px 1px @blueMid;
-        }
     }
 }
 
@@ -687,7 +672,8 @@
     }
 
     .imagecropper .umb-sortable-thumbnails li .crop-name,
-    .imagecropper .umb-sortable-thumbnails li .crop-size {
+    .imagecropper .umb-sortable-thumbnails li .crop-size,
+    .imagecropper .umb-sortable-thumbnails li .crop-annotation {
         display: block;
         text-align: left;
         font-size: 13px;
@@ -699,10 +685,15 @@
         margin: 10px 0 5px;
     }
 
-    .imagecropper .umb-sortable-thumbnails li .crop-size {
+    .imagecropper .umb-sortable-thumbnails li .crop-size,
+    .imagecropper .umb-sortable-thumbnails li .crop-annotation {
         font-size: 10px;
         font-style: italic;
         margin: 0 0 5px;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li .crop-annotation {
+        color: @gray-6;
     }
 
     .btn-crop-delete {
@@ -710,6 +701,12 @@
         text-align: left;
     }
 
+    .imagecropper .cropList-container {
+        h5 {
+            margin-left: 10px;
+            margin-top: 0;
+        }
+    }
 //
 // folder-browser
 // --------------------------------------------------
@@ -725,6 +722,10 @@
 //
 // File upload
 // --------------------------------------------------
+.umb-fileupload {
+    display: flex;
+}
+
 .umb-fileupload .preview {
   border-radius: 5px;
   border: 1px solid @gray-6;

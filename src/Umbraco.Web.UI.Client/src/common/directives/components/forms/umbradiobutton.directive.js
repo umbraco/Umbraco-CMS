@@ -44,6 +44,8 @@
         vm.change = change;
 
         function onInit() {
+            vm.inputId = vm.inputId || "umb-radio_" + String.CreateGuid();
+
             // If a labelKey is passed let's update the returned text if it's does not contain an opening square bracket [
             if (vm.labelKey) {
                  localizationService.localize(vm.labelKey).then(function (data) {
@@ -67,6 +69,7 @@
         templateUrl: 'views/components/forms/umb-radiobutton.html',
         controller: UmbRadiobuttonController,
         controllerAs: 'vm',
+        transclude: true,
         bindings: {
             model: "=",
             inputId: "@",

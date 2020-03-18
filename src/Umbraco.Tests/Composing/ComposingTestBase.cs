@@ -5,10 +5,9 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Composing
 {
@@ -23,7 +22,7 @@ namespace Umbraco.Tests.Composing
         {
             ProfilingLogger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
 
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeFinder = TestHelper.GetTypeFinder();
             var ioHelper = TestHelper.IOHelper;
             TypeLoader = new TypeLoader(ioHelper, typeFinder, NoAppCache.Instance, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), ProfilingLogger, false, AssembliesToScan);
         }

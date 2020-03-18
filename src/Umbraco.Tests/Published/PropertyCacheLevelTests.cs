@@ -12,13 +12,14 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.Published
 {
     [TestFixture]
-    public class PropertyCacheLevelTests
+    public class PropertyCacheLevelTests : UmbracoTestBase
     {
         [TestCase(PropertyCacheLevel.None, 2)]
         [TestCase(PropertyCacheLevel.Element, 1)]
@@ -126,7 +127,7 @@ namespace Umbraco.Tests.Published
 
             var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", CreatePropertyTypes);
 
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeFinder = TestHelper.GetTypeFinder();
             var elementsCache = new FastDictionaryAppCache(typeFinder);
             var snapshotCache = new FastDictionaryAppCache(typeFinder);
 

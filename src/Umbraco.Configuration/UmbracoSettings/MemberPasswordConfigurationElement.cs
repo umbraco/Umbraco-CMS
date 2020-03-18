@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class MemberPasswordConfigurationElement : PasswordConfigurationElement, IMemberPasswordConfigurationSection
+    internal class MemberPasswordConfigurationElement : PasswordConfigurationElement, IMemberPasswordConfiguration
     {
     }
 }

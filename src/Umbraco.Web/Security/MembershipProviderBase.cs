@@ -9,7 +9,7 @@ using System.Web.Hosting;
 using System.Web.Configuration;
 using System.Web.Security;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Security;
@@ -300,7 +300,7 @@ namespace Umbraco.Web.Security
         public override bool ChangePassword(string username, string oldPassword, string newPassword)
         {
             string rawPasswordValue = string.Empty;
-            
+
             var args = new ValidatePasswordEventArgs(username, newPassword, false);
             OnValidatingPassword(args);
 

@@ -6,18 +6,24 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Controllers
 {
     public class UmbLoginController : SurfaceController
     {
+        private readonly MembershipHelper _membershipHelper;
+
         public UmbLoginController()
         {
         }
 
-        public UmbLoginController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
-            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger, umbracoHelper)
+        public UmbLoginController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory,
+            ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger,
+            MembershipHelper membershipHelper)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger)
         {
+            _membershipHelper = membershipHelper;
         }
 
         [HttpPost]
@@ -30,7 +36,7 @@ namespace Umbraco.Web.Controllers
                 return CurrentUmbracoPage();
             }
 
-            if (Members.Login(model.Username, model.Password) == false)
+            if (_membershipHelper.Login(model.Username, model.Password) == false)
             {
                 //don't add a field level error, just model level
                 ModelState.AddModelError("loginModel", "Invalid username or password");
@@ -46,7 +52,7 @@ namespace Umbraco.Web.Controllers
                 // if it's not a local url we'll redirect to the root of the current site
                 return Redirect(Url.IsLocalUrl(model.RedirectUrl)
                     ? model.RedirectUrl
-                    : CurrentPage.AncestorOrSelf(1).Url);
+                    : CurrentPage.AncestorOrSelf(1).Url());
             }
 
             //redirect to current page by default

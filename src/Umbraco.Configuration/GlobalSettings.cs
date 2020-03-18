@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Configuration;
 using System.Linq;
+using System.Net.Mail;
 using System.Xml.Linq;
+using Umbraco.Composing;
+using Umbraco.Configuration;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Configuration
@@ -62,7 +65,6 @@ namespace Umbraco.Core.Configuration
     /// </summary>
     public class GlobalSettings : IGlobalSettings
     {
-        private readonly IIOHelper _ioHelper;
 
         // TODO these should not be static
         private static string _reservedPaths;
@@ -72,11 +74,6 @@ namespace Umbraco.Core.Configuration
         internal const string StaticReservedPaths = "~/app_plugins/,~/install/,~/mini-profiler-resources/,"; //must end with a comma!
         internal const string StaticReservedUrls = "~/config/splashes/noNodes.aspx,~/.well-known,"; //must end with a comma!
 
-        public GlobalSettings(IIOHelper ioHelper)
-        {
-            _ioHelper = ioHelper;
-        }
-
         /// <summary>
         /// Used in unit testing to reset all config items that were set with property setters (i.e. did not come from config)
         /// </summary>
@@ -84,7 +81,6 @@ namespace Umbraco.Core.Configuration
         {
             _reservedPaths = null;
             _reservedUrls = null;
-            HasSmtpServer = null;
         }
 
         /// <summary>
@@ -95,29 +91,39 @@ namespace Umbraco.Core.Configuration
         {
             ResetInternal();
         }
+
+
         public bool IsSmtpServerConfigured
         {
             get
             {
-                var smtpSection = ConfigurationManager.GetSection("system.net/mailSettings/smtp") as ConfigurationSection;
-                if (smtpSection is null) return false;
+                var smtpSettings = SmtpSettings;
 
+                if (smtpSettings is null) return false;
+
+                if (!(smtpSettings.From is null)) return true;
+                if (!(smtpSettings.Host is null)) return true;
+                if (!(smtpSettings.PickupDirectoryLocation is null)) return true;
+
+                return false;
+            }
+        }
+
+        public ISmtpSettings SmtpSettings
+        {
+            get
+            {
+                var smtpSection = ConfigurationManager.GetSection("system.net/mailSettings/smtp") as ConfigurationSection;
+                if (smtpSection is null) return null;
+
+                var result = new SmtpSettings();
                 var from = smtpSection.ElementInformation.Properties["from"];
                 if (@from != null
                     && @from.Value is string fromPropValue
                     && string.IsNullOrEmpty(fromPropValue) == false
                     && !string.Equals("noreply@example.com", fromPropValue, StringComparison.OrdinalIgnoreCase))
                 {
-                    return true;
-                }
-
-                var networkSection = ConfigurationManager.GetSection("system.net/mailSettings/smtp/network") as ConfigurationSection;
-                var host = networkSection?.ElementInformation.Properties["host"];
-                if (host != null
-                    && host.Value is string hostPropValue
-                    && string.IsNullOrEmpty(hostPropValue) == false)
-                {
-                    return true;
+                    result.From = fromPropValue;
                 }
 
                 var specifiedPickupDirectorySection = ConfigurationManager.GetSection("system.net/mailSettings/smtp/specifiedPickupDirectory") as ConfigurationSection;
@@ -126,17 +132,20 @@ namespace Umbraco.Core.Configuration
                     && pickupDirectoryLocation.Value is string pickupDirectoryLocationPropValue
                     && string.IsNullOrEmpty(pickupDirectoryLocationPropValue) == false)
                 {
-                    return true;
+                    result.PickupDirectoryLocation = pickupDirectoryLocationPropValue;
                 }
 
-                return false;
+                // SmtpClient can magically read the section system.net/mailSettings/smtp/network, witch is always
+                // null if we use ConfigurationManager.GetSection. SmtpSection does not exist in .Net Standard
+                var smtpClient = new SmtpClient();
+
+                result.Host = smtpClient.Host;
+                result.Port = smtpClient.Port;
+
+                return result;
+
             }
         }
-
-        /// <summary>
-        /// For testing only
-        /// </summary>
-        internal static bool? HasSmtpServer { get; set; }
 
         /// <summary>
         /// Gets the reserved urls from web.config.
@@ -186,35 +195,10 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
-        /// Gets the name of the content XML file.
-        /// </summary>
-        /// <value>The content XML.</value>
-        /// <remarks>
-        /// Defaults to ~/App_Data/umbraco.config
-        /// </remarks>
-        public string ContentXmlFile
-        {
-            get
-            {
-                return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.ContentXML)
-                    ? ConfigurationManager.AppSettings[Constants.AppSettings.ContentXML]
-                    : "~/App_Data/umbraco.config";
-            }
-        }
-
-        /// <summary>
         /// Gets the path to umbraco's root directory (/umbraco by default).
         /// </summary>
         /// <value>The path.</value>
-        public string Path
-        {
-            get
-            {
-                return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.Path)
-                    ? _ioHelper.ResolveUrl(ConfigurationManager.AppSettings[Constants.AppSettings.Path])
-                    : string.Empty;
-            }
-        }
+        public string Path => ConfigurationManager.AppSettings[Constants.AppSettings.Path];
 
         /// <summary>
         /// Gets or sets the configuration status. This will return the version number of the currently installed umbraco instance.
@@ -230,7 +214,7 @@ namespace Umbraco.Core.Configuration
             }
             set
             {
-                SaveSetting(Constants.AppSettings.ConfigurationStatus, value, _ioHelper);
+                SaveSetting(Constants.AppSettings.ConfigurationStatus, value, Current.IOHelper); //TODO remove
             }
         }
 
@@ -255,26 +239,6 @@ namespace Umbraco.Core.Configuration
 
             xml.Save(fileName, SaveOptions.DisableFormatting);
             ConfigurationManager.RefreshSection("appSettings");
-        }
-
-        /// <summary>
-        /// Removes a setting from the configuration file.
-        /// </summary>
-        /// <param name="key">Key of the setting to be removed.</param>
-        public static void RemoveSetting(string key, IIOHelper ioHelper)
-        {
-            var fileName = ioHelper.MapPath(string.Format("{0}/web.config", ioHelper.Root));
-            var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
-
-            var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();
-            var setting = appSettings.Descendants("add").FirstOrDefault(s => s.Attribute("key").Value == key);
-
-            if (setting != null)
-            {
-                setting.Remove();
-                xml.Save(fileName, SaveOptions.DisableFormatting);
-                ConfigurationManager.RefreshSection("appSettings");
-            }
         }
 
 
@@ -405,6 +369,10 @@ namespace Umbraco.Core.Configuration
         private string _databaseFactoryServerVersion;
         public string DatabaseFactoryServerVersion => GetterWithDefaultValue(Constants.AppSettings.Debug.DatabaseFactoryServerVersion, string.Empty, ref _databaseFactoryServerVersion);
 
+        private string _mainDomLock;
+
+        public string MainDomLock => GetterWithDefaultValue(Constants.AppSettings.MainDomLock, string.Empty, ref _mainDomLock);
+
         private T GetterWithDefaultValue<T>(string appSettingKey, T defaultValue, ref T backingField)
         {
             if (backingField != null) return backingField;
@@ -429,6 +397,23 @@ namespace Umbraco.Core.Configuration
             }
 
             return backingField;
+        }
+
+        /// <summary>
+        /// Gets the path to the razor file used when no published content is available.
+        /// </summary>
+        public string NoNodesViewPath
+        {
+            get
+            {
+                var configuredValue = ConfigurationManager.AppSettings[Constants.AppSettings.NoNodesViewPath];
+                if (!string.IsNullOrWhiteSpace(configuredValue))
+                {
+                    return configuredValue;
+                }
+
+                return "~/config/splashes/NoNodes.cshtml";
+            }
         }
     }
 }

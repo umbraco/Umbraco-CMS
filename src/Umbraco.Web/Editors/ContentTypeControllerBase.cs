@@ -5,18 +5,21 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Web.Http;
+using System.Web.Http.ModelBinding;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors
@@ -29,9 +32,24 @@ namespace Umbraco.Web.Editors
     public abstract class ContentTypeControllerBase<TContentType> : UmbracoAuthorizedJsonController
         where TContentType : class, IContentTypeComposition
     {
-        protected ContentTypeControllerBase(ICultureDictionary cultureDictionary, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
+        private readonly EditorValidatorCollection _editorValidatorCollection;
+
+        protected ContentTypeControllerBase(
+            ICultureDictionary cultureDictionary,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider,
+            EditorValidatorCollection editorValidatorCollection)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
+            _editorValidatorCollection = editorValidatorCollection;
             CultureDictionary = cultureDictionary;
         }
 
@@ -258,7 +276,7 @@ namespace Umbraco.Web.Editors
             }
 
             // execute the external validators
-            EditorValidator.Validate(ModelState, contentTypeSave);
+            ValidateExternalValidators(ModelState, contentTypeSave);
 
             if (ModelState.IsValid == false)
             {
@@ -348,6 +366,20 @@ namespace Umbraco.Web.Editors
                 }
                 return newCt;
             }
+        }
+
+        private void ValidateExternalValidators(ModelStateDictionary modelState, object model)
+        {
+            var modelType = model.GetType();
+
+                       var validationResults = _editorValidatorCollection
+                           .Where(x => x.ModelType == modelType)
+                           .SelectMany(x => x.Validate(model))
+                           .Where(x => !string.IsNullOrWhiteSpace(x.ErrorMessage) && x.MemberNames.Any());
+
+                       foreach (var r in validationResults)
+                       foreach (var m in r.MemberNames)
+                           modelState.AddModelError(m, r.ErrorMessage);
         }
 
         /// <summary>
@@ -549,6 +581,6 @@ namespace Umbraco.Web.Editors
 
             forDisplay.Errors = ModelState.ToErrorDictionary();
             return new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
-        }        
+        }
     }
 }

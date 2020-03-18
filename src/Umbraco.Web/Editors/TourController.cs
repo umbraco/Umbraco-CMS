@@ -4,11 +4,19 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
+using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Tour;
 
 namespace Umbraco.Web.Editors
@@ -17,20 +25,38 @@ namespace Umbraco.Web.Editors
     public class TourController : UmbracoAuthorizedJsonController
     {
         private readonly TourFilterCollection _filters;
+        private readonly IIOHelper _ioHelper;
+        private readonly ITourSettings _tourSettings;
 
-        public TourController(TourFilterCollection filters)
+        public TourController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            TourFilterCollection filters,
+            IIOHelper ioHelper,
+            IPublishedUrlProvider publishedUrlProvider,
+            ITourSettings tourSettings)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _filters = filters;
+            _ioHelper = ioHelper;
+            _tourSettings = tourSettings;
         }
 
         public IEnumerable<BackOfficeTourFile> GetTours()
         {
             var result = new List<BackOfficeTourFile>();
 
-            if (Current.Configs.Settings().BackOffice.Tours.EnableTours == false)
+            if (_tourSettings.EnableTours == false)
                 return result;
 
-            var user = Composing.Current.UmbracoContext.Security.CurrentUser;
+            var user = UmbracoContext.Security.CurrentUser;
             if (user == null)
                 return result;
 
@@ -41,7 +67,7 @@ namespace Umbraco.Web.Editors
             var nonPluginFilters = _filters.Where(x => x.PluginName == null).ToList();
 
             //add core tour files
-            var coreToursPath = Path.Combine(Current.IOHelper.MapPath(Core.Constants.SystemDirectories.Config), "BackOfficeTours");
+            var coreToursPath = Path.Combine(_ioHelper.MapPath(Core.Constants.SystemDirectories.Config), "BackOfficeTours");
             if (Directory.Exists(coreToursPath))
             {
                 foreach (var tourFile in Directory.EnumerateFiles(coreToursPath, "*.json"))
@@ -51,7 +77,7 @@ namespace Umbraco.Web.Editors
             }
 
             //collect all tour files in packages
-            var appPlugins = Current.IOHelper.MapPath(Core.Constants.SystemDirectories.AppPlugins);
+            var appPlugins = _ioHelper.MapPath(Core.Constants.SystemDirectories.AppPlugins);
             if (Directory.Exists(appPlugins))
             {
                 foreach (var plugin in Directory.EnumerateDirectories(appPlugins))
@@ -108,6 +134,39 @@ namespace Umbraco.Web.Editors
             }
 
             return result.Except(toursToBeRemoved).OrderBy(x => x.FileName, StringComparer.InvariantCultureIgnoreCase);
+        }
+
+        /// <summary>
+        /// Gets a tours for a specific doctype
+        /// </summary>
+        /// <param name="doctypeAlias">The documenttype alias</param>
+        /// <returns>A <see cref="BackOfficeTour"/></returns>
+        public IEnumerable<BackOfficeTour> GetToursForDoctype(string doctypeAlias)
+        {
+            var tourFiles = this.GetTours();
+
+            var doctypeAliasWithCompositions = new List<string>
+                                                   {
+                                                       doctypeAlias
+                                                   };
+
+            var contentType = this.Services.ContentTypeService.Get(doctypeAlias);
+
+            if (contentType != null)
+            {
+                doctypeAliasWithCompositions.AddRange(contentType.CompositionAliases());
+            }
+
+            return tourFiles.SelectMany(x => x.Tours)
+                .Where(x =>
+                    {
+                        if (string.IsNullOrEmpty(x.ContentType))
+                        {
+                            return false;
+                        }
+                        var contentTypes = x.ContentType.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(ct => ct.Trim());
+                        return contentTypes.Intersect(doctypeAliasWithCompositions).Any();
+                    });
         }
 
         private void TryParseTourFile(string tourFile,

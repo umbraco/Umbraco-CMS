@@ -5,14 +5,18 @@ using System.Web;
 using System.Web.Mvc;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
-using Umbraco.Core.Composing;
+using Umbraco.Core.Hosting;
+using Umbraco.Core.IO;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.Models;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Web
 {
     using Core.Configuration;
+    using Umbraco.Core.Configuration.UmbracoSettings;
     using Umbraco.Web.JavaScript;
 
     /// <summary>
@@ -36,9 +40,9 @@ namespace Umbraco.Web
         /// These are the bare minimal server variables that are required for the application to start without being authenticated,
         /// we will load the rest of the server vars after the user is authenticated.
         /// </remarks>
-        public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion)
+        public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IContentSettings contentSettings, IIOHelper ioHelper, TreeCollection treeCollection, IHttpContextAccessor httpContextAccessor, IHostingEnvironment hostingEnvironment, IRuntimeSettings settings, ISecuritySettings securitySettings)
         {
-            var serverVars = new BackOfficeServerVariables(uri, Current.RuntimeState, features, globalSettings, umbracoVersion);
+            var serverVars = new BackOfficeServerVariables(uri, Current.RuntimeState, features, globalSettings, umbracoVersion, contentSettings, ioHelper, treeCollection, httpContextAccessor, hostingEnvironment, settings, securitySettings);
             var minVars = serverVars.BareMinimumServerVariables();
 
             var str = @"<script type=""text/javascript"">

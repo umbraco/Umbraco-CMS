@@ -1133,7 +1133,6 @@ namespace Umbraco.Core.Packaging
         {
             var macroName = macroElement.Element("name").Value;
             var macroAlias = macroElement.Element("alias").Value;
-            var macroType = Enum<MacroTypes>.Parse(macroElement.Element("macroType").Value);
             var macroSource = macroElement.Element("macroSource").Value;
 
             //Following xml elements are treated as nullable properties
@@ -1169,7 +1168,7 @@ namespace Umbraco.Core.Packaging
             }
 
             var existingMacro = _macroService.GetByAlias(macroAlias) as Macro;
-            var macro = existingMacro ?? new Macro(_shortStringHelper, macroAlias, macroName, macroSource, macroType,
+            var macro = existingMacro ?? new Macro(_shortStringHelper, macroAlias, macroName, macroSource,
                 cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration);
 
             var properties = macroElement.Element("properties");

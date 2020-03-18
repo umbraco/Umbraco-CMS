@@ -546,7 +546,7 @@ namespace Umbraco.Core.Services.Implement
                 return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("Name"));
             }
         }
-        
+
         /// <summary>
         /// Finds a list of <see cref="IMember"/> objects by a partial email string
         /// </summary>
@@ -1114,7 +1114,7 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs after members have been exported.
         /// </summary>
-        internal static event TypedEventHandler<IMemberService, ExportedMemberEventArgs> Exported;
+        public static event TypedEventHandler<IMemberService, ExportedMemberEventArgs> Exported;
 
         #endregion
 

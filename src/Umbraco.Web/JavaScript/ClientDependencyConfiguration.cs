@@ -9,8 +9,8 @@ using System.Xml.Linq;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
 using Semver;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.JavaScript
@@ -23,11 +23,11 @@ namespace Umbraco.Web.JavaScript
         private readonly ILogger _logger;
         private readonly string _fileName;
 
-        public ClientDependencyConfiguration(ILogger logger)
+        public ClientDependencyConfiguration(ILogger logger, IIOHelper ioHelper)
         {
             if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;
-            _fileName = Current.IOHelper.MapPath(string.Format("{0}/ClientDependency.config", Core.Constants.SystemDirectories.Config));
+            _fileName = ioHelper.MapPath(string.Format("{0}/ClientDependency.config", Core.Constants.SystemDirectories.Config));
         }
 
         /// <summary>

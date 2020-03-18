@@ -12,7 +12,6 @@ using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
@@ -22,7 +21,6 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.ControllerTesting;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -34,7 +32,10 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
+using Umbraco.Web.Composing;
 using Task = System.Threading.Tasks.Task;
+using Umbraco.Core.Mapping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Web.Controllers
 {
@@ -159,10 +160,10 @@ namespace Umbraco.Tests.Web.Controllers
             if (_contentTypeForMockedContent == null)
             {
                 _contentTypeForMockedContent = GetMockedContentType();
-                Mock.Get(Current.Services.ContentTypeService)
+                Mock.Get(ServiceContext.ContentTypeService)
                     .Setup(x => x.Get(_contentTypeForMockedContent.Id))
                     .Returns(_contentTypeForMockedContent);
-                Mock.Get(Current.Services.ContentTypeService)
+                Mock.Get(ServiceContext.ContentTypeService)
                     .As<IContentTypeBaseService>()
                     .Setup(x => x.Get(_contentTypeForMockedContent.Id))
                     .Returns(_contentTypeForMockedContent);
@@ -251,9 +252,9 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async Task PostSave_Validate_Existing_Content()
         {
-            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor)
             {
-                var contentServiceMock = Mock.Get(Current.Services.ContentService);
+                var contentServiceMock = Mock.Get(ServiceContext.ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => null); //do not find it
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
@@ -268,8 +269,9 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    Factory.GetInstance<UmbracoMapper>(),
+                    Factory.GetInstance<IPublishedUrlProvider>());
 
                 return controller;
             }
@@ -290,7 +292,7 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async Task PostSave_Validate_At_Least_One_Variant_Flagged_For_Saving()
         {
-            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor)
             {
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var controller = new ContentController(
@@ -303,8 +305,9 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    Factory.GetInstance<UmbracoMapper>(),
+                    Factory.GetInstance<IPublishedUrlProvider>());
 
                 return controller;
             }
@@ -330,9 +333,9 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async Task PostSave_Validate_Properties_Exist()
         {
-            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor)
             {
-                var contentServiceMock = Mock.Get(Current.Services.ContentService);
+                var contentServiceMock = Mock.Get(ServiceContext.ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => GetMockedContent());
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
@@ -346,8 +349,9 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    Factory.GetInstance<UmbracoMapper>(),
+                    Factory.GetInstance<IPublishedUrlProvider>());
 
                 return controller;
             }
@@ -376,9 +380,9 @@ namespace Umbraco.Tests.Web.Controllers
         {
             var content = GetMockedContent();
 
-            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor)
             {
-                var contentServiceMock = Mock.Get(Current.Services.ContentService);
+                var contentServiceMock = Mock.Get(ServiceContext.ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => content);
                 contentServiceMock.Setup(x => x.Save(It.IsAny<IContent>(), It.IsAny<int>(), It.IsAny<bool>()))
                     .Returns(new OperationResult(OperationResultType.Success, new Core.Events.EventMessages())); //success
@@ -394,8 +398,9 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    Factory.GetInstance<UmbracoMapper>(),
+                    Factory.GetInstance<IPublishedUrlProvider>());
 
                 return controller;
             }
@@ -416,9 +421,9 @@ namespace Umbraco.Tests.Web.Controllers
         {
             var content = GetMockedContent();
 
-            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor)
             {
-                var contentServiceMock = Mock.Get(Current.Services.ContentService);
+                var contentServiceMock = Mock.Get(ServiceContext.ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => content);
                 contentServiceMock.Setup(x => x.Save(It.IsAny<IContent>(), It.IsAny<int>(), It.IsAny<bool>()))
                     .Returns(new OperationResult(OperationResultType.Success, new Core.Events.EventMessages())); //success
@@ -434,8 +439,10 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    Factory.GetInstance<UmbracoMapper>(),
+                    Factory.GetInstance<IPublishedUrlProvider>()
+                    );
 
                 return controller;
             }
@@ -462,9 +469,9 @@ namespace Umbraco.Tests.Web.Controllers
         {
             var content = GetMockedContent();
 
-            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor)
             {
-                var contentServiceMock = Mock.Get(Current.Services.ContentService);
+                var contentServiceMock = Mock.Get(ServiceContext.ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => content);
                 contentServiceMock.Setup(x => x.Save(It.IsAny<IContent>(), It.IsAny<int>(), It.IsAny<bool>()))
                     .Returns(new OperationResult(OperationResultType.Success, new Core.Events.EventMessages())); //success
@@ -480,8 +487,10 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    Factory.GetInstance<UmbracoMapper>(),
+                    Factory.GetInstance<IPublishedUrlProvider>()
+                    );
 
                 return controller;
             }

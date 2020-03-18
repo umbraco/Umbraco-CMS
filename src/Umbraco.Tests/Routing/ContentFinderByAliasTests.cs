@@ -48,7 +48,8 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext(urlAsString);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
-            var lookup = new ContentFinderByUrlAlias(Logger);
+            var lookup =
+                new ContentFinderByUrlAlias(Logger, Mock.Of<IPublishedValueFallback>(), VariationContextAccessor);
 
             var result = lookup.TryFindContent(frequest);
 

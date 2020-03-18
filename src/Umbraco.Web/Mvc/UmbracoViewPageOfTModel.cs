@@ -5,6 +5,8 @@ using System.Web.Mvc;
 using System.Web.WebPages;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -20,7 +22,10 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     public abstract class UmbracoViewPage<TModel> : WebViewPage<TModel>
     {
-        private UmbracoContext _umbracoContext;
+        private readonly IGlobalSettings _globalSettings;
+        private readonly IContentSettings _contentSettings;
+
+        private IUmbracoContext _umbracoContext;
         private UmbracoHelper _helper;
 
         /// <summary>
@@ -45,13 +50,13 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the Umbraco context.
         /// </summary>
-        public UmbracoContext UmbracoContext => _umbracoContext
+        public IUmbracoContext UmbracoContext => _umbracoContext
             ?? (_umbracoContext = ViewContext.GetUmbracoContext() ?? Current.UmbracoContext);
 
         /// <summary>
         /// Gets the public content request.
         /// </summary>
-        internal PublishedRequest PublishedRequest
+        internal IPublishedRequest PublishedRequest
         {
             get
             {
@@ -62,11 +67,11 @@ namespace Umbraco.Web.Mvc
 
                 // try view context
                 if (ViewContext.RouteData.DataTokens.ContainsKey(token))
-                    return (PublishedRequest) ViewContext.RouteData.DataTokens.GetRequiredObject(token);
+                    return (IPublishedRequest) ViewContext.RouteData.DataTokens.GetRequiredObject(token);
 
                 // child action, try parent view context
                 if (ViewContext.IsChildAction && ViewContext.ParentActionViewContext.RouteData.DataTokens.ContainsKey(token))
-                    return (PublishedRequest) ViewContext.ParentActionViewContext.RouteData.DataTokens.GetRequiredObject(token);
+                    return (IPublishedRequest) ViewContext.ParentActionViewContext.RouteData.DataTokens.GetRequiredObject(token);
 
                 // fallback to UmbracoContext
                 return UmbracoContext.PublishedRequest;
@@ -96,23 +101,22 @@ namespace Umbraco.Web.Mvc
             }
         }
 
-        /// <summary>
-        /// Gets the membership helper.
-        /// </summary>
-        public MembershipHelper Members => Umbraco.MembershipHelper;
-
         protected UmbracoViewPage()
             : this(
                 Current.Factory.GetInstance<ServiceContext>(),
-                Current.Factory.GetInstance<AppCaches>()
+                Current.Factory.GetInstance<AppCaches>(),
+                Current.Factory.GetInstance<IGlobalSettings>(),
+                Current.Factory.GetInstance<IContentSettings>()
             )
         {
         }
 
-        protected UmbracoViewPage(ServiceContext services, AppCaches appCaches)
+        protected UmbracoViewPage(ServiceContext services, AppCaches appCaches, IGlobalSettings globalSettings, IContentSettings contentSettings)
         {
             Services = services;
             AppCaches = appCaches;
+            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
         // view logic below:
@@ -210,9 +214,9 @@ namespace Umbraco.Web.Mvc
                         {
                             // creating previewBadge markup
                             markupToInject =
-                                string.Format(Current.Configs.Settings().Content.PreviewBadge,
-                                    Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath),
-                                    Server.UrlEncode(Current.UmbracoContext.HttpContext.Request.Url?.PathAndQuery),
+                                string.Format(_contentSettings.PreviewBadge,
+                                    Current.IOHelper.ResolveUrl(_globalSettings.UmbracoPath),
+                                    Server.UrlEncode(HttpContext.Current.Request.Url?.PathAndQuery),
                                     Current.UmbracoContext.PublishedRequest.PublishedContent.Id);
                         }
                         else

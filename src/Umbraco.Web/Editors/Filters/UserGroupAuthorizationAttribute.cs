@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Editors.Filters
 {
@@ -33,7 +33,7 @@ namespace Umbraco.Web.Editors.Filters
             _paramName = paramName;
         }
 
-        private UmbracoContext GetUmbracoContext()
+        private IUmbracoContext GetUmbracoContext()
         {
             return _umbracoContextAccessor?.UmbracoContext ?? Composing.Current.UmbracoContext;
         }

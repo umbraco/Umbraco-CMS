@@ -24,17 +24,19 @@ namespace Umbraco.Tests.Composing
 
             var composition = new Composition(container, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
 
+            var expectedPackageActions = TypeLoader.GetPackageActions();
             composition.WithCollectionBuilder<PackageActionCollectionBuilder>()
-                .Add(() => TypeLoader.GetPackageActions());
+                .Add(() => expectedPackageActions);
 
-            Current.Factory = composition.CreateFactory();
+            var factory = composition.CreateFactory();
 
-            var actions = Current.PackageActions;
+            var actions = factory.GetInstance<PackageActionCollection>();
             Assert.AreEqual(2, actions.Count());
 
             // order is unspecified, but both must be there
             var hasAction1 = actions.ElementAt(0) is PackageAction1 || actions.ElementAt(1) is PackageAction1;
             var hasAction2 = actions.ElementAt(0) is PackageAction2 || actions.ElementAt(1) is PackageAction2;
+
             Assert.IsTrue(hasAction1);
             Assert.IsTrue(hasAction2);
         }

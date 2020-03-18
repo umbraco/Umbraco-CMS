@@ -12,7 +12,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
-using System.Globalization;
 using Umbraco.Core.Models.Entities;
 using System.Web.Http.ModelBinding;
 using Umbraco.Web.Actions;
@@ -21,14 +20,30 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Mapping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Trees
 {
-    public abstract class ContentTreeControllerBase : TreeController
+    public abstract class ContentTreeControllerBase : TreeController, ITreeNodeController
     {
+        public IMenuItemCollectionFactory MenuItemCollectionFactory { get; }
 
-        protected ContentTreeControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+
+        protected ContentTreeControllerBase(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider,
+            IMenuItemCollectionFactory menuItemCollectionFactory)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
+            MenuItemCollectionFactory = menuItemCollectionFactory;
         }
 
         protected ContentTreeControllerBase()
@@ -195,19 +210,29 @@ namespace Umbraco.Web.Trees
             //get the current user start node/paths
             GetUserStartNodes(out var userStartNodes, out var userStartNodePaths);
 
-            nodes.AddRange(entities.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths)).Where(x => x != null));
-
             // if the user does not have access to the root node, what we have is the start nodes,
-            // but to provide some context we also need to add their topmost nodes when they are not
+            // but to provide some context we need to add their topmost nodes when they are not
             // topmost nodes themselves (level > 1).
             if (id == rootIdString && hasAccessToRoot == false)
             {
-                var topNodeIds = entities.Where(x => x.Level > 1).Select(GetTopNodeId).Where(x => x != 0).Distinct().ToArray();
+                // first add the entities that are topmost to the nodes collection
+                var topMostEntities = entities.Where(x => x.Level == 1).ToArray();
+                nodes.AddRange(topMostEntities.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths)).Where(x => x != null));
+
+                // now add the topmost nodes of the entities that aren't topmost to the nodes collection as well
+                // - these will appear as "no-access" nodes in the tree, but will allow the editors to drill down through the tree
+                //   until they reach their start nodes
+                var topNodeIds = entities.Except(topMostEntities).Select(GetTopNodeId).Where(x => x != 0).Distinct().ToArray();
                 if (topNodeIds.Length > 0)
                 {
                     var topNodes = Services.EntityService.GetAll(UmbracoObjectType, topNodeIds.ToArray());
                     nodes.AddRange(topNodes.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths)).Where(x => x != null));
                 }
+            }
+            else
+            {
+                // the user has access to the root, just add the entities
+                nodes.AddRange(entities.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths)).Where(x => x != null));
             }
 
             return nodes;
@@ -354,7 +379,12 @@ namespace Umbraco.Web.Trees
                 var startNodes = Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes);
                 //if any of these start nodes' parent is current, then we need to render children normally so we need to switch some logic and tell
                 // the UI that this node does have children and that it isn't a container
-                if (startNodes.Any(x => x.ParentId == e.Id))
+
+                if (startNodes.Any(x =>
+                {
+                    var pathParts = x.Path.Split(',');
+                    return pathParts.Contains(e.Id.ToInvariantString());
+                }))
                 {
                     renderChildren = true;
                 }
@@ -407,7 +437,7 @@ namespace Umbraco.Web.Trees
                     deleteAllowed = perms.FirstOrDefault(x => x.Contains(deleteAction.Letter)) != null;
                 }
 
-                var menu = new MenuItemCollection();
+                var menu = MenuItemCollectionFactory.Create();
                 // only add empty recycle bin if the current user is allowed to delete by default
                 if (deleteAllowed)
                 {

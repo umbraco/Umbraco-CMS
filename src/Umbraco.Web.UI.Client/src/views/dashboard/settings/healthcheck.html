@@ -5,10 +5,10 @@
         <umb-box>
             <umb-box-content>
                 <div class="umb-healthcheck-help-text">
-                    <p>
-                        The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.
-                        You can add your own health checks, have a look at <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">the documentation for more information</a> about custom health checks.
-                    </p>
+                    <localize key="healthcheck_helpText">
+                        <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.
+                            You can add your own health checks, have a look at <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
+                    </localize>
                 </div>
                 <div class="umb-panel-group__details-status-actions">
                         <umb-button type="button"
@@ -75,7 +75,7 @@
         <umb-editor-sub-header>
             <umb-editor-sub-header-content-left>
                 <button type="button" class="umb-healthcheck-back-link" ng-click="vm.setViewState('list');">
-                    <span aria-hidden="true">&larr;</span> Back to overview
+                    <span aria-hidden="true">&larr;</span> <localize key="general_backToOverview">Back to overview</localize>
                 </button>
             </umb-editor-sub-header-content-left>
         </umb-editor-sub-header>
@@ -85,9 +85,12 @@
             <div class="umb-panel-group__details-group">
                 <div class="umb-panel-group__details-group-title">
                     <div class="umb-panel-group__details-group-name">{{ vm.selectedGroup.name }}</div>
-                    <umb-button type="button" button-style="success"
-                                action="vm.checkAllInGroup(vm.selectedGroup, vm.selectedGroup.checks)"
-                                label="Check group">
+                    <umb-button
+                        type="button"
+                        button-style="success"
+                        action="vm.checkAllInGroup(vm.selectedGroup, vm.selectedGroup.checks)"
+                        label="Check group"
+                        label-key="healthcheck_checkGroup">
                     </umb-button>
                 </div>
 

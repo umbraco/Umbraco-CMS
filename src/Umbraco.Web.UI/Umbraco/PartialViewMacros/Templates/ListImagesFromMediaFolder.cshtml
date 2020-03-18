@@ -1,3 +1,5 @@
+@using Umbraco.Web
+@using Umbraco.Web.Composing
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
 @*
@@ -17,7 +19,7 @@
 @if (mediaId != null)
 {
     @* Get the media item associated with the id passed in *@
-    var media = Umbraco.Media(mediaId);
+    var media = Current.PublishedContentQuery.Media(mediaId);
     var selection = media.Children.ToArray();
 
     if (selection.Length > 0)
@@ -26,7 +28,7 @@
             @foreach (var item in selection)
             {
                 <li>
-                    <img src="@item.Url" alt="@item.Name" />
+                    <img src="@item.Url()" alt="@item.Name" />
                 </li>
             }
         </ul>

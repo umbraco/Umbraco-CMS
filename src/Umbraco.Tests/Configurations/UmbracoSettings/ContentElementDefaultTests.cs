@@ -14,27 +14,27 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public override void DisableHtmlEmail()
         {
-            Assert.IsTrue(SettingsSection.Content.DisableHtmlEmail == false);
+            Assert.IsTrue(ContentSettings.DisableHtmlEmail == false);
         }
 
         [Test]
         public override void Can_Set_Multiple()
         {
-            Assert.IsTrue(SettingsSection.Content.Error404Collection.Count() == 1);
-            Assert.IsTrue(SettingsSection.Content.Error404Collection.ElementAt(0).Culture == null);
-            Assert.IsTrue(SettingsSection.Content.Error404Collection.ElementAt(0).ContentId == 1);
+            Assert.IsTrue(ContentSettings.Error404Collection.Count() == 1);
+            Assert.IsTrue(ContentSettings.Error404Collection.ElementAt(0).Culture == null);
+            Assert.IsTrue(ContentSettings.Error404Collection.ElementAt(0).ContentId == 1);
         }
 
         [Test]
         public override void ImageAutoFillProperties()
         {
-            Assert.IsTrue(SettingsSection.Content.ImageAutoFillProperties.Count() == 1);
-            Assert.IsTrue(SettingsSection.Content.ImageAutoFillProperties.ElementAt(0).Alias == "umbracoFile");
-            Assert.IsTrue(SettingsSection.Content.ImageAutoFillProperties.ElementAt(0).WidthFieldAlias == "umbracoWidth");
-            Assert.IsTrue(SettingsSection.Content.ImageAutoFillProperties.ElementAt(0).HeightFieldAlias == "umbracoHeight");
-            Assert.IsTrue(SettingsSection.Content.ImageAutoFillProperties.ElementAt(0).LengthFieldAlias == "umbracoBytes");
-            Assert.IsTrue(SettingsSection.Content.ImageAutoFillProperties.ElementAt(0).ExtensionFieldAlias == "umbracoExtension");
+            Assert.IsTrue(ContentSettings.ImageAutoFillProperties.Count() == 1);
+            Assert.IsTrue(ContentSettings.ImageAutoFillProperties.ElementAt(0).Alias == "umbracoFile");
+            Assert.IsTrue(ContentSettings.ImageAutoFillProperties.ElementAt(0).WidthFieldAlias == "umbracoWidth");
+            Assert.IsTrue(ContentSettings.ImageAutoFillProperties.ElementAt(0).HeightFieldAlias == "umbracoHeight");
+            Assert.IsTrue(ContentSettings.ImageAutoFillProperties.ElementAt(0).LengthFieldAlias == "umbracoBytes");
+            Assert.IsTrue(ContentSettings.ImageAutoFillProperties.ElementAt(0).ExtensionFieldAlias == "umbracoExtension");
         }
-        
+
     }
 }

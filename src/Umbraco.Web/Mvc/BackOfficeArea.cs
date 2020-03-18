@@ -1,6 +1,7 @@
 ﻿using System.Web.Mvc;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Web.Editors;
 
 namespace Umbraco.Web.Mvc
@@ -10,11 +11,11 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     internal class BackOfficeArea : AreaRegistration
     {
-        private readonly IGlobalSettings _globalSettings;
+        private readonly IIOHelper _ioHelper;
 
-        public BackOfficeArea(IGlobalSettings globalSettings)
+        public BackOfficeArea(IIOHelper ioHelper)
         {
-            _globalSettings = globalSettings;
+            _ioHelper = ioHelper;
         }
 
         /// <summary>
@@ -48,6 +49,6 @@ namespace Umbraco.Web.Mvc
                 new[] {typeof (BackOfficeController).Namespace});
         }
 
-        public override string AreaName => _globalSettings.GetUmbracoMvcArea(Current.IOHelper);
+        public override string AreaName => _ioHelper.GetUmbracoMvcArea();
     }
 }

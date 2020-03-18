@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web
@@ -24,52 +23,12 @@ namespace Umbraco.Web
         //
         // besides, for tests, Current support setting a fallback without even a container
         //
+        // Update to this comment 8/2/2020: issue as been ameliorated by creating extensions methods in Umbraco.Core
+        // that accept the dependencies as arguments for many of these extension methods, and can be used within the Umbraco code-base.
+        // For site developers, the "friendly" extension methods using service location have been maintained, delegating to the ones that
+        // take the dependencies as parameters.
+
         private static IPublishedValueFallback PublishedValueFallback => Current.PublishedValueFallback;
-
-        #region IsComposedOf
-
-        /// <summary>
-        /// Gets a value indicating whether the content is of a content type composed of the given alias
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The content type alias.</param>
-        /// <returns>A value indicating whether the content is of a content type composed of a content type identified by the alias.</returns>
-        public static bool IsComposedOf(this IPublishedElement content, string alias)
-        {
-            return content.ContentType.CompositionAliases.InvariantContains(alias);
-        }
-
-        #endregion
-
-        #region HasProperty
-
-        /// <summary>
-        /// Gets a value indicating whether the content has a property identified by its alias.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <returns>A value indicating whether the content has the property identified by the alias.</returns>
-        /// <remarks>The content may have a property, and that property may not have a value.</remarks>
-        public static bool HasProperty(this IPublishedElement content, string alias)
-        {
-            return content.ContentType.GetPropertyType(alias) != null;
-        }
-
-        #endregion
-
-        #region HasValue
-
-        /// <summary>
-        /// Gets a value indicating whether the content has a value for a property identified by its alias.
-        /// </summary>
-        /// <remarks>Returns true if <c>GetProperty(alias)</c> is not <c>null</c> and <c>GetProperty(alias).HasValue</c> is <c>true</c>.</remarks>
-        public static bool HasValue(this IPublishedElement content, string alias, string culture = null, string segment = null)
-        {
-            var prop = content.GetProperty(alias);
-            return prop != null && prop.HasValue(culture, segment);
-        }
-
-        #endregion
 
         #region Value
 
@@ -91,19 +50,7 @@ namespace Umbraco.Web
         /// </remarks>
         public static object Value(this IPublishedElement content, string alias, string culture = null, string segment = null, Fallback fallback = default, object defaultValue = default)
         {
-            var property = content.GetProperty(alias);
-
-            // if we have a property, and it has a value, return that value
-            if (property != null && property.HasValue(culture, segment))
-                return property.GetValue(culture, segment);
-
-            // else let fallback try to get a value
-            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value))
-                return value;
-
-            // else... if we have a property, at least let the converter return its own
-            // vision of 'no value' (could be an empty enumerable) - otherwise, default
-            return property?.GetValue(culture, segment);
+            return content.Value(PublishedValueFallback, alias, culture, segment, fallback, defaultValue);
         }
 
         #endregion
@@ -129,45 +76,7 @@ namespace Umbraco.Web
         /// </remarks>
         public static T Value<T>(this IPublishedElement content, string alias, string culture = null, string segment = null, Fallback fallback = default, T defaultValue = default)
         {
-            var property = content.GetProperty(alias);
-
-            // if we have a property, and it has a value, return that value
-            if (property != null && property.HasValue(culture, segment))
-                return property.Value<T>(culture, segment);
-
-            // else let fallback try to get a value
-            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value))
-                return value;
-
-            // else... if we have a property, at least let the converter return its own
-            // vision of 'no value' (could be an empty enumerable) - otherwise, default
-            return property == null ? default : property.Value<T>(culture, segment);
-        }
-
-        #endregion
-
-        #region ToIndexedArray
-
-        public static IndexedArrayItem<TContent>[] ToIndexedArray<TContent>(this IEnumerable<TContent> source)
-            where TContent : class, IPublishedElement
-        {
-            var set = source.Select((content, index) => new IndexedArrayItem<TContent>(content, index)).ToArray();
-            foreach (var setItem in set) setItem.TotalCount = set.Length;
-            return set;
-        }
-
-        #endregion
-
-        #region OfTypes
-
-        // the .OfType<T>() filter is nice when there's only one type
-        // this is to support filtering with multiple types
-        public static IEnumerable<T> OfTypes<T>(this IEnumerable<T> contents, params string[] types)
-            where T : IPublishedElement
-        {
-            if (types == null || types.Length == 0) return Enumerable.Empty<T>();
-
-            return contents.Where(x => types.InvariantContains(x.ContentType.Alias));
+            return content.Value<T>(PublishedValueFallback, alias, culture, segment, fallback, defaultValue);
         }
 
         #endregion
@@ -183,9 +92,7 @@ namespace Umbraco.Web
         /// the content is visible.</remarks>
         public static bool IsVisible(this IPublishedElement content)
         {
-            // rely on the property converter - will return default bool value, ie false, if property
-            // is not defined, or has no value, else will return its value.
-            return content.Value<bool>(Constants.Conventions.Content.NaviHide) == false;
+            return content.IsVisible(PublishedValueFallback);
         }
 
         #endregion
@@ -207,14 +114,12 @@ namespace Umbraco.Web
         /// </remarks>
         public static string MediaUrl(this IPublishedContent content, string culture = null, UrlMode mode = UrlMode.Default, string propertyAlias = Constants.Conventions.Media.File)
         {
-            var umbracoContext = Composing.Current.UmbracoContext;
+            var publishedUrlProvider = Current.PublishedUrlProvider;
 
-            if (umbracoContext == null)
-                throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext is null.");
-            if (umbracoContext.UrlProvider == null)
-                throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext.UrlProvider is null.");
+            if (publishedUrlProvider== null)
+                throw new InvalidOperationException("Cannot resolve a Url when Current.PublishedUrlProvider is null.");
 
-            return umbracoContext.UrlProvider.GetMediaUrl(content, mode, culture, propertyAlias);
+            return publishedUrlProvider.GetMediaUrl(content, mode, culture, propertyAlias);
         }
 
         #endregion

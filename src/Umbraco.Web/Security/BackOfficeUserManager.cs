@@ -12,6 +12,7 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
+using Umbraco.Web.Models.Identity;
 using IPasswordHasher = Microsoft.AspNet.Identity.IPasswordHasher;
 
 namespace Umbraco.Web.Security
@@ -26,14 +27,14 @@ namespace Umbraco.Web.Security
         public BackOfficeUserManager(
             IUserStore<BackOfficeIdentityUser, int> store,
             IdentityFactoryOptions<BackOfficeUserManager> options,
-            IContentSection contentSectionConfig,
+            IContentSettings contentSettingsConfig,
             IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
             IGlobalSettings globalSettings)
             : base(store, passwordConfiguration, ipResolver)
         {
             if (options == null) throw new ArgumentNullException("options");
-            InitUserManager(this, passwordConfiguration, options.DataProtectionProvider, contentSectionConfig, globalSettings);
+            InitUserManager(this, passwordConfiguration, options.DataProtectionProvider, contentSettingsConfig, globalSettings);
         }
 
         #region Static Create methods
@@ -46,7 +47,7 @@ namespace Umbraco.Web.Security
         /// <param name="entityService"></param>
         /// <param name="externalLoginService"></param>
         /// <param name="passwordConfiguration"></param>
-        /// <param name="contentSectionConfig"></param>
+        /// <param name="contentSettingsConfig"></param>
         /// <param name="globalSettings"></param>
         /// <returns></returns>
         public static BackOfficeUserManager Create(
@@ -55,7 +56,7 @@ namespace Umbraco.Web.Security
             IEntityService entityService,
             IExternalLoginService externalLoginService,
             UmbracoMapper mapper,
-            IContentSection contentSectionConfig,
+            IContentSettings contentSettingsConfig,
             IGlobalSettings globalSettings,
             IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver)
@@ -65,7 +66,7 @@ namespace Umbraco.Web.Security
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
 
             var store = new BackOfficeUserStore(userService, entityService, externalLoginService, globalSettings, mapper);
-            var manager = new BackOfficeUserManager(store, options, contentSectionConfig, passwordConfiguration, ipResolver, globalSettings);
+            var manager = new BackOfficeUserManager(store, options, contentSettingsConfig, passwordConfiguration, ipResolver, globalSettings);
             return manager;
         }
 
@@ -75,17 +76,17 @@ namespace Umbraco.Web.Security
         /// <param name="options"></param>
         /// <param name="customUserStore"></param>
         /// <param name="passwordConfiguration"></param>
-        /// <param name="contentSectionConfig"></param>
+        /// <param name="contentSettingsConfig"></param>
         /// <returns></returns>
         public static BackOfficeUserManager Create(
             IdentityFactoryOptions<BackOfficeUserManager> options,
             BackOfficeUserStore customUserStore,
-            IContentSection contentSectionConfig,
+            IContentSettings contentSettingsConfig,
             IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
             IGlobalSettings globalSettings)
         {
-            var manager = new BackOfficeUserManager(customUserStore, options, contentSectionConfig, passwordConfiguration, ipResolver, globalSettings);
+            var manager = new BackOfficeUserManager(customUserStore, options, contentSettingsConfig, passwordConfiguration, ipResolver, globalSettings);
             return manager;
         }
         #endregion
@@ -153,13 +154,13 @@ namespace Umbraco.Web.Security
         /// <param name="manager"></param>
         /// <param name="passwordConfig"></param>
         /// <param name="dataProtectionProvider"></param>
-        /// <param name="contentSectionConfig"></param>
+        /// <param name="contentSettingsConfig"></param>
         /// <returns></returns>
         protected void InitUserManager(
             BackOfficeUserManager<T> manager,
             IPasswordConfiguration passwordConfig,
             IDataProtectionProvider dataProtectionProvider,
-            IContentSection contentSectionConfig,
+            IContentSettings contentSettingsConfig,
             IGlobalSettings globalSettings)
         {
             // Configure validation logic for usernames
@@ -194,7 +195,7 @@ namespace Umbraco.Web.Security
             manager.ClaimsIdentityFactory = new BackOfficeClaimsIdentityFactory<T>();
 
             manager.EmailService = new EmailService(
-                contentSectionConfig.NotificationEmailAddress,
+                contentSettingsConfig.NotificationEmailAddress,
                 new EmailSender(globalSettings));
 
             //NOTE: Not implementing these, if people need custom 2 factor auth, they'll need to implement their own UserStore to support it

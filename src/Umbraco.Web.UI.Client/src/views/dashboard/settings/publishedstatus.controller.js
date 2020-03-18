@@ -7,8 +7,6 @@
         $http.get(umbRequestHelper.getApiUrl('publishedStatusBaseUrl', 'GetPublishedStatusUrl')),
         'Failed to get published status url')
     .then(function (result) {
-
-        //result = 'views/dashboard/developer/nucache.html'
         vm.includeUrl = result;
     });
 

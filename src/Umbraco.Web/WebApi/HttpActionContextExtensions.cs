@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using Newtonsoft.Json;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.IO;
+using Umbraco.Core;
 
 namespace Umbraco.Web.WebApi
 {

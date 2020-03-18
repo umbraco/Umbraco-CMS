@@ -1,6 +1,8 @@
 @using Umbraco.Core.Models.PublishedContent
 @using Umbraco.Web
 @using Umbraco.Core
+@using Umbraco.Core.Models
+@using Umbraco.Web.Composing
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
 @*
@@ -24,18 +26,18 @@
     <div class="row">
         @foreach (var mediaId in mediaIds.Split(','))
         {
-            var media = Umbraco.Media(mediaId);
+            var media = Current.PublishedContentQuery.Media(mediaId);
 
             @* a single image *@
             if (media.IsDocumentType("Image"))
             {
-                @Render(media);
+                @Render(media)
             }
 
             @* a folder with images under it *@
-            foreach (var image in media.Children())
+            foreach (var image in media.Children(Current.VariationContextAccessor))
             {
-                @Render(image);
+                @Render(image)
             }
         }
     </div>
@@ -44,8 +46,8 @@
 @helper Render(IPublishedContent item)
 {
     <div class="col-xs-6 col-md-3">
-        <a href="@item.Url" class="thumbnail">
-            <img src="@item.GetCropUrl(width:200, height:200)" alt="@item.Name" />
+        <a href="@item.Url()" class="thumbnail">
+            <img src="@(item.GetCropUrl(Current.Factory.GetInstance<IImageUrlGenerator>(), width:200, height:200))" alt="@item.Name" />
         </a>
     </div>
 }

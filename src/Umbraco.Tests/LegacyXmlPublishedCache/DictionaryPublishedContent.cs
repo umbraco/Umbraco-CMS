@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Examine;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Xml.XPath;
-using Examine.LuceneEngine.Providers;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -37,9 +37,10 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             Func<int, XPathNavigator, IEnumerable<IPublishedContent>> getChildren,
             Func<DictionaryPublishedContent, string, IPublishedProperty> getProperty,
             IAppCache appCache,
+            IVariationContextAccessor variationContextAccessor,
             PublishedContentTypeCache contentTypeCache,
             XPathNavigator nav,
-            bool fromExamine)
+            bool fromExamine):base(variationContextAccessor)
         {
             if (valueDictionary == null) throw new ArgumentNullException(nameof(valueDictionary));
             if (getParent == null) throw new ArgumentNullException(nameof(getParent));
@@ -58,10 +59,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             ValidateAndSetProperty(valueDictionary, val => _sortOrder = Int32.Parse(val), "sortOrder");
             ValidateAndSetProperty(valueDictionary, val => _name = val, "nodeName");
             ValidateAndSetProperty(valueDictionary, val => _urlName = val, "urlName");
-            ValidateAndSetProperty(valueDictionary, val => _documentTypeAlias = val, "nodeTypeAlias", LuceneIndex.ItemTypeFieldName);
+            ValidateAndSetProperty(valueDictionary, val => _documentTypeAlias = val, "nodeTypeAlias", ExamineFieldNames.ItemTypeFieldName);
             ValidateAndSetProperty(valueDictionary, val => _documentTypeId = Int32.Parse(val), "nodeType");
-            //ValidateAndSetProperty(valueDictionary, val => _writerName = val, "writerName");
-            ValidateAndSetProperty(valueDictionary, val => _creatorName = val, "creatorName", "writerName"); //this is a bit of a hack fix for: U4-1132
             //ValidateAndSetProperty(valueDictionary, val => _writerId = int.Parse(val), "writerID");
             ValidateAndSetProperty(valueDictionary, val => _creatorId = Int32.Parse(val), "creatorID", "writerID"); //this is a bit of a hack fix for: U4-1132
             ValidateAndSetProperty(valueDictionary, val => _path = val, "path", "__Path");
@@ -160,10 +159,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         public override string UrlSegment => _urlName;
 
-        public override string WriterName => _creatorName;
-
-        public override string CreatorName => _creatorName;
-
         public override int WriterId => _creatorId;
 
         public override int CreatorId => _creatorId;
@@ -202,8 +197,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private string _urlName;
         private string _documentTypeAlias;
         private int _documentTypeId;
-        //private string _writerName;
-        private string _creatorName;
         //private int _writerId;
         private int _creatorId;
         private string _path;

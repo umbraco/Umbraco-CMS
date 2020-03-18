@@ -99,13 +99,18 @@ Use this directive to render a ui component for selecting child items to a paren
 @param {string} parentName (<code>binding</code>): The parent name.
 @param {string} parentIcon (<code>binding</code>): The parent icon.
 @param {number} parentId (<code>binding</code>): The parent id.
-@param {callback} onRemove (<code>binding</code>): Callback when the remove button is clicked on an item.
+@param {callback} onRemove (<code>binding</code>): Callback when removing an item.
     <h3>The callback returns:</h3>
     <ul>
         <li><code>child</code>: The selected item.</li>
         <li><code>$index</code>: The selected item index.</li>
     </ul>
-@param {callback} onAdd (<code>binding</code>): Callback when the add button is clicked.
+@param {callback} onAdd (<code>binding</code>): Callback when adding an item.
+    <h3>The callback returns:</h3>
+    <ul>
+        <li><code>$event</code>: The select event.</li>
+    </ul>
+@param {callback} onSort (<code>binding</code>): Callback when sorting an item.
     <h3>The callback returns:</h3>
     <ul>
         <li><code>$event</code>: The select event.</li>
@@ -174,19 +179,35 @@ Use this directive to render a ui component for selecting child items to a paren
             eventBindings.push(scope.$watch('parentName', function(newValue, oldValue){
 
               if (newValue === oldValue) { return; }
-              if ( oldValue === undefined || newValue === undefined) { return; }
+              if (oldValue === undefined || newValue === undefined) { return; }
 
               syncParentName();
-
             }));
 
             eventBindings.push(scope.$watch('parentIcon', function(newValue, oldValue){
 
               if (newValue === oldValue) { return; }
-              if ( oldValue === undefined || newValue === undefined) { return; }
+              if (oldValue === undefined || newValue === undefined) { return; }
 
               syncParentIcon();
             }));
+
+            // sortable options for allowed child content types
+            scope.sortableOptions = {
+                axis: "y",
+                cancel: ".unsortable",
+                containment: "parent",
+                distance: 10,
+                opacity: 0.7,
+                tolerance: "pointer",
+                scroll: true,
+                zIndex: 6000,
+                update: function (e, ui) {
+                    if(scope.onSort) {
+                       scope.onSort();
+                    }
+                }
+            };
 
             // clean up
             scope.$on('$destroy', function(){
@@ -209,7 +230,8 @@ Use this directive to render a ui component for selecting child items to a paren
                 parentIcon: "=",
                 parentId: "=",
                 onRemove: "=",
-                onAdd: "="
+                onAdd: "=",
+                onSort: "="
             },
             link: link
         };

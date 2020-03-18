@@ -20,7 +20,10 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
-
+using Umbraco.Core.Mapping;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Models;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
 {
@@ -31,6 +34,9 @@ namespace Umbraco.Web.Editors
     public class CurrentUserController : UmbracoAuthorizedJsonController
     {
         private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly IContentSettings _contentSettings;
+        private readonly IIOHelper _ioHelper;
+        private readonly IImageUrlGenerator _imageUrlGenerator;
 
         public CurrentUserController(
             IGlobalSettings globalSettings,
@@ -40,12 +46,19 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             IMediaFileSystem mediaFileSystem,
-            IShortStringHelper shortStringHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            IContentSettings contentSettings,
+            IIOHelper ioHelper,
+            IImageUrlGenerator imageUrlGenerator,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _mediaFileSystem = mediaFileSystem;
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _imageUrlGenerator = imageUrlGenerator;
         }
 
         /// <summary>
@@ -179,7 +192,7 @@ namespace Umbraco.Web.Editors
         public async Task<HttpResponseMessage> PostSetAvatar()
         {
             //borrow the logic from the user controller
-            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache,  _mediaFileSystem, ShortStringHelper, Security.GetUserId().ResultOr(0));
+            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache,  _mediaFileSystem, ShortStringHelper, _contentSettings, _ioHelper, _imageUrlGenerator, Security.GetUserId().ResultOr(0));
         }
 
         /// <summary>

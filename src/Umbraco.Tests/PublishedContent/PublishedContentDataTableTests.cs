@@ -4,8 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -13,6 +12,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using PublishedContentExtensions = Umbraco.Web.PublishedContentExtensions;
 
@@ -53,8 +53,8 @@ namespace Umbraco.Tests.PublishedContent
                             {"NodeTypeAlias", "NodeTypeAlias"},
                             {"CreateDate", "CreateDate"},
                             {"UpdateDate", "UpdateDate"},
-                            {"CreatorName", "CreatorName"},
-                            {"WriterName", "WriterName"},
+                            {"CreatorId", "CreatorId"},
+                            {"WriterId", "WriterId"},
                             {"Url", "Url"}
                         };
                     foreach (var f in userFields.Where(f => !allFields.ContainsKey(f.Key)))
@@ -79,7 +79,7 @@ namespace Umbraco.Tests.PublishedContent
         public void To_DataTable()
         {
             var doc = GetContent(true, 1);
-            var dt = doc.ChildrenAsTable(Current.Services);
+            var dt = doc.ChildrenAsTable(ServiceContext);
 
             Assert.AreEqual(11, dt.Columns.Count);
             Assert.AreEqual(3, dt.Rows.Count);
@@ -102,7 +102,7 @@ namespace Umbraco.Tests.PublishedContent
             var c = (SolidPublishedContent)doc.Children.ElementAt(0);
             c.ContentType = new PublishedContentType(22, "DontMatch", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
 
-            var dt = doc.ChildrenAsTable(Current.Services, "Child");
+            var dt = doc.ChildrenAsTable(ServiceContext, "Child");
 
             Assert.AreEqual(11, dt.Columns.Count);
             Assert.AreEqual(2, dt.Rows.Count);
@@ -118,7 +118,7 @@ namespace Umbraco.Tests.PublishedContent
         public void To_DataTable_No_Rows()
         {
             var doc = GetContent(false, 1);
-            var dt = doc.ChildrenAsTable(Current.Services);
+            var dt = doc.ChildrenAsTable(ServiceContext);
             //will return an empty data table
             Assert.AreEqual(0, dt.Columns.Count);
             Assert.AreEqual(0, dt.Rows.Count);
@@ -136,7 +136,6 @@ namespace Umbraco.Tests.PublishedContent
                 {
                     CreateDate = DateTime.Now,
                     CreatorId = 1,
-                    CreatorName = "Shannon",
                     Id = 3,
                     SortOrder = 4,
                     TemplateId = 5,
@@ -146,7 +145,6 @@ namespace Umbraco.Tests.PublishedContent
                     Name = "Page" + Guid.NewGuid(),
                     Version = Guid.NewGuid(),
                     WriterId = 1,
-                    WriterName = "Shannon",
                     Parent = null,
                     Level = 1,
                     Children = new List<IPublishedContent>()

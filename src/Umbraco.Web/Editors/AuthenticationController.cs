@@ -13,7 +13,6 @@ using Microsoft.AspNet.Identity.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -24,9 +23,12 @@ using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
-using Umbraco.Web.Composing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Core.Mapping;
+using Umbraco.Web.Models.Identity;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
 {
@@ -42,11 +44,29 @@ namespace Umbraco.Web.Editors
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
         private readonly IUserPasswordConfiguration _passwordConfiguration;
+        private readonly IRuntimeState _runtimeState;
+        private readonly ISecuritySettings _securitySettings;
+        private readonly IIOHelper _ioHelper;
 
-        public AuthenticationController(IUserPasswordConfiguration passwordConfiguration, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper)
+        public AuthenticationController(
+            IUserPasswordConfiguration passwordConfiguration,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoMapper umbracoMapper,
+            ISecuritySettings securitySettings,
+            IIOHelper ioHelper,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
             _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
+            _securitySettings = securitySettings ?? throw new ArgumentNullException(nameof(securitySettings));
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
         }
 
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager
@@ -290,7 +310,7 @@ namespace Umbraco.Web.Editors
         {
             // If this feature is switched off in configuration the UI will be amended to not make the request to reset password available.
             // So this is just a server-side secondary check.
-            if (Current.Configs.Settings().Security.AllowPasswordReset == false)
+            if (_securitySettings.AllowPasswordReset == false)
             {
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
@@ -514,13 +534,13 @@ namespace Umbraco.Web.Editors
             var action = urlHelper.Action("ValidatePasswordResetCode", "BackOffice",
                 new
                 {
-                    area = GlobalSettings.GetUmbracoMvcArea(Current.IOHelper),
+                    area = _ioHelper.GetUmbracoMvcArea(),
                     u = userId,
                     r = code
                 });
 
             // Construct full URL using configured application URL (which will fall back to request)
-            var applicationUri = Current.RuntimeState.ApplicationUrl;
+            var applicationUri = _runtimeState.ApplicationUrl;
             var callbackUri = new Uri(applicationUri, action);
             return callbackUri.ToString();
         }

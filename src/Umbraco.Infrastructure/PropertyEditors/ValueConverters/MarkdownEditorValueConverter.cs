@@ -1,12 +1,23 @@
 ﻿using System;
+using HeyRed.MarkdownSharp;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Templates;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
     public class MarkdownEditorValueConverter : PropertyValueConverterBase
     {
+        private readonly HtmlLocalLinkParser _localLinkParser;
+        private readonly HtmlUrlParser _urlParser;
+
+        public MarkdownEditorValueConverter(HtmlLocalLinkParser localLinkParser, HtmlUrlParser urlParser)
+        {
+            _localLinkParser = localLinkParser;
+            _urlParser = urlParser;
+        }
+
         public override bool IsConverter(IPublishedPropertyType propertyType)
             => Constants.PropertyEditors.Aliases.MarkdownEditor.Equals(propertyType.EditorAlias);
 
@@ -15,20 +26,26 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         // PropertyCacheLevel.Content is ok here because that converter does not parse {locallink} nor executes macros
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
-            => PropertyCacheLevel.Element;
+            => PropertyCacheLevel.Snapshot;
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
-            // in xml a string is: string
-            // in the database a string is: string
-            // default value is: null
-            return source;
+            if (source == null) return null;
+            var sourceString = source.ToString();
+
+            // ensures string is parsed for {localLink} and urls are resolved correctly
+            sourceString = _localLinkParser.EnsureInternalLinks(sourceString, preview);
+            sourceString = _urlParser.EnsureUrls(sourceString);
+
+            return sourceString;
         }
 
         public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
+            // convert markup to HTML for frontend rendering.
             // source should come from ConvertSource and be a string (or null) already
-            return new HtmlEncodedString(inter == null ? string.Empty : (string) inter);
+            var mark = new Markdown();
+            return new HtmlEncodedString(inter == null ? string.Empty : mark.Transform((string)inter));
         }
 
         public override object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)

@@ -2,16 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Web;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -28,18 +26,20 @@ namespace Umbraco.Web.Security
     {
         private readonly MembersMembershipProvider _membershipProvider;
         private readonly RoleProvider _roleProvider;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMemberService _memberService;
         private readonly IMemberTypeService _memberTypeService;
         private readonly IPublicAccessService _publicAccessService;
         private readonly AppCaches _appCaches;
         private readonly ILogger _logger;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IEntityService _entityService;
 
         #region Constructors
 
         public MembershipHelper
         (
-            HttpContextBase httpContext,
+            IHttpContextAccessor httpContextAccessor,
             IPublishedMemberCache memberCache,
             MembersMembershipProvider membershipProvider,
             RoleProvider roleProvider,
@@ -48,11 +48,12 @@ namespace Umbraco.Web.Security
             IPublicAccessService publicAccessService,
             AppCaches appCaches,
             ILogger logger,
-            IShortStringHelper shortStringHelper
+            IShortStringHelper shortStringHelper,
+            IEntityService entityService
         )
         {
-            HttpContext = httpContext;
             MemberCache = memberCache;
+            _httpContextAccessor = httpContextAccessor;
             _memberService = memberService;
             _memberTypeService = memberTypeService;
             _publicAccessService = publicAccessService;
@@ -62,11 +63,11 @@ namespace Umbraco.Web.Security
 
             _membershipProvider = membershipProvider ?? throw new ArgumentNullException(nameof(membershipProvider));
             _roleProvider = roleProvider ?? throw new ArgumentNullException(nameof(roleProvider));
+            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
         }
 
         #endregion
 
-        protected HttpContextBase HttpContext { get; }
         protected IPublishedMemberCache MemberCache { get; }
 
         /// <summary>
@@ -128,7 +129,7 @@ namespace Umbraco.Web.Security
             var provider = _membershipProvider;
             var membershipUser = provider.GetCurrentUser();
             //NOTE: This should never happen since they are logged in
-            if (membershipUser == null) throw new InvalidOperationException("Could not find member with username " + HttpContext.User.Identity.Name);
+            if (membershipUser == null) throw new InvalidOperationException("Could not find member with username " + _httpContextAccessor.GetRequiredHttpContext().User.Identity.Name);
 
             try
             {
@@ -312,12 +313,11 @@ namespace Umbraco.Web.Security
 
             var umbracoType = UdiEntityTypeHelper.ToUmbracoObjectType(udi.EntityType);
 
-            var entityService = Current.Services.EntityService;
             switch (umbracoType)
             {
                 case UmbracoObjectTypes.Member:
                     // TODO: need to implement Get(guid)!
-                    var memberAttempt = entityService.GetId(guidUdi.Guid, umbracoType);
+                    var memberAttempt = _entityService.GetId(guidUdi.Guid, umbracoType);
                     if (memberAttempt.Success)
                         return GetById(memberAttempt.Result);
                     break;
@@ -545,13 +545,14 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public bool IsLoggedIn()
         {
-            return HttpContext.User != null && HttpContext.User.Identity.IsAuthenticated;
+            var httpContext = _httpContextAccessor.HttpContext;
+            return httpContext?.User != null && httpContext.User.Identity.IsAuthenticated;
         }
 
         /// <summary>
         /// Returns the currently logged in username
         /// </summary>
-        public string CurrentUserName => HttpContext.User.Identity.Name;
+        public string CurrentUserName => _httpContextAccessor.GetRequiredHttpContext().User.Identity.Name;
 
         /// <summary>
         /// Returns true or false if the currently logged in member is authorized based on the parameters provided

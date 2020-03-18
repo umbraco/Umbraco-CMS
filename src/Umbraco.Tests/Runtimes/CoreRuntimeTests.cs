@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Web.Hosting;
 using Examine;
 using Moq;
-using NPoco.Expressions;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Compose;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -24,6 +21,7 @@ using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Runtime;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Runtimes
 {
@@ -84,7 +82,7 @@ namespace Umbraco.Tests.Runtimes
         // test application
         public class TestUmbracoApplication : UmbracoApplicationBase
         {
-            public TestUmbracoApplication() : base(_logger, _configs, _ioHelper, _profiler, new AspNetHostingEnvironment(_hostingSettings), new AspNetBackOfficeInfo(_globalSettings, _ioHelper, _settings, _logger))
+            public TestUmbracoApplication() : base(_logger, _configs, _ioHelper, _profiler, new AspNetHostingEnvironment(_hostingSettings), new AspNetBackOfficeInfo(_globalSettings, _ioHelper,  _logger, _settings))
             {
             }
 
@@ -92,16 +90,17 @@ namespace Umbraco.Tests.Runtimes
             private static readonly IIOHelper _ioHelper = TestHelper.IOHelper;
             private static readonly IProfiler _profiler = new TestProfiler();
             private static readonly Configs _configs = GetConfigs();
-            private static readonly IGlobalSettings _globalSettings = _configs.Global();
-            private static readonly IHostingSettings _hostingSettings = _configs.Hosting();
-            private static readonly IUmbracoSettingsSection _settings = _configs.Settings();
+            private static readonly IGlobalSettings _globalSettings = SettingsForTests.GetDefaultGlobalSettings();
+            private static readonly IHostingSettings _hostingSettings = SettingsForTests.GetDefaultHostingSettings();
+            private static readonly IContentSettings _contentSettings = SettingsForTests.GenerateMockContentSettings();
+            private static readonly IWebRoutingSettings _settings = _configs.WebRouting();
 
             private static Configs GetConfigs()
             {
-                var configs = new ConfigsFactory().Create(_ioHelper);
-                configs.Add(SettingsForTests.GetDefaultGlobalSettings);
-                configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
-                configs.Add(SettingsForTests.GetDefaultHostingSettings);
+                var configs = new ConfigsFactory().Create();
+                configs.Add(() => _globalSettings);
+                configs.Add(() => _contentSettings);
+                configs.Add(() => _hostingSettings);
                 return configs;
             }
 
@@ -122,10 +121,14 @@ namespace Umbraco.Tests.Runtimes
         public class TestRuntime : CoreRuntime
         {
             public TestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
-                :base(configs, umbracoVersion, ioHelper, logger,  profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider, TestHelper.MainDom)
+                :base(configs, umbracoVersion, ioHelper, logger,  profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom)
             {
 
             }
+
+            // override because we cannot use Assembly.GetEntryAssembly in Nunit tests since that is always null
+            protected override ITypeFinder GetTypeFinder()
+                => new TypeFinder(Logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly));
 
             // must override the database factory
             // else BootFailedException because U cannot connect to the configured db
@@ -210,7 +213,7 @@ namespace Umbraco.Tests.Runtimes
 
             public void Compose(Composition composition)
             {
-                composition.Register(factory => SettingsForTests.GetDefaultUmbracoSettings());
+                composition.Register(factory => SettingsForTests.GenerateMockContentSettings());
                 composition.RegisterUnique<IExamineManager, TestExamineManager>();
                 composition.Components().Append<TestComponent>();
 

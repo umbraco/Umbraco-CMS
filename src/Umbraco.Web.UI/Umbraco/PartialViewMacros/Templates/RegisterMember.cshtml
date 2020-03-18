@@ -1,6 +1,7 @@
 ﻿@using System.Web.Mvc.Html
 @using ClientDependency.Core.Mvc
 @using Umbraco.Web
+@using Umbraco.Web.Composing
 @using Umbraco.Web.Controllers
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
@@ -12,7 +13,7 @@
         var registerModel = Members.CreateRegistrationModel("Custom Member");
     *@
 
-    var registerModel = Members.CreateRegistrationModel();
+    var registerModel = Current.MembershipHelper.CreateRegistrationModel();
 
     @*
         Configurable here:
@@ -45,7 +46,7 @@
 
 @if (success)
 {
-    @* This message will show if RedirectOnSucces is set to false (default) *@
+    @* This message will show if registerModel.RedirectUrl is not defined (default) *@
     <p>Registration succeeded.</p>
 }
 else

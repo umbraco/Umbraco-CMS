@@ -21,6 +21,8 @@ using Umbraco.Core.Strings;
 using Umbraco.Web.Composing;
 using Constants = Umbraco.Core.Constants;
 using IMediaType = Umbraco.Core.Models.IMediaType;
+using Umbraco.Core.Mapping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
 {
@@ -38,11 +40,26 @@ namespace Umbraco.Web.Editors
     public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     {
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IEntityService _entityService;
 
-        public MediaTypeController(ICultureDictionary cultureDictionary, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper)
-            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
+        public MediaTypeController(
+            ICultureDictionary cultureDictionary,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            IEntityService entityService,
+            IPublishedUrlProvider publishedUrlProvider,
+            EditorValidatorCollection editorValidatorCollection)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider, editorValidatorCollection)
         {
             _shortStringHelper = shortStringHelper;
+            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
         }
 
         /// <summary>
@@ -244,11 +261,11 @@ namespace Umbraco.Web.Editors
                 }
 
                 var contentType = Services.MediaTypeService.Get(contentItem.ContentTypeId);
-                var ids = contentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
+                var ids = contentType.AllowedContentTypes.OrderBy(c => c.SortOrder).Select(x => x.Id.Value).ToArray();
 
                 if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
 
-                types = Services.MediaTypeService.GetAll(ids).ToList();
+                types = Services.MediaTypeService.GetAll(ids).OrderBy(c => ids.IndexOf(c.Id)).ToList();
             }
 
             var basics = types.Select(Mapper.Map<IMediaType, ContentTypeBasic>).ToList();
@@ -259,7 +276,7 @@ namespace Umbraco.Web.Editors
                 basic.Description = TranslateItem(basic.Description);
             }
 
-            return basics.OrderBy(x => x.Name);
+            return basics.OrderBy(c => contentId == Constants.System.Root ? c.Name : string.Empty);
         }
 
         /// <summary>
@@ -269,7 +286,7 @@ namespace Umbraco.Web.Editors
         [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(Guid contentId)
         {
-            var entity = Current.Services.EntityService.Get(contentId);
+            var entity = _entityService.Get(contentId);
             if (entity != null)
             {
                 return GetAllowedChildren(entity.Id);
@@ -288,7 +305,7 @@ namespace Umbraco.Web.Editors
             var guidUdi = contentId as GuidUdi;
             if (guidUdi != null)
             {
-                var entity = Current.Services.EntityService.Get(guidUdi.Guid);
+                var entity = _entityService.Get(guidUdi.Guid);
                 if (entity != null)
                 {
                     return GetAllowedChildren(entity.Id);

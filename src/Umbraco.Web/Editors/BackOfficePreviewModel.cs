@@ -1,7 +1,11 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web.Features;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Editors
 {
@@ -10,7 +14,8 @@ namespace Umbraco.Web.Editors
         private readonly UmbracoFeatures _features;
         public IEnumerable<ILanguage> Languages { get; }
 
-        public BackOfficePreviewModel(UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IEnumerable<ILanguage> languages) : base(features, globalSettings, umbracoVersion)
+        public BackOfficePreviewModel(UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IEnumerable<ILanguage> languages, IContentSettings contentSettings, IIOHelper ioHelper, TreeCollection treeCollection, IHttpContextAccessor httpContextAccessor, IHostingEnvironment hostingEnvironment, IRuntimeSettings runtimeSettings, ISecuritySettings securitySettings)
+            : base(features, globalSettings, umbracoVersion, contentSettings, ioHelper, treeCollection, httpContextAccessor, hostingEnvironment, runtimeSettings, securitySettings)
         {
             _features = features;
             Languages = languages;

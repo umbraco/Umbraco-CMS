@@ -42,13 +42,15 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly PublishedContentTypeCache _contentTypeCache;
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IExamineManager _examineManager = new ExamineManager();
 
         // must be specified by the ctor
         private readonly IAppCache _appCache;
 
         public PublishedMediaCache(XmlStore xmlStore, IMediaService mediaService, IUserService userService,
             IAppCache appCache, PublishedContentTypeCache contentTypeCache, IEntityXmlSerializer entitySerializer,
-            IUmbracoContextAccessor umbracoContextAccessor)
+            IUmbracoContextAccessor umbracoContextAccessor, IVariationContextAccessor variationContextAccessor)
             : base(false)
         {
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
@@ -59,6 +61,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _contentTypeCache = contentTypeCache;
             _entitySerializer = entitySerializer;
             _umbracoContextAccessor = umbracoContextAccessor;
+            _variationContextAccessor = variationContextAccessor;
         }
 
         /// <summary>
@@ -117,7 +120,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                     // +(+parentID:-1) +__IndexType:media
 
                     var criteria = searchProvider.CreateQuery("media");
-                    var filter = criteria.ParentId(-1).Not().Field(UmbracoExamineIndex.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
+                    var filter = criteria.ParentId(-1).Not().Field(UmbracoExamineFieldNames.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
 
                     var result = filter.Execute();
                     if (result != null)
@@ -227,29 +230,14 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         public override bool HasContent(bool preview) { throw new NotImplementedException(); }
 
-        private static IExamineManager GetExamineManagerSafe()
-        {
-            try
-            {
-                return ExamineManager.Instance;
-            }
-            catch (TypeInitializationException)
-            {
-                return null;
-            }
-        }
-
         private ISearcher GetSearchProviderSafe()
         {
             if (_searchProvider != null)
                 return _searchProvider;
 
-            var eMgr = GetExamineManagerSafe();
-            if (eMgr == null) return null;
-
             try
             {
-                return eMgr.TryGetIndex(Constants.UmbracoIndexes.InternalIndexName, out var index) ? index.GetSearcher() : null;
+                return _examineManager.TryGetIndex(Constants.UmbracoIndexes.InternalIndexName, out var index) ? index.GetSearcher() : null;
             }
             catch (FileNotFoundException)
             {
@@ -301,7 +289,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                     // note that since the use of the wildcard, it automatically escapes it in Lucene.
 
                     var criteria = searchProvider.CreateQuery("media");
-                    var filter = criteria.Id(id.ToInvariantString()).Not().Field(UmbracoExamineIndex.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
+                    var filter = criteria.Id(id.ToInvariantString()).Not().Field(UmbracoExamineFieldNames.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
 
                     var result = filter.Execute().FirstOrDefault();
                     if (result != null) return ConvertFromSearchResult(result);
@@ -483,7 +471,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             {
                 //We are going to check for a special field however, that is because in some cases we store a 'Raw'
                 //value in the index such as for xml/html.
-                var rawValue = dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(UmbracoExamineIndex.RawFieldPrefix + alias));
+                var rawValue = dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(UmbracoExamineFieldNames.RawFieldPrefix + alias));
                 return rawValue
                        ?? dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
             }
@@ -516,7 +504,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                     //first check in Examine as this is WAY faster
                     var criteria = searchProvider.CreateQuery("media");
 
-                    var filter = criteria.ParentId(parentId).Not().Field(UmbracoExamineIndex.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard())
+                    var filter = criteria.ParentId(parentId).Not().Field(UmbracoExamineFieldNames.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard())
                         .OrderBy(new SortableField("sortOrder", SortType.Int));
                     //the above filter will create a query like this, NOTE: That since the use of the wildcard, it automatically escapes it in Lucene.
                     //+(+parentId:3113 -__Path:-1,-21,*) +__IndexType:media
@@ -557,7 +545,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             // was library.GetMedia which had its own cache, but MediaService *also* caches
             // so, library.GetMedia is gone and now we directly work with MediaService
             // (code below copied from what library was doing)
-            var media = Current.Services.MediaService.GetById(parentId);
+            var media = _mediaService.GetById(parentId);
             if (media == null)
             {
                 return Enumerable.Empty<IPublishedContent>();
@@ -672,6 +660,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 GetChildrenMedia,
                 GetProperty,
                 _appCache,
+                _variationContextAccessor,
                 _contentTypeCache,
                 cacheValues.XPath, // though, outside of tests, that should be null
                 cacheValues.FromExamine

@@ -43,6 +43,19 @@ namespace Umbraco.Web
             }
         }
 
+        public IBulkSqlInsertProvider CreateBulkSqlInsertProvider(string providerName)
+        {
+            switch (providerName)
+            {
+                case Constants.DbProviderNames.SqlCe:
+                    return new SqlCeBulkSqlInsertProvider();
+                case Constants.DbProviderNames.SqlServer:
+                    return new SqlServerBulkSqlInsertProvider();
+                default:
+                    return new BasicBulkSqlInsertProvider();
+            }
+        }
+
         public void CreateDatabase()
         {
             var engine = new SqlCeEngine(DatabaseBuilder.EmbeddedDatabaseConnectionString);

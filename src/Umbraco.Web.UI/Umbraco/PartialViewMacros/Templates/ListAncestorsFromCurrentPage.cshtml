@@ -1,3 +1,4 @@
+@using Umbraco.Core
 @using Umbraco.Web
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
@@ -17,7 +18,7 @@
         @* For each page in the ancestors collection which have been ordered by Level (so we start with the highest top node first) *@
         @foreach (var item in selection.OrderBy(x => x.Level))
         {
-            <li><a href="@item.Url">@item.Name</a> &raquo;</li>
+            <li><a href="@item.Url()">@item.Name</a> &raquo;</li>
         }
 
         @* Display the current page as the last item in the list *@

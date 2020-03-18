@@ -3,7 +3,8 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Exceptions;
+using Current = Umbraco.Web.Composing.Current;
+
 
 namespace Umbraco.Web.Security
 {

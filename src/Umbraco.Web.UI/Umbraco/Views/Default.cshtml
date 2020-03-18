@@ -1,10 +1,8 @@
 ﻿@using Umbraco.Core
 @using ClientDependency.Core
 @using ClientDependency.Core.Mvc
-@using Umbraco.Core.Composing
-@using Umbraco.Core.IO
+@using Umbraco.Web.Composing
 @using Umbraco.Web
-@using Umbraco.Core.Configuration
 
 @inherits WebViewPage<Umbraco.Web.Editors.BackOfficeModel>
 
@@ -30,7 +28,7 @@
 
 <html lang="en">
 <head>
-    <base href="@Model.GlobalSettings.Path.EnsureEndsWith('/')" />
+    <base href="@Model.IOHelper.BackOfficePath.EnsureEndsWith('/')" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -112,7 +110,7 @@
         on-login="hideLoginScreen()">
     </umb-login>
 
-    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewData.GetUmbracoPath() }), Model.Features, Current.Configs.Global(), Model.UmbracoVersion)
+    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewData.GetUmbracoPath() }), Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.ContentSettings, Model.IOHelper, Model.TreeCollection, Model.HttpContextAccessor, Model.HostingEnvironment, Model.RuntimeSettings, Model.SecuritySettings)
 
     <script>
 

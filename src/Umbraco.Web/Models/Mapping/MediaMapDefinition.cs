@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
@@ -9,31 +7,35 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using System;
 
 namespace Umbraco.Web.Models.Mapping
 {
     /// <summary>
     /// Declares model mappings for media.
     /// </summary>
-    internal class MediaMapDefinition : IMapDefinition
+    public class MediaMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;
-        private readonly ILogger _logger;
+        private readonly CommonTreeNodeMapper _commonTreeNodeMapper;
         private readonly IMediaService _mediaService;
         private readonly IMediaTypeService _mediaTypeService;
-        private readonly PropertyEditorCollection _propertyEditorCollection;
+        private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
         private readonly TabsAndPropertiesMapper<IMedia> _tabsAndPropertiesMapper;
+        private readonly IContentSettings _contentSettings;
 
-        public MediaMapDefinition(ICultureDictionary cultureDictionary, ILogger logger, CommonMapper commonMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
-            ILocalizedTextService localizedTextService, PropertyEditorCollection propertyEditorCollection)
+        public MediaMapDefinition(ICultureDictionary cultureDictionary, CommonMapper commonMapper, CommonTreeNodeMapper commonTreeNodeMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
+            ILocalizedTextService localizedTextService, MediaUrlGeneratorCollection mediaUrlGenerators, IContentSettings contentSettings, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
         {
-            _logger = logger;
             _commonMapper = commonMapper;
+            _commonTreeNodeMapper = commonTreeNodeMapper;
             _mediaService = mediaService;
             _mediaTypeService = mediaTypeService;
-            _propertyEditorCollection = propertyEditorCollection;
+            _mediaUrlGenerators = mediaUrlGenerators;
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
 
-            _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IMedia>(cultureDictionary, localizedTextService);
+            _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IMedia>(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider);
         }
 
         public void DefineMaps(UmbracoMapper mapper)
@@ -60,9 +62,9 @@ namespace Umbraco.Web.Models.Mapping
             target.CreateDate = source.CreateDate;
             target.Icon = source.ContentType.Icon;
             target.Id = source.Id;
-            target.IsChildOfListView = DermineIsChildOfListView(source);
+            target.IsChildOfListView = DetermineIsChildOfListView(source);
             target.Key = source.Key;
-            target.MediaLink = string.Join(",", source.GetUrls(Current.Configs.Settings().Content, _logger, _propertyEditorCollection));
+            target.MediaLink = string.Join(",", source.GetUrls(_contentSettings, _mediaUrlGenerators));
             target.Name = source.Name;
             target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
@@ -71,7 +73,7 @@ namespace Umbraco.Web.Models.Mapping
             target.State = null;
             target.Tabs = _tabsAndPropertiesMapper.Map(source, context);
             target.Trashed = source.Trashed;
-            target.TreeNodeUrl = _commonMapper.GetTreeNodeUrl<MediaTreeController>(source);
+            target.TreeNodeUrl = _commonTreeNodeMapper.GetTreeNodeUrl<MediaTreeController>(source);
             target.Udi = Udi.Create(Constants.UdiEntityType.Media, source.Key);
             target.UpdateDate = source.UpdateDate;
             target.VariesByCulture = source.ContentType.VariesByCulture();
@@ -99,7 +101,7 @@ namespace Umbraco.Web.Models.Mapping
             target.VariesByCulture = source.ContentType.VariesByCulture();
         }
 
-        private bool DermineIsChildOfListView(IMedia source)
+        private bool DetermineIsChildOfListView(IMedia source)
         {
             // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
             var parent = _mediaService.GetParent(source);

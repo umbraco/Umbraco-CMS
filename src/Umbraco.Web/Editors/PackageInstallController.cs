@@ -8,23 +8,25 @@ using System.Web.Http;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Net;
 using Umbraco.Web.JavaScript;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using File = System.IO.File;
-using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 
 namespace Umbraco.Web.Editors
 {
@@ -37,13 +39,28 @@ namespace Umbraco.Web.Editors
     {
 
         private readonly IUmbracoVersion _umbracoVersion;
-        public PackageInstallController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext, ServiceContext services, AppCaches appCaches,
-            IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper, IUmbracoVersion umbracoVersion)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
+        private readonly IIOHelper _ioHelper;
+        private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
+
+        public PackageInstallController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            IShortStringHelper shortStringHelper,
+            IUmbracoVersion umbracoVersion,
+            UmbracoMapper umbracoMapper,
+            IIOHelper ioHelper,
+            IPublishedUrlProvider publishedUrlProvider,
+            IUmbracoApplicationLifetime umbracoApplicationLifetime)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _umbracoVersion = umbracoVersion;
-                
+            _ioHelper = ioHelper;
+            _umbracoApplicationLifetime = umbracoApplicationLifetime;
         }
 
         /// <summary>
@@ -94,7 +111,7 @@ namespace Umbraco.Web.Editors
 
         private void PopulateFromPackageData(LocalPackageInstallModel model)
         {
-            var zipFile = new FileInfo(Path.Combine(Current.IOHelper.MapPath(Core.Constants.SystemDirectories.Packages), model.ZipFileName));
+            var zipFile = new FileInfo(Path.Combine(_ioHelper.MapPath(Core.Constants.SystemDirectories.Packages), model.ZipFileName));
 
             var ins = Services.PackagingService.GetCompiledPackageInfo(zipFile);
 
@@ -107,8 +124,8 @@ namespace Umbraco.Web.Editors
             model.LicenseUrl = ins.LicenseUrl;
             model.Readme = ins.Readme;
             model.ConflictingMacroAliases = ins.Warnings.ConflictingMacros.ToDictionary(x => x.Name, x => x.Alias);
-            model.ConflictingStyleSheetNames = ins.Warnings.ConflictingStylesheets.ToDictionary(x => x.Name, x => x.Alias); ;
-            model.ConflictingTemplateAliases = ins.Warnings.ConflictingTemplates.ToDictionary(x => x.Name, x => x.Alias); ;
+            model.ConflictingStyleSheetNames = ins.Warnings.ConflictingStylesheets.ToDictionary(x => x.Name, x => x.Alias);
+            model.ConflictingTemplateAliases = ins.Warnings.ConflictingTemplates.ToDictionary(x => x.Name, x => x.Alias);
             model.ContainsUnsecureFiles = ins.Warnings.UnsecureFiles.Any();
             model.Url = ins.Url;
             model.Version = ins.Version;
@@ -136,7 +153,7 @@ namespace Umbraco.Web.Editors
             if (Request.Content.IsMimeMultipartContent() == false)
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
 
-            var root = Current.IOHelper.MapPath(Core.Constants.SystemDirectories.TempFileUploads);
+            var root = _ioHelper.MapPath(Core.Constants.SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -163,7 +180,7 @@ namespace Umbraco.Web.Editors
                 {
                     //we always save package files to /App_Data/packages/package-guid.umb for processing as a standard so lets copy.
 
-                    var packagesFolder = Current.IOHelper.MapPath(Core.Constants.SystemDirectories.Packages);
+                    var packagesFolder = _ioHelper.MapPath(Core.Constants.SystemDirectories.Packages);
                     Directory.CreateDirectory(packagesFolder);
                     var packageFile = Path.Combine(packagesFolder, model.PackageGuid + ".umb");
                     File.Copy(file.LocalFileName, packageFile);
@@ -193,7 +210,7 @@ namespace Umbraco.Web.Editors
                 }
                 else
                 {
-                    model.Notifications.Add(new Notification(
+                    model.Notifications.Add(new BackOfficeNotification(
                         Services.TextService.Localize("speechBubbles/operationFailedHeader"),
                         Services.TextService.Localize("media/disallowedFileType"),
                         NotificationStyle.Warning));
@@ -215,7 +232,7 @@ namespace Umbraco.Web.Editors
         {
             //Default path
             string fileName = packageGuid + ".umb";
-            if (File.Exists(Path.Combine(Current.IOHelper.MapPath(Core.Constants.SystemDirectories.Packages), fileName)) == false)
+            if (File.Exists(Path.Combine(_ioHelper.MapPath(Core.Constants.SystemDirectories.Packages), fileName)) == false)
             {
                 var packageFile = await Services.PackagingService.FetchPackageFileAsync(
                     Guid.Parse(packageGuid),
@@ -255,7 +272,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel Import(PackageInstallModel model)
         {
-            var zipFile = new FileInfo(Path.Combine(Current.IOHelper.MapPath(Core.Constants.SystemDirectories.Packages), model.ZipFileName));
+            var zipFile = new FileInfo(Path.Combine(_ioHelper.MapPath(Core.Constants.SystemDirectories.Packages), model.ZipFileName));
 
             var packageInfo = Services.PackagingService.GetCompiledPackageInfo(zipFile);
 
@@ -311,7 +328,7 @@ namespace Umbraco.Web.Editors
             var installedFiles = Services.PackagingService.InstallCompiledPackageFiles(definition, zipFile, Security.GetUserId().ResultOr(0));
 
             //set a restarting marker and reset the app pool
-            UmbracoApplication.Restart(Request.TryGetHttpContext().Result);
+            _umbracoApplicationLifetime.Restart();
 
             model.IsRestarting = true;
 
@@ -323,12 +340,8 @@ namespace Umbraco.Web.Editors
         {
             if (model.IsRestarting == false) return model;
 
-            //check for the key, if it's not there we're are restarted
-            if (Request.TryGetHttpContext().Result.Application.AllKeys.Contains("AppPoolRestarting") == false)
-            {
-                //reset it
-                model.IsRestarting = false;
-            }
+            model.IsRestarting = _umbracoApplicationLifetime.IsRestarting;
+
             return model;
         }
 
@@ -368,7 +381,7 @@ namespace Umbraco.Web.Editors
             zipFile.Delete();
 
             //bump cdf to be safe
-            var clientDependencyConfig = new ClientDependencyConfiguration(Logger);
+            var clientDependencyConfig = new ClientDependencyConfiguration(Logger, _ioHelper);
             var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
                 _umbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
 

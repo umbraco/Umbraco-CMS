@@ -5,8 +5,8 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
@@ -14,7 +14,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Composing.CompositionExtensions;
-using Umbraco.Core.Strings;
+using Current = Umbraco.Web.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 
 namespace Umbraco.Tests.IO
@@ -34,18 +34,18 @@ namespace Umbraco.Tests.IO
 
             composition.Register(_ => Mock.Of<ILogger>());
             composition.Register(_ => Mock.Of<IDataTypeService>());
-            composition.Register(_ => Mock.Of<IContentSection>());
+            composition.Register(_ => Mock.Of<IContentSettings>());
             composition.Register(_ => TestHelper.ShortStringHelper);
             composition.Register(_ => TestHelper.IOHelper);
             composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
             composition.RegisterUnique(TestHelper.IOHelper);
 
             composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
-            composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+            composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
 
             composition.ComposeFileSystems();
 
-            composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+            composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
 
             _factory = composition.CreateFactory();
 

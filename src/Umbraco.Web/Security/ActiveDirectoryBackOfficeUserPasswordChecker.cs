@@ -1,22 +1,22 @@
 ﻿using System;
-using System.Configuration;
 using System.DirectoryServices.AccountManagement;
 using System.Threading.Tasks;
-using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Configuration;
+using Umbraco.Web.Models.Identity;
 
 namespace Umbraco.Web.Security
 {
     // TODO: This relies on an assembly that is not .NET Standard (at least not at the time of implementation) :(
     public class ActiveDirectoryBackOfficeUserPasswordChecker : IBackOfficeUserPasswordChecker
     {
-        public virtual string ActiveDirectoryDomain
+        private readonly IActiveDirectorySettings _settings;
+
+        public ActiveDirectoryBackOfficeUserPasswordChecker(IActiveDirectorySettings settings)
         {
-            get
-            {
-                // TODO: Verify this AppSetting key is used in .NET Framework & canot be changed to Umbraco.Core. prefix
-                return ConfigurationManager.AppSettings["ActiveDirectoryDomain"];
-            }
+            _settings = settings;
         }
+
+        public virtual string ActiveDirectoryDomain => _settings.ActiveDirectoryDomain;
 
         public Task<BackOfficeUserPasswordCheckerResult> CheckPasswordAsync(BackOfficeIdentityUser user, string password)
         {

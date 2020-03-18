@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
+﻿using System.Web;
 using Microsoft.AspNet.SignalR;
 using Microsoft.Owin.Logging;
 using Owin;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
+using Umbraco.Core.IO;
 using Umbraco.Web.Composing;
-using Umbraco.Web.SignalR;
+using Umbraco.Web.Logging;
 
 namespace Umbraco.Web
 {
@@ -48,10 +43,10 @@ namespace Umbraco.Web
         /// Configures SignalR.
         /// </summary>
         /// <param name="app">The app builder.</param>
-        /// <param name="globalSettings"></param>
-        public static IAppBuilder UseSignalR(this IAppBuilder app, IGlobalSettings globalSettings)
+        /// <param name="ioHelper"></param>
+        public static IAppBuilder UseSignalR(this IAppBuilder app, IIOHelper ioHelper)
         {
-            var umbracoPath = globalSettings.GetUmbracoMvcArea(Current.IOHelper);
+            var umbracoPath = ioHelper.GetUmbracoMvcArea();
             var signalrPath = HttpRuntime.AppDomainAppVirtualPath + umbracoPath + "/BackOffice/signalr";
             return app.MapSignalR(signalrPath, new HubConfiguration { EnableDetailedErrors = true });
         }

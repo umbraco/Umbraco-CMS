@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void Find_Class_Of_Type_With_Attribute()
         {
-            var typeFinder = new TypeFinder(GetTestProfilingLogger());
+            var typeFinder = new TypeFinder(GetTestProfilingLogger(), new DefaultUmbracoAssemblyProvider(GetType().Assembly));
             var typesFound = typeFinder.FindClassesOfTypeWithAttribute<TestEditor, MyTestAttribute>(_assemblies);
             Assert.AreEqual(2, typesFound.Count());
         }
@@ -65,11 +65,14 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void Find_Classes_With_Attribute()
         {
-            var typeFinder = new TypeFinder(GetTestProfilingLogger());
+            var typeFinder = new TypeFinder(GetTestProfilingLogger(), new DefaultUmbracoAssemblyProvider(GetType().Assembly));
             var typesFound = typeFinder.FindClassesWithAttribute<TreeAttribute>(_assemblies);
             Assert.AreEqual(0, typesFound.Count()); // 0 classes in _assemblies are marked with [Tree]
 
             typesFound = typeFinder.FindClassesWithAttribute<TreeAttribute>(new[] { typeof (UmbracoContext).Assembly });
+            Assert.AreEqual(22, typesFound.Count()); // + classes in Umbraco.Web are marked with [Tree]
+
+            typesFound = typeFinder.FindClassesWithAttribute<TreeAttribute>();
             Assert.AreEqual(22, typesFound.Count()); // + classes in Umbraco.Web are marked with [Tree]
         }
 

@@ -17,13 +17,13 @@ namespace Umbraco.Web.Media
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly ILogger _logger;
-        private readonly IContentSection _contentSection;
+        private readonly IContentSettings _contentSettings;
 
-        public UploadAutoFillProperties(IMediaFileSystem mediaFileSystem, ILogger logger, IContentSection contentSection)
+        public UploadAutoFillProperties(IMediaFileSystem mediaFileSystem, ILogger logger, IContentSettings contentSettings)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _contentSection = contentSection ?? throw new ArgumentNullException(nameof(contentSection));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Umbraco.Web.Media
                     using (var filestream = _mediaFileSystem.OpenFile(filepath))
                     {
                         var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
-                        var size = _contentSection.IsImageFile(extension) ? (Size?)ImageHelper.GetDimensions(filestream) : null;
+                        var size = _contentSettings.IsImageFile(extension) ? (Size?)ImageHelper.GetDimensions(filestream) : null;
                         SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
                     }
                 }
@@ -102,7 +102,7 @@ namespace Umbraco.Web.Media
             else
             {
                 var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
-                var size = _contentSection.IsImageFile(extension) ? (Size?)ImageHelper.GetDimensions(filestream) : null;
+                var size = _contentSettings.IsImageFile(extension) ? (Size?)ImageHelper.GetDimensions(filestream) : null;
                 SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
             }
         }

@@ -11,9 +11,9 @@ using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -29,7 +29,8 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
-using Notification = Umbraco.Web.Models.ContentEditing.Notification;
+using Umbraco.Core.Mapping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
 {
@@ -50,27 +51,43 @@ namespace Umbraco.Web.Editors
         private readonly IGlobalSettings _globalSettings;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
+        private readonly IIOHelper _ioHelper;
 
         public ContentTypeController(IEntityXmlSerializer serializer,
             ICultureDictionary cultureDictionary,
             IGlobalSettings globalSettings,
             IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext, PropertyEditorCollection propertyEditors,
-            ServiceContext services, AppCaches appCaches,
-            IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper,
+            ISqlContext sqlContext,
+            PropertyEditorCollection propertyEditors,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
             IScopeProvider scopeProvider,
-            IShortStringHelper shortStringHelper)
-            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            IIOHelper ioHelper,
+            IPublishedUrlProvider publishedUrlProvider,
+            EditorValidatorCollection editorValidatorCollection)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider, editorValidatorCollection)
         {
             _serializer = serializer;
             _globalSettings = globalSettings;
             _propertyEditors = propertyEditors;
             _scopeProvider = scopeProvider;
+            _ioHelper = ioHelper;
         }
 
         public int GetCount()
         {
             return Services.ContentTypeService.Count();
+        }
+
+        [HttpGet]
+        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        public bool HasContentNodes(int id)
+        {
+            return Services.ContentTypeService.HasContentNodes(id);
         }
 
         public DocumentTypeDisplay GetById(int id)
@@ -428,11 +445,11 @@ namespace Umbraco.Web.Editors
                 }
 
                 var contentType = Services.ContentTypeBaseServices.GetContentTypeOf(contentItem);
-                var ids = contentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
+                var ids = contentType.AllowedContentTypes.OrderBy(c => c.SortOrder).Select(x => x.Id.Value).ToArray();
 
                 if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
 
-                types = Services.ContentTypeService.GetAll(ids).ToList();
+                types = Services.ContentTypeService.GetAll(ids).OrderBy(c => ids.IndexOf(c.Id)).ToList();
             }
 
             var basics = types.Where(type => type.IsElement == false).Select(Mapper.Map<IContentType, ContentTypeBasic>).ToList();
@@ -455,7 +472,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            return basics;
+            return basics.OrderBy(c => contentId == Constants.System.Root ? c.Name : string.Empty);
         }
 
         /// <summary>
@@ -517,7 +534,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage Import(string file)
         {
-            var filePath = Path.Combine(Current.IOHelper.MapPath(Core.Constants.SystemDirectories.Data), file);
+            var filePath = Path.Combine(_ioHelper.MapPath(Core.Constants.SystemDirectories.Data), file);
             if (string.IsNullOrEmpty(file) || !System.IO.File.Exists(filePath))
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -555,7 +572,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = Current.IOHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "FileUploads");
+            var root = _ioHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "FileUploads");
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -598,7 +615,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                model.Notifications.Add(new Notification(
+                model.Notifications.Add(new BackOfficeNotification(
                     Services.TextService.Localize("speechBubbles/operationFailedHeader"),
                     Services.TextService.Localize("media/disallowedFileType"),
                     NotificationStyle.Warning));

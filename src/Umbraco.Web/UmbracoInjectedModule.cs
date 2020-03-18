@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Web;
 using System.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Routing;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Security;
 using Umbraco.Web.Composing;
+using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
@@ -31,27 +31,33 @@ namespace Umbraco.Web
     /// </remarks>
     public class UmbracoInjectedModule : IHttpModule
     {
-        private readonly IGlobalSettings _globalSettings;
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
         private readonly IPublishedRouter _publishedRouter;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly RoutableDocumentFilter _routableDocumentLookup;
+        private readonly IRequestCache _requestCache;
+        private readonly IIOHelper _ioHelper;
+        private readonly UriUtility _uriUtility;
 
         public UmbracoInjectedModule(
-            IGlobalSettings globalSettings,
             IRuntimeState runtime,
             ILogger logger,
             IPublishedRouter publishedRouter,
             IUmbracoContextFactory umbracoContextFactory,
-            RoutableDocumentFilter routableDocumentLookup)
+            RoutableDocumentFilter routableDocumentLookup,
+            UriUtility uriUtility,
+            IRequestCache requestCache,
+            IIOHelper ioHelper)
         {
-            _globalSettings = globalSettings;
             _runtime = runtime;
             _logger = logger;
             _publishedRouter = publishedRouter;
             _umbracoContextFactory = umbracoContextFactory;
             _routableDocumentLookup = routableDocumentLookup;
+            _uriUtility = uriUtility;
+            _requestCache = requestCache;
+            _ioHelper = ioHelper;
         }
 
         #region HttpModule event handlers
@@ -77,7 +83,7 @@ namespace Umbraco.Web
             // TODO: should we move this to after we've ensured we are processing a routable page?
             // ensure there's an UmbracoContext registered for the current request
             // registers the context reference so its disposed at end of request
-            var umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext(httpContext);
+            var umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
             httpContext.DisposeOnPipelineCompleted(umbracoContextReference);
         }
 
@@ -105,7 +111,7 @@ namespace Umbraco.Web
             var umbracoContext = Current.UmbracoContext;
 
             // re-write for the default back office path
-            if (httpContext.Request.Url.IsDefaultBackOfficeRequest(_globalSettings))
+            if (httpContext.Request.Url.IsDefaultBackOfficeRequest(_ioHelper))
             {
                 if (EnsureRuntime(httpContext, umbracoContext.OriginalRequestUrl))
                     RewriteToBackOfficeHandler(httpContext);
@@ -116,7 +122,7 @@ namespace Umbraco.Web
             var isRoutableAttempt = EnsureUmbracoRoutablePage(umbracoContext, httpContext);
 
             // raise event here
-            UmbracoModule.OnRouteAttempt(this, new RoutableAttemptEventArgs(isRoutableAttempt.Result, umbracoContext, httpContext));
+            UmbracoModule.OnRouteAttempt(this, new RoutableAttemptEventArgs(isRoutableAttempt.Result, umbracoContext));
             if (isRoutableAttempt.Success == false) return;
 
             httpContext.Trace.Write("UmbracoModule", "Umbraco request confirmed");
@@ -154,7 +160,7 @@ namespace Umbraco.Web
         /// <param name="context"></param>
         /// <param name="httpContext"></param>
         /// <returns></returns>
-        internal Attempt<EnsureRoutableOutcome> EnsureUmbracoRoutablePage(UmbracoContext context, HttpContextBase httpContext)
+        internal Attempt<EnsureRoutableOutcome> EnsureUmbracoRoutablePage(IUmbracoContext context, HttpContextBase httpContext)
         {
             var uri = context.OriginalRequestUrl;
 
@@ -205,7 +211,7 @@ namespace Umbraco.Web
                 case RuntimeLevel.Upgrade:
                     // redirect to install
                     ReportRuntime(level, "Umbraco must install or upgrade.");
-                    var installPath = UriUtility.ToAbsolute(Constants.SystemDirectories.Install);
+                    var installPath = _uriUtility.ToAbsolute(Constants.SystemDirectories.Install);
                     var installUrl = $"{installPath}/?redir=true&url={HttpUtility.UrlEncode(uri.ToString())}";
                     httpContext.Response.Redirect(installUrl, true);
                     return false; // cannot serve content
@@ -229,15 +235,17 @@ namespace Umbraco.Web
         // ensures Umbraco has at least one published node
         // if not, rewrites to splash and return false
         // if yes, return true
-        private bool EnsureHasContent(UmbracoContext context, HttpContextBase httpContext)
+        private bool EnsureHasContent(IUmbracoContext context, HttpContextBase httpContext)
         {
             if (context.Content.HasContent())
                 return true;
 
             _logger.Warn<UmbracoModule>("Umbraco has no content");
 
-            const string noContentUrl = "~/config/splashes/noNodes.aspx";
-            httpContext.RewritePath(UriUtility.ToAbsolute(noContentUrl));
+            if (RouteTable.Routes[Constants.Web.NoContentRouteName] is Route route)
+            {
+                httpContext.RewritePath(route.Url);
+            }
 
             return false;
         }
@@ -249,7 +257,7 @@ namespace Umbraco.Web
         private void RewriteToBackOfficeHandler(HttpContextBase context)
         {
             // GlobalSettings.Path has already been through IOHelper.ResolveUrl() so it begins with / and vdir (if any)
-            var rewritePath = _globalSettings.Path.TrimEnd('/') + "/Default";
+            var rewritePath = _ioHelper.BackOfficePath.TrimEnd('/') + "/Default";
             // rewrite the path to the path of the handler (i.e. /umbraco/RenderMvc)
             context.RewritePath(rewritePath, "", "", false);
 
@@ -272,7 +280,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="context"></param>
         /// <param name="pcr"> </param>
-        private void RewriteToUmbracoHandler(HttpContextBase context, PublishedRequest pcr)
+        private void RewriteToUmbracoHandler(HttpContextBase context, IPublishedRequest pcr)
         {
             // NOTE: we do not want to use TransferRequest even though many docs say it is better with IIS7, turns out this is
             // not what we need. The purpose of TransferRequest is to ensure that .net processes all of the rules for the newly
@@ -282,7 +290,7 @@ namespace Umbraco.Web
             var query = pcr.Uri.Query.TrimStart('?');
 
             // GlobalSettings.Path has already been through IOHelper.ResolveUrl() so it begins with / and vdir (if any)
-            var rewritePath = _globalSettings.Path.TrimEnd('/') + "/RenderMvc";
+            var rewritePath = _ioHelper.BackOfficePath.TrimEnd('/') + "/RenderMvc";
             // rewrite the path to the path of the handler (i.e. /umbraco/RenderMvc)
             context.RewritePath(rewritePath, "", query, false);
 
@@ -304,15 +312,15 @@ namespace Umbraco.Web
         /// Any object that is in the HttpContext.Items collection that is IDisposable will get disposed on the end of the request
         /// </summary>
         /// <param name="http"></param>
-        private void DisposeHttpContextItems(HttpContext http)
+        private void DisposeRequestCacheItems(HttpContext http, IRequestCache requestCache)
         {
             // do not process if client-side request
             if (http.Request.Url.IsClientSideRequest())
                 return;
 
             //get a list of keys to dispose
-            var keys = new HashSet<object>();
-            foreach (DictionaryEntry i in http.Items)
+            var keys = new HashSet<string>();
+            foreach (var i in requestCache)
             {
                 if (i.Value is IDisposeOnRequestEnd || i.Key is IDisposeOnRequestEnd)
                 {
@@ -324,7 +332,7 @@ namespace Umbraco.Web
             {
                 try
                 {
-                    http.Items[k].DisposeIfDisposable();
+                    requestCache.Get(k).DisposeIfDisposable();
                 }
                 catch (Exception ex)
                 {
@@ -366,7 +374,7 @@ namespace Umbraco.Web
                     // also, if something goes wrong with our DI setup, the logging subsystem may
                     // not even kick in, so here we try to give as much detail as possible
 
-                    BootFailedException.Rethrow(Core.Composing.Current.RuntimeState.BootFailedException);
+                    BootFailedException.Rethrow(Current.RuntimeState.BootFailedException);
                 };
                 return;
             }
@@ -375,7 +383,7 @@ namespace Umbraco.Web
             {
                 var httpContext = ((HttpApplication) sender).Context;
 
-                LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, Current.AppCaches.RequestCache);
+                LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, _requestCache);
 
                 _logger.Verbose<UmbracoModule>("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, httpContext.Request.Url);
                 BeginRequest(new HttpContextWrapper(httpContext));
@@ -420,14 +428,14 @@ namespace Umbraco.Web
 
                 if (Current.UmbracoContext != null && Current.UmbracoContext.IsFrontEndUmbracoRequest)
                 {
-                    LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, Current.AppCaches.RequestCache);
+                    LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, _requestCache);
 
                     _logger.Verbose<UmbracoModule>("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, httpContext.Request.Url, DateTime.Now.Subtract(Current.UmbracoContext.ObjectCreated).TotalMilliseconds);
                 }
 
-                UmbracoModule.OnEndRequest(this, new UmbracoRequestEventArgs(Current.UmbracoContext, new HttpContextWrapper(httpContext)));
+                UmbracoModule.OnEndRequest(this, new UmbracoRequestEventArgs(Current.UmbracoContext));
 
-                DisposeHttpContextItems(httpContext);
+                DisposeRequestCacheItems(httpContext, _requestCache);
             };
         }
 

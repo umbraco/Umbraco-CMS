@@ -115,7 +115,6 @@ namespace Umbraco.Core.Services.Implement
 
                 user = new User(_globalSettings)
                 {
-                    DefaultToLiveEditing = false,
                     Email = email,
                     Language = _globalSettings.DefaultUILanguage,
                     Name = username,
@@ -1180,7 +1179,7 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        internal static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavingUserGroup;
+        public static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavingUserGroup;
 
         /// <summary>
         /// Occurs after Save

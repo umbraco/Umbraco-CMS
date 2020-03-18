@@ -3,6 +3,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web
 {
@@ -12,13 +13,11 @@ namespace Umbraco.Web
     /// </summary>
     public static class CacheHelperExtensions
     {
-
-        public const string PartialViewCacheKey = "Umbraco.Web.PartialViewCacheKey";
-
         /// <summary>
         /// Outputs and caches a partial view in MVC
         /// </summary>
         /// <param name="appCaches"></param>
+        /// <param name="hostingEnvironment"></param>
         /// <param name="htmlHelper"></param>
         /// <param name="partialViewName"></param>
         /// <param name="model"></param>
@@ -28,6 +27,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static IHtmlString CachedPartialView(
             this AppCaches appCaches,
+            IHostingEnvironment hostingEnvironment,
             HtmlHelper htmlHelper,
             string partialViewName,
             object model,
@@ -36,25 +36,17 @@ namespace Umbraco.Web
             ViewDataDictionary viewData = null)
         {
             //disable cached partials in debug mode: http://issues.umbraco.org/issue/U4-5940
-            if (htmlHelper.ViewContext.HttpContext.IsDebuggingEnabled)
+            if (hostingEnvironment.IsDebugMode)
             {
                 // just return a normal partial view instead
                 return htmlHelper.Partial(partialViewName, model, viewData);
             }
 
             return appCaches.RuntimeCache.GetCacheItem<IHtmlString>(
-                PartialViewCacheKey + cacheKey,
+                Core.CacheHelperExtensions.PartialViewCacheKey + cacheKey,
                 () => htmlHelper.Partial(partialViewName, model, viewData),
                 timeout: new TimeSpan(0, 0, 0, cachedSeconds));
         }
 
-        /// <summary>
-        /// Clears the cache for partial views
-        /// </summary>
-        /// <param name="appCaches"></param>
-        public static void ClearPartialViewCache(this AppCaches appCaches)
-        {
-            appCaches.RuntimeCache.ClearByKey(PartialViewCacheKey);
-        }
     }
 }

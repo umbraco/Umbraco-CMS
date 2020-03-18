@@ -1,11 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Web.Composing;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Core.Mapping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -15,6 +23,26 @@ namespace Umbraco.Web.PropertyEditors
     [PluginController("UmbracoApi")]
     public class RichTextPreValueController : UmbracoAuthorizedJsonController
     {
+        private readonly IIOHelper _ioHelper;
+
+        public RichTextPreValueController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            IShortStringHelper shortStringHelper,
+            IIOHelper ioHelper,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider
+            )
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
+        {
+            _ioHelper = ioHelper;
+        }
+
         private static volatile bool _init;
         private static readonly object Locker = new object();
         private static readonly Dictionary<string, RichTextEditorCommand> Commands = new Dictionary<string, RichTextEditorCommand>();
@@ -40,7 +68,7 @@ namespace Umbraco.Web.PropertyEditors
             return config;
         }
 
-        private static void EnsureInit()
+        private void EnsureInit()
         {
 
             if (_init == false)
@@ -51,7 +79,7 @@ namespace Umbraco.Web.PropertyEditors
                     {
                         // Load config
                         XmlDocument xd = new XmlDocument();
-                        xd.Load(Current.IOHelper.MapPath(SystemFiles.TinyMceConfig));
+                        xd.Load(_ioHelper.MapPath(SystemFiles.TinyMceConfig));
 
                         foreach (XmlNode n in xd.DocumentElement.SelectNodes("//command"))
                         {

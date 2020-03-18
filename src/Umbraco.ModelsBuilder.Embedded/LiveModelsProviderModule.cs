@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.ModelsBuilder.Embedded;
 
 // will install only if configuration says it needs to be installed

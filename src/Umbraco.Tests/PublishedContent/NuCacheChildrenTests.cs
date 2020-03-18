@@ -9,6 +9,8 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Install;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -18,15 +20,16 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Common;
 using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -34,6 +37,7 @@ namespace Umbraco.Tests.PublishedContent
     public class NuCacheChildrenTests
     {
         private IPublishedModelFactory PublishedModelFactory { get; } = new NoopPublishedModelFactory();
+        private IVariationContextAccessor VariationContextAccessor  { get; } = TestHelper.VariationContextAccessor;
 
         private IPublishedSnapshotService _snapshotService;
         private IVariationContextAccessor _variationAccesor;
@@ -57,9 +61,9 @@ namespace Umbraco.Tests.PublishedContent
 
             var configs = TestHelper.GetConfigs();
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);
-            var globalSettings = new GlobalSettings(TestHelper.IOHelper);
+            var globalSettings = new GlobalSettings();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-            configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
+            configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
             configs.Add<IGlobalSettings>(() => globalSettings);
 
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(IPublishedModelFactory))).Returns(PublishedModelFactory);
@@ -128,7 +132,7 @@ namespace Umbraco.Tests.PublishedContent
 
             // create a published content type factory
             var contentTypeFactory = new PublishedContentTypeFactory(
-                Mock.Of<IPublishedModelFactory>(),
+                PublishedModelFactory,
                 new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()),
                 dataTypeService);
 
@@ -139,7 +143,9 @@ namespace Umbraco.Tests.PublishedContent
             // create a data source for NuCache
             _source = new TestDataSource(kits);
 
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeFinder = TestHelper.GetTypeFinder();
+            var settings = Mock.Of<INuCacheSettings>();
+
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
@@ -148,7 +154,6 @@ namespace Umbraco.Tests.PublishedContent
                 runtime,
                 serviceContext,
                 contentTypeFactory,
-                null,
                 _snapshotAccessor,
                 _variationAccesor,
                 Mock.Of<IProfilingLogger>(),
@@ -160,11 +165,13 @@ namespace Umbraco.Tests.PublishedContent
                 _source,
                 globalSettings,
                 Mock.Of<IEntityXmlSerializer>(),
-                Mock.Of<IPublishedModelFactory>(),
+                PublishedModelFactory,
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 typeFinder,
                 hostingEnvironment,
-                new MockShortStringHelper());
+                new MockShortStringHelper(),
+                TestHelper.IOHelper,
+                settings);
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
@@ -400,19 +407,19 @@ namespace Umbraco.Tests.PublishedContent
             var documents = snapshot.Content.GetAtRoot().ToArray();
             AssertDocuments(documents, "N1", "N2", "N3");
 
-            documents = snapshot.Content.GetById(1).Children().ToArray();
+            documents = snapshot.Content.GetById(1).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N4", "N5", "N6");
 
-            documents = snapshot.Content.GetById(2).Children().ToArray();
+            documents = snapshot.Content.GetById(2).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N9", "N8", "N7");
 
-            documents = snapshot.Content.GetById(3).Children().ToArray();
+            documents = snapshot.Content.GetById(3).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N10");
 
-            documents = snapshot.Content.GetById(4).Children().ToArray();
+            documents = snapshot.Content.GetById(4).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N11", "N12");
 
-            documents = snapshot.Content.GetById(10).Children().ToArray();
+            documents = snapshot.Content.GetById(10).Children(_variationAccesor).ToArray();
             AssertDocuments(documents);
         }
 
@@ -478,7 +485,7 @@ namespace Umbraco.Tests.PublishedContent
             var documents = snapshot.Content.GetAtRoot().ToArray();
             AssertDocuments(documents, "N1", "N2", "N3", "N10");
 
-            documents = snapshot.Content.GetById(3).Children().ToArray();
+            documents = snapshot.Content.GetById(3).Children(_variationAccesor).ToArray();
             AssertDocuments(documents);
 
             Assert.IsNull(snapshot.Content.GetById(10).Parent);
@@ -520,7 +527,7 @@ namespace Umbraco.Tests.PublishedContent
             var documents = snapshot.Content.GetAtRoot().ToArray();
             AssertDocuments(documents, "N2", "N3");
 
-            documents = snapshot.Content.GetById(10).Children().ToArray();
+            documents = snapshot.Content.GetById(10).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N1");
 
             Assert.AreEqual(10, snapshot.Content.GetById(1).Parent?.Id);
@@ -597,7 +604,7 @@ namespace Umbraco.Tests.PublishedContent
             _snapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(kit.Node.ParentContentId, Guid.Empty, TreeChangeTypes.RefreshBranch) }, out _, out _);
 
             // changes that *I* make are immediately visible on the current snapshot
-            var documents = snapshot.Content.GetById(kit.Node.ParentContentId).Children().ToArray();
+            var documents = snapshot.Content.GetById(kit.Node.ParentContentId).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N7", "N9", "N8");
         }
 
@@ -696,10 +703,10 @@ namespace Umbraco.Tests.PublishedContent
             }, out _, out _);
 
             // changes that *I* make are immediately visible on the current snapshot
-            var documents = snapshot.Content.GetById(1).Children().ToArray();
+            var documents = snapshot.Content.GetById(1).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N7", "N4", "N5", "N6");
 
-            documents = snapshot.Content.GetById(2).Children().ToArray();
+            documents = snapshot.Content.GetById(2).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N9", "N8");
 
             Assert.AreEqual(1, snapshot.Content.GetById(7).Parent?.Id);
@@ -721,15 +728,15 @@ namespace Umbraco.Tests.PublishedContent
             var documents = snapshot.Content.GetAtRoot().ToArray();
             AssertDocuments(documents, "N1-en-US");
 
-            documents = snapshot.Content.GetById(1).Children().ToArray();
+            documents = snapshot.Content.GetById(1).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N4", "N7-en-US");
 
             //Get the invariant and list children, there's a variation context so it should return invariant AND en-us variants
-            documents = snapshot.Content.GetById(4).Children().ToArray();
+            documents = snapshot.Content.GetById(4).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N10-en-US", "N11");
 
             //Get the variant and list children, there's a variation context so it should return invariant AND en-us variants
-            documents = snapshot.Content.GetById(7).Children().ToArray();
+            documents = snapshot.Content.GetById(7).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N12-en-US", "N13");
 
             //TEST with fr-fr variation context
@@ -739,15 +746,15 @@ namespace Umbraco.Tests.PublishedContent
             documents = snapshot.Content.GetAtRoot().ToArray();
             AssertDocuments(documents, "N1-fr-FR");
 
-            documents = snapshot.Content.GetById(1).Children().ToArray();
+            documents = snapshot.Content.GetById(1).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N4", "N7-fr-FR");
 
             //Get the invariant and list children, there's a variation context so it should return invariant AND en-us variants
-            documents = snapshot.Content.GetById(4).Children().ToArray();
+            documents = snapshot.Content.GetById(4).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N10-fr-FR", "N11");
 
             //Get the variant and list children, there's a variation context so it should return invariant AND en-us variants
-            documents = snapshot.Content.GetById(7).Children().ToArray();
+            documents = snapshot.Content.GetById(7).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N12-fr-FR", "N13");
 
             //TEST specific cultures
@@ -755,19 +762,19 @@ namespace Umbraco.Tests.PublishedContent
             documents = snapshot.Content.GetAtRoot("fr-FR").ToArray();
             AssertDocuments(documents, "N1-fr-FR");
 
-            documents = snapshot.Content.GetById(1).Children("fr-FR").ToArray();
+            documents = snapshot.Content.GetById(1).Children(_variationAccesor, "fr-FR").ToArray();
             AssertDocuments(documents, "N4", "N7-fr-FR"); //NOTE: Returns invariant, this is expected
-            documents = snapshot.Content.GetById(1).Children("").ToArray();
+            documents = snapshot.Content.GetById(1).Children(_variationAccesor, "").ToArray();
             AssertDocuments(documents, "N4"); //Only returns invariant since that is what was requested
 
-            documents = snapshot.Content.GetById(4).Children("fr-FR").ToArray();
+            documents = snapshot.Content.GetById(4).Children(_variationAccesor, "fr-FR").ToArray();
             AssertDocuments(documents, "N10-fr-FR", "N11"); //NOTE: Returns invariant, this is expected
-            documents = snapshot.Content.GetById(4).Children("").ToArray();
+            documents = snapshot.Content.GetById(4).Children(_variationAccesor, "").ToArray();
             AssertDocuments(documents, "N11"); //Only returns invariant since that is what was requested
 
-            documents = snapshot.Content.GetById(7).Children("fr-FR").ToArray();
+            documents = snapshot.Content.GetById(7).Children(_variationAccesor, "fr-FR").ToArray();
             AssertDocuments(documents, "N12-fr-FR", "N13"); //NOTE: Returns invariant, this is expected
-            documents = snapshot.Content.GetById(7).Children("").ToArray();
+            documents = snapshot.Content.GetById(7).Children(_variationAccesor, "").ToArray();
             AssertDocuments(documents, "N13"); //Only returns invariant since that is what was requested
 
             //TEST without variation context
@@ -783,15 +790,15 @@ namespace Umbraco.Tests.PublishedContent
             documents = snapshot.Content.GetAtRoot("fr-FR").ToArray();
             Assert.AreEqual(1, documents.Length);
 
-            documents = snapshot.Content.GetById(1).Children().ToArray();
+            documents = snapshot.Content.GetById(1).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N4");
 
             //Get the invariant and list children
-            documents = snapshot.Content.GetById(4).Children().ToArray();
+            documents = snapshot.Content.GetById(4).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N11");
 
             //Get the variant and list children
-            documents = snapshot.Content.GetById(7).Children().ToArray();
+            documents = snapshot.Content.GetById(7).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N13");
         }
 
@@ -808,19 +815,19 @@ namespace Umbraco.Tests.PublishedContent
             var documents = snapshot.Content.GetAtRoot().ToArray();
             AssertDocuments(documents, "N1-en-US", "N2-en-US", "N3-en-US");
 
-            documents = snapshot.Content.GetById(1).Children().ToArray();
+            documents = snapshot.Content.GetById(1).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N4-en-US", "N5-en-US", "N6-en-US");
 
-            documents = snapshot.Content.GetById(2).Children().ToArray();
+            documents = snapshot.Content.GetById(2).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N9-en-US", "N8-en-US", "N7-en-US");
 
-            documents = snapshot.Content.GetById(3).Children().ToArray();
+            documents = snapshot.Content.GetById(3).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N10-en-US");
 
-            documents = snapshot.Content.GetById(4).Children().ToArray();
+            documents = snapshot.Content.GetById(4).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N11-en-US", "N12-en-US");
 
-            documents = snapshot.Content.GetById(10).Children().ToArray();
+            documents = snapshot.Content.GetById(10).Children(_variationAccesor).ToArray();
             AssertDocuments(documents);
 
 
@@ -829,26 +836,26 @@ namespace Umbraco.Tests.PublishedContent
             documents = snapshot.Content.GetAtRoot().ToArray();
             AssertDocuments(documents, "N1-fr-FR", "N3-fr-FR");
 
-            documents = snapshot.Content.GetById(1).Children().ToArray();
+            documents = snapshot.Content.GetById(1).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N4-fr-FR", "N6-fr-FR");
 
-            documents = snapshot.Content.GetById(2).Children().ToArray();
+            documents = snapshot.Content.GetById(2).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N9-fr-FR", "N7-fr-FR");
 
-            documents = snapshot.Content.GetById(3).Children().ToArray();
+            documents = snapshot.Content.GetById(3).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N10-fr-FR");
 
-            documents = snapshot.Content.GetById(4).Children().ToArray();
+            documents = snapshot.Content.GetById(4).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N12-fr-FR");
 
-            documents = snapshot.Content.GetById(10).Children().ToArray();
+            documents = snapshot.Content.GetById(10).Children(_variationAccesor).ToArray();
             AssertDocuments(documents);
 
-            documents = snapshot.Content.GetById(1).Children("*").ToArray();
+            documents = snapshot.Content.GetById(1).Children(_variationAccesor, "*").ToArray();
             AssertDocuments(documents, "N4-fr-FR", null, "N6-fr-FR");
             AssertDocuments("en-US", documents, "N4-en-US", "N5-en-US", "N6-en-US");
 
-            documents = snapshot.Content.GetById(1).Children("en-US").ToArray();
+            documents = snapshot.Content.GetById(1).Children(_variationAccesor, "en-US").ToArray();
             AssertDocuments(documents, "N4-fr-FR", null, "N6-fr-FR");
             AssertDocuments("en-US", documents, "N4-en-US", "N5-en-US", "N6-en-US");
 
@@ -878,10 +885,10 @@ namespace Umbraco.Tests.PublishedContent
             var documents = snapshot.Content.GetAtRoot().ToArray();
             AssertDocuments(documents, "N1", "N2", "N3");
 
-            documents = snapshot.Content.GetById(1).Children().ToArray();
+            documents = snapshot.Content.GetById(1).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N4", "N5", "N6");
 
-            documents = snapshot.Content.GetById(2).Children().ToArray();
+            documents = snapshot.Content.GetById(2).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N9", "N8", "N7");
 
             // notify
@@ -895,10 +902,10 @@ namespace Umbraco.Tests.PublishedContent
             documents = snapshot.Content.GetAtRoot().ToArray();
             AssertDocuments(documents, "N1", "N2");
 
-            documents = snapshot.Content.GetById(1).Children().ToArray();
+            documents = snapshot.Content.GetById(1).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N4", "N6");
 
-            documents = snapshot.Content.GetById(2).Children().ToArray();
+            documents = snapshot.Content.GetById(2).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N8", "N7");
 
             // notify
@@ -912,7 +919,7 @@ namespace Umbraco.Tests.PublishedContent
             documents = snapshot.Content.GetAtRoot().ToArray();
             AssertDocuments(documents, "N2");
 
-            documents = snapshot.Content.GetById(2).Children().ToArray();
+            documents = snapshot.Content.GetById(2).Children(_variationAccesor).ToArray();
             AssertDocuments(documents);
         }
 
@@ -924,13 +931,21 @@ namespace Umbraco.Tests.PublishedContent
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
             _snapshotAccessor.PublishedSnapshot = snapshot;
 
+            var snapshotService = (PublishedSnapshotService)_snapshotService;
+            var contentStore = snapshotService.GetContentStore();
+
+            var parentNodes = contentStore.Test.GetValues(1);
+            var parentNode = parentNodes[0];
+            AssertLinkedNode(parentNode.contentNode, -1, -1, 2, 4, 6);
+            Assert.AreEqual(1, parentNode.gen);
+
             var documents = snapshot.Content.GetAtRoot().ToArray();
             AssertDocuments(documents, "N1", "N2", "N3");
 
-            documents = snapshot.Content.GetById(1).Children().ToArray();
+            documents = snapshot.Content.GetById(1).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N4", "N5", "N6");
 
-            documents = snapshot.Content.GetById(2).Children().ToArray();
+            documents = snapshot.Content.GetById(2).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N9", "N8", "N7");
 
             // notify
@@ -940,14 +955,25 @@ namespace Umbraco.Tests.PublishedContent
                 new ContentCacheRefresher.JsonPayload(2, Guid.Empty, TreeChangeTypes.RefreshNode),
             }, out _, out _);
 
+            parentNodes = contentStore.Test.GetValues(1);
+            Assert.AreEqual(2, parentNodes.Length);
+            parentNode = parentNodes[1]; // get the first gen
+            AssertLinkedNode(parentNode.contentNode, -1, -1, 2, 4, 6); // the structure should have remained the same
+            Assert.AreEqual(1, parentNode.gen);
+            parentNode = parentNodes[0]; // get the latest gen
+            AssertLinkedNode(parentNode.contentNode, -1, -1, 2, 4, 6); // the structure should have remained the same
+            Assert.AreEqual(2, parentNode.gen);
+
             documents = snapshot.Content.GetAtRoot().ToArray();
             AssertDocuments(documents, "N1", "N2", "N3");
 
-            documents = snapshot.Content.GetById(1).Children().ToArray();
+            documents = snapshot.Content.GetById(1).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N4", "N5", "N6");
 
-            documents = snapshot.Content.GetById(2).Children().ToArray();
+            documents = snapshot.Content.GetById(2).Children(_variationAccesor).ToArray();
             AssertDocuments(documents, "N9", "N8", "N7");
+
+
         }
 
         [Test]
@@ -1319,7 +1345,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             Assert.AreEqual(names.Length, documents.Length);
             for (var i = 0; i < names.Length; i++)
-                Assert.AreEqual(names[i], documents[i].Name(culture));
+                Assert.AreEqual(names[i], documents[i].Name(_variationAccesor, culture));
         }
     }
 }

@@ -1,20 +1,22 @@
 ﻿using System.Linq;
-using System.Web;
 using System.Web.Security;
 using Examine;
 using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Dashboards;
+using Umbraco.Core.Cookie;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Install;
 using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Core.Sync;
 using Umbraco.Net;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
@@ -24,6 +26,7 @@ using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Hosting;
+using Umbraco.Web.Install;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Models.PublishedContent;
@@ -41,6 +44,13 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Examine;
+using Umbraco.Core.Models;
+using Umbraco.Core.Request;
+using Umbraco.Core.Session;
+using Umbraco.Web.AspNet;
+using Umbraco.Web.AspNet;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Runtime
 {
@@ -55,12 +65,23 @@ namespace Umbraco.Web.Runtime
 
             composition.Register<UmbracoInjectedModule>();
             composition.Register<IIpResolver, AspNetIpResolver>();
-            composition.Register<ISessionIdResolver, AspNetSessionIdResolver>();
+
+            composition.Register<IUserAgentProvider, AspNetUserAgentProvider>();
+            composition.Register<AspNetSessionManager>(Lifetime.Singleton);
+            composition.Register<ISessionIdResolver>(factory => factory.GetInstance<AspNetSessionManager>(), Lifetime.Singleton);
+            composition.Register<ISessionManager>(factory => factory.GetInstance<AspNetSessionManager>(), Lifetime.Singleton);
+
+            composition.Register<IRequestAccessor, AspNetRequestAccessor>(Lifetime.Singleton);
+
             composition.Register<IHostingEnvironment, AspNetHostingEnvironment>();
             composition.Register<IBackOfficeInfo, AspNetBackOfficeInfo>();
+            composition.Register<IUmbracoApplicationLifetime, AspNetUmbracoApplicationLifetime>(Lifetime.Singleton);
             composition.Register<IPasswordHasher, AspNetPasswordHasher>();
+            composition.Register<IFilePermissionHelper, FilePermissionHelper>(Lifetime.Singleton);
 
             composition.RegisterUnique<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
+            composition.RegisterUnique<ICookieManager, AspNetCookieManager>();
+
 
             composition.ComposeWebMappingProfiles();
 
@@ -73,11 +94,13 @@ namespace Umbraco.Web.Runtime
             composition.Register(factory => MembershipProviderExtensions.GetMembersMembershipProvider());
             composition.Register(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetInstance<IMemberService>()));
             composition.Register<MembershipHelper>(Lifetime.Request);
-            composition.Register<IPublishedMemberCache>(factory => factory.GetInstance<UmbracoContext>().PublishedSnapshot.Members);
+            composition.Register<IPublishedMemberCache>(factory => factory.GetInstance<IUmbracoContext>().PublishedSnapshot.Members);
+            composition.RegisterUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
+            composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
 
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
-            composition.RegisterUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
+
 
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
@@ -87,29 +110,24 @@ namespace Umbraco.Web.Runtime
 
             // register the umbraco context factory
             composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
-
-            // register a per-request HttpContextBase object
-            // is per-request so only one wrapper is created per request
-            composition.Register<HttpContextBase>(factory => new HttpContextWrapper(factory.GetInstance<IHttpContextAccessor>().HttpContext), Lifetime.Request);
-
-            // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
-            composition.RegisterUnique<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
+            composition.RegisterUnique<IPublishedUrlProvider, UrlProvider>();
 
             // we should stop injecting UmbracoContext and always inject IUmbracoContextAccessor, however at the moment
             // there are tons of places (controllers...) which require UmbracoContext in their ctor - so let's register
             // a way to inject the UmbracoContext - DO NOT register this as Lifetime.Request since LI will dispose the context
             // in it's own way but we don't want that to happen, we manage its lifetime ourselves.
             composition.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext);
-
+            composition.RegisterUnique<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
             composition.Register<IPublishedContentQuery>(factory =>
             {
                 var umbCtx = factory.GetInstance<IUmbracoContextAccessor>();
-                return new PublishedContentQuery(umbCtx.UmbracoContext.PublishedSnapshot, factory.GetInstance<IVariationContextAccessor>());
+                return new PublishedContentQuery(umbCtx.UmbracoContext.PublishedSnapshot, factory.GetInstance<IVariationContextAccessor>(), factory.GetInstance<IExamineManager>());
             }, Lifetime.Request);
             composition.Register<ITagQuery, TagQuery>(Lifetime.Request);
 
             composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
             composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
+
             composition.RegisterUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 
             composition.RegisterUnique<HtmlLocalLinkParser>();
@@ -123,17 +141,15 @@ namespace Umbraco.Web.Runtime
             if (composition.RuntimeState.Level == RuntimeLevel.Run)
                 composition.Register<UmbracoHelper>(factory =>
                 {
-                    var umbCtx = factory.GetInstance<UmbracoContext>();
-                    return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null,
-                        factory.GetInstance<ITagQuery>(), factory.GetInstance<ICultureDictionaryFactory>(),
-                        factory.GetInstance<IUmbracoComponentRenderer>(), factory.GetInstance<IPublishedContentQuery>(),
-                        factory.GetInstance<MembershipHelper>());
+                    var umbCtx = factory.GetInstance<IUmbracoContext>();
+                    return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null, factory.GetInstance<ICultureDictionaryFactory>(),
+                        factory.GetInstance<IUmbracoComponentRenderer>(), factory.GetInstance<IPublishedContentQuery>());
                 });
             else
                 composition.Register(_ => new UmbracoHelper());
 
             // register distributed cache
-            composition.RegisterUnique(f => new DistributedCache());
+            composition.RegisterUnique(f => new DistributedCache(f.GetInstance<IServerMessenger>(), f.GetInstance<CacheRefresherCollection>()));
 
             composition.RegisterUnique<RoutableDocumentFilter>();
 
@@ -143,9 +159,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<ITreeService, TreeService>();
             composition.RegisterUnique<ISectionService, SectionService>();
 
-            composition.RegisterUnique<IDashboardService, DashboardService>();
-
-            composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
+            composition.RegisterUnique<IExamineManager, ExamineManager>();
 
             // configure the container for web
             composition.ConfigureForWeb();
@@ -198,6 +212,8 @@ namespace Umbraco.Web.Runtime
             composition.MediaUrlProviders()
                 .Append<DefaultMediaUrlProvider>();
 
+            composition.RegisterUnique<IImageUrlGenerator, ImageProcessorImageUrlGenerator>();
+
             composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
             composition.ContentFinders()
@@ -224,7 +240,6 @@ namespace Umbraco.Web.Runtime
 
             // register published router
             composition.RegisterUnique<IPublishedRouter, PublishedRouter>();
-            composition.Register(_ => Current.Configs.Settings().WebRouting);
 
             // register preview SignalR hub
             composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>());
@@ -248,10 +263,6 @@ namespace Umbraco.Web.Runtime
                 .Append<MembersSection>()
                 .Append<FormsSection>()
                 .Append<TranslationSection>();
-
-            // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
-            composition.Dashboards()
-                .Add(composition.TypeLoader.GetTypes<IDashboard>());
 
             // register back office trees
             // the collection builder only accepts types inheriting from TreeControllerBase

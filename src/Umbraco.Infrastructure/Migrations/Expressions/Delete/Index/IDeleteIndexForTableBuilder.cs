@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Migrations.Expressions.Delete.Index
+﻿using Umbraco.Core.Migrations.Expressions.Common;
+
+namespace Umbraco.Core.Migrations.Expressions.Delete.Index
 {
     /// <summary>
     /// Builds a Delete expression.
@@ -8,6 +10,6 @@
         /// <summary>
         /// Specifies the table of the index to delete.
         /// </summary>
-        IDeleteIndexOnColumnBuilder OnTable(string tableName);
+        IExecutableBuilder OnTable(string tableName);
     }
 }

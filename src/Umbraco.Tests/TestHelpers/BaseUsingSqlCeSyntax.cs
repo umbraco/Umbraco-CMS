@@ -5,14 +5,13 @@ using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Tests.Components;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -39,7 +38,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var ioHelper = TestHelper.IOHelper;
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeFinder = TestHelper.GetTypeFinder();
             var typeLoader = new TypeLoader(ioHelper, typeFinder, NoAppCache.Instance,
                 new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")),
                 logger,

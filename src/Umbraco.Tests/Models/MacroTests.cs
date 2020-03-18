@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Tests.TestHelpers;
@@ -12,18 +10,10 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class MacroTests
     {
-        [SetUp]
-        public void Init()
-        {
-            Current.Reset();
-            Current.UnlockConfigs(TestHelper.GetConfigsFactory(), TestHelper.IOHelper);
-            Current.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
-        }
-
         [Test]
         public void Can_Deep_Clone()
         {
-            var macro = new Macro(TestHelper.ShortStringHelper, 1, Guid.NewGuid(), true, 3, "test", "Test", false, true, true, "~/script.cshtml", MacroTypes.PartialView);
+            var macro = new Macro(TestHelper.ShortStringHelper, 1, Guid.NewGuid(), true, 3, "test", "Test", false, true, true, "~/script.cshtml");
             macro.Properties.Add(new MacroProperty(6, Guid.NewGuid(), "rewq", "REWQ", 1, "asdfasdf"));
 
             var clone = (Macro)macro.DeepClone();

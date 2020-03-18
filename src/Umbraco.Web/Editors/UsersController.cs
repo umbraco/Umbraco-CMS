@@ -13,26 +13,29 @@ using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Editors.Filters;
+using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Task = System.Threading.Tasks.Task;
+using Umbraco.Core.Mapping;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
 {
@@ -43,6 +46,11 @@ namespace Umbraco.Web.Editors
     public class UsersController : UmbracoAuthorizedJsonController
     {
         private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly IContentSettings _contentSettings;
+        private readonly IIOHelper _ioHelper;
+        private readonly ISqlContext _sqlContext;
+        private readonly IImageUrlGenerator _imageUrlGenerator;
+        private readonly ISecuritySettings _securitySettings;
 
         public UsersController(
             IGlobalSettings globalSettings,
@@ -52,12 +60,22 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             IMediaFileSystem mediaFileSystem,
-            IShortStringHelper shortStringHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            IContentSettings contentSettings,
+            IIOHelper ioHelper,
+            IImageUrlGenerator imageUrlGenerator,
+            IPublishedUrlProvider publishedUrlProvider,
+            ISecuritySettings securitySettings)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _mediaFileSystem = mediaFileSystem;
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _ioHelper = ioHelper;
+            _sqlContext = sqlContext;
+            _imageUrlGenerator = imageUrlGenerator;
+            _securitySettings = securitySettings;
         }
 
         /// <summary>
@@ -66,7 +84,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public string[] GetCurrentUserAvatarUrls()
         {
-            var urls = UmbracoContext.Security.CurrentUser.GetUserAvatarUrls(AppCaches.RuntimeCache, _mediaFileSystem);
+            var urls = UmbracoContext.Security.CurrentUser.GetUserAvatarUrls(AppCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator);
             if (urls == null)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Could not access Gravatar endpoint"));
 
@@ -78,17 +96,17 @@ namespace Umbraco.Web.Editors
         [AdminUsersAuthorize]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
-            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, _mediaFileSystem, ShortStringHelper, id);
+            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, _mediaFileSystem, ShortStringHelper, _contentSettings, _ioHelper, _imageUrlGenerator, id);
         }
 
-        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, int id)
+        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IContentSettings contentSettings, IIOHelper ioHelper, IImageUrlGenerator imageUrlGenerator, int id)
         {
             if (request.Content.IsMimeMultipartContent() == false)
             {
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = Current.IOHelper.MapPath(Constants.SystemDirectories.TempFileUploads);
+            var root = ioHelper.MapPath(Constants.SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -116,14 +134,14 @@ namespace Umbraco.Web.Editors
             var safeFileName = fileName.ToSafeFileName(shortStringHelper);
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
-            if (Current.Configs.Settings().Content.DisallowedUploadFiles.Contains(ext) == false)
+            if (contentSettings.DisallowedUploadFiles.Contains(ext) == false)
             {
                 //generate a path of known data, we don't want this path to be guessable
                 user.Avatar = "UserAvatars/" + (user.Id + safeFileName).GenerateHash<SHA1>() + "." + ext;
 
                 using (var fs = System.IO.File.OpenRead(file.LocalFileName))
                 {
-                    Current.MediaFileSystem.AddFile(user.Avatar, fs, true);
+                    mediaFileSystem.AddFile(user.Avatar, fs, true);
                 }
 
                 userService.Save(user);
@@ -135,7 +153,7 @@ namespace Umbraco.Web.Editors
                 });
             }
 
-            return request.CreateResponse(HttpStatusCode.OK, user.GetUserAvatarUrls(cache, mediaFileSystem));
+            return request.CreateResponse(HttpStatusCode.OK, user.GetUserAvatarUrls(cache, mediaFileSystem, imageUrlGenerator));
         }
 
         [AppendUserModifiedHeader("id")]
@@ -165,11 +183,11 @@ namespace Umbraco.Web.Editors
 
             if (filePath.IsNullOrWhiteSpace() == false)
             {
-                if (Current.MediaFileSystem.FileExists(filePath))
-                    Current.MediaFileSystem.DeleteFile(filePath);
+                if (_mediaFileSystem.FileExists(filePath))
+                    _mediaFileSystem.DeleteFile(filePath);
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, found.GetUserAvatarUrls(AppCaches.RuntimeCache, _mediaFileSystem));
+            return Request.CreateResponse(HttpStatusCode.OK, found.GetUserAvatarUrls(AppCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator));
         }
 
         /// <summary>
@@ -215,7 +233,7 @@ namespace Umbraco.Web.Editors
             // so to do that here, we'll need to check if this current user is an admin and if not we should exclude all user who are
             // also admins
 
-            var hideDisabledUsers = Current.Configs.Settings().Security.HideDisabledUsersInBackoffice;
+            var hideDisabledUsers = _securitySettings.HideDisabledUsersInBackoffice;
             var excludeUserGroups = new string[0];
             var isAdmin = Security.CurrentUser.IsAdmin();
             if (isAdmin == false)
@@ -224,7 +242,7 @@ namespace Umbraco.Web.Editors
                 excludeUserGroups = new[] {Constants.Security.AdminGroupAlias};
             }
 
-            var filterQuery = Current.SqlContext.Query<IUser>();
+            var filterQuery = _sqlContext.Query<IUser>();
 
             if (!Security.CurrentUser.IsSuper())
             {
@@ -273,7 +291,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
 
-            if (Current.Configs.Settings().Security.UsernameIsEmail)
+            if (_securitySettings.UsernameIsEmail)
             {
                 //ensure they are the same if we're using it
                 userSave.Username = userSave.Email;
@@ -295,7 +313,7 @@ namespace Umbraco.Web.Editors
 
             //we want to create the user with the UserManager, this ensures the 'empty' (special) password
             //format is applied without us having to duplicate that logic
-            var identityUser = BackOfficeIdentityUser.CreateNew(userSave.Username, userSave.Email, GlobalSettings.DefaultUILanguage);
+            var identityUser = BackOfficeIdentityUser.CreateNew(GlobalSettings, userSave.Username, userSave.Email, GlobalSettings.DefaultUILanguage);
             identityUser.Name = userSave.Name;
 
             var created = await UserManager.CreateAsync(identityUser);
@@ -365,7 +383,7 @@ namespace Umbraco.Web.Editors
             }
 
             IUser user;
-            if (Current.Configs.Settings().Security.UsernameIsEmail)
+            if (_securitySettings.UsernameIsEmail)
             {
                 //ensure it's the same
                 userSave.Username = userSave.Email;
@@ -389,7 +407,7 @@ namespace Umbraco.Web.Editors
             {
                 //we want to create the user with the UserManager, this ensures the 'empty' (special) password
                 //format is applied without us having to duplicate that logic
-                var identityUser = BackOfficeIdentityUser.CreateNew(userSave.Username, userSave.Email, GlobalSettings.DefaultUILanguage);
+                var identityUser = BackOfficeIdentityUser.CreateNew(GlobalSettings, userSave.Username, userSave.Email, GlobalSettings.DefaultUILanguage);
                 identityUser.Name = userSave.Name;
 
                 var created = await UserManager.CreateAsync(identityUser);
@@ -439,7 +457,7 @@ namespace Umbraco.Web.Editors
             if (user != null && (extraCheck == null || extraCheck(user)))
             {
                 ModelState.AddModelError(
-                    Current.Configs.Settings().Security.UsernameIsEmail ? "Email" : "Username",
+                    _securitySettings.UsernameIsEmail ? "Email" : "Username",
                     "A user with the username already exists");
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
@@ -469,7 +487,7 @@ namespace Umbraco.Web.Editors
             var action = urlHelper.Action("VerifyInvite", "BackOffice",
                 new
                 {
-                    area = GlobalSettings.GetUmbracoMvcArea(Current.IOHelper),
+                    area = _ioHelper.GetUmbracoMvcArea(),
                     invite = inviteToken
                 });
 
@@ -559,31 +577,9 @@ namespace Umbraco.Web.Editors
 
             // if the found user has their email for username, we want to keep this synced when changing the email.
             // we have already cross-checked above that the email isn't colliding with anything, so we can safely assign it here.
-            if (Current.Configs.Settings().Security.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
+            if (_securitySettings.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
             {
                 userSave.Username = userSave.Email;
-            }
-
-            if (userSave.ChangePassword != null)
-            {
-                var passwordChanger = new PasswordChanger(Logger);
-
-                //this will change the password and raise appropriate events
-                var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, found, userSave.ChangePassword, UserManager);
-                if (passwordChangeResult.Success)
-                {
-                    //need to re-get the user
-                    found = Services.UserService.GetUserById(intId.Result);
-                }
-                else
-                {
-                    hasErrors = true;
-
-                    foreach (var memberName in passwordChangeResult.Result.ChangeError.MemberNames)
-                    {
-                        ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
-                    }
-                }
             }
 
             if (hasErrors)
@@ -599,6 +595,51 @@ namespace Umbraco.Web.Editors
             display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserSaved"));
             return display;
         }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="changingPasswordModel"></param>
+        /// <returns></returns>
+        public async Task<ModelWithNotifications<string>> PostChangePassword(ChangingPasswordModel changingPasswordModel)
+        {
+            changingPasswordModel = changingPasswordModel ?? throw new ArgumentNullException(nameof(changingPasswordModel));
+
+            if (ModelState.IsValid == false)
+            {
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+            }
+
+            var intId = changingPasswordModel.Id.TryConvertTo<int>();
+            if (intId.Success == false)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var found = Services.UserService.GetUserById(intId.Result);
+            if (found == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var passwordChanger = new PasswordChanger(Logger);
+            var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, found, changingPasswordModel, UserManager);
+
+            if (passwordChangeResult.Success)
+            {
+                var result = new ModelWithNotifications<string>(passwordChangeResult.Result.ResetPassword);
+                result.AddSuccessNotification(Services.TextService.Localize("general/success"), Services.TextService.Localize("user/passwordChangedGeneric"));
+                return result;
+            }
+
+            foreach (var memberName in passwordChangeResult.Result.ChangeError.MemberNames)
+            {
+                ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
+            }
+
+            throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+        }
+
 
         /// <summary>
         /// Disables the users with the given user ids

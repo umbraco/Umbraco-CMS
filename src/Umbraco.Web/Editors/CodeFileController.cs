@@ -16,7 +16,6 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Strings.Css;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -24,6 +23,8 @@ using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.Trees;
 using Stylesheet = Umbraco.Core.Models.Stylesheet;
 using StylesheetRule = Umbraco.Web.Models.ContentEditing.StylesheetRule;
+using Umbraco.Core.Mapping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
 {
@@ -34,6 +35,9 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
     public class CodeFileController : BackOfficeNotificationsController
     {
+        private readonly IIOHelper _ioHelper;
+        private readonly IFileSystems _fileSystems;
+
         public CodeFileController(
             IGlobalSettings globalSettings,
             IUmbracoContextAccessor umbracoContextAccessor,
@@ -42,11 +46,15 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
-            IShortStringHelper shortStringHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
-
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            IIOHelper ioHelper,
+            IFileSystems fileSystems,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
+            _ioHelper = ioHelper;
+            _fileSystems = fileSystems;
         }
 
         /// <summary>
@@ -129,11 +137,11 @@ namespace Umbraco.Web.Editors
                     Services.FileService.CreatePartialViewMacroFolder(virtualPath);
                     break;
                 case Core.Constants.Trees.Scripts:
-                    virtualPath = NormalizeVirtualPath(name, Current.Configs.Global().UmbracoScriptsPath);
+                    virtualPath = NormalizeVirtualPath(name, GlobalSettings.UmbracoScriptsPath);
                     Services.FileService.CreateScriptFolder(virtualPath);
                     break;
                 case Core.Constants.Trees.Stylesheets:
-                    virtualPath = NormalizeVirtualPath(name, Current.Configs.Global().UmbracoCssPath);
+                    virtualPath = NormalizeVirtualPath(name, GlobalSettings.UmbracoCssPath);
                     Services.FileService.CreateStyleSheetFolder(virtualPath);
                     break;
 
@@ -273,11 +281,11 @@ namespace Umbraco.Web.Editors
                     break;
                 case Core.Constants.Trees.Scripts:
                     codeFileDisplay = Mapper.Map<Script, CodeFileDisplay>(new Script(string.Empty));
-                    codeFileDisplay.VirtualPath = Current.Configs.Global().UmbracoScriptsPath;
+                    codeFileDisplay.VirtualPath = GlobalSettings.UmbracoScriptsPath;
                     break;
                 case Core.Constants.Trees.Stylesheets:
                     codeFileDisplay = Mapper.Map<Stylesheet, CodeFileDisplay>(new Stylesheet(string.Empty));
-                    codeFileDisplay.VirtualPath = Current.Configs.Global().UmbracoCssPath;
+                    codeFileDisplay.VirtualPath = GlobalSettings.UmbracoCssPath;
                     break;
                 default:
                     throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Unsupported editortype"));
@@ -340,7 +348,7 @@ namespace Umbraco.Web.Editors
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View Macro or folder found with the specified path");
 
                 case Core.Constants.Trees.Scripts:
-                    if (IsDirectory(virtualPath, Current.Configs.Global().UmbracoScriptsPath))
+                    if (IsDirectory(virtualPath, GlobalSettings.UmbracoScriptsPath))
                     {
                         Services.FileService.DeleteScriptFolder(virtualPath);
                         return Request.CreateResponse(HttpStatusCode.OK);
@@ -353,7 +361,7 @@ namespace Umbraco.Web.Editors
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Script or folder found with the specified path");
 
                 case Core.Constants.Trees.Stylesheets:
-                    if (IsDirectory(virtualPath, Current.Configs.Global().UmbracoCssPath))
+                    if (IsDirectory(virtualPath, GlobalSettings.UmbracoCssPath))
                     {
                         Services.FileService.DeleteStyleSheetFolder(virtualPath);
                         return Request.CreateResponse(HttpStatusCode.OK);
@@ -516,7 +524,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         private IScript CreateOrUpdateScript(CodeFileDisplay display)
         {
-            return CreateOrUpdateFile(display, ".js", Current.FileSystems.ScriptsFileSystem,
+            return CreateOrUpdateFile(display, ".js", _fileSystems.ScriptsFileSystem,
                 name => Services.FileService.GetScriptByName(name),
                 (script, userId) => Services.FileService.SaveScript(script, userId),
                 name => new Script(name));
@@ -524,7 +532,7 @@ namespace Umbraco.Web.Editors
 
         private IStylesheet CreateOrUpdateStylesheet(CodeFileDisplay display)
         {
-            return CreateOrUpdateFile(display, ".css", Current.FileSystems.StylesheetsFileSystem,
+            return CreateOrUpdateFile(display, ".css", _fileSystems.StylesheetsFileSystem,
                 name => Services.FileService.GetStylesheetByName(name),
                 (stylesheet, userId) => Services.FileService.SaveStylesheet(stylesheet, userId),
                 name => new Stylesheet(name)
@@ -646,7 +654,7 @@ namespace Umbraco.Web.Editors
 
         private bool IsDirectory(string virtualPath, string systemDirectory)
         {
-            var path = Current.IOHelper.MapPath(systemDirectory + "/" + virtualPath);
+            var path = _ioHelper.MapPath(systemDirectory + "/" + virtualPath);
             var dirInfo = new DirectoryInfo(path);
             return dirInfo.Attributes == FileAttributes.Directory;
         }

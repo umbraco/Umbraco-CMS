@@ -9,6 +9,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 
@@ -19,6 +20,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly IAppCache _appCache;
         private readonly IGlobalSettings _globalSettings;
         private readonly RoutesCache _routesCache;
+        private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IDomainCache _domainCache;
         private readonly PublishedContentTypeCache _contentTypeCache;
 
@@ -34,12 +36,14 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             IGlobalSettings globalSettings,
             PublishedContentTypeCache contentTypeCache, // a PublishedContentType cache
             RoutesCache routesCache, // a RoutesCache
+            IVariationContextAccessor variationContextAccessor,
             string previewToken) // a preview token string (or null if not previewing)
             : base(previewToken.IsNullOrWhiteSpace() == false)
         {
             _appCache = appCache;
             _globalSettings = globalSettings;
             _routesCache = routesCache; // may be null for unit-testing
+            _variationContextAccessor = variationContextAccessor;
             _contentTypeCache = contentTypeCache;
             _domainCache = domainCache;
 
@@ -264,7 +268,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             while (hasDomains == false && n != null) // n is null at root
             {
                 // get the url
-                var urlName = n.UrlSegment();
+                var urlName = n.UrlSegment(TestHelper.VariationContextAccessor);
                 pathParts.Add(urlName);
 
                 // move to parent node
@@ -313,13 +317,13 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         private IPublishedContent ConvertToDocument(XmlNode xmlNode, bool isPreviewing)
         {
-            return xmlNode == null ? null : XmlPublishedContent.Get(xmlNode, isPreviewing, _appCache, _contentTypeCache);
+            return xmlNode == null ? null : XmlPublishedContent.Get(xmlNode, isPreviewing, _appCache, _contentTypeCache, _variationContextAccessor);
         }
 
         private IEnumerable<IPublishedContent> ConvertToDocuments(XmlNodeList xmlNodes, bool isPreviewing)
         {
             return xmlNodes.Cast<XmlNode>()
-                .Select(xmlNode => XmlPublishedContent.Get(xmlNode, isPreviewing, _appCache, _contentTypeCache));
+                .Select(xmlNode => XmlPublishedContent.Get(xmlNode, isPreviewing, _appCache, _contentTypeCache, _variationContextAccessor));
         }
 
         #endregion

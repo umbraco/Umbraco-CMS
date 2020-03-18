@@ -4,8 +4,6 @@ using System;
 using System.IO;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging.Viewer;
 using Umbraco.Tests.TestHelpers;
 
@@ -166,7 +164,7 @@ namespace Umbraco.Tests.Logging
 
             //Query @Level='Warning' BUT we pass in array of LogLevels for Debug & Info (Expect to get 0 results)
             string[] logLevelMismatch = { "Debug", "Information" };
-            var filterLevelQuery = _logViewer.GetLogs(_logTimePeriod, pageNumber: 1, filterExpression: "@Level='Warning'", logLevels: logLevelMismatch); ;
+            var filterLevelQuery = _logViewer.GetLogs(_logTimePeriod, pageNumber: 1, filterExpression: "@Level='Warning'", logLevels: logLevelMismatch);
             Assert.AreEqual(0, filterLevelQuery.TotalItems);
         }
 

@@ -1,17 +1,8 @@
-﻿@using System.Collections
-@using System.Net.Http
-@using System.Web.Mvc.Html
-@using Umbraco.Core
+﻿@using Umbraco.Core
 @using ClientDependency.Core
 @using ClientDependency.Core.Mvc
-@using Microsoft.Owin.Security
-@using Newtonsoft.Json
-@using Newtonsoft.Json.Linq
-@using Umbraco.Core.Composing
-@using Umbraco.Core.IO
+@using Umbraco.Web.Composing
 @using Umbraco.Web
-@using Umbraco.Web.Editors
-@using Umbraco.Core.Configuration
 @inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Editors.BackOfficeModel>
 @{
     Layout = null;
@@ -26,14 +17,14 @@
 
 <html lang="en">
 <head>
-    <base href="@Model.GlobalSettings.Path.EnsureEndsWith('/')" />
+    <base href="@Model.IOHelper.BackOfficePath.EnsureEndsWith('/')" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Umbraco</title>
 
     @Html.RenderCssHere(
-        new BasicPath("Umbraco", Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath)))
+        new BasicPath("Umbraco", Current.IOHelper.ResolveUrl(Model.GlobalSettings.UmbracoPath)))
 
     @*Because we're lazy loading angular js, the embedded cloak style will not be loaded initially, but we need it*@
     <style>
@@ -57,7 +48,7 @@
             redirectUrl = Url.Action("AuthorizeUpgrade", "BackOffice")
         });
     }
-    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl, Model.Features, Model.GlobalSettings, Model.UmbracoVersion)
+    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl, Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.ContentSettings, Model.IOHelper, Model.TreeCollection, Model.HttpContextAccessor, Model.HostingEnvironment, Model.RuntimeSettings, Model.SecuritySettings)
 
     <script type="text/javascript">
     document.angularReady = function (app) {

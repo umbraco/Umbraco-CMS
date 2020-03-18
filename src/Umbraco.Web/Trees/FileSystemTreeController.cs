@@ -4,15 +4,45 @@ using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Trees;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Trees
 {
     public abstract class FileSystemTreeController : TreeController
     {
+        protected FileSystemTreeController()
+        {
+            MenuItemCollectionFactory = Current.MenuItemCollectionFactory;
+        }
+
+        protected FileSystemTreeController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider,
+            IMenuItemCollectionFactory menuItemCollectionFactory)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
+        {
+            MenuItemCollectionFactory = menuItemCollectionFactory;
+        }
+
         protected abstract IFileSystem FileSystem { get; }
+        protected IMenuItemCollectionFactory MenuItemCollectionFactory { get; }
         protected abstract string[] Extensions { get; }
         protected abstract string FileIcon { get; }
 
@@ -88,7 +118,7 @@ namespace Umbraco.Web.Trees
 
         protected virtual MenuItemCollection GetMenuForRootNode(FormDataCollection queryStrings)
         {
-            var menu = new MenuItemCollection();
+            var menu = MenuItemCollectionFactory.Create();
 
             //set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
@@ -102,7 +132,7 @@ namespace Umbraco.Web.Trees
 
         protected virtual MenuItemCollection GetMenuForFolder(string path, FormDataCollection queryStrings)
         {
-            var menu = new MenuItemCollection();
+            var menu = MenuItemCollectionFactory.Create();
 
             //set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
@@ -126,7 +156,7 @@ namespace Umbraco.Web.Trees
 
         protected virtual MenuItemCollection GetMenuForFile(string path, FormDataCollection queryStrings)
         {
-            var menu = new MenuItemCollection();
+            var menu = MenuItemCollectionFactory.Create();
 
             //if it's not a directory then we only allow to delete the item
             menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
@@ -142,7 +172,7 @@ namespace Umbraco.Web.Trees
                 return GetMenuForRootNode(queryStrings);
             }
 
-            var menu = new MenuItemCollection();
+            var menu = MenuItemCollectionFactory.Create();
 
             var path = string.IsNullOrEmpty(id) == false && id != Constants.System.RootString
                 ? HttpUtility.UrlDecode(id).TrimStart("/")

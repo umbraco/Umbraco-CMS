@@ -1,7 +1,14 @@
 ﻿using System.Net.Http.Formatting;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
@@ -13,6 +20,24 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class PackagesTreeController : TreeController
     {
+        private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
+
+        public PackagesTreeController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider,
+            IMenuItemCollectionFactory menuItemCollectionFactory)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
+        {
+            _menuItemCollectionFactory = menuItemCollectionFactory;
+        }
+
         /// <summary>
         /// Helper method to create a root model for a tree
         /// </summary>
@@ -39,7 +64,7 @@ namespace Umbraco.Web.Trees
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
             //doesn't have a menu, this is a full screen app without tree nodes
-            return MenuItemCollection.Empty;
+            return _menuItemCollectionFactory.Create();
         }
     }
 }

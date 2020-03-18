@@ -7,18 +7,18 @@ namespace Umbraco.Web.Mvc
 {
     public class ContainerControllerFactory : DefaultControllerFactory
     {
-        private readonly IFactory _container;
+        private readonly Lazy<IFactory> _factory;
 
-        public ContainerControllerFactory(IFactory container)
+        public ContainerControllerFactory(Lazy<IFactory> factory)
         {
-            _container = container;
+            _factory = factory;
         }
 
         protected override IController GetControllerInstance(RequestContext requestContext, Type controllerType)
         {
             try
             {
-                return (IController) _container.GetInstance(controllerType);
+                return (IController) _factory.Value.GetInstance(controllerType);
             }
             catch (Exception e)
             {
@@ -28,7 +28,7 @@ namespace Umbraco.Web.Mvc
 
         public override void ReleaseController(IController controller)
         {
-            _container.Release(controller);
+            _factory.Value.Release(controller);
         }
     }
 }

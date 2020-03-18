@@ -15,12 +15,14 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Runtime;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Xml;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
@@ -93,7 +95,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _hostingEnvironment = hostingEnvironment;
             _shortStringHelper = shortStringHelper;
 
-            _xmlFileName = Current.IOHelper.MapPath(SystemFiles.GetContentCacheXml(_hostingEnvironment));
+            _xmlFileName = TestHelper.IOHelper.MapPath(SystemFiles.GetContentCacheXml(_hostingEnvironment));
 
             if (testing)
             {
@@ -117,7 +119,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _mediaRepository = mediaRepository;
             _memberRepository = memberRepository;
             _xmlFileEnabled = false;
-            _xmlFileName = Current.IOHelper.MapPath(SystemFiles.GetContentCacheXml(hostingEnvironment));
+            _xmlFileName = TestHelper.IOHelper.MapPath(SystemFiles.GetContentCacheXml(hostingEnvironment));
             // do not plug events, we may not have what it takes to handle them
         }
 
@@ -131,7 +133,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _memberRepository = memberRepository;
             GetXmlDocument = getXmlDocument ?? throw new ArgumentNullException(nameof(getXmlDocument));
             _xmlFileEnabled = false;
-            _xmlFileName = Current.IOHelper.MapPath(SystemFiles.GetContentCacheXml(hostingEnvironment));
+            _xmlFileName = TestHelper.IOHelper.MapPath(SystemFiles.GetContentCacheXml(hostingEnvironment));
             // do not plug events, we may not have what it takes to handle them
         }
 
@@ -148,7 +150,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 LongRunning = true,
                 KeepAlive = true,
                 Hosted = false // main domain will take care of stopping the runner (see below)
-            }, logger);
+            }, logger, _hostingEnvironment);
 
             // create (and add to runner)
             _persisterTask = new XmlStoreFilePersister(runner, this, logger);

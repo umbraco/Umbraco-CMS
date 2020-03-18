@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Web.Composing;
 
@@ -21,8 +22,10 @@ namespace Umbraco.Web.Mvc
 
         public void OnException(ExceptionContext filterContext)
         {
+            var settings = Current.Factory.GetInstance<IExceptionFilterSettings>();
+            var disabled = settings?.Disabled ?? false;
             if (Current.PublishedModelFactory.IsLiveFactory()
-                && ConfigurationManager.AppSettings["Umbraco.Web.DisableModelBindingExceptionFilter"] != "true"
+                && !disabled
                 && !filterContext.ExceptionHandled
                 && ((filterContext.Exception is ModelBindingException || filterContext.Exception is InvalidCastException)
                     && IsMessageAboutTheSameModelType(filterContext.Exception.Message)))

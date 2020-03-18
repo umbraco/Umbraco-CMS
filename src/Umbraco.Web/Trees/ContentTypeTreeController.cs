@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
@@ -13,6 +14,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Search;
 using Umbraco.Web.WebApi.Filters;
 
@@ -25,10 +27,24 @@ namespace Umbraco.Web.Trees
     public class ContentTypeTreeController : TreeController, ISearchableTree
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
+        private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
 
-        public ContentTypeTreeController(UmbracoTreeSearcher treeSearcher, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public ContentTypeTreeController(
+            UmbracoTreeSearcher treeSearcher,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider,
+            IMenuItemCollectionFactory menuItemCollectionFactory)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
             _treeSearcher = treeSearcher;
+            _menuItemCollectionFactory = menuItemCollectionFactory;
         }
 
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
@@ -69,15 +85,18 @@ namespace Umbraco.Web.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
+                        // get the content type here so we can get the icon from it to use when we create the tree node
+                        // and we can enrich the result with content type data that's not available in the entity service output
+                        var contentType = contentTypes[dt.Id];
+
                         // since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to.
                         // need this check to keep supporting sites where children have already been created.
                         var hasChildren = dt.HasChildren;
-                        var node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentType, id, queryStrings, Constants.Icons.ContentType, hasChildren);
+                        var node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentType, id, queryStrings, contentType?.Icon ?? Constants.Icons.ContentType, hasChildren);
 
                         node.Path = dt.Path;
 
-                        // enrich the result with content type data that's not available in the entity service output
-                        var contentType = contentTypes[dt.Id];
+                        // now we can enrich the result with content type data that's not available in the entity service output
                         node.Alias = contentType.Alias;
                         node.AdditionalData["isElement"] = contentType.IsElement;
 
@@ -89,7 +108,7 @@ namespace Umbraco.Web.Trees
 
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
-            var menu = new MenuItemCollection();
+            var menu = _menuItemCollectionFactory.Create();
 
             if (id == Constants.System.RootString)
             {

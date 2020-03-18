@@ -7,6 +7,8 @@ using Umbraco.Web;
 using Umbraco.Core;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Composing;
+using Moq;
+using Examine;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -33,7 +35,6 @@ namespace Umbraco.Tests.PublishedContent
                 UrlSegment = "content-1",
                 Path = "/1",
                 Level = 1,
-                Url = "/content-1",
                 ParentId = -1,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
@@ -57,7 +58,6 @@ namespace Umbraco.Tests.PublishedContent
                 UrlSegment = "content-2",
                 Path = "/2",
                 Level = 1,
-                Url = "/content-2",
                 ParentId = -1,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
@@ -81,7 +81,6 @@ namespace Umbraco.Tests.PublishedContent
                 UrlSegment = "content-2sub",
                 Path = "/3",
                 Level = 1,
-                Url = "/content-2sub",
                 ParentId = -1,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
@@ -102,7 +101,7 @@ namespace Umbraco.Tests.PublishedContent
         public void First()
         {
             var content = Current.UmbracoContext.Content.GetAtRoot().First();
-            Assert.AreEqual("Content 1", content.Name());
+            Assert.AreEqual("Content 1", content.Name(VariationContextAccessor));
         }
 
         [Test]
@@ -201,7 +200,8 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void PublishedContentQueryTypedContentList()
         {
-            var query = new PublishedContentQuery(Current.UmbracoContext.PublishedSnapshot, Current.UmbracoContext.VariationContextAccessor);
+            var examineManager = new Mock<IExamineManager>();
+            var query = new PublishedContentQuery(Current.UmbracoContext.PublishedSnapshot, Current.UmbracoContext.VariationContextAccessor, examineManager.Object);
             var result = query.Content(new[] { 1, 2, 4 }).ToArray();
             Assert.AreEqual(2, result.Length);
             Assert.AreEqual(1, result[0].Id);

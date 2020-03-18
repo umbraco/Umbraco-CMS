@@ -10,13 +10,14 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using System.Web.Compilation;
-using System.Web.Hosting;
 using System.Web.WebPages.Razor;
+using Umbraco.Core.Configuration;
 using Umbraco.Core;
+using Umbraco.Core.Hosting;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
-using Umbraco.ModelsBuilder.Embedded.Configuration;
 using File = System.IO.File;
 
 namespace Umbraco.ModelsBuilder.Embedded
@@ -41,29 +42,38 @@ namespace Umbraco.ModelsBuilder.Embedded
         private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err" };
 
         private readonly IModelsBuilderConfig _config;
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IIOHelper _ioHelper;
         private readonly ModelsGenerationError _errors;
 
-        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IProfilingLogger logger, IModelsBuilderConfig config)
+        public PureLiveModelFactory(
+            Lazy<UmbracoServices> umbracoServices,
+            IProfilingLogger logger,
+            IModelsBuilderConfig config,
+            IHostingEnvironment hostingEnvironment,
+            IIOHelper ioHelper)
         {
             _umbracoServices = umbracoServices;
             _logger = logger;
             _config = config;
-            _errors = new ModelsGenerationError(config);
+            _hostingEnvironment = hostingEnvironment;
+            _ioHelper = ioHelper;
+            _errors = new ModelsGenerationError(config, ioHelper);
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
 
             RazorBuildProvider.CodeGenerationStarted += RazorBuildProvider_CodeGenerationStarted;
 
-            if (!HostingEnvironment.IsHosted) return;
+            if (!_hostingEnvironment.IsHosted) return;
 
-            var modelsDirectory = _config.ModelsDirectory;
+            var modelsDirectory = _config.ModelsDirectoryAbsolute(_ioHelper);
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
             // BEWARE! if the watcher is not properly released then for some reason the
             // BuildManager will start confusing types - using a 'registered object' here
             // though we should probably plug into Umbraco's MainDom - which is internal
-            HostingEnvironment.RegisterObject(this);
+            _hostingEnvironment.RegisterObject(this);
             _watcher = new FileSystemWatcher(modelsDirectory);
             _watcher.Changed += WatcherOnChanged;
             _watcher.EnableRaisingEvents = true;
@@ -206,7 +216,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 _hasModels = false;
                 _pendingRebuild = true;
 
-                var modelsDirectory = _config.ModelsDirectory;
+                var modelsDirectory = _config.ModelsDirectoryAbsolute(_ioHelper);
                 if (!Directory.Exists(modelsDirectory))
                     Directory.CreateDirectory(modelsDirectory);
 
@@ -328,7 +338,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         private Assembly GetModelsAssembly(bool forceRebuild)
         {
-            var modelsDirectory = _config.ModelsDirectory;
+            var modelsDirectory = _config.ModelsDirectoryAbsolute(_ioHelper);
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
@@ -550,7 +560,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         private string GenerateModelsCode(IList<TypeModel> typeModels)
         {
-            var modelsDirectory = _config.ModelsDirectory;
+            var modelsDirectory = _config.ModelsDirectoryAbsolute(_ioHelper);
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
@@ -667,7 +677,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         {
             _watcher.EnableRaisingEvents = false;
             _watcher.Dispose();
-            HostingEnvironment.UnregisterObject(this);
+            _hostingEnvironment.UnregisterObject(this);
         }
 
         #endregion

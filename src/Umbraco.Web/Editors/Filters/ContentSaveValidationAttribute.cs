@@ -83,7 +83,7 @@ namespace Umbraco.Web.Editors.Filters
         /// <param name="actionContext"></param>
         /// <param name="contentItem"></param>
         /// <param name="webSecurity"></param>
-        private bool ValidateUserAccess(ContentItemSave contentItem, HttpActionContext actionContext, WebSecurity webSecurity)
+        private bool ValidateUserAccess(ContentItemSave contentItem, HttpActionContext actionContext, IWebSecurity webSecurity)
         {
 
             //We now need to validate that the user is allowed to be doing what they are doing.

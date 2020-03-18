@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Web.Http;
 using System.Xml;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using Umbraco.Core.Logging;
@@ -11,7 +10,8 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using File = System.IO.File;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.Editors
 {
@@ -19,10 +19,12 @@ namespace Umbraco.Web.Editors
     public class RedirectUrlManagementController : UmbracoAuthorizedApiController
     {
         private readonly ILogger _logger;
+        private readonly IWebRoutingSettings _webRoutingSettings;
 
-        public RedirectUrlManagementController(ILogger logger)
+        public RedirectUrlManagementController(ILogger logger, IWebRoutingSettings webRoutingSettings)
         {
             _logger = logger;
+            _webRoutingSettings = webRoutingSettings;
         }
 
         /// <summary>
@@ -32,7 +34,7 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public IHttpActionResult GetEnableState()
         {
-            var enabled = Current.Configs.Settings().WebRouting.DisableRedirectUrlTracking == false;
+            var enabled = _webRoutingSettings.DisableRedirectUrlTracking == false;
             var userIsAdmin = UmbracoContext.Security.CurrentUser.IsAdmin();
             return Ok(new { enabled, userIsAdmin });
         }
