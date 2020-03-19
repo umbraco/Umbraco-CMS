@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+using Umbraco.Core;
 using Umbraco.Core.Configuration.HealthChecks;
 
 namespace Umbraco.Configuration.Models
 {
     internal class HealthChecksSettings : IHealthChecksSettings
     {
+        private const string Prefix = Constants.Configuration.ConfigPrefix + "HealthChecks:";
         private readonly IConfiguration _configuration;
 
         public HealthChecksSettings(IConfiguration configuration)
@@ -16,7 +18,7 @@ namespace Umbraco.Configuration.Models
         }
 
         public IEnumerable<IDisabledHealthCheck> DisabledChecks => _configuration
-            .GetSection("Umbraco:CMS:HealthChecks:DisabledChecks")
+            .GetSection(Prefix+"DisabledChecks")
             .GetChildren()
             .Select(
                 x => new DisabledHealthCheck
@@ -28,7 +30,7 @@ namespace Umbraco.Configuration.Models
 
         public IHealthCheckNotificationSettings NotificationSettings =>
             new HealthCheckNotificationSettings(
-                _configuration.GetSection("Umbraco:CMS:HealthChecks:NotificationSettings"));
+                _configuration.GetSection(Prefix+"NotificationSettings"));
 
         private class DisabledHealthCheck : IDisabledHealthCheck
         {

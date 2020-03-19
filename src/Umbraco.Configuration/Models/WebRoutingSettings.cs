@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 
@@ -6,6 +7,7 @@ namespace Umbraco.Configuration.Models
 {
     internal class WebRoutingSettings : IWebRoutingSettings
     {
+        private const string Prefix = Constants.Configuration.ConfigPrefix + "WebRouting:";
         private readonly IConfiguration _configuration;
 
         public WebRoutingSettings(IConfiguration configuration)
@@ -14,27 +16,27 @@ namespace Umbraco.Configuration.Models
         }
 
         public bool TrySkipIisCustomErrors =>
-            _configuration.GetValue("Umbraco:CMS:WebRouting:TrySkipIisCustomErrors", false);
+            _configuration.GetValue(Prefix + "TrySkipIisCustomErrors", false);
 
         public bool InternalRedirectPreservesTemplate =>
-            _configuration.GetValue("Umbraco:CMS:WebRouting:InternalRedirectPreservesTemplate", false);
+            _configuration.GetValue(Prefix + "InternalRedirectPreservesTemplate", false);
 
         public bool DisableAlternativeTemplates =>
-            _configuration.GetValue("Umbraco:CMS:WebRouting:DisableAlternativeTemplates", false);
+            _configuration.GetValue(Prefix + "DisableAlternativeTemplates", false);
 
         public bool ValidateAlternativeTemplates =>
-            _configuration.GetValue("Umbraco:CMS:WebRouting:ValidateAlternativeTemplates", false);
+            _configuration.GetValue(Prefix + "ValidateAlternativeTemplates", false);
 
         public bool DisableFindContentByIdPath =>
-            _configuration.GetValue("Umbraco:CMS:WebRouting:DisableFindContentByIdPath", false);
+            _configuration.GetValue(Prefix + "DisableFindContentByIdPath", false);
 
         public bool DisableRedirectUrlTracking =>
-            _configuration.GetValue("Umbraco:CMS:WebRouting:DisableRedirectUrlTracking", false);
+            _configuration.GetValue(Prefix + "DisableRedirectUrlTracking", false);
 
         public string UrlProviderMode =>
-            _configuration.GetValue("Umbraco:CMS:WebRouting:UrlProviderMode", UrlMode.Auto.ToString());
+            _configuration.GetValue(Prefix + "UrlProviderMode", UrlMode.Auto.ToString());
 
         public string UmbracoApplicationUrl =>
-            _configuration.GetValue<string>("Umbraco:CMS:WebRouting:UmbracoApplicationUrl");
+            _configuration.GetValue<string>(Prefix + "UmbracoApplicationUrl");
     }
 }

@@ -64,7 +64,7 @@ namespace Umbraco.Configuration.Models
                     .Select(x => new CharItem()
                     {
                         Char = x.GetValue<string>("Char"),
-                        Replacement = x.GetValue<string>("Replacement"),UseLegacyEncoding
+                        Replacement = x.GetValue<string>("Replacement"),
                     }).ToArray();
 
                 if (collection.Any() || _configuration.GetSection("Prefix").GetChildren().Any(x =>

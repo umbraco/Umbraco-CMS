@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Configuration.Models
@@ -9,8 +10,10 @@ namespace Umbraco.Configuration.Models
     ///     The GlobalSettings Class contains general settings information for the entire Umbraco instance based on information
     ///     from  web.config appsettings
     /// </summary>
-    public class GlobalSettings : IGlobalSettings
+    internal class GlobalSettings : IGlobalSettings
     {
+        private const string Prefix = Constants.Configuration.ConfigPrefix + "Global:";
+
         internal const string
             StaticReservedPaths = "~/app_plugins/,~/install/,~/mini-profiler-resources/,"; //must end with a comma!
 
@@ -24,56 +27,57 @@ namespace Umbraco.Configuration.Models
             _configuration = configuration;
         }
 
-        public string ReservedUrls => _configuration.GetValue("Umbraco:CMS:Global:ReservedUrls", StaticReservedUrls);
-        public string ReservedPaths => _configuration.GetValue("Umbraco:CMS:Global:ReservedPaths", StaticReservedPaths);
+        public string ReservedUrls => _configuration.GetValue(Prefix + "ReservedUrls", StaticReservedUrls);
+        public string ReservedPaths => _configuration.GetValue(Prefix + "ReservedPaths", StaticReservedPaths);
 
-        public string Path => _configuration.GetValue<string>("Umbraco:CMS:Global:Path");
+        public string Path => _configuration.GetValue<string>(Prefix + "Path");
 
         // TODO: https://github.com/umbraco/Umbraco-CMS/issues/4238 - stop having version in web.config appSettings
         public string ConfigurationStatus
         {
-            get => _configuration.GetValue<string>("Umbraco:CMS:Global:ConfigurationStatus");
+            get => _configuration.GetValue<string>(Prefix + "ConfigurationStatus");
             set => throw new NotImplementedException("We should remove this and only use the value from database");
         }
 
-        public int TimeOutInMinutes => _configuration.GetValue("Umbraco:CMS:Global:TimeOutInMinutes", 20);
-        public string DefaultUILanguage => _configuration.GetValue("Umbraco:CMS:Global:TimeOutInMinutes", "en-US");
+        public int TimeOutInMinutes => _configuration.GetValue(Prefix + "TimeOutInMinutes", 20);
+        public string DefaultUILanguage => _configuration.GetValue(Prefix + "TimeOutInMinutes", "en-US");
 
         public bool HideTopLevelNodeFromPath =>
-            _configuration.GetValue("Umbraco:CMS:Global:HideTopLevelNodeFromPath", false);
+            _configuration.GetValue(Prefix + "HideTopLevelNodeFromPath", false);
 
-        public bool UseHttps => _configuration.GetValue("Umbraco:CMS:Global:UseHttps", false);
-        public int VersionCheckPeriod => _configuration.GetValue("Umbraco:CMS:Global:VersionCheckPeriod", 7);
-        public string UmbracoPath => _configuration.GetValue("Umbraco:CMS:Global:UmbracoPath", "~/umbraco");
-        public string UmbracoCssPath => _configuration.GetValue("Umbraco:CMS:Global:UmbracoCssPath", "~/css");
+        public bool UseHttps => _configuration.GetValue(Prefix + "UseHttps", false);
+        public int VersionCheckPeriod => _configuration.GetValue(Prefix + "VersionCheckPeriod", 7);
+        public string UmbracoPath => _configuration.GetValue(Prefix + "UmbracoPath", "~/umbraco");
+        public string UmbracoCssPath => _configuration.GetValue(Prefix + "UmbracoCssPath", "~/css");
 
         public string UmbracoScriptsPath =>
-            _configuration.GetValue("Umbraco:CMS:Global:UmbracoScriptsPath", "~/scripts");
+            _configuration.GetValue(Prefix + "UmbracoScriptsPath", "~/scripts");
 
-        public string UmbracoMediaPath => _configuration.GetValue("Umbraco:CMS:Global:UmbracoMediaPath", "~/media");
+        public string UmbracoMediaPath => _configuration.GetValue(Prefix + "UmbracoMediaPath", "~/media");
 
         public bool InstallMissingDatabase =>
-            _configuration.GetValue("Umbraco:CMS:Global:InstallMissingDatabase", false);
+            _configuration.GetValue(Prefix + "InstallMissingDatabase", false);
 
-        public bool InstallEmptyDatabase => _configuration.GetValue("Umbraco:CMS:Global:InstallEmptyDatabase", false);
+        public bool InstallEmptyDatabase => _configuration.GetValue(Prefix + "InstallEmptyDatabase", false);
 
         public bool DisableElectionForSingleServer =>
-            _configuration.GetValue("Umbraco:CMS:Global:DisableElectionForSingleServer", false);
+            _configuration.GetValue(Prefix + "DisableElectionForSingleServer", false);
 
-        public string RegisterType => _configuration.GetValue("Umbraco:CMS:Global:RegisterType", string.Empty);
+        public string RegisterType => _configuration.GetValue(Prefix + "RegisterType", string.Empty);
 
         public string DatabaseFactoryServerVersion =>
-            _configuration.GetValue("Umbraco:CMS:Global:DatabaseFactoryServerVersion", string.Empty);
+            _configuration.GetValue(Prefix + "DatabaseFactoryServerVersion", string.Empty);
 
-        public string MainDomLock => _configuration.GetValue("Umbraco:CMS:Global:MainDomLock", string.Empty);
+        public string MainDomLock => _configuration.GetValue(Prefix + "MainDomLock", string.Empty);
 
         public string NoNodesViewPath =>
-            _configuration.GetValue("Umbraco:CMS:Global:NoNodesViewPath", "~/config/splashes/NoNodes.cshtml");
+            _configuration.GetValue(Prefix + "NoNodesViewPath", "~/config/splashes/NoNodes.cshtml");
 
         public bool IsSmtpServerConfigured =>
-            _configuration.GetSection("Umbraco:CMS:Smtp")?.GetChildren().Any() ?? false;
+            _configuration.GetSection(Constants.Configuration.ConfigPrefix + "Smtp")?.GetChildren().Any() ?? false;
 
-        public ISmtpSettings SmtpSettings => new SmtpSettingsImpl(_configuration.GetSection("Umbraco:CMS:Smtp"));
+        public ISmtpSettings SmtpSettings =>
+            new SmtpSettingsImpl(_configuration.GetSection(Constants.Configuration.ConfigPrefix + "Smtp"));
 
         private class SmtpSettingsImpl : ISmtpSettings
         {

@@ -4,7 +4,7 @@ using Umbraco.Core.Configuration;
 
 namespace Umbraco.Configuration.Models
 {
-    public class MachineKeyConfig : IMachineKeyConfig
+    internal class MachineKeyConfig : IMachineKeyConfig
     {
         private readonly IConfiguration _configuration;
 

@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Configuration.Models
 {
     internal class UserPasswordConfigurationSettings : IUserPasswordConfiguration
     {
+        private const string Prefix = Constants.Configuration.ConfigSecurityPrefix + "UserPassword:";
         private readonly IConfiguration _configuration;
 
         public UserPasswordConfigurationSettings(IConfiguration configuration)
@@ -12,26 +14,26 @@ namespace Umbraco.Configuration.Models
             _configuration = configuration;
         }
 
-        public int RequiredLength => _configuration.GetValue("Umbraco:CMS:Security:UserPassword:RequiredLength", 10);
+        public int RequiredLength => _configuration.GetValue(Prefix + "RequiredLength", 10);
 
         public bool RequireNonLetterOrDigit =>
-            _configuration.GetValue("Umbraco:CMS:Security:UserPassword:RequireNonLetterOrDigit", false);
+            _configuration.GetValue(Prefix + "RequireNonLetterOrDigit", false);
 
-        public bool RequireDigit => _configuration.GetValue("Umbraco:CMS:Security:UserPassword:RequireDigit", false);
+        public bool RequireDigit => _configuration.GetValue(Prefix + "RequireDigit", false);
 
         public bool RequireLowercase =>
-            _configuration.GetValue("Umbraco:CMS:Security:UserPassword:RequireLowercase", false);
+            _configuration.GetValue(Prefix + "RequireLowercase", false);
 
         public bool RequireUppercase =>
-            _configuration.GetValue("Umbraco:CMS:Security:UserPassword:RequireUppercase", false);
+            _configuration.GetValue(Prefix + "RequireUppercase", false);
 
         public bool UseLegacyEncoding =>
-            _configuration.GetValue("Umbraco:CMS:Security:UserPassword:UseLegacyEncoding", false);
+            _configuration.GetValue(Prefix + "UseLegacyEncoding", false);
 
         public string HashAlgorithmType =>
-            _configuration.GetValue("Umbraco:CMS:Security:UserPassword:HashAlgorithmType", "HMACSHA256");
+            _configuration.GetValue(Prefix + "HashAlgorithmType", "HMACSHA256");
 
         public int MaxFailedAccessAttemptsBeforeLockout =>
-            _configuration.GetValue("Umbraco:CMS:Security:UserPassword:MaxFailedAccessAttemptsBeforeLockout", 5);
+            _configuration.GetValue(Prefix + "MaxFailedAccessAttemptsBeforeLockout", 5);
     }
 }

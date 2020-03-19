@@ -6,7 +6,7 @@ using Umbraco.Core.Configuration;
 
 namespace Umbraco.Configuration.Models
 {
-    public class ConnectionStrings : IConnectionStrings
+    internal class ConnectionStrings : IConnectionStrings
     {
         private readonly IConfiguration _configuration;
 

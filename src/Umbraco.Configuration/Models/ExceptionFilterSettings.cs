@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Configuration.Models
 {
     internal class ExceptionFilterSettings : IExceptionFilterSettings
     {
+        private const string Prefix = Constants.Configuration.ConfigPrefix + "ExceptionFilter:";
         private readonly IConfiguration _configuration;
 
         public ExceptionFilterSettings(IConfiguration configuration)
@@ -12,6 +14,6 @@ namespace Umbraco.Configuration.Models
             _configuration = configuration;
         }
 
-        public bool Disabled => _configuration.GetValue("Umbraco:CMS:ExceptionFilter:Disabled", false);
+        public bool Disabled => _configuration.GetValue(Prefix+"Disabled", false);
     }
 }

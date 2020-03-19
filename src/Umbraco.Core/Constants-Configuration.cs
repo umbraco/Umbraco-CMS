@@ -11,6 +11,8 @@
             /// ":" is used as marker for nested objects in json. E.g. "Umbraco:CMS:" = {"Umbraco":{"CMS":{....}}
             /// </remarks>
             public const string ConfigPrefix = "Umbraco:CMS:";
+            public const string ConfigSecurityPrefix = ConfigPrefix+"Security:";
+            public const string ConfigModelsBuilderPrefix = ConfigPrefix+"ModelsBuilder:";
         }
     }
 }

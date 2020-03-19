@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Configuration.Models
@@ -8,6 +9,7 @@ namespace Umbraco.Configuration.Models
     /// </summary>
     internal class ModelsBuilderConfig : IModelsBuilderConfig
     {
+        private const string Prefix = Constants.Configuration.ConfigModelsBuilderPrefix;
         private readonly IConfiguration _configuration;
 
         /// <summary>
@@ -27,25 +29,25 @@ namespace Umbraco.Configuration.Models
         ///     <para>If this is false then absolutely nothing happens.</para>
         ///     <para>Default value is <c>false</c> which means that unless we have this setting, nothing happens.</para>
         /// </remarks>
-        public bool Enable => _configuration.GetValue("Umbraco:CMS:ModelsBuilder:Enable", false);
+        public bool Enable => _configuration.GetValue(Prefix+"Enable", false);
 
         /// <summary>
         ///     Gets the models mode.
         /// </summary>
         public ModelsMode ModelsMode =>
-            _configuration.GetValue("Umbraco:CMS:ModelsBuilder:ModelsMode", ModelsMode.Nothing);
+            _configuration.GetValue(Prefix+"ModelsMode", ModelsMode.Nothing);
 
         /// <summary>
         ///     Gets the models namespace.
         /// </summary>
         /// <remarks>That value could be overriden by other (attribute in user's code...). Return default if no value was supplied.</remarks>
-        public string ModelsNamespace => _configuration.GetValue<string>("Umbraco:CMS:ModelsBuilder:ModelsNamespace");
+        public string ModelsNamespace => _configuration.GetValue<string>(Prefix+"ModelsNamespace");
 
         /// <summary>
         ///     Gets a value indicating whether we should enable the models factory.
         /// </summary>
         /// <remarks>Default value is <c>true</c> because no factory is enabled by default in Umbraco.</remarks>
-        public bool EnableFactory => _configuration.GetValue("Umbraco:CMS:ModelsBuilder:EnableFactory", true);
+        public bool EnableFactory => _configuration.GetValue(Prefix+"EnableFactory", true);
 
         /// <summary>
         ///     Gets a value indicating whether we should flag out-of-date models.
@@ -56,14 +58,14 @@ namespace Umbraco.Configuration.Models
         ///     generated through the dashboard, the files is cleared. Default value is <c>false</c>.
         /// </remarks>
         public bool FlagOutOfDateModels =>
-            _configuration.GetValue("Umbraco:CMS:ModelsBuilder:FlagOutOfDateModels", false) && !ModelsMode.IsLive();
+            _configuration.GetValue(Prefix+"FlagOutOfDateModels", false) && !ModelsMode.IsLive();
 
         /// <summary>
         ///     Gets the models directory.
         /// </summary>
         /// <remarks>Default is ~/App_Data/Models but that can be changed.</remarks>
         public string ModelsDirectory =>
-            _configuration.GetValue("Umbraco:CMS:ModelsBuilder:ModelsDirectory", "~/App_Data/Models");
+            _configuration.GetValue(Prefix+"ModelsDirectory", "~/App_Data/Models");
 
         /// <summary>
         ///     Gets a value indicating whether to accept an unsafe value for ModelsDirectory.
@@ -73,12 +75,12 @@ namespace Umbraco.Configuration.Models
         ///     of the website root.
         /// </remarks>
         public bool AcceptUnsafeModelsDirectory =>
-            _configuration.GetValue("Umbraco:CMS:ModelsBuilder:AcceptUnsafeModelsDirectory", false);
+            _configuration.GetValue(Prefix+"AcceptUnsafeModelsDirectory", false);
 
         /// <summary>
         ///     Gets a value indicating the debug log level.
         /// </summary>
         /// <remarks>0 means minimal (safe on live site), anything else means more and more details (maybe not safe).</remarks>
-        public int DebugLevel => _configuration.GetValue("Umbraco:CMS:ModelsBuilder:DebugLevel", 0);
+        public int DebugLevel => _configuration.GetValue(Prefix+"DebugLevel", 0);
     }
 }
