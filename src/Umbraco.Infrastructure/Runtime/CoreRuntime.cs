@@ -403,9 +403,9 @@ namespace Umbraco.Core.Runtime
             // is overridden by the web runtime
 
             return new AppCaches(
-                new DeepCloneAppCache(new ObjectCacheAppCache(TypeFinder)),
+                new DeepCloneAppCache(new ObjectCacheAppCache()),
                 NoAppCache.Instance,
-                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache(TypeFinder))));
+                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
         }
 
         // by default, returns null, meaning that Umbraco should auto-detect the application root path.
