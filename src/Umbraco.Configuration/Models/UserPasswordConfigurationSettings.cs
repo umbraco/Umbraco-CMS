@@ -27,9 +27,6 @@ namespace Umbraco.Configuration.Models
         public bool RequireUppercase =>
             _configuration.GetValue(Prefix + "RequireUppercase", false);
 
-        public bool UseLegacyEncoding =>
-            _configuration.GetValue(Prefix + "UseLegacyEncoding", false);
-
         public string HashAlgorithmType =>
             _configuration.GetValue(Prefix + "HashAlgorithmType", "HMACSHA256");
 
