@@ -43,7 +43,6 @@ using Umbraco.Web.SignalR;
 using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
-using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Examine;
 using Umbraco.Core.Models;

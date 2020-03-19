@@ -8,6 +8,7 @@ using Umbraco.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
@@ -23,6 +24,10 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var configsFactory = new AspNetCoreConfigsFactory(configuration);
 
             var configs = configsFactory.Create();
+
+            var x = configs.GetConfig<IRequestHandlerSettings>();
+
+            var y = x.CharCollection;
             services.AddSingleton(configs);
 
             return services;
