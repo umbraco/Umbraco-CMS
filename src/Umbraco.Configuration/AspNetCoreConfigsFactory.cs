@@ -42,7 +42,6 @@ namespace Umbraco.Configuration
             configs.Add<IHostingSettings>(() => new HostingSettings(_configuration));
             configs.Add<IGlobalSettings>(() => new GlobalSettings(_configuration));
             configs.Add<IConnectionStrings>(() => new ConnectionStrings(_configuration));
-            configs.Add<IMachineKeyConfig>(() => new MachineKeyConfig(_configuration));
             configs.Add<IImagingSettings>(() => new ImagingSettings(_configuration));
 
             return configs;

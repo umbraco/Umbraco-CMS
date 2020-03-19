@@ -11,7 +11,6 @@ namespace Umbraco.Core.Configuration
     {
         public IHostingSettings HostingSettings { get; } = new HostingSettings();
         public ICoreDebugSettings CoreDebugSettings { get; } = new CoreDebugSettings();
-        public IMachineKeyConfig MachineKeyConfig { get; } = new MachineKeyConfig();
         public IIndexCreatorSettings IndexCreatorSettings { get; } = new IndexCreatorSettings();
         public INuCacheSettings NuCacheSettings { get; } = new NuCacheSettings();
         public ITypeFinderSettings TypeFinderSettings { get; } = new TypeFinderSettings();
@@ -40,7 +39,6 @@ namespace Umbraco.Core.Configuration
             configs.Add<IHostingSettings>(() => HostingSettings);
             configs.Add<IHealthChecksSettings>(() => HealthChecksSettings);
             configs.Add<ICoreDebugSettings>(() => CoreDebugSettings);
-            configs.Add<IMachineKeyConfig>(() => MachineKeyConfig);
             configs.Add<IConnectionStrings>(() => ConnectionStrings);
             configs.Add<IModelsBuilderConfig>(() => ModelsBuilderConfig);
             configs.Add<IIndexCreatorSettings>(() => IndexCreatorSettings);
