@@ -20,7 +20,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
         private readonly IGlobalSettings _globalSettings;
         private readonly IContentSettings _contentSettings;
 
-        public EmailNotificationMethod(ILocalizedTextService textService, IRuntimeState runtimeState, ILogger logger, IGlobalSettings globalSettings, IHealthChecks healthChecks, IContentSettings contentSettings) : base(healthChecks)
+        public EmailNotificationMethod(ILocalizedTextService textService, IRuntimeState runtimeState, ILogger logger, IGlobalSettings globalSettings, IHealthChecksSettings healthChecksSettings, IContentSettings contentSettings) : base(healthChecksSettings)
         {
             var recipientEmail = Settings["recipientEmail"]?.Value;
             if (string.IsNullOrWhiteSpace(recipientEmail))

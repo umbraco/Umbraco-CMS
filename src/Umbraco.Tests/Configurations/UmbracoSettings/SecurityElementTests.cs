@@ -67,12 +67,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         }
 
         [Test]
-        public void UserPasswordConfiguration_UseLegacyEncoding()
-        {
-            Assert.IsTrue(UserPasswordConfiguration.UseLegacyEncoding == false);
-        }
-
-        [Test]
         public void UserPasswordConfiguration_HashAlgorithmType()
         {
             Assert.IsTrue(UserPasswordConfiguration.HashAlgorithmType == "HMACSHA256");
@@ -112,12 +106,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         public void MemberPasswordConfiguration_RequireUppercase()
         {
             Assert.IsTrue(MemberPasswordConfiguration.RequireUppercase == false);
-        }
-
-        [Test]
-        public void MemberPasswordConfiguration_UseLegacyEncoding()
-        {
-            Assert.IsTrue(MemberPasswordConfiguration.UseLegacyEncoding == false);
         }
 
         [Test]

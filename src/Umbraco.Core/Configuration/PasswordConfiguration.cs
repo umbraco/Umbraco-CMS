@@ -17,7 +17,6 @@ namespace Umbraco.Core.Configuration
             RequireDigit = configSettings.RequireDigit;
             RequireLowercase = configSettings.RequireLowercase;
             RequireUppercase = configSettings.RequireUppercase;
-            UseLegacyEncoding = configSettings.UseLegacyEncoding;
             HashAlgorithmType = configSettings.HashAlgorithmType;
             MaxFailedAccessAttemptsBeforeLockout = configSettings.MaxFailedAccessAttemptsBeforeLockout;
         }
@@ -31,8 +30,6 @@ namespace Umbraco.Core.Configuration
         public bool RequireLowercase { get; }
 
         public bool RequireUppercase { get; }
-
-        public bool UseLegacyEncoding { get; }
 
         public string HashAlgorithmType { get; }
 

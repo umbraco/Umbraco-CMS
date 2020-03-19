@@ -6,7 +6,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 
-namespace Umbraco.Configuration
+namespace Umbraco.Configuration.Legacy
 {
     /// <summary>
     /// Represents the models builder configuration.

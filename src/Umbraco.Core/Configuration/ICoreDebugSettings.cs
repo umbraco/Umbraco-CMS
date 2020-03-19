@@ -1,6 +1,6 @@
 namespace Umbraco.Core.Configuration
 {
-    public interface ICoreDebug
+    public interface ICoreDebugSettings
     {
         /// <summary>
         /// When set to true, Scope logs the stack trace for any scope that gets disposed without being completed.

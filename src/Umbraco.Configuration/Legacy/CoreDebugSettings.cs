@@ -3,9 +3,9 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration
 {
-    public class CoreDebug : ICoreDebug
+    public class CoreDebugSettings : ICoreDebugSettings
     {
-        public CoreDebug()
+        public CoreDebugSettings()
         {
             var appSettings = ConfigurationManager.AppSettings;
             LogUncompletedScopes = string.Equals("true", appSettings[Constants.AppSettings.Debug.LogUncompletedScopes], StringComparison.OrdinalIgnoreCase);

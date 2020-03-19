@@ -9,22 +9,21 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Configuration
 {
-    public class ConnectionStrings : IConnectionStrings
+    public class XmlConfigManipulator : IConfigManipulator
     {
+        private readonly IIOHelper _ioHelper;
+        private readonly ILogger _logger;
 
-        public ConfigConnectionString this[string key]
+        public XmlConfigManipulator(IIOHelper ioHelper, ILogger logger)
         {
-            get
-            {
-                var settings = ConfigurationManager.ConnectionStrings[key];
-                if (settings == null) return null;
-                return new ConfigConnectionString(settings.ConnectionString, settings.ProviderName, settings.Name);
-            }
+            _ioHelper = ioHelper;
+            _logger = logger;
         }
 
-        public void RemoveConnectionString(string key, IIOHelper ioHelper)
+        public void RemoveConnectionString()
         {
-            var fileName = ioHelper.MapPath(string.Format("{0}/web.config", ioHelper.Root));
+            var key = Constants.System.UmbracoConnectionName;
+            var fileName = _ioHelper.MapPath(string.Format("{0}/web.config", _ioHelper.Root));
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
             var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();
@@ -36,26 +35,30 @@ namespace Umbraco.Core.Configuration
                 xml.Save(fileName, SaveOptions.DisableFormatting);
                 ConfigurationManager.RefreshSection("appSettings");
             }
+
             var settings = ConfigurationManager.ConnectionStrings[key];
         }
 
-         /// <summary>
-        /// Saves the connection string as a proper .net connection string in web.config.
+        /// <summary>
+        ///     Saves the connection string as a proper .net connection string in web.config.
         /// </summary>
         /// <remarks>Saves the ConnectionString in the very nasty 'medium trust'-supportive way.</remarks>
         /// <param name="connectionString">The connection string.</param>
         /// <param name="providerName">The provider name.</param>
-         public void SaveConnectionString(string connectionString, string providerName, IIOHelper ioHelper)
+        public void SaveConnectionString(string connectionString, string providerName)
         {
-
             if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
-            if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(connectionString));
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+                    nameof(connectionString));
             if (providerName == null) throw new ArgumentNullException(nameof(providerName));
-            if (string.IsNullOrWhiteSpace(providerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(providerName));
+            if (string.IsNullOrWhiteSpace(providerName))
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+                    nameof(providerName));
 
 
             var fileSource = "web.config";
-            var fileName = ioHelper.MapPath(ioHelper.Root +"/" + fileSource);
+            var fileName = _ioHelper.MapPath(_ioHelper.Root + "/" + fileSource);
 
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
             if (xml.Root == null) throw new Exception($"Invalid {fileSource} file (no root).");
@@ -68,7 +71,7 @@ namespace Umbraco.Core.Configuration
             if (configSourceAttribute != null)
             {
                 fileSource = configSourceAttribute.Value;
-                fileName = ioHelper.MapPath(ioHelper.Root + "/" + fileSource);
+                fileName = _ioHelper.MapPath(_ioHelper.Root + "/" + fileSource);
 
                 if (!File.Exists(fileName))
                     throw new Exception($"Invalid configSource \"{fileSource}\" (no such file).");
@@ -77,11 +80,13 @@ namespace Umbraco.Core.Configuration
                 if (xml.Root == null) throw new Exception($"Invalid {fileSource} file (no root).");
 
                 connectionStrings = xml.Root.DescendantsAndSelf("connectionStrings").FirstOrDefault();
-                if (connectionStrings == null) throw new Exception($"Invalid {fileSource} file (no connection strings).");
+                if (connectionStrings == null)
+                    throw new Exception($"Invalid {fileSource} file (no connection strings).");
             }
 
             // create or update connection string
-            var setting = connectionStrings.Descendants("add").FirstOrDefault(s => s.Attribute("name")?.Value == Constants.System.UmbracoConnectionName);
+            var setting = connectionStrings.Descendants("add").FirstOrDefault(s =>
+                s.Attribute("name")?.Value == Constants.System.UmbracoConnectionName);
             if (setting == null)
             {
                 connectionStrings.Add(new XElement("add",
@@ -96,19 +101,18 @@ namespace Umbraco.Core.Configuration
             }
 
             // save
-            Current.Logger.Info<ConnectionStrings>("Saving connection string to {ConfigFile}.", fileSource);
+            _logger.Info<XmlConfigManipulator>("Saving connection string to {ConfigFile}.", fileSource);
             xml.Save(fileName, SaveOptions.DisableFormatting);
-            Current.Logger.Info<ConnectionStrings>("Saved connection string to {ConfigFile}.", fileSource);
+            _logger.Info<XmlConfigManipulator>("Saved connection string to {ConfigFile}.", fileSource);
         }
 
-         private static void AddOrUpdateAttribute(XElement element, string name, string value)
-         {
-             var attribute = element.Attribute(name);
-             if (attribute == null)
-                 element.Add(new XAttribute(name, value));
-             else
-                 attribute.Value = value;
-         }
-
+        private static void AddOrUpdateAttribute(XElement element, string name, string value)
+        {
+            var attribute = element.Attribute(name);
+            if (attribute == null)
+                element.Add(new XAttribute(name, value));
+            else
+                attribute.Value = value;
+        }
     }
 }

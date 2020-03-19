@@ -2,9 +2,9 @@
 using System.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 
-namespace Umbraco.Core.Configuration.Implementations
+namespace Umbraco.Core.Configuration.Legacy
 {
-    public class HealthChecksSettings : IHealthChecks
+    public class HealthChecksSettings : IHealthChecksSettings
     {
         private HealthChecksSection _healthChecksSection;
 
