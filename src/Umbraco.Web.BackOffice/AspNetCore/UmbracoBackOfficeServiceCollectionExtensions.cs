@@ -25,9 +25,6 @@ namespace Umbraco.Web.BackOffice.AspNetCore
 
             var configs = configsFactory.Create();
 
-            var x = configs.GetConfig<IRequestHandlerSettings>();
-
-            var y = x.CharCollection;
             services.AddSingleton(configs);
 
             return services;
