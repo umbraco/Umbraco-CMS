@@ -10,8 +10,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects.Accessors;
-using Umbraco.Web.Security;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Tests.Web

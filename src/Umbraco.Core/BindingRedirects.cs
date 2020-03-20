@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using System.Web;
-using Umbraco.Core;
 
 // no binding redirect for now = de-activate
 //[assembly: PreApplicationStartMethod(typeof(BindingRedirects), "Initialize")]

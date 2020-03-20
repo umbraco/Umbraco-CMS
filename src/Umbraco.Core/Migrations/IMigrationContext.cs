@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Umbraco.Core.Logging;
+﻿using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Migrations

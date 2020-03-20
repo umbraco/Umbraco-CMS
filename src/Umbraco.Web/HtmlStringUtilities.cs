@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Web;
 using HtmlAgilityPack;
-using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web
 {

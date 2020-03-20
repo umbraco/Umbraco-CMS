@@ -12,9 +12,7 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.Persistence
 {

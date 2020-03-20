@@ -2,7 +2,6 @@
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {

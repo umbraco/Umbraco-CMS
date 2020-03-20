@@ -6,12 +6,10 @@ using System.Linq;
 using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 

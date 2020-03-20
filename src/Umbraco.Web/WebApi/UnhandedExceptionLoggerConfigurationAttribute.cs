@@ -1,12 +1,6 @@
-﻿using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Web.Http.Controllers;
+﻿using System.Web.Http.Controllers;
 using System.Web.Http.ExceptionHandling;
 using System.Web.Http.Filters;
-using Umbraco.Core;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.WebApi
 {

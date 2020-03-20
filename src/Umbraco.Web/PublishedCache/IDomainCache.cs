@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Umbraco.Core.Models.PublishedContent;
+﻿using System.Collections.Generic;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.PublishedCache

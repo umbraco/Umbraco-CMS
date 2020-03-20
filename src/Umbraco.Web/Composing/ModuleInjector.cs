@@ -1,6 +1,5 @@
 ﻿using System.Web;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Web.Composing

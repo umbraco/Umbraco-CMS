@@ -1,9 +1,4 @@
-﻿using System.IO;
-using NUnit.Framework;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models.Packaging;
-using Umbraco.Core.Services.Implement;
-using Umbraco.Tests.TestHelpers;
+﻿using NUnit.Framework;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services

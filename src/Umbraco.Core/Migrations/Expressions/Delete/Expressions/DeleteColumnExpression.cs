@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using NPoco;
 
 namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
 {

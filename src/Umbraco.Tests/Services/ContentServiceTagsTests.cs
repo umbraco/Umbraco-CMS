@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Umbraco.Core.Composing;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;

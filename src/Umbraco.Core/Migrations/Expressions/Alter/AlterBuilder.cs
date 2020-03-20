@@ -1,5 +1,4 @@
-﻿using NPoco;
-using Umbraco.Core.Migrations.Expressions.Alter.Expressions;
+﻿using Umbraco.Core.Migrations.Expressions.Alter.Expressions;
 using Umbraco.Core.Migrations.Expressions.Alter.Table;
 
 namespace Umbraco.Core.Migrations.Expressions.Alter

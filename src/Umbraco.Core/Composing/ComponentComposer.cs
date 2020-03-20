@@ -1,6 +1,4 @@
-﻿using Umbraco.Core.Compose;
-
-namespace Umbraco.Core.Composing
+﻿namespace Umbraco.Core.Composing
 {
     /// <summary>
     /// Provides a base class for composers which compose a component.

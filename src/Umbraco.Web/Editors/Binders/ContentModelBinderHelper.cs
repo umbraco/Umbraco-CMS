@@ -4,7 +4,6 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi;

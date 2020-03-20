@@ -6,8 +6,6 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.Persistence.FaultHandling
 {

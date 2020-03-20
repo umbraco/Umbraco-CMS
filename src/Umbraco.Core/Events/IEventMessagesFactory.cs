@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Umbraco.Core.Events
+﻿namespace Umbraco.Core.Events
 {
     /// <summary>
     /// Event messages factory

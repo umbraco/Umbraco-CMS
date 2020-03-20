@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Net;
-using System.Net.Http;
 using System.Web.Mvc;
 using Umbraco.Core;
 

@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Umbraco.Core.Models;
+﻿using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Strings
 {

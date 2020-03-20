@@ -1,8 +1,6 @@
 ﻿using System;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
 using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.Persistence.Repositories.Implement;

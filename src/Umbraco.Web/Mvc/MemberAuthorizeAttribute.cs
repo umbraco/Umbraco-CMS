@@ -4,7 +4,6 @@ using System.Web.Mvc;
 using AuthorizeAttribute = System.Web.Mvc.AuthorizeAttribute;
 using Umbraco.Core;
 using Umbraco.Web.Security;
-using Umbraco.Core.Composing;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Mvc

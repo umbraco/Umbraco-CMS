@@ -1,6 +1,5 @@
 ﻿using Examine;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
 
 namespace Umbraco.Examine
 {

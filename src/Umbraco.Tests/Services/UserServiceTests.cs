@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Tests.TestHelpers.Entities;

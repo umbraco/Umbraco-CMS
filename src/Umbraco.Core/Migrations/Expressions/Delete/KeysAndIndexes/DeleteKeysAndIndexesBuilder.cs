@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using NPoco;
-using Umbraco.Core;
 using Umbraco.Core.Migrations.Expressions.Common;
 using Umbraco.Core.Persistence.SqlSyntax;
 

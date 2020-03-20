@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0

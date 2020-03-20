@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Diagnosers;
 using Moq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;

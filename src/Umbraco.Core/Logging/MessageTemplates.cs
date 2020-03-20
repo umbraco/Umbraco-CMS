@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Serilog;
 using Serilog.Events;
 using Serilog.Parsing;

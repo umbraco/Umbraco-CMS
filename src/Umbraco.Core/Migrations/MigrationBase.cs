@@ -1,5 +1,4 @@
-﻿using System;
-using NPoco;
+﻿using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Expressions.Alter;
 using Umbraco.Core.Migrations.Expressions.Create;

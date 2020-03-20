@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Core.Logging;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Scheduling;
 
 namespace Umbraco.Tests.Scheduling

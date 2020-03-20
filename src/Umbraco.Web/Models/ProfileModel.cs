@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 using Umbraco.Web.Security;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Models

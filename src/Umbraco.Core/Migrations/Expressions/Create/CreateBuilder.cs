@@ -1,5 +1,4 @@
 ﻿using System;
-using NPoco;
 using Umbraco.Core.Migrations.Expressions.Common;
 using Umbraco.Core.Migrations.Expressions.Common.Expressions;
 using Umbraco.Core.Migrations.Expressions.Create.Column;

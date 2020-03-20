@@ -1,6 +1,4 @@
-﻿using NPoco;
-
-namespace Umbraco.Core.Migrations.Expressions.Alter.Expressions
+﻿namespace Umbraco.Core.Migrations.Expressions.Alter.Expressions
 {
     public class AlterTableExpression : MigrationExpressionBase
     {

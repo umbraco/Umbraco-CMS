@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;

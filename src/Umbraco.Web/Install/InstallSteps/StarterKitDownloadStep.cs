@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Packaging;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps

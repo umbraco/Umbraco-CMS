@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models

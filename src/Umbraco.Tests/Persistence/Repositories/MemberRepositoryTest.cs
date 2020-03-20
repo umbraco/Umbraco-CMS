@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Xml.Linq;
 using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;

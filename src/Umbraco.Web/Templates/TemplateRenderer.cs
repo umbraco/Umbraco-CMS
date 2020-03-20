@@ -1,19 +1,14 @@
 using System;
-using System.Collections;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
-using Umbraco.Core;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Services;
-using Umbraco.Web.Macros;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Templates
 {

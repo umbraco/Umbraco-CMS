@@ -1,5 +1,4 @@
-﻿using Umbraco.Core.Compose;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Logging.Viewer
 {

@@ -2,13 +2,10 @@
 using System.Data;
 using Moq;
 using NUnit.Framework;
-using Semver;
 using Umbraco.Core.Events;
 using Umbraco.Core.Migrations;
-using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
 using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Migrations

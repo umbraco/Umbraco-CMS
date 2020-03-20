@@ -1,6 +1,4 @@
 ﻿using System.Web.Mvc;
-using System.Web.UI;
-using ClientDependency.Core;
 using ClientDependency.Core.CompositeFiles;
 
 namespace Umbraco.Web.Mvc

@@ -5,7 +5,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Scoping;
 using Umbraco.Web.PublishedCache.NuCache;
-using Umbraco.Web.PublishedCache.NuCache.Snap;
 
 namespace Umbraco.Tests.Cache
 {

@@ -4,9 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Core.Persistence;
 

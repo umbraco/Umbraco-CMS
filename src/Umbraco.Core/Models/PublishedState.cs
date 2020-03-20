@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Umbraco.Core.Models
+﻿namespace Umbraco.Core.Models
 {
 
     /// <summary>

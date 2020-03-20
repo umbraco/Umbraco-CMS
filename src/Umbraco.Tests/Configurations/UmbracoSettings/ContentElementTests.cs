@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Macros;
 
@@ -47,7 +45,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         {
             Assert.IsTrue(SettingsSection.Content.ImageFileTypes.All(x => "jpeg,jpg,gif,bmp,png,tiff,tif".Split(',').Contains(x)));
         }
-        
+
         [Test]
         public virtual void ImageAutoFillProperties()
         {
@@ -63,7 +61,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.AreEqual(SettingsSection.Content.ImageAutoFillProperties.ElementAt(1).LengthFieldAlias, "umbracoBytes2");
             Assert.AreEqual(SettingsSection.Content.ImageAutoFillProperties.ElementAt(1).ExtensionFieldAlias, "umbracoExtension2");
         }
-        
+
         [Test]
         public void PreviewBadge()
         {

@@ -2,7 +2,6 @@ using System;
 using System.Web.Mvc;
 using Umbraco.Web.Routing;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Current = Umbraco.Web.Composing.Current;
 

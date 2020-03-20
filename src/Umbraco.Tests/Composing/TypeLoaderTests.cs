@@ -8,13 +8,10 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
-using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.Composing
 {

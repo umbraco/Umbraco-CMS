@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using Umbraco.Core;
 
 namespace Umbraco.Tests.Models.Collections
 {

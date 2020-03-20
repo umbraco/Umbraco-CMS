@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
 {

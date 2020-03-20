@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Configuration;
-using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;

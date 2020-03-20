@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Web;
-using System.Web.Routing;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Configuration

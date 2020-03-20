@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using NUnit.Framework;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Serialization;
 

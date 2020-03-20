@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Models;

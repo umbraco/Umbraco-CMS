@@ -1,5 +1,4 @@
-﻿using NPoco;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Migrations.Expressions.Alter.Expressions
 {

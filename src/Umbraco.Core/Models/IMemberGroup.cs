@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core.Models.Entities;
+﻿using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {

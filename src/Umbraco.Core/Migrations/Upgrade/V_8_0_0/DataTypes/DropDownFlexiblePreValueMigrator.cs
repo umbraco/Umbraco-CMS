@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes

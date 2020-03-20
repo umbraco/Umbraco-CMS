@@ -1,12 +1,8 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using System.Linq;
-using Umbraco.Core.Services;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Publishing

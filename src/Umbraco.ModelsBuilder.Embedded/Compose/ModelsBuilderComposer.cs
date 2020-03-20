@@ -8,7 +8,6 @@ using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.ModelsBuilder.Embedded.Configuration;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache.NuCache;
-using Umbraco.Web.Features;
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {

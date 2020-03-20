@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Security;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Security;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Security
 {

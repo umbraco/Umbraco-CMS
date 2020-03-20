@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Web;
-using System.Web.Compilation;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
@@ -10,7 +9,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
-using System.Collections.Generic;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.Features;
 

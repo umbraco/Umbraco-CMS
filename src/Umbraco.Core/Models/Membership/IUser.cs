@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models.Membership

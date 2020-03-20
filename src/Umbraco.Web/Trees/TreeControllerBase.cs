@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Http.ModelBinding;
@@ -15,7 +14,6 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Validation;
 
 namespace Umbraco.Web.Models.ContentEditing

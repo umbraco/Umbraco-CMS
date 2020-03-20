@@ -4,9 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Web.Hosting;
-using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Runtime
 {

@@ -2,8 +2,6 @@
 using System.Globalization;
 using System.IO;
 using System.Threading;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.IO.MediaPathSchemes
 {

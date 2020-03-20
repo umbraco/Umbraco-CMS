@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Models
 {

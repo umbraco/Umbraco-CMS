@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Examine;
-using Umbraco.Examine;
+﻿using Umbraco.Examine;
 
 namespace Umbraco.Web.Search
 {

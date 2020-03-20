@@ -10,9 +10,7 @@ using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Security;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Security
 {

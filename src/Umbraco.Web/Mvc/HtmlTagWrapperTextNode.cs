@@ -1,6 +1,4 @@
-﻿using Umbraco.Core;
-
-namespace Umbraco.Web.Mvc
+﻿namespace Umbraco.Web.Mvc
 {
     public class HtmlTagWrapperTextNode : IHtmlTagWrapper
     {

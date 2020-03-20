@@ -2,8 +2,6 @@
 {
     using System.Runtime.Serialization;
 
-    using Umbraco.Core.Events;
-
     /// <summary>
     /// Represents a content app badge
     /// </summary>

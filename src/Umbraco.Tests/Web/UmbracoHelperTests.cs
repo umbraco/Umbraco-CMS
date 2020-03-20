@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Text;
-using Examine.LuceneEngine;
-using Lucene.Net.Analysis;
-using Lucene.Net.Analysis.Standard;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;

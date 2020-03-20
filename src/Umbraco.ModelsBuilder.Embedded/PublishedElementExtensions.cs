@@ -2,7 +2,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.ModelsBuilder;
 using Umbraco.ModelsBuilder.Embedded;
 
 // same namespace as original Umbraco.Web PublishedElementExtensions

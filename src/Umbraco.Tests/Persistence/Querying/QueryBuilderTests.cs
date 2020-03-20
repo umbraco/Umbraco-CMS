@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;

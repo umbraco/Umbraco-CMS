@@ -1,10 +1,8 @@
 using System;
-using System.Text;
 using System.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Xml;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Routing

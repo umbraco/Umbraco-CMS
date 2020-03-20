@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Umbraco.Core;
+﻿using System.Collections.Generic;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Composing;

@@ -2,10 +2,8 @@
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Cache;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
 using Umbraco.Web.Security;
 

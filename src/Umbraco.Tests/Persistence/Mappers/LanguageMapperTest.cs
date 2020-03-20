@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Tests.Persistence.Mappers
 {

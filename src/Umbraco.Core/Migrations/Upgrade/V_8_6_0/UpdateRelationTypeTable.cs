@@ -1,8 +1,5 @@
-﻿using Umbraco.Core.Persistence.Dtos;
-
-namespace Umbraco.Core.Migrations.Upgrade.V_8_6_0
+﻿namespace Umbraco.Core.Migrations.Upgrade.V_8_6_0
 {
-
     public class UpdateRelationTypeTable : MigrationBase
     {
         public UpdateRelationTypeTable(IMigrationContext context)
@@ -11,7 +8,6 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_6_0
 
         public override void Migrate()
         {
-
             Alter.Table(Constants.DatabaseSchema.Tables.RelationType).AlterColumn("parentObjectType").AsGuid().Nullable().Do();
             Alter.Table(Constants.DatabaseSchema.Tables.RelationType).AlterColumn("childObjectType").AsGuid().Nullable().Do();
 

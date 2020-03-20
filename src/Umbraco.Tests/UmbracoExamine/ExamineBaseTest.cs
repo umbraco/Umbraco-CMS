@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using NUnit.Framework;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Strings;

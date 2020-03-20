@@ -15,7 +15,6 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services.Implement
 {

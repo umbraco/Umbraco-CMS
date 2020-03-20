@@ -1,7 +1,6 @@
 ﻿using System;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 
 namespace Umbraco.Web.Cache

@@ -1,10 +1,6 @@
 ﻿using System.Linq;
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Reflection;
 using System.Web;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Models;

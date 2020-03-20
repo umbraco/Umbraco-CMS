@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Umbraco.Core.Models.Entities
+﻿namespace Umbraco.Core.Models.Entities
 {
     /// <summary>
     /// Represents an entity that can be managed by the entity service.

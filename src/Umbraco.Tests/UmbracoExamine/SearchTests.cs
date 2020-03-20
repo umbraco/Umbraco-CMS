@@ -11,7 +11,6 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Testing;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Composing;
 using Umbraco.Examine;
 
 namespace Umbraco.Tests.UmbracoExamine

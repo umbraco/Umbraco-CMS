@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Packaging
 {

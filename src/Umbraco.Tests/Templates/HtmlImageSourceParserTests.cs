@@ -1,5 +1,4 @@
-﻿using Umbraco.Core.Logging;
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Templates;

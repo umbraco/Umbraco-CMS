@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Configuration;
+﻿using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {

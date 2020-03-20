@@ -1,5 +1,4 @@
-﻿using NPoco;
-using Umbraco.Core.Migrations.Expressions.Insert.Expressions;
+﻿using Umbraco.Core.Migrations.Expressions.Insert.Expressions;
 
 namespace Umbraco.Core.Migrations.Expressions.Insert
 {

@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Semver;
 using Umbraco.Core.Events;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;

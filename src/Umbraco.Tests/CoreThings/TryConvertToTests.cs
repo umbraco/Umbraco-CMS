@@ -1,7 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Testing;

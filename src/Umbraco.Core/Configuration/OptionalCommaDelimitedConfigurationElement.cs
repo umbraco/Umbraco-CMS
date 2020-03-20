@@ -1,5 +1,4 @@
 ﻿using System.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Core.Configuration
 {

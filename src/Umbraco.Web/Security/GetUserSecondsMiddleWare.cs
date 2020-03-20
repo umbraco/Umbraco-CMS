@@ -8,7 +8,6 @@ using Microsoft.Owin.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {

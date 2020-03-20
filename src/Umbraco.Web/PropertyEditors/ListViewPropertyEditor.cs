@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 

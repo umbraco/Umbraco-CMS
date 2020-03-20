@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Linq;
-using System.Collections;
 using System.IO;
 using System.Web;
-using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Web.Templates;
 using System.Collections.Generic;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Macros;
 
 namespace Umbraco.Web

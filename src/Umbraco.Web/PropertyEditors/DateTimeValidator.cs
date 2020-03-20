@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core;
 

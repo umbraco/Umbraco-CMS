@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes

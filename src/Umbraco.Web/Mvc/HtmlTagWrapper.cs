@@ -3,7 +3,6 @@ using System.Linq;
 using System.Web.UI;
 using System.IO;
 using System.Web;
-using Umbraco.Core;
 
 namespace Umbraco.Web.Mvc
 {

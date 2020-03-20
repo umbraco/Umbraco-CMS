@@ -1,6 +1,5 @@
 ﻿using System;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Collections;
 
 namespace Umbraco.Tests.Collections

@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using NUnit.Framework;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Strings

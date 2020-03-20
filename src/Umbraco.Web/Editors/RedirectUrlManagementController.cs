@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Web.Http;
 using System.Xml;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using Umbraco.Core.Logging;

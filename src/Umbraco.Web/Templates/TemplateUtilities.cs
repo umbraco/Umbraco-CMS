@@ -1,17 +1,11 @@
-﻿using HtmlAgilityPack;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System;
 using Umbraco.Core;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PropertyEditors;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using File = System.IO.File;
 
 namespace Umbraco.Web.Templates
 {

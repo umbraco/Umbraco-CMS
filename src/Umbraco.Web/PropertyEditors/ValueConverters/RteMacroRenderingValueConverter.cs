@@ -1,15 +1,11 @@
 ﻿using System.Text;
 using Umbraco.Core;
-using Umbraco.Core.Macros;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Templates;
 using System.Linq;
 using HtmlAgilityPack;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Macros;
 using System.Web;
 

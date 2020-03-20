@@ -1,5 +1,4 @@
-﻿using Examine;
-using Umbraco.Core.Models;
+﻿using Umbraco.Core.Models;
 
 namespace Umbraco.Examine
 {

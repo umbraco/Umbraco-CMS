@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using Examine;
-using Umbraco.Core;
+﻿using Examine;
 
 namespace Umbraco.Examine
 {

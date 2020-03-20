@@ -8,8 +8,6 @@ using Umbraco.Core.Xml;
 
 namespace Umbraco.Web
 {
-    using Examine = global::Examine;
-
     /// <summary>
     /// Query methods used for accessing strongly typed content in templates
     /// </summary>

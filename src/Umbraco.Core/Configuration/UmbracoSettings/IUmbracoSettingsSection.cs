@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Umbraco.Core.Configuration.UmbracoSettings
+﻿namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     public interface IUmbracoSettingsSection : IUmbracoConfigurationSection
     {

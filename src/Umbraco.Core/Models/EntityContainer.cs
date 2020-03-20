@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models

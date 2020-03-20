@@ -1,5 +1,4 @@
-﻿using System.Text;
-using System.Web;
+﻿using System.Web;
 using Newtonsoft.Json;
 
 namespace Umbraco.Web.Media.EmbedProviders

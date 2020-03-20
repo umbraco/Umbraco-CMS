@@ -3,7 +3,6 @@ using System.IO;
 using System.Web;
 using System.Web.Routing;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Configuration;
 using System.Threading;
 using System.Collections.Generic;

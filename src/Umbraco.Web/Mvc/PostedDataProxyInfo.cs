@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Umbraco.Web.Mvc
+﻿namespace Umbraco.Web.Mvc
 {
     /// <summary>
     /// Represents the data required to proxy a request to a surface controller for posted data

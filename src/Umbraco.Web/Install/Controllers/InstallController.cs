@@ -4,7 +4,6 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;

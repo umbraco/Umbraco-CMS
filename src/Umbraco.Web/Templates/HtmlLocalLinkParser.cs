@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Templates
 {

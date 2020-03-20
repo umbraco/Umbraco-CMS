@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using Umbraco.Core.CodeAnnotations;
+﻿using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Models
 {

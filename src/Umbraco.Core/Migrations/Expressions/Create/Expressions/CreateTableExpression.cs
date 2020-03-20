@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using NPoco;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Migrations.Expressions.Create.Expressions

@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Services;

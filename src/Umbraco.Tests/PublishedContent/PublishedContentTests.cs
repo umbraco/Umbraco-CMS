@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -11,7 +10,6 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Composing;
 using Moq;
-using Newtonsoft.Json;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
@@ -22,7 +20,6 @@ using Umbraco.Tests.Testing;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Templates;
-using Umbraco.Web.Models;
 
 namespace Umbraco.Tests.PublishedContent
 {

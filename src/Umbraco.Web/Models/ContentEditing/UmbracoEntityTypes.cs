@@ -1,7 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-
-namespace Umbraco.Web.Models.ContentEditing
+﻿namespace Umbraco.Web.Models.ContentEditing
 {
     /// <summary>
     /// Represents the type's of Umbraco entities that can be resolved from the EntityController

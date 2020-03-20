@@ -1,6 +1,5 @@
 using Umbraco.Core.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using System.Globalization;

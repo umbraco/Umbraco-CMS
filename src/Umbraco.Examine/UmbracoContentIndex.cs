@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 using Examine;
-using Umbraco.Core;
 using Umbraco.Core.Services;
 using Lucene.Net.Analysis;
 using Lucene.Net.Store;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Examine.LuceneEngine;
 

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;

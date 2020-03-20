@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using NUnit.Framework;
-using Umbraco.Web;
+﻿using NUnit.Framework;
 
 namespace Umbraco.Tests.PublishedContent
 {

@@ -1,6 +1,5 @@
 using Examine;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Examine
 {

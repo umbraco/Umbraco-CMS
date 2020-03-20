@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using NUnit.Framework;
-using Umbraco.Web.Editors;
+﻿using NUnit.Framework;
 
 namespace Umbraco.Tests.Web.Controllers
 {

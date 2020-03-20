@@ -1,6 +1,5 @@
 ﻿using System.Runtime.Serialization;
 using Umbraco.Core.Models;
-using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Models.ContentEditing
 {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Composing;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 

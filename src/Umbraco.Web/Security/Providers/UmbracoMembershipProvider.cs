@@ -3,7 +3,6 @@ using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Linq;
 using System.Text;
-using System.Web;
 using System.Web.Configuration;
 using System.Web.Security;
 using Umbraco.Core;
@@ -14,7 +13,6 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Web.Security.Providers
 {

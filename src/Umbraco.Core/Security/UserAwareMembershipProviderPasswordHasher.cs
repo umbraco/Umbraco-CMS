@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNet.Identity;
+﻿using Microsoft.AspNet.Identity;
 using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Core.Security

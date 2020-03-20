@@ -7,7 +7,6 @@ using Lucene.Net.Search;
 using NUnit.Framework;
 using Umbraco.Tests.Testing;
 using Umbraco.Examine;
-using Umbraco.Core.Composing;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Models;

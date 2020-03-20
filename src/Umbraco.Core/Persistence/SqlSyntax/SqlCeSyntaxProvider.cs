@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlServerCe;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;

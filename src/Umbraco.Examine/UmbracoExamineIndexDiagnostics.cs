@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Lucene.Net.Store;
-using Umbraco.Core;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Examine

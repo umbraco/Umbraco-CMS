@@ -4,7 +4,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Models.ContentEditing
 {

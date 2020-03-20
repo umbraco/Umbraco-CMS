@@ -5,7 +5,6 @@ using System.Threading;
 using Serilog;
 using Serilog.Events;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Diagnostics;
 
 namespace Umbraco.Core.Logging.Serilog

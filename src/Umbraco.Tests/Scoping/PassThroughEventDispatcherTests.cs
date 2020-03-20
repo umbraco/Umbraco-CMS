@@ -1,9 +1,4 @@
-﻿using System;
-using Moq;
-using NUnit.Framework;
-using Umbraco.Core.Events;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Scoping;
+﻿using NUnit.Framework;
 
 namespace Umbraco.Tests.Scoping
 {

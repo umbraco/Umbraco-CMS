@@ -4,7 +4,6 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Lucene.Net.Store;
 using Umbraco.Core.IO;
-using System.Linq;
 
 namespace Umbraco.Examine
 {

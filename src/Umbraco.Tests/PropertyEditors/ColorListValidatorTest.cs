@@ -3,7 +3,6 @@ using Moq;
 using NUnit.Framework;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Services;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.PropertyEditors

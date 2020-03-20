@@ -1,5 +1,4 @@
-﻿using NPoco;
-using Umbraco.Core.Migrations.Expressions.Rename.Column;
+﻿using Umbraco.Core.Migrations.Expressions.Rename.Column;
 using Umbraco.Core.Migrations.Expressions.Rename.Expressions;
 using Umbraco.Core.Migrations.Expressions.Rename.Table;
 

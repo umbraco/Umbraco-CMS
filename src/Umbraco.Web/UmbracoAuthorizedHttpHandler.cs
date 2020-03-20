@@ -1,7 +1,5 @@
-﻿using System;
-using System.Security;
+﻿using System.Security;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Security;
 using Umbraco.Core.Models.Membership;

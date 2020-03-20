@@ -5,9 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models.Validation;
 
 namespace Umbraco.Web.Models.ContentEditing
 {

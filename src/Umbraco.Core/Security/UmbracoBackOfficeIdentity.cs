@@ -1,15 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Security.Claims;
-using System.Security.Principal;
-using System.Web;
-using System.Web.Security;
 using Microsoft.AspNet.Identity;
-using Microsoft.Owin.Security;
-using Newtonsoft.Json;
-using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Security
 {

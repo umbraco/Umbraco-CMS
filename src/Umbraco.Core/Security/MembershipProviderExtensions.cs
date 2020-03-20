@@ -4,8 +4,6 @@ using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.Security;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 

@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http.Filters;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using File = System.IO.File;

@@ -12,7 +12,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
-using System.Globalization;
 using Umbraco.Core.Models.Entities;
 using System.Web.Http.ModelBinding;
 using Umbraco.Web.Actions;

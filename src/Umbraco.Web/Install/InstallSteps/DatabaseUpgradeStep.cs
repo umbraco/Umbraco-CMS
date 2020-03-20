@@ -1,5 +1,4 @@
-﻿using System;
-using System.Configuration;
+﻿using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using Umbraco.Core;
@@ -7,7 +6,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Web.Install.Models;
-using Umbraco.Web.Migrations;
 using Umbraco.Web.Migrations.PostMigrations;
 
 namespace Umbraco.Web.Install.InstallSteps

@@ -6,10 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Text;
-using System.Web;
 using System.Web.Compilation;
-using System.Web.Hosting;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Composing

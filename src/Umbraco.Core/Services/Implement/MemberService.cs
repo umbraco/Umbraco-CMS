@@ -4,7 +4,6 @@ using System.Linq;
 using System.Web.Security;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;

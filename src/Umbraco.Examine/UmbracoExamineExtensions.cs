@@ -1,5 +1,4 @@
-﻿using Examine.LuceneEngine.Search;
-using Examine.Search;
+﻿using Examine.Search;
 using Umbraco.Core;
 
 namespace Umbraco.Examine

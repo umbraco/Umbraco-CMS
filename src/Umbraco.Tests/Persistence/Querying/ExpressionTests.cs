@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Linq.Expressions;
 using Moq;
-using NPoco;
 using NUnit.Framework;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;

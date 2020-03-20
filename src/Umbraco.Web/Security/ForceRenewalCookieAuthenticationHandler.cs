@@ -3,7 +3,6 @@ using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Infrastructure;
 using Umbraco.Core;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-using System.Web.Mvc;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 

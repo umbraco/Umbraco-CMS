@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Runtime.Remoting.Messaging;
-using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Persistence;

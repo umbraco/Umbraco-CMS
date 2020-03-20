@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
-using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
 {

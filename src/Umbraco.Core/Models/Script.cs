@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Models
 {

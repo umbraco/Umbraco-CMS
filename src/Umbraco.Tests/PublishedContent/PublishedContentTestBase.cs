@@ -5,14 +5,12 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Tests.TestHelpers;
 using Moq;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.Templates;
-using Umbraco.Web.Models;
 
 namespace Umbraco.Tests.PublishedContent
 {

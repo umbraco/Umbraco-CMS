@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using System.Web;
-using System.Web.Http.ModelBinding;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Logging;

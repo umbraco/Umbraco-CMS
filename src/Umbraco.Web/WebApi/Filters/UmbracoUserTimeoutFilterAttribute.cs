@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.Web.Http.Filters;
-using Umbraco.Core.Security;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.WebApi.Filters

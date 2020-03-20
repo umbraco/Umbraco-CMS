@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Web.Http;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -7,7 +6,6 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Web.Editors;
 
 namespace Umbraco.Tests.Web.Controllers
 {

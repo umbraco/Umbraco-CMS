@@ -1,6 +1,5 @@
 ﻿using System;
 using NPoco;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Models;

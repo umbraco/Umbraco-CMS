@@ -6,7 +6,6 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.WebApi.Filters
 {

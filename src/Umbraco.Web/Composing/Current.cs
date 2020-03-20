@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Dictionary;
