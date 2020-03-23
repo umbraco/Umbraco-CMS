@@ -42,7 +42,7 @@ namespace Umbraco.Web.Security
             TicketDataFormat = new UmbracoSecureDataFormat(LoginTimeoutMinutes, secureDataFormat1);
 
             //Custom cookie manager so we can filter requests
-            CookieManager = new BackOfficeCookieManager(umbracoContextAccessor, runtimeState, globalSettings, ioHelper, requestCache, explicitPaths);
+            CookieManager = new BackOfficeCookieManager(umbracoContextAccessor, runtimeState, ioHelper, requestCache, explicitPaths);
         }
 
         /// <summary>

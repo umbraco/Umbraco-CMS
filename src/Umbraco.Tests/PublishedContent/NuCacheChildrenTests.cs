@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Legacy;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Install;
@@ -61,7 +62,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var configs = TestHelper.GetConfigs();
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);
-            var globalSettings = new GlobalSettings(TestHelper.IOHelper);
+            var globalSettings = new GlobalSettings();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
             configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
             configs.Add<IGlobalSettings>(() => globalSettings);
@@ -167,7 +168,6 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IEntityXmlSerializer>(),
                 PublishedModelFactory,
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
-                typeFinder,
                 hostingEnvironment,
                 new MockShortStringHelper(),
                 TestHelper.IOHelper,

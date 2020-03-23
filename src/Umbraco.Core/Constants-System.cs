@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core
+﻿ namespace Umbraco.Core
 {
     public static partial class Constants
     {

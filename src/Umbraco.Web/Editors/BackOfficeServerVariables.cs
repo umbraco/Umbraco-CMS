@@ -347,7 +347,7 @@ namespace Umbraco.Web.Editors
                 {
                     "umbracoSettings", new Dictionary<string, object>
                     {
-                        {"umbracoPath", _globalSettings.Path},
+                        {"umbracoPath", _ioHelper.BackOfficePath},
                         {"mediaPath", _ioHelper.ResolveUrl(globalSettings.UmbracoMediaPath).TrimEnd('/')},
                         {"appPluginsPath", _ioHelper.ResolveUrl(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
                         {

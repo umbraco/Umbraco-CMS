@@ -30,15 +30,15 @@ namespace Umbraco.Tests.Common
         public TestHelperBase()
         {
             SettingsForTests = new SettingsForTests();
-            IOHelper = new IOHelper(GetHostingEnvironment());
+            IOHelper = new IOHelper(GetHostingEnvironment(), SettingsForTests.GenerateMockGlobalSettings());
             MainDom = new MainDom(Mock.Of<ILogger>(), GetHostingEnvironment(), new MainDomSemaphoreLock(Mock.Of<ILogger>(), GetHostingEnvironment()));
-            UriUtility = new UriUtility(GetHostingEnvironment());            
+            UriUtility = new UriUtility(GetHostingEnvironment());
         }
 
         public ITypeFinder GetTypeFinder()
         {
-            
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>(),                
+
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>(),
                 new DefaultUmbracoAssemblyProvider(typeof(TestHelperBase).Assembly));
             return typeFinder;
         }
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Common
 
         public Configs GetConfigs()
         {
-            return GetConfigsFactory().Create(IOHelper, Mock.Of<ILogger>());
+            return GetConfigsFactory().Create();
         }
         public IRuntimeState GetRuntimeState()
         {
@@ -93,7 +93,7 @@ namespace Umbraco.Tests.Common
         public abstract IDbProviderFactoryCreator DbProviderFactoryCreator { get; }
         public abstract IBulkSqlInsertProvider BulkSqlInsertProvider { get; }
         public abstract IMarchal Marchal { get; }
-        public ICoreDebug CoreDebug { get; } =  new CoreDebug();
+        public ICoreDebugSettings CoreDebugSettings { get; } =  new CoreDebugSettings();
 
 
         public IIOHelper IOHelper { get; }

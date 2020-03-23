@@ -235,7 +235,7 @@ namespace Umbraco.Web.Security
             var cookieAuthOptions = app.CreateUmbracoCookieAuthOptions(
                 umbracoContextAccessor, globalSettings, runtimeState, securitySettings,
                 //This defines the explicit path read cookies from for this middleware
-                ioHelper, requestCache, new[] {$"{globalSettings.Path}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds"});
+                ioHelper, requestCache, new[] {$"{ioHelper.BackOfficePath}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds"});
             cookieAuthOptions.Provider = cookieOptions.Provider;
 
             //This is a custom middleware, we need to return the user's remaining logged in seconds
@@ -243,7 +243,8 @@ namespace Umbraco.Web.Security
                 cookieAuthOptions,
                 Current.Configs.Global(),
                 Current.Configs.Security(),
-                app.CreateLogger<GetUserSecondsMiddleWare>());
+                app.CreateLogger<GetUserSecondsMiddleWare>(),
+                Current.IOHelper);
 
             //This is required so that we can read the auth ticket format outside of this pipeline
             app.CreatePerOwinContext<UmbracoAuthTicketDataProtector>(
@@ -344,7 +345,7 @@ namespace Umbraco.Web.Security
                 CookieName = Constants.Security.BackOfficeExternalCookieName,
                 ExpireTimeSpan = TimeSpan.FromMinutes(5),
                 //Custom cookie manager so we can filter requests
-                CookieManager = new BackOfficeCookieManager(umbracoContextAccessor, runtimeState, globalSettings, ioHelper, requestCache),
+                CookieManager = new BackOfficeCookieManager(umbracoContextAccessor, runtimeState, ioHelper, requestCache),
                 CookiePath = "/",
                 CookieSecure = globalSettings.UseHttps ? CookieSecureOption.Always : CookieSecureOption.SameAsRequest,
                 CookieHttpOnly = true,
@@ -396,7 +397,7 @@ namespace Umbraco.Web.Security
             if (runtimeState.Level != RuntimeLevel.Run) return app;
 
             var authOptions = app.CreateUmbracoCookieAuthOptions(umbracoContextAccessor, globalSettings, runtimeState, securitySettings, ioHelper, requestCache);
-            app.Use(typeof(PreviewAuthenticationMiddleware),  authOptions, Current.Configs.Global(), ioHelper);
+            app.Use(typeof(PreviewAuthenticationMiddleware),  authOptions, ioHelper);
 
             // This middleware must execute at least on PostAuthentication, by default it is on Authorize
             // The middleware needs to execute after the RoleManagerModule executes which is during PostAuthenticate,

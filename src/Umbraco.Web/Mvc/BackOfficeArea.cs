@@ -11,12 +11,10 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     internal class BackOfficeArea : AreaRegistration
     {
-        private readonly IGlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
 
-        public BackOfficeArea(IGlobalSettings globalSettings, IIOHelper ioHelper)
+        public BackOfficeArea(IIOHelper ioHelper)
         {
-            _globalSettings = globalSettings;
             _ioHelper = ioHelper;
         }
 
@@ -51,6 +49,6 @@ namespace Umbraco.Web.Mvc
                 new[] {typeof (BackOfficeController).Namespace});
         }
 
-        public override string AreaName => _globalSettings.GetUmbracoMvcArea(_ioHelper);
+        public override string AreaName => _ioHelper.GetUmbracoMvcArea();
     }
 }

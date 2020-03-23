@@ -72,11 +72,6 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         public string FormatPasswordForStorage(string hashedPassword, string salt)
         {
-            if (PasswordConfiguration.UseLegacyEncoding)
-            {
-                return hashedPassword;
-            }
-
             return salt + hashedPassword;
         }
 
@@ -88,13 +83,6 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         public string HashPassword(string pass, string salt)
         {
-            //if we are doing it the old way
-
-            if (PasswordConfiguration.UseLegacyEncoding)
-            {
-                return LegacyEncodePassword(pass);
-            }
-
             //This is the correct way to implement this (as per the sql membership provider)
 
             var bytes = Encoding.Unicode.GetBytes(pass);
@@ -183,11 +171,6 @@ namespace Umbraco.Core.Security
         public string ParseStoredHashPassword(string storedString, out string salt)
         {
             if (string.IsNullOrWhiteSpace(storedString)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(storedString));
-            if (PasswordConfiguration.UseLegacyEncoding)
-            {
-                salt = string.Empty;
-                return storedString;
-            }
 
             var saltLen = GenerateSalt();
             salt = storedString.Substring(0, saltLen.Length);
@@ -208,15 +191,6 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         public HashAlgorithm GetHashAlgorithm(string password)
         {
-            if (PasswordConfiguration.UseLegacyEncoding)
-            {
-                return new HMACSHA1
-                {
-                    //the legacy salt was actually the password :(
-                    Key = Encoding.Unicode.GetBytes(password)
-                };
-            }
-
             if (PasswordConfiguration.HashAlgorithmType.IsNullOrWhiteSpace())
                 throw new InvalidOperationException("No hash algorithm type specified");
 
@@ -239,9 +213,9 @@ namespace Umbraco.Core.Security
             return encodedPassword;
         }
 
-       
 
-        
+
+
 
     }
 }

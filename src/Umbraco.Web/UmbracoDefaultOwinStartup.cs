@@ -27,10 +27,10 @@ namespace Umbraco.Web
     public class UmbracoDefaultOwinStartup
     {
         protected IUmbracoContextAccessor UmbracoContextAccessor => Current.UmbracoContextAccessor;
-        protected IGlobalSettings GlobalSettings => Current.Configs.Global();
-        protected IContentSettings ContentSettings => Current.Configs.Content();
-        protected ISecuritySettings SecuritySettings => Current.Configs.Security();
-        protected IUserPasswordConfiguration UserPasswordConfig => Current.Configs.UserPasswordConfiguration();
+        protected IGlobalSettings GlobalSettings => Current.Factory.GetInstance<IGlobalSettings>();
+        protected IContentSettings ContentSettings => Current.Factory.GetInstance<IContentSettings>();
+        protected ISecuritySettings SecuritySettings => Current.Factory.GetInstance<ISecuritySettings>();
+        protected IUserPasswordConfiguration UserPasswordConfig => Current.Factory.GetInstance<IUserPasswordConfiguration>();
         protected IRuntimeState RuntimeState => Current.RuntimeState;
         protected ServiceContext Services => Current.Services;
         protected UmbracoMapper Mapper => Current.Mapper;
@@ -76,7 +76,7 @@ namespace Umbraco.Web
             ConfigureUmbracoAuthentication(app);
 
             app
-                .UseSignalR(GlobalSettings, IOHelper)
+                .UseSignalR(IOHelper)
                 .FinalizeMiddlewareConfiguration();
         }
 
