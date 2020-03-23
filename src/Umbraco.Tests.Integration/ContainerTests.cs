@@ -42,10 +42,10 @@ namespace Umbraco.Tests.Integration
 
             // Register in the container
             var composition = new Composition(umbracoContainer, typeLoader,
-                testHelper.Logger, runtimeState, testHelper.Configs, testHelper.IOHelper, testHelper.AppCaches);
+                testHelper.Logger, runtimeState, testHelper.GetConfigs(), testHelper.IOHelper, testHelper.AppCaches);
             composition.RegisterEssentials(testHelper.Logger, testHelper.Profiler, testHelper.Logger, testHelper.MainDom,
                 testHelper.AppCaches, umbracoDatabaseFactory, typeLoader, runtimeState, testHelper.GetTypeFinder(),
-                testHelper.IOHelper, testHelper.UmbracoVersion, dbProviderFactoryCreator);
+                testHelper.IOHelper, testHelper.GetUmbracoVersion(), dbProviderFactoryCreator);
 
             // Cross wire - this would be called by the Host Builder at the very end of ConfigureServices
             var lightInjectServiceProvider = serviceProviderFactory.CreateServiceProvider(umbracoContainer.Container);

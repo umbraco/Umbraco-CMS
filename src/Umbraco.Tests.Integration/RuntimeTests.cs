@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Integration
 
             // Create the core runtime
             var testHelper = new TestHelper();
-            var coreRuntime = new CoreRuntime(testHelper.Configs, testHelper.UmbracoVersion,
+            var coreRuntime = new CoreRuntime(testHelper.GetConfigs(), testHelper.GetUmbracoVersion(),
                 testHelper.IOHelper, testHelper.Logger, testHelper.Profiler, testHelper.UmbracoBootPermissionChecker,
                 testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo(), testHelper.DbProviderFactoryCreator,
                 testHelper.MainDom, testHelper.GetTypeFinder());

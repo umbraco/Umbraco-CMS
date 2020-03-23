@@ -56,7 +56,7 @@ namespace Umbraco.Tests.TestHelpers
 
             public override IBackOfficeInfo GetBackOfficeInfo()
                 => new AspNetBackOfficeInfo(
-                    SettingsForTests.GenerateMockGlobalSettings(UmbracoVersion),
+                    SettingsForTests.GenerateMockGlobalSettings(GetUmbracoVersion()),
                     TestHelper.IOHelper, Mock.Of<ILogger>(), SettingsForTests.GenerateMockWebRoutingSettings());
 
             public override IHostingEnvironment GetHostingEnvironment()
@@ -70,13 +70,13 @@ namespace Umbraco.Tests.TestHelpers
 
         public static TypeLoader GetMockedTypeLoader() => _testHelperInternal.GetMockedTypeLoader();
 
-        public static Configs GetConfigs() => _testHelperInternal.Configs;
+        public static Configs GetConfigs() => _testHelperInternal.GetConfigs();
 
         public static IRuntimeState GetRuntimeState() => _testHelperInternal.GetRuntimeState();
 
         public static IBackOfficeInfo GetBackOfficeInfo() => _testHelperInternal.GetBackOfficeInfo();
 
-        public static IConfigsFactory GetConfigsFactory() => _testHelperInternal.ConfigsFactory;
+        public static IConfigsFactory GetConfigsFactory() => _testHelperInternal.GetConfigsFactory();
 
         /// <summary>
         /// Gets the current assembly directory.
@@ -314,7 +314,7 @@ namespace Umbraco.Tests.TestHelpers
         }
 
 
-        public static IUmbracoVersion GetUmbracoVersion() => _testHelperInternal.UmbracoVersion;
+        public static IUmbracoVersion GetUmbracoVersion() => _testHelperInternal.GetUmbracoVersion();
 
         public static IRegister GetRegister() => _testHelperInternal.GetRegister();
 

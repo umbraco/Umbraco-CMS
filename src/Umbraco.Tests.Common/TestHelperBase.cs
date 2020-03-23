@@ -28,11 +28,8 @@ namespace Umbraco.Tests.Common
     public abstract class TestHelperBase
     {
         private readonly ITypeFinder _typeFinder;
-        private IConfigsFactory _configsFactory;
         private UriUtility _uriUtility;
         private IIOHelper _ioHelper;
-        private Configs _configs;
-        private IUmbracoVersion _umbracoVersion;
 
         public TestHelperBase(Assembly entryAssembly)
         {
@@ -48,15 +45,7 @@ namespace Umbraco.Tests.Common
             return new TypeLoader(IOHelper, Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
         }
 
-        public Configs Configs
-        {
-            get
-            {
-                if (_configs == null)
-                    _configs = ConfigsFactory.Create();
-                return _configs;
-            }
-        }
+        public Configs GetConfigs() => GetConfigsFactory().Create();
 
         public IRuntimeState GetRuntimeState()
         {
@@ -65,7 +54,7 @@ namespace Umbraco.Tests.Common
                 Mock.Of<IGlobalSettings>(),
                 new Lazy<IMainDom>(),
                 new Lazy<IServerRegistrar>(),
-                UmbracoVersion,
+                GetUmbracoVersion(),
                 GetHostingEnvironment(),
                 GetBackOfficeInfo()
                 );
@@ -73,15 +62,7 @@ namespace Umbraco.Tests.Common
 
         public abstract IBackOfficeInfo GetBackOfficeInfo();
 
-        public IConfigsFactory ConfigsFactory
-        {
-            get
-            {
-                if (_configsFactory == null)
-                    _configsFactory = new ConfigsFactory();
-                return _configsFactory;
-            }
-        }
+        public IConfigsFactory GetConfigsFactory() => new ConfigsFactory();
 
         /// <summary>
         /// Gets the current assembly directory.
@@ -143,19 +124,16 @@ namespace Umbraco.Tests.Common
             return relativePath.Replace("~/", CurrentAssemblyDirectory + "/");
         }
 
-        public IUmbracoVersion UmbracoVersion
+        public IUmbracoVersion GetUmbracoVersion()
         {
-            get
-            {
-                if (_umbracoVersion == null)
-                    _umbracoVersion = new UmbracoVersion(Configs.Global());
-                return _umbracoVersion;
-            }
+            if (_umbracoVersion == null)
+                _umbracoVersion = new UmbracoVersion(GetConfigs().Global());
+            return _umbracoVersion;
         }
 
         public IRegister GetRegister()
         {
-            return RegisterFactory.Create(Configs.Global());
+            return RegisterFactory.Create(GetConfigs().Global());
         }
 
         public abstract IHostingEnvironment GetHostingEnvironment();

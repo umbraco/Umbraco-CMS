@@ -177,7 +177,6 @@ namespace Umbraco.Tests.Runtimes
 
             public override void Terminate()
             {
-                ((IRegisteredObject) _mainDom).Stop(false);
                 base.Terminate();
             }
 
