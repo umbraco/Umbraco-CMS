@@ -127,9 +127,8 @@ namespace Umbraco.Tests.Published
 
             var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", CreatePropertyTypes);
 
-            var typeFinder = TestHelper.GetTypeFinder();
-            var elementsCache = new FastDictionaryAppCache(typeFinder);
-            var snapshotCache = new FastDictionaryAppCache(typeFinder);
+            var elementsCache = new FastDictionaryAppCache();
+            var snapshotCache = new FastDictionaryAppCache();
 
             var publishedSnapshot = new Mock<IPublishedSnapshot>();
             publishedSnapshot.Setup(x => x.SnapshotCache).Returns(snapshotCache);

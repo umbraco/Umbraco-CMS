@@ -27,6 +27,8 @@ namespace Umbraco.Core.Runtime
         private IFactory _factory;
         private RuntimeState _state;
         private readonly IUmbracoBootPermissionChecker _umbracoBootPermissionChecker;
+        private readonly IGlobalSettings _globalSettings;
+        private readonly IConnectionStrings _connectionStrings;
 
 
         public CoreRuntime(
@@ -55,6 +57,10 @@ namespace Umbraco.Core.Runtime
             Logger = logger;
             MainDom = mainDom;
             TypeFinder = typeFinder;
+
+            _globalSettings = Configs.Global();
+            _connectionStrings = configs.ConnectionStrings();
+
 
             // runtime state
             // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
@@ -367,9 +373,9 @@ namespace Umbraco.Core.Runtime
             // is overridden by the web runtime
 
             return new AppCaches(
-                new DeepCloneAppCache(new ObjectCacheAppCache(TypeFinder)),
+                new DeepCloneAppCache(new ObjectCacheAppCache()),
                 NoAppCache.Instance,
-                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache(TypeFinder))));
+                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
         }
 
         // by default, returns null, meaning that Umbraco should auto-detect the application root path.
@@ -382,7 +388,7 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         /// <remarks>This is strictly internal, for tests only.</remarks>
         protected internal virtual IUmbracoDatabaseFactory GetDatabaseFactory()
-            => new UmbracoDatabaseFactory(Logger, new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()), Configs, DbProviderFactoryCreator);
+            => new UmbracoDatabaseFactory(Logger, _globalSettings, _connectionStrings, new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()), DbProviderFactoryCreator);
 
 
         #endregion

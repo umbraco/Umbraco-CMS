@@ -112,7 +112,7 @@ namespace Umbraco.Web.Models.Trees
                     return Current.IOHelper.ResolveUrl("~" + Icon.TrimStart('~'));
 
                 //legacy icon path
-                return string.Format("{0}images/umbraco/{1}", Current.Configs.Global().Path.EnsureEndsWith("/"), Icon);
+                return string.Format("{0}images/umbraco/{1}", Current.IOHelper.BackOfficePath.EnsureEndsWith("/"), Icon);
             }
         }
 

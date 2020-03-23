@@ -3,13 +3,16 @@ using System.Data.Common;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Composing;
+using Umbraco.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
@@ -19,8 +22,23 @@ using Umbraco.Core.Runtime;
 namespace Umbraco.Web.BackOffice.AspNetCore
 {
 
+
     public static class UmbracoBackOfficeServiceCollectionExtensions
     {
+
+        public static IServiceCollection AddUmbracoConfiguration(this IServiceCollection services)
+        {
+            var serviceProvider = services.BuildServiceProvider();
+            var configuration = serviceProvider.GetService<IConfiguration>();
+            var configsFactory = new AspNetCoreConfigsFactory(configuration);
+
+            var configs = configsFactory.Create();
+
+            services.AddSingleton(configs);
+
+            return services;
+        }
+
 
         /// <summary>
         ///  Adds the Umbraco Back Core requirements
@@ -79,9 +97,11 @@ namespace Umbraco.Web.BackOffice.AspNetCore
                 DbProviderFactories.GetFactory);
 
             // Determine if we should use the sql main dom or the default
-            var appSettingMainDomLock = configs.Global().MainDomLock;
+            var globalSettings = configs.Global();
+            var connStrings = configs.ConnectionStrings();
+            var appSettingMainDomLock = globalSettings.MainDomLock;
             var mainDomLock = appSettingMainDomLock == "SqlMainDomLock"
-                ? (IMainDomLock)new SqlMainDomLock(logger, configs, dbProviderFactoryCreator)
+                ? (IMainDomLock)new SqlMainDomLock(logger, globalSettings, connStrings, dbProviderFactoryCreator)
                 : new MainDomSemaphoreLock(logger, hostingEnvironment);
 
             var mainDom = new MainDom(logger, hostingEnvironment, mainDomLock);
@@ -90,6 +110,33 @@ namespace Umbraco.Web.BackOffice.AspNetCore
                 hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom, typeFinder);
 
             return coreRuntime;
+        }
+
+        public static IServiceCollection CreateCompositionRoot(
+            this IServiceCollection services,
+            IHttpContextAccessor httpContextAccessor,
+            IWebHostEnvironment webHostEnvironment,
+            IHostApplicationLifetime hostApplicationLifetime,
+            Configs configs)
+        {
+            var hostingSettings = configs.Hosting();
+            var coreDebug = configs.CoreDebug();
+            var globalSettings = configs.Global();
+
+            var hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment,
+                httpContextAccessor, hostApplicationLifetime);
+            var ioHelper = new IOHelper(hostingEnvironment, globalSettings);
+            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,
+                new AspNetCoreSessionIdResolver(httpContextAccessor),
+                () => services.BuildServiceProvider().GetService<IRequestCache>(), coreDebug, ioHelper,
+                new AspNetCoreMarchal());
+
+            var backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
+            var profiler = new LogProfiler(logger);
+
+            Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
+
+            return services;
         }
 
         private static void CreateCompositionRoot(IServiceCollection services)
@@ -102,16 +149,18 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var webHostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
             var hostApplicationLifetime = serviceProvider.GetRequiredService<IHostApplicationLifetime>();
 
-            var configFactory = new ConfigsFactory();
+            var configs = serviceProvider.GetService<Configs>();
 
-            var hostingSettings = configFactory.HostingSettings;
-            var coreDebug = configFactory.CoreDebug;
+            var hostingSettings = configs.Hosting();
+            var coreDebug = configs.CoreDebug();
+            var globalSettings = configs.Global();
 
             var hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment, httpContextAccessor, hostApplicationLifetime);
-            var ioHelper = new IOHelper(hostingEnvironment);
-
-            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, new AspNetCoreSessionIdResolver(httpContextAccessor), () => services.BuildServiceProvider().GetService<IRequestCache>(), coreDebug, ioHelper, new AspNetCoreMarchal());
-            var configs = configFactory.Create(ioHelper, logger);
+            var ioHelper = new IOHelper(hostingEnvironment, globalSettings);
+            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,
+                new AspNetCoreSessionIdResolver(httpContextAccessor),
+                () => serviceProvider.GetService<IRequestCache>(), coreDebug, ioHelper,
+                new AspNetCoreMarchal());
 
             var backOfficeInfo = new AspNetCoreBackOfficeInfo(configs.Global());
             var profiler = new LogProfiler(logger);

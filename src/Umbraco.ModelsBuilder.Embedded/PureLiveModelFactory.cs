@@ -14,6 +14,7 @@ using System.Web.WebPages.Razor;
 using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
@@ -42,15 +43,22 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         private readonly IModelsBuilderConfig _config;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IIOHelper _ioHelper;
         private readonly ModelsGenerationError _errors;
 
-        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IProfilingLogger logger, IModelsBuilderConfig config, IHostingEnvironment hostingEnvironment)
+        public PureLiveModelFactory(
+            Lazy<UmbracoServices> umbracoServices,
+            IProfilingLogger logger,
+            IModelsBuilderConfig config,
+            IHostingEnvironment hostingEnvironment,
+            IIOHelper ioHelper)
         {
             _umbracoServices = umbracoServices;
             _logger = logger;
             _config = config;
             _hostingEnvironment = hostingEnvironment;
-            _errors = new ModelsGenerationError(config);
+            _ioHelper = ioHelper;
+            _errors = new ModelsGenerationError(config, ioHelper);
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
 
@@ -58,7 +66,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             if (!_hostingEnvironment.IsHosted) return;
 
-            var modelsDirectory = _config.ModelsDirectory;
+            var modelsDirectory = _config.ModelsDirectoryAbsolute(_ioHelper);
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
@@ -208,7 +216,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 _hasModels = false;
                 _pendingRebuild = true;
 
-                var modelsDirectory = _config.ModelsDirectory;
+                var modelsDirectory = _config.ModelsDirectoryAbsolute(_ioHelper);
                 if (!Directory.Exists(modelsDirectory))
                     Directory.CreateDirectory(modelsDirectory);
 
@@ -330,7 +338,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         private Assembly GetModelsAssembly(bool forceRebuild)
         {
-            var modelsDirectory = _config.ModelsDirectory;
+            var modelsDirectory = _config.ModelsDirectoryAbsolute(_ioHelper);
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
@@ -552,7 +560,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         private string GenerateModelsCode(IList<TypeModel> typeModels)
         {
-            var modelsDirectory = _config.ModelsDirectory;
+            var modelsDirectory = _config.ModelsDirectoryAbsolute(_ioHelper);
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 

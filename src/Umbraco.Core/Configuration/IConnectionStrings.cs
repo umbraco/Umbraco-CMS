@@ -6,8 +6,5 @@ namespace Umbraco.Core.Configuration
         {
             get;
         }
-
-        void RemoveConnectionString(string umbracoConnectionName);
-        void SaveConnectionString(string connectionString, string providerName);
     }
 }

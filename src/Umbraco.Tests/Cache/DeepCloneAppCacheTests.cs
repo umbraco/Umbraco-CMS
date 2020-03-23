@@ -29,8 +29,7 @@ namespace Umbraco.Tests.Cache
         public override void Setup()
         {
             base.Setup();
-            var typeFinder = TestHelper.GetTypeFinder();
-            _memberCache = new ObjectCacheAppCache(typeFinder);
+            _memberCache = new ObjectCacheAppCache();
 
             _provider = new DeepCloneAppCache(_memberCache);
         }

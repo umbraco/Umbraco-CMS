@@ -18,8 +18,7 @@ namespace Umbraco.Tests.Cache
         public override void Setup()
         {
             base.Setup();
-            var typeFinder = TestHelper.GetTypeFinder();
-            _provider = new ObjectCacheAppCache(typeFinder);
+            _provider = new ObjectCacheAppCache();
         }
 
         internal override IAppCache AppCache

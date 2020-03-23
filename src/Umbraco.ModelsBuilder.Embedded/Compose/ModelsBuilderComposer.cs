@@ -31,7 +31,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             composition.RegisterUnique<LiveModelsProvider>();
             composition.RegisterUnique<OutOfDateModelsStatus>();
             composition.RegisterUnique<ModelsGenerationError>();
-
+            
             if (composition.Configs.ModelsBuilder().ModelsMode == ModelsMode.PureLive)
                 ComposeForLiveModels(composition);
             else if (composition.Configs.ModelsBuilder().EnableFactory)

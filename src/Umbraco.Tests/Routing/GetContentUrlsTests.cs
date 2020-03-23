@@ -14,6 +14,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
 using Umbraco.Tests.Common;
+using SettingsForTests = Umbraco.Tests.TestHelpers.SettingsForTests;
 
 namespace Umbraco.Tests.Routing
 {
@@ -77,7 +78,7 @@ namespace Umbraco.Tests.Routing
             content.Path = "-1,1046";
             content.Published = true;
 
-            var umbracoSettings = Current.Configs.RequestHandler();
+            var umbracoSettings = SettingsForTests.GenerateMockRequestHandlerSettings();
 
             var umbContext = GetUmbracoContext("http://localhost:8000");
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbContext);
@@ -122,7 +123,7 @@ namespace Umbraco.Tests.Routing
             child.Path = "-1,1046,1173";
             child.Published = true;
 
-            var umbracoSettings = Current.Configs.RequestHandler();
+            var umbracoSettings = SettingsForTests.GenerateMockRequestHandlerSettings();
 
 
             var umbContext = GetUmbracoContext("http://localhost:8000");

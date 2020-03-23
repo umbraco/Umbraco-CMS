@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Integration.Implementations
         public override IBackOfficeInfo GetBackOfficeInfo()
         {
             if (_backOfficeInfo == null)
-                _backOfficeInfo = new AspNetCoreBackOfficeInfo(SettingsForTests.GetDefaultGlobalSettings(GetUmbracoVersion(), IOHelper));
+                _backOfficeInfo = new AspNetCoreBackOfficeInfo(SettingsForTests.GetDefaultGlobalSettings(GetUmbracoVersion()));
             return _backOfficeInfo;
         }
 

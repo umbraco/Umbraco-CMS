@@ -266,7 +266,7 @@ namespace Umbraco.Tests.Testing
                     profiler = Mock.Of<IProfiler>();
                     break;
                 case UmbracoTestOptions.Logger.Serilog:
-                    logger = new SerilogLogger(TestHelper.CoreDebug, IOHelper, TestHelper.Marchal, new FileInfo(TestHelper.MapPathForTest("~/unit-test.config")));
+                    logger = new SerilogLogger(TestHelper.CoreDebugSettings, IOHelper, TestHelper.Marchal, new FileInfo(TestHelper.MapPathForTest("~/unit-test.config")));
                     profiler = new LogProfiler(logger);
                     break;
                 case UmbracoTestOptions.Logger.Console:
@@ -457,11 +457,16 @@ namespace Umbraco.Tests.Testing
                 .AddCoreMappers();
 
             Composition.RegisterUnique<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
+
+            var globalSettings = TestHelper.GetConfigs().Global();
+            var connectionStrings = TestHelper.GetConfigs().ConnectionStrings();
+
             Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(
                 Constants.System.UmbracoConnectionName,
+                globalSettings,
+                connectionStrings,
                 Logger,
                 new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>),
-                TestHelper.GetConfigs(),
                 TestHelper.DbProviderFactoryCreator));
             Composition.RegisterUnique(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 

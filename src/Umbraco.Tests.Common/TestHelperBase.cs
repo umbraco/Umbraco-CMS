@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Common
         public Configs GetConfigs()
         {
             if (_configs == null)
-                _configs = GetConfigsFactory().Create(IOHelper, Mock.Of<ILogger>());
+                _configs = GetConfigsFactory().Create();
             return _configs;
         }
         public IRuntimeState GetRuntimeState()
@@ -92,14 +92,14 @@ namespace Umbraco.Tests.Common
         public abstract IDbProviderFactoryCreator DbProviderFactoryCreator { get; }
         public abstract IBulkSqlInsertProvider BulkSqlInsertProvider { get; }
         public abstract IMarchal Marchal { get; }
-        public ICoreDebug CoreDebug { get; } = new CoreDebug();
+        public ICoreDebugSettings CoreDebugSettings { get; } =  new CoreDebugSettings();
 
         public IIOHelper IOHelper
         {
             get
             {
                 if (_ioHelper == null)
-                    _ioHelper = new IOHelper(GetHostingEnvironment());
+                    _ioHelper = new IOHelper(GetHostingEnvironment(), SettingsForTests.GenerateMockGlobalSettings());
                 return _ioHelper;
             }
         }

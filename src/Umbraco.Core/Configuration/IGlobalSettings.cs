@@ -21,7 +21,7 @@
         string ReservedPaths { get; }
 
         /// <summary>
-        /// Gets the path to umbraco's root directory (/umbraco by default).
+        /// Gets the path to umbraco's root directory.
         /// </summary>
         string Path { get; }
 

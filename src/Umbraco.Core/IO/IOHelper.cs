@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Reflection;
 using System.IO;
 using System.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Strings;
 
@@ -12,10 +13,22 @@ namespace Umbraco.Core.IO
     public class IOHelper : IIOHelper
     {
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IGlobalSettings _globalSettings;
 
-        public IOHelper(IHostingEnvironment hostingEnvironment)
+        public IOHelper(IHostingEnvironment hostingEnvironment, IGlobalSettings globalSettings)
         {
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+            _globalSettings = globalSettings;
+        }
+
+        public string BackOfficePath
+        {
+            get
+            {
+                var path = _globalSettings.Path;
+
+                return string.IsNullOrEmpty(path) ? string.Empty : ResolveUrl(path);
+            }
         }
 
         /// <summary>

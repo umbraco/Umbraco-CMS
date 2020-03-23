@@ -545,7 +545,6 @@
     <Compile Include="WebApi\UmbracoAuthorizedApiController.cs" />
     <Compile Include="WebApi\Filters\ValidationFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoUserTimeoutFilterAttribute.cs" />
-    <Compile Include="Runtime\WebRuntime.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
