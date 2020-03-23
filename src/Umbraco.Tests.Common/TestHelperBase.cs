@@ -124,12 +124,7 @@ namespace Umbraco.Tests.Common
             return relativePath.Replace("~/", CurrentAssemblyDirectory + "/");
         }
 
-        public IUmbracoVersion GetUmbracoVersion()
-        {
-            if (_umbracoVersion == null)
-                _umbracoVersion = new UmbracoVersion(GetConfigs().Global());
-            return _umbracoVersion;
-        }
+        public IUmbracoVersion GetUmbracoVersion() => new UmbracoVersion(GetConfigs().Global());
 
         public IRegister GetRegister()
         {
