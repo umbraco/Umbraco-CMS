@@ -9,6 +9,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Integration.Implementations;
@@ -41,8 +42,14 @@ namespace Umbraco.Tests.Integration
             Assert.IsNull(coreRuntime.State.BootFailedException);
             Assert.AreEqual(RuntimeLevel.Install, coreRuntime.State.Level);            
             Assert.IsTrue(MyComposer.IsComposed);
+            Assert.IsTrue(MyComponent.IsInit);
+            Assert.IsFalse(MyComponent.IsTerminated);
 
             Assertions.AssertContainer(umbracoContainer.Container, reportOnly: true); // TODO Change that to false eventually when we clean up the container
+
+            coreRuntime.Terminate();
+
+            Assert.IsTrue(MyComponent.IsTerminated);
         }
 
         [Test]
@@ -86,10 +93,34 @@ namespace Umbraco.Tests.Integration
         {
             public void Compose(Composition composition)
             {
+                composition.Components().Append<MyComponent>();
                 IsComposed = true;
             }
 
             public static bool IsComposed { get; private set; }
+        }
+
+        public class MyComponent : IComponent
+        {
+            public static bool IsInit { get; private set; }
+            public static bool IsTerminated { get; private set; }
+
+            private readonly ILogger _logger;
+
+            public MyComponent(ILogger logger)
+            {
+                _logger = logger;
+            }
+
+            public void Initialize()
+            {
+                IsInit = true;
+            }
+
+            public void Terminate()
+            {
+                IsTerminated = true;
+            }
         }
     }
 
