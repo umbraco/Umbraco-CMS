@@ -1,8 +1,8 @@
 ﻿using System.Configuration;
-using Umbraco.Core.Configuration;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 
-namespace Umbraco.Configuration
+namespace Umbraco.Configuration.Legacy
 {
     public class TypeFinderSettings : ITypeFinderSettings
     {

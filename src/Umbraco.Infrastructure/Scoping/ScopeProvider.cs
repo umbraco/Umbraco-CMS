@@ -26,14 +26,14 @@ namespace Umbraco.Core.Scoping
         private readonly ITypeFinder _typeFinder;
         private readonly IRequestCache _requestCache;
         private readonly FileSystems _fileSystems;
-        private readonly ICoreDebug _coreDebug;
+        private readonly ICoreDebugSettings _coreDebugSettings;
         private readonly IMediaFileSystem _mediaFileSystem;
 
-        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, ICoreDebug coreDebug, IMediaFileSystem mediaFileSystem, ILogger logger, ITypeFinder typeFinder, IRequestCache requestCache)
+        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, ICoreDebugSettings coreDebugSettings, IMediaFileSystem mediaFileSystem, ILogger logger, ITypeFinder typeFinder, IRequestCache requestCache)
         {
             DatabaseFactory = databaseFactory;
             _fileSystems = fileSystems;
-            _coreDebug = coreDebug;
+            _coreDebugSettings = coreDebugSettings;
             _mediaFileSystem = mediaFileSystem;
             _logger = logger;
             _typeFinder = typeFinder;
@@ -255,7 +255,7 @@ namespace Umbraco.Core.Scoping
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null)
         {
-            return new Scope(this, _coreDebug, _mediaFileSystem, _logger, _typeFinder, _fileSystems, true, null, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems);
+            return new Scope(this, _coreDebugSettings, _mediaFileSystem, _logger, _typeFinder, _fileSystems, true, null, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems);
         }
 
         /// <inheritdoc />
@@ -311,13 +311,13 @@ namespace Umbraco.Core.Scoping
             {
                 var ambientContext = AmbientContext;
                 var newContext = ambientContext == null ? new ScopeContext() : null;
-                var scope = new Scope(this, _coreDebug, _mediaFileSystem, _logger, _typeFinder, _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
+                var scope = new Scope(this, _coreDebugSettings, _mediaFileSystem, _logger, _typeFinder, _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
                 // assign only if scope creation did not throw!
                 SetAmbient(scope, newContext ?? ambientContext);
                 return scope;
             }
 
-            var nested = new Scope(this, _coreDebug, _mediaFileSystem, _logger, _typeFinder, _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
+            var nested = new Scope(this, _coreDebugSettings, _mediaFileSystem, _logger, _typeFinder, _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
             SetAmbient(nested, AmbientContext);
             return nested;
         }

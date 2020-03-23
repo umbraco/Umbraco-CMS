@@ -20,12 +20,12 @@ namespace Umbraco.Web.HealthCheck
         private readonly IList<Guid> _disabledCheckIds;
         private readonly ILogger _logger;
 
-        public HealthCheckController(HealthCheckCollection checks, ILogger logger, IHealthChecks healthChecks)
+        public HealthCheckController(HealthCheckCollection checks, ILogger logger, IHealthChecksSettings healthChecksSettings)
         {
             _checks = checks ?? throw new ArgumentNullException(nameof(checks));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            var healthCheckConfig = healthChecks ?? throw new ArgumentNullException(nameof(healthChecks));
+            var healthCheckConfig = healthChecksSettings ?? throw new ArgumentNullException(nameof(healthChecksSettings));
             _disabledCheckIds = healthCheckConfig.DisabledChecks
                 .Select(x => x.Id)
                 .ToList();

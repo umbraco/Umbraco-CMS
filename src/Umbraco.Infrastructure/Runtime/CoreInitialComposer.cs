@@ -175,6 +175,7 @@ namespace Umbraco.Core.Runtime
 
             // Grid config is not a real config file as we know them
             composition.RegisterUnique<IGridConfig, GridConfig>();
+
         }
     }
 }

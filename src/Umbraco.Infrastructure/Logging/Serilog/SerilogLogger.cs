@@ -18,7 +18,7 @@ namespace Umbraco.Core.Logging.Serilog
     ///</summary>
     public class SerilogLogger : ILogger, IDisposable
     {
-        private readonly ICoreDebug _coreDebug;
+        private readonly ICoreDebugSettings _coreDebugSettings;
         private readonly IIOHelper _ioHelper;
         private readonly IMarchal _marchal;
 
@@ -26,9 +26,9 @@ namespace Umbraco.Core.Logging.Serilog
         /// Initialize a new instance of the <see cref="SerilogLogger"/> class with a configuration file.
         /// </summary>
         /// <param name="logConfigFile"></param>
-        public SerilogLogger(ICoreDebug coreDebug, IIOHelper ioHelper, IMarchal marchal, FileInfo logConfigFile)
+        public SerilogLogger(ICoreDebugSettings coreDebugSettings, IIOHelper ioHelper, IMarchal marchal, FileInfo logConfigFile)
         {
-            _coreDebug = coreDebug;
+            _coreDebugSettings = coreDebugSettings;
             _ioHelper = ioHelper;
             _marchal = marchal;
 
@@ -37,9 +37,9 @@ namespace Umbraco.Core.Logging.Serilog
                 .CreateLogger();
         }
 
-        public SerilogLogger(ICoreDebug coreDebug, IIOHelper ioHelper, IMarchal marchal, LoggerConfiguration logConfig)
+        public SerilogLogger(ICoreDebugSettings coreDebugSettings, IIOHelper ioHelper, IMarchal marchal, LoggerConfiguration logConfig)
         {
-            _coreDebug = coreDebug;
+            _coreDebugSettings = coreDebugSettings;
             _ioHelper = ioHelper;
             _marchal = marchal;
 
@@ -51,7 +51,7 @@ namespace Umbraco.Core.Logging.Serilog
         /// Creates a logger with some pre-defined configuration and remainder from config file
         /// </summary>
         /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
-        public static SerilogLogger CreateWithDefaultConfiguration(IHostingEnvironment hostingEnvironment, ISessionIdResolver sessionIdResolver, Func<IRequestCache> requestCacheGetter, ICoreDebug coreDebug, IIOHelper ioHelper, IMarchal marchal)
+        public static SerilogLogger CreateWithDefaultConfiguration(IHostingEnvironment hostingEnvironment, ISessionIdResolver sessionIdResolver, Func<IRequestCache> requestCacheGetter, ICoreDebugSettings coreDebugSettings, IIOHelper ioHelper, IMarchal marchal)
         {
             var loggerConfig = new LoggerConfiguration();
             loggerConfig
@@ -59,7 +59,7 @@ namespace Umbraco.Core.Logging.Serilog
                 .ReadFromConfigFile()
                 .ReadFromUserConfigFile();
 
-            return new SerilogLogger(coreDebug, ioHelper, marchal, loggerConfig);
+            return new SerilogLogger(coreDebugSettings, ioHelper, marchal, loggerConfig);
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace Umbraco.Core.Logging.Serilog
                 messageTemplate += "\r\nThe thread has been aborted, because the request has timed out.";
 
                 // dump if configured, or if stacktrace contains Monitor.ReliableEnter
-                dump = _coreDebug.DumpOnTimeoutThreadAbort || IsMonitorEnterThreadAbortException(exception);
+                dump = _coreDebugSettings.DumpOnTimeoutThreadAbort || IsMonitorEnterThreadAbortException(exception);
 
                 // dump if it is ok to dump (might have a cap on number of dump...)
                 dump &= MiniDump.OkToDump(_ioHelper);

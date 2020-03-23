@@ -43,9 +43,9 @@ namespace Umbraco.Tests.Scoping
         {
             // this is what's created core web runtime
             return new AppCaches(
-                new DeepCloneAppCache(new ObjectCacheAppCache(TypeFinder)),
+                new DeepCloneAppCache(new ObjectCacheAppCache()),
                 NoAppCache.Instance,
-                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache(TypeFinder))));
+                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
         }
 
         [TearDown]

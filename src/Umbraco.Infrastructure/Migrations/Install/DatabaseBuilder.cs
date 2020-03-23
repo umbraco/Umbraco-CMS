@@ -28,7 +28,7 @@ namespace Umbraco.Core.Migrations.Install
         private readonly IIOHelper _ioHelper;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
-        private readonly IConnectionStrings _connectionStrings;
+        private readonly IConfigManipulator _configManipulator;
 
         private DatabaseSchemaResult _databaseSchemaValidationResult;
 
@@ -46,7 +46,7 @@ namespace Umbraco.Core.Migrations.Install
             IIOHelper ioHelper,
             IUmbracoVersion umbracoVersion,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IConnectionStrings connectionStrings)
+             IConfigManipulator configManipulator)
         {
             _scopeProvider = scopeProvider;
             _globalSettings = globalSettings;
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Migrations.Install
             _ioHelper = ioHelper;
             _umbracoVersion = umbracoVersion;
             _dbProviderFactoryCreator = dbProviderFactoryCreator;
-            _connectionStrings = connectionStrings;
+            _configManipulator = configManipulator;
         }
 
         #region Status
@@ -146,7 +146,7 @@ namespace Umbraco.Core.Migrations.Install
 
         private void ConfigureEmbeddedDatabaseConnection(IUmbracoDatabaseFactory factory, IIOHelper ioHelper)
         {
-            _connectionStrings.SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe, ioHelper);
+            _configManipulator.SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
 
             var path = Path.Combine(ioHelper.GetRootDirectorySafe(), "App_Data", "Umbraco.sdf");
             if (File.Exists(path) == false)
@@ -169,7 +169,7 @@ namespace Umbraco.Core.Migrations.Install
         {
             const string providerName = Constants.DbProviderNames.SqlServer;
 
-            _connectionStrings.SaveConnectionString(connectionString, providerName, _ioHelper);
+            _configManipulator.SaveConnectionString(connectionString, providerName);
             _databaseFactory.Configure(connectionString, providerName);
         }
 
@@ -185,7 +185,7 @@ namespace Umbraco.Core.Migrations.Install
         {
             var connectionString = GetDatabaseConnectionString(server, databaseName, user, password, databaseProvider, out var providerName);
 
-            _connectionStrings.SaveConnectionString(connectionString, providerName, _ioHelper);
+            _configManipulator.SaveConnectionString(connectionString, providerName);
             _databaseFactory.Configure(connectionString, providerName);
         }
 
@@ -216,7 +216,7 @@ namespace Umbraco.Core.Migrations.Install
         public void ConfigureIntegratedSecurityDatabaseConnection(string server, string databaseName)
         {
             var connectionString = GetIntegratedSecurityDatabaseConnectionString(server, databaseName);
-            _connectionStrings.SaveConnectionString(connectionString, Constants.DbProviderNames.SqlServer, _ioHelper);
+            _configManipulator.SaveConnectionString(connectionString, Constants.DbProviderNames.SqlServer);
             _databaseFactory.Configure(connectionString, Constants.DbProviderNames.SqlServer);
         }
 

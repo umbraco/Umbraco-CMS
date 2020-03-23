@@ -51,14 +51,14 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Removes items of a specified type from the cache.
         /// </summary>
-        /// <param name="typeName">The name of the type to remove.</param>
+        /// <param name="type">The type to remove.</param>
         /// <remarks>
         /// <para>If the type is an interface, then all items of a type implementing that interface are
         /// removed. Otherwise, only items of that exact type are removed (items of type inheriting from
         /// the specified type are not removed).</para>
         /// <para>Performs a case-sensitive search.</para>
         /// </remarks>
-        void ClearOfType(string typeName);
+        void ClearOfType(Type type);
 
         /// <summary>
         /// Removes items of a specified type from the cache.

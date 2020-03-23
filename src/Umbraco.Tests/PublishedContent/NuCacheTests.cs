@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Legacy;
 using Umbraco.Core.Events;
 using Umbraco.Core.Install;
 using Umbraco.Core.Logging;
@@ -207,7 +208,6 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IEntityXmlSerializer>(),
                 publishedModelFactory,
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
-                typeFinder,
                 TestHelper.GetHostingEnvironment(),
                 new MockShortStringHelper(),
                 TestHelper.IOHelper,

@@ -270,8 +270,7 @@ namespace Umbraco.Tests.Models
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
 
-            var typeFinder = TestHelper.GetTypeFinder();
-            var runtimeCache = new ObjectCacheAppCache(typeFinder);
+            var runtimeCache = new ObjectCacheAppCache();
             runtimeCache.Insert(content.Id.ToString(CultureInfo.InvariantCulture), () => content);
 
             var proflog = GetTestProfilingLogger();

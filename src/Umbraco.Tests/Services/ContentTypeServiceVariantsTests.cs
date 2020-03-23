@@ -78,7 +78,6 @@ namespace Umbraco.Tests.Services
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
-                typeFinder,
                 hostingEnvironment,
                 new MockShortStringHelper(),
                 IOHelper,

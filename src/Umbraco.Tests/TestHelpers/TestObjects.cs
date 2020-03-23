@@ -255,7 +255,7 @@ namespace Umbraco.Tests.TestHelpers
 
             typeFinder = typeFinder ?? new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly));
             fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings());
-            var coreDebug = TestHelper.CoreDebug;
+            var coreDebug = TestHelper.CoreDebugSettings;
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
             var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, coreDebug, mediaFileSystem, logger, typeFinder, NoAppCache.Instance);
             return scopeProvider;

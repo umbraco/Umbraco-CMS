@@ -13,6 +13,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Web.AspNet;
 using Umbraco.Web.Hosting;
+using Umbraco.Web.Logging;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web
@@ -34,7 +35,7 @@ namespace Umbraco.Web
                 var configFactory = new ConfigsFactory();
 
                 var hostingSettings = configFactory.HostingSettings;
-                var coreDebug = configFactory.CoreDebug;
+                var coreDebug = configFactory.CoreDebugSettings;
                 var globalSettings = configFactory.GlobalSettings;
 
                 var hostingEnvironment = new AspNetHostingEnvironment(hostingSettings);
@@ -43,10 +44,26 @@ namespace Umbraco.Web
                 var configs = configFactory.Create();
 
                 var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, logger, configFactory.WebRoutingSettings);
-                var profiler = new LogProfiler(logger);
+                var profiler = GetWebProfiler(hostingEnvironment);
                 Umbraco.Composing.Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
             }
 
+        }
+
+        private IProfiler GetWebProfiler(IHostingEnvironment hostingEnvironment)
+        {
+            // create and start asap to profile boot
+            if (!hostingEnvironment.IsDebugMode)
+            {
+                // should let it be null, that's how MiniProfiler is meant to work,
+                // but our own IProfiler expects an instance so let's get one
+                return new VoidProfiler();
+            }
+
+            var webProfiler = new WebProfiler();
+            webProfiler.Start();
+
+            return webProfiler;
         }
 
         protected UmbracoApplicationBase(ILogger logger, Configs configs, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
@@ -114,7 +131,7 @@ namespace Umbraco.Web
                 Umbraco.Composing.Current.Profiler,
                 Umbraco.Composing.Current.HostingEnvironment,
                 Umbraco.Composing.Current.BackOfficeInfo);
-            _factory =_runtime.Boot(register);
+            _factory = Current.Factory = _runtime.Boot(register);
         }
 
         // called by ASP.NET (auto event wireup) once per app domain

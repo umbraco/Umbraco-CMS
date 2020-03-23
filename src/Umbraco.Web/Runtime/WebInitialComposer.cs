@@ -5,6 +5,7 @@ using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Cookie;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
@@ -42,13 +43,11 @@ using Umbraco.Web.SignalR;
 using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
-using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Examine;
 using Umbraco.Core.Models;
 using Umbraco.Core.Request;
 using Umbraco.Core.Session;
-using Umbraco.Web.AspNet;
 using Umbraco.Web.AspNet;
 using Umbraco.Web.Models;
 
@@ -291,6 +290,9 @@ namespace Umbraco.Web.Runtime
 
             // replace with web implementation
             composition.RegisterUnique<IPublishedSnapshotRebuilder, Migrations.PostMigrations.PublishedSnapshotRebuilder>();
+
+            // Config manipulator
+            composition.RegisterUnique<IConfigManipulator, XmlConfigManipulator>();
         }
     }
 }
