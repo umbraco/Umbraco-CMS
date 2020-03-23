@@ -11,7 +11,6 @@ using Umbraco.Core.Assets;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Runtime;
-using CssFile = Umbraco.Core.Assets.CssFile;
 
 namespace Umbraco.Web.JavaScript
 {

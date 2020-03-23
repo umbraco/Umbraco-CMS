@@ -30,8 +30,6 @@ namespace Umbraco.Web.JavaScript.CDF
 
         public void Initialize()
         {
-            // anything else?
-
             if (_hostingEnvironment.IsHosted)
             {
                 ConfigureClientDependency();

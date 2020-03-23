@@ -62,9 +62,6 @@ namespace Umbraco.Web.Install.Controllers
                 // Update ClientDependency version and delete its temp directories to make sure we get fresh caches
                 _runtimeMinifier.Reset();
 
-                // Delete ClientDependency temp directories to make sure we get fresh caches
-                var clientDependencyTempFilesDeleted = clientDependencyConfig.ClearTempFiles(HttpContext);
-
                 var result = _umbracoContextAccessor.UmbracoContext.Security.ValidateCurrentUser(false);
 
                 switch (result)
