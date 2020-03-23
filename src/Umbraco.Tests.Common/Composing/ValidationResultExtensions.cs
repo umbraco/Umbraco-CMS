@@ -4,6 +4,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Tests.Common.Composing
 {
+    // These are used for Light Inject container validation
     public static class ValidationResultExtensions
     {
         public static string ToText(this ValidationResult result)
