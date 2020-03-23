@@ -208,7 +208,6 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IEntityXmlSerializer>(),
                 publishedModelFactory,
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
-                typeFinder,
                 TestHelper.GetHostingEnvironment(),
                 new MockShortStringHelper(),
                 TestHelper.IOHelper,

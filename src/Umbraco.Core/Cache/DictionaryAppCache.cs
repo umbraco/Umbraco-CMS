@@ -71,16 +71,16 @@ namespace Umbraco.Core.Cache
         }
 
         /// <inheritdoc />
-        public virtual void ClearOfType(string typeName)
+        public virtual void ClearOfType(Type type)
         {
-            _items.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType().ToString().InvariantEquals(typeName));
+            _items.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == type);
         }
 
         /// <inheritdoc />
         public virtual void ClearOfType<T>()
         {
             var typeOfT = typeof(T);
-            _items.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT);
+            ClearOfType(typeOfT);
         }
 
         /// <inheritdoc />

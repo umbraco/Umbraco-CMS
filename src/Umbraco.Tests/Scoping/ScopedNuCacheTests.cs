@@ -106,7 +106,6 @@ namespace Umbraco.Tests.Scoping
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 new NoopPublishedModelFactory(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
-                typeFinder,
                 hostingEnvironment,
                 new MockShortStringHelper(),
                 IOHelper,

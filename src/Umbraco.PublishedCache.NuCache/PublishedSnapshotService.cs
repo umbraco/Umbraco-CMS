@@ -49,7 +49,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
-        private readonly ITypeFinder _typeFinder;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IIOHelper _ioHelper;
@@ -88,7 +87,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
             UrlSegmentProviderCollection urlSegmentProviders,
-            ITypeFinder typeFinder,
             IHostingEnvironment hostingEnvironment,
             IShortStringHelper shortStringHelper,
             IIOHelper ioHelper,
@@ -109,7 +107,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
             _urlSegmentProviders = urlSegmentProviders;
-            _typeFinder = typeFinder;
             _hostingEnvironment = hostingEnvironment;
             _shortStringHelper = shortStringHelper;
             _ioHelper = ioHelper;
@@ -1207,7 +1204,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     _contentGen = contentSnap.Gen;
                     _mediaGen = mediaSnap.Gen;
                     _domainGen = domainSnap.Gen;
-                    elementsCache = _elementsCache = new FastDictionaryAppCache(_typeFinder);
+                    elementsCache = _elementsCache = new FastDictionaryAppCache();
                 }
             }
 

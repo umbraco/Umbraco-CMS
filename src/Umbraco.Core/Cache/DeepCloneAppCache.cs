@@ -73,7 +73,7 @@ namespace Umbraco.Core.Cache
                 var result = SafeLazy.GetSafeLazy(factory);
                 var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
                 // do not store null values (backward compat), clone / reset to go into the cache
-                return value == null ? null : CheckCloneableAndTracksChanges(value); 
+                return value == null ? null : CheckCloneableAndTracksChanges(value);
 
                 // clone / reset to go into the cache
             }, timeout, isSliding, dependentFiles);
@@ -107,9 +107,9 @@ namespace Umbraco.Core.Cache
         }
 
         /// <inheritdoc />
-        public void ClearOfType(string typeName)
+        public void ClearOfType(Type type)
         {
-            InnerCache.ClearOfType(typeName);
+            InnerCache.ClearOfType(type);
         }
 
         /// <inheritdoc />

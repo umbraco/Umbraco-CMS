@@ -188,7 +188,7 @@ namespace Umbraco.Core.Scoping
                 if (ParentScope != null) return ParentScope.IsolatedCaches;
 
                 return _isolatedCaches ?? (_isolatedCaches
-                           = new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache(_typeFinder))));
+                           = new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
             }
         }
 
