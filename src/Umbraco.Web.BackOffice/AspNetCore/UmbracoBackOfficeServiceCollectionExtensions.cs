@@ -30,6 +30,9 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         {
             var serviceProvider = services.BuildServiceProvider();
             var configuration = serviceProvider.GetService<IConfiguration>();
+            if (configuration == null)
+                throw new InvalidOperationException($"Could not resolve {typeof(IConfiguration)} from the container");
+
             var configsFactory = new AspNetCoreConfigsFactory(configuration);
 
             var configs = configsFactory.Create();
@@ -112,33 +115,6 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             return coreRuntime;
         }
 
-        public static IServiceCollection CreateCompositionRoot(
-            this IServiceCollection services,
-            IHttpContextAccessor httpContextAccessor,
-            IWebHostEnvironment webHostEnvironment,
-            IHostApplicationLifetime hostApplicationLifetime,
-            Configs configs)
-        {
-            var hostingSettings = configs.Hosting();
-            var coreDebug = configs.CoreDebug();
-            var globalSettings = configs.Global();
-
-            var hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment,
-                httpContextAccessor, hostApplicationLifetime);
-            var ioHelper = new IOHelper(hostingEnvironment, globalSettings);
-            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,
-                new AspNetCoreSessionIdResolver(httpContextAccessor),
-                () => services.BuildServiceProvider().GetService<IRequestCache>(), coreDebug, ioHelper,
-                new AspNetCoreMarchal());
-
-            var backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
-            var profiler = new LogProfiler(logger);
-
-            Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
-
-            return services;
-        }
-
         private static void CreateCompositionRoot(IServiceCollection services)
         {
             // TODO: This isn't the best to have to resolve the services now but to avoid this will
@@ -150,6 +126,8 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var hostApplicationLifetime = serviceProvider.GetRequiredService<IHostApplicationLifetime>();
 
             var configs = serviceProvider.GetService<Configs>();
+            if (configs == null)
+                throw new InvalidOperationException($"Could not resolve type {typeof(Configs)} from the container, ensure {nameof(AddUmbracoConfiguration)} is called before calling {nameof(AddUmbracoCore)}");
 
             var hostingSettings = configs.Hosting();
             var coreDebug = configs.CoreDebug();

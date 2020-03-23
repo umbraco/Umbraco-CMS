@@ -28,15 +28,15 @@ namespace Umbraco.Tests.Common
     public abstract class TestHelperBase
     {
         private readonly ITypeFinder _typeFinder;
-        private readonly IConfigsFactory _configsFactory;
+        private IConfigsFactory _configsFactory;
         private UriUtility _uriUtility;
         private IIOHelper _ioHelper;
         private Configs _configs;
+        private IUmbracoVersion _umbracoVersion;
 
         public TestHelperBase(Assembly entryAssembly)
         {
-            _configsFactory = new ConfigsFactory();
-            SettingsForTests = new SettingsForTests();
+            SettingsForTests = new SettingsForTests();            
             MainDom = new SimpleMainDom();
             _typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(entryAssembly));
         }
@@ -54,6 +54,7 @@ namespace Umbraco.Tests.Common
                 _configs = GetConfigsFactory().Create();
             return _configs;
         }
+
         public IRuntimeState GetRuntimeState()
         {
             return new RuntimeState(
@@ -69,7 +70,12 @@ namespace Umbraco.Tests.Common
 
         public abstract IBackOfficeInfo GetBackOfficeInfo();
 
-        public IConfigsFactory GetConfigsFactory() => _configsFactory;
+        public IConfigsFactory GetConfigsFactory()
+        {
+            if (_configsFactory == null)
+                _configsFactory = new ConfigsFactory();
+            return _configsFactory;
+        }
 
         /// <summary>
         /// Gets the current assembly directory.
@@ -133,7 +139,9 @@ namespace Umbraco.Tests.Common
 
         public IUmbracoVersion GetUmbracoVersion()
         {
-            return new UmbracoVersion(GetConfigs().Global());
+            if (_umbracoVersion == null)
+                _umbracoVersion = new UmbracoVersion(GetConfigs().Global());
+            return _umbracoVersion;
         }
 
         public IRegister GetRegister()

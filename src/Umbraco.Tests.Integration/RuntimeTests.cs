@@ -2,7 +2,9 @@
 using LightInject.Microsoft.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Moq;
 using NUnit.Framework;
@@ -66,7 +68,13 @@ namespace Umbraco.Tests.Integration
             var serviceProviderFactory = new UmbracoServiceProviderFactory(container);
             var umbracoContainer = serviceProviderFactory.GetContainer();
 
+            // Some IConfiguration must exist in the container first
+            var configurationBuilder = new ConfigurationBuilder();
+            configurationBuilder.AddEnvironmentVariables();
+            services.AddSingleton<IConfiguration>(x => configurationBuilder.Build());
+
             // Add it!
+            services.AddUmbracoConfiguration();
             services.AddUmbracoCore(umbracoContainer, GetType().Assembly);
 
             // assert results
