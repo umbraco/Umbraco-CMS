@@ -48,11 +48,14 @@ namespace Umbraco.Tests.Common
             return new TypeLoader(IOHelper, Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
         }
 
-        public Configs GetConfigs()
+        public Configs Configs
         {
-            if (_configs == null)
-                _configs = GetConfigsFactory().Create();
-            return _configs;
+            get
+            {
+                if (_configs == null)
+                    _configs = ConfigsFactory.Create();
+                return _configs;
+            }
         }
 
         public IRuntimeState GetRuntimeState()
@@ -62,7 +65,7 @@ namespace Umbraco.Tests.Common
                 Mock.Of<IGlobalSettings>(),
                 new Lazy<IMainDom>(),
                 new Lazy<IServerRegistrar>(),
-                GetUmbracoVersion(),
+                UmbracoVersion,
                 GetHostingEnvironment(),
                 GetBackOfficeInfo()
                 );
@@ -70,11 +73,14 @@ namespace Umbraco.Tests.Common
 
         public abstract IBackOfficeInfo GetBackOfficeInfo();
 
-        public IConfigsFactory GetConfigsFactory()
+        public IConfigsFactory ConfigsFactory
         {
-            if (_configsFactory == null)
-                _configsFactory = new ConfigsFactory();
-            return _configsFactory;
+            get
+            {
+                if (_configsFactory == null)
+                    _configsFactory = new ConfigsFactory();
+                return _configsFactory;
+            }
         }
 
         /// <summary>
@@ -137,16 +143,19 @@ namespace Umbraco.Tests.Common
             return relativePath.Replace("~/", CurrentAssemblyDirectory + "/");
         }
 
-        public IUmbracoVersion GetUmbracoVersion()
+        public IUmbracoVersion UmbracoVersion
         {
-            if (_umbracoVersion == null)
-                _umbracoVersion = new UmbracoVersion(GetConfigs().Global());
-            return _umbracoVersion;
+            get
+            {
+                if (_umbracoVersion == null)
+                    _umbracoVersion = new UmbracoVersion(Configs.Global());
+                return _umbracoVersion;
+            }
         }
 
         public IRegister GetRegister()
         {
-            return RegisterFactory.Create(GetConfigs().Global());
+            return RegisterFactory.Create(Configs.Global());
         }
 
         public abstract IHostingEnvironment GetHostingEnvironment();
