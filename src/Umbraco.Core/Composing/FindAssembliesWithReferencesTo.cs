@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -42,7 +43,14 @@ namespace Umbraco.Core.Composing
             {
                 foreach(var target in _targetAssemblies)
                 {
-                    referenceItems.Add(Assembly.Load(target));
+                    try
+                    {
+                        referenceItems.Add(Assembly.Load(target));
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        // occurs if we cannot load this ... for example in a test project where we aren't currently referencing Umbraco.Web, etc...
+                    }
                 }
             }
 

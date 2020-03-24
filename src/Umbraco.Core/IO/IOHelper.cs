@@ -17,7 +17,7 @@ namespace Umbraco.Core.IO
 
         public IOHelper(IHostingEnvironment hostingEnvironment, IGlobalSettings globalSettings)
         {
-            _hostingEnvironment = hostingEnvironment;
+            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _globalSettings = globalSettings;
         }
 

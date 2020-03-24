@@ -43,6 +43,11 @@ namespace Umbraco.Tests.TestHelpers
         private static TestHelperInternal _testHelperInternal = new TestHelperInternal();
         private class TestHelperInternal : TestHelperBase
         {
+            public TestHelperInternal() : base(typeof(TestHelperInternal).Assembly)
+            {
+
+            }
+
             public override IDbProviderFactoryCreator DbProviderFactoryCreator { get; } = new UmbracoDbProviderFactoryCreator(Constants.DbProviderNames.SqlCe);
 
             public override IBulkSqlInsertProvider BulkSqlInsertProvider { get; } = new SqlCeBulkSqlInsertProvider();

@@ -25,8 +25,8 @@ namespace Umbraco.Web.UI.BackOffice
 
             services.AddUmbracoConfiguration();
             services.AddUmbracoRequest();
+            services.AddUmbracoCore();
             services.AddUmbracoWebsite();
-            services.AddUmbracoBackOffice();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

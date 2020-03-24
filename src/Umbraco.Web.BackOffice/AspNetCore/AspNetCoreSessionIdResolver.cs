@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Umbraco.Net;
 
 namespace Umbraco.Web.BackOffice.AspNetCore
@@ -12,6 +13,18 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public string SessionId => _httpContextAccessor?.HttpContext.Session?.Id;
+        
+        public string SessionId
+        {
+            get
+            {
+                var httpContext = _httpContextAccessor?.HttpContext;
+                // If session isn't enabled this will throw an exception so we check
+                var sessionFeature = httpContext?.Features.Get<ISessionFeature>();
+                return sessionFeature != null
+                    ? httpContext?.Session?.Id
+                    : "0";
+            }
+        }
     }
 }
