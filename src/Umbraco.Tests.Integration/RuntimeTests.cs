@@ -9,6 +9,7 @@ using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.LightInject;
@@ -28,6 +29,13 @@ namespace Umbraco.Tests.Integration
     [TestFixture]
     public class RuntimeTests
     {
+        [TearDown]
+        public void TearDown()
+        {
+            MyComponent.Reset();
+            MyComposer.Reset();
+        }
+
         [OneTimeTearDown]
         public void FixtureTearDown()
         {
@@ -73,12 +81,11 @@ namespace Umbraco.Tests.Integration
         /// Calling AddUmbracoCore to configure the container and boot the core runtime within a generic host
         /// </summary>
         [Test]
-        public void AddUmbracoCore()
+        public async Task AddUmbracoCore()
         {
             var umbracoContainer = GetUmbracoContainer(out var serviceProviderFactory);
 
-            var host = Host.CreateDefaultBuilder()
-                .UseTestLifetime()
+            var hostBuilder = new HostBuilder()
                 .UseUmbraco(serviceProviderFactory)
                 .ConfigureServices((hostContext, services) =>
                 {
@@ -89,38 +96,61 @@ namespace Umbraco.Tests.Integration
                     // Add it!
                     services.AddUmbracoConfiguration();
                     services.AddUmbracoCore(umbracoContainer, GetType().Assembly);
+                });
 
-                    // Run tests
-                    services.AddHostedService(x => DelegateHostedService.Create(() =>
-                    {
-                        // assert results
-                        var runtimeState = umbracoContainer.GetInstance<IRuntimeState>();
-                        var mainDom = umbracoContainer.GetInstance<IMainDom>();
+            var host = await hostBuilder.StartAsync();
 
-                        Assert.IsTrue(mainDom.IsMainDom);
-                        Assert.IsNull(runtimeState.BootFailedException);
-                        Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
-                        Assert.IsTrue(MyComposer.IsComposed);
+            // assert results
+            var runtimeState = umbracoContainer.GetInstance<IRuntimeState>();
+            var mainDom = umbracoContainer.GetInstance<IMainDom>();
 
-                    }, null));
-                })
-                .Build();
+            Assert.IsTrue(mainDom.IsMainDom);
+            Assert.IsNull(runtimeState.BootFailedException);
+            Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
+            Assert.IsTrue(MyComponent.IsInit);
+            Assert.IsFalse(MyComponent.IsTerminated);
 
-            // NOTE: host.Run() could be used but that requires more work by manually calling IHostApplicationLifetime.StopApplication(). In these cases we don't need to wind down.
-            host.Start();
+            await host.StopAsync();
+
+            Assert.IsTrue(MyComponent.IsTerminated);
         }
 
 
+        [Ignore("This test just shows that resolving services from the container before the host is done resolves 2 different instances")]
         [Test]
-        public void UseUmbracoCore()
+        public async Task BuildServiceProvider()
+        {
+            var umbracoContainer = GetUmbracoContainer(out var serviceProviderFactory);
+
+            IHostApplicationLifetime lifetime1 = null;
+
+            var hostBuilder = new HostBuilder()
+                .UseUmbraco(serviceProviderFactory)
+                .ConfigureServices((hostContext, services) =>
+                {
+                    lifetime1 = services.BuildServiceProvider().GetRequiredService<IHostApplicationLifetime>();
+                });
+
+            var host = await hostBuilder.StartAsync();
+
+            var lifetime2 = host.Services.GetRequiredService<IHostApplicationLifetime>();
+
+            lifetime1.StopApplication();
+            Assert.IsTrue(lifetime1.ApplicationStopping.IsCancellationRequested);
+            Assert.AreEqual(lifetime1.ApplicationStopping.IsCancellationRequested, lifetime2.ApplicationStopping.IsCancellationRequested);
+
+        }
+
+        [Test]
+        public async Task UseUmbracoCore()
         {
             var umbracoContainer = GetUmbracoContainer(out var serviceProviderFactory);
             var testHelper = new TestHelper();
 
-            var host = Host.CreateDefaultBuilder()
+            var hostBuilder = new HostBuilder()
                 //TODO: Need to have a configured umb version for the runtime state
                 .UseLocalDb(Path.Combine(testHelper.CurrentAssemblyDirectory, "LocalDb"))
-                .UseTestLifetime()
+                //.UseTestLifetime()
                 .UseUmbraco(serviceProviderFactory)
                 .ConfigureServices((hostContext, services) =>
                 {   
@@ -129,33 +159,26 @@ namespace Umbraco.Tests.Integration
                     // Add it!
                     services.AddUmbracoConfiguration();
                     services.AddUmbracoCore(umbracoContainer, GetType().Assembly);
+                });
 
-                    // Run tests
-                    services.AddHostedService(x => DelegateHostedService.Create(() =>
-                    {
-                        var runtimeState = (RuntimeState)umbracoContainer.GetInstance<IRuntimeState>();
-                        Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
+            var host = await hostBuilder.StartAsync();
 
-                        var dbBuilder = umbracoContainer.GetInstance<DatabaseBuilder>();
-                        Assert.IsNotNull(dbBuilder);
+            var runtimeState = (RuntimeState)umbracoContainer.GetInstance<IRuntimeState>();
+            Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
 
-                        var canConnect = dbBuilder.CanConnectToDatabase;
-                        Assert.IsTrue(canConnect);
+            var dbBuilder = umbracoContainer.GetInstance<DatabaseBuilder>();
+            Assert.IsNotNull(dbBuilder);
 
-                        var dbResult = dbBuilder.CreateSchemaAndData();
-                        Assert.IsTrue(dbResult.Success);
+            var canConnect = dbBuilder.CanConnectToDatabase;
+            Assert.IsTrue(canConnect);
 
-                        var dbFactory = umbracoContainer.GetInstance<IUmbracoDatabaseFactory>();
-                        var profilingLogger = umbracoContainer.GetInstance<IProfilingLogger>();
-                        runtimeState.DetermineRuntimeLevel(dbFactory, profilingLogger);
-                        Assert.AreEqual(RuntimeLevel.Run, runtimeState.Level);
+            var dbResult = dbBuilder.CreateSchemaAndData();
+            Assert.IsTrue(dbResult.Success);
 
-                    }, null));
-                })
-                .Build();
-
-            // NOTE: host.Run() could be used but that requires more work by manually calling IHostApplicationLifetime.StopApplication(). In these cases we don't need to wind down.
-            host.Start();
+            var dbFactory = umbracoContainer.GetInstance<IUmbracoDatabaseFactory>();
+            var profilingLogger = umbracoContainer.GetInstance<IProfilingLogger>();
+            runtimeState.DetermineRuntimeLevel(dbFactory, profilingLogger);
+            Assert.AreEqual(RuntimeLevel.Run, runtimeState.Level);
         }
 
         private LightInjectContainer GetUmbracoContainer(out UmbracoServiceProviderFactory serviceProviderFactory)
@@ -181,6 +204,11 @@ namespace Umbraco.Tests.Integration
                 IsComposed = true;
             }
 
+            public static void Reset()
+            {
+                IsComposed = false;
+            }
+
             public static bool IsComposed { get; private set; }
         }
 
@@ -204,6 +232,12 @@ namespace Umbraco.Tests.Integration
             public void Terminate()
             {
                 IsTerminated = true;
+            }
+
+            public static void Reset()
+            {
+                IsTerminated = false;
+                IsInit = false;
             }
         }
     }

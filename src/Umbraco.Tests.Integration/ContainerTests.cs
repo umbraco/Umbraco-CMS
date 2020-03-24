@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Integration
             var testHelper = new TestHelper();           
             var runtimeState = Mock.Of<IRuntimeState>();
             var umbracoDatabaseFactory = Mock.Of<IUmbracoDatabaseFactory>();
-            var dbProviderFactoryCreator = Mock.Of<IDbProviderFactoryCreator>();
+            var dbProviderFactoryCreator = Mock.Of<IDbProviderFactoryCreator>();            
             var typeLoader = testHelper.GetMockedTypeLoader();
 
             // Register in the container
@@ -45,7 +45,8 @@ namespace Umbraco.Tests.Integration
                 testHelper.Logger, runtimeState, testHelper.GetConfigs(), testHelper.IOHelper, testHelper.AppCaches);
             composition.RegisterEssentials(testHelper.Logger, testHelper.Profiler, testHelper.Logger, testHelper.MainDom,
                 testHelper.AppCaches, umbracoDatabaseFactory, typeLoader, runtimeState, testHelper.GetTypeFinder(),
-                testHelper.IOHelper, testHelper.GetUmbracoVersion(), dbProviderFactoryCreator);
+                testHelper.IOHelper, testHelper.GetUmbracoVersion(), dbProviderFactoryCreator,
+                testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo());
 
             // Cross wire - this would be called by the Host Builder at the very end of ConfigureServices
             var lightInjectServiceProvider = serviceProviderFactory.CreateServiceProvider(umbracoContainer.Container);

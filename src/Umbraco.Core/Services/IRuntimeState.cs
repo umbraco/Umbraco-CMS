@@ -47,12 +47,6 @@ namespace Umbraco.Core
         Uri ApplicationUrl { get; }
 
         /// <summary>
-        /// Gets the Umbraco application virtual path.
-        /// </summary>
-        /// <remarks>This is either "/" or eg "/virtual".</remarks>
-        string ApplicationVirtualPath { get; }
-
-        /// <summary>
         /// Gets the runtime level of execution.
         /// </summary>
         RuntimeLevel Level { get; }

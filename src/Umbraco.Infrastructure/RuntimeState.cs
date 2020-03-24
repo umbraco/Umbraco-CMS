@@ -43,8 +43,6 @@ namespace Umbraco.Core
             _umbracoVersion = umbracoVersion;
             _hostingEnvironment = hostingEnvironment;
             _backOfficeInfo = backOfficeInfo;
-
-            ApplicationVirtualPath = _hostingEnvironment.ApplicationVirtualPath;
         }
 
         /// <summary>
@@ -83,9 +81,6 @@ namespace Umbraco.Core
 
         /// <inheritdoc />
         public Uri ApplicationUrl { get; private set; }
-
-        /// <inheritdoc />
-        public string ApplicationVirtualPath { get; }
 
         /// <inheritdoc />
         public string CurrentMigrationState { get; internal set; }

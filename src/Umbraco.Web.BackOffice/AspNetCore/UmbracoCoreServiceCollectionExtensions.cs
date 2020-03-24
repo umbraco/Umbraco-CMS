@@ -6,14 +6,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Umbraco.Composing;
 using Umbraco.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
@@ -24,9 +21,13 @@ namespace Umbraco.Web.BackOffice.AspNetCore
 {
 
 
-    public static class UmbracoBackOfficeServiceCollectionExtensions
+    public static class UmbracoCoreServiceCollectionExtensions
     {
-
+        /// <summary>
+        /// Adds the Umbraco Configuration requirements
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         public static IServiceCollection AddUmbracoConfiguration(this IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
@@ -45,13 +46,10 @@ namespace Umbraco.Web.BackOffice.AspNetCore
 
 
         /// <summary>
-        ///  Adds the Umbraco Back Core requirements
+        /// Adds the Umbraco Back Core requirements
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        /// <remarks>
-        /// Must be called after all services are added to the application because we are cross-wiring the container (currently)
-        /// </remarks>
         public static IServiceCollection AddUmbracoCore(this IServiceCollection services)
         {
             if (!UmbracoServiceProviderFactory.IsActive)
@@ -62,6 +60,13 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             return services.AddUmbracoCore(umbContainer, Assembly.GetEntryAssembly());
         }
 
+        /// <summary>
+        /// Adds the Umbraco Back Core requirements
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="umbContainer"></param>
+        /// <param name="entryAssembly"></param>
+        /// <returns></returns>
         public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IRegister umbContainer, Assembly entryAssembly)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
@@ -89,6 +94,8 @@ namespace Umbraco.Web.BackOffice.AspNetCore
                 hostingEnvironment,
                 backOfficeInfo,
                 typeFinder);
+
+            hostingEnvironment.RegisterObject(new CoreRuntimeShutdown(coreRuntime));
 
             var factory = coreRuntime.Boot(umbContainer);
 
@@ -124,8 +131,8 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             out ILogger logger, out Configs configs, out IIOHelper ioHelper, out Core.Hosting.IHostingEnvironment hostingEnvironment,
             out IBackOfficeInfo backOfficeInfo, out IProfiler profiler)
         {
-            // TODO: This isn't the best to have to resolve the services now but to avoid this will
-            // require quite a lot of re-work. 
+            // TODO: Resolving services before the Host is done configuring this way means that the services resolved
+            // are not going to be the same instances that are going to be used within the application!
             var serviceProvider = services.BuildServiceProvider();
 
             var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
@@ -160,6 +167,30 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             public void ThrowIfNotPermissions()
             {
                 // nothing to check
+            }
+        }
+
+        /// <summary>
+        /// Ensures the runtime is shutdown when the application is shutting down
+        /// </summary>
+        private class CoreRuntimeShutdown : IRegisteredObject
+        {
+            public CoreRuntimeShutdown(IRuntime runtime)
+            {
+                _runtime = runtime;
+            }
+
+            private bool _completed = false;
+            private readonly IRuntime _runtime;
+
+            public void Stop(bool immediate)
+            {
+                if (!_completed)
+                {
+                    _completed = true;
+                    _runtime.Terminate();
+                }
+                
             }
         }
     }
