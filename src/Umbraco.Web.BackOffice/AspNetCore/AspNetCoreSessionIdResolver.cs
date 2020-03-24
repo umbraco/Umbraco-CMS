@@ -18,10 +18,11 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         {
             get
             {
+                var httpContext = _httpContextAccessor?.HttpContext;
                 // If session isn't enabled this will throw an exception so we check
-                var sessionFeature = _httpContextAccessor?.HttpContext?.Features.Get<ISessionFeature>();
+                var sessionFeature = httpContext?.Features.Get<ISessionFeature>();
                 return sessionFeature != null
-                    ? _httpContextAccessor?.HttpContext?.Session?.Id
+                    ? httpContext?.Session?.Id
                     : "0";
             }
         }

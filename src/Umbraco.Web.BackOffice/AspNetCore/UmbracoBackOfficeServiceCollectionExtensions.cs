@@ -137,10 +137,11 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var ioHelper = new IOHelper(hostingEnvironment, globalSettings);
             var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,
                 new AspNetCoreSessionIdResolver(httpContextAccessor),
-                () => serviceProvider.GetService<IRequestCache>(), coreDebug, ioHelper,
+                // need to build a new service provider since the one already resolved above doesn't have the IRequestCache yet
+                () => services.BuildServiceProvider().GetService<IRequestCache>(), coreDebug, ioHelper,
                 new AspNetCoreMarchal());
 
-            var backOfficeInfo = new AspNetCoreBackOfficeInfo(configs.Global());
+            var backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
             var profiler = new LogProfiler(logger);
 
             Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);

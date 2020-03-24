@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using Serilog;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.UI.BackOffice
@@ -15,9 +14,8 @@ namespace Umbraco.Web.UI.BackOffice
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)                
+            Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
-                .UseUmbraco()
-                .UseSerilog();
+                .UseUmbraco();
     }
 }
