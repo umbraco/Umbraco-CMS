@@ -1,14 +1,18 @@
-@using Umbraco.Core
+﻿@using Umbraco.Core
 @using ClientDependency.Core
 @using ClientDependency.Core.Mvc
+@using Smidge
 @using Umbraco.Web.Composing
 @using Umbraco.Web
+@using Constants = Umbraco.Core.Constants
 
 @inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Editors.BackOfficePreviewModel>
 @{
     var disableDevicePreview = Model.DisableDevicePreview.ToString().ToLowerInvariant();
 
-    Html.RequiresCss("assets/css/canvasdesigner.css", "Umbraco");
+    SmidgeHelper
+        .CreateCssBundle(Constants.RuntimeMinification.CssBundles.Index)
+        .RequiresCss("~/assets/css/canvasdesigner.css");
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -18,8 +22,7 @@
     <meta name="robots" content="noindex, nofollow">
     <meta name="pinterest" content="nopin" />
 
-    @Html.RenderCssHere(
-        new BasicPath("Umbraco", Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath)))
+    @Current.RuntimeMinifier.RenderCssHere("index-css")
 
 </head>
 <body id="canvasdesignerPanel" ng-mouseover="outlinePositionHide()" ng-controller="previewController" ng-class="{'tabbing-active': tabbingActive === true}" ng-click="windowClickHandler($event)">
@@ -64,7 +67,8 @@
                     </div>
                 }
 
-                <button ng-click="exitPreview()" title="Exit Preview" class="menu-bar__button umb-outline"><i class="icon icon-power"></i><span>Exit</span>
+                <button ng-click="exitPreview()" title="Exit Preview" class="menu-bar__button umb-outline">
+                    <i class="icon icon-power"></i><span>Exit</span>
                 </button>
 
             </div>

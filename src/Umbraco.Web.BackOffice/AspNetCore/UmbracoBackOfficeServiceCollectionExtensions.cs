@@ -42,6 +42,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var httpContextAccessor = serviceProvider.GetService<IHttpContextAccessor>();
             var webHostEnvironment = serviceProvider.GetService<IWebHostEnvironment>();
             var hostApplicationLifetime = serviceProvider.GetService<IHostApplicationLifetime>();
+            var configuration = serviceProvider.GetService<IConfiguration>();
 
             var configs = serviceProvider.GetService<Configs>();
 
@@ -51,7 +52,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
                 hostApplicationLifetime,
                 configs);
 
-            services.AddRuntimeMinifier();
+            services.AddRuntimeMinifier(configuration);
 
             return services;
         }
@@ -84,9 +85,10 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             return services;
         }
 
-        public static IServiceCollection AddRuntimeMinifier(this IServiceCollection services)
+        public static IServiceCollection AddRuntimeMinifier(this IServiceCollection services,
+            IConfiguration configuration)
         {
-            services.AddSmidge((IConfiguration) ConfigurationManager.GetSection("smidge"));
+            services.AddSmidge(configuration.GetSection("Umbraco:Smidge"));
 
             return services;
         }

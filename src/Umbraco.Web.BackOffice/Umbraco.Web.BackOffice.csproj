@@ -19,6 +19,7 @@
         <ProjectReference Include="..\Umbraco.Configuration\Umbraco.Configuration.csproj" />
         <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
         <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+        <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj" />
     </ItemGroup>
 
 </Project>

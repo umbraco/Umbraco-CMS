@@ -1,8 +1,10 @@
 ﻿@using Umbraco.Core
 @using ClientDependency.Core
 @using ClientDependency.Core.Mvc
+@using Smidge
 @using Umbraco.Web.Composing
 @using Umbraco.Web
+@using Constants = Umbraco.Core.Constants
 
 @inherits WebViewPage<Umbraco.Web.Editors.BackOfficeModel>
 
@@ -18,10 +20,9 @@
         }
     }
 
-    Html
-        .RequiresCss("assets/css/umbraco.css", "Umbraco")
-        .RequiresCss("lib/bootstrap-social/bootstrap-social.css", "Umbraco")
-        .RequiresCss("lib/font-awesome/css/font-awesome.min.css", "Umbraco");
+    SmidgeHelper
+        .CreateCssBundle(Constants.RuntimeMinification.CssBundles.Default)
+        .RequiresCss("~/assets/css/umbraco.css", "~/lib/bootstrap-social/bootstrap-social.css", "~/lib/font-awesome/css/font-awesome.min.css");
 }
 
 <!DOCTYPE html>
@@ -38,8 +39,7 @@
 
     <title ng-bind="$root.locationTitle">Umbraco</title>
 
-    @Html.RenderCssHere(
-        new BasicPath("Umbraco", Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath)))
+    @Current.RuntimeMinifier.RenderCssHere("default-css")
 </head>
 <body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show, 'umb-tour-is-visible': tour.show, 'tabbing-active':tabbingActive}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
 

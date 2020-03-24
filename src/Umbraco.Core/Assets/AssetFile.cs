@@ -18,7 +18,7 @@ namespace Umbraco.Core.Assets
         public int Group { get; set; }
         public string PathNameAlias { get; set; }
         public string ForceProvider { get; set; }
-        public bool ForceBundle { get; set; }
+        public string Bundle { get; }
 
         /// <summary>
         /// Used to store additional attributes in the HTML markup for the item
@@ -30,7 +30,7 @@ namespace Umbraco.Core.Assets
 
         #endregion
 
-        public AssetFile(AssetType type)
+        public AssetFile(AssetType type, string bundleName = "unspecfed")
         {
             DependencyType = type;
             HtmlAttributes = new Dictionary<string, string>();
@@ -39,6 +39,7 @@ namespace Umbraco.Core.Assets
             Priority = 100;
             //Unless a group is specified, all dependencies will go into the same, default, group.
             Group = 100;
+            Bundle = bundleName;
         }
     }
 }

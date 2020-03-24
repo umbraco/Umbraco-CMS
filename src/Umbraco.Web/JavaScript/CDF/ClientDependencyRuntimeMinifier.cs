@@ -45,7 +45,7 @@ namespace Umbraco.Web.JavaScript.CDF
             //return html;
         }
 
-        public string RenderCssHere(params string[] path)
+        public string RenderCssHere(string bundleName)
         {
             throw new NotImplementedException();
             //return new HtmlString(_htmlHelper.ViewContext.GetLoader().RenderPlaceholder(
@@ -59,7 +59,7 @@ namespace Umbraco.Web.JavaScript.CDF
             //return _htmlHelper;
         }
 
-        public string RenderJsHere()
+        public string RenderJsHere(string bundleName)
         {
             throw new NotImplementedException();
             //return new HtmlString(
@@ -75,7 +75,7 @@ namespace Umbraco.Web.JavaScript.CDF
 
             foreach (var assetFile in attributes)
             {
-                if(!((AssetFile)assetFile is null))
+                if (!((AssetFile)assetFile is null))
                     dependencies.Add(MapAssetFile(assetFile));
             }
 
@@ -86,12 +86,19 @@ namespace Umbraco.Web.JavaScript.CDF
             return toParse.Split(new[] { DependencyPathRenderer.Delimiter }, StringSplitOptions.RemoveEmptyEntries);
         }
 
-        public string Minify(string src)
+        public string Minify(string src, AssetType assetType)
         {
             TextReader reader = new StringReader(src);
-            var jsMinifier = new JSMin();
 
-            return jsMinifier.Minify(reader);
+            if (assetType == AssetType.Javascript)
+            {
+                var jsMinifier = new JSMin();
+                return jsMinifier.Minify(reader);
+            }
+
+            // asset type is Css
+            var cssMinifier = new CssMinifier();
+            return cssMinifier.Minify(reader);
         }
 
         public void Reset()

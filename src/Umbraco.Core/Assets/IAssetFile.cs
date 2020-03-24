@@ -10,7 +10,7 @@ namespace Umbraco.Core.Assets
         int Group { get; set; }
         string PathNameAlias { get; set; }
         string ForceProvider { get; set; }
-        bool ForceBundle { get; set; }
+        string Bundle { get; }
         IDictionary<string, string> HtmlAttributes { get; }
     }
 }

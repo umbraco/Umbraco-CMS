@@ -1,8 +1,11 @@
 ﻿@using Umbraco.Core
 @using ClientDependency.Core
 @using ClientDependency.Core.Mvc
+@using Smidge
 @using Umbraco.Web.Composing
 @using Umbraco.Web
+@using Constants = Umbraco.Core.Constants
+using Umbraco.Core
 @inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Editors.BackOfficeModel>
 @{
     Layout = null;
@@ -11,6 +14,10 @@
         .RequiresCss("assets/css/umbraco.css", "Umbraco")
         .RequiresCss("lib/bootstrap-social/bootstrap-social.css", "Umbraco")
         .RequiresCss("lib/font-awesome/css/font-awesome.min.css", "Umbraco");
+
+    SmidgeHelper
+        .CreateCssBundle(Constants.RuntimeMinification.CssBundles.Index)
+        .RequiresCss("~/assets/css/canvasdesigner.css");
 }
 
 <!DOCTYPE html>

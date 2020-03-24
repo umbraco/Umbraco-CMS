@@ -1,4 +1,5 @@
 ﻿using System.Web.Mvc;
+using Umbraco.Core.Assets;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Runtime;
@@ -43,7 +44,7 @@ namespace Umbraco.Web.Mvc
 
             //minify the result
             var result = jsResult.Script;
-            var minified = _runtimeMinifier.Minify(result);
+            var minified = _runtimeMinifier.Minify(result, AssetType.Javascript);
             jsResult.Script = minified;
         }
     }

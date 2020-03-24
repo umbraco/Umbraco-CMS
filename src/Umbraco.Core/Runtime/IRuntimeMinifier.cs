@@ -14,17 +14,17 @@ namespace Umbraco.Core.Runtime
 
         //return type IHtmlString
         //IClientDependencyPath[]
-        string RenderCssHere(params string[] path);
+        string RenderCssHere(string bundleName);
 
         // return type HtmlHelper
         string RequiresJs(string filePath);
 
         // return type IHtmlString
-        string RenderJsHere();
+        string RenderJsHere(string bundleName);
 
         IEnumerable<string> GetAssetPaths(AssetType assetType, List<IAssetFile> attributes);
 
-        string Minify(string src);
+        string Minify(string src, AssetType assetType);
         void Reset();
         string GetScriptForBackOffice();
         IEnumerable<string> GetAssetList();
