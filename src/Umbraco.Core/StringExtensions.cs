@@ -87,13 +87,11 @@ namespace Umbraco.Core
         public static string GetFileExtension(this string file)
         {
             //Find any characters between the last . and the start of a query string or the end of the string
-            string pattern = @"(?<extension>\.[^\.\?]+)(\?.*|$)";
+            const string pattern = @"(?<extension>\.[^\.\?]+)(\?.*|$)";
             var match = Regex.Match(file, pattern);
-            if (match.Success)
-            {
-                return match.Groups[2].Value;
-            }
-            return string.Empty;
+            return match.Success
+                ? match.Groups["extension"].Value
+                : string.Empty;
         }
 
         /// <summary>
