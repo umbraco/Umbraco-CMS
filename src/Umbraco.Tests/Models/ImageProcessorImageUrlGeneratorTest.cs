@@ -16,10 +16,10 @@ using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.Models;
 using Umbraco.Web;
 using Umbraco.Web.PropertyEditors;
 using System.Text;
+using Umbraco.Infrastructure.Media;
 
 namespace Umbraco.Tests.Models
 {

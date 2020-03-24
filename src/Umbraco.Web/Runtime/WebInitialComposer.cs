@@ -45,11 +45,11 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Examine;
-using Umbraco.Core.Models;
 using Umbraco.Core.Request;
 using Umbraco.Core.Session;
 using Umbraco.Web.AspNet;
-using Umbraco.Web.Models;
+using Umbraco.Core.Media;
+using Umbraco.Infrastructure.Media;
 
 namespace Umbraco.Web.Runtime
 {

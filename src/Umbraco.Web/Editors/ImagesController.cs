@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;

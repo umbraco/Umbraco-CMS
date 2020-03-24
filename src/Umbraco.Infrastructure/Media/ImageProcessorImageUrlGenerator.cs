@@ -1,9 +1,10 @@
 ﻿using System.Globalization;
 using System.Text;
 using Umbraco.Core;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 
-namespace Umbraco.Web.Models
+namespace Umbraco.Infrastructure.Media
 {
     public class ImageProcessorImageUrlGenerator : IImageUrlGenerator
     {

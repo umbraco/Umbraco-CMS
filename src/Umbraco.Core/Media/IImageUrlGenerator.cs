@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Models
+﻿using Umbraco.Core.Models;
+
+namespace Umbraco.Core.Media
 {
     public interface IImageUrlGenerator
     {
