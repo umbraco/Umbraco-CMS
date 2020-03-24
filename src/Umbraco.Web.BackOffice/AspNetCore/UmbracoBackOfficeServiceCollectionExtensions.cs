@@ -13,6 +13,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
@@ -63,26 +64,30 @@ namespace Umbraco.Web.BackOffice.AspNetCore
 
         public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IRegister umbContainer, Assembly entryAssembly)
         {
+            if (services is null) throw new ArgumentNullException(nameof(services));
+            if (umbContainer is null) throw new ArgumentNullException(nameof(umbContainer));
+            if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
+
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            CreateCompositionRoot(services);
+            CreateCompositionRoot(services, out var logger, out var configs, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
 
             // TODO: Get rid of this 'Current' requirement
-            var globalSettings = Current.Configs.Global();
+            var globalSettings = configs.Global();
             var umbracoVersion = new UmbracoVersion(globalSettings);
 
             // TODO: Currently we are not passing in any TypeFinderConfig (with ITypeFinderSettings) which we should do, however
             // this is not critical right now and would require loading in some config before boot time so just leaving this as-is for now.
-            var typeFinder = new TypeFinder(Current.Logger, new DefaultUmbracoAssemblyProvider(entryAssembly));
+            var typeFinder = new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(entryAssembly));
 
             var coreRuntime = GetCoreRuntime(
-                Current.Configs,
+                configs,
                 umbracoVersion,
-                Current.IOHelper,
-                Current.Logger,
-                Current.Profiler,
-                Current.HostingEnvironment,
-                Current.BackOfficeInfo,
+                ioHelper,
+                logger,
+                profiler,
+                hostingEnvironment,
+                backOfficeInfo,
                 typeFinder);
 
             var factory = coreRuntime.Boot(umbContainer);
@@ -115,7 +120,9 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             return coreRuntime;
         }
 
-        private static void CreateCompositionRoot(IServiceCollection services)
+        private static void CreateCompositionRoot(IServiceCollection services,
+            out ILogger logger, out Configs configs, out IIOHelper ioHelper, out Core.Hosting.IHostingEnvironment hostingEnvironment,
+            out IBackOfficeInfo backOfficeInfo, out IProfiler profiler)
         {
             // TODO: This isn't the best to have to resolve the services now but to avoid this will
             // require quite a lot of re-work. 
@@ -123,9 +130,12 @@ namespace Umbraco.Web.BackOffice.AspNetCore
 
             var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
             var webHostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
+            // TODO: I'm unsure about this, by doing this it means we are resolving a "Different" instance to the one
+            // that controls the whole app because the instances comes from a different service provider. This
+            // could cause some issues with shutdowns, etc... we need to investigate. 
             var hostApplicationLifetime = serviceProvider.GetRequiredService<IHostApplicationLifetime>();
 
-            var configs = serviceProvider.GetService<Configs>();
+            configs = serviceProvider.GetService<Configs>();
             if (configs == null)
                 throw new InvalidOperationException($"Could not resolve type {typeof(Configs)} from the container, ensure {nameof(AddUmbracoConfiguration)} is called before calling {nameof(AddUmbracoCore)}");
 
@@ -133,17 +143,15 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var coreDebug = configs.CoreDebug();
             var globalSettings = configs.Global();
 
-            var hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment, httpContextAccessor, hostApplicationLifetime);
-            var ioHelper = new IOHelper(hostingEnvironment, globalSettings);
-            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,
+            hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment, httpContextAccessor, hostApplicationLifetime);
+            ioHelper = new IOHelper(hostingEnvironment, globalSettings);
+            logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,
                 new AspNetCoreSessionIdResolver(httpContextAccessor),
                 () => serviceProvider.GetService<IRequestCache>(), coreDebug, ioHelper,
                 new AspNetCoreMarchal());
 
-            var backOfficeInfo = new AspNetCoreBackOfficeInfo(configs.Global());
-            var profiler = new LogProfiler(logger);
-
-            Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
+            backOfficeInfo = new AspNetCoreBackOfficeInfo(configs.Global());
+            profiler = new LogProfiler(logger);
         }
 
         private class AspNetCoreBootPermissionsChecker : IUmbracoBootPermissionChecker

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Moq;
+using System.Data.Common;
 using System.Net;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -60,7 +61,7 @@ namespace Umbraco.Tests.Integration.Implementations
 
         public IWebHostEnvironment GetWebHostEnvironment() => _hostEnvironment;
 
-        public override IDbProviderFactoryCreator DbProviderFactoryCreator => new TestDbProviderFactoryCreator();
+        public override IDbProviderFactoryCreator DbProviderFactoryCreator => new SqlServerDbProviderFactoryCreator("System.Data.SqlClient", DbProviderFactories.GetFactory);
 
         public override IBulkSqlInsertProvider BulkSqlInsertProvider => new SqlServerBulkSqlInsertProvider();
 

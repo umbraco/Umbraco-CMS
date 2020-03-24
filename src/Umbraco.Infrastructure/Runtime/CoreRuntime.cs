@@ -115,6 +115,8 @@ namespace Umbraco.Core.Runtime
         /// <inheritdoc/>
         public virtual IFactory Boot(IRegister register)
         {
+            if (register is null) throw new ArgumentNullException(nameof(register));
+
             // create and register the essential services
             // ie the bare minimum required to boot
 
@@ -152,6 +154,9 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         protected virtual IFactory Boot(IRegister register, DisposableTimer timer)
         {
+            if (register is null) throw new ArgumentNullException(nameof(register));
+            if (timer is null) throw new ArgumentNullException(nameof(timer));
+
             Composition composition = null;
 
             try
