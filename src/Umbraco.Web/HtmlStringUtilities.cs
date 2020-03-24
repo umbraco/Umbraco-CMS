@@ -243,21 +243,27 @@ namespace Umbraco.Web
                                         }
                                     }
 
-                                    if (!lengthReached && currentTextLength >= length)
+                                    if (!lengthReached)
                                     {
-                                        // if the last character added was the first of a two character unicode pair, add the second character
-                                        if (Char.IsHighSurrogate((char)ic))
+                                        if (currentTextLength == length)
                                         {
-                                            var lowSurrogate = tr.Read();
-                                            outputtw.Write((char)lowSurrogate);
-                                        }
+                                            // if the last character added was the first of a two character unicode pair, add the second character
+                                            if (char.IsHighSurrogate((char)ic))
+                                            {
+                                                var lowSurrogate = tr.Read();
+                                                outputtw.Write((char)lowSurrogate);
+                                            }
 
-                                        // Reached truncate limit.
-                                        if (addElipsis)
-                                        {
-                                            outputtw.Write(hellip);
                                         }
-                                        lengthReached = true;
+                                        // only add elipsis if current length greater than original length
+                                        if (currentTextLength > length)
+                                        {
+                                            if (addElipsis)
+                                            {
+                                                outputtw.Write(hellip);
+                                            }
+                                            lengthReached = true;
+                                        }
                                     }
 
                                 }

@@ -61,7 +61,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ClientDependency" Version="1.9.8" />
+    <PackageReference Include="ClientDependency" Version="1.9.9" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="Examine" Version="1.0.2" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
@@ -1190,11 +1190,6 @@
     <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoInjectedModule.cs" />
     <Compile Include="UriUtility.cs" />
-    <Compile Include="Web References\org.umbraco.update\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.map</DependentUpon>
-    </Compile>
     <Compile Include="UmbracoAuthorizedHttpHandler.cs" />
     <Compile Include="UmbracoHttpHandler.cs" />
     <Compile Include="UmbracoWebService.cs">
@@ -1219,30 +1214,14 @@
     <EmbeddedResource Include="JavaScript\ServerVariables.js" />
   </ItemGroup>
   <ItemGroup>
-    <WebReferences Include="Web References\" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="JavaScript\PreviewInitialize.js" />
     <None Include="JavaScript\TinyMceInitialize.js" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <None Include="PublishedCache\NuCache\readme.md" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
-    <None Include="Web References\org.umbraco.update\checkforupgrade.wsdl" />
-    <None Include="Web References\org.umbraco.update\Reference.map">
-      <Generator>MSDiscoCodeGenerator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </None>
     <None Include="..\Umbraco.Web.UI\Views\web.config">
       <Link>Mvc\web.config</Link>
-    </None>
-    <None Include="Web References\org.umbraco.update\UpgradeResult.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
-    </None>
-    <None Include="Web References\org.umbraco.update\UpgradeResult1.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
     </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

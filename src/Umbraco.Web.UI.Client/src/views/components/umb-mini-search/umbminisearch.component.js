@@ -10,7 +10,8 @@
             bindings: {
                 model: "=",
                 onStartTyping: "&?",
-                onSearch: "&?"
+                onSearch: "&?",
+                onBlur: "&?"
             }
         });
 

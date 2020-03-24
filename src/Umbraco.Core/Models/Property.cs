@@ -50,7 +50,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Represents a property value.
         /// </summary>
-        public class PropertyValue
+        public class PropertyValue : IEquatable<PropertyValue>
         {
             // TODO: Either we allow change tracking at this class level, or we add some special change tracking collections to the Property
             // class to deal with change tracking which variants have changed
@@ -95,6 +95,26 @@ namespace Umbraco.Core.Models
             /// </summary>
             public PropertyValue Clone()
                 => new PropertyValue { _culture = _culture, _segment = _segment, PublishedValue = PublishedValue, EditedValue = EditedValue };
+
+            public override bool Equals(object obj)
+            {
+                return Equals(obj as PropertyValue);
+            }
+
+            public bool Equals(PropertyValue other)
+            {
+                return other != null &&
+                       _culture == other._culture &&
+                       _segment == other._segment;
+            }
+
+            public override int GetHashCode()
+            {
+                var hashCode = -1254204277;
+                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(_culture);
+                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(_segment);
+                return hashCode;
+            }
         }
 
         private static readonly DelegateEqualityComparer<object> PropertyValueComparer = new DelegateEqualityComparer<object>(
@@ -337,6 +357,20 @@ namespace Umbraco.Core.Models
             base.PerformDeepClone(clone);
 
             var clonedEntity = (Property)clone;
+
+            //manually clone _values, _pvalue, _vvalues
+            clonedEntity._values = _values?.Select(x => x.Clone()).ToList(); // all values get copied
+            clonedEntity._pvalue = _pvalue?.Clone();
+            // the tricky part here is that _values contains ALL values including the values in the _vvalues
+            // dictionary and they are by reference which is why we have equality overloads on PropertyValue
+            if (clonedEntity._vvalues != null)
+            {
+                clonedEntity._vvalues = new Dictionary<CompositeNStringNStringKey, PropertyValue>();
+                foreach (var item in _vvalues)
+                {
+                    clonedEntity._vvalues[item.Key] = clonedEntity._values.First(x => x.Equals(item.Value));
+                }
+            }
 
             //need to manually assign since this is a readonly property
             clonedEntity.PropertyType = (PropertyType) PropertyType.DeepClone();

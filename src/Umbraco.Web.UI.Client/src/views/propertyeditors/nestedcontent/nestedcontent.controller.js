@@ -221,6 +221,7 @@
             if (vm.overlayMenu.availableItems.length === 1 && vm.overlayMenu.pasteItems.length === 0) {
                 // only one scaffold type - no need to display the picker
                 addNode(vm.scaffolds[0].contentTypeAlias);
+                vm.overlayMenu = null;
                 return;
             }
 
@@ -276,6 +277,9 @@
         };
 
         vm.getName = function (idx) {
+            if (!model.value || !model.value.length) {
+                return "";
+            }
 
             var name = "";
 
@@ -325,6 +329,10 @@
         };
 
         vm.getIcon = function (idx) {
+            if (!model.value || !model.value.length) {
+                return "";
+            }
+
             var scaffold = getScaffold(model.value[idx].ncContentTypeAlias);
             return scaffold && scaffold.icon ? iconHelper.convertFromLegacyIcon(scaffold.icon) : "icon-folder";
         }
@@ -583,8 +591,8 @@
         }
 
         function updatePropertyActionStates() {
-            copyAllEntriesAction.isDisabled = !model.value || model.value.length === 0;
-            removeAllEntriesAction.isDisabled = !model.value || model.value.length === 0;
+            copyAllEntriesAction.isDisabled = !model.value || !model.value.length;
+            removeAllEntriesAction.isDisabled = copyAllEntriesAction.isDisabled;
         }
 
 

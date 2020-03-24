@@ -51,7 +51,10 @@ namespace Umbraco.Core.Services
         IEnumerable<TItem> GetComposedOf(int id); // composition axis
 
         IEnumerable<TItem> GetChildren(int id);
+        IEnumerable<TItem> GetChildren(Guid id);
+
         bool HasChildren(int id);
+        bool HasChildren(Guid id);
 
         void Save(TItem item, int userId = Constants.Security.SuperUserId);
         void Save(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId);
@@ -68,6 +71,13 @@ namespace Umbraco.Core.Services
         /// <param name="contentPath"></param>
         /// <returns></returns>
         bool HasContainerInPath(string contentPath);
+
+        /// <summary>
+        /// Gets a value indicating whether there is a list view content item in the path.
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        bool HasContainerInPath(params int[] ids);
 
         Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentContainerId, string name, int userId = Constants.Security.SuperUserId);
         Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);

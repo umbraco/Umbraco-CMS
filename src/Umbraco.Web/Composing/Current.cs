@@ -88,6 +88,12 @@ namespace Umbraco.Web.Composing
 
         public static UmbracoHelper UmbracoHelper
             => Factory.GetInstance<UmbracoHelper>();
+        public static IUmbracoComponentRenderer UmbracoComponentRenderer
+            => Factory.GetInstance<IUmbracoComponentRenderer>();
+        public static ITagQuery TagQuery
+            => Factory.GetInstance<ITagQuery>();
+        public static IPublishedContentQuery PublishedContentQuery
+            => Factory.GetInstance<IPublishedContentQuery>();
 
         public static DistributedCache DistributedCache
             => Factory.GetInstance<DistributedCache>();
