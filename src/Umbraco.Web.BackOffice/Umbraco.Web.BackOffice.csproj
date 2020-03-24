@@ -11,6 +11,11 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Smidge" Version="3.1.0" />
+      <PackageReference Include="Smidge.Nuglify" Version="2.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\Umbraco.Configuration\Umbraco.Configuration.csproj" />
         <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
         <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />

@@ -1,8 +1,11 @@
+using System.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Smidge;
 using Umbraco.Composing;
 using Umbraco.Configuration;
 using Umbraco.Core;
@@ -48,6 +51,8 @@ namespace Umbraco.Web.BackOffice.AspNetCore
                 hostApplicationLifetime,
                 configs);
 
+            services.AddRuntimeMinifier();
+
             return services;
         }
 
@@ -75,6 +80,13 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var profiler = new LogProfiler(logger);
 
             Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
+
+            return services;
+        }
+
+        public static IServiceCollection AddRuntimeMinifier(this IServiceCollection services)
+        {
+            services.AddSmidge((IConfiguration) ConfigurationManager.GetSection("smidge"));
 
             return services;
         }

@@ -10,7 +10,7 @@ namespace Umbraco.Core.Runtime
         string GetHashValue { get; }
 
         //return type HtmlHelper
-        string RequiresCss(string filePath, string pathNameAlias);
+        string RequiresCss(string filePath, string bundleName);
 
         //return type IHtmlString
         //IClientDependencyPath[]

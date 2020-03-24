@@ -38,7 +38,7 @@ namespace Umbraco.Web.JavaScript.CDF
             _htmlHelper = new HtmlHelper(new ViewContext(), new ViewPage());
         }
 
-        public string RequiresCss(string filePath, string pathNameAlias)
+        public string RequiresCss(string filePath, string bundleName)
         {
             throw new NotImplementedException();
             //_htmlHelper.ViewContext.GetLoader().RegisterDependency(filePath, pathNameAlias, ClientDependencyType.Css);
