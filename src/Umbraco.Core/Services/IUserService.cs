@@ -199,6 +199,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
         IEnumerable<IUser> GetAllInGroup(int groupId);
 
+        IEnumerable<IUser> GetUsersInGroup(int groupId, int page, int maxUsers,out long totalRecords);
         /// <summary>
         /// Gets a list of <see cref="IUser"/> objects not associated with a given group
         /// </summary>
@@ -255,5 +256,6 @@ namespace Umbraco.Core.Services
         void DeleteUserGroup(IUserGroup userGroup);
 
         #endregion
+
     }
 }

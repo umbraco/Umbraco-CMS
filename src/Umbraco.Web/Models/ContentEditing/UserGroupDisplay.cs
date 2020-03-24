@@ -15,6 +15,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "users")]
         public IEnumerable<UserBasic> Users { get; set; }
+        [DataMember(Name = "usersPages")]
+        public long UsersPages { get; set; }
 
         /// <summary>
         /// The default permissions for the user group organized by permission group name
@@ -27,5 +29,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "assignedPermissions")]
         public IEnumerable<AssignedContentPermissions> AssignedPermissions { get; set; }
+      [DataMember(Name = "currentUsersPage")]
+        public int CurrentUserPage { get; set; }
     }
 }

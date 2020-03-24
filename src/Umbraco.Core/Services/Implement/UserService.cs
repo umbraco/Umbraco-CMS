@@ -205,7 +205,7 @@ namespace Umbraco.Core.Services.Implement
                         //NOTE: this will not be cached
                         return _userRepository.GetByUsername(username, includeSecurityData: false);
                     }
-                    
+
                     throw;
                 }
             }
@@ -641,7 +641,15 @@ namespace Umbraco.Core.Services.Implement
                 return _userRepository.GetAllInGroup(groupId);
             }
         }
+        public IEnumerable<IUser> GetUsersInGroup(int groupId, int page, int maxUsers,out long totalRecords)
+        {
 
+                using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+                {
+                    return _userRepository.GetUsersInGroup(groupId,page,maxUsers, out totalRecords);
+                }
+
+        }
         /// <summary>
         /// Gets a list of <see cref="IUser"/> objects not associated with a given group
         /// </summary>
@@ -710,7 +718,7 @@ namespace Umbraco.Core.Services.Implement
                         //NOTE: this will not be cached
                         return _userRepository.Get(id, includeSecurityData: false);
                     }
-                    
+
                     throw;
                 }
             }
@@ -898,6 +906,8 @@ namespace Umbraco.Core.Services.Implement
                 scope.Complete();
             }
         }
+
+
 
         /// <summary>
         /// Removes a specific section from all users

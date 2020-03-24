@@ -7,6 +7,7 @@
         var contentPickerOpen = false;
 
         vm.page = {};        
+        
         vm.page.rootIcon = "icon-folder";
         vm.userGroup = {};
         vm.labels = {};
@@ -22,7 +23,8 @@
         vm.save = save;
         vm.openGranularPermissionsPicker = openGranularPermissionsPicker;
         vm.setPermissionsForNode = setPermissionsForNode;
-
+        vm.changePageNumber = changePageNumber;
+        
         function init() {
 
             vm.loading = true;
@@ -73,7 +75,13 @@
             }
 
         }
-
+        function changePageNumber(page) {
+            vm.loading = true;
+            userGroupsResource.getUserGroup($routeParams.id, page-1).then(function (userGroup) {
+                vm.userGroup = userGroup;
+                vm.loading = false;
+            });
+        }
         function save() {
             vm.page.saveButtonState = "busy";
 

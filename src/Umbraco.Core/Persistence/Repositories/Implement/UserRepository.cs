@@ -151,7 +151,7 @@ SELECT '4CountOfLockedOut' AS colName, COUNT(id) AS num FROM umbracoUser WHERE u
 UNION
 SELECT '5CountOfInvited' AS colName, COUNT(id) AS num FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL
 UNION
-SELECT '6CountOfDisabled' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL 
+SELECT '6CountOfDisabled' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL
 ORDER BY colName";
 
             var result = Database.Fetch<dynamic>(sql);
@@ -562,9 +562,9 @@ ORDER BY colName";
             {
                 userDto.EmailConfirmedDate = null;
                 userDto.SecurityStampToken = entity.SecurityStamp = Guid.NewGuid().ToString();
-                
+
                 changedCols.Add("emailConfirmedDate");
-                changedCols.Add("securityStampToken");  
+                changedCols.Add("securityStampToken");
             }
 
             //only update the changed cols
@@ -667,6 +667,12 @@ ORDER BY colName";
         {
             return GetAllInOrNotInGroup(groupId, true);
         }
+        public IEnumerable<IUser> GetUsersInGroup(int groupId,int page, int maxUsers,out long totalRecords)
+        {
+            return GetUsersInOrNotInGroup(groupId, true, page, maxUsers,out totalRecords);
+        }
+
+
 
         /// <summary>
         /// Gets a list of <see cref="IUser"/> objects not associated with a given group
@@ -695,7 +701,26 @@ ORDER BY colName";
 
             return ConvertFromDtos(Database.Fetch<UserDto>(sql));
         }
+        private IEnumerable<IUser> GetUsersInOrNotInGroup(int groupId, bool include, int page, int maxUsers,out long totalRecords)
+        {
+            var sql = SqlContext.Sql()
+                .Select<UserDto>()
+                .From<UserDto>();
 
+            var inSql = SqlContext.Sql()
+                .Select<User2UserGroupDto>(x => x.UserId)
+                .From<User2UserGroupDto>()
+                .Where<User2UserGroupDto>(x => x.UserGroupId == groupId);
+
+            if (include)
+                sql.WhereIn<UserDto>(x => x.Id, inSql);
+            else
+                sql.WhereNotIn<UserDto>(x => x.Id, inSql);
+            sql.OrderBy<UserDto>(x => x.Id);
+            var users = Database.Page<UserDto>(page + 1, maxUsers, sql);
+            totalRecords = users.TotalPages;
+            return ConvertFromDtos(users.Items);
+        }
         /// <summary>
         /// Gets paged user results
         /// </summary>
