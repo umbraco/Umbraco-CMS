@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
@@ -14,6 +15,11 @@ namespace Umbraco.Web.AspNet
         {
             _httpContextAccessor = httpContextAccessor;
             _hostApplicationLifetime = hostApplicationLifetime;
+
+            hostApplicationLifetime.ApplicationStarted.Register(() =>
+            {
+                ApplicationInit?.Invoke(this, EventArgs.Empty);
+            });
         }
 
         public bool IsRestarting { get; set; }
@@ -32,5 +38,7 @@ namespace Umbraco.Web.AspNet
             Thread.CurrentPrincipal = null;
             _hostApplicationLifetime.StopApplication();
         }
+
+        public event EventHandler ApplicationInit;
     }
 }

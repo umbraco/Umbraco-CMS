@@ -1,3 +1,5 @@
+using System;
+
 namespace Umbraco.Net
 {
     public interface IUmbracoApplicationLifetime
@@ -10,5 +12,7 @@ namespace Umbraco.Net
         /// Terminates the current application. The application restarts the next time a request is received for it.
         /// </summary>
         void Restart();
+
+        event EventHandler ApplicationInit;
     }
 }

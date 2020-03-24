@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Web.BackOffice.AspNetCore;
+using Umbraco.Web.Common.Extensions;
 using Umbraco.Web.Website.AspNetCore;
 
 
@@ -21,7 +22,9 @@ namespace Umbraco.Web.UI.BackOffice
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddUmbracoConfiguration();
+            services.AddUmbracoRequest();
             services.AddUmbracoWebsite();
             services.AddUmbracoBackOffice();
         }
@@ -29,6 +32,7 @@ namespace Umbraco.Web.UI.BackOffice
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseUmbracoRequest();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
