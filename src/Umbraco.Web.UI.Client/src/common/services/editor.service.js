@@ -588,7 +588,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function mediaPicker(editor) {
             editor.view = "views/common/infiniteeditors/mediapicker/mediapicker.html";
-            if (!editor.size) editor.size = "small";
+            if (!editor.size) editor.size = "medium";
             editor.updatedMediaNodes = [];
             open(editor);
         }
