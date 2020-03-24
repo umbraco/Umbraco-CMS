@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Integration
         public void BootCoreRuntime()
         {
             // LightInject / Umbraco
-            var container = new ServiceContainer(ContainerOptions.Default.Clone().WithMicrosoftSettings().WithAspNetCoreSettings());
+            var container = UmbracoServiceProviderFactory.CreateServiceContainer();
             var serviceProviderFactory = new UmbracoServiceProviderFactory(container);
             var umbracoContainer = serviceProviderFactory.GetContainer();            
 
