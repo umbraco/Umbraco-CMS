@@ -31,9 +31,10 @@ namespace Umbraco.Web.Runtime
             IBackOfficeInfo backOfficeInfo,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             IMainDom mainDom,
+            ITypeFinder typeFinder,
             IRequestCache requestCache,
             IUmbracoBootPermissionChecker umbracoBootPermissionChecker):
-            base(configs, umbracoVersion, ioHelper, logger, profiler ,umbracoBootPermissionChecker, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom)
+            base(configs, umbracoVersion, ioHelper, logger, profiler ,umbracoBootPermissionChecker, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom, typeFinder)
         {
             _requestCache = requestCache;
         }

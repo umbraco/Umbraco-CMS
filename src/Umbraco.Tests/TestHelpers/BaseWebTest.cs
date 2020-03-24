@@ -33,7 +33,6 @@ namespace Umbraco.Tests.TestHelpers
         protected override void Compose()
         {
             base.Compose();
-            base.Compose();
 
             Composition.RegisterUnique<IPublishedValueFallback, PublishedValueFallback>();
             Composition.RegisterUnique<IProfilingLogger, ProfilingLogger>();

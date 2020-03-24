@@ -3,7 +3,7 @@ using Umbraco.Net;
 
 namespace Umbraco.Web.BackOffice.AspNetCore
 {
-    internal class AspNetIpResolver : IIpResolver
+    public class AspNetIpResolver : IIpResolver
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 

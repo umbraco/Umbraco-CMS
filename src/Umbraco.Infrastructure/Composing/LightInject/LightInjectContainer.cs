@@ -16,10 +16,12 @@ namespace Umbraco.Core.Composing.LightInject
         /// <summary>
         /// Initializes a new instance of the <see cref="LightInjectContainer"/> with a LightInject container.
         /// </summary>
-        protected LightInjectContainer(ServiceContainer container)
+        public LightInjectContainer(ServiceContainer container)
         {
-            Container = container;
+            Container = ConfigureContainer(container);
         }
+
+        //TODO: The Create methods can die when net framework is gone
 
         /// <summary>
         /// Creates a new instance of the <see cref="LightInjectContainer"/> class.
@@ -33,7 +35,12 @@ namespace Umbraco.Core.Composing.LightInject
         protected static ServiceContainer CreateServiceContainer()
         {
             var container = new ServiceContainer(new ContainerOptions { EnablePropertyInjection = false });
+            ConfigureContainer(container);
+            return container;
+        }
 
+        private static ServiceContainer ConfigureContainer(ServiceContainer container)
+        {
             // note: the block below is disabled, as it is too LightInject-specific
             //
             // supports annotated constructor injections
@@ -84,7 +91,7 @@ namespace Umbraco.Core.Composing.LightInject
         /// <summary>
         /// Gets the LightInject container.
         /// </summary>
-        protected ServiceContainer Container { get; }
+        public ServiceContainer Container { get; }
 
         /// <inheritdoc cref="IRegister"/>
         /// <inheritdoc cref="IFactory"/>

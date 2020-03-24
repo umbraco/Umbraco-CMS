@@ -2,6 +2,7 @@
 
 namespace Umbraco.Core.Logging
 {
+
     /// <summary>
     /// Defines the logging service.
     /// </summary>
