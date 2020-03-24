@@ -222,9 +222,17 @@ angular.module('umbraco')
             // they contain different data structures so if we need to query against it we need to be aware of this.
             mediaHelper.registerFileResolver("Umbraco.ImageCropper", function (property, entity, thumbnail) {
                 if (property.value && property.value.src) {
-
                     if (thumbnail === true) {
-                        return property.value.src + "?width=500&mode=max&animationprocessmode=first";
+                        return mediaHelper.getProcessedImageUrl(property.value.src,
+                            {
+                                animationprocessmode: "first",
+                                mode: "max",
+                                width: 500
+                            })
+                            .then(function (url) {
+                                return url;
+                            });
+
                     }
                     else {
                         return property.value.src;

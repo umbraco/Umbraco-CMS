@@ -105,17 +105,17 @@ namespace Umbraco.Web.Editors
                                            int? focalPointLeft = null,
                                            int? focalPointTop = null,
                                            string animationProcessMode = "first",
-                                           string mode = "crop",
+                                           string mode = "max",
                                            bool upscale = false,
                                            string cacheBusterValue = "")
 {
             var options = new ImageUrlGenerationOptions(imagePath)
             {
-                AnimationProcessMode = "first",
+                AnimationProcessMode = animationProcessMode,
                 CacheBusterValue = cacheBusterValue,
                 Height = height,
-                ImageCropMode = "max",
-                UpScale = false,
+                ImageCropMode = mode,
+                UpScale = upscale,
                 Width = width,
             };
             if (focalPointLeft.HasValue && focalPointTop.HasValue)

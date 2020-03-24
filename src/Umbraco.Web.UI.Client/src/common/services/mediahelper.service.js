@@ -409,6 +409,7 @@ function mediaHelper(umbRequestHelper, $http, $log) {
          * @param {object} options Object describing image generation parameters:
          *  {
          *      animationProcessMode: <string>
+         *      cacheBusterValue: <string>
          *      focalPoint: {
          *          left: <int>
          *          top: <int>
@@ -433,6 +434,7 @@ function mediaHelper(umbRequestHelper, $http, $log) {
                         {
                             imagePath,
                             animationProcessMode: options.animationProcessMode,
+                            cacheBusterValue: options.cacheBusterValue,
                             focalPoint: options.focalPoint,
                             height: options.height,
                             mode: options.mode,
