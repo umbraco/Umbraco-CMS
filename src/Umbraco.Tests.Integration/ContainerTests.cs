@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Integration
             var msdiServiceProvider = services.BuildServiceProvider();
 
             // LightInject / Umbraco
-            var container = new ServiceContainer(ContainerOptions.Default.Clone().WithMicrosoftSettings().WithAspNetCoreSettings());
+            var container = UmbracoServiceProviderFactory.CreateServiceContainer();
             var serviceProviderFactory = new UmbracoServiceProviderFactory(container);
             var umbracoContainer = serviceProviderFactory.GetContainer();
             serviceProviderFactory.CreateBuilder(services); // called during Host Builder, needed to capture services

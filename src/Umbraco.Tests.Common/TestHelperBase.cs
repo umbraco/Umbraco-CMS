@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using LightInject;
+using LightInject.Microsoft.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;

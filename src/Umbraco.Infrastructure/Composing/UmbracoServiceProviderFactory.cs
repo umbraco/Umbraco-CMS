@@ -18,11 +18,17 @@ namespace Umbraco.Core.Composing
         }
 
         /// <summary>
+        /// Creates an ASP.NET Core compatible service container
+        /// </summary>
+        /// <returns></returns>
+        public static ServiceContainer CreateServiceContainer() => new ServiceContainer(ContainerOptions.Default.Clone().WithMicrosoftSettings().WithAspNetCoreSettings());
+
+        /// <summary>
         /// Default ctor for use in Host Builder configuration
         /// </summary>
         public UmbracoServiceProviderFactory()
         {
-            var container = new ServiceContainer(ContainerOptions.Default.Clone().WithMicrosoftSettings().WithAspNetCoreSettings());
+            var container = CreateServiceContainer();
             UmbracoContainer = _container = new LightInjectContainer(container);
             IsActive = true;
         }
