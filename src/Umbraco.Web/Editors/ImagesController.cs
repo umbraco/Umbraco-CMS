@@ -84,5 +84,46 @@ namespace Umbraco.Web.Editors
             return response;
         }
 
+        /// <summary>
+        /// Gets a processed image for the image at the given path
+        /// </summary>
+        /// <param name="imagePath"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="focalPointLeft"></param>
+        /// <param name="focalPointTop"></param>
+        /// <param name="animationProcessMode"></param>
+        /// <param name="mode"></param>
+        /// <param name="upscale"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// If there is no media, image property or image file is found then this will return not found.
+        /// </remarks>
+        public string GetProcessedImageUrl(string imagePath,
+                                           int? width = null,
+                                           int? height = null,
+                                           int? focalPointLeft = null,
+                                           int? focalPointTop = null,
+                                           string animationProcessMode = "first",
+                                           string mode = "crop",
+                                           bool upscale = false,
+                                           string cacheBusterValue = "")
+{
+            var options = new ImageUrlGenerationOptions(imagePath)
+            {
+                AnimationProcessMode = "first",
+                CacheBusterValue = cacheBusterValue,
+                Height = height,
+                ImageCropMode = "max",
+                UpScale = false,
+                Width = width,
+            };
+            if (focalPointLeft.HasValue && focalPointTop.HasValue)
+            {
+                options.FocalPoint = new ImageUrlGenerationOptions.FocalPointPosition(focalPointTop.Value, focalPointLeft.Value);
+            }
+
+            return _imageUrlGenerator.GetImageUrl(options);
+        }
     }
 }
