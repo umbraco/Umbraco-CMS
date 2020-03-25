@@ -1,6 +1,6 @@
 using System.Web;
+using Umbraco.Core.Net;
 using Umbraco.Core.Session;
-using Umbraco.Net;
 
 namespace Umbraco.Web.AspNet
 {

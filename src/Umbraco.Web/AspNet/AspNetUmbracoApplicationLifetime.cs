@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Web;
-using Umbraco.Net;
+using Umbraco.Core.Net;
 
 namespace Umbraco.Web.AspNet
 {

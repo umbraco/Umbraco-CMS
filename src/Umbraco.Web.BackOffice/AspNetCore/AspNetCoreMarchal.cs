@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using Umbraco.Core.Diagnostics;
 
-namespace Umbraco.Web.BackOffice
+namespace Umbraco.Web.BackOffice.AspNetCore
 {
 
     public class AspNetCoreMarchal : IMarchal

@@ -9,9 +9,9 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Net;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Net;
 using Umbraco.Web.Models.Identity;
 using IPasswordHasher = Microsoft.AspNet.Identity.IPasswordHasher;
 

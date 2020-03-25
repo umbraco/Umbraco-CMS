@@ -10,10 +10,10 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Net;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Net;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Security.Providers

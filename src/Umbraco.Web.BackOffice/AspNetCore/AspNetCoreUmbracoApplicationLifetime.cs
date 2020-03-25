@@ -1,9 +1,9 @@
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
-using Umbraco.Net;
+using Umbraco.Core.Net;
 
-namespace Umbraco.Web.AspNet
+namespace Umbraco.Web.BackOffice.AspNetCore
 {
     public class AspNetCoreUmbracoApplicationLifetime : IUmbracoApplicationLifetime
     {
