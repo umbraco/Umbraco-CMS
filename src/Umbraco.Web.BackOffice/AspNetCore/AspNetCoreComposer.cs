@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Net;
+using Umbraco.Net;
 using Umbraco.Core.Runtime;
 
 namespace Umbraco.Web.BackOffice.AspNetCore

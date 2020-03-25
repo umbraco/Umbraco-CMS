@@ -51,7 +51,7 @@ using Umbraco.Web.Templates;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models;
-using Umbraco.Core.Net;
+using Umbraco.Net;
 using Umbraco.Core.Request;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;

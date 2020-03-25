@@ -14,7 +14,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Packaging;
-using Umbraco.Core.Net;
+using Umbraco.Net;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;

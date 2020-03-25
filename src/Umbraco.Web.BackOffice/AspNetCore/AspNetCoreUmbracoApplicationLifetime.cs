@@ -1,7 +1,7 @@
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
-using Umbraco.Core.Net;
+using Umbraco.Net;
 
 namespace Umbraco.Web.BackOffice.AspNetCore
 {

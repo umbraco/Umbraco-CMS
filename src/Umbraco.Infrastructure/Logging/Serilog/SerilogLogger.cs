@@ -9,7 +9,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Net;
+using Umbraco.Net;
 
 namespace Umbraco.Core.Logging.Serilog
 {

@@ -4,7 +4,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
-using Umbraco.Core.Net;
+using Umbraco.Net;
 
 namespace Umbraco.Core.Compose
 {

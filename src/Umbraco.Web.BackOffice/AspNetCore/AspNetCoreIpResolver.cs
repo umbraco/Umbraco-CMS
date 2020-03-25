@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Http;
-using Umbraco.Core.Net;
+using Umbraco.Net;
 
 namespace Umbraco.Web.BackOffice.AspNetCore
 {

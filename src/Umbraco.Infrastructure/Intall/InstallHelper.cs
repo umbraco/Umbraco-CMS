@@ -9,7 +9,7 @@ using Umbraco.Core.Cookie;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models;
-using Umbraco.Core.Net;
+using Umbraco.Net;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;

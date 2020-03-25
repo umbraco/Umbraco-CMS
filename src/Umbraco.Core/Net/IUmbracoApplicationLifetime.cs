@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Net
+namespace Umbraco.Net
 {
     public interface IUmbracoApplicationLifetime
     {

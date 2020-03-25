@@ -10,7 +10,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Net;
+using Umbraco.Net;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
 using Umbraco.Tests.Common;
