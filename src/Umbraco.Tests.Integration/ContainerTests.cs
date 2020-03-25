@@ -73,6 +73,14 @@ namespace Umbraco.Tests.Integration
         [Test]
         public async Task BuildServiceProvider_Before_Host_Is_Configured()
         {
+            // This is a test to show an anti-pattern used in netcore. This should be avoided in all cases if possible.
+            // There's a thread about this here: https://github.com/dotnet/aspnetcore/issues/14587
+            // For some reason we are not being warned about this with our code analysis since we are using it
+            // in a couple of places but we should really try to see if we can avoid it.
+            // The test below shows how it could be possible to resolve an instance and then re-register it as a factory
+            // so that only one singleton instance is every created, but it's hacky and like Fowler says in that article
+            // it means the container won't be disposed, and maybe other services? not sure.
+
             var umbracoContainer = RuntimeTests.GetUmbracoContainer(out var serviceProviderFactory);
 
             IHostApplicationLifetime lifetime1 = null;

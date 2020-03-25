@@ -29,6 +29,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         /// <returns></returns>
         public static IServiceCollection AddUmbracoConfiguration(this IServiceCollection services)
         {
+            // TODO: We need to avoid this, surely there's a way? See ContainerTests.BuildServiceProvider_Before_Host_Is_Configured
             var serviceProvider = services.BuildServiceProvider();
             var configuration = serviceProvider.GetService<IConfiguration>();
             if (configuration == null)
@@ -129,8 +130,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             out ILogger logger, out Configs configs, out IIOHelper ioHelper, out Core.Hosting.IHostingEnvironment hostingEnvironment,
             out IBackOfficeInfo backOfficeInfo, out IProfiler profiler)
         {
-            // TODO: Resolving services before the Host is done configuring this way means that the services resolved
-            // are not going to be the same instances that are going to be used within the application!
+            // TODO: We need to avoid this, surely there's a way? See ContainerTests.BuildServiceProvider_Before_Host_Is_Configured
             var serviceProvider = services.BuildServiceProvider();
 
             var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
@@ -148,7 +148,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             ioHelper = new IOHelper(hostingEnvironment, globalSettings);
             logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,
                 new AspNetCoreSessionIdResolver(httpContextAccessor),
-                // need to build a new service provider since the one already resolved above doesn't have the IRequestCache yet
+                // TODO: We need to avoid this, surely there's a way? See ContainerTests.BuildServiceProvider_Before_Host_Is_Configured
                 () => services.BuildServiceProvider().GetService<IRequestCache>(), coreDebug, ioHelper,
                 new AspNetCoreMarchal());
 
