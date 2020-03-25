@@ -94,18 +94,18 @@ namespace Umbraco.Tests.Integration
         public async Task AddUmbracoCore()
         {
             var umbracoContainer = GetUmbracoContainer(out var serviceProviderFactory);
+            var testHelper = new TestHelper();
 
             var hostBuilder = new HostBuilder()
                 .UseUmbraco(serviceProviderFactory)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    var testHelper = new TestHelper();
-
-                    AddRequiredNetCoreServices(services, testHelper);
+                    var webHostEnvironment = testHelper.GetWebHostEnvironment();
+                    AddRequiredNetCoreServices(services, testHelper, webHostEnvironment);
 
                     // Add it!
-                    services.AddUmbracoConfiguration();
-                    services.AddUmbracoCore(umbracoContainer, GetType().Assembly);
+                    services.AddUmbracoConfiguration(hostContext.Configuration);
+                    services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly);
                 });
 
             var host = await hostBuilder.StartAsync();
@@ -138,12 +138,13 @@ namespace Umbraco.Tests.Integration
             var hostBuilder = new HostBuilder()
                 .UseUmbraco(serviceProviderFactory)
                 .ConfigureServices((hostContext, services) =>
-                {   
-                    AddRequiredNetCoreServices(services, testHelper);
+                {
+                    var webHostEnvironment = testHelper.GetWebHostEnvironment();
+                    AddRequiredNetCoreServices(services, testHelper, webHostEnvironment);
 
                     // Add it!
-                    services.AddUmbracoConfiguration();
-                    services.AddUmbracoCore(umbracoContainer, GetType().Assembly);
+                    services.AddUmbracoConfiguration(hostContext.Configuration);
+                    services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly);
                 });
 
             var host = await hostBuilder.StartAsync();
@@ -178,11 +179,12 @@ namespace Umbraco.Tests.Integration
                 .UseUmbraco(serviceProviderFactory)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    AddRequiredNetCoreServices(services, testHelper);
+                    var webHostEnvironment = testHelper.GetWebHostEnvironment();
+                    AddRequiredNetCoreServices(services, testHelper, webHostEnvironment);
 
                     // Add it!
-                    services.AddUmbracoConfiguration();
-                    services.AddUmbracoCore(umbracoContainer, GetType().Assembly);
+                    services.AddUmbracoConfiguration(hostContext.Configuration);
+                    services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly);
                 });
 
             var host = await hostBuilder.StartAsync();
@@ -223,11 +225,12 @@ namespace Umbraco.Tests.Integration
         /// </summary>
         /// <param name="services"></param>
         /// <param name="testHelper"></param>
-        private void AddRequiredNetCoreServices(IServiceCollection services, TestHelper testHelper)
+        /// <param name="webHostEnvironment"></param>
+        private void AddRequiredNetCoreServices(IServiceCollection services, TestHelper testHelper, IWebHostEnvironment webHostEnvironment)
         {
             services.AddSingleton<IHttpContextAccessor>(x => testHelper.GetHttpContextAccessor());
             // the generic host does add IHostEnvironment but not this one because we are not actually in a web context
-            services.AddSingleton<IWebHostEnvironment>(x => testHelper.GetWebHostEnvironment());
+            services.AddSingleton<IWebHostEnvironment>(x => webHostEnvironment);
         }
 
         [RuntimeLevel(MinLevel = RuntimeLevel.Install)]

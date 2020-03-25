@@ -26,14 +26,11 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         /// Adds the Umbraco Configuration requirements
         /// </summary>
         /// <param name="services"></param>
+        /// <param name="configuration"></param>
         /// <returns></returns>
-        public static IServiceCollection AddUmbracoConfiguration(this IServiceCollection services)
+        public static IServiceCollection AddUmbracoConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            // TODO: We need to avoid this, surely there's a way? See ContainerTests.BuildServiceProvider_Before_Host_Is_Configured
-            var serviceProvider = services.BuildServiceProvider();
-            var configuration = serviceProvider.GetService<IConfiguration>();
-            if (configuration == null)
-                throw new InvalidOperationException($"Could not resolve {typeof(IConfiguration)} from the container");
+            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
             var configsFactory = new AspNetCoreConfigsFactory(configuration);
 
@@ -49,25 +46,27 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         /// Adds the Umbraco Back Core requirements
         /// </summary>
         /// <param name="services"></param>
+        /// <param name="webHostEnvironment"></param>
         /// <returns></returns>
-        public static IServiceCollection AddUmbracoCore(this IServiceCollection services)
+        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment)
         {
             if (!UmbracoServiceProviderFactory.IsActive)
                 throw new InvalidOperationException("Ensure to add UseUmbraco() in your Program.cs after ConfigureWebHostDefaults to enable Umbraco's service provider factory");
 
             var umbContainer = UmbracoServiceProviderFactory.UmbracoContainer;
 
-            return services.AddUmbracoCore(umbContainer, Assembly.GetEntryAssembly());
+            return services.AddUmbracoCore(webHostEnvironment, umbContainer, Assembly.GetEntryAssembly());
         }
 
         /// <summary>
         /// Adds the Umbraco Back Core requirements
         /// </summary>
         /// <param name="services"></param>
+        /// <param name="webHostEnvironment"></param>
         /// <param name="umbContainer"></param>
         /// <param name="entryAssembly"></param>
         /// <returns></returns>
-        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IRegister umbContainer, Assembly entryAssembly)
+        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IRegister umbContainer, Assembly entryAssembly)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (umbContainer is null) throw new ArgumentNullException(nameof(umbContainer));
@@ -77,7 +76,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             // we resolve it before the host finishes configuring in the call to CreateCompositionRoot
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            CreateCompositionRoot(services, out var logger, out var configs, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
+            CreateCompositionRoot(services, webHostEnvironment, out var logger, out var configs, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
 
             var globalSettings = configs.Global();
             var umbracoVersion = new UmbracoVersion(globalSettings);
@@ -126,7 +125,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             return coreRuntime;
         }
 
-        private static void CreateCompositionRoot(IServiceCollection services,
+        private static void CreateCompositionRoot(IServiceCollection services, IWebHostEnvironment webHostEnvironment,
             out ILogger logger, out Configs configs, out IIOHelper ioHelper, out Core.Hosting.IHostingEnvironment hostingEnvironment,
             out IBackOfficeInfo backOfficeInfo, out IProfiler profiler)
         {
@@ -134,7 +133,6 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var serviceProvider = services.BuildServiceProvider();
 
             var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
-            var webHostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
 
             configs = serviceProvider.GetService<Configs>();
             if (configs == null)
