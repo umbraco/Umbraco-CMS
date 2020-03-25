@@ -104,11 +104,6 @@ namespace Umbraco.Tests.Runtimes
                 return configs;
             }
 
-            private static IProfiler GetProfiler()
-            {
-                return new TestProfiler();
-            }
-
             public IRuntime Runtime { get; private set; }
 
             protected override IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
