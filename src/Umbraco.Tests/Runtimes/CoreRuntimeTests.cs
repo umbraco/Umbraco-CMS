@@ -136,48 +136,12 @@ namespace Umbraco.Tests.Runtimes
                 return mock.Object;
             }
 
-            // FIXME: so how the f* should we do it now?
-            /*
-            // pretend we have the proper migration
-            // else BootFailedException because our mock IUmbracoDatabaseFactory does not provide databases
-            protected override bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory)
-            {
-                return true;
-            }
-            */
-
-            //// because we don't even have the core runtime component,
-            //// there are a few required stuff that we need to compose
-            //public override void Compose(Composition composition)
-            //{
-            //    base.Compose(composition);
-
-            //    var scopeProvider = Mock.Of<IScopeProvider>();
-            //    Mock.Get(scopeProvider)
-            //        .Setup(x => x.CreateScope(
-            //            It.IsAny<IsolationLevel>(),
-            //            It.IsAny<RepositoryCacheMode>(),
-            //            It.IsAny<IEventDispatcher>(),
-            //            It.IsAny<bool?>(),
-            //            It.IsAny<bool>(),
-            //            It.IsAny<bool>()))
-            //        .Returns(Mock.Of<IScope>());
-
-            //    composition.RegisterUnique(scopeProvider);
-            //}
-
-            private IMainDom _mainDom;
-
             public override IFactory Configure(IRegister container)
             {
-                var factory = base.Configure(container);
-                _mainDom = factory.GetInstance<IMainDom>();
-                return factory;
-            }
+                container.Register<IHostingEnvironmentLifetime, AspNetHostingLifetime>(Lifetime.Singleton);
 
-            public override void Terminate()
-            {
-                base.Terminate();
+                var factory = base.Configure(container);
+                return factory;
             }
 
             // runs with only one single component
