@@ -210,36 +210,9 @@ namespace Umbraco.Tests.Integration
             //Assert.AreEqual(RuntimeLevel.Run, runtimeState.Level);
         }
 
-        [Ignore("This test just shows that resolving services from the container before the host is done resolves 2 different instances")]
-        [Test]
-        public async Task BuildServiceProvider()
+        internal static LightInjectContainer GetUmbracoContainer(out UmbracoServiceProviderFactory serviceProviderFactory)
         {
-            var umbracoContainer = GetUmbracoContainer(out var serviceProviderFactory);
-
-            IHostApplicationLifetime lifetime1 = null;
-
-            var hostBuilder = new HostBuilder()
-                .UseUmbraco(serviceProviderFactory)
-                .ConfigureServices((hostContext, services) =>
-                {
-                    // TODO: Try to re-register the service as a callback and see if it resolves to the same instance
-
-                    lifetime1 = services.BuildServiceProvider().GetRequiredService<IHostApplicationLifetime>();
-                });
-
-            var host = await hostBuilder.StartAsync();
-
-            var lifetime2 = host.Services.GetRequiredService<IHostApplicationLifetime>();
-
-            lifetime1.StopApplication();
-            Assert.IsTrue(lifetime1.ApplicationStopping.IsCancellationRequested);
-            Assert.AreEqual(lifetime1.ApplicationStopping.IsCancellationRequested, lifetime2.ApplicationStopping.IsCancellationRequested);
-
-        }
-
-        private LightInjectContainer GetUmbracoContainer(out UmbracoServiceProviderFactory serviceProviderFactory)
-        {
-            var container = new ServiceContainer(ContainerOptions.Default.Clone().WithMicrosoftSettings().WithAspNetCoreSettings());
+            var container = UmbracoServiceProviderFactory.CreateServiceContainer();
             serviceProviderFactory = new UmbracoServiceProviderFactory(container);
             var umbracoContainer = serviceProviderFactory.GetContainer();
             return umbracoContainer;

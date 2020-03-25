@@ -1,4 +1,5 @@
-﻿using LightInject;
+﻿using System.Threading.Tasks;
+using LightInject;
 using LightInject.Microsoft.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -66,6 +67,37 @@ namespace Umbraco.Tests.Integration
             Assert.AreSame(foo2, foo3);
 
             Assertions.AssertContainer(umbracoContainer.Container);
+        }
+
+        [Explicit("This test just shows that resolving services from the container before the host is done resolves 2 different instances")]
+        [Test]
+        public async Task BuildServiceProvider_Before_Host_Is_Configured()
+        {
+            var umbracoContainer = RuntimeTests.GetUmbracoContainer(out var serviceProviderFactory);
+
+            IHostApplicationLifetime lifetime1 = null;
+
+            var hostBuilder = new HostBuilder()
+                .UseUmbraco(serviceProviderFactory)
+                .ConfigureServices((hostContext, services) =>
+                {
+                    // Resolve a service from the netcore container before the host has finished the ConfigureServices sequence
+                    lifetime1 = services.BuildServiceProvider().GetRequiredService<IHostApplicationLifetime>();
+
+                    // Re-add as a callback, ensures its the same instance all the way through (hack)
+                    services.AddSingleton<IHostApplicationLifetime>(x => lifetime1);
+                });
+
+            var host = await hostBuilder.StartAsync();
+
+            var lifetime2 = host.Services.GetRequiredService<IHostApplicationLifetime>();
+            var lifetime3 = umbracoContainer.GetInstance<IHostApplicationLifetime>();
+
+            lifetime1.StopApplication();
+            Assert.IsTrue(lifetime1.ApplicationStopping.IsCancellationRequested);
+            Assert.AreEqual(lifetime1.ApplicationStopping.IsCancellationRequested, lifetime2.ApplicationStopping.IsCancellationRequested);
+            Assert.AreEqual(lifetime1.ApplicationStopping.IsCancellationRequested, lifetime3.ApplicationStopping.IsCancellationRequested);
+
         }
 
         private class Foo
