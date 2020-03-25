@@ -36,7 +36,7 @@ namespace Umbraco.Web
 
             var requestCache = new HttpRequestAppCache(() => HttpContext.Current?.Items);
             var umbracoBootPermissionChecker = new AspNetUmbracoBootPermissionChecker();
-            return new WebRuntime(configs, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom, requestCache, umbracoBootPermissionChecker);
+            return new WebRuntime(configs, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom, GetTypeFinder(), requestCache, umbracoBootPermissionChecker);
         }
     }
 }

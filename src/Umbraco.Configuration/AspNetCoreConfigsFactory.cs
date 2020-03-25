@@ -14,7 +14,7 @@ namespace Umbraco.Configuration
 
         public AspNetCoreConfigsFactory(IConfiguration configuration)
         {
-            _configuration = configuration;
+            _configuration = configuration ?? throw new System.ArgumentNullException(nameof(configuration));
         }
 
         public Configs Create()

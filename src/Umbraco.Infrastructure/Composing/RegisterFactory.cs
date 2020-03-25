@@ -1,14 +1,22 @@
-﻿using System;
+﻿using LightInject;
+using LightInject.Microsoft.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System;
 using System.Reflection;
+using Umbraco.Core.Composing.LightInject;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Composing
 {
+
     /// <summary>
     /// Creates the container.
     /// </summary>
     public static class RegisterFactory
     {
+        //TODO: This can die when net framework is gone
+
         // cannot use typeof().AssemblyQualifiedName on the web container - we don't reference it
         // a normal Umbraco site should run on the web container, but an app may run on the core one
         private const string CoreLightInjectContainerTypeName = "Umbraco.Core.Composing.LightInject.LightInjectContainer,Umbraco.Core";
