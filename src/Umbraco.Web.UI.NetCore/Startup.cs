@@ -24,7 +24,6 @@ namespace Umbraco.Web.UI.BackOffice
         {
 
             services.AddUmbracoConfiguration();
-            services.AddUmbracoRequest();
             services.AddUmbracoCore();
             services.AddUmbracoWebsite();
         }

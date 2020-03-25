@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Net;
 
-namespace Umbraco.Web.AspNet
+namespace Umbraco.Web.Common.AspNetCore
 {
     public class AspNetCoreUmbracoApplicationLifetime : IUmbracoApplicationLifetime
     {

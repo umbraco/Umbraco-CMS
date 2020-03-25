@@ -18,6 +18,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
+using Umbraco.Web.Common.Runtime.Profiler;
 
 namespace Umbraco.Web.BackOffice.AspNetCore
 {
@@ -118,7 +119,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         private static void CreateCompositionRoot(IServiceCollection services)
         {
             // TODO: This isn't the best to have to resolve the services now but to avoid this will
-            // require quite a lot of re-work. 
+            // require quite a lot of re-work.
             var serviceProvider = services.BuildServiceProvider();
 
             var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
@@ -142,11 +143,26 @@ namespace Umbraco.Web.BackOffice.AspNetCore
                 new AspNetCoreMarchal());
 
             var backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
-            var profiler = new LogProfiler(logger);
+            var profiler = GetWebProfiler(hostingEnvironment, httpContextAccessor);
 
             Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
         }
 
+        private static IProfiler GetWebProfiler(Umbraco.Core.Hosting.IHostingEnvironment hostingEnvironment, IHttpContextAccessor httpContextAccessor)
+        {
+            // create and start asap to profile boot
+            if (!hostingEnvironment.IsDebugMode)
+            {
+                // should let it be null, that's how MiniProfiler is meant to work,
+                // but our own IProfiler expects an instance so let's get one
+                return new VoidProfiler();
+            }
+
+            var webProfiler = new WebProfiler(httpContextAccessor);
+            webProfiler.Start();
+
+            return webProfiler;
+        }
         private class AspNetCoreBootPermissionsChecker : IUmbracoBootPermissionChecker
         {
             public void ThrowIfNotPermissions()
