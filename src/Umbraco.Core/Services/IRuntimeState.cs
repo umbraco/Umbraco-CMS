@@ -26,21 +26,6 @@ namespace Umbraco.Core
         SemVersion SemanticVersion { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the application is running in debug mode.
-        /// </summary>
-        bool Debug { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether the runtime is the current main domain.
-        /// </summary>
-        bool IsMainDom { get; }
-
-        /// <summary>
-        /// Get the server's current role.
-        /// </summary>
-        ServerRole ServerRole { get; }
-
-        /// <summary>
         /// Gets the Umbraco application url.
         /// </summary>
         /// <remarks>This is eg "http://www.example.com".</remarks>
@@ -71,6 +56,5 @@ namespace Umbraco.Core
         /// </summary>
         BootFailedException BootFailedException { get; }
 
-        IMainDom MainDom { get; }
     }
 }

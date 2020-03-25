@@ -19,13 +19,13 @@ namespace Umbraco.Tests.Scheduling
     public class BackgroundTaskRunnerTests
     {
         private ILogger _logger;
-        private IHostingEnvironment _hostingEnvironment;
+        private IHostingEnvironmentLifetime _hostingEnvironment;
 
         [OneTimeSetUp]
         public void InitializeFixture()
         {
             _logger = new ConsoleLogger(new MessageTemplates());
-            _hostingEnvironment = TestHelper.GetHostingEnvironment();
+            _hostingEnvironment = TestHelper.GetHostingEnvironmentLifetime();
         }
 
         [Test]
@@ -934,7 +934,7 @@ namespace Umbraco.Tests.Scheduling
         [Test]
         public void SourceTaskTest()
         {
-            var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions { KeepAlive = true, LongRunning = true }, _logger, TestHelper.GetHostingEnvironment());
+            var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions { KeepAlive = true, LongRunning = true }, _logger, TestHelper.GetHostingEnvironmentLifetime());
 
             var task = new SourceTask();
             runner.Add(task);

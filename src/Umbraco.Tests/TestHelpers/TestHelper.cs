@@ -21,12 +21,12 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Net;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Web;
 using Umbraco.Web.Hosting;
@@ -40,7 +40,7 @@ namespace Umbraco.Tests.TestHelpers
     /// </summary>
     public static class TestHelper
     {
-        private static TestHelperInternal _testHelperInternal = new TestHelperInternal();
+        private static readonly TestHelperInternal _testHelperInternal = new TestHelperInternal();
         private class TestHelperInternal : TestHelperBase
         {
             public TestHelperInternal() : base(typeof(TestHelperInternal).Assembly)
@@ -61,6 +61,9 @@ namespace Umbraco.Tests.TestHelpers
 
             public override IHostingEnvironment GetHostingEnvironment()
                 => new AspNetHostingEnvironment(SettingsForTests.GetDefaultHostingSettings());
+
+            public override IHostingEnvironmentLifetime GetHostingEnvironmentLifetime()
+                => new AspNetHostingLifetime();
 
             public override IIpResolver GetIpResolver()
                 => new AspNetIpResolver();
@@ -319,6 +322,8 @@ namespace Umbraco.Tests.TestHelpers
         public static IRegister GetRegister() => _testHelperInternal.GetRegister();
 
         public static IHostingEnvironment GetHostingEnvironment() => _testHelperInternal.GetHostingEnvironment();
+
+        public static IHostingEnvironmentLifetime GetHostingEnvironmentLifetime() => _testHelperInternal.GetHostingEnvironmentLifetime();
 
         public static IIpResolver GetIpResolver() => _testHelperInternal.GetIpResolver();
 

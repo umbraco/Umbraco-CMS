@@ -10,6 +10,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.LightInject;
@@ -46,27 +47,36 @@ namespace Umbraco.Tests.Integration
         /// Manually configure the containers/dependencies and call Boot on Core runtime
         /// </summary>
         [Test]
-        public void BootCoreRuntime()
+        public void Boot_Core_Runtime()
         {
             // LightInject / Umbraco
             var container = UmbracoServiceProviderFactory.CreateServiceContainer();
             var serviceProviderFactory = new UmbracoServiceProviderFactory(container);
             var umbracoContainer = serviceProviderFactory.GetContainer();            
 
-            // Create the core runtime
+            // Special case since we are not using the Generic Host, we need to manually add an AspNetCore service to the container
+            umbracoContainer.Register(x => Mock.Of<IHostApplicationLifetime>());
+            
             var testHelper = new TestHelper();
+
+            // Create the core runtime
             var coreRuntime = new CoreRuntime(testHelper.GetConfigs(), testHelper.GetUmbracoVersion(),
                 testHelper.IOHelper, testHelper.Logger, testHelper.Profiler, testHelper.UmbracoBootPermissionChecker,
                 testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo(), testHelper.DbProviderFactoryCreator,
                 testHelper.MainDom, testHelper.GetTypeFinder());
 
-            // boot it!
-            var factory = coreRuntime.Boot(umbracoContainer);
+                // boot it!
+            var factory = coreRuntime.Configure(umbracoContainer);
 
             Assert.IsTrue(coreRuntime.MainDom.IsMainDom);
             Assert.IsNull(coreRuntime.State.BootFailedException);
             Assert.AreEqual(RuntimeLevel.Install, coreRuntime.State.Level);            
             Assert.IsTrue(MyComposer.IsComposed);
+            Assert.IsFalse(MyComponent.IsInit);
+            Assert.IsFalse(MyComponent.IsTerminated);
+
+            coreRuntime.Start();
+
             Assert.IsTrue(MyComponent.IsInit);
             Assert.IsFalse(MyComponent.IsTerminated);
 
@@ -78,7 +88,7 @@ namespace Umbraco.Tests.Integration
         }
 
         /// <summary>
-        /// Calling AddUmbracoCore to configure the container and boot the core runtime within a generic host
+        /// Calling AddUmbracoCore to configure the container 
         /// </summary>
         [Test]
         public async Task AddUmbracoCore()
@@ -99,22 +109,106 @@ namespace Umbraco.Tests.Integration
                 });
 
             var host = await hostBuilder.StartAsync();
+            var app = new ApplicationBuilder(host.Services);
 
             // assert results
-            var runtimeState = umbracoContainer.GetInstance<IRuntimeState>();
-            var mainDom = umbracoContainer.GetInstance<IMainDom>();
+            var runtimeState = app.ApplicationServices.GetRequiredService<IRuntimeState>();
+            var mainDom = app.ApplicationServices.GetRequiredService<IMainDom>();
+
+            Assert.IsFalse(mainDom.IsMainDom); // We haven't "Started" the runtime yet
+            Assert.IsNull(runtimeState.BootFailedException);
+            Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
+            Assert.IsFalse(MyComponent.IsInit); // We haven't "Started" the runtime yet
+
+            await host.StopAsync();
+
+            Assert.IsFalse(MyComponent.IsTerminated); // we didn't "Start" the runtime so nothing was registered for shutdown
+        }
+
+        /// <summary>
+        /// Calling AddUmbracoCore to configure the container and UseUmbracoCore to start the runtime
+        /// </summary>
+        /// <returns></returns>
+        [Test]
+        public async Task UseUmbracoCore()
+        {
+            var umbracoContainer = GetUmbracoContainer(out var serviceProviderFactory);
+            var testHelper = new TestHelper();
+
+            var hostBuilder = new HostBuilder()
+                .UseUmbraco(serviceProviderFactory)
+                .ConfigureServices((hostContext, services) =>
+                {   
+                    AddRequiredNetCoreServices(services, testHelper);
+
+                    // Add it!
+                    services.AddUmbracoConfiguration();
+                    services.AddUmbracoCore(umbracoContainer, GetType().Assembly);
+                });
+
+            var host = await hostBuilder.StartAsync();
+            var app = new ApplicationBuilder(host.Services);
+
+            app.UseUmbracoCore();
+
+
+            // assert results
+            var runtimeState = app.ApplicationServices.GetRequiredService<IRuntimeState>();
+            var mainDom = app.ApplicationServices.GetRequiredService<IMainDom>();
 
             Assert.IsTrue(mainDom.IsMainDom);
             Assert.IsNull(runtimeState.BootFailedException);
             Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
             Assert.IsTrue(MyComponent.IsInit);
-            Assert.IsFalse(MyComponent.IsTerminated);
 
             await host.StopAsync();
 
             Assert.IsTrue(MyComponent.IsTerminated);
         }
 
+        [Test]
+        public async Task Install_Database()
+        {
+            var umbracoContainer = GetUmbracoContainer(out var serviceProviderFactory);
+            var testHelper = new TestHelper();
+
+            var hostBuilder = new HostBuilder()
+                //TODO: Need to have a configured umb version for the runtime state
+                .UseLocalDb(Path.Combine(testHelper.CurrentAssemblyDirectory, "LocalDb"))
+                .UseUmbraco(serviceProviderFactory)
+                .ConfigureServices((hostContext, services) =>
+                {
+                    AddRequiredNetCoreServices(services, testHelper);
+
+                    // Add it!
+                    services.AddUmbracoConfiguration();
+                    services.AddUmbracoCore(umbracoContainer, GetType().Assembly);
+                });
+
+            var host = await hostBuilder.StartAsync();
+            var app = new ApplicationBuilder(host.Services);
+
+            app.UseUmbracoCore();
+
+
+            var runtimeState = (RuntimeState)app.ApplicationServices.GetRequiredService<IRuntimeState>();
+            Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
+
+            var dbBuilder = app.ApplicationServices.GetRequiredService<DatabaseBuilder>();
+            Assert.IsNotNull(dbBuilder);
+
+            var canConnect = dbBuilder.CanConnectToDatabase;
+            Assert.IsTrue(canConnect);
+
+            var dbResult = dbBuilder.CreateSchemaAndData();
+            Assert.IsTrue(dbResult.Success);
+
+            // TODO: Get this to work ... but to do that we need to mock or pass in a current umbraco version
+            //var dbFactory = app.ApplicationServices.GetRequiredService<IUmbracoDatabaseFactory>();
+            //var profilingLogger = app.ApplicationServices.GetRequiredService<IProfilingLogger>();
+            //runtimeState.DetermineRuntimeLevel(dbFactory, profilingLogger);
+            //Assert.AreEqual(RuntimeLevel.Run, runtimeState.Level);
+        }
 
         [Ignore("This test just shows that resolving services from the container before the host is done resolves 2 different instances")]
         [Test]
@@ -128,6 +222,8 @@ namespace Umbraco.Tests.Integration
                 .UseUmbraco(serviceProviderFactory)
                 .ConfigureServices((hostContext, services) =>
                 {
+                    // TODO: Try to re-register the service as a callback and see if it resolves to the same instance
+
                     lifetime1 = services.BuildServiceProvider().GetRequiredService<IHostApplicationLifetime>();
                 });
 
@@ -141,46 +237,6 @@ namespace Umbraco.Tests.Integration
 
         }
 
-        [Test]
-        public async Task UseUmbracoCore()
-        {
-            var umbracoContainer = GetUmbracoContainer(out var serviceProviderFactory);
-            var testHelper = new TestHelper();
-
-            var hostBuilder = new HostBuilder()
-                //TODO: Need to have a configured umb version for the runtime state
-                .UseLocalDb(Path.Combine(testHelper.CurrentAssemblyDirectory, "LocalDb"))
-                //.UseTestLifetime()
-                .UseUmbraco(serviceProviderFactory)
-                .ConfigureServices((hostContext, services) =>
-                {   
-                    AddRequiredNetCoreServices(services, testHelper);
-
-                    // Add it!
-                    services.AddUmbracoConfiguration();
-                    services.AddUmbracoCore(umbracoContainer, GetType().Assembly);
-                });
-
-            var host = await hostBuilder.StartAsync();
-
-            var runtimeState = (RuntimeState)umbracoContainer.GetInstance<IRuntimeState>();
-            Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
-
-            var dbBuilder = umbracoContainer.GetInstance<DatabaseBuilder>();
-            Assert.IsNotNull(dbBuilder);
-
-            var canConnect = dbBuilder.CanConnectToDatabase;
-            Assert.IsTrue(canConnect);
-
-            var dbResult = dbBuilder.CreateSchemaAndData();
-            Assert.IsTrue(dbResult.Success);
-
-            var dbFactory = umbracoContainer.GetInstance<IUmbracoDatabaseFactory>();
-            var profilingLogger = umbracoContainer.GetInstance<IProfilingLogger>();
-            runtimeState.DetermineRuntimeLevel(dbFactory, profilingLogger);
-            Assert.AreEqual(RuntimeLevel.Run, runtimeState.Level);
-        }
-
         private LightInjectContainer GetUmbracoContainer(out UmbracoServiceProviderFactory serviceProviderFactory)
         {
             var container = new ServiceContainer(ContainerOptions.Default.Clone().WithMicrosoftSettings().WithAspNetCoreSettings());
@@ -189,9 +245,15 @@ namespace Umbraco.Tests.Integration
             return umbracoContainer;
         }
 
+        /// <summary>
+        /// These services need to be manually added because they do not get added by the generic host
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="testHelper"></param>
         private void AddRequiredNetCoreServices(IServiceCollection services, TestHelper testHelper)
         {
             services.AddSingleton<IHttpContextAccessor>(x => testHelper.GetHttpContextAccessor());
+            // the generic host does add IHostEnvironment but not this one because we are not actually in a web context
             services.AddSingleton<IWebHostEnvironment>(x => testHelper.GetWebHostEnvironment());
         }
 

@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Runtimes
             var mainDom = new SimpleMainDom();
             var umbracoVersion = TestHelper.GetUmbracoVersion();
             var backOfficeInfo = TestHelper.GetBackOfficeInfo();
-            var runtimeState = new RuntimeState(logger, null, new Lazy<IMainDom>(() => mainDom), new Lazy<IServerRegistrar>(() => factory.GetInstance<IServerRegistrar>()), umbracoVersion, hostingEnvironment, backOfficeInfo);
+            var runtimeState = new RuntimeState(logger, null, umbracoVersion, backOfficeInfo);
             var configs = TestHelper.GetConfigs();
             var variationContextAccessor = TestHelper.VariationContextAccessor;
             
@@ -84,7 +84,6 @@ namespace Umbraco.Tests.Runtimes
 
             // create the core runtime and have it compose itself
             var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, typeFinder);
-            coreRuntime.Compose(composition);
 
             // determine actual runtime level
             runtimeState.DetermineRuntimeLevel(databaseFactory, logger);
@@ -279,7 +278,6 @@ namespace Umbraco.Tests.Runtimes
 
             // create the core runtime and have it compose itself
             var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, typeFinder);
-            coreRuntime.Compose(composition);
 
             // get the components
             // all of them?

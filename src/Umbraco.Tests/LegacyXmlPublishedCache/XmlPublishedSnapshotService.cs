@@ -41,6 +41,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IHostingEnvironmentLifetime _hostingLifetime;
         private readonly IHostingEnvironment _hostingEnvironment;
 
         #region Constructors
@@ -57,6 +58,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             ILogger logger,
             IGlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
+            IHostingEnvironmentLifetime hostingLifetime,
             IShortStringHelper shortStringHelper,
             ISiteDomainHelper siteDomainHelper,
             IEntityXmlSerializer entitySerializer,
@@ -67,7 +69,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor,
                 documentRepository, mediaRepository, memberRepository,
                 defaultCultureAccessor,
-                logger, globalSettings, hostingEnvironment, shortStringHelper, siteDomainHelper, entitySerializer, null, mainDom, testing, enableRepositoryEvents)
+                logger, globalSettings, hostingEnvironment, hostingLifetime, shortStringHelper, siteDomainHelper, entitySerializer, null, mainDom, testing, enableRepositoryEvents)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
         }
@@ -84,6 +86,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             ILogger logger,
             IGlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
+            IHostingEnvironmentLifetime hostingLifetime,
             IShortStringHelper shortStringHelper,
             ISiteDomainHelper siteDomainHelper,
             IEntityXmlSerializer entitySerializer,
@@ -99,7 +102,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
             _xmlStore = new XmlStore(serviceContext.ContentTypeService, serviceContext.ContentService, scopeProvider, _routesCache,
                 _contentTypeCache, publishedSnapshotAccessor, mainDom, testing, enableRepositoryEvents,
-                documentRepository, mediaRepository, memberRepository, globalSettings, entitySerializer, hostingEnvironment, shortStringHelper);
+                documentRepository, mediaRepository, memberRepository, entitySerializer, hostingEnvironment, hostingLifetime, shortStringHelper);
 
             _domainService = serviceContext.DomainService;
             _memberService = serviceContext.MemberService;
@@ -113,6 +116,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _siteDomainHelper = siteDomainHelper;
             _entitySerializer = entitySerializer;
             _hostingEnvironment = hostingEnvironment;
+            _hostingLifetime = hostingLifetime;
         }
 
         public override void Dispose()

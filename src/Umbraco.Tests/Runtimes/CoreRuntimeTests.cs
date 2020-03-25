@@ -146,31 +146,31 @@ namespace Umbraco.Tests.Runtimes
             }
             */
 
-            // because we don't even have the core runtime component,
-            // there are a few required stuff that we need to compose
-            public override void Compose(Composition composition)
-            {
-                base.Compose(composition);
+            //// because we don't even have the core runtime component,
+            //// there are a few required stuff that we need to compose
+            //public override void Compose(Composition composition)
+            //{
+            //    base.Compose(composition);
 
-                var scopeProvider = Mock.Of<IScopeProvider>();
-                Mock.Get(scopeProvider)
-                    .Setup(x => x.CreateScope(
-                        It.IsAny<IsolationLevel>(),
-                        It.IsAny<RepositoryCacheMode>(),
-                        It.IsAny<IEventDispatcher>(),
-                        It.IsAny<bool?>(),
-                        It.IsAny<bool>(),
-                        It.IsAny<bool>()))
-                    .Returns(Mock.Of<IScope>());
+            //    var scopeProvider = Mock.Of<IScopeProvider>();
+            //    Mock.Get(scopeProvider)
+            //        .Setup(x => x.CreateScope(
+            //            It.IsAny<IsolationLevel>(),
+            //            It.IsAny<RepositoryCacheMode>(),
+            //            It.IsAny<IEventDispatcher>(),
+            //            It.IsAny<bool?>(),
+            //            It.IsAny<bool>(),
+            //            It.IsAny<bool>()))
+            //        .Returns(Mock.Of<IScope>());
 
-                composition.RegisterUnique(scopeProvider);
-            }
+            //    composition.RegisterUnique(scopeProvider);
+            //}
 
             private IMainDom _mainDom;
 
-            public override IFactory Boot(IRegister container)
+            public override IFactory Configure(IRegister container)
             {
-                var factory = base.Boot(container);
+                var factory = base.Configure(container);
                 _mainDom = factory.GetInstance<IMainDom>();
                 return factory;
             }

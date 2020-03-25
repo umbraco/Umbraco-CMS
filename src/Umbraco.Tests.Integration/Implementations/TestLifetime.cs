@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Hosting;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 
-namespace Umbraco.Tests.Integration
+namespace Umbraco.Tests.Integration.Implementations
 {
     /// <summary>
     /// Ensures the host lifetime ends as soon as code execution is done

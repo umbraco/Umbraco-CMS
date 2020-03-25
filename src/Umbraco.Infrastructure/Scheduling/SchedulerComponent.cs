@@ -26,10 +26,12 @@ namespace Umbraco.Web.Scheduling
         private const int OneHourMilliseconds = 3600000;
 
         private readonly IRuntimeState _runtime;
+        private readonly IMainDom _mainDom;
+        private readonly IServerRegistrar _serverRegistrar;
         private readonly IContentService _contentService;
         private readonly IAuditService _auditService;
         private readonly IProfilingLogger _logger;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IHostingEnvironmentLifetime _hostingEnvironment;
         private readonly IScopeProvider _scopeProvider;
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
@@ -43,7 +45,6 @@ namespace Umbraco.Web.Scheduling
 
         private BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
         private BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
-        private BackgroundTaskRunner<IBackgroundTask> _tasksRunner;
         private BackgroundTaskRunner<IBackgroundTask> _scrubberRunner;
         private BackgroundTaskRunner<IBackgroundTask> _fileCleanupRunner;
         private BackgroundTaskRunner<IBackgroundTask> _healthCheckRunner;
@@ -52,15 +53,17 @@ namespace Umbraco.Web.Scheduling
         private object _locker = new object();
         private IBackgroundTask[] _tasks;
 
-        public SchedulerComponent(IRuntimeState runtime,
+        public SchedulerComponent(IRuntimeState runtime, IMainDom mainDom, IServerRegistrar serverRegistrar,
             IContentService contentService, IAuditService auditService,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger logger,
-            IHostingEnvironment hostingEnvironment, IHealthChecksSettings healthChecksSettingsConfig,
+            IHostingEnvironmentLifetime hostingEnvironment, IHealthChecksSettings healthChecksSettingsConfig,
             IIOHelper ioHelper, IServerMessenger serverMessenger, IRequestAccessor requestAccessor,
             ILoggingSettings loggingSettings, IKeepAliveSettings keepAliveSettings)
         {
             _runtime = runtime;
+            _mainDom = mainDom;
+            _serverRegistrar = serverRegistrar;
             _contentService = contentService;
             _auditService = auditService;
             _scopeProvider = scopeProvider;
@@ -83,7 +86,6 @@ namespace Umbraco.Web.Scheduling
             // backgrounds runners are web aware, if the app domain dies, these tasks will wind down correctly
             _keepAliveRunner = new BackgroundTaskRunner<IBackgroundTask>("KeepAlive", _logger, _hostingEnvironment);
             _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing", _logger, _hostingEnvironment);
-            _tasksRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledTasks", _logger, _hostingEnvironment);
             _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber", _logger, _hostingEnvironment);
             _fileCleanupRunner = new BackgroundTaskRunner<IBackgroundTask>("TempFileCleanup", _logger, _hostingEnvironment);
             _healthCheckRunner = new BackgroundTaskRunner<IBackgroundTask>("HealthCheckNotifier", _logger, _hostingEnvironment);
@@ -138,7 +140,7 @@ namespace Umbraco.Web.Scheduling
         {
             // ping/keepalive
             // on all servers
-            var task = new KeepAlive(_keepAliveRunner, DefaultDelayMilliseconds, FiveMinuteMilliseconds, _runtime, keepAliveSettings, _logger);
+            var task = new KeepAlive(_keepAliveRunner, DefaultDelayMilliseconds, FiveMinuteMilliseconds, _runtime, _mainDom, keepAliveSettings, _logger, _serverRegistrar);
             _keepAliveRunner.TryAdd(task);
             return task;
         }
@@ -147,7 +149,7 @@ namespace Umbraco.Web.Scheduling
         {
             // scheduled publishing/unpublishing
             // install on all, will only run on non-replica servers
-            var task = new ScheduledPublishing(_publishingRunner, DefaultDelayMilliseconds, OneMinuteMilliseconds, _runtime, _contentService, _umbracoContextFactory, _logger, _serverMessenger);
+            var task = new ScheduledPublishing(_publishingRunner, DefaultDelayMilliseconds, OneMinuteMilliseconds, _runtime, _mainDom, _serverRegistrar, _contentService, _umbracoContextFactory, _logger, _serverMessenger);
             _publishingRunner.TryAdd(task);
             return task;
         }
@@ -173,7 +175,7 @@ namespace Umbraco.Web.Scheduling
             }
 
             var periodInMilliseconds = healthCheckSettingsConfig.NotificationSettings.PeriodInHours * 60 * 60 * 1000;
-            var task = new HealthCheckNotifier(_healthCheckRunner, delayInMilliseconds, periodInMilliseconds, healthChecks, notifications, _runtime, logger, _healthChecksSettingsConfig);
+            var task = new HealthCheckNotifier(_healthCheckRunner, delayInMilliseconds, periodInMilliseconds, healthChecks, notifications, _mainDom, logger, _healthChecksSettingsConfig, _serverRegistrar, _runtime);
             _healthCheckRunner.TryAdd(task);
             return task;
         }
@@ -182,7 +184,7 @@ namespace Umbraco.Web.Scheduling
         {
             // log scrubbing
             // install on all, will only run on non-replica servers
-            var task = new LogScrubber(_scrubberRunner, DefaultDelayMilliseconds, LogScrubber.GetLogScrubbingInterval(), _runtime, _auditService, settings, _scopeProvider, _logger);
+            var task = new LogScrubber(_scrubberRunner, DefaultDelayMilliseconds, LogScrubber.GetLogScrubbingInterval(), _mainDom, _serverRegistrar, _auditService, settings, _scopeProvider, _logger);
             _scrubberRunner.TryAdd(task);
             return task;
         }
@@ -194,7 +196,7 @@ namespace Umbraco.Web.Scheduling
             var task = new TempFileCleanup(_fileCleanupRunner, DefaultDelayMilliseconds, OneHourMilliseconds,
                 new[] { new DirectoryInfo(_ioHelper.MapPath(Constants.SystemDirectories.TempFileUploads)) },
                 TimeSpan.FromDays(1), //files that are over a day old
-                _runtime, _logger);
+                _mainDom, _logger);
             _scrubberRunner.TryAdd(task);
             return task;
         }

@@ -19,8 +19,7 @@ using Umbraco.Core.Runtime;
 
 namespace Umbraco.Web.BackOffice.AspNetCore
 {
-
-
+    // TODO: Move to Umbraco.Web.Common
     public static class UmbracoCoreServiceCollectionExtensions
     {
         /// <summary>
@@ -73,11 +72,12 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             if (umbContainer is null) throw new ArgumentNullException(nameof(umbContainer));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
 
+            // Special case! The generic host adds a few default services but we need to manually add this one here NOW because
+            // we resolve it before the host finishes configuring in the call to CreateCompositionRoot
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             CreateCompositionRoot(services, out var logger, out var configs, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
 
-            // TODO: Get rid of this 'Current' requirement
             var globalSettings = configs.Global();
             var umbracoVersion = new UmbracoVersion(globalSettings);
 
@@ -95,9 +95,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
                 backOfficeInfo,
                 typeFinder);
 
-            hostingEnvironment.RegisterObject(new CoreRuntimeShutdown(coreRuntime));
-
-            var factory = coreRuntime.Boot(umbContainer);
+            var factory = coreRuntime.Configure(umbContainer);
 
             return services;
         }
@@ -119,7 +117,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
                 ? (IMainDomLock)new SqlMainDomLock(logger, globalSettings, connStrings, dbProviderFactoryCreator)
                 : new MainDomSemaphoreLock(logger, hostingEnvironment);
 
-            var mainDom = new MainDom(logger, hostingEnvironment, mainDomLock);
+            var mainDom = new MainDom(logger, mainDomLock);
 
             var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetCoreBootPermissionsChecker(),
                 hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom, typeFinder);
@@ -137,10 +135,6 @@ namespace Umbraco.Web.BackOffice.AspNetCore
 
             var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
             var webHostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
-            // TODO: I'm unsure about this, by doing this it means we are resolving a "Different" instance to the one
-            // that controls the whole app because the instances comes from a different service provider. This
-            // could cause some issues with shutdowns, etc... we need to investigate. 
-            var hostApplicationLifetime = serviceProvider.GetRequiredService<IHostApplicationLifetime>();
 
             configs = serviceProvider.GetService<Configs>();
             if (configs == null)
@@ -150,7 +144,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var coreDebug = configs.CoreDebug();
             var globalSettings = configs.Global();
 
-            hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment, httpContextAccessor, hostApplicationLifetime);
+            hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment, httpContextAccessor);
             ioHelper = new IOHelper(hostingEnvironment, globalSettings);
             logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,
                 new AspNetCoreSessionIdResolver(httpContextAccessor),
@@ -170,28 +164,6 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             }
         }
 
-        /// <summary>
-        /// Ensures the runtime is shutdown when the application is shutting down
-        /// </summary>
-        private class CoreRuntimeShutdown : IRegisteredObject
-        {
-            public CoreRuntimeShutdown(IRuntime runtime)
-            {
-                _runtime = runtime;
-            }
-
-            private bool _completed = false;
-            private readonly IRuntime _runtime;
-
-            public void Stop(bool immediate)
-            {
-                if (!_completed)
-                {
-                    _completed = true;
-                    _runtime.Terminate();
-                }
-                
-            }
-        }
+        
     }
 }
