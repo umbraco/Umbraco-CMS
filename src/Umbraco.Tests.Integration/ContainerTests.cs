@@ -80,6 +80,7 @@ namespace Umbraco.Tests.Integration
             // The test below shows how it could be possible to resolve an instance and then re-register it as a factory
             // so that only one singleton instance is every created, but it's hacky and like Fowler says in that article
             // it means the container won't be disposed, and maybe other services? not sure.
+            // In cases where we use it can we use IConfigureOptions? https://andrewlock.net/access-services-inside-options-and-startup-using-configureoptions/
 
             var umbracoContainer = RuntimeTests.GetUmbracoContainer(out var serviceProviderFactory);
 
