@@ -21,6 +21,11 @@ namespace Umbraco.Core.Composing
         public DisableAttribute()
         { }
 
+        public DisableAttribute(string fullTypeName)
+        {
+            DisabledType = Type.GetType(fullTypeName);
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DisableAttribute"/> class.
         /// </summary>

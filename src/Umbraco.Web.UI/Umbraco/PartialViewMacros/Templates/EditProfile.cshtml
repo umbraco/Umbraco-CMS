@@ -1,9 +1,4 @@
-﻿@using System.Web.Mvc.Html
-@using ClientDependency.Core.Mvc
-@using Smidge
-@using Umbraco.Core
-@using Umbraco.Web
-@using Umbraco.Web.Composing
+﻿@using Umbraco.Web.Composing
 @using Umbraco.Web.Controllers
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
@@ -13,17 +8,17 @@
     Html.EnableClientValidation();
     Html.EnableUnobtrusiveJavaScript();
 
-    SmidgeHelper
-        .CreateJsBundle(Constants.RuntimeMinification.JsBundles.Default)
-        .RequiresJs("//cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js")
-        .RequiresJs("//cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js")
-        .RequiresJs("//cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js");
+    var runtimeMinifier = Current.RuntimeMinifier;
+
+    runtimeMinifier.RequiresJs("https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js", "umbraco");
+    runtimeMinifier.RequiresJs("https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js", "umbraco");
+    runtimeMinifier.RequiresJs("https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js", "umbraco");
 
     var success = TempData["ProfileUpdateSuccess"] != null;
 }
 
 @*NOTE: This RenderJsHere code should be put on your main template page where the rest of your script tags are placed*@
-@Current.RuntimeMinifier.RenderJsHere("default-js")
+@Html.Raw(runtimeMinifier.RenderJsHere("Umbraco"));
 
 @if (Current.MembershipHelper.IsLoggedIn() && profileModel != null)
 {

@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Web.Mvc;
 using ClientDependency.Core;
 using ClientDependency.Core.CompositeFiles;
 using ClientDependency.Core.Config;
+using ClientDependency.Core.Mvc;
 using Umbraco.Core.Assets;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -38,33 +40,65 @@ namespace Umbraco.Web.JavaScript.CDF
             _htmlHelper = new HtmlHelper(new ViewContext(), new ViewPage());
         }
 
-        public string RequiresCss(string filePath, string bundleName)
+        private DependencyRenderer GetDependencyRenderer
         {
-            throw new NotImplementedException();
-            //_htmlHelper.ViewContext.GetLoader().RegisterDependency(filePath, pathNameAlias, ClientDependencyType.Css);
-            //return html;
+            get
+            {
+                return (DependencyRenderer) typeof(DependencyRenderer)
+                    .GetMethod("TryCreate", BindingFlags.Static |BindingFlags.NonPublic)
+                    .Invoke(null, new object[]
+                    {
+                        _httpContextAccessor.GetRequiredHttpContext(),
+                        null
+                    });
+            }
+        }
+
+
+        public void RequiresCss(string filePath, string bundleName)
+        {
+            GetDependencyRenderer.RegisterDependency(filePath, bundleName, ClientDependencyType.Css);
         }
 
         public string RenderCssHere(string bundleName)
         {
-            throw new NotImplementedException();
+            var path = new BasicPath(bundleName, _ioHelper.ResolveUrl(_globalSettings.UmbracoPath));
+            return typeof(DependencyRenderer)
+                .GetMethod("RenderPlaceholder",
+                    BindingFlags.NonPublic | BindingFlags.Instance,
+                    null,
+                    new []{typeof(ClientDependencyType), typeof(IEnumerable<IClientDependencyPath>)},
+                    null)
+                ?.Invoke(GetDependencyRenderer, new object[]
+                {
+                    ClientDependencyType.Css,
+                    new IClientDependencyPath[]{path}
+                }) as string;
+
             //return new HtmlString(_htmlHelper.ViewContext.GetLoader().RenderPlaceholder(
             //    ClientDependencyType.Css, path));
         }
 
-        public string RequiresJs(string filePath)
+        public void RequiresJs(string filePath, string bundleName)
         {
-            throw new NotImplementedException();
-            //_htmlHelper.ViewContext.GetLoader().RegisterDependency(filePath, ClientDependencyType.Javascript);
-            //return _htmlHelper;
+            GetDependencyRenderer.RegisterDependency(filePath, bundleName, ClientDependencyType.Javascript);
         }
 
         public string RenderJsHere(string bundleName)
         {
-            throw new NotImplementedException();
-            //return new HtmlString(
-            //    _htmlHelper.ViewContext.GetLoader().RenderPlaceholder(
-            //        ClientDependencyType.Javascript, new List<IClientDependencyPath>()));
+            var path = new BasicPath(bundleName, _ioHelper.ResolveUrl(_globalSettings.UmbracoPath));
+            return typeof(DependencyRenderer)
+                .GetMethod("RenderPlaceholder",
+                    BindingFlags.NonPublic | BindingFlags.Instance,
+                    null,
+                    new []{typeof(ClientDependencyType), typeof(IEnumerable<IClientDependencyPath>)},
+                    null)
+                ?.Invoke(GetDependencyRenderer, new object[]
+                {
+                    ClientDependencyType.Javascript,
+                    new IClientDependencyPath[]{path}
+                }) as string;
+
         }
 
         public IEnumerable<string> GetAssetPaths(AssetType assetType, List<IAssetFile> attributes)
@@ -153,7 +187,25 @@ namespace Umbraco.Web.JavaScript.CDF
         private IClientDependencyFile MapAssetFile(IAssetFile assetFile)
         {
             var assetFileType = (AssetFile)assetFile;
-            var basicFile = new BasicFile(MapDependencyTypeValue(assetFileType.DependencyType));
+            var basicFile = new BasicFile(MapDependencyTypeValue(assetFileType.DependencyType))
+            {
+                Group = assetFile.Group,
+                Priority = assetFile.Priority,
+                //ForceBundle = assetFile.Bundle, //TODO
+                FilePath = assetFile.FilePath,
+                ForceProvider = assetFile.ForceProvider,
+                PathNameAlias = assetFile.PathNameAlias,
+            };
+
+            foreach (var kvp in assetFile.HtmlAttributes)
+            {
+                basicFile.HtmlAttributes.Add(kvp.Key, kvp.Value);
+            }
+
+
+
+
+
 
             return basicFile;
         }

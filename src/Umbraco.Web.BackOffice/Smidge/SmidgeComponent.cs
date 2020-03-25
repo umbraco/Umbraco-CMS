@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Umbraco.Core.Composing;
-using Umbraco.Web.Runtime;
 
 namespace Umbraco.Web.BackOffice.Smidge
 {
-    [ComposeAfter(typeof(WebInitialComponent))]
+    [ComposeAfter(typeof(IComponent))]
     public sealed class SmidgeComponent : IComponent
     {
         public void Initialize()

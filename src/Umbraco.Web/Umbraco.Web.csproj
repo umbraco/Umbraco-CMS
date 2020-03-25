@@ -39,6 +39,9 @@
   </PropertyGroup>
   <PropertyGroup />
   <ItemGroup>
+    <Reference Include="ClientDependency.Core.Mvc, Version=1.9.3.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>C:\Users\Berg\.nuget\packages\clientdependency-mvc5\1.9.3\lib\net45\ClientDependency.Core.Mvc.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -64,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ClientDependency" Version="1.9.9" />
+    <PackageReference Include="ClientDependency-Mvc5" Version="1.9.3" />
     <PackageReference Include="Examine.Core">
       <Version>2.0.0-alpha.20200128.15</Version>
     </PackageReference>
@@ -145,8 +149,11 @@
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
     <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
+    <Compile Include="JavaScript\AssetInitialization.cs" />
     <Compile Include="JavaScript\CDF\ClientDependencyRuntimeMinifier.cs" />
+    <Compile Include="JavaScript\CssInitialization.cs" />
     <Compile Include="JavaScript\JavaScriptHelper.cs" />
+    <Compile Include="JavaScript\JsInitialization.cs" />
     <Compile Include="Models\NoNodesViewModel.cs" />
     <Compile Include="Mvc\RenderNoContentController.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
@@ -400,8 +407,6 @@
     <Compile Include="Trees\MenuRenderingEventArgs.cs" />
     <Compile Include="Trees\TemplatesTreeController.cs" />
     <Compile Include="Trees\TreeControllerBase.cs" />
-    <Compile Include="JavaScript\CDF\AssetInitialization.cs" />
-    <Compile Include="JavaScript\CDF\CssInitialization.cs" />
     <Compile Include="JavaScript\CDF\DependencyPathRenderer.cs" />
     <Compile Include="UmbracoComponentRenderer.cs" />
     <Compile Include="WebApi\AngularJsonMediaTypeFormatter.cs" />
@@ -450,7 +455,6 @@
     <Compile Include="Trees\ContentTreeController.cs" />
     <Compile Include="Trees\TreeRenderingEventArgs.cs" />
     <Compile Include="Trees\UrlHelperExtensions.cs" />
-    <Compile Include="JavaScript\CDF\JsInitialization.cs" />
     <Compile Include="HttpRequestExtensions.cs" />
     <Compile Include="HttpUrlHelperExtensions.cs" />
     <Compile Include="Install\FilePermissionHelper.cs" />

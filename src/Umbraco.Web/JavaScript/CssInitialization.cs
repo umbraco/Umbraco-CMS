@@ -7,7 +7,7 @@ using Umbraco.Core.Assets;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Runtime;
 
-namespace Umbraco.Web.JavaScript.CDF
+namespace Umbraco.Web.JavaScript
 {
     internal class CssInitialization : AssetInitialization
     {

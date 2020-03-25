@@ -1,18 +1,12 @@
-﻿@using Umbraco.Core
-@using ClientDependency.Core
-@using ClientDependency.Core.Mvc
-@using Smidge
-@using Umbraco.Web.Composing
-@using Umbraco.Web
-@using Constants = Umbraco.Core.Constants
+﻿@using Umbraco.Web.Composing
 
 @inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Editors.BackOfficePreviewModel>
 @{
     var disableDevicePreview = Model.DisableDevicePreview.ToString().ToLowerInvariant();
 
-    SmidgeHelper
-        .CreateCssBundle(Constants.RuntimeMinification.CssBundles.Index)
-        .RequiresCss("~/assets/css/canvasdesigner.css");
+    var runtimeMinifier = Current.RuntimeMinifier;
+
+    runtimeMinifier.RequiresCss("assets/css/canvasdesigner.css", "Umbraco");
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -22,7 +16,9 @@
     <meta name="robots" content="noindex, nofollow">
     <meta name="pinterest" content="nopin" />
 
-    @Current.RuntimeMinifier.RenderCssHere("index-css")
+
+     @Html.Raw(runtimeMinifier.RenderCssHere("Umbraco"))
+
 
 </head>
 <body id="canvasdesignerPanel" ng-mouseover="outlinePositionHide()" ng-controller="previewController" ng-class="{'tabbing-active': tabbingActive === true}" ng-click="windowClickHandler($event)">

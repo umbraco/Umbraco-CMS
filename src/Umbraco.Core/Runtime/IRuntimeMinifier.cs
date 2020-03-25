@@ -10,14 +10,14 @@ namespace Umbraco.Core.Runtime
         string GetHashValue { get; }
 
         //return type HtmlHelper
-        string RequiresCss(string filePath, string bundleName);
+        void RequiresCss(string filePath, string bundleName);
 
         //return type IHtmlString
         //IClientDependencyPath[]
         string RenderCssHere(string bundleName);
 
         // return type HtmlHelper
-        string RequiresJs(string filePath);
+        void RequiresJs(string filePath, string bundleName);
 
         // return type IHtmlString
         string RenderJsHere(string bundleName);

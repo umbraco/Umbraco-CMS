@@ -1,18 +1,16 @@
 ﻿@using Umbraco.Core
-@using ClientDependency.Core
-@using ClientDependency.Core.Mvc
-@using Smidge
 @using Umbraco.Web.Composing
 @using Umbraco.Web
-@using Constants = Umbraco.Core.Constants
-using Umbraco.Core
+
 @inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Editors.BackOfficeModel>
 @{
     Layout = null;
 
-    SmidgeHelper
-        .CreateCssBundle(Constants.RuntimeMinification.CssBundles.Default)
-        .RequiresCss("~/assets/css/umbraco.css", "~/lib/bootstrap-social/bootstrap-social.css", "~/lib/font-awesome/css/font-awesome.min.css");
+    var runtimeMinifier = Current.RuntimeMinifier;
+
+    runtimeMinifier.RequiresCss("assets/css/umbraco.css", "umbraco");
+    runtimeMinifier.RequiresCss("lib/bootstrap-social/bootstrap-social.css", "umbraco");
+    runtimeMinifier.RequiresCss("lib/font-awesome/css/font-awesome.min.css", "umbraco");
 }
 
 <!DOCTYPE html>
@@ -25,8 +23,7 @@ using Umbraco.Core
 
     <title>Umbraco</title>
 
-    @Html.RenderCssHere(
-        new BasicPath("Umbraco", Current.IOHelper.ResolveUrl(Model.GlobalSettings.UmbracoPath)))
+    @Html.Raw(runtimeMinifier.RenderJsHere("Umbraco"));
 
     @*Because we're lazy loading angular js, the embedded cloak style will not be loaded initially, but we need it*@
     <style>
@@ -50,7 +47,7 @@ using Umbraco.Core
             redirectUrl = Url.Action("AuthorizeUpgrade", "BackOffice")
         });
     }
-    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl, Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.ContentSettings, Model.IOHelper, Model.TreeCollection, Model.HttpContextAccessor, Model.HostingEnvironment, Model.RuntimeSettings, Model.SecuritySettings, Current.RuntimeMinifier)
+    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl, Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.ContentSettings, Model.IOHelper, Model.TreeCollection, Model.HttpContextAccessor, Model.HostingEnvironment, Model.RuntimeSettings, Model.SecuritySettings, runtimeMinifier)
 
     <script type="text/javascript">
     document.angularReady = function (app) {

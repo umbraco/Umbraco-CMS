@@ -25,7 +25,7 @@ namespace Umbraco.Web.BackOffice.Smidge
         {
             _smidge = smidge;
         }
-        public string RequiresCss(string filePath, string bundleName)
+        public void RequiresCss(string filePath, string bundleName)
         {
             throw new NotImplementedException();
         }
@@ -35,7 +35,7 @@ namespace Umbraco.Web.BackOffice.Smidge
             return _smidge.CssHereAsync(bundleName).ToString();
         }
 
-        public string RequiresJs(string filePath)
+        public void RequiresJs(string filePath, string bundleName)
         {
             throw new NotImplementedException();
         }

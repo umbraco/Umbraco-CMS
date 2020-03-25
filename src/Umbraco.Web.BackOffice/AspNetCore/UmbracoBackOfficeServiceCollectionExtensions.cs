@@ -1,8 +1,12 @@
+
+
+using System;
+using System.Data.Common;
+using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Smidge;
 using Umbraco.Composing;
@@ -11,7 +15,6 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
@@ -57,14 +60,14 @@ namespace Umbraco.Web.BackOffice.AspNetCore
 
             var umbContainer = UmbracoServiceProviderFactory.UmbracoContainer;
 
-            return services.AddUmbracoCore(umbContainer, Assembly.GetEntryAssembly());
+            services.AddUmbracoCore(umbContainer, Assembly.GetEntryAssembly());
+
+            return services;
         }
 
         public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IRegister umbContainer, Assembly entryAssembly)
         {
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-            CreateCompositionRoot(services);
 
             // TODO: Get rid of this 'Current' requirement
             var globalSettings = Current.Configs.Global();
@@ -114,27 +117,6 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             return coreRuntime;
         }
 
-        private static void CreateCompositionRoot(IServiceCollection services)
-        {
-            // TODO: This isn't the best to have to resolve the services now but to avoid this will
-            // require quite a lot of re-work.
-            var serviceProvider = services.BuildServiceProvider();
-
-            var httpContextAccessor = serviceProvider.GetService<IHttpContextAccessor>();
-            var webHostEnvironment = serviceProvider.GetService<IWebHostEnvironment>();
-            var hostApplicationLifetime = serviceProvider.GetService<IHostApplicationLifetime>();
-            var configuration = serviceProvider.GetService<IConfiguration>();
-
-            var configs = serviceProvider.GetService<Configs>();
-            if (configs == null)
-                throw new InvalidOperationException($"Could not resolve type {typeof(Configs)} from the container, ensure {nameof(AddUmbracoConfiguration)} is called before calling {nameof(AddUmbracoCore)}");
-
-            services.AddRuntimeMinifier(configuration);
-
-            return services;
-        }
-
-
         public static IServiceCollection CreateCompositionRoot(
             this IServiceCollection services,
             IHttpContextAccessor httpContextAccessor,
@@ -162,7 +144,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             return services;
         }
 
-        public static IServiceCollection AddRuntimeMinifier(this IServiceCollection services,
+        public static IServiceCollection AddUmbracoRuntimeMinifier(this IServiceCollection services,
             IConfiguration configuration)
         {
             services.AddSmidge(configuration.GetSection(Constants.Configuration.ConfigPrefix+"RuntimeMinification"));

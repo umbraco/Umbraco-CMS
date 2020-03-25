@@ -7,7 +7,7 @@ using Umbraco.Core.Assets;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Runtime;
 
-namespace Umbraco.Web.JavaScript.CDF
+namespace Umbraco.Web.JavaScript
 {
     /// <summary>
     /// Reads from all defined manifests and ensures that any of their initialization is output with the
