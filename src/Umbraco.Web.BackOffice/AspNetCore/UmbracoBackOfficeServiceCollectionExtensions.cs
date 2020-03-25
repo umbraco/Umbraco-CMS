@@ -88,7 +88,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         public static IServiceCollection AddRuntimeMinifier(this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddSmidge(configuration.GetSection("Umbraco:Smidge"));
+            services.AddSmidge(configuration.GetSection(Constants.Configuration.ConfigPrefix+"RuntimeMinification"));
 
             return services;
         }
