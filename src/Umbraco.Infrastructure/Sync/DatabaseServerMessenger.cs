@@ -28,10 +28,11 @@ namespace Umbraco.Core.Sync
     //
     public class DatabaseServerMessenger : ServerMessengerBase, IDatabaseServerMessenger
     {
-        private readonly IRuntimeState _runtime;
+        private readonly IMainDom _mainDom;
         private readonly ManualResetEvent _syncIdle;
         private readonly object _locko = new object();
         private readonly IProfilingLogger _profilingLogger;
+        private readonly IServerRegistrar _serverRegistrar;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly CacheRefresherCollection _cacheRefreshers;
         private readonly ISqlContext _sqlContext;
@@ -46,14 +47,15 @@ namespace Umbraco.Core.Sync
         public DatabaseServerMessengerOptions Options { get; }
 
         public DatabaseServerMessenger(
-            IRuntimeState runtime, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog,
+            IMainDom mainDom, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, IServerRegistrar serverRegistrar,
             bool distributedEnabled, DatabaseServerMessengerOptions options,  IHostingEnvironment hostingEnvironment, CacheRefresherCollection cacheRefreshers)
             : base(distributedEnabled)
         {
             ScopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
             _sqlContext = sqlContext;
-            _runtime = runtime;
+            _mainDom = mainDom;
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
+            _serverRegistrar = serverRegistrar;
             _hostingEnvironment = hostingEnvironment;
             _cacheRefreshers = cacheRefreshers;
             Logger = proflog;
@@ -126,7 +128,7 @@ namespace Umbraco.Core.Sync
             const int weight = 10;
 
 
-            var registered = _runtime.MainDom.Register(
+            var registered = _mainDom.Register(
                 () =>
                 {
                     lock (_locko)
@@ -262,7 +264,7 @@ namespace Umbraco.Core.Sync
 
                     _lastPruned = _lastSync;
 
-                    switch (_runtime.ServerRole)
+                    switch (_serverRegistrar.GetCurrentServerRole())
                     {
                         case ServerRole.Single:
                         case ServerRole.Master:

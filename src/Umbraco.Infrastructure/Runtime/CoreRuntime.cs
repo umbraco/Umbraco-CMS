@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -12,7 +11,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Runtime
 {
@@ -25,11 +23,10 @@ namespace Umbraco.Core.Runtime
     {
         private ComponentCollection _components;
         private IFactory _factory;
-        private RuntimeState _state;
+        private readonly RuntimeState _state;
         private readonly IUmbracoBootPermissionChecker _umbracoBootPermissionChecker;
         private readonly IGlobalSettings _globalSettings;
         private readonly IConnectionStrings _connectionStrings;
-
 
         public CoreRuntime(
             Configs configs,
@@ -65,11 +62,7 @@ namespace Umbraco.Core.Runtime
             // runtime state
             // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
             // as the second one captures the current value (null) and therefore fails
-           _state = new RuntimeState(Logger,
-                Configs.Global(),
-                new Lazy<IMainDom>(() => mainDom),
-                new Lazy<IServerRegistrar>(() => _factory.GetInstance<IServerRegistrar>()),
-                UmbracoVersion,HostingEnvironment, BackOfficeInfo)
+           _state = new RuntimeState(Logger, Configs.Global(), UmbracoVersion, BackOfficeInfo)
             {
                 Level = RuntimeLevel.Boot
             };
@@ -81,13 +74,13 @@ namespace Umbraco.Core.Runtime
         protected ILogger Logger { get; }
 
         protected IBackOfficeInfo BackOfficeInfo { get; }
+
         public IDbProviderFactoryCreator DbProviderFactoryCreator { get; }
-        //public IBulkSqlInsertProvider BulkSqlInsertProvider { get; }
 
         /// <summary>
         /// Gets the profiler.
         /// </summary>
-        protected IProfiler Profiler { get; set; }
+        protected IProfiler Profiler { get; }
 
         /// <summary>
         /// Gets the profiling logger.
@@ -110,11 +103,13 @@ namespace Umbraco.Core.Runtime
         /// <inheritdoc />
         public IRuntimeState State => _state;
 
-        public IMainDom MainDom { get; private set; }
+        public IMainDom MainDom { get; }
 
         /// <inheritdoc/>
-        public virtual IFactory Boot(IRegister register)
+        public virtual IFactory Configure(IRegister register)
         {
+            if (register is null) throw new ArgumentNullException(nameof(register));
+
             // create and register the essential services
             // ie the bare minimum required to boot
 
@@ -139,25 +134,24 @@ namespace Umbraco.Core.Runtime
 
                 // application environment
                 ConfigureUnhandledException();
-                ConfigureApplicationRootPath();
-
-                Boot(register, timer);
+                return _factory = Configure(register, timer);
             }
-
-            return _factory;
         }
 
         /// <summary>
-        /// Boots the runtime within a timer.
+        /// Configure the runtime within a timer.
         /// </summary>
-        protected virtual IFactory Boot(IRegister register, DisposableTimer timer)
+        private IFactory Configure(IRegister register, DisposableTimer timer)
         {
+            if (register is null) throw new ArgumentNullException(nameof(register));
+            if (timer is null) throw new ArgumentNullException(nameof(timer));
+
             Composition composition = null;
+            IFactory factory = null;
 
             try
             {
-                // throws if not full-trust
-                _umbracoBootPermissionChecker.ThrowIfNotPermissions();
+                
 
                 // run handlers
                 RuntimeOptions.DoRuntimeBoot(ProfilingLogger);
@@ -171,31 +165,12 @@ namespace Umbraco.Core.Runtime
                 // type finder/loader
                 var typeLoader = new TypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), ProfilingLogger);
 
-                // runtime state
-                // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
-                // as the second one captures the current value (null) and therefore fails
-                _state = new RuntimeState(Logger,
-                    Configs.Global(),
-                    new Lazy<IMainDom>(() => _factory.GetInstance<IMainDom>()),
-                    new Lazy<IServerRegistrar>(() => _factory.GetInstance<IServerRegistrar>()),
-                    UmbracoVersion, HostingEnvironment, BackOfficeInfo)
-                {
-                    Level = RuntimeLevel.Boot
-                };
-
                 // create the composition
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs, IOHelper, appCaches);
-                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator);
+                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, HostingEnvironment, BackOfficeInfo);
 
-                // run handlers
-                RuntimeOptions.DoRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);
-
-                // register runtime-level services
-                // there should be none, really - this is here "just in case"
-                Compose(composition);
-
-                // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
-                AcquireMainDom(MainDom);
+                // register ourselves (TODO: Should we put this in RegisterEssentials?)
+                composition.Register<IRuntime>(_ => this, Lifetime.Singleton);
 
                 // determine our runtime level
                 DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
@@ -213,13 +188,7 @@ namespace Umbraco.Core.Runtime
                 composers.Compose();
 
                 // create the factory
-                _factory = composition.CreateFactory();
-
-                // create & initialize the components
-                _components = _factory.GetInstance<ComponentCollection>();
-                _components.Initialize();
-
-
+                factory = composition.CreateFactory();
             }
             catch (Exception e)
             {
@@ -236,11 +205,11 @@ namespace Umbraco.Core.Runtime
                 // if something goes wrong above, we may end up with no factory
                 // meaning nothing can get the runtime state, etc - so let's try
                 // to make sure we have a factory
-                if (_factory == null)
+                if (factory == null)
                 {
                     try
                     {
-                        _factory = composition?.CreateFactory();
+                        factory = composition?.CreateFactory();
                     }
                     catch { /* yea */ }
                 }
@@ -254,7 +223,29 @@ namespace Umbraco.Core.Runtime
                 // throw a BootFailedException for every requests.
             }
 
-            return _factory;
+            return factory;
+        }
+
+        public void Start()
+        {
+            // throws if not full-trust
+            _umbracoBootPermissionChecker.ThrowIfNotPermissions();
+
+            ConfigureApplicationRootPath();
+
+            // run handlers
+            RuntimeOptions.DoRuntimeEssentials(_factory);
+
+            var hostingEnvironmentLifetime = _factory.TryGetInstance<IApplicationShutdownRegistry>();
+            if (hostingEnvironmentLifetime == null)
+                throw new InvalidOperationException($"An instance of {typeof(IApplicationShutdownRegistry)} could not be resolved from the container, ensure that one if registered in your runtime before calling {nameof(IRuntime)}.{nameof(Start)}");
+
+            // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
+            AcquireMainDom(MainDom, _factory.GetInstance<IApplicationShutdownRegistry>());
+
+            // create & initialize the components
+            _components = _factory.GetInstance<ComponentCollection>();
+            _components.Initialize();
         }
 
         protected virtual void ConfigureUnhandledException()
@@ -281,13 +272,13 @@ namespace Umbraco.Core.Runtime
                 IOHelper.SetRootDirectory(path);
         }
 
-        private bool AcquireMainDom(IMainDom mainDom)
+        private bool AcquireMainDom(IMainDom mainDom, IApplicationShutdownRegistry applicationShutdownRegistry)
         {
             using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired."))
             {
                 try
                 {
-                    return mainDom.IsMainDom;
+                    return mainDom.Acquire(applicationShutdownRegistry);
                 }
                 catch
                 {
@@ -346,12 +337,6 @@ namespace Umbraco.Core.Runtime
             _components?.Terminate();
         }
 
-        /// <summary>
-        /// Composes the runtime.
-        /// </summary>
-        public virtual void Compose(Composition composition)
-        {
-        }
 
         #region Getters
 
@@ -392,5 +377,6 @@ namespace Umbraco.Core.Runtime
 
 
         #endregion
+
     }
 }

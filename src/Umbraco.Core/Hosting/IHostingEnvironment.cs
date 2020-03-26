@@ -19,8 +19,5 @@ namespace Umbraco.Core.Hosting
         Version IISVersion { get; }
         string MapPath(string path);
         string ToAbsolute(string virtualPath, string root);
-
-        void RegisterObject(IRegisteredObject registeredObject);
-        void UnregisterObject(IRegisteredObject registeredObject);
     }
 }

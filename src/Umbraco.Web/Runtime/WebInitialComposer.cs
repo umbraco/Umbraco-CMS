@@ -18,7 +18,6 @@ using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
-using Umbraco.Net;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing.CompositionExtensions;
@@ -46,6 +45,7 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Examine;
 using Umbraco.Core.Models;
+using Umbraco.Net;
 using Umbraco.Core.Request;
 using Umbraco.Core.Session;
 using Umbraco.Web.AspNet;
@@ -72,8 +72,6 @@ namespace Umbraco.Web.Runtime
 
             composition.Register<IRequestAccessor, AspNetRequestAccessor>(Lifetime.Singleton);
 
-            composition.Register<IHostingEnvironment, AspNetHostingEnvironment>();
-            composition.Register<IBackOfficeInfo, AspNetBackOfficeInfo>();
             composition.Register<IUmbracoApplicationLifetime, AspNetUmbracoApplicationLifetime>(Lifetime.Singleton);
             composition.Register<IPasswordHasher, AspNetPasswordHasher>();
             composition.Register<IFilePermissionHelper, FilePermissionHelper>(Lifetime.Singleton);

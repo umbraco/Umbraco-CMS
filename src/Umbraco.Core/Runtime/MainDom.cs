@@ -21,7 +21,7 @@ namespace Umbraco.Core.Runtime
         #region Vars
 
         private readonly ILogger _logger;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private IApplicationShutdownRegistry _hostingEnvironment;
         private readonly IMainDomLock _mainDomLock;
 
         // our own lock for local consistency
@@ -42,16 +42,24 @@ namespace Umbraco.Core.Runtime
         #region Ctor
 
         // initializes a new instance of MainDom
-        public MainDom(ILogger logger, IHostingEnvironment hostingEnvironment, IMainDomLock systemLock)
+        public MainDom(ILogger logger, IMainDomLock systemLock)
         {
-            hostingEnvironment.RegisterObject(this);
-
             _logger = logger;
-            _hostingEnvironment = hostingEnvironment;
             _mainDomLock = systemLock;
         }
 
         #endregion
+
+        public bool Acquire(IApplicationShutdownRegistry hostingEnvironment)
+        {
+            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+
+            return LazyInitializer.EnsureInitialized(ref _isMainDom, ref _isInitialized, ref _locko, () =>
+            {
+                hostingEnvironment.RegisterObject(this);
+                return Acquire();
+            });
+        }
 
         /// <summary>
         /// Registers a resource that requires the current AppDomain to be the main domain to function.
@@ -180,10 +188,9 @@ namespace Umbraco.Core.Runtime
         /// Gets a value indicating whether the current domain is the main domain.
         /// </summary>
         /// <remarks>
-        /// The lazy initializer call will only call the Acquire callback when it's not been initialized, else it will just return
-        /// the value from _isMainDom which means when we set _isMainDom to false again after being signaled, this will return false;
+        /// Acquire must be called first else this will always return false
         /// </remarks>
-        public bool IsMainDom => LazyInitializer.EnsureInitialized(ref _isMainDom, ref _isInitialized, ref _locko, () => Acquire());
+        public bool IsMainDom => _isMainDom;
 
         // IRegisteredObject
         void IRegisteredObject.Stop(bool immediate)
@@ -193,7 +200,7 @@ namespace Umbraco.Core.Runtime
             // The web app is stopping, need to wind down
             Dispose(true);
 
-            _hostingEnvironment.UnregisterObject(this);
+            _hostingEnvironment?.UnregisterObject(this);
         }
 
         #region IDisposable Support

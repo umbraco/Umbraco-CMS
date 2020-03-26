@@ -46,7 +46,7 @@ namespace Umbraco.Core.Migrations.Install
             IIOHelper ioHelper,
             IUmbracoVersion umbracoVersion,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
-             IConfigManipulator configManipulator)
+            IConfigManipulator configManipulator)
         {
             _scopeProvider = scopeProvider;
             _globalSettings = globalSettings;
