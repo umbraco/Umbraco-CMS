@@ -2,6 +2,7 @@ using System;
 
 namespace Umbraco.Net
 {
+    // TODO: This shouldn't be in this namespace?
     public interface IUmbracoApplicationLifetime
     {
         /// <summary>

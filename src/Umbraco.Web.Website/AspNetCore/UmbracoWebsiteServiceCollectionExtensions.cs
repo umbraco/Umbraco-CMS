@@ -19,6 +19,7 @@ namespace Umbraco.Web.Website.AspNetCore
     {
         public static IServiceCollection AddUmbracoWebsite(this IServiceCollection services)
         {
+            // TODO: We need to avoid this, surely there's a way? See ContainerTests.BuildServiceProvider_Before_Host_Is_Configured
             var serviceProvider = services.BuildServiceProvider();
             var configs = serviceProvider.GetService<Configs>();
             var imagingSettings = configs.Imaging();

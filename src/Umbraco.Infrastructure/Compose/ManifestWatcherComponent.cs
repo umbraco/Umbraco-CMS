@@ -10,7 +10,7 @@ namespace Umbraco.Core.Compose
 {
     public sealed class ManifestWatcherComponent : IComponent
     {
-        private readonly IRuntimeState _runtimeState;
+        private readonly IHostingEnvironment _hosting;
         private readonly ILogger _logger;
         private readonly IIOHelper _ioHelper;
         private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
@@ -19,9 +19,9 @@ namespace Umbraco.Core.Compose
         // package.manifest chances and restarts the application on any change
         private ManifestWatcher _mw;
 
-        public ManifestWatcherComponent(IRuntimeState runtimeState, ILogger logger, IIOHelper ioHelper, IUmbracoApplicationLifetime umbracoApplicationLifetime)
+        public ManifestWatcherComponent(IHostingEnvironment hosting, ILogger logger, IIOHelper ioHelper, IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
-            _runtimeState = runtimeState;
+            _hosting = hosting;
             _logger = logger;
             _ioHelper = ioHelper;
             _umbracoApplicationLifetime = umbracoApplicationLifetime;
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Compose
 
         public void Initialize()
         {
-            if (_runtimeState.Debug == false) return;
+            if (_hosting.IsDebugMode == false) return;
 
             //if (ApplicationContext.Current.IsConfigured == false || GlobalSettings.DebugMode == false)
             //    return;

@@ -32,7 +32,7 @@ namespace Umbraco.Web
                 ? (IMainDomLock)new SqlMainDomLock(logger, globalSettings, connectionStrings, dbProviderFactoryCreator)
                 : new MainDomSemaphoreLock(logger, hostingEnvironment);
 
-            var mainDom = new MainDom(logger, hostingEnvironment, mainDomLock);
+            var mainDom = new MainDom(logger, mainDomLock);
 
             var requestCache = new HttpRequestAppCache(() => HttpContext.Current?.Items);
             var umbracoBootPermissionChecker = new AspNetUmbracoBootPermissionChecker();

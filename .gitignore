@@ -166,3 +166,4 @@ build/temp/
 /src/ApiDocs/api/*
 /src/Umbraco.Web.UI.NetCore/wwwroot/Media/*
 /src/Umbraco.Web.UI.NetCore/wwwroot/is-cache/*
+/src/Umbraco.Tests.Integration/App_Data/*

@@ -28,17 +28,18 @@ namespace Umbraco.Web
         private readonly IRequestAccessor _requestAccessor;
 
         public BatchedDatabaseServerMessenger(
-            IRuntimeState runtime,
+            IMainDom mainDom,
             IUmbracoDatabaseFactory databaseFactory,
             IScopeProvider scopeProvider,
             ISqlContext sqlContext,
             IProfilingLogger proflog,
+            IServerRegistrar serverRegistrar,
             DatabaseServerMessengerOptions options,
             IHostingEnvironment hostingEnvironment,
             CacheRefresherCollection cacheRefreshers,
             IRequestCache requestCache,
             IRequestAccessor requestAccessor)
-            : base(runtime, scopeProvider, sqlContext, proflog, true, options, hostingEnvironment, cacheRefreshers)
+            : base(mainDom, scopeProvider, sqlContext, proflog, serverRegistrar, true, options, hostingEnvironment, cacheRefreshers)
         {
             _databaseFactory = databaseFactory;
             _requestCache = requestCache;

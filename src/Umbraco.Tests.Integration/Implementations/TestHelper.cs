@@ -3,14 +3,16 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Moq;
+using System.Data.Common;
 using System.Net;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Diagnostics;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
+using Umbraco.Net;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
-using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Web.BackOffice;
 using Umbraco.Web.BackOffice.AspNetCore;
@@ -18,11 +20,11 @@ using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Tests.Integration.Implementations
 {
-
     public class TestHelper : TestHelperBase
     {
         private IBackOfficeInfo _backOfficeInfo;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly IIpResolver _ipResolver;
         private readonly IWebHostEnvironment _hostEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -39,11 +41,12 @@ namespace Umbraco.Tests.Integration.Implementations
                 && x.ContentRootPath == CurrentAssemblyDirectory
                 && x.WebRootPath == CurrentAssemblyDirectory); // same folder for now?
 
-            _hostingEnvironment = new AspNetCoreHostingEnvironment(
+            _hostingEnvironment = new TestHostingEnvironment(
                 SettingsForTests.GetDefaultHostingSettings(),
                 _hostEnvironment,
-                _httpContextAccessor,
-                Mock.Of<IHostApplicationLifetime>());
+                _httpContextAccessor);
+
+            _hostingLifetime = new AspNetCoreApplicationShutdownRegistry(Mock.Of<IHostApplicationLifetime>());
 
             Logger = new ProfilingLogger(new ConsoleLogger(new MessageTemplates()), Profiler);
         }
@@ -60,7 +63,7 @@ namespace Umbraco.Tests.Integration.Implementations
 
         public IWebHostEnvironment GetWebHostEnvironment() => _hostEnvironment;
 
-        public override IDbProviderFactoryCreator DbProviderFactoryCreator => new TestDbProviderFactoryCreator();
+        public override IDbProviderFactoryCreator DbProviderFactoryCreator => new SqlServerDbProviderFactoryCreator(Constants.DbProviderNames.SqlServer, DbProviderFactories.GetFactory);
 
         public override IBulkSqlInsertProvider BulkSqlInsertProvider => new SqlServerBulkSqlInsertProvider();
 
@@ -74,7 +77,9 @@ namespace Umbraco.Tests.Integration.Implementations
         }
 
         public override IHostingEnvironment GetHostingEnvironment() => _hostingEnvironment;
+        public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime() => _hostingLifetime;
 
         public override IIpResolver GetIpResolver() => _ipResolver;
+
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -15,6 +16,9 @@ namespace Umbraco.Core
         /// <summary>
         /// Registers essential services.
         /// </summary>
+        /// <remarks>
+        /// These services are all either created by the runtime or used to construct the runtime
+        /// </remarks>
         public static void RegisterEssentials(this Composition composition,
             ILogger logger, IProfiler profiler, IProfilingLogger profilingLogger,
             IMainDom mainDom,
@@ -25,8 +29,10 @@ namespace Umbraco.Core
             ITypeFinder typeFinder,
             IIOHelper ioHelper,
             IUmbracoVersion umbracoVersion,
-            IDbProviderFactoryCreator dbProviderFactoryCreator)
-        {
+            IDbProviderFactoryCreator dbProviderFactoryCreator,
+            IHostingEnvironment hostingEnvironment,
+            IBackOfficeInfo backOfficeInfo)
+        {            
             composition.RegisterUnique(logger);
             composition.RegisterUnique(profiler);
             composition.RegisterUnique(profilingLogger);
@@ -42,6 +48,8 @@ namespace Umbraco.Core
             composition.RegisterUnique(umbracoVersion);
             composition.RegisterUnique(dbProviderFactoryCreator);
             composition.RegisterUnique(factory => factory.GetInstance<IUmbracoDatabaseFactory>().BulkSqlInsertProvider);
+            composition.RegisterUnique(hostingEnvironment);
+            composition.RegisterUnique(backOfficeInfo);
         }
     }
 }

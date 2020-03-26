@@ -44,7 +44,7 @@ namespace Umbraco.Core.Runtime
         public override void Compose(Composition composition)
         {
             base.Compose(composition);
-
+            
             // composers
             composition
                 .ComposeRepositories()
@@ -120,10 +120,11 @@ namespace Umbraco.Core.Runtime
             // project
             composition.RegisterUnique<IServerMessenger>(factory
                 => new DatabaseServerMessenger(
-                    factory.GetInstance<IRuntimeState>(),
+                    factory.GetInstance<IMainDom>(),
                     factory.GetInstance<IScopeProvider>(),
                     factory.GetInstance<ISqlContext>(),
                     factory.GetInstance<IProfilingLogger>(),
+                    factory.GetInstance<IServerRegistrar>(),
                     true, new DatabaseServerMessengerOptions(),
                     factory.GetInstance<IHostingEnvironment>(),
                     factory.GetInstance<CacheRefresherCollection>()
@@ -176,6 +177,8 @@ namespace Umbraco.Core.Runtime
             // Grid config is not a real config file as we know them
             composition.RegisterUnique<IGridConfig, GridConfig>();
 
+            // Config manipulator
+            composition.RegisterUnique<IConfigManipulator, JsonConfigManipulator>();
         }
     }
 }
