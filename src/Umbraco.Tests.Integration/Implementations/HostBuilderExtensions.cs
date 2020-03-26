@@ -16,7 +16,7 @@ namespace Umbraco.Tests.Integration.Implementations
         {
             // Need to register SqlClient manually
             // TODO: Move this to someplace central
-            DbProviderFactories.RegisterFactory("System.Data.SqlClient", SqlClientFactory.Instance);
+            DbProviderFactories.RegisterFactory(Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
 
             hostBuilder.ConfigureAppConfiguration(x =>
             {
