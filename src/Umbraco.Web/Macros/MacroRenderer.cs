@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -196,7 +196,7 @@ namespace Umbraco.Web.Macros
                     ? macroParams[key]?.ToString() ?? string.Empty
                     : string.Empty;
             }
-        } 
+        }
         #endregion
 
         #region Render/Execute
@@ -226,10 +226,10 @@ namespace Umbraco.Web.Macros
                 // parse macro parameters ie replace the special [#key], [$key], etc. syntaxes
                 foreach (var prop in macro.Properties)
                     prop.Value = ParseAttribute(pageElements, prop.Value);
-                //is this the best most performant way to get the culture for variant purposes? or is it best read from the current thread culture?
-                var cultureName = content.GetCultureFromDomains();
-                macro.CacheIdentifier = GetContentCacheIdentifier(macro, content.Id,cultureName);
-     
+
+                var cultureName = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
+                macro.CacheIdentifier = GetContentCacheIdentifier(macro, content.Id, cultureName);
+
                 // get the macro from cache if it is there
                 var macroContent = GetMacroContentFromCache(macro);
 
@@ -324,7 +324,7 @@ namespace Umbraco.Web.Macros
         private Attempt<MacroContent> ExecuteMacroOfType(MacroModel model, IPublishedContent content)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
-            
+
             // ensure that we are running against a published node (ie available in XML)
             // that may not be the case if the macro is embedded in a RTE of an unpublished document
 
@@ -460,9 +460,9 @@ namespace Umbraco.Web.Macros
 
             return value;
         }
-        
+
         #endregion
-        
+
     }
 
 }
