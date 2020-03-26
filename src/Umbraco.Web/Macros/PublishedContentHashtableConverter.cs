@@ -248,8 +248,10 @@ namespace Umbraco.Web.Macros
 
             public string UrlSegment => throw new NotImplementedException();
 
+            [Obsolete("Use WriterName(IUserService) extension instead")]
             public string WriterName { get; }
 
+            [Obsolete("Use CreatorName(IUserService) extension instead")]
             public string CreatorName { get; }
 
             public int WriterId => _inner.WriterId;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -30,25 +31,36 @@ namespace Umbraco.Web.PropertyEditors
         private readonly HtmlImageSourceParser _imageSourceParser;
         private readonly HtmlLocalLinkParser _localLinkParser;
         private readonly RichTextEditorPastedImages _pastedImages;
+        private readonly IImageUrlGenerator _imageUrlGenerator;
 
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
+        [Obsolete("Use the constructor which takes an IImageUrlGenerator")]
         public RichTextPropertyEditor(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, HtmlImageSourceParser imageSourceParser, HtmlLocalLinkParser localLinkParser, RichTextEditorPastedImages pastedImages)
+            : this(logger, umbracoContextAccessor, imageSourceParser, localLinkParser, pastedImages, Current.ImageUrlGenerator)
+        {
+        }
+
+        /// <summary>
+        /// The constructor will setup the property editor based on the attribute if one is found
+        /// </summary>
+        public RichTextPropertyEditor(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, HtmlImageSourceParser imageSourceParser, HtmlLocalLinkParser localLinkParser, RichTextEditorPastedImages pastedImages, IImageUrlGenerator imageUrlGenerator)
             : base(logger)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _imageSourceParser = imageSourceParser;
             _localLinkParser = localLinkParser;
             _pastedImages = pastedImages;
+            _imageUrlGenerator = imageUrlGenerator;
         }
 
         /// <summary>
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _umbracoContextAccessor, _imageSourceParser, _localLinkParser, _pastedImages);
+        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _umbracoContextAccessor, _imageSourceParser, _localLinkParser, _pastedImages, _imageUrlGenerator);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
 
@@ -63,14 +75,16 @@ namespace Umbraco.Web.PropertyEditors
             private readonly HtmlImageSourceParser _imageSourceParser;
             private readonly HtmlLocalLinkParser _localLinkParser;
             private readonly RichTextEditorPastedImages _pastedImages;
+            private readonly IImageUrlGenerator _imageUrlGenerator;
 
-            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor, HtmlImageSourceParser imageSourceParser, HtmlLocalLinkParser localLinkParser, RichTextEditorPastedImages pastedImages)
+            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor, HtmlImageSourceParser imageSourceParser, HtmlLocalLinkParser localLinkParser, RichTextEditorPastedImages pastedImages, IImageUrlGenerator imageUrlGenerator)
                 : base(attribute)
             {
                 _umbracoContextAccessor = umbracoContextAccessor;
                 _imageSourceParser = imageSourceParser;
                 _localLinkParser = localLinkParser;
                 _pastedImages = pastedImages;
+                _imageUrlGenerator = imageUrlGenerator;
             }
 
             /// <inheritdoc />
@@ -124,7 +138,7 @@ namespace Umbraco.Web.PropertyEditors
                 var mediaParent = config?.MediaParentId;
                 var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
 
-                var parseAndSavedTempImages = _pastedImages.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, userId);
+                var parseAndSavedTempImages = _pastedImages.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, userId, _imageUrlGenerator);
                 var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
 

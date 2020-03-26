@@ -64,6 +64,8 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
 
         var currentNode = $scope.model.currentNode;
 
+        var previouslyFocusedElement = null;
+
         function initDialogTree() {
             vm.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
             // TODO: Also deal with unexpanding!!
@@ -76,18 +78,20 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
          */
         function onInit () {
 
-            // load languages
-            languageResource.getAll().then(function (languages) {
-                vm.languages = languages;
+            if (vm.showLanguageSelector) {
+                // load languages
+                languageResource.getAll().then(function (languages) {
+                    vm.languages = languages;
 
-                // set the default language
-                vm.languages.forEach(function (language) {
-                    if (language.isDefault) {
-                        vm.selectedLanguage = language;
-                        vm.languageSelectorIsOpen = false;
-                    }
+                    // set the default language
+                    vm.languages.forEach(function (language) {
+                        if (language.isDefault) {
+                            vm.selectedLanguage = language;
+                            vm.languageSelectorIsOpen = false;
+                        }
+                    });
                 });
-            });
+            }
 
             if (vm.treeAlias === "content") {
                 vm.entityType = "Document";
@@ -212,7 +216,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             if (vm.dataTypeKey) {
                 queryParams["dataTypeKey"] = vm.dataTypeKey;
             }
-                
+
             var queryString = $.param(queryParams); //create the query string from the params object
             
             if (!queryString) {
@@ -487,6 +491,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         }
 
         function openMiniListView(node) {
+            previouslyFocusedElement = document.activeElement;
             vm.miniListView = node;
         }
 
@@ -650,6 +655,12 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
 
         function closeMiniListView() {
             vm.miniListView = undefined;
+            if (previouslyFocusedElement) {
+                $timeout(function () {
+                    previouslyFocusedElement.focus();
+                    previouslyFocusedElement = null;
+                });
+            }
         }
 
         function listViewItemsLoaded(items) {

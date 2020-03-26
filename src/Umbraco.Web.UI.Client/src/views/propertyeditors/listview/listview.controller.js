@@ -276,6 +276,9 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     }
 
     $scope.reloadView = function (id, reloadActiveNode) {
+        if (!id) {
+            return;
+        }
         $scope.viewLoaded = false;
         $scope.folders = [];
 
@@ -713,44 +716,11 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     }
 
     function initView() {
-        //default to root id if the id is undefined
         var id = $routeParams.id;
         if (id === undefined) {
-            id = -1;
+            // no ID found in route params - don't list anything as we don't know for sure where we are
+            return;
         }
-
-        getContentTypesCallback(id).then(function (listViewAllowedTypes) {
-          $scope.listViewAllowedTypes = listViewAllowedTypes;
-
-          var blueprints = false;
-          _.each(listViewAllowedTypes, function (allowedType) {
-              if (_.isEmpty(allowedType.blueprints)) {
-                // this helps the view understand that there are no blueprints available
-                allowedType.blueprints = null;
-              }
-              else {
-                blueprints = true;
-                // turn the content type blueprints object into an array of sortable objects for the view
-                allowedType.blueprints = _.map(_.pairs(allowedType.blueprints || {}), function (pair) {
-                  return {
-                    id: pair[0],
-                    name: pair[1]
-                  };
-                });
-              }
-            });
-
-            if (listViewAllowedTypes.length === 1 && blueprints === false) {
-                $scope.createAllowedButtonSingle = true;
-            }
-            if (listViewAllowedTypes.length === 1 && blueprints === true) {
-                $scope.createAllowedButtonSingleWithBlueprints = true;
-            }
-            if (listViewAllowedTypes.length > 1) {
-                $scope.createAllowedButtonMultiWithBlueprints = true;
-            }
-        });
-
 
         $scope.contentId = id;
         $scope.isTrashed = editorState.current ? editorState.current.trashed : id === "-20" || id === "-21";
@@ -764,6 +734,40 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             $scope.options.allowBulkCopy ||
             $scope.options.allowBulkMove ||
             $scope.options.allowBulkDelete;
+
+        if ($scope.isTrashed === false) {
+            getContentTypesCallback(id).then(function (listViewAllowedTypes) {
+                $scope.listViewAllowedTypes = listViewAllowedTypes;
+
+                var blueprints = false;
+                _.each(listViewAllowedTypes, function (allowedType) {
+                    if (_.isEmpty(allowedType.blueprints)) {
+                        // this helps the view understand that there are no blueprints available
+                        allowedType.blueprints = null;
+                    }
+                    else {
+                        blueprints = true;
+                        // turn the content type blueprints object into an array of sortable objects for the view
+                        allowedType.blueprints = _.map(_.pairs(allowedType.blueprints || {}), function (pair) {
+                            return {
+                                id: pair[0],
+                                name: pair[1]
+                            };
+                        });
+                    }
+                });
+
+                if (listViewAllowedTypes.length === 1 && blueprints === false) {
+                    $scope.createAllowedButtonSingle = true;
+                }
+                if (listViewAllowedTypes.length === 1 && blueprints === true) {
+                    $scope.createAllowedButtonSingleWithBlueprints = true;
+                }
+                if (listViewAllowedTypes.length > 1) {
+                    $scope.createAllowedButtonMultiWithBlueprints = true;
+                }
+            });
+        }
 
         $scope.reloadView($scope.contentId);
     }

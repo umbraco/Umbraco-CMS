@@ -869,7 +869,7 @@ namespace Umbraco.Web.Editors
             return true;
         }
 
-        
+
 
         /// <summary>
         /// Helper method to perform the saving of the content and add the notifications to the result
@@ -1161,14 +1161,14 @@ namespace Umbraco.Web.Editors
             //validate if we can publish based on the mandatory language requirements
             var canPublish = ValidatePublishingMandatoryLanguages(
                 cultureErrors,
-                contentItem, cultureVariants, mandatoryCultures, 
+                contentItem, cultureVariants, mandatoryCultures,
                 mandatoryVariant => mandatoryVariant.Publish);
 
             //Now check if there are validation errors on each variant.
             //If validation errors are detected on a variant and it's state is set to 'publish', then we
             //need to change it to 'save'.
             //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.
-            
+
             foreach (var variant in contentItem.Variants)
             {
                 if (cultureErrors.Contains(variant.Culture))
@@ -1656,14 +1656,14 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public DomainSave PostSaveLanguageAndDomains(DomainSave model)
         {
-            foreach(var domain in model.Domains)
+            foreach (var domain in model.Domains)
             {
                 try
                 {
                     var uri = DomainUtilities.ParseUriFromDomainName(domain.Name, Request.RequestUri);
                 }
                 catch (UriFormatException)
-                {                    
+                {
                     var response = Request.CreateValidationErrorResponse(Services.TextService.Localize("assignDomain/invalidDomain"));
                     throw new HttpResponseException(response);
                 }
@@ -1829,7 +1829,7 @@ namespace Umbraco.Web.Editors
             base.HandleInvalidModelState(display);
 
         }
-        
+
         /// <summary>
         /// Maps the dto property values and names to the persisted model
         /// </summary>
@@ -1842,7 +1842,7 @@ namespace Umbraco.Web.Editors
                 var culture = property.PropertyType.VariesByCulture() ? variant.Culture : null;
                 var segment = property.PropertyType.VariesBySegment() ? variant.Segment : null;
                 return (culture, segment);
-            }            
+            }
 
             var variantIndex = 0;
 
@@ -1884,15 +1884,15 @@ namespace Umbraco.Web.Editors
                     (save, property) =>
                     {
                         // Get property value
-                        (var culture, var segment) = PropertyCultureAndSegment(property, variant);                        
-                        return property.GetValue(culture, segment);                        
+                        (var culture, var segment) = PropertyCultureAndSegment(property, variant);
+                        return property.GetValue(culture, segment);
                     },
                     (save, property, v) =>
                     {
                         // Set property value
                         (var culture, var segment) = PropertyCultureAndSegment(property, variant);
-                        property.SetValue(v, culture, segment);                        
-                    },  
+                        property.SetValue(v, culture, segment);
+                    },
                     variant.Culture);
 
                 variantIndex++;
@@ -2172,7 +2172,10 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private ContentItemDisplay MapToDisplay(IContent content)
         {
-            var display = Mapper.Map<ContentItemDisplay>(content);
+            var display = Mapper.Map<ContentItemDisplay>(content, context =>
+            {
+                context.Items["CurrentUser"] = Security.CurrentUser;
+            });
             display.AllowPreview = display.AllowPreview && content.Trashed == false && content.ContentType.IsElement == false;
             return display;
         }

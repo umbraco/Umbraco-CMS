@@ -365,11 +365,22 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
         },
         
         /**
+         * @ngdoc method
+         * @name umbraco.resources.contentResource#downloadFile
+         * @methodOf umbraco.resources.contentResource
+         *
+         * @description
          * Downloads a file to the client using AJAX/XHR
-         * Based on an implementation here: web.student.tuwien.ac.at/~e0427417/jsdownload.html
-         * See https://stackoverflow.com/a/24129082/694494
+         * 
+         * @param {string} httpPath the path (url) to the resource being downloaded
+         * @returns {Promise} http promise object.
          */
         downloadFile : function (httpPath) {
+
+            /**
+             * Based on an implementation here: web.student.tuwien.ac.at/~e0427417/jsdownload.html
+             * See https://stackoverflow.com/a/24129082/694494
+             */
 
             // Use an arraybuffer
             return $http.get(httpPath, { responseType: 'arraybuffer' })
