@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -24,6 +25,8 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="groupName"></param>
         /// <returns></returns>
         IEnumerable<IMember> GetByMemberGroup(string groupName);
+
+        IEnumerable<IMember> FindMembersByGroup(int memberGroupId, long pageIndex, int pageSize, out long totalRecords);
 
         /// <summary>
         /// Checks if a member with the username exists
