@@ -14,26 +14,26 @@ namespace Umbraco.Web.Scheduling
     {
         private readonly DirectoryInfo[] _tempFolders;
         private readonly TimeSpan _age;
-        private readonly IRuntimeState _runtime;
+        private readonly IMainDom _mainDom;
         private readonly IProfilingLogger _logger;
 
         public TempFileCleanup(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
             IEnumerable<DirectoryInfo> tempFolders, TimeSpan age,
-            IRuntimeState runtime, IProfilingLogger logger)
+            IMainDom mainDom, IProfilingLogger logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             //SystemDirectories.TempFileUploads
 
             _tempFolders = tempFolders.ToArray();
             _age = age;
-            _runtime = runtime;
+            _mainDom = mainDom;
             _logger = logger;
         }
 
         public override bool PerformRun()
         {
             // ensure we do not run if not main domain
-            if (_runtime.IsMainDom == false)
+            if (_mainDom.IsMainDom == false)
             {
                 _logger.Debug<TempFileCleanup>("Does not run if not MainDom.");
                 return false; // do NOT repeat, going down

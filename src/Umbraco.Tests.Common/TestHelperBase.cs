@@ -12,11 +12,11 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Net;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
-using Umbraco.Net;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
 
@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Common
         private UriUtility _uriUtility;
         private IIOHelper _ioHelper;
 
-        public TestHelperBase(Assembly entryAssembly)
+        protected TestHelperBase(Assembly entryAssembly)
         {
             SettingsForTests = new SettingsForTests();            
             MainDom = new SimpleMainDom();
@@ -52,12 +52,8 @@ namespace Umbraco.Tests.Common
             return new RuntimeState(
                 Mock.Of<ILogger>(),
                 Mock.Of<IGlobalSettings>(),
-                new Lazy<IMainDom>(),
-                new Lazy<IServerRegistrar>(),
                 GetUmbracoVersion(),
-                GetHostingEnvironment(),
-                GetBackOfficeInfo()
-                );
+                GetBackOfficeInfo());
         }
 
         public abstract IBackOfficeInfo GetBackOfficeInfo();
@@ -132,6 +128,7 @@ namespace Umbraco.Tests.Common
         }
 
         public abstract IHostingEnvironment GetHostingEnvironment();
+        public abstract IApplicationShutdownRegistry GetHostingEnvironmentLifetime();
 
         public abstract IIpResolver GetIpResolver();
 
