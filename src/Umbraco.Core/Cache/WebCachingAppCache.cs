@@ -37,23 +37,28 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
-            CacheDependency dependency = null;
-            if (dependentFiles != null && dependentFiles.Any())
-            {
-                dependency = new CacheDependency(dependentFiles);
-            }
-            return Get(key, factory, timeout, isSliding, priority, removedCallback, dependency);
+            return Get(key, factory, timeout, isSliding, priority, removedCallback,
+                // NOTE: We don't want to allocate an object if it isn't going to be used so we create the CacheDependency
+                // in a callback if it's needed ... but more importantly and we didn't anticipate this, just constructing
+                // a CacheDependency object is expensive and allocates a bunch of stuff, just check the code out for it:
+                // https://referencesource.microsoft.com/#system.web/Cache/CacheDependency.cs,304
+                // Init is called as part of the ctor!! yikes.
+                // This change fixes https://github.com/umbraco/Umbraco-CMS/issues/7773
+                () => dependentFiles != null && dependentFiles.Length > 0 ? new CacheDependency(dependentFiles) : null);
         }
 
         /// <inheritdoc />
         public void Insert(string key, Func<object> factory, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
-            CacheDependency dependency = null;
-            if (dependentFiles != null && dependentFiles.Any())
-            {
-                dependency = new CacheDependency(dependentFiles);
-            }
-            Insert(key, factory, timeout, isSliding, priority, removedCallback, dependency);
+            
+            Insert(key, factory, timeout, isSliding, priority, removedCallback,
+                // NOTE: We don't want to allocate an object if it isn't going to be used so we create the CacheDependency
+                // in a callback if it's needed ... but more importantly and we didn't anticipate this, just constructing
+                // a CacheDependency object is expensive and allocates a bunch of stuff, just check the code out for it:
+                // https://referencesource.microsoft.com/#system.web/Cache/CacheDependency.cs,304
+                // Init is called as part of the ctor!! yikes.
+                // This change fixes https://github.com/umbraco/Umbraco-CMS/issues/7773
+                () => dependentFiles != null && dependentFiles.Length > 0 ? new CacheDependency(dependentFiles) : null);
         }
 
         #region Dictionary
@@ -103,7 +108,7 @@ namespace Umbraco.Core.Cache
 
         #endregion
 
-        private object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, CacheDependency dependency = null)
+        private object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, Func<CacheDependency> dependency = null)
         {
             key = GetCacheKey(key);
 
@@ -164,7 +169,7 @@ namespace Umbraco.Core.Cache
 
                     lck.UpgradeToWriteLock();
                     //NOTE: 'Insert' on System.Web.Caching.Cache actually does an add or update!
-                    _cache.Insert(key, result, dependency, absolute, sliding, priority, removedCallback);
+                    _cache.Insert(key, result, dependency(), absolute, sliding, priority, removedCallback);
                 }
             }
 
@@ -180,7 +185,7 @@ namespace Umbraco.Core.Cache
             return value;
         }
 
-        private void Insert(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, CacheDependency dependency = null)
+        private void Insert(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, Func<CacheDependency> dependency = null)
         {
             // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
             // and make sure we don't store a null value.
@@ -198,7 +203,7 @@ namespace Umbraco.Core.Cache
             {
                 _locker.EnterWriteLock();
                 //NOTE: 'Insert' on System.Web.Caching.Cache actually does an add or update!
-                _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
+                _cache.Insert(cacheKey, result, dependency(), absolute, sliding, priority, removedCallback);
             }
             finally
             {
