@@ -1,32 +1,19 @@
-﻿using System;
-using System.Diagnostics;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using NUnit.Framework;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Common.Builders;
 
-namespace Umbraco.Tests.Models
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
 {
     [TestFixture]
     public class LanguageTests
     {
-        private IGlobalSettings GlobalSettings { get; } = SettingsForTests.GenerateMockGlobalSettings();
+        private readonly LanguageBuilder _builder = new LanguageBuilder();
 
         [Test]
         public void Can_Deep_Clone()
         {
-            var item = new Language(GlobalSettings, "en-AU")
-            {
-                CreateDate = DateTime.Now,
-                CultureName = "AU",
-                Id = 11,
-                IsoCode = "en",
-                Key = Guid.NewGuid(),
-                UpdateDate = DateTime.Now
-            };
+            var item = _builder.Build();
 
             var clone = (Language) item.DeepClone();
             Assert.AreNotSame(clone, item);
@@ -49,18 +36,9 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var item = new Language(GlobalSettings, "en-AU")
-            {
-                CreateDate = DateTime.Now,
-                CultureName = "AU",
-                Id = 11,
-                IsoCode = "en",
-                Key = Guid.NewGuid(),
-                UpdateDate = DateTime.Now
-            };
+            var item = _builder.Build();
 
-            var json = JsonConvert.SerializeObject(item);
-            Debug.Print(json);
+            Assert.DoesNotThrow(() => JsonConvert.SerializeObject(item));
         }
     }
 }
