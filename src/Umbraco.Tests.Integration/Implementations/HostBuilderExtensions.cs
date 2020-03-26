@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Umbraco.Core;
 using Umbraco.Tests.Integration.Testing;
 
 namespace Umbraco.Tests.Integration.Implementations

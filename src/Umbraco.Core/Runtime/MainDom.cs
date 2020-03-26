@@ -21,7 +21,7 @@ namespace Umbraco.Core.Runtime
         #region Vars
 
         private readonly ILogger _logger;
-        private IHostingEnvironmentLifetime _hostingEnvironment;
+        private IApplicationShutdownRegistry _hostingEnvironment;
         private readonly IMainDomLock _mainDomLock;
 
         // our own lock for local consistency
@@ -50,9 +50,10 @@ namespace Umbraco.Core.Runtime
 
         #endregion
 
-        public bool Acquire(IHostingEnvironmentLifetime hostingEnvironment)
+        public bool Acquire(IApplicationShutdownRegistry hostingEnvironment)
         {
-            _hostingEnvironment = hostingEnvironment;
+            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+
             return LazyInitializer.EnsureInitialized(ref _isMainDom, ref _isInitialized, ref _locko, () =>
             {
                 hostingEnvironment.RegisterObject(this);
@@ -199,7 +200,7 @@ namespace Umbraco.Core.Runtime
             // The web app is stopping, need to wind down
             Dispose(true);
 
-            _hostingEnvironment.UnregisterObject(this);
+            _hostingEnvironment?.UnregisterObject(this);
         }
 
         #region IDisposable Support

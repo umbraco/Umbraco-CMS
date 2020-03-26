@@ -99,7 +99,7 @@ namespace Umbraco.Web.Compose
             IServerMessenger serverMessenger,
             IServerRegistrationService registrationService,
             ILogger logger,
-            IHostingEnvironmentLifetime hostingEnvironment,
+            IApplicationShutdownRegistry hostingEnvironment,
             IRequestAccessor requestAccessor)
         {
             _runtime = runtime;

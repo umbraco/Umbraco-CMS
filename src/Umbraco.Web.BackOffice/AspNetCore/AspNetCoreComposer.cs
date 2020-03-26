@@ -21,7 +21,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
 
             // Our own netcore implementations
             composition.RegisterUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
-            composition.RegisterUnique<IHostingEnvironmentLifetime, AspNetCoreHostingEnvironmentLifetime>();
+            composition.RegisterUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Scheduling
     public class BackgroundTaskRunnerTests
     {
         private ILogger _logger;
-        private IHostingEnvironmentLifetime _hostingEnvironment;
+        private IApplicationShutdownRegistry _hostingEnvironment;
 
         [OneTimeSetUp]
         public void InitializeFixture()

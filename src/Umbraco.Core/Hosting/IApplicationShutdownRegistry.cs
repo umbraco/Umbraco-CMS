@@ -1,6 +1,6 @@
 namespace Umbraco.Core.Hosting
 {
-    public interface IHostingEnvironmentLifetime
+    public interface IApplicationShutdownRegistry
     {
         void RegisterObject(IRegisteredObject registeredObject);
         void UnregisterObject(IRegisteredObject registeredObject);

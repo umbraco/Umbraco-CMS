@@ -62,8 +62,8 @@ namespace Umbraco.Tests.TestHelpers
             public override IHostingEnvironment GetHostingEnvironment()
                 => new AspNetHostingEnvironment(SettingsForTests.GetDefaultHostingSettings());
 
-            public override IHostingEnvironmentLifetime GetHostingEnvironmentLifetime()
-                => new AspNetHostingLifetime();
+            public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime()
+                => new AspNetApplicationShutdownRegistry();
 
             public override IIpResolver GetIpResolver()
                 => new AspNetIpResolver();
@@ -323,7 +323,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IHostingEnvironment GetHostingEnvironment() => _testHelperInternal.GetHostingEnvironment();
 
-        public static IHostingEnvironmentLifetime GetHostingEnvironmentLifetime() => _testHelperInternal.GetHostingEnvironmentLifetime();
+        public static IApplicationShutdownRegistry GetHostingEnvironmentLifetime() => _testHelperInternal.GetHostingEnvironmentLifetime();
 
         public static IIpResolver GetIpResolver() => _testHelperInternal.GetIpResolver();
 

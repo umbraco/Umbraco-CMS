@@ -31,7 +31,7 @@ namespace Umbraco.Web.Scheduling
         private readonly IContentService _contentService;
         private readonly IAuditService _auditService;
         private readonly IProfilingLogger _logger;
-        private readonly IHostingEnvironmentLifetime _hostingEnvironment;
+        private readonly IApplicationShutdownRegistry _hostingEnvironment;
         private readonly IScopeProvider _scopeProvider;
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Scheduling
             IContentService contentService, IAuditService auditService,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger logger,
-            IHostingEnvironmentLifetime hostingEnvironment, IHealthChecksSettings healthChecksSettingsConfig,
+            IApplicationShutdownRegistry hostingEnvironment, IHealthChecksSettings healthChecksSettingsConfig,
             IIOHelper ioHelper, IServerMessenger serverMessenger, IRequestAccessor requestAccessor,
             ILoggingSettings loggingSettings, IKeepAliveSettings keepAliveSettings)
         {

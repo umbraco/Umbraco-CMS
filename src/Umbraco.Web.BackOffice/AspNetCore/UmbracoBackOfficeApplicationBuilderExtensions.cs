@@ -27,7 +27,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             if (app == null) throw new ArgumentNullException(nameof(app));
 
             // Register a listener for application shutdown in order to terminate the runtime
-            var hostLifetime = app.ApplicationServices.GetRequiredService<IHostingEnvironmentLifetime>();
+            var hostLifetime = app.ApplicationServices.GetRequiredService<IApplicationShutdownRegistry>();
             var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
             var runtimeShutdown = new CoreRuntimeShutdown(runtime, hostLifetime);
             hostLifetime.RegisterObject(runtimeShutdown);
@@ -43,7 +43,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         /// </summary>
         private class CoreRuntimeShutdown : IRegisteredObject
         {
-            public CoreRuntimeShutdown(IRuntime runtime, IHostingEnvironmentLifetime hostLifetime)
+            public CoreRuntimeShutdown(IRuntime runtime, IApplicationShutdownRegistry hostLifetime)
             {
                 _runtime = runtime;
                 _hostLifetime = hostLifetime;
@@ -51,7 +51,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
 
             private bool _completed = false;
             private readonly IRuntime _runtime;
-            private readonly IHostingEnvironmentLifetime _hostLifetime;
+            private readonly IApplicationShutdownRegistry _hostLifetime;
 
             public void Stop(bool immediate)
             {

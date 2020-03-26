@@ -1,22 +1,15 @@
 using System;
 using System.Collections.Concurrent;
-using System.Threading;
-using Microsoft.Extensions.Hosting;
-using Umbraco.Core;
+using System.Web.Hosting;
 using Umbraco.Core.Hosting;
+using IRegisteredObject = Umbraco.Core.IRegisteredObject;
 
-namespace Umbraco.Web.BackOffice.AspNetCore
+namespace Umbraco.Web.Hosting
 {
-    public class AspNetCoreHostingEnvironmentLifetime : IHostingEnvironmentLifetime
+    public class AspNetApplicationShutdownRegistry : IApplicationShutdownRegistry
     {
-        private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly ConcurrentDictionary<IRegisteredObject, RegisteredObjectWrapper> _registeredObjects =
             new ConcurrentDictionary<IRegisteredObject, RegisteredObjectWrapper>();
-
-        public AspNetCoreHostingEnvironmentLifetime(IHostApplicationLifetime hostApplicationLifetime)
-        {
-            _hostApplicationLifetime = hostApplicationLifetime;
-        }
 
         public void RegisterObject(IRegisteredObject registeredObject)
         {
@@ -25,21 +18,18 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             {
                 throw new InvalidOperationException("Could not register object");
             }
-
-            var cancellationTokenRegistration = _hostApplicationLifetime.ApplicationStopping.Register(() => wrapped.Stop(true));
-            wrapped.CancellationTokenRegistration = cancellationTokenRegistration;
+            HostingEnvironment.RegisterObject(wrapped);
         }
 
         public void UnregisterObject(IRegisteredObject registeredObject)
         {
             if (_registeredObjects.TryGetValue(registeredObject, out var wrapped))
             {
-                wrapped.CancellationTokenRegistration.Unregister();
+                HostingEnvironment.UnregisterObject(wrapped);
             }
         }
 
-
-        private class RegisteredObjectWrapper
+        private class RegisteredObjectWrapper : System.Web.Hosting.IRegisteredObject
         {
             private readonly IRegisteredObject _inner;
 
@@ -47,8 +37,6 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             {
                 _inner = inner;
             }
-
-            public CancellationTokenRegistration CancellationTokenRegistration { get; set; }
 
             public void Stop(bool immediate)
             {

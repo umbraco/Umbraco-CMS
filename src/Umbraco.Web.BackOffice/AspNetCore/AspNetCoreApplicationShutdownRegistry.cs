@@ -1,15 +1,22 @@
 using System;
 using System.Collections.Concurrent;
-using System.Web.Hosting;
+using System.Threading;
+using Microsoft.Extensions.Hosting;
+using Umbraco.Core;
 using Umbraco.Core.Hosting;
-using IRegisteredObject = Umbraco.Core.IRegisteredObject;
 
-namespace Umbraco.Web.Hosting
+namespace Umbraco.Web.BackOffice.AspNetCore
 {
-    public class AspNetHostingLifetime : IHostingEnvironmentLifetime
+    public class AspNetCoreApplicationShutdownRegistry : IApplicationShutdownRegistry
     {
+        private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly ConcurrentDictionary<IRegisteredObject, RegisteredObjectWrapper> _registeredObjects =
             new ConcurrentDictionary<IRegisteredObject, RegisteredObjectWrapper>();
+
+        public AspNetCoreApplicationShutdownRegistry(IHostApplicationLifetime hostApplicationLifetime)
+        {
+            _hostApplicationLifetime = hostApplicationLifetime;
+        }
 
         public void RegisterObject(IRegisteredObject registeredObject)
         {
@@ -18,18 +25,21 @@ namespace Umbraco.Web.Hosting
             {
                 throw new InvalidOperationException("Could not register object");
             }
-            HostingEnvironment.RegisterObject(wrapped);
+
+            var cancellationTokenRegistration = _hostApplicationLifetime.ApplicationStopping.Register(() => wrapped.Stop(true));
+            wrapped.CancellationTokenRegistration = cancellationTokenRegistration;
         }
 
         public void UnregisterObject(IRegisteredObject registeredObject)
         {
             if (_registeredObjects.TryGetValue(registeredObject, out var wrapped))
             {
-                HostingEnvironment.UnregisterObject(wrapped);
+                wrapped.CancellationTokenRegistration.Unregister();
             }
         }
 
-        private class RegisteredObjectWrapper : System.Web.Hosting.IRegisteredObject
+
+        private class RegisteredObjectWrapper
         {
             private readonly IRegisteredObject _inner;
 
@@ -37,6 +47,8 @@ namespace Umbraco.Web.Hosting
             {
                 _inner = inner;
             }
+
+            public CancellationTokenRegistration CancellationTokenRegistration { get; set; }
 
             public void Stop(bool immediate)
             {

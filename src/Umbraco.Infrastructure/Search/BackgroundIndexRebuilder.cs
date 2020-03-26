@@ -18,10 +18,10 @@ namespace Umbraco.Web.Search
         private readonly IndexRebuilder _indexRebuilder;
         private readonly IMainDom _mainDom;
         private readonly IProfilingLogger _logger;
-        private readonly IHostingEnvironmentLifetime _hostingEnvironment;
+        private readonly IApplicationShutdownRegistry _hostingEnvironment;
         private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
 
-        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger logger, IHostingEnvironmentLifetime hostingEnvironment, IndexRebuilder indexRebuilder)
+        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger logger, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
         {
             _mainDom = mainDom;
             _logger = logger;

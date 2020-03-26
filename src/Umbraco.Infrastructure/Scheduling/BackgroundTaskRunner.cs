@@ -81,7 +81,7 @@ namespace Umbraco.Web.Scheduling
         private readonly string _logPrefix;
         private readonly BackgroundTaskRunnerOptions _options;
         private readonly ILogger _logger;
-        private readonly IHostingEnvironmentLifetime _hostingEnvironment;
+        private readonly IApplicationShutdownRegistry _hostingEnvironment;
         private readonly object _locker = new object();
 
         private readonly BufferBlock<T> _tasks = new BufferBlock<T>(new DataflowBlockOptions());
@@ -105,7 +105,7 @@ namespace Umbraco.Web.Scheduling
         /// <param name="logger">A logger.</param>
         /// <param name="hostingEnvironment">The hosting environment</param>
         /// <param name="hook">An optional main domain hook.</param>
-        public BackgroundTaskRunner(ILogger logger, IHostingEnvironmentLifetime hostingEnvironment, MainDomHook hook = null)
+        public BackgroundTaskRunner(ILogger logger, IApplicationShutdownRegistry hostingEnvironment, MainDomHook hook = null)
             : this(typeof(T).FullName, new BackgroundTaskRunnerOptions(), logger, hostingEnvironment, hook)
         { }
 
@@ -116,7 +116,7 @@ namespace Umbraco.Web.Scheduling
         /// <param name="logger">A logger.</param>
         /// <param name="hostingEnvironment">The hosting environment</param>
         /// <param name="hook">An optional main domain hook.</param>
-        public BackgroundTaskRunner(string name, ILogger logger, IHostingEnvironmentLifetime hostingEnvironment, MainDomHook hook = null)
+        public BackgroundTaskRunner(string name, ILogger logger, IApplicationShutdownRegistry hostingEnvironment, MainDomHook hook = null)
             : this(name, new BackgroundTaskRunnerOptions(), logger, hostingEnvironment, hook)
         { }
 
@@ -127,7 +127,7 @@ namespace Umbraco.Web.Scheduling
         /// <param name="logger">A logger.</param>
         /// <param name="hostingEnvironment">The hosting environment</param>
         /// <param name="hook">An optional main domain hook.</param>
-        public BackgroundTaskRunner(BackgroundTaskRunnerOptions options, ILogger logger, IHostingEnvironmentLifetime hostingEnvironment, MainDomHook hook = null)
+        public BackgroundTaskRunner(BackgroundTaskRunnerOptions options, ILogger logger, IApplicationShutdownRegistry hostingEnvironment, MainDomHook hook = null)
             : this(typeof(T).FullName, options, logger, hostingEnvironment, hook)
         { }
 
@@ -139,7 +139,7 @@ namespace Umbraco.Web.Scheduling
         /// <param name="logger">A logger.</param>
         /// <param name="hostingEnvironment">The hosting environment</param>
         /// <param name="hook">An optional main domain hook.</param>
-        public BackgroundTaskRunner(string name, BackgroundTaskRunnerOptions options, ILogger logger, IHostingEnvironmentLifetime hostingEnvironment, MainDomHook hook = null)
+        public BackgroundTaskRunner(string name, BackgroundTaskRunnerOptions options, ILogger logger, IApplicationShutdownRegistry hostingEnvironment, MainDomHook hook = null)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

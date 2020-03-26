@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Common
         }
 
         public abstract IHostingEnvironment GetHostingEnvironment();
-        public abstract IHostingEnvironmentLifetime GetHostingEnvironmentLifetime();
+        public abstract IApplicationShutdownRegistry GetHostingEnvironmentLifetime();
 
         public abstract IIpResolver GetIpResolver();
 

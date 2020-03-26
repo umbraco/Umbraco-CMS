@@ -133,7 +133,7 @@ namespace Umbraco.Tests.Runtimes
 
             public override IFactory Configure(IRegister container)
             {
-                container.Register<IHostingEnvironmentLifetime, AspNetHostingLifetime>(Lifetime.Singleton);
+                container.Register<IApplicationShutdownRegistry, AspNetApplicationShutdownRegistry>(Lifetime.Singleton);
 
                 var factory = base.Configure(container);
                 return factory;

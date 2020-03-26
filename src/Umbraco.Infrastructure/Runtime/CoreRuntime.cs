@@ -28,21 +28,6 @@ namespace Umbraco.Core.Runtime
         private readonly IGlobalSettings _globalSettings;
         private readonly IConnectionStrings _connectionStrings;
 
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="configs"></param>
-        /// <param name="umbracoVersion"></param>
-        /// <param name="ioHelper"></param>
-        /// <param name="logger"></param>
-        /// <param name="profiler"></param>
-        /// <param name="umbracoBootPermissionChecker"></param>
-        /// <param name="hostingEnvironment"></param>
-        /// <param name="backOfficeInfo"></param>
-        /// <param name="dbProviderFactoryCreator"></param>
-        /// <param name="mainDom"></param>
-        /// <param name="typeFinder"></param>
         public CoreRuntime(
             Configs configs,
             IUmbracoVersion umbracoVersion,
@@ -251,12 +236,12 @@ namespace Umbraco.Core.Runtime
             // run handlers
             RuntimeOptions.DoRuntimeEssentials(_factory);
 
-            var hostingEnvironmentLifetime = _factory.TryGetInstance<IHostingEnvironmentLifetime>();
+            var hostingEnvironmentLifetime = _factory.TryGetInstance<IApplicationShutdownRegistry>();
             if (hostingEnvironmentLifetime == null)
-                throw new InvalidOperationException($"An instance of {typeof(IHostingEnvironmentLifetime)} could not be resolved from the container, ensure that one if registered in your runtime before calling {nameof(IRuntime)}.{nameof(Start)}");
+                throw new InvalidOperationException($"An instance of {typeof(IApplicationShutdownRegistry)} could not be resolved from the container, ensure that one if registered in your runtime before calling {nameof(IRuntime)}.{nameof(Start)}");
 
             // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
-            AcquireMainDom(MainDom, _factory.GetInstance<IHostingEnvironmentLifetime>());
+            AcquireMainDom(MainDom, _factory.GetInstance<IApplicationShutdownRegistry>());
 
             // create & initialize the components
             _components = _factory.GetInstance<ComponentCollection>();
@@ -287,13 +272,13 @@ namespace Umbraco.Core.Runtime
                 IOHelper.SetRootDirectory(path);
         }
 
-        private bool AcquireMainDom(IMainDom mainDom, IHostingEnvironmentLifetime hostingEnvironmentLifetime)
+        private bool AcquireMainDom(IMainDom mainDom, IApplicationShutdownRegistry applicationShutdownRegistry)
         {
             using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired."))
             {
                 try
                 {
-                    return mainDom.Acquire(hostingEnvironmentLifetime);
+                    return mainDom.Acquire(applicationShutdownRegistry);
                 }
                 catch
                 {

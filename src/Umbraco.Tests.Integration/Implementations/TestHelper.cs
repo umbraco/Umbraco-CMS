@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Integration.Implementations
     {
         private IBackOfficeInfo _backOfficeInfo;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IHostingEnvironmentLifetime _hostingLifetime;
+        private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly IIpResolver _ipResolver;
         private readonly IWebHostEnvironment _hostEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Integration.Implementations
                 _hostEnvironment,
                 _httpContextAccessor);
 
-            _hostingLifetime = new AspNetCoreHostingEnvironmentLifetime(Mock.Of<IHostApplicationLifetime>());
+            _hostingLifetime = new AspNetCoreApplicationShutdownRegistry(Mock.Of<IHostApplicationLifetime>());
 
             Logger = new ProfilingLogger(new ConsoleLogger(new MessageTemplates()), Profiler);
         }
@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Integration.Implementations
         }
 
         public override IHostingEnvironment GetHostingEnvironment() => _hostingEnvironment;
-        public override IHostingEnvironmentLifetime GetHostingEnvironmentLifetime() => _hostingLifetime;
+        public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime() => _hostingLifetime;
 
         public override IIpResolver GetIpResolver() => _ipResolver;
 

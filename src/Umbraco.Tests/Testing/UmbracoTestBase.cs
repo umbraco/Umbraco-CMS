@@ -140,7 +140,7 @@ namespace Umbraco.Tests.Testing
         protected virtual IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
 
         protected IHostingEnvironment HostingEnvironment { get; } = new AspNetHostingEnvironment(TestHelpers.SettingsForTests.GetDefaultHostingSettings());
-        protected IHostingEnvironmentLifetime HostingLifetime { get; } = new AspNetHostingLifetime();
+        protected IApplicationShutdownRegistry HostingLifetime { get; } = new AspNetApplicationShutdownRegistry();
         protected IIpResolver IpResolver => Factory.GetInstance<IIpResolver>();
         protected IBackOfficeInfo BackOfficeInfo => Factory.GetInstance<IBackOfficeInfo>();
         protected AppCaches AppCaches => Factory.GetInstance<AppCaches>();

@@ -42,7 +42,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err" };
 
         private readonly IModelsBuilderConfig _config;
-        private readonly IHostingEnvironmentLifetime _hostingLifetime;
+        private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly IIOHelper _ioHelper;
         private readonly ModelsGenerationError _errors;
 
@@ -51,7 +51,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             IProfilingLogger logger,
             IModelsBuilderConfig config,
             IHostingEnvironment hostingEnvironment,
-            IHostingEnvironmentLifetime hostingLifetime,
+            IApplicationShutdownRegistry hostingLifetime,
             IIOHelper ioHelper)
         {
             _umbracoServices = umbracoServices;

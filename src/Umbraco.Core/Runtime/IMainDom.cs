@@ -26,7 +26,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="hostingEnvironment"></param>
         /// <returns></returns>
-        bool Acquire(IHostingEnvironmentLifetime hostingEnvironment);
+        bool Acquire(IApplicationShutdownRegistry hostingEnvironment);
 
         /// <summary>
         /// Registers a resource that requires the current AppDomain to be the main domain to function.

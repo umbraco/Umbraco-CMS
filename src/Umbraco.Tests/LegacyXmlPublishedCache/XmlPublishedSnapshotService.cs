@@ -41,7 +41,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly IHostingEnvironmentLifetime _hostingLifetime;
+        private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly IHostingEnvironment _hostingEnvironment;
 
         #region Constructors
@@ -58,7 +58,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             ILogger logger,
             IGlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
-            IHostingEnvironmentLifetime hostingLifetime,
+            IApplicationShutdownRegistry hostingLifetime,
             IShortStringHelper shortStringHelper,
             ISiteDomainHelper siteDomainHelper,
             IEntityXmlSerializer entitySerializer,
@@ -86,7 +86,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             ILogger logger,
             IGlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
-            IHostingEnvironmentLifetime hostingLifetime,
+            IApplicationShutdownRegistry hostingLifetime,
             IShortStringHelper shortStringHelper,
             ISiteDomainHelper siteDomainHelper,
             IEntityXmlSerializer entitySerializer,

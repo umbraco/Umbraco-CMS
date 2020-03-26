@@ -18,7 +18,7 @@ namespace Umbraco.Core
         public bool IsMainDom { get; private set; } = true;
 
         // always acquire
-        public bool Acquire(IHostingEnvironmentLifetime hostingEnvironment) => true;
+        public bool Acquire(IApplicationShutdownRegistry hostingEnvironment) => true;
 
         /// <inheritdoc />
         public bool Register(Action release, int weight = 100)
