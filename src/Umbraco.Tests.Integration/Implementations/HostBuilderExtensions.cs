@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Integration.Implementations
 
                 x.AddInMemoryCollection(new[]
                 {
-                    new KeyValuePair<string, string>("ConnectionStrings:umbracoDbDSN", instance.GetConnectionString(dbName))
+                    new KeyValuePair<string, string>($"ConnectionStrings:{Constants.System.UmbracoConnectionName}", instance.GetConnectionString(dbName))
                 });
             });
             return hostBuilder;
