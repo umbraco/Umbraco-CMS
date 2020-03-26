@@ -40,7 +40,7 @@ namespace Umbraco.Web.Runtime
         }
 
         /// <inheritdoc/>
-        public override IFactory Boot(IRegister register)
+        public override IFactory Configure(IRegister register)
         {
 
             var profilingLogger =  new ProfilingLogger(Logger, Profiler);
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Runtime
                     NetworkHelper.MachineName);
                 Logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
 
-                var factory =  base.Boot(register);
+                var factory =  base.Configure(register);
 
                 // now (and only now) is the time to switch over to perWebRequest scopes.
                 // up until that point we may not have a request, and scoped services would

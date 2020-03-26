@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Hosting;
 
 // TODO: Can't change namespace due to breaking changes, change in netcore
 namespace Umbraco.Core
@@ -16,9 +17,16 @@ namespace Umbraco.Core
         /// Gets a value indicating whether the current domain is the main domain.
         /// </summary>
         /// <remarks>
-        /// When the first call is made to this there will generally be some logic executed to acquire a distributed lock lease.
+        /// Acquire must be called first else this will always return false
         /// </remarks>
         bool IsMainDom { get; }
+
+        /// <summary>
+        /// Tries to acquire the MainDom, returns true if successful else false
+        /// </summary>
+        /// <param name="hostingEnvironment"></param>
+        /// <returns></returns>
+        bool Acquire(IApplicationShutdownRegistry hostingEnvironment);
 
         /// <summary>
         /// Registers a resource that requires the current AppDomain to be the main domain to function.

@@ -91,7 +91,6 @@ namespace Umbraco.Web.Compose
         private readonly BackgroundTaskRunner<IBackgroundTask> _processTaskRunner;
         private bool _started;
         private IBackgroundTask[] _tasks;
-        private IndexRebuilder _indexRebuilder;
         private readonly IRequestAccessor _requestAccessor;
 
         public DatabaseServerRegistrarAndMessengerComponent(
@@ -100,14 +99,12 @@ namespace Umbraco.Web.Compose
             IServerMessenger serverMessenger,
             IServerRegistrationService registrationService,
             ILogger logger,
-            IHostingEnvironment hostingEnvironment,
-            IndexRebuilder indexRebuilder,
+            IApplicationShutdownRegistry hostingEnvironment,
             IRequestAccessor requestAccessor)
         {
             _runtime = runtime;
             _logger = logger;
             _registrationService = registrationService;
-            _indexRebuilder = indexRebuilder;
             _requestAccessor = requestAccessor;
 
             // create task runner for DatabaseServerRegistrar

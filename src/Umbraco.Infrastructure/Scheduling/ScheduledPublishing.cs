@@ -10,16 +10,20 @@ namespace Umbraco.Web.Scheduling
     public class ScheduledPublishing : RecurringTaskBase
     {
         private readonly IRuntimeState _runtime;
+        private readonly IMainDom _mainDom;
+        private readonly IServerRegistrar _serverRegistrar;
         private readonly IContentService _contentService;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly ILogger _logger;
         private readonly IServerMessenger _serverMessenger;
 
         public ScheduledPublishing(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IContentService contentService, IUmbracoContextFactory umbracoContextFactory, ILogger logger, IServerMessenger serverMessenger)
+            IRuntimeState runtime, IMainDom mainDom, IServerRegistrar serverRegistrar, IContentService contentService, IUmbracoContextFactory umbracoContextFactory, ILogger logger, IServerMessenger serverMessenger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
+            _mainDom = mainDom;
+            _serverRegistrar = serverRegistrar;
             _contentService = contentService;
             _umbracoContextFactory = umbracoContextFactory;
             _logger = logger;
@@ -31,7 +35,7 @@ namespace Umbraco.Web.Scheduling
             if (Suspendable.ScheduledPublishing.CanRun == false)
                 return true; // repeat, later
 
-            switch (_runtime.ServerRole)
+            switch (_serverRegistrar.GetCurrentServerRole())
             {
                 case ServerRole.Replica:
                     _logger.Debug<ScheduledPublishing>("Does not run on replica servers.");
@@ -42,7 +46,7 @@ namespace Umbraco.Web.Scheduling
             }
 
             // ensure we do not run if not main domain, but do NOT lock it
-            if (_runtime.IsMainDom == false)
+            if (_mainDom.IsMainDom == false)
             {
                 _logger.Debug<ScheduledPublishing>("Does not run if not MainDom.");
                 return false; // do NOT repeat, going down

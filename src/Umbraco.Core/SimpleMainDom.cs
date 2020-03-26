@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Core
 {
@@ -15,6 +16,9 @@ namespace Umbraco.Core
 
         /// <inheritdoc />
         public bool IsMainDom { get; private set; } = true;
+
+        // always acquire
+        public bool Acquire(IApplicationShutdownRegistry hostingEnvironment) => true;
 
         /// <inheritdoc />
         public bool Register(Action release, int weight = 100)

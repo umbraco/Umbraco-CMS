@@ -50,10 +50,10 @@ using FileSystems = Umbraco.Core.IO.FileSystems;
 using Umbraco.Web.Templates;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Dictionary;
+using Umbraco.Net;
 using Umbraco.Core.Request;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Net;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Web.AspNet;
 using Umbraco.Web.Install;
@@ -140,6 +140,7 @@ namespace Umbraco.Tests.Testing
         protected virtual IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
 
         protected IHostingEnvironment HostingEnvironment { get; } = new AspNetHostingEnvironment(TestHelpers.SettingsForTests.GetDefaultHostingSettings());
+        protected IApplicationShutdownRegistry HostingLifetime { get; } = new AspNetApplicationShutdownRegistry();
         protected IIpResolver IpResolver => Factory.GetInstance<IIpResolver>();
         protected IBackOfficeInfo BackOfficeInfo => Factory.GetInstance<IBackOfficeInfo>();
         protected AppCaches AppCaches => Factory.GetInstance<AppCaches>();
