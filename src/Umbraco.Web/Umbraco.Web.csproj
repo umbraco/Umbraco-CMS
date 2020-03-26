@@ -138,6 +138,7 @@
     <Compile Include="AppBuilderExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="AspNet\AspNetHostingEnvironment.cs" />
+    <Compile Include="AspNet\AspNetApplicationShutdownRegistry.cs" />
     <Compile Include="AspNet\AspNetRequestAccessor.cs" />
     <Compile Include="AspNet\AspNetSessionManager.cs" />
     <Compile Include="AspNet\AspNetUserAgentProvider.cs" />

@@ -140,12 +140,12 @@ namespace Umbraco.Web
             //in case the user bypasses the installer and just bumps the web.config or client dependency config
 
             //if in debug mode, always burst the cache
-            if (Current.RuntimeState.Debug)
+            if (Current.HostingEnvironment.IsDebugMode)
             {
                 return DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture).GenerateHash();
             }
-            
-            var version = Current.RuntimeState.SemanticVersion.ToSemanticString();
+
+            var version = Current.UmbracoVersion.SemanticVersion.ToSemanticString();
             return $"{version}.{Current.RuntimeMinifier.GetHashValue}".GenerateHash();
         }
     }

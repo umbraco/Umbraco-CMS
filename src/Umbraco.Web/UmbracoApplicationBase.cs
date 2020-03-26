@@ -152,7 +152,9 @@ namespace Umbraco.Web
                 Umbraco.Composing.Current.Profiler,
                 Umbraco.Composing.Current.HostingEnvironment,
                 Umbraco.Composing.Current.BackOfficeInfo);
-            _factory = Current.Factory = _runtime.Boot(register);
+            _factory = Current.Factory = _runtime.Configure(register);
+
+            _runtime.Start();
         }
 
         // called by ASP.NET (auto event wireup) once per app domain

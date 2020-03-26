@@ -11,22 +11,27 @@ namespace Umbraco.Web.Scheduling
 {
     public class HealthCheckNotifier : RecurringTaskBase
     {
-        private readonly IRuntimeState _runtimeState;
+        private readonly IMainDom _mainDom;
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
         private readonly IProfilingLogger _logger;
         private readonly IHealthChecksSettings _healthChecksSettingsConfig;
+        private readonly IServerRegistrar _serverRegistrar;
+        private readonly IRuntimeState _runtimeState;
 
         public HealthCheckNotifier(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
-            IRuntimeState runtimeState, IProfilingLogger logger, IHealthChecksSettings healthChecksSettingsConfig)
+            IMainDom mainDom, IProfilingLogger logger, IHealthChecksSettings healthChecksSettingsConfig, IServerRegistrar serverRegistrar,
+            IRuntimeState runtimeState)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _healthChecks = healthChecks;
             _notifications = notifications;
-            _runtimeState = runtimeState;
+            _mainDom = mainDom;
             _logger = logger;
             _healthChecksSettingsConfig = healthChecksSettingsConfig;
+            _serverRegistrar = serverRegistrar;
+            _runtimeState = runtimeState;
         }
 
         public override async Task<bool> PerformRunAsync(CancellationToken token)
@@ -34,7 +39,7 @@ namespace Umbraco.Web.Scheduling
             if (_runtimeState.Level != RuntimeLevel.Run)
                 return true; // repeat...
 
-            switch (_runtimeState.ServerRole)
+            switch (_serverRegistrar.GetCurrentServerRole())
             {
                 case ServerRole.Replica:
                     _logger.Debug<HealthCheckNotifier>("Does not run on replica servers.");
@@ -45,7 +50,7 @@ namespace Umbraco.Web.Scheduling
             }
 
             // ensure we do not run if not main domain, but do NOT lock it
-            if (_runtimeState.IsMainDom == false)
+            if (_mainDom.IsMainDom == false)
             {
                 _logger.Debug<HealthCheckNotifier>("Does not run if not MainDom.");
                 return false; // do NOT repeat, going down

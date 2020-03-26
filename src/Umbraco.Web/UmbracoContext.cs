@@ -150,7 +150,7 @@ namespace Umbraco.Web
             {
                 var request = GetRequestFromContext();
                 //NOTE: the request can be null during app startup!
-                return Current.RuntimeState.Debug
+                return Current.HostingEnvironment.IsDebugMode
                        && request != null
                        && (string.IsNullOrEmpty(request["umbdebugshowtrace"]) == false
                            || string.IsNullOrEmpty(request["umbdebug"]) == false

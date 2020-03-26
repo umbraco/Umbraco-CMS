@@ -1,6 +1,7 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Persistence;
@@ -18,7 +19,7 @@ namespace Umbraco.Web.Profiling
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
     public class WebProfilingController : UmbracoAuthorizedJsonController
     {
-        private readonly IRuntimeState _runtimeState;
+        private readonly IHostingEnvironment _hosting;
 
         public WebProfilingController(
             IGlobalSettings globalSettings,
@@ -30,17 +31,18 @@ namespace Umbraco.Web.Profiling
             IRuntimeState runtimeState,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider)
+            IPublishedUrlProvider publishedUrlProvider,
+            IHostingEnvironment hosting)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
-            _runtimeState = runtimeState;
+            _hosting = hosting;
         }
 
         public object GetStatus()
         {
             return new
             {
-                Enabled = _runtimeState.Debug
+                Enabled = _hosting.IsDebugMode
             };
         }
     }}

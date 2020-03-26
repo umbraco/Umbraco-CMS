@@ -11,17 +11,19 @@ namespace Umbraco.Web.Scheduling
 
     public class LogScrubber : RecurringTaskBase
     {
-        private readonly IRuntimeState _runtime;
+        private readonly IMainDom _mainDom;
+        private readonly IServerRegistrar _serverRegistrar;
         private readonly IAuditService _auditService;
         private readonly ILoggingSettings _settings;
         private readonly IProfilingLogger _logger;
         private readonly IScopeProvider _scopeProvider;
 
         public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IAuditService auditService, ILoggingSettings settings, IScopeProvider scopeProvider, IProfilingLogger logger)
+            IMainDom mainDom, IServerRegistrar serverRegistrar, IAuditService auditService, ILoggingSettings settings, IScopeProvider scopeProvider, IProfilingLogger logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
-            _runtime = runtime;
+            _mainDom = mainDom;
+            _serverRegistrar = serverRegistrar;
             _auditService = auditService;
             _settings = settings;
             _scopeProvider = scopeProvider;
@@ -53,7 +55,7 @@ namespace Umbraco.Web.Scheduling
 
         public override bool PerformRun()
         {
-            switch (_runtime.ServerRole)
+            switch (_serverRegistrar.GetCurrentServerRole())
             {
                 case ServerRole.Replica:
                     _logger.Debug<LogScrubber>("Does not run on replica servers.");
@@ -64,7 +66,7 @@ namespace Umbraco.Web.Scheduling
             }
 
             // ensure we do not run if not main domain, but do NOT lock it
-            if (_runtime.IsMainDom == false)
+            if (_mainDom.IsMainDom == false)
             {
                 _logger.Debug<LogScrubber>("Does not run if not MainDom.");
                 return false; // do NOT repeat, going down

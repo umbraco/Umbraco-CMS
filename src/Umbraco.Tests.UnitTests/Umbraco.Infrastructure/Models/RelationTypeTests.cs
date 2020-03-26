@@ -1,39 +1,37 @@
 ﻿using System;
-using System.Diagnostics;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
-using Umbraco.Core.Serialization;
+using Umbraco.Tests.Common.Builders;
 
-namespace Umbraco.Tests.Models
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
 {
     [TestFixture]
     public class RelationTypeTests
     {
+        private readonly RelationTypeBuilder _builder = new RelationTypeBuilder();
+
         [Test]
         public void Can_Deep_Clone()
         {
-            var item = new RelationType("test", "test", false, Guid.NewGuid(), Guid.NewGuid())
-            {
-                Id = 66,
-                CreateDate = DateTime.Now,
-                IsBidirectional = true,
-                Key = Guid.NewGuid(),
-                Name = "Test",
-                UpdateDate = DateTime.Now
-            };
+            var item = _builder
+                .WithParentObjectType(Guid.NewGuid())
+                .WithChildObjectType(Guid.NewGuid())
+                .Build();
 
-            var clone = (RelationType)item.DeepClone();
+            var clone = (RelationType) item.DeepClone();
 
             Assert.AreNotSame(clone, item);
             Assert.AreEqual(clone, item);
             Assert.AreEqual(clone.Alias, item.Alias);
             Assert.AreEqual(clone.ChildObjectType, item.ChildObjectType);
+            Assert.AreEqual(clone.ParentObjectType, item.ParentObjectType);
             Assert.AreEqual(clone.IsBidirectional, item.IsBidirectional);
             Assert.AreEqual(clone.Id, item.Id);
             Assert.AreEqual(clone.Key, item.Key);
             Assert.AreEqual(clone.Name, item.Name);
             Assert.AreNotSame(clone.ParentObjectType, item.ParentObjectType);
+            Assert.AreNotSame(clone.ChildObjectType, item.ChildObjectType);
             Assert.AreEqual(clone.UpdateDate, item.UpdateDate);
 
             //This double verifies by reflection
@@ -47,18 +45,9 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var item = new RelationType("test", "test", false, Guid.NewGuid(), Guid.NewGuid())
-            {
-                Id = 66,
-                CreateDate = DateTime.Now,
-                IsBidirectional = true,
-                Key = Guid.NewGuid(),
-                Name = "Test",
-                UpdateDate = DateTime.Now
-            };
+            var item = _builder.Build();
 
-            var json = JsonConvert.SerializeObject(item);
-            Debug.Print(json);
+            Assert.DoesNotThrow(() => JsonConvert.SerializeObject(item));
         }
     }
 }
