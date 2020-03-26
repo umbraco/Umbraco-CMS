@@ -19,9 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj" />
       <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
-      <ProjectReference Include="..\Umbraco.Tests.Shared\Umbraco.Tests.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>
