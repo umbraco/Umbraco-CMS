@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Models
         public void Can_Deep_Clone()
         {
             // needs to be within collection to support publishing
-            var ptCollection = new PropertyTypeCollection(true, new[] {new PropertyType("TestPropertyEditor", ValueStorageType.Nvarchar, "test")
+            var ptCollection = new PropertyTypeCollection(true, new[] {new PropertyType(ShortStringHelper,"TestPropertyEditor", ValueStorageType.Nvarchar, "test")
             {
                 Id = 3,
                 CreateDate = DateTime.Now,
@@ -50,8 +50,8 @@ namespace Umbraco.Tests.Models
             {
                 Assert.AreNotSame(property.Values.ElementAt(i), clone.Values.ElementAt(i));
             }
-            
-            
+
+
             //This double verifies by reflection
             var allProps = clone.GetType().GetProperties();
             foreach (var propertyInfo in allProps)
