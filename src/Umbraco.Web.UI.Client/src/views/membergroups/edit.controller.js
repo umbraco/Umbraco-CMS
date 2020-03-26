@@ -6,7 +6,7 @@
  * @description
  * The controller for the member group editor
  */
-function MemberGroupsEditController($scope, $routeParams, appState, navigationService, memberGroupResource, contentEditingHelper, formHelper, editorState, eventsService) {
+function MemberGroupsEditController($scope, $routeParams, appState, navigationService, memberGroupResource, memberResource, contentEditingHelper, formHelper, editorState, eventsService) {
 
     //setup scope vars
     $scope.page = {};
@@ -38,6 +38,18 @@ function MemberGroupsEditController($scope, $routeParams, appState, navigationSe
     }
     else {
         loadMemberGroup();
+        loadMembers();
+    }
+
+    function loadMembers() {
+        $scope.page.loading = true;
+
+        memberResource.getMembersByGroup({ groupId: $routeParams.id, pageSize: 25, pageNumber: 1 })
+            .then(function (data) {
+                $scope.members = data;
+
+                $scope.page.loading = false;
+            });
     }
 
     function loadMemberGroup() {
@@ -103,6 +115,7 @@ function MemberGroupsEditController($scope, $routeParams, appState, navigationSe
 
     evts.push(eventsService.on("app.refreshEditor", function (name, error) {
         loadMemberGroup();
+        loadMembers();
     }));
 
     //ensure to unregister from all events!

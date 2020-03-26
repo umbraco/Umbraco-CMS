@@ -161,6 +161,8 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         IEnumerable<IMember> GetMembersByGroup(string memberGroupName);
 
+        IEnumerable<IMember> GetMembersByGroup(int memberGroupId, long pageIndex, int pageSize, out long totalRecords);
+
         /// <summary>
         /// Gets all Members with the ids specified
         /// </summary>

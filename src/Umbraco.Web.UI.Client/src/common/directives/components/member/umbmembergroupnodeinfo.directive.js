@@ -45,7 +45,8 @@
             replace: true,
             templateUrl: 'views/components/member/umb-membergroup-node-info.html',
             scope: {
-                node: "="
+                node: "=",
+                members: "="
             },
             link: link
         };

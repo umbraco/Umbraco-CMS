@@ -503,6 +503,15 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public IEnumerable<IMember> GetMembersByGroup(int memberGroupId, long pageNumber, int pageSize, out long totalRecords)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MemberTree);
+                return _memberRepository.FindMembersByGroup(memberGroupId, pageNumber, pageSize, out totalRecords);
+            }
+        }
+
         /// <summary>
         /// Gets all Members with the ids specified
         /// </summary>
@@ -1401,7 +1410,6 @@ namespace Umbraco.Core.Services.Implement
         {
             return Current.Services.MemberTypeService.GetDefault();
         }
-
         #endregion
     }
 }

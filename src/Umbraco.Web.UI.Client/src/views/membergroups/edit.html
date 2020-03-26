@@ -21,8 +21,9 @@
 
             <umb-editor-container class="form-horizontal">
 
-                <umb-membergroup-node-info ng-if="content"
-                                           node="content">
+                <umb-membergroup-node-info ng-if="content && members"
+                                           node="content"
+                                           members="members">
                 </umb-membergroup-node-info>
 
             </umb-editor-container>
