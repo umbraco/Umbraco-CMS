@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Umbraco.Composing;
 using Umbraco.Web.BackOffice.AspNetCore;
+using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Extensions;
 using Umbraco.Web.Website.AspNetCore;
 
@@ -52,6 +54,7 @@ namespace Umbraco.Web.UI.BackOffice
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseUmbracoCore();
             app.UseUmbracoWebsite();
             app.UseUmbracoBackOffice();
 
@@ -59,7 +62,10 @@ namespace Umbraco.Web.UI.BackOffice
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context => { await context.Response.WriteAsync("Hello World!"); });
+                endpoints.MapGet("/", async context =>
+                {
+                    await context.Response.WriteAsync($"<html><body>Hello World!{Current.Profiler.Render()}</body></html>");
+                });
             });
         }
     }

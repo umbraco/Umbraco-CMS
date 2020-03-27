@@ -29,7 +29,7 @@ namespace Umbraco.Web.Logging
             MiniProfiler.Configure(new MiniProfilerOptions
             {
                 SqlFormatter = new SqlServerFormatter(),
-                StackMaxLength = 5000, 
+                StackMaxLength = 5000,
                 ProfilerProvider = _provider
             });
         }

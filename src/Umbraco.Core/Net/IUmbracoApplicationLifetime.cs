@@ -15,5 +15,7 @@ namespace Umbraco.Net
         void Restart();
 
         event EventHandler ApplicationInit;
+
+        void InvokeApplicationInit();
     }
 }

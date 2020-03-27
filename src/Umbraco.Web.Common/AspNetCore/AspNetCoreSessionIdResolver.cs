@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http.Features;
 using Umbraco.Net;
 
-namespace Umbraco.Web.BackOffice.AspNetCore
+namespace Umbraco.Web.Common.AspNetCore
 {
     internal class AspNetCoreSessionIdResolver : ISessionIdResolver
     {
@@ -13,7 +13,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             _httpContextAccessor = httpContextAccessor;
         }
 
-        
+
         public string SessionId
         {
             get

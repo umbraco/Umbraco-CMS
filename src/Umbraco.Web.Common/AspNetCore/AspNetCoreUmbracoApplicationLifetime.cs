@@ -15,11 +15,6 @@ namespace Umbraco.Web.Common.AspNetCore
         {
             _httpContextAccessor = httpContextAccessor;
             _hostApplicationLifetime = hostApplicationLifetime;
-
-            hostApplicationLifetime.ApplicationStarted.Register(() =>
-            {
-                ApplicationInit?.Invoke(this, EventArgs.Empty);
-            });
         }
 
         public bool IsRestarting { get; set; }
@@ -39,6 +34,10 @@ namespace Umbraco.Web.Common.AspNetCore
             _hostApplicationLifetime.StopApplication();
         }
 
+        public void InvokeApplicationInit()
+        {
+            ApplicationInit?.Invoke(this, EventArgs.Empty);
+        }
         public event EventHandler ApplicationInit;
     }
 }

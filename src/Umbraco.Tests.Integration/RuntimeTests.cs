@@ -22,6 +22,7 @@ using Umbraco.Tests.Common;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Web.BackOffice.AspNetCore;
+using Umbraco.Web.Common.AspNetCore;
 using static Umbraco.Core.Migrations.Install.DatabaseBuilder;
 
 namespace Umbraco.Tests.Integration
@@ -52,11 +53,11 @@ namespace Umbraco.Tests.Integration
             // LightInject / Umbraco
             var container = UmbracoServiceProviderFactory.CreateServiceContainer();
             var serviceProviderFactory = new UmbracoServiceProviderFactory(container);
-            var umbracoContainer = serviceProviderFactory.GetContainer();            
+            var umbracoContainer = serviceProviderFactory.GetContainer();
 
             // Special case since we are not using the Generic Host, we need to manually add an AspNetCore service to the container
             umbracoContainer.Register(x => Mock.Of<IHostApplicationLifetime>());
-            
+
             var testHelper = new TestHelper();
 
             // Create the core runtime
@@ -70,7 +71,7 @@ namespace Umbraco.Tests.Integration
 
             Assert.IsTrue(coreRuntime.MainDom.IsMainDom);
             Assert.IsNull(coreRuntime.State.BootFailedException);
-            Assert.AreEqual(RuntimeLevel.Install, coreRuntime.State.Level);            
+            Assert.AreEqual(RuntimeLevel.Install, coreRuntime.State.Level);
             Assert.IsTrue(MyComposer.IsComposed);
             Assert.IsFalse(MyComponent.IsInit);
             Assert.IsFalse(MyComponent.IsTerminated);
@@ -88,7 +89,7 @@ namespace Umbraco.Tests.Integration
         }
 
         /// <summary>
-        /// Calling AddUmbracoCore to configure the container 
+        /// Calling AddUmbracoCore to configure the container
         /// </summary>
         [Test]
         public async Task AddUmbracoCore()
@@ -280,5 +281,5 @@ namespace Umbraco.Tests.Integration
         }
     }
 
-   
+
 }

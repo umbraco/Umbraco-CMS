@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Umbraco.Web.Common.Lifetime;
 
 namespace Umbraco.Web.Common.Middleware
 {
@@ -22,31 +23,4 @@ namespace Umbraco.Web.Common.Middleware
         }
     }
 
-    public interface IUmbracoRequestLifetime
-    {
-        event EventHandler<HttpContext> RequestStart;
-        event EventHandler<HttpContext> RequestEnd;
-    }
-
-    public class UmbracoRequestLifetime : IUmbracoRequestLifetime, IUmbracoRequestLifetimeManager
-    {
-        public event EventHandler<HttpContext> RequestStart;
-        public event EventHandler<HttpContext> RequestEnd;
-
-        public void InitRequest(HttpContext context)
-        {
-            RequestStart?.Invoke(this, context);
-        }
-
-        public void EndRequest(HttpContext context)
-        {
-            RequestEnd?.Invoke(this, context);
-        }
-    }
-
-    public interface IUmbracoRequestLifetimeManager
-    {
-        void InitRequest(HttpContext context);
-        void EndRequest(HttpContext context);
-    }
 }

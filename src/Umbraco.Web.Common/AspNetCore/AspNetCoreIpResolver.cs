@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Umbraco.Net;
 
-namespace Umbraco.Web.BackOffice.AspNetCore
+namespace Umbraco.Web.Common.AspNetCore
 {
     public class AspNetIpResolver : IIpResolver
     {

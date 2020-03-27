@@ -19,9 +19,8 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.Common.Runtime.Profiler;
 
-namespace Umbraco.Web.BackOffice.AspNetCore
+namespace Umbraco.Web.Common.AspNetCore
 {
-    // TODO: Move to Umbraco.Web.Common
     public static class UmbracoCoreServiceCollectionExtensions
     {
         /// <summary>
@@ -71,7 +70,8 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IRegister umbContainer, Assembly entryAssembly)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
-            if (umbContainer is null) throw new ArgumentNullException(nameof(umbContainer));
+            var container = umbContainer;
+            if (container is null) throw new ArgumentNullException(nameof(container));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
 
             // Special case! The generic host adds a few default services but we need to manually add this one here NOW because
@@ -97,7 +97,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
                 backOfficeInfo,
                 typeFinder);
 
-            var factory = coreRuntime.Configure(umbContainer);
+            var factory = coreRuntime.Configure(container);
 
             return services;
         }

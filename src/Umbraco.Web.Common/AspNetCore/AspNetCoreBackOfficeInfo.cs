@@ -1,7 +1,7 @@
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 
-namespace Umbraco.Web.BackOffice.AspNetCore
+namespace Umbraco.Web.Common.AspNetCore
 {
     public class AspNetCoreBackOfficeInfo : IBackOfficeInfo
     {

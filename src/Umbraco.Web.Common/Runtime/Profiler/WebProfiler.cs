@@ -22,10 +22,15 @@ namespace Umbraco.Web.Common.Runtime.Profiler
             // create our own provider, which can provide a profiler even during boot
             _provider = new WebProfilerProvider();
             _httpContextAccessor = httpContextAccessor;
+
+            MiniProfiler.DefaultOptions.ProfilerProvider = _provider;
         }
 
-        public string Render() => MiniProfiler.Current
-            .RenderIncludes(_httpContextAccessor.HttpContext, RenderPosition.Right).ToString();
+        public string Render()
+        {
+            return MiniProfiler.Current
+                .RenderIncludes(_httpContextAccessor.HttpContext, RenderPosition.Right).ToString();
+        }
 
         public IDisposable Step(string name) => MiniProfiler.Current?.Step(name);
 

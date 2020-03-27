@@ -35,5 +35,9 @@ namespace Umbraco.Web.AspNet
         }
 
         public event EventHandler ApplicationInit;
+        public void InvokeApplicationInit()
+        {
+
+        }
     }
 }
