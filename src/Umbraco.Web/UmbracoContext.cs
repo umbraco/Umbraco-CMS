@@ -207,7 +207,7 @@ namespace Umbraco.Web
         {
             try
             {
-                return _httpContextAccessor.GetRequiredHttpContext().Request;
+                return _httpContextAccessor.HttpContext?.Request;
             }
             catch (HttpException)
             {

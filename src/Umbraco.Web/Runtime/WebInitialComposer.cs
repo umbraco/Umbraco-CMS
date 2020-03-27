@@ -291,6 +291,9 @@ namespace Umbraco.Web.Runtime
 
             // Config manipulator
             composition.RegisterUnique<IConfigManipulator, XmlConfigManipulator>();
+
+            //ApplicationShutdownRegistry
+            composition.RegisterUnique<IApplicationShutdownRegistry, AspNetApplicationShutdownRegistry>();
         }
     }
 }
