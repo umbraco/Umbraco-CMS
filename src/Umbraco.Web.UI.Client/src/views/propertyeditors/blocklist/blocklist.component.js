@@ -182,24 +182,29 @@
             vm.blocks.forEach(deleteBlock);
         }
 
-        function editBlock(blockModel) {
+        function editBlock(blockModel, hideContent) {
+            if (hideContent && !blockModel.config.settingsElementTypeAlias) {
+                return;
+            }
 
             // make a clone to avoid editing model directly.
-            var blockContentModelClone = angular.copy(blockModel.content);
-
-            // TODO: implement settings
-            // Settings should be available as a tab in this overlay:
-            //var blockSettingsModelClone = angular.copy(blockModel.settings);
+            var blockContentModelClone = angular.copy(hideContent ? null : blockModel.content);
+            var blockSettingsModelClone = angular.copy(blockModel.settings);
             
             var blockEditorModel = {
                 content: blockContentModelClone,
-                //settings: blockSettingsModelClone,
+                settings: blockSettingsModelClone,
                 title: blockModel.label,
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
                 size: blockModel.config.overlaySize || "medium",
                 submit: function(blockEditorModel) {
                     // To ensure syncronization gets tricked we transfer
-                    blockEditorService.mapElementTypeValues(blockEditorModel.content, blockModel.content)
+                    if (!hideContent) {
+                        blockEditorService.mapElementTypeValues(blockEditorModel.content, blockModel.content)
+                    }
+                    if (blockModel.config.settingsElementTypeAlias) {
+                        blockEditorService.mapElementTypeValues(blockEditorModel.settings, blockModel.settings)
+                    }
                     editorService.close();
                 },
                 close: function() {
@@ -244,10 +249,14 @@
                     vm.blockTypePicker.close();
                 },
                 submit: function (model) {
+                    var added = false;
                     if (model && model.selectedItem) {
-                        addNewBlock(createIndex, model.selectedItem.alias);
+                        added = addNewBlock(createIndex, model.selectedItem.alias);
                     }
                     vm.blockTypePicker.close();
+                    if (added && vm.blocks.length > createIndex) {
+                        editBlock(vm.blocks[createIndex]);
+                    }
                 },
                 close: function () {
                     vm.blockTypePicker.show = false;
@@ -379,8 +388,8 @@
             });
         }
 
-        function openSettingsForBlock() {
-            alert("settings not implemented jet.");
+        function openSettingsForBlock(block) {
+            editBlock(block, true);
         }
 
 

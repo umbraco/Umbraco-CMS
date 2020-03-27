@@ -56,7 +56,21 @@
          * @param {Object} toModel ElementTypeModel to recive property values from.
          */
         function mapElementTypeValues(fromModel, toModel) {
+            if (!fromModel || !fromModel.variants) {
+                toModel.variants = null;
+                return;
+            }
+            if (!fromModel.variants.length) {
+                toModel.variants = [];
+                return;
+            }
+
             var fromVariant = fromModel.variants[0];
+            if (!fromVariant) {
+                toModel.variants = [null];
+                return;
+            }
+
             var toVariant = toModel.variants[0];
 
             for (var t = 0; t < fromVariant.tabs.length; t++) {
@@ -80,6 +94,31 @@
             return blockModel.contentTypeName;
         }
 
+
+        /**
+         * Used to add watchers on all properties in a content or settings model
+         */
+        function addWatchers(blockModel, isolatedScope, forSettings) {
+            var model = forSettings ? blockModel.settings : blockModel.content;
+            if (!model || !model.variants || !model.variants.length) { return; }
+
+            // Start watching each property value.
+            var variant = model.variants[0];
+            var field = forSettings ? "settings" : "content";
+            var watcherCreator = forSettings ? createSettingsModelPropWatcher : createContentModelPropWatcher;
+            for (var t = 0; t < variant.tabs.length; t++) {
+                var tab = variant.tabs[t];
+                for (var p = 0; p < tab.properties.length; p++) {
+                    var prop = tab.properties[p];
+
+                    // Watch value of property since this is the only value we want to keep synced.
+                    // Do notice that it is not performing a deep watch, meaning that we are only watching primatives and changes directly to the object of property-value.
+                    // But we like to sync non-primative values as well! Yes, and this does happen, just not through this code, but through the nature of JavaScript. 
+                    // Non-primative values act as references to the same data and are therefor synced.
+                    blockModel.watchers.push(isolatedScope.$watch("blockModels._" + blockModel.key + "." + field + ".variants[0].tabs[" + t + "].properties[" + p + "].value", watcherCreator(blockModel, prop)));
+                }
+            }
+        }
 
         /**
          * Used to create a scoped watcher for a content property on a blockModel.
@@ -225,13 +264,13 @@
                 blockModel.config = angular.copy(blockConfiguration);
                 blockModel.labelInterpolator = $interpolate(blockModel.config.label);
 
-                var scaffold = this.getScaffoldFor(blockConfiguration.contentTypeAlias);
-                if(scaffold === null) {
+                var contentScaffold = this.getScaffoldFor(blockConfiguration.contentTypeAlias);
+                if(contentScaffold === null) {
                     return null;
                 }
 
                 // make basics from scaffold
-                blockModel.content = angular.copy(scaffold);
+                blockModel.content = angular.copy(contentScaffold);
                 blockModel.content.udi = udi;
 
                 mapToElementTypeModel(blockModel.content, contentModel);
@@ -240,37 +279,32 @@
                 blockModel.layoutModel = layoutEntry;
                 blockModel.watchers = [];
 
-                // TODO: implement settings
+                if (blockConfiguration.settingsElementTypeAlias) {
+                    var settingsScaffold = this.getScaffoldFor(blockConfiguration.settingsElementTypeAlias);
+                    if (settingsScaffold === null) {
+                        return null;
+                    }
 
-                // create ElementTypeModel of settings
-                // store ElementTypeModel in blockModel.settings
-                // setup watchers for mapping
-
+                    // make basics from scaffold
+                    blockModel.settings = angular.copy(settingsScaffold);
+                    layoutEntry.settings = layoutEntry.settings || { key: String.CreateGuid(), contentTypeAlias: blockConfiguration.settingsElementTypeAlias };
+                    if (!layoutEntry.settings.key) { layoutEntry.settings.key = String.CreateGuid(); }
+                    if (!layoutEntry.settings.contentTypeAlias) { layoutEntry.settings.contentTypeAlias = blockConfiguration.settingsElementTypeAlias; }
+                    mapToElementTypeModel(blockModel.settings, layoutEntry.settings);
+                } else {
+                    layoutEntry.settings = null;
+                }
 
                 // Add blockModel to our isolated scope to enable watching its values:
                 this.isolatedScope.blockModels["_"+blockModel.key] = blockModel;
-
-                // Start watching each property value.
-                var variant = blockModel.content.variants[0];
-                for (var t = 0; t < variant.tabs.length; t++) {
-                    var tab = variant.tabs[t];
-                    for (var p = 0; p < tab.properties.length; p++) {
-                        var prop = tab.properties[p];
-
-                        // Watch value of property since this is the only value we want to keep synced.
-                        // Do notice that it is not performing a deep watch, meaning that we are only watching primatives and changes directly to the object of property-value.
-                        // But we like to sync non-primative values as well! Yes, and this does happen, just not through this code, but through the nature of JavaScript. 
-                        // Non-primative values act as references to the same data and are therefor synced.
-                        blockModel.watchers.push(this.isolatedScope.$watch("blockModels._"+blockModel.key+".content.variants[0].tabs["+t+"].properties["+p+"].value", createContentModelPropWatcher(blockModel, prop)));
-                    }
-                }
+                addWatchers(blockModel, this.isolatedScope);
+                addWatchers(blockModel, this.isolatedScope, true);
 
                 return blockModel;
 
             },
 
-
-            removeDataAndDestroyModel: function(blockModel) {
+            removeDataAndDestroyModel: function (blockModel) {
                 this.destroyBlockModel(blockModel);
                 this.removeDataByUdi(blockModel.content.udi);
             },
@@ -331,7 +365,7 @@
                 }
 
                 if (blockConfiguration.settingsElementTypeAlias != null) {
-                    entry.settings = {};
+                    entry.settings = { key: String.CreateGuid(), contentTypeAlias: blockConfiguration.settingsElementTypeAlias };
                 }
                 
                 return entry;

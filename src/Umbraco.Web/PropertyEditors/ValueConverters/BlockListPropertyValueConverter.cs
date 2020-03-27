@@ -59,6 +59,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             {
                 var configuration = propertyType.DataType.ConfigurationAs<BlockListConfiguration>();
                 var contentTypes = configuration.Blocks;
+                var contentTypeMap = contentTypes.ToDictionary(x => x.Alias);
                 var elements = (contentTypes.Length == 1
                     ? (IList<IPublishedElement>)_publishedModelFactory.CreateModelList(contentTypes[0].Alias)
                     : new List<IPublishedElement>())
@@ -105,6 +106,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     // get the data reference
                     if (!elements.TryGetValue(guidUdi.Guid, out var data))
                         continue;
+
+                    if (!contentTypeMap.TryGetValue(data.ContentType.Alias, out var blockConfig))
+                        continue;
+
+                    // this can happen if they have a settings type, save content, remove the settings type, and display the front-end page before saving the content again
+                    if (element != null && string.IsNullOrWhiteSpace(blockConfig.SettingsElementTypeAlias))
+                        element = null;
 
                     var layoutRef = new BlockListLayoutReference(udi, element);
                     layout.Add(layoutRef);

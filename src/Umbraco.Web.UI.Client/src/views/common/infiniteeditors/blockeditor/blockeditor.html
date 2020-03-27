@@ -1,15 +1,16 @@
 <div class="umb-block-editor"  ng-controller="Umbraco.Editors.BlockEditorController as vm">
 
     <ng-form name="blockForm" val-form-manager>
-        <umb-editor-view ng-if="!page.loading">
+        <umb-editor-view umb-tabs ng-if="!page.loading">
 
             <umb-editor-header
                 name="vm.title"
                 name-locked="true"
-                navigation="vm.content.apps"
+                navigation="vm.tabs"
                 hide-alias="true"
                 hide-icon="true"
-                hide-description="true">
+                hide-description="true"
+                on-select-navigation-item="vm.selectTab">
             </umb-editor-header>
 
             <div class="umb-editor-container umb-panel-body umb-scrollable row-fluid">
@@ -21,12 +22,19 @@
                 -->
 
                 <!-- Missing content apps? — but i'm not sure content apps will or can work for ElementTypes? -->
+                <div ng-show="vm.contentTab.active">
+                    <div class="umb-pane">
+                        <div class="umb-editor-sub-views" val-sub-view>
+                            <umb-element-content-editor content="vm.content"></umb-element-content-editor>
+                        </div>
+                    </div>
+                </div>
 
-                <!-- TODO: implement settings -->
-
-                <div class="umb-pane">
-                    <div class="umb-editor-sub-views" val-sub-view>
-                        <umb-element-content-editor content="vm.content"></umb-element-content-editor>
+                <div ng-show="vm.settingsTab.active">
+                    <div class="umb-pane" ng-if="vm.settings">
+                        <div class="umb-editor-sub-views" val-sub-view>
+                            <umb-element-content-editor content="vm.settings"></umb-element-content-editor>
+                        </div>
                     </div>
                 </div>
             </div>
