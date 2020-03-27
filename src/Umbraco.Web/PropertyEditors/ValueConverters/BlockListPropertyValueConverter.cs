@@ -96,10 +96,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 foreach (var blockListLayout in blockListLayouts)
                 {
                     var settingsJson = blockListLayout["settings"] as JObject;
-                    if (settingsJson == null) continue;
-
                     // the result of this can be null, that's ok
-                    var element = _blockConverter.ConvertToElement(settingsJson, BlockEditorPropertyEditor.ContentTypeAliasPropertyKey, referenceCacheLevel, preview);
+                    var element = settingsJson != null ? _blockConverter.ConvertToElement(settingsJson, BlockEditorPropertyEditor.ContentTypeAliasPropertyKey, referenceCacheLevel, preview) : null;
 
                     if (!Udi.TryParse(blockListLayout.Value<string>("udi"), out var udi) || !(udi is GuidUdi guidUdi))
                         continue;

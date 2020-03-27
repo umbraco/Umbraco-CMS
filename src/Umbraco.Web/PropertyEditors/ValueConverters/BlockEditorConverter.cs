@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.PublishedCache;
@@ -33,9 +34,17 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             var propertyValues = sourceObject.ToObject<Dictionary<string, object>>();
 
-            if (!propertyValues.TryGetValue("key", out var keyo)
-                || !Guid.TryParse(keyo.ToString(), out var key))
-                key = Guid.Empty;
+            if (!propertyValues.TryGetValue("key", out var keyo) || !Guid.TryParse(keyo.ToString(), out var key))
+            {
+                if (propertyValues.TryGetValue("udi", out var udio) && udio is string udis && GuidUdi.TryParse(udis, out var udi))
+                {
+                    key = udi.Guid;
+                }
+                else
+                {
+                    key = Guid.Empty;
+                }
+            }
 
             IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, referenceCacheLevel, _publishedSnapshotAccessor);
             element = _publishedModelFactory.CreateModel(element);
