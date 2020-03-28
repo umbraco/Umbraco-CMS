@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionExtensions;
@@ -7,9 +6,8 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dashboards;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.IO;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Migrations;
@@ -25,16 +23,15 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
-using Umbraco.Web.Models.PublishedContent;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web;
-using Umbraco.Web.Migrations.PostMigrations;
 using Umbraco.Web.Install;
-using Umbraco.Web.Trees;
+using Umbraco.Web.Migrations.PostMigrations;
+using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Services;
+using Umbraco.Web.Trees;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
-using Umbraco.Infrastructure.Migrations.Custom;
 
 namespace Umbraco.Core.Runtime
 {
@@ -149,7 +146,6 @@ namespace Umbraco.Core.Runtime
                 .Append<DefaultUrlSegmentProvider>();
 
             composition.RegisterUnique<IMigrationBuilder>(factory => new MigrationBuilder(factory));
-            composition.RegisterUnique<IKeyValueServiceInitialization, KeyValueServiceInitialization>();
 
             // by default, register a noop factory
             composition.RegisterUnique<IPublishedModelFactory, NoopPublishedModelFactory>();

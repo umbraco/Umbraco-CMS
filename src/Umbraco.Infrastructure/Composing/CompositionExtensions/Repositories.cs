@@ -1,6 +1,5 @@
 ﻿using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Infrastructure.Migrations.Custom;
 
 namespace Umbraco.Core.Composing.CompositionExtensions
 {
@@ -49,7 +48,6 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             composition.RegisterUnique<IStylesheetRepository, StylesheetRepository>();
             composition.RegisterUnique<IContentTypeCommonRepository, ContentTypeCommonRepository>();
             composition.RegisterUnique<IKeyValueRepository, KeyValueRepository>();
-            composition.RegisterUnique<IKeyValueServiceInitialization, KeyValueServiceInitialization>();
             composition.RegisterUnique<IInstallationRepository, InstallationRepository>();
             composition.RegisterUnique<IUpgradeCheckRepository, UpgradeCheckRepository>();
 
