@@ -213,15 +213,11 @@ angular.module("umbraco")
                                     return f.path.indexOf($scope.startNodeId) !== -1;
                                 });
                         });
-
-                    mediaTypeHelper.getAllowedImagetypes(folder.id)
-                        .then(function (types) {
-                            vm.acceptedMediatypes = types;
-                        });
                 } else {
                     $scope.path = [];
                 }
 
+                mediaTypeHelper.getAllowedImagetypes(folder.id).then(function (types) { vm.acceptedMediatypes = types; });
                 $scope.lockedFolder = (folder.id === -1 && $scope.model.startNodeIsVirtual) || hasFolderAccess(folder) === false;
                 $scope.currentFolder = folder;
 
