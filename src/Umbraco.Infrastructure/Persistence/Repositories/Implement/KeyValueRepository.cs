@@ -33,21 +33,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return database.FirstOrDefault<KeyValueDto>(sql)?.Value;
         }
 
-        #region Overrides of IReadWriteQueryRepository<string, IKeyValue>
-
-        public override void Save(IKeyValue entity)
-        {
-            if (Get(entity.Identifier) == null)
-                PersistNewItem(entity);
-            else
-                PersistUpdatedItem(entity);
-        }
-
-        #endregion
-
         #region Overrides of NPocoRepositoryBase<string, IKeyValue>
 
-        protected override Guid NodeObjectTypeId => throw new NotImplementedException();
+        protected override Guid NodeObjectTypeId => throw new NotSupportedException();
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
@@ -70,7 +58,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
-            return new List<string>();
+            return Enumerable.Empty<string>();
         }
 
         protected override IKeyValue PerformGet(string id)
@@ -89,7 +77,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override IEnumerable<IKeyValue> PerformGetByQuery(IQuery<IKeyValue> query)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         protected override void PersistNewItem(IKeyValue entity)

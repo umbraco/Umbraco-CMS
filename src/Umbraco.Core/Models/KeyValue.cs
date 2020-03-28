@@ -9,11 +9,10 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class KeyValue : EntityBase, IKeyValue
+    public class KeyValue : EntityBase, IKeyValue, IEntity
     {
         private string _identifier;
         private string _value;
-        private DateTime _updateDate;
 
         /// <inheritdoc />
         public string Identifier
@@ -28,5 +27,7 @@ namespace Umbraco.Core.Models
             get => _value;
             set => SetPropertyValueAndDetectChanges(value, ref _value, nameof(Value));
         }
+
+        bool IEntity.HasIdentity => !string.IsNullOrEmpty(Identifier);
     }
 }

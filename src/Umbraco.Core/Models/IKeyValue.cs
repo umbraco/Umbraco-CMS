@@ -8,7 +8,5 @@ namespace Umbraco.Core.Models
         string Identifier { get; set; }
 
         string Value { get; set; }
-
-        DateTime UpdateDate { get; set; }
     }
 }
