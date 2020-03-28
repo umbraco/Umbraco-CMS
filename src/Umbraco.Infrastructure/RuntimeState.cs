@@ -225,7 +225,7 @@ namespace Umbraco.Core
             // no scope, no service - just directly accessing the database
             using (var database = databaseFactory.CreateDatabase())
             {
-                CurrentMigrationState = KeyValueRepository.GetValue(database, stateValueKey);
+                CurrentMigrationState = database.GetFromKeyValueTable(stateValueKey);
                 FinalMigrationState = upgrader.Plan.FinalState;
             }
 
