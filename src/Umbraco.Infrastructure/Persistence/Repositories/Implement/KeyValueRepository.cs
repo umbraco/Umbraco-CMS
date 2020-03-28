@@ -18,6 +18,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             : base(scopeAccessor, AppCaches.NoCache, logger)
         { }
 
+        #region Overrides of IReadWriteQueryRepository<string, IKeyValue>
+
+        public override void Save(IKeyValue entity)
+        {
+            if (Get(entity.Identifier) == null)
+                PersistNewItem(entity);
+            else
+                PersistUpdatedItem(entity);
+        }
+
+        #endregion
+
         #region Overrides of NPocoRepositoryBase<string, IKeyValue>
 
         protected override Guid NodeObjectTypeId => throw new NotSupportedException();
