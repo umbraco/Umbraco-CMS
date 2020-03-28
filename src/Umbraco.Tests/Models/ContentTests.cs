@@ -22,10 +22,10 @@ using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Models
 {
-
     [TestFixture]
     public class ContentTests : UmbracoTestBase
     {
@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Models
             Composition.ComposeFileSystems();
 
             Composition.Register(_ => Mock.Of<IDataTypeService>());
-            Composition.Register(_ => Mock.Of<IContentSection>());
+            Composition.Register(_ => Mock.Of<IContentSettings>());
 
             // all this is required so we can validate properties...
             var editor = new TextboxPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), IOHelper, ShortStringHelper, LocalizedTextService) { Alias = "test" };
@@ -269,7 +269,7 @@ namespace Umbraco.Tests.Models
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
 
-            var runtimeCache = new ObjectCacheAppCache(new TypeFinder(Mock.Of<ILogger>()));
+            var runtimeCache = new ObjectCacheAppCache();
             runtimeCache.Insert(content.Id.ToString(CultureInfo.InvariantCulture), () => content);
 
             var proflog = GetTestProfilingLogger();
@@ -459,7 +459,7 @@ namespace Umbraco.Tests.Models
                 Assert.IsTrue(prop.WasPropertyDirty("Id"));
             }
             Assert.IsTrue(content.WasPropertyDirty("CultureInfos"));
-            foreach(var culture in content.CultureInfos)
+            foreach (var culture in content.CultureInfos)
             {
                 Assert.IsTrue(culture.WasDirty());
                 Assert.IsTrue(culture.WasPropertyDirty("Name"));
@@ -537,7 +537,7 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
-            content.PropertyValues(new { title = "This is the new title"});
+            content.PropertyValues(new { title = "This is the new title" });
 
             // Assert
             Assert.That(content.Properties.Any(), Is.True);
@@ -601,13 +601,13 @@ namespace Umbraco.Tests.Models
 
             // Act
             contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "subtitle")
-                                                                        {
-                                                                            Name = "Subtitle",
-                                                                            Description = "Optional subtitle",
-                                                                            Mandatory = false,
-                                                                            SortOrder = 3,
-                                                                            DataTypeId = -88
-                                                                        });
+            {
+                Name = "Subtitle",
+                Description = "Optional subtitle",
+                Mandatory = false,
+                SortOrder = 3,
+                DataTypeId = -88
+            });
 
             // Assert
             Assert.That(contentType.PropertyGroups["Content"].PropertyTypes.Count, Is.EqualTo(3));
@@ -624,9 +624,13 @@ namespace Umbraco.Tests.Models
 
             // Act
             var propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "subtitle")
-                                   {
-                                        Name = "Subtitle", Description = "Optional subtitle", Mandatory = false, SortOrder = 3, DataTypeId = -88
-                                   };
+            {
+                Name = "Subtitle",
+                Description = "Optional subtitle",
+                Mandatory = false,
+                SortOrder = 3,
+                DataTypeId = -88
+            };
             contentType.PropertyGroups["Content"].PropertyTypes.Add(propertyType);
             var newProperty = new Property(propertyType);
             newProperty.SetValue("This is a subtitle Test");
@@ -648,14 +652,14 @@ namespace Umbraco.Tests.Models
 
             // Act
             var propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "subtitle")
-                                   {
-                                       Name = "Subtitle",
-                                       Description = "Optional subtitle",
-                                       Mandatory = false,
-                                       SortOrder = 3,
-                                       DataTypeId = -88
-                                   };
-            var propertyGroup = new PropertyGroup(true) { Name = "Test Group", SortOrder = 3};
+            {
+                Name = "Subtitle",
+                Description = "Optional subtitle",
+                Mandatory = false,
+                SortOrder = 3,
+                DataTypeId = -88
+            };
+            var propertyGroup = new PropertyGroup(true) { Name = "Test Group", SortOrder = 3 };
             propertyGroup.PropertyTypes.Add(propertyType);
             contentType.PropertyGroups.Add(propertyGroup);
             var newProperty = new Property(propertyType);
@@ -679,9 +683,13 @@ namespace Umbraco.Tests.Models
 
             // Act - note that the PropertyType's properties like SortOrder is not updated through the Content object
             var propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "title")
-                                   {
-                                        Name = "Title", Description = "Title description added", Mandatory = false, SortOrder = 10, DataTypeId = -88
-                                   };
+            {
+                Name = "Title",
+                Description = "Title description added",
+                Mandatory = false,
+                SortOrder = 10,
+                DataTypeId = -88
+            };
             content.Properties.Add(new Property(propertyType));
 
             // Assert
@@ -909,13 +917,13 @@ namespace Umbraco.Tests.Models
 
             // Act
             var propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "subtitle")
-                                   {
-                                       Name = "Subtitle",
-                                       Description = "Optional subtitle",
-                                       Mandatory = false,
-                                       SortOrder = 3,
-                                       DataTypeId = -88
-                                   };
+            {
+                Name = "Subtitle",
+                Description = "Optional subtitle",
+                Mandatory = false,
+                SortOrder = 3,
+                DataTypeId = -88
+            };
             contentType.PropertyGroups["Content"].PropertyTypes.Add(propertyType);
 
             // Assert

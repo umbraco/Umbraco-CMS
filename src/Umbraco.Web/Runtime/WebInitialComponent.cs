@@ -20,6 +20,7 @@ using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 
+using Constants = Umbraco.Core.Constants;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Runtime
@@ -171,7 +172,7 @@ namespace Umbraco.Web.Runtime
             UmbracoApiControllerTypeCollection apiControllerTypes,
             IIOHelper ioHelper)
         {
-            var umbracoPath = globalSettings.GetUmbracoMvcArea(ioHelper);
+            var umbracoPath = ioHelper.GetUmbracoMvcArea();
 
             // create the front-end route
             var defaultRoute = RouteTable.Routes.MapRoute(
@@ -181,14 +182,25 @@ namespace Umbraco.Web.Runtime
             );
             defaultRoute.RouteHandler = new RenderRouteHandler(umbracoContextAccessor, ControllerBuilder.Current.GetControllerFactory(), shortStringHelper);
 
+            // register no content route
+            RouteNoContentController(umbracoPath);
+
             // register install routes
             RouteTable.Routes.RegisterArea<UmbracoInstallArea>();
 
             // register all back office routes
-            RouteTable.Routes.RegisterArea(new BackOfficeArea(globalSettings, ioHelper));
+            RouteTable.Routes.RegisterArea(new BackOfficeArea(ioHelper));
 
             // plugin controllers must come first because the next route will catch many things
             RoutePluginControllers(globalSettings, surfaceControllerTypes, apiControllerTypes, ioHelper);
+        }
+
+        private static void RouteNoContentController(string umbracoPath)
+        {
+            RouteTable.Routes.MapRoute(
+                Constants.Web.NoContentRouteName,
+                umbracoPath + "/UmbNoContent",
+                new { controller = "RenderNoContent", action = "Index" });
         }
 
         private static void RoutePluginControllers(
@@ -197,7 +209,7 @@ namespace Umbraco.Web.Runtime
             UmbracoApiControllerTypeCollection apiControllerTypes,
             IIOHelper ioHelper)
         {
-            var umbracoPath = globalSettings.GetUmbracoMvcArea(ioHelper);
+            var umbracoPath = ioHelper.GetUmbracoMvcArea();
 
             // need to find the plugin controllers and route them
             var pluginControllers = surfaceControllerTypes.Concat(apiControllerTypes).ToArray();
@@ -252,6 +264,5 @@ namespace Umbraco.Web.Runtime
             // make it use our custom/special SurfaceMvcHandler
             route.RouteHandler = new SurfaceRouteHandler();
         }
-
     }
 }

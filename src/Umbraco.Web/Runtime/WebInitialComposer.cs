@@ -5,6 +5,7 @@ using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Cookie;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
@@ -17,7 +18,6 @@ using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
-using Umbraco.Net;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing.CompositionExtensions;
@@ -42,13 +42,12 @@ using Umbraco.Web.SignalR;
 using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
-using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Examine;
 using Umbraco.Core.Models;
+using Umbraco.Net;
 using Umbraco.Core.Request;
 using Umbraco.Core.Session;
-using Umbraco.Web.AspNet;
 using Umbraco.Web.AspNet;
 using Umbraco.Web.Models;
 
@@ -73,8 +72,6 @@ namespace Umbraco.Web.Runtime
 
             composition.Register<IRequestAccessor, AspNetRequestAccessor>(Lifetime.Singleton);
 
-            composition.Register<IHostingEnvironment, AspNetHostingEnvironment>();
-            composition.Register<IBackOfficeInfo, AspNetBackOfficeInfo>();
             composition.Register<IUmbracoApplicationLifetime, AspNetUmbracoApplicationLifetime>(Lifetime.Singleton);
             composition.Register<IPasswordHasher, AspNetPasswordHasher>();
             composition.Register<IFilePermissionHelper, FilePermissionHelper>(Lifetime.Singleton);
@@ -240,7 +237,6 @@ namespace Umbraco.Web.Runtime
 
             // register published router
             composition.RegisterUnique<IPublishedRouter, PublishedRouter>();
-            composition.Register(_ => composition.Configs.Settings().WebRouting);
 
             // register preview SignalR hub
             composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>());
@@ -292,6 +288,12 @@ namespace Umbraco.Web.Runtime
 
             // replace with web implementation
             composition.RegisterUnique<IPublishedSnapshotRebuilder, Migrations.PostMigrations.PublishedSnapshotRebuilder>();
+
+            // Config manipulator
+            composition.RegisterUnique<IConfigManipulator, XmlConfigManipulator>();
+
+            //ApplicationShutdownRegistry
+            composition.RegisterUnique<IApplicationShutdownRegistry, AspNetApplicationShutdownRegistry>();
         }
     }
 }

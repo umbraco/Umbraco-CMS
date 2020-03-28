@@ -21,7 +21,7 @@
         string ReservedPaths { get; }
 
         /// <summary>
-        /// Gets the path to umbraco's root directory (/umbraco by default).
+        /// Gets the path to umbraco's root directory.
         /// </summary>
         string Path { get; }
 
@@ -96,5 +96,10 @@
         string RegisterType { get; }
         string DatabaseFactoryServerVersion { get; }
         string MainDomLock { get; }
+
+        /// <summary>
+        /// Gets the path to the razor file used when no published content is available.
+        /// </summary>
+        string NoNodesViewPath { get; }
     }
 }

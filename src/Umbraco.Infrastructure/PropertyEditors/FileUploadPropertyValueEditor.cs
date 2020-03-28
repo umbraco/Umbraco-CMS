@@ -16,13 +16,13 @@ namespace Umbraco.Web.PropertyEditors
     internal class FileUploadPropertyValueEditor : DataValueEditor
     {
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IContentSettings _contentSettings;
 
-        public FileUploadPropertyValueEditor(DataEditorAttribute attribute, IMediaFileSystem mediaFileSystem, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IUmbracoSettingsSection umbracoSettingsSection)
+        public FileUploadPropertyValueEditor(DataEditorAttribute attribute, IMediaFileSystem mediaFileSystem, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IContentSettings contentSettings)
             : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             // process the file
             // no file, invalid file, reject change
-            if (UploadFileTypeValidator.IsValidFileExtension(file.FileName, _umbracoSettingsSection) == false)
+            if (UploadFileTypeValidator.IsValidFileExtension(file.FileName, _contentSettings) == false)
                 return null;
 
             // get the filepath

@@ -17,7 +17,7 @@ namespace Umbraco.Tests.UmbracoExamine
         [OneTimeSetUp]
         public void InitializeFixture()
         {
-            var logger = new SerilogLogger(TestHelper.CoreDebug, IOHelper, TestHelper.Marchal, new FileInfo(TestHelper.MapPathForTest("~/unit-test.config")));
+            var logger = new SerilogLogger(TestHelper.CoreDebugSettings, IOHelper, TestHelper.Marchal, new FileInfo(TestHelper.MapPathForTest("~/unit-test.config")));
             _profilingLogger = new ProfilingLogger(logger, new LogProfiler(logger));
         }
 
@@ -33,7 +33,7 @@ namespace Umbraco.Tests.UmbracoExamine
         {
             base.Compose();
 
-            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefaultUmbracoSettings()));
+            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GenerateMockRequestHandlerSettings()));
         }
     }
 }

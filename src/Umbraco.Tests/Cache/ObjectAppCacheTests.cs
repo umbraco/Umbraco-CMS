@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Moq;
+﻿using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Cache
 {
@@ -21,8 +18,7 @@ namespace Umbraco.Tests.Cache
         public override void Setup()
         {
             base.Setup();
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
-            _provider = new ObjectCacheAppCache(typeFinder);
+            _provider = new ObjectCacheAppCache();
         }
 
         internal override IAppCache AppCache

@@ -90,7 +90,7 @@
     <key alias="saveAndPublish">Opslaan en publiceren</key>
     <key alias="saveToPublish">Opslaan en verzenden voor goedkeuring</key>
     <key alias="saveListView">Sla list view op</key>
-    <key alias="showPage">voorbeeld bekijken</key>
+    <key alias="saveAndPreview">voorbeeld bekijken</key>
     <key alias="showPageDisabled">Voorbeeld bekijken is uitgeschakeld omdat er geen template is geselecteerd</key>
     <key alias="styleChoose">Stijl kiezen</key>
     <key alias="styleShow">Stijlen tonen</key>

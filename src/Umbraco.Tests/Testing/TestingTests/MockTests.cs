@@ -16,9 +16,9 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -85,7 +85,7 @@ namespace Umbraco.Tests.Testing.TestingTests
 
             var theUrlProvider = new UrlProvider(
                 new TestUmbracoContextAccessor(umbracoContext),
-                TestHelper.WebRoutingSection,
+                TestHelper.WebRoutingSettings,
                 new UrlProviderCollection(new [] { urlProvider }),
                 new MediaUrlProviderCollection( Enumerable.Empty<IMediaUrlProvider>())
                 , umbracoContext.VariationContextAccessor);

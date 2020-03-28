@@ -43,11 +43,10 @@ namespace Umbraco.Web
         /// Configures SignalR.
         /// </summary>
         /// <param name="app">The app builder.</param>
-        /// <param name="globalSettings"></param>
         /// <param name="ioHelper"></param>
-        public static IAppBuilder UseSignalR(this IAppBuilder app, IGlobalSettings globalSettings, IIOHelper ioHelper)
+        public static IAppBuilder UseSignalR(this IAppBuilder app, IIOHelper ioHelper)
         {
-            var umbracoPath = globalSettings.GetUmbracoMvcArea(ioHelper);
+            var umbracoPath = ioHelper.GetUmbracoMvcArea();
             var signalrPath = HttpRuntime.AppDomainAppVirtualPath + umbracoPath + "/BackOffice/signalr";
             return app.MapSignalR(signalrPath, new HubConfiguration { EnableDetailedErrors = true });
         }

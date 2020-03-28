@@ -47,9 +47,8 @@ namespace Umbraco.Tests.CoreThings
         {
             var ioHelper = TestHelper.IOHelper;
             ioHelper.Root = virtualPath;
-            var globalConfig = SettingsForTests.GenerateMockGlobalSettings();
             var source = new Uri(input);
-            Assert.AreEqual(expected, source.IsBackOfficeRequest(virtualPath, globalConfig, ioHelper));
+            Assert.AreEqual(expected, source.IsBackOfficeRequest(virtualPath, ioHelper));
         }
 
         [TestCase("http://www.domain.com/install", true)]

@@ -6,9 +6,9 @@ using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Templates
                 umbracoContextAccessor: umbracoContextAccessor);
 
             var publishedUrlProvider = new UrlProvider(umbracoContextAccessor,
-                TestHelper.WebRoutingSection,
+                TestHelper.WebRoutingSettings,
                 new UrlProviderCollection(new []{contentUrlProvider.Object}),
                 new MediaUrlProviderCollection(new []{mediaUrlProvider.Object}),
                 Mock.Of<IVariationContextAccessor>()

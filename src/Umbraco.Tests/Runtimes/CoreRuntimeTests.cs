@@ -82,7 +82,7 @@ namespace Umbraco.Tests.Runtimes
         // test application
         public class TestUmbracoApplication : UmbracoApplicationBase
         {
-            public TestUmbracoApplication() : base(_logger, _configs, _ioHelper, _profiler, new AspNetHostingEnvironment(_hostingSettings), new AspNetBackOfficeInfo(_globalSettings, _ioHelper, _settings, _logger))
+            public TestUmbracoApplication() : base(_logger, _configs, _ioHelper, _profiler, new AspNetHostingEnvironment(_hostingSettings), new AspNetBackOfficeInfo(_globalSettings, _ioHelper,  _logger, _settings))
             {
             }
 
@@ -90,22 +90,18 @@ namespace Umbraco.Tests.Runtimes
             private static readonly IIOHelper _ioHelper = TestHelper.IOHelper;
             private static readonly IProfiler _profiler = new TestProfiler();
             private static readonly Configs _configs = GetConfigs();
-            private static readonly IGlobalSettings _globalSettings = _configs.Global();
-            private static readonly IHostingSettings _hostingSettings = _configs.Hosting();
-            private static readonly IUmbracoSettingsSection _settings = _configs.Settings();
+            private static readonly IGlobalSettings _globalSettings = SettingsForTests.GetDefaultGlobalSettings();
+            private static readonly IHostingSettings _hostingSettings = SettingsForTests.GetDefaultHostingSettings();
+            private static readonly IContentSettings _contentSettings = SettingsForTests.GenerateMockContentSettings();
+            private static readonly IWebRoutingSettings _settings = _configs.WebRouting();
 
             private static Configs GetConfigs()
             {
-                var configs = new ConfigsFactory().Create(_ioHelper);
-                configs.Add(SettingsForTests.GetDefaultGlobalSettings);
-                configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
-                configs.Add(SettingsForTests.GetDefaultHostingSettings);
+                var configs = new ConfigsFactory().Create();
+                configs.Add(() => _globalSettings);
+                configs.Add(() => _contentSettings);
+                configs.Add(() => _hostingSettings);
                 return configs;
-            }
-
-            private static IProfiler GetProfiler()
-            {
-                return new TestProfiler();
             }
 
             public IRuntime Runtime { get; private set; }
@@ -120,7 +116,7 @@ namespace Umbraco.Tests.Runtimes
         public class TestRuntime : CoreRuntime
         {
             public TestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
-                :base(configs, umbracoVersion, ioHelper, logger,  profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom)
+                :base(configs, umbracoVersion, ioHelper, logger,  profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder())
             {
 
             }
@@ -135,49 +131,12 @@ namespace Umbraco.Tests.Runtimes
                 return mock.Object;
             }
 
-            // FIXME: so how the f* should we do it now?
-            /*
-            // pretend we have the proper migration
-            // else BootFailedException because our mock IUmbracoDatabaseFactory does not provide databases
-            protected override bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory)
+            public override IFactory Configure(IRegister container)
             {
-                return true;
-            }
-            */
+                container.Register<IApplicationShutdownRegistry, AspNetApplicationShutdownRegistry>(Lifetime.Singleton);
 
-            // because we don't even have the core runtime component,
-            // there are a few required stuff that we need to compose
-            public override void Compose(Composition composition)
-            {
-                base.Compose(composition);
-
-                var scopeProvider = Mock.Of<IScopeProvider>();
-                Mock.Get(scopeProvider)
-                    .Setup(x => x.CreateScope(
-                        It.IsAny<IsolationLevel>(),
-                        It.IsAny<RepositoryCacheMode>(),
-                        It.IsAny<IEventDispatcher>(),
-                        It.IsAny<bool?>(),
-                        It.IsAny<bool>(),
-                        It.IsAny<bool>()))
-                    .Returns(Mock.Of<IScope>());
-
-                composition.RegisterUnique(scopeProvider);
-            }
-
-            private IMainDom _mainDom;
-
-            public override IFactory Boot(IRegister container)
-            {
-                var factory = base.Boot(container);
-                _mainDom = factory.GetInstance<IMainDom>();
+                var factory = base.Configure(container);
                 return factory;
-            }
-
-            public override void Terminate()
-            {
-                ((IRegisteredObject) _mainDom).Stop(false);
-                base.Terminate();
             }
 
             // runs with only one single component
@@ -208,7 +167,7 @@ namespace Umbraco.Tests.Runtimes
 
             public void Compose(Composition composition)
             {
-                composition.Register(factory => SettingsForTests.GetDefaultUmbracoSettings());
+                composition.Register(factory => SettingsForTests.GenerateMockContentSettings());
                 composition.RegisterUnique<IExamineManager, TestExamineManager>();
                 composition.Components().Append<TestComponent>();
 

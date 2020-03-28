@@ -14,6 +14,7 @@ using Umbraco.Core.Request;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Common;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing.Objects.Accessors;
@@ -31,7 +32,6 @@ namespace Umbraco.Tests.TestHelpers
     {
         protected override void Compose()
         {
-            base.Compose();
             base.Compose();
 
             Composition.RegisterUnique<IPublishedValueFallback, PublishedValueFallback>();
@@ -90,18 +90,17 @@ namespace Umbraco.Tests.TestHelpers
 
         internal PublishedRouter CreatePublishedRouter(IFactory container = null, ContentFinderCollection contentFinders = null)
         {
-            return CreatePublishedRouter(TestObjects.GetUmbracoSettings().WebRouting, container ?? Factory, contentFinders);
+            return CreatePublishedRouter(SettingsForTests.GenerateMockWebRoutingSettings(), container ?? Factory, contentFinders);
         }
 
-        internal static PublishedRouter CreatePublishedRouter(IWebRoutingSection webRoutingSection, IFactory container = null, ContentFinderCollection contentFinders = null)
+        internal static PublishedRouter CreatePublishedRouter(IWebRoutingSettings webRoutingSettings, IFactory container = null, ContentFinderCollection contentFinders = null)
         {
             return new PublishedRouter(
-                webRoutingSection,
+                webRoutingSettings,
                 contentFinders ?? new ContentFinderCollection(Enumerable.Empty<IContentFinder>()),
                 new TestLastChanceFinder(),
                 new TestVariationContextAccessor(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()),
-                container?.TryGetInstance<IUmbracoSettingsSection>() ?? Current.Factory.GetInstance<IUmbracoSettingsSection>(),
                 Mock.Of<IPublishedUrlProvider>(),
                 Mock.Of<IRequestAccessor>(),
                 container?.GetInstance<IPublishedValueFallback>() ?? Current.Factory.GetInstance<IPublishedValueFallback>(),

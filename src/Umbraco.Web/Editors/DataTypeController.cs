@@ -43,7 +43,7 @@ namespace Umbraco.Web.Editors
     public class DataTypeController : BackOfficeNotificationsController
     {
         private readonly PropertyEditorCollection _propertyEditors;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IContentSettings _contentSettings;
 
         public DataTypeController(
             PropertyEditorCollection propertyEditors,
@@ -56,12 +56,12 @@ namespace Umbraco.Web.Editors
             IRuntimeState runtimeState,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
-            IUmbracoSettingsSection umbracoSettingsSection,
+            IContentSettings contentSettings,
             IPublishedUrlProvider publishedUrlProvider)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _propertyEditors = propertyEditors;
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
         /// <summary>
@@ -468,7 +468,7 @@ namespace Umbraco.Web.Editors
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedPropertyEditors()
         {
             var datatypes = new List<DataTypeBasic>();
-            var showDeprecatedPropertyEditors = _umbracoSettingsSection.Content.ShowDeprecatedPropertyEditors;
+            var showDeprecatedPropertyEditors = _contentSettings.ShowDeprecatedPropertyEditors;
 
             var propertyEditors = Current.PropertyEditors
                 .Where(x=>x.IsDeprecated == false || showDeprecatedPropertyEditors);

@@ -15,14 +15,6 @@ namespace Umbraco.Tests.Security
     public class PasswordSecurityTests
     {
         [Test]
-        public void Get_Hash_Algorithm_Legacy()
-        {
-            var passwordSecurity = new PasswordSecurity(Mock.Of<IPasswordConfiguration>(x => x.UseLegacyEncoding == true && x.HashAlgorithmType == "HMACSHA256"));
-            var alg = passwordSecurity.GetHashAlgorithm("blah");
-            Assert.IsTrue(alg is HMACSHA1);
-        }
-
-        [Test]
         public void Get_Hash_Algorithm_Default()
         {
             var passwordSecurity = new PasswordSecurity(Mock.Of<IPasswordConfiguration>(x => x.HashAlgorithmType == "HMACSHA256"));

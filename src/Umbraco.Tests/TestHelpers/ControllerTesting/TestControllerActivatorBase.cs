@@ -25,6 +25,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Security.Providers;
 using Umbraco.Tests.Strings;
+using Umbraco.Tests.Common;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting
 {

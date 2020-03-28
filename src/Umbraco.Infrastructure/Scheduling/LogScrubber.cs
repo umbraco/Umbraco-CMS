@@ -11,17 +11,19 @@ namespace Umbraco.Web.Scheduling
 
     public class LogScrubber : RecurringTaskBase
     {
-        private readonly IRuntimeState _runtime;
+        private readonly IMainDom _mainDom;
+        private readonly IServerRegistrar _serverRegistrar;
         private readonly IAuditService _auditService;
-        private readonly IUmbracoSettingsSection _settings;
+        private readonly ILoggingSettings _settings;
         private readonly IProfilingLogger _logger;
         private readonly IScopeProvider _scopeProvider;
 
         public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IAuditService auditService, IUmbracoSettingsSection settings, IScopeProvider scopeProvider, IProfilingLogger logger)
+            IMainDom mainDom, IServerRegistrar serverRegistrar, IAuditService auditService, ILoggingSettings settings, IScopeProvider scopeProvider, IProfilingLogger logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
-            _runtime = runtime;
+            _mainDom = mainDom;
+            _serverRegistrar = serverRegistrar;
             _auditService = auditService;
             _settings = settings;
             _scopeProvider = scopeProvider;
@@ -29,13 +31,13 @@ namespace Umbraco.Web.Scheduling
         }
 
         // maximum age, in minutes
-        private int GetLogScrubbingMaximumAge(IUmbracoSettingsSection settings)
+        private int GetLogScrubbingMaximumAge(ILoggingSettings settings)
         {
             var maximumAge = 24 * 60; // 24 hours, in minutes
             try
             {
-                if (settings.Logging.MaxLogAge > -1)
-                    maximumAge = settings.Logging.MaxLogAge;
+                if (settings.MaxLogAge > -1)
+                    maximumAge = settings.MaxLogAge;
             }
             catch (Exception ex)
             {
@@ -45,7 +47,7 @@ namespace Umbraco.Web.Scheduling
 
         }
 
-        public static int GetLogScrubbingInterval(IUmbracoSettingsSection settings, ILogger logger)
+        public static int GetLogScrubbingInterval()
         {
             const int interval = 4 * 60 * 60 * 1000; // 4 hours, in milliseconds
             return interval;
@@ -53,7 +55,7 @@ namespace Umbraco.Web.Scheduling
 
         public override bool PerformRun()
         {
-            switch (_runtime.ServerRole)
+            switch (_serverRegistrar.GetCurrentServerRole())
             {
                 case ServerRole.Replica:
                     _logger.Debug<LogScrubber>("Does not run on replica servers.");
@@ -64,7 +66,7 @@ namespace Umbraco.Web.Scheduling
             }
 
             // ensure we do not run if not main domain, but do NOT lock it
-            if (_runtime.IsMainDom == false)
+            if (_mainDom.IsMainDom == false)
             {
                 _logger.Debug<LogScrubber>("Does not run if not MainDom.");
                 return false; // do NOT repeat, going down

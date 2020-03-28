@@ -60,12 +60,12 @@ namespace Umbraco.Web
         /// <remarks>
         /// See: http://issues.umbraco.org/issue/U4-1614
         /// </remarks>
-        public static MvcHtmlString PreviewBadge(this HtmlHelper helper, IHttpContextAccessor httpContextAccessor, IGlobalSettings globalSettings, IIOHelper ioHelper, IUmbracoSettingsSection umbracoSettingsSection)
+        public static MvcHtmlString PreviewBadge(this HtmlHelper helper, IHttpContextAccessor httpContextAccessor, IGlobalSettings globalSettings, IIOHelper ioHelper, IContentSettings contentSettings)
         {
             if (Current.UmbracoContext.InPreviewMode)
             {
                 var htmlBadge =
-                    String.Format(umbracoSettingsSection.Content.PreviewBadge,
+                    String.Format(contentSettings.PreviewBadge,
                                 ioHelper.ResolveUrl(globalSettings.UmbracoPath),
                                   WebUtility.UrlEncode(httpContextAccessor.GetRequiredHttpContext().Request.Path),
                                   Current.UmbracoContext.PublishedRequest.PublishedContent.Id);

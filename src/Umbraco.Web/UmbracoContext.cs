@@ -150,7 +150,7 @@ namespace Umbraco.Web
             {
                 var request = GetRequestFromContext();
                 //NOTE: the request can be null during app startup!
-                return Current.RuntimeState.Debug
+                return Current.HostingEnvironment.IsDebugMode
                        && request != null
                        && (string.IsNullOrEmpty(request["umbdebugshowtrace"]) == false
                            || string.IsNullOrEmpty(request["umbdebug"]) == false
@@ -184,7 +184,7 @@ namespace Umbraco.Web
         {
             var request = GetRequestFromContext();
             if (request?.Url != null
-                && request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, _globalSettings, _ioHelper) == false
+                && request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, _ioHelper) == false
                 && Security.CurrentUser != null)
             {
                 var previewToken = _cookieManager.GetPreviewCookieValue(); // may be null or empty
@@ -207,7 +207,7 @@ namespace Umbraco.Web
         {
             try
             {
-                return _httpContextAccessor.GetRequiredHttpContext().Request;
+                return _httpContextAccessor.HttpContext?.Request;
             }
             catch (HttpException)
             {

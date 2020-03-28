@@ -89,10 +89,11 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IMediaFileSystem>(),
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
-                    Factory.GetInstance<IUmbracoSettingsSection>(),
+                    Factory.GetInstance<IContentSettings>(),
                     Factory.GetInstance<IIOHelper>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
-                    Factory.GetInstance<IPublishedUrlProvider>()
+                    Factory.GetInstance<IPublishedUrlProvider>(),
+                    Factory.GetInstance<ISecuritySettings>()
 
                 );
                 return usersController;
@@ -161,10 +162,11 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IMediaFileSystem>(),
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
-                    Factory.GetInstance<IUmbracoSettingsSection>(),
+                    Factory.GetInstance<IContentSettings>(),
                     Factory.GetInstance<IIOHelper>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
-                    Factory.GetInstance<IPublishedUrlProvider>()
+                    Factory.GetInstance<IPublishedUrlProvider>(),
+                    Factory.GetInstance<ISecuritySettings>()
                 );
                 return usersController;
             }
@@ -203,10 +205,11 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IMediaFileSystem>(),
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
-                    Factory.GetInstance<IUmbracoSettingsSection>(),
+                    Factory.GetInstance<IContentSettings>(),
                     Factory.GetInstance<IIOHelper>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
-                    Factory.GetInstance<IPublishedUrlProvider>()
+                    Factory.GetInstance<IPublishedUrlProvider>(),
+                    Factory.GetInstance<ISecuritySettings>()
                 );
                 return usersController;
             }
@@ -280,10 +283,11 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IMediaFileSystem>(),
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
-                    Factory.GetInstance<IUmbracoSettingsSection>(),
+                    Factory.GetInstance<IContentSettings>(),
                     Factory.GetInstance<IIOHelper>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
-                    Factory.GetInstance<IPublishedUrlProvider>()
+                    Factory.GetInstance<IPublishedUrlProvider>(),
+                    Factory.GetInstance<ISecuritySettings>()
                 );
                 return usersController;
             }

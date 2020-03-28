@@ -13,15 +13,13 @@ namespace Umbraco.Core.Cache
     /// </summary>
     public class ObjectCacheAppCache : IAppPolicyCache
     {
-        private readonly ITypeFinder _typeFinder;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ObjectCacheAppCache"/>.
         /// </summary>
-        public ObjectCacheAppCache(ITypeFinder typeFinder)
+        public ObjectCacheAppCache()
         {
-            _typeFinder = typeFinder ?? throw new ArgumentNullException(nameof(typeFinder));
             // the MemoryCache is created with name "in-memory". That name is
             // used to retrieve configuration options. It does not identify the memory cache, i.e.
             // each instance of this class has its own, independent, memory cache.
@@ -178,9 +176,8 @@ namespace Umbraco.Core.Cache
         }
 
         /// <inheritdoc />
-        public virtual void ClearOfType(string typeName)
+        public virtual void ClearOfType(Type type)
         {
-            var type = _typeFinder.GetTypeByName(typeName);
             if (type == null) return;
             var isInterface = type.IsInterface;
             try

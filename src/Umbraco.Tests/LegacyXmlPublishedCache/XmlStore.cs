@@ -45,9 +45,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly IDocumentRepository _documentRepository;
         private readonly IMediaRepository _mediaRepository;
         private readonly IMemberRepository _memberRepository;
-        private readonly IGlobalSettings _globalSettings;
         private readonly IEntityXmlSerializer _entitySerializer;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly PublishedContentTypeCache _contentTypeCache;
@@ -58,7 +57,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         private XmlStoreFilePersister _persisterTask;
         private volatile bool _released;
-        private bool _withRepositoryEvents;
 
         #region Constructors
 
@@ -67,8 +65,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         /// </summary>
         /// <remarks>The default constructor will boot the cache, load data from file or database, /// wire events in order to manage changes, etc.</remarks>
         public XmlStore(IContentTypeService contentTypeService, IContentService contentService, IScopeProvider scopeProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
-            IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings, IEntityXmlSerializer entitySerializer, IHostingEnvironment hostingEnvironment, IShortStringHelper shortStringHelper)
-            : this(contentTypeService, contentService, scopeProvider, routesCache, contentTypeCache, publishedSnapshotAccessor, mainDom, false, false, documentRepository, mediaRepository, memberRepository, globalSettings, entitySerializer, hostingEnvironment, shortStringHelper)
+            IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IEntityXmlSerializer entitySerializer, IHostingEnvironment hostingEnvironment, IApplicationShutdownRegistry hostingLifetime, IShortStringHelper shortStringHelper)
+            : this(contentTypeService, contentService, scopeProvider, routesCache, contentTypeCache, publishedSnapshotAccessor, mainDom, false, false, documentRepository, mediaRepository, memberRepository, entitySerializer, hostingEnvironment, hostingLifetime, shortStringHelper)
         { }
 
         // internal for unit tests
@@ -76,7 +74,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         // TODO: er, we DO have a DB?
         internal XmlStore(IContentTypeService contentTypeService, IContentService contentService, IScopeProvider scopeProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom,
-            bool testing, bool enableRepositoryEvents, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings, IEntityXmlSerializer entitySerializer, IHostingEnvironment hostingEnvironment, IShortStringHelper shortStringHelper)
+            bool testing, bool enableRepositoryEvents, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IEntityXmlSerializer entitySerializer, IHostingEnvironment hostingEnvironment, IApplicationShutdownRegistry hostingLifetime, IShortStringHelper shortStringHelper)
         {
             if (testing == false)
                 EnsureConfigurationIsValid();
@@ -90,12 +88,11 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _documentRepository = documentRepository;
             _mediaRepository = mediaRepository;
             _memberRepository = memberRepository;
-            _globalSettings = globalSettings;
             _entitySerializer = entitySerializer;
-            _hostingEnvironment = hostingEnvironment;
+            _hostingLifetime = hostingLifetime;
             _shortStringHelper = shortStringHelper;
 
-            _xmlFileName = TestHelper.IOHelper.MapPath(SystemFiles.GetContentCacheXml(_hostingEnvironment));
+            _xmlFileName = TestHelper.IOHelper.MapPath(SystemFiles.GetContentCacheXml(hostingEnvironment));
 
             if (testing)
             {
@@ -150,7 +147,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 LongRunning = true,
                 KeepAlive = true,
                 Hosted = false // main domain will take care of stopping the runner (see below)
-            }, logger, _hostingEnvironment);
+            }, logger, _hostingLifetime);
 
             // create (and add to runner)
             _persisterTask = new XmlStoreFilePersister(runner, this, logger);
@@ -207,7 +204,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             MediaTypeService.ScopedRefreshedEntity += OnMediaTypeRefreshedEntity;
             MemberTypeService.ScopedRefreshedEntity += OnMemberTypeRefreshedEntity;
 
-            _withRepositoryEvents = true;
         }
 
         private void ClearEvents()
@@ -226,7 +222,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             MediaTypeService.ScopedRefreshedEntity -= OnMediaTypeRefreshedEntity;
             MemberTypeService.ScopedRefreshedEntity -= OnMemberTypeRefreshedEntity;
 
-            _withRepositoryEvents = false;
         }
 
         private void LazyInitializeContent()

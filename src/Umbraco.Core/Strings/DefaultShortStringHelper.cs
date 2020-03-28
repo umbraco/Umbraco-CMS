@@ -19,7 +19,7 @@ namespace Umbraco.Core.Strings
     {
         #region Ctor, consts and vars
 
-        public DefaultShortStringHelper(IUmbracoSettingsSection settings)
+        public DefaultShortStringHelper(IRequestHandlerSettings settings)
         {
             _config = new DefaultShortStringHelperConfig().WithDefault(settings);
         }
@@ -619,6 +619,6 @@ namespace Umbraco.Core.Strings
             return new string(output, 0, opos);
         }
 
-        #endregion      
+        #endregion
     }
 }

@@ -1,12 +1,15 @@
 ﻿using System;
+using System.IO;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Migrations;
@@ -42,10 +45,9 @@ namespace Umbraco.Core.Runtime
         public override void Compose(Composition composition)
         {
             base.Compose(composition);
-
+            
             // composers
             composition
-                .ComposeConfiguration()
                 .ComposeRepositories()
                 .ComposeServices()
                 .ComposeCoreMappingProfiles()
@@ -119,10 +121,11 @@ namespace Umbraco.Core.Runtime
             // project
             composition.RegisterUnique<IServerMessenger>(factory
                 => new DatabaseServerMessenger(
-                    factory.GetInstance<IRuntimeState>(),
+                    factory.GetInstance<IMainDom>(),
                     factory.GetInstance<IScopeProvider>(),
                     factory.GetInstance<ISqlContext>(),
                     factory.GetInstance<IProfilingLogger>(),
+                    factory.GetInstance<IServerRegistrar>(),
                     true, new DatabaseServerMessengerOptions(),
                     factory.GetInstance<IHostingEnvironment>(),
                     factory.GetInstance<CacheRefresherCollection>()
@@ -140,7 +143,7 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
             composition.RegisterUnique<IShortStringHelper>(factory
-                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetInstance<IUmbracoSettingsSection>())));
+                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetInstance<IRequestHandlerSettings>())));
 
             composition.UrlSegmentProviders()
                 .Append<DefaultUrlSegmentProvider>();
@@ -172,6 +175,12 @@ namespace Umbraco.Core.Runtime
             // will be injected in controllers when needed to invoke rest endpoints on Our
             composition.RegisterUnique<IInstallationService, InstallationService>();
             composition.RegisterUnique<IUpgradeService, UpgradeService>();
+
+            // Grid config is not a real config file as we know them
+            composition.RegisterUnique<IGridConfig, GridConfig>();
+
+            // Config manipulator
+            composition.RegisterUnique<IConfigManipulator, JsonConfigManipulator>();
         }
     }
 }

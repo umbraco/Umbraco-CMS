@@ -21,7 +21,6 @@ namespace Umbraco.Web.Install
                 a.OfType<NewInstallStep>().First(),
                 a.OfType<UpgradeStep>().First(),
                 a.OfType<FilePermissionsStep>().First(),
-                a.OfType<ConfigureMachineKey>().First(),
                 a.OfType<DatabaseConfigureStep>().First(),
                 a.OfType<DatabaseInstallStep>().First(),
                 a.OfType<DatabaseUpgradeStep>().First(),

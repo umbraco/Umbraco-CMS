@@ -30,8 +30,8 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.LegacyXmlPublishedCache;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.WebApi;
+using Umbraco.Tests.Common;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -265,6 +265,7 @@ namespace Umbraco.Tests.TestHelpers
                 Logger,
                 Factory.GetInstance<IGlobalSettings>(),
                 HostingEnvironment,
+                HostingLifetime,
                 ShortStringHelper,
                 new SiteDomainHelper(),
                 Factory.GetInstance<IEntityXmlSerializer>(),

@@ -35,7 +35,6 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Services;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.PublishedCache;
@@ -52,10 +51,10 @@ using Umbraco.Web.Templates;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models;
+using Umbraco.Net;
 using Umbraco.Core.Request;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Net;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Web.AspNet;
 using Umbraco.Web.Install;
@@ -63,6 +62,8 @@ using Umbraco.Web.Security;
 using Umbraco.Web.Security.Providers;
 using Umbraco.Web.Trees;
 using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Tests.Common;
+
 namespace Umbraco.Tests.Testing
 {
     /// <summary>
@@ -138,7 +139,8 @@ namespace Umbraco.Tests.Testing
 
         protected virtual IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
 
-        protected IHostingEnvironment HostingEnvironment { get; } = new AspNetHostingEnvironment(SettingsForTests.GetDefaultHostingSettings());
+        protected IHostingEnvironment HostingEnvironment { get; } = new AspNetHostingEnvironment(TestHelpers.SettingsForTests.GetDefaultHostingSettings());
+        protected IApplicationShutdownRegistry HostingLifetime { get; } = new AspNetApplicationShutdownRegistry();
         protected IIpResolver IpResolver => Factory.GetInstance<IIpResolver>();
         protected IBackOfficeInfo BackOfficeInfo => Factory.GetInstance<IBackOfficeInfo>();
         protected AppCaches AppCaches => Factory.GetInstance<AppCaches>();
@@ -171,12 +173,12 @@ namespace Umbraco.Tests.Testing
             var proflogger = new ProfilingLogger(logger, profiler);
             IOHelper = TestHelper.IOHelper;
 
-            TypeFinder = new TypeFinder(logger);
+            TypeFinder = new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly));
             var appCaches = GetAppCaches();
-            var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
-            var settings = SettingsForTests.GetDefaultUmbracoSettings();
+            var globalSettings = TestHelpers.SettingsForTests.GetDefaultGlobalSettings();
+            var settings = TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings();
 
-            IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, settings, logger);
+            IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, logger, settings);
             IIpResolver ipResolver = new AspNetIpResolver();
             UmbracoVersion = new UmbracoVersion(globalSettings);
 
@@ -265,7 +267,7 @@ namespace Umbraco.Tests.Testing
                     profiler = Mock.Of<IProfiler>();
                     break;
                 case UmbracoTestOptions.Logger.Serilog:
-                    logger = new SerilogLogger(TestHelper.CoreDebug, IOHelper, TestHelper.Marchal, new FileInfo(TestHelper.MapPathForTest("~/unit-test.config")));
+                    logger = new SerilogLogger(TestHelper.CoreDebugSettings, IOHelper, TestHelper.Marchal, new FileInfo(TestHelper.MapPathForTest("~/unit-test.config")));
                     profiler = new LogProfiler(logger);
                     break;
                 case UmbracoTestOptions.Logger.Console:
@@ -321,7 +323,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IPublishedUrlProvider>(factory =>
                 new UrlProvider(
                     factory.GetInstance<IUmbracoContextAccessor>(),
-                    TestObjects.GetUmbracoSettings().WebRouting,
+                    TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings(),
                     new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                     new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                     factory.GetInstance<IVariationContextAccessor>()
@@ -411,9 +413,15 @@ namespace Umbraco.Tests.Testing
 
         protected virtual void ComposeSettings()
         {
-            Composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
-            Composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
-            Composition.Configs.Add(SettingsForTests.GetDefaultHostingSettings);
+            Composition.Configs.Add(TestHelpers.SettingsForTests.GetDefaultGlobalSettings);
+            Composition.Configs.Add(TestHelpers.SettingsForTests.GetDefaultHostingSettings);
+            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings);
+            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings);
+            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockSecuritySettings);
+            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockUserPasswordConfiguration);
+            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockMemberPasswordConfiguration);
+            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
+
             //Composition.Configs.Add<IUserPasswordConfiguration>(() => new DefaultUserPasswordConfig());
         }
 
@@ -425,10 +433,6 @@ namespace Umbraco.Tests.Testing
 
             // default Datalayer/Repositories/SQL/Database/etc...
             Composition.ComposeRepositories();
-
-            // register basic stuff that might need to be there for some container resolvers to work
-            Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
-            Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().WebRouting);
 
             Composition.RegisterUnique<IExamineManager, ExamineManager>();
 
@@ -454,11 +458,16 @@ namespace Umbraco.Tests.Testing
                 .AddCoreMappers();
 
             Composition.RegisterUnique<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
+
+            var globalSettings = TestHelper.GetConfigs().Global();
+            var connectionStrings = TestHelper.GetConfigs().ConnectionStrings();
+
             Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(
                 Constants.System.UmbracoConnectionName,
+                globalSettings,
+                connectionStrings,
                 Logger,
                 new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>),
-                TestHelper.GetConfigs(),
                 TestHelper.DbProviderFactoryCreator));
             Composition.RegisterUnique(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
@@ -546,7 +555,7 @@ namespace Umbraco.Tests.Testing
 
             // reset all other static things that should not be static ;(
             UriUtility.ResetAppDomainAppVirtualPath(HostingEnvironment);
-            SettingsForTests.Reset(); // FIXME: should it be optional?
+            TestHelpers.SettingsForTests.Reset(); // FIXME: should it be optional?
 
             // clear static events
             DocumentRepository.ClearScopeEvents();

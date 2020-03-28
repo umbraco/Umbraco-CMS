@@ -19,14 +19,16 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly ILogger _logger;
         private readonly IIOHelper _ioHelper;
         private readonly IConnectionStrings _connectionStrings;
+        private readonly IConfigManipulator _configManipulator;
 
-        public DatabaseInstallStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger, IIOHelper ioHelper, IConnectionStrings connectionStrings)
+        public DatabaseInstallStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger, IIOHelper ioHelper, IConnectionStrings connectionStrings, IConfigManipulator configManipulator)
         {
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
             _logger = logger;
             _ioHelper = ioHelper;
             _connectionStrings = connectionStrings;
+            _configManipulator = configManipulator;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
@@ -43,7 +45,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             if (result.RequiresUpgrade == false)
             {
-                HandleConnectionStrings(_logger, _ioHelper, _connectionStrings);
+                HandleConnectionStrings(_logger, _ioHelper, _connectionStrings, _configManipulator);
                 return Task.FromResult<InstallSetupResult>(null);
             }
 
@@ -54,7 +56,7 @@ namespace Umbraco.Web.Install.InstallSteps
             }));
         }
 
-        internal static void HandleConnectionStrings(ILogger logger, IIOHelper ioHelper, IConnectionStrings connectionStrings)
+        internal static void HandleConnectionStrings(ILogger logger, IIOHelper ioHelper, IConnectionStrings connectionStrings, IConfigManipulator configManipulator)
         {
 
 
@@ -65,7 +67,7 @@ namespace Umbraco.Web.Install.InstallSteps
             // Remove legacy umbracoDbDsn configuration setting if it exists and connectionstring also exists
             if (databaseSettings != null)
             {
-                connectionStrings.RemoveConnectionString(Constants.System.UmbracoConnectionName);
+                configManipulator.RemoveConnectionString();
             }
             else
             {

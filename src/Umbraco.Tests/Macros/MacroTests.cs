@@ -17,12 +17,11 @@ namespace Umbraco.Tests.Macros
         [SetUp]
         public void Setup()
         {
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
             //we DO want cache enabled for these tests
             var cacheHelper = new AppCaches(
-                new ObjectCacheAppCache(typeFinder),
+                new ObjectCacheAppCache(),
                 NoAppCache.Instance,
-                new IsolatedCaches(type => new ObjectCacheAppCache(typeFinder)));
+                new IsolatedCaches(type => new ObjectCacheAppCache()));
         }
 
         [TestCase("anything", true)]

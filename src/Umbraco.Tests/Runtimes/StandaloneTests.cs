@@ -25,9 +25,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
-using Umbraco.Tests.Composing;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Macros;
@@ -36,6 +34,8 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Runtime;
 using File = System.IO.File;
 using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Tests.Common;
+using Umbraco.Tests.Common.Composing;
 
 namespace Umbraco.Tests.Runtimes
 {
@@ -62,25 +62,28 @@ namespace Umbraco.Tests.Runtimes
             var profiler = new LogProfiler(logger);
             var profilingLogger = new ProfilingLogger(logger, profiler);
             var appCaches = AppCaches.Disabled;
-            var databaseFactory = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()), TestHelper.GetConfigs(), TestHelper.DbProviderFactoryCreator);
-            var typeFinder = new TypeFinder(logger);
+            var globalSettings = TestHelper.GetConfigs().Global();
+            var connectionStrings = TestHelper.GetConfigs().ConnectionStrings();
+            var typeFinder = TestHelper.GetTypeFinder();
+            var databaseFactory = new UmbracoDatabaseFactory(logger,globalSettings, connectionStrings, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()),  TestHelper.DbProviderFactoryCreator);
             var ioHelper = TestHelper.IOHelper;
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
             var typeLoader = new TypeLoader(ioHelper, typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), profilingLogger);
             var mainDom = new SimpleMainDom();
             var umbracoVersion = TestHelper.GetUmbracoVersion();
             var backOfficeInfo = TestHelper.GetBackOfficeInfo();
-            var runtimeState = new RuntimeState(logger, null, null, new Lazy<IMainDom>(() => mainDom), new Lazy<IServerRegistrar>(() => factory.GetInstance<IServerRegistrar>()), umbracoVersion, hostingEnvironment, backOfficeInfo);
+            var runtimeState = new RuntimeState(logger, null, umbracoVersion, backOfficeInfo);
             var configs = TestHelper.GetConfigs();
             var variationContextAccessor = TestHelper.VariationContextAccessor;
+            
 
             // create the register and the composition
             var register = TestHelper.GetRegister();
             var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, configs, ioHelper, appCaches);
-            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator);
+            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator, hostingEnvironment, backOfficeInfo);
 
             // create the core runtime and have it compose itself
-            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom);coreRuntime.Compose(composition);
+            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, typeFinder);
 
             // determine actual runtime level
             runtimeState.DetermineRuntimeLevel(databaseFactory, logger);
@@ -120,8 +123,8 @@ namespace Umbraco.Tests.Runtimes
                 .Append<DistributedCacheBinderComponent>();
 
             // configure
-            composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
-            composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+            composition.Configs.Add(TestHelpers.SettingsForTests.GetDefaultGlobalSettings);
+            composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
 
             // create and register the factory
             Current.Factory = factory = composition.CreateFactory();
@@ -159,7 +162,7 @@ namespace Umbraco.Tests.Runtimes
                 var scopeProvider = factory.GetInstance<IScopeProvider>();
                 using (var scope = scopeProvider.CreateScope())
                 {
-                    var creator = new DatabaseSchemaCreator(scope.Database, logger, umbracoVersion, SettingsForTests.GetDefaultGlobalSettings());
+                    var creator = new DatabaseSchemaCreator(scope.Database, logger, umbracoVersion, TestHelpers.SettingsForTests.GetDefaultGlobalSettings());
                     creator.InitializeDatabaseSchema();
                     scope.Complete();
                 }
@@ -256,7 +259,7 @@ namespace Umbraco.Tests.Runtimes
             var profilingLogger = new ProfilingLogger(logger, profiler);
             var appCaches = AppCaches.Disabled;
             var databaseFactory = Mock.Of<IUmbracoDatabaseFactory>();
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeFinder = TestHelper.GetTypeFinder();
             var ioHelper = TestHelper.IOHelper;
             var typeLoader = new TypeLoader(ioHelper, typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), profilingLogger);
             var runtimeState = Mock.Of<IRuntimeState>();
@@ -271,11 +274,10 @@ namespace Umbraco.Tests.Runtimes
             var register = TestHelper.GetRegister();
             var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, configs, ioHelper, appCaches);
             var umbracoVersion = TestHelper.GetUmbracoVersion();
-            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator);
+            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator, hostingEnvironment, backOfficeInfo);
 
             // create the core runtime and have it compose itself
-            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom);
-            coreRuntime.Compose(composition);
+            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, typeFinder);
 
             // get the components
             // all of them?
@@ -313,107 +315,14 @@ namespace Umbraco.Tests.Runtimes
             foreach (var result in resultGroup)
             {
                 Console.WriteLine();
-                Console.Write(ToText(result));
+                Console.Write(result.ToText());
             }
 
             Assert.AreEqual(0, results.Count);
         }
 
-        private static string ToText(ValidationResult result)
-        {
-            var text = new StringBuilder();
+        
 
-            text.AppendLine($"{result.Severity}: {WordWrap(result.Message, 120)}");
-            var target = result.ValidationTarget;
-            text.Append("\tsvce: ");
-            text.Append(target.ServiceName);
-            text.Append(target.DeclaringService.ServiceType);
-            if (!target.DeclaringService.ServiceName.IsNullOrWhiteSpace())
-            {
-                text.Append(" '");
-                text.Append(target.DeclaringService.ServiceName);
-                text.Append("'");
-            }
-
-            text.Append("     (");
-            if (target.DeclaringService.Lifetime == null)
-                text.Append("Transient");
-            else
-                text.Append(target.DeclaringService.Lifetime.ToString().TrimStart("LightInject.").TrimEnd("Lifetime"));
-            text.AppendLine(")");
-            text.Append("\timpl: ");
-            text.Append(target.DeclaringService.ImplementingType);
-            text.AppendLine();
-            text.Append("\tparm: ");
-            text.Append(target.Parameter);
-            text.AppendLine();
-
-            return text.ToString();
-        }
-
-        private static string WordWrap(string text, int width)
-        {
-            int pos, next;
-            var sb = new StringBuilder();
-            var nl = Environment.NewLine;
-
-            // Lucidity check
-            if (width < 1)
-                return text;
-
-            // Parse each line of text
-            for (pos = 0; pos < text.Length; pos = next)
-            {
-                // Find end of line
-                var eol = text.IndexOf(nl, pos, StringComparison.Ordinal);
-
-                if (eol == -1)
-                    next = eol = text.Length;
-                else
-                    next = eol + nl.Length;
-
-                // Copy this line of text, breaking into smaller lines as needed
-                if (eol > pos)
-                {
-                    do
-                    {
-                        var len = eol - pos;
-
-                        if (len > width)
-                            len = BreakLine(text, pos, width);
-
-                        if (pos > 0)
-                            sb.Append("\t\t");
-                        sb.Append(text, pos, len);
-                        sb.Append(nl);
-
-                        // Trim whitespace following break
-                        pos += len;
-
-                        while (pos < eol && char.IsWhiteSpace(text[pos]))
-                            pos++;
-
-                    } while (eol > pos);
-                }
-                else sb.Append(nl); // Empty line
-            }
-
-            return sb.ToString();
-        }
-
-        private static int BreakLine(string text, int pos, int max)
-        {
-            // Find last whitespace in line
-            var i = max - 1;
-            while (i >= 0 && !char.IsWhiteSpace(text[pos + i]))
-                i--;
-            if (i < 0)
-                return max; // No whitespace found; break at maximum length
-            // Find start of whitespace
-            while (i >= 0 && char.IsWhiteSpace(text[pos + i]))
-                i--;
-            // Return length of text before whitespace
-            return i + 1;
-        }
+        
     }
 }

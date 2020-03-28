@@ -14,31 +14,31 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public override void UrlProviderMode()
         {
-            Assert.IsTrue(SettingsSection.WebRouting.UrlProviderMode == "Auto");
+            Assert.IsTrue(WebRoutingSettings.UrlProviderMode == "Auto");
         }
 
         [Test]
         public void DisableAlternativeTemplates()
         {
-            Assert.IsTrue(SettingsSection.WebRouting.DisableAlternativeTemplates == false);
+            Assert.IsTrue(WebRoutingSettings.DisableAlternativeTemplates == false);
         }
 
         [Test]
         public void ValidateAlternativeTemplates()
         {
-            Assert.IsTrue(SettingsSection.WebRouting.ValidateAlternativeTemplates == false);
+            Assert.IsTrue(WebRoutingSettings.ValidateAlternativeTemplates == false);
         }
 
         [Test]
         public void DisableFindContentByIdPath()
         {
-            Assert.IsTrue(SettingsSection.WebRouting.DisableFindContentByIdPath == false);
+            Assert.IsTrue(WebRoutingSettings.DisableFindContentByIdPath == false);
         }
 
         [Test]
         public void DisableRedirectUrlTracking()
         {
-            Assert.IsTrue(SettingsSection.WebRouting.DisableRedirectUrlTracking == false);
+            Assert.IsTrue(WebRoutingSettings.DisableRedirectUrlTracking == false);
         }
     }
 }

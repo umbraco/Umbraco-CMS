@@ -20,7 +20,7 @@ namespace Umbraco.Web.Security
         public UmbracoBackOfficeCookieAuthOptions(
             string[] explicitPaths,
             IUmbracoContextAccessor umbracoContextAccessor,
-            ISecuritySection securitySection,
+            ISecuritySettings securitySettings,
             IGlobalSettings globalSettings,
             IRuntimeState runtimeState,
             ISecureDataFormat<AuthenticationTicket> secureDataFormat,
@@ -33,8 +33,8 @@ namespace Umbraco.Web.Security
 
             SlidingExpiration = true;
             ExpireTimeSpan = TimeSpan.FromMinutes(LoginTimeoutMinutes);
-            CookieDomain = securitySection.AuthCookieDomain;
-            CookieName = securitySection.AuthCookieName;
+            CookieDomain = securitySettings.AuthCookieDomain;
+            CookieName = securitySettings.AuthCookieName;
             CookieHttpOnly = true;
             CookieSecure = globalSettings.UseHttps ? CookieSecureOption.Always : CookieSecureOption.SameAsRequest;
             CookiePath = "/";
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Security
             TicketDataFormat = new UmbracoSecureDataFormat(LoginTimeoutMinutes, secureDataFormat1);
 
             //Custom cookie manager so we can filter requests
-            CookieManager = new BackOfficeCookieManager(umbracoContextAccessor, runtimeState, globalSettings, ioHelper, requestCache, explicitPaths);
+            CookieManager = new BackOfficeCookieManager(umbracoContextAccessor, runtimeState, ioHelper, requestCache, explicitPaths);
         }
 
         /// <summary>

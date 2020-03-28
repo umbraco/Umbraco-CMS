@@ -149,11 +149,11 @@ namespace Umbraco.Core
         }
 
         public static bool IsAllowedTemplate(this IPublishedContent content, IContentTypeService contentTypeService,
-            IUmbracoSettingsSection umbracoSettingsSection, int templateId)
+            IWebRoutingSettings webRoutingSettings, int templateId)
         {
             return content.IsAllowedTemplate(contentTypeService,
-                umbracoSettingsSection.WebRouting.DisableAlternativeTemplates,
-                umbracoSettingsSection.WebRouting.ValidateAlternativeTemplates, templateId);
+                webRoutingSettings.DisableAlternativeTemplates,
+                webRoutingSettings.ValidateAlternativeTemplates, templateId);
         }
 
         public static bool IsAllowedTemplate(this IPublishedContent content, IContentTypeService contentTypeService, bool disableAlternativeTemplates, bool validateAlternativeTemplates, int templateId)

@@ -20,7 +20,7 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpRequestAppCache"/> class with a context, for unit tests!
         /// </summary>
-        public HttpRequestAppCache(Func<IDictionary> requestItems, ITypeFinder typeFinder) : base(typeFinder)
+        public HttpRequestAppCache(Func<IDictionary> requestItems) : base()
         {
             ContextItems = requestItems;
         }

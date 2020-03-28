@@ -45,7 +45,7 @@ namespace Umbraco.Web.Editors
         private BackOfficeSignInManager _signInManager;
         private readonly IUserPasswordConfiguration _passwordConfiguration;
         private readonly IRuntimeState _runtimeState;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly ISecuritySettings _securitySettings;
         private readonly IIOHelper _ioHelper;
 
         public AuthenticationController(
@@ -58,14 +58,14 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             UmbracoMapper umbracoMapper,
-            IUmbracoSettingsSection umbracoSettingsSection,
+            ISecuritySettings securitySettings,
             IIOHelper ioHelper,
             IPublishedUrlProvider publishedUrlProvider)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
             _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _securitySettings = securitySettings ?? throw new ArgumentNullException(nameof(securitySettings));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
         }
 
@@ -310,7 +310,7 @@ namespace Umbraco.Web.Editors
         {
             // If this feature is switched off in configuration the UI will be amended to not make the request to reset password available.
             // So this is just a server-side secondary check.
-            if (_umbracoSettingsSection.Security.AllowPasswordReset == false)
+            if (_securitySettings.AllowPasswordReset == false)
             {
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
@@ -534,7 +534,7 @@ namespace Umbraco.Web.Editors
             var action = urlHelper.Action("ValidatePasswordResetCode", "BackOffice",
                 new
                 {
-                    area = GlobalSettings.GetUmbracoMvcArea(_ioHelper),
+                    area = _ioHelper.GetUmbracoMvcArea(),
                     u = userId,
                     r = code
                 });

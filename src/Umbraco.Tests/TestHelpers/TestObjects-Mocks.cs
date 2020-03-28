@@ -17,7 +17,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Tests.Common;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -138,18 +138,6 @@ namespace Umbraco.Tests.TestHelpers
                 new AspNetCookieManager(httpContextAccessor));
 
             return umbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
-        }
-
-        public IUmbracoSettingsSection GetUmbracoSettings()
-        {
-            // FIXME: Why not use the SettingsForTest.GenerateMock ... ?
-            // FIXME: Shouldn't we use the default ones so they are the same instance for each test?
-
-            var umbracoSettingsMock = new Mock<IUmbracoSettingsSection>();
-            var webRoutingSectionMock = new Mock<IWebRoutingSection>();
-            webRoutingSectionMock.Setup(x => x.UrlProviderMode).Returns(UrlMode.Auto.ToString());
-            umbracoSettingsMock.Setup(x => x.WebRouting).Returns(webRoutingSectionMock.Object);
-            return umbracoSettingsMock.Object;
         }
 
         public IGlobalSettings GetGlobalSettings()

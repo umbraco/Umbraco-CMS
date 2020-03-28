@@ -8,6 +8,7 @@ using Microsoft.Owin.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
@@ -24,21 +25,24 @@ namespace Umbraco.Web.Security
     {
         private readonly UmbracoBackOfficeCookieAuthOptions _authOptions;
         private readonly IGlobalSettings _globalSettings;
-        private readonly ISecuritySection _security;
+        private readonly ISecuritySettings _security;
         private readonly ILogger _logger;
+        private readonly IIOHelper _ioHelper;
 
         public GetUserSecondsMiddleWare(
             OwinMiddleware next,
             UmbracoBackOfficeCookieAuthOptions authOptions,
             IGlobalSettings globalSettings,
-            ISecuritySection security,
-            ILogger logger)
+            ISecuritySettings security,
+            ILogger logger,
+            IIOHelper ioHelper)
             : base(next)
         {
             _authOptions = authOptions ?? throw new ArgumentNullException(nameof(authOptions));
             _globalSettings = globalSettings;
             _security = security;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _ioHelper = ioHelper;
         }
 
         public override async Task Invoke(IOwinContext context)
@@ -48,7 +52,7 @@ namespace Umbraco.Web.Security
 
             if (request.Uri.Scheme.InvariantStartsWith("http")
                 && request.Uri.AbsolutePath.InvariantEquals(
-                    $"{_globalSettings.Path}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds"))
+                    $"{_ioHelper.BackOfficePath}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds"))
             {
                 var cookie = _authOptions.CookieManager.GetRequestCookie(context, _security.AuthCookieName);
                 if (cookie.IsNullOrWhiteSpace() == false)

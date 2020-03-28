@@ -9,127 +9,115 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void KeepUserLoggedIn()
         {
-            Assert.IsTrue(SettingsSection.Security.KeepUserLoggedIn == true);
+            Assert.IsTrue(SecuritySettings.KeepUserLoggedIn == true);
         }
 
         [Test]
         public void HideDisabledUsersInBackoffice()
         {
-            Assert.IsTrue(SettingsSection.Security.HideDisabledUsersInBackoffice == false);
+            Assert.IsTrue(SecuritySettings.HideDisabledUsersInBackoffice == false);
         }
 
         [Test]
         public void AllowPasswordReset()
         {
-            Assert.IsTrue(SettingsSection.Security.AllowPasswordReset == true);
+            Assert.IsTrue(SecuritySettings.AllowPasswordReset == true);
         }
 
         [Test]
         public void AuthCookieDomain()
         {
-            Assert.IsTrue(SettingsSection.Security.AuthCookieDomain == null);
+            Assert.IsTrue(SecuritySettings.AuthCookieDomain == null);
         }
 
         [Test]
         public void AuthCookieName()
         {
-            Assert.IsTrue(SettingsSection.Security.AuthCookieName == "UMB_UCONTEXT");
+            Assert.IsTrue(SecuritySettings.AuthCookieName == "UMB_UCONTEXT");
         }
 
         [Test]
         public void UserPasswordConfiguration_RequiredLength()
         {
-            Assert.IsTrue(SettingsSection.Security.UserPasswordConfiguration.RequiredLength == 12);
+            Assert.IsTrue(UserPasswordConfiguration.RequiredLength == 12);
         }
 
         [Test]
         public void UserPasswordConfiguration_RequireNonLetterOrDigit()
         {
-            Assert.IsTrue(SettingsSection.Security.UserPasswordConfiguration.RequireNonLetterOrDigit == false);
+            Assert.IsTrue(UserPasswordConfiguration.RequireNonLetterOrDigit == false);
         }
 
         [Test]
         public void UserPasswordConfiguration_RequireDigit()
         {
-            Assert.IsTrue(SettingsSection.Security.UserPasswordConfiguration.RequireDigit == false);
+            Assert.IsTrue(UserPasswordConfiguration.RequireDigit == false);
         }
 
         [Test]
         public void UserPasswordConfiguration_RequireLowercase()
         {
-            Assert.IsTrue(SettingsSection.Security.UserPasswordConfiguration.RequireLowercase == false);
+            Assert.IsTrue(UserPasswordConfiguration.RequireLowercase == false);
         }
 
         [Test]
         public void UserPasswordConfiguration_RequireUppercase()
         {
-            Assert.IsTrue(SettingsSection.Security.UserPasswordConfiguration.RequireUppercase == false);
-        }
-
-        [Test]
-        public void UserPasswordConfiguration_UseLegacyEncoding()
-        {
-            Assert.IsTrue(SettingsSection.Security.UserPasswordConfiguration.UseLegacyEncoding == false);
+            Assert.IsTrue(UserPasswordConfiguration.RequireUppercase == false);
         }
 
         [Test]
         public void UserPasswordConfiguration_HashAlgorithmType()
         {
-            Assert.IsTrue(SettingsSection.Security.UserPasswordConfiguration.HashAlgorithmType == "HMACSHA256");
+            Assert.IsTrue(UserPasswordConfiguration.HashAlgorithmType == "HMACSHA256");
         }
 
         [Test]
         public void UserPasswordConfiguration_MaxFailedAccessAttemptsBeforeLockout()
         {
-            Assert.IsTrue(SettingsSection.Security.UserPasswordConfiguration.MaxFailedAccessAttemptsBeforeLockout == 5);
+            Assert.IsTrue(UserPasswordConfiguration.MaxFailedAccessAttemptsBeforeLockout == 5);
         }
 
         [Test]
         public void MemberPasswordConfiguration_RequiredLength()
         {
-            Assert.IsTrue(SettingsSection.Security.MemberPasswordConfiguration.RequiredLength == 12);
+            Assert.IsTrue(MemberPasswordConfiguration.RequiredLength == 12);
         }
 
         [Test]
         public void MemberPasswordConfiguration_RequireNonLetterOrDigit()
         {
-            Assert.IsTrue(SettingsSection.Security.MemberPasswordConfiguration.RequireNonLetterOrDigit == false);
+            Assert.IsTrue(MemberPasswordConfiguration.RequireNonLetterOrDigit == false);
         }
 
         [Test]
         public void MemberPasswordConfiguration_RequireDigit()
         {
-            Assert.IsTrue(SettingsSection.Security.MemberPasswordConfiguration.RequireDigit == false);
+            Assert.IsTrue(MemberPasswordConfiguration.RequireDigit == false);
         }
 
         [Test]
         public void MemberPasswordConfiguration_RequireLowercase()
         {
-            Assert.IsTrue(SettingsSection.Security.MemberPasswordConfiguration.RequireLowercase == false);
+            Assert.IsTrue(MemberPasswordConfiguration.RequireLowercase == false);
         }
 
         [Test]
         public void MemberPasswordConfiguration_RequireUppercase()
         {
-            Assert.IsTrue(SettingsSection.Security.MemberPasswordConfiguration.RequireUppercase == false);
-        }
-
-        [Test]
-        public void MemberPasswordConfiguration_UseLegacyEncoding()
-        {
-            Assert.IsTrue(SettingsSection.Security.MemberPasswordConfiguration.UseLegacyEncoding == false);
+            Assert.IsTrue(MemberPasswordConfiguration.RequireUppercase == false);
         }
 
         [Test]
         public void MemberPasswordConfiguration_HashAlgorithmType()
         {
-            Assert.IsTrue(SettingsSection.Security.MemberPasswordConfiguration.HashAlgorithmType == "HMACSHA256");
+            Assert.IsTrue(MemberPasswordConfiguration.HashAlgorithmType == "HMACSHA256");
         }
 
         [Test]
         public void MemberPasswordConfiguration_MaxFailedAccessAttemptsBeforeLockout()
         {
-            Assert.IsTrue(SettingsSection.Security.MemberPasswordConfiguration.MaxFailedAccessAttemptsBeforeLockout == 5);
+            Assert.IsTrue(MemberPasswordConfiguration.MaxFailedAccessAttemptsBeforeLockout == 5);
         }
     }
 }
