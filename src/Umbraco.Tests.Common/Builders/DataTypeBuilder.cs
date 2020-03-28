@@ -8,6 +8,7 @@ namespace Umbraco.Tests.Common.Builders
         : BuilderBase<DataType>,
             IWithIdBuilder,
             IWithKeyBuilder,
+            IWithCreatorIdBuilder,
             IWithCreateDateBuilder,
             IWithUpdateDateBuilder,
             IWithDeleteDateBuilder,
@@ -131,6 +132,12 @@ namespace Umbraco.Tests.Common.Builders
         {
             get => _key;
             set => _key = value;
+        }
+
+        int? IWithCreatorIdBuilder.CreatorId
+        {
+            get => _creatorId;
+            set => _creatorId = value;
         }
 
         DateTime? IWithCreateDateBuilder.CreateDate
