@@ -2,7 +2,7 @@ angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.MediaController",
         function ($scope, userService, editorService, mediaHelper) {
 
-            $scope.thumbnailUrl = getThumbnailUrl();
+            setThumbnailUrl();
 
             if (!$scope.model.config.startNodeId) {
                 if ($scope.model.config.ignoreUserStartNodes === true) {
@@ -55,26 +55,24 @@ angular.module("umbraco")
                     return; // simply skip that
                 }
 
-                $scope.thumbnailUrl = getThumbnailUrl();
+                setThumbnailUrl();
             }, true);
 
-            function getThumbnailUrl() {
+            function setThumbnailUrl() {
                 if ($scope.control.value && $scope.control.value.image) {
-
-                    var imageOptions;
+                    var url = $scope.control.value.image;
+                    var imageOptions = {};
                     if (url.indexOf('?') == -1) {
                         // set default size if no crop present (moved from the view)
-                        imageOptions = {
-                            animationprocessmode : false,
-                            width: 800
-                        }
+                        imageOptions.animationprocessmode = false;
+                        imageOptions.width = 800;
                     }
                     else {
-                        imageOptions = {
-                            animationprocessmode: "first",
-                            height: $scope.control.editor.config.size.height,
-                            width: $scope.control.editor.config.size.width
-                        };
+                        if ($scope.control.editor.config && $scope.control.editor.config.size) {
+                            imageOptions.animationprocessmode = "first";
+                            imageOptions.height = $scope.control.editor.config.size.height;
+                            imageOptions.width = $scope.control.editor.config.size.width;
+                        }
 
                         if ($scope.control.value.focalPoint) {
                             imageOptions.focalPoint = {
@@ -85,13 +83,11 @@ angular.module("umbraco")
                         }
                     }
 
-                    return mediaHelper.getProcessedImageUrl($scope.control.value.image, imageOptions)
+                    mediaHelper.getProcessedImageUrl($scope.control.value.image, imageOptions)
                         .then(function (url) {
-                            return url;
+                            $scope.thumbnailUrl = url;
                         });
                 }
-
-                return null;
             };
 
         });
