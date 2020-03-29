@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Interfaces;
 
@@ -14,15 +13,14 @@ namespace Umbraco.Tests.Common.Builders
             IWithUpdateDateBuilder,
             IWithNameBuilder
     {
+        private GenericDictionaryBuilder<MemberGroupBuilder, string, object> _additionalDataBuilder;
+
         private int? _id;
         private Guid? _key;
         private DateTime? _createDate;
         private DateTime? _updateDate;
         private string _name;
         private int? _creatorId;
-        private IDictionary<string, object> _additionalData = new Dictionary<string, object>();
-
-        private GenericDictionaryBuilder<MemberGroupBuilder, string, object> _additionalDataBuilder;
 
         public GenericDictionaryBuilder<MemberGroupBuilder, string, object> AddAdditionalData()
         {
@@ -40,7 +38,7 @@ namespace Umbraco.Tests.Common.Builders
             var name = _name ?? Guid.NewGuid().ToString();
             var creatorId = _creatorId ?? 1;
 
-            return new MemberGroup
+            var memberGroup = new MemberGroup
             {
                 Id = id,
                 Key = key,
@@ -49,6 +47,17 @@ namespace Umbraco.Tests.Common.Builders
                 Name = name,
                 CreatorId = creatorId,
             };
+
+            if (_additionalDataBuilder != null)
+            {
+                var additionalData = _additionalDataBuilder.Build();
+                foreach (var kvp in additionalData)
+                {
+                    memberGroup.AdditionalData.Add(kvp.Key, kvp.Value);
+                }
+            }
+
+            return memberGroup;
         }
 
         int? IWithIdBuilder.Id

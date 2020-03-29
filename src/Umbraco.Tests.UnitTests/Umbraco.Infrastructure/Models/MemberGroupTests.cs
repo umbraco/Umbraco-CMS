@@ -59,8 +59,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
                 .WithCreateDate(DateTime.Now)
                 .WithUpdateDate(DateTime.Now)
                 .AddAdditionalData()
-                    .AddKeyValue("test1", 123)
-                    .AddKeyValue("test2", "hello")
+                    .WithKeyValue("test1", 123)
+                    .WithKeyValue("test2", "hello")
                     .Done()
                 .Build();
         }

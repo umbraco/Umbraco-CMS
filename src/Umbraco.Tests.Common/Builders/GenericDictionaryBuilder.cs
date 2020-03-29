@@ -14,10 +14,10 @@ namespace Umbraco.Tests.Common.Builders
 
         public override IDictionary<TKey, TValue> Build()
         {
-            return new Dictionary<TKey, TValue>();
+            return _dictionary;
         }
 
-        public GenericDictionaryBuilder<TBuilder, TKey, TValue> AddKeyValue(TKey key, TValue value)
+        public GenericDictionaryBuilder<TBuilder, TKey, TValue> WithKeyValue(TKey key, TValue value)
         {
             _dictionary.Add(key, value);
             return this;
