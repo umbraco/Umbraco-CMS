@@ -1,10 +1,10 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-    function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage) {
+        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage, notificationsService) {
 
             var vm = this;
-            
+
             vm.submit = submit;
             vm.close = close;
             
@@ -157,7 +157,13 @@ angular.module("umbraco")
             }
 
             function upload(v) {
-                angular.element(".umb-file-dropzone .file-select").trigger("click");
+                var fileSelect = angular.element(".umb-file-dropzone .file-select");
+                if (fileSelect.length === 0){
+                    localizationService.localize('media_uploadNotAllowed').then(function (message) { notificationsService.warning(message); });
+                }
+                else{
+                    angular.element(".umb-file-dropzone .file-select").trigger("click");
+                }
             }
 
             function dragLeave(el, event) {
