@@ -162,7 +162,7 @@ angular.module("umbraco")
                     localizationService.localize('media_uploadNotAllowed').then(function (message) { notificationsService.warning(message); });
                 }
                 else{
-                    angular.element(".umb-file-dropzone .file-select").trigger("click");
+                    fileSelect.trigger("click");
                 }
             }
 
