@@ -169,7 +169,7 @@ namespace Umbraco.Web.Common.AspNetCore
             }
 
             var webProfiler = new WebProfiler(httpContextAccessor);
-            webProfiler.Start();
+            webProfiler.StartBoot();
 
             return webProfiler;
         }

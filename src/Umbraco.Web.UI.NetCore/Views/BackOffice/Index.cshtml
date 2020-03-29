@@ -1,0 +1,20 @@
+﻿@using Umbraco.Composing
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>title</title>
+</head>
+<body>
+<div>
+    Hello World
+    @Html.Raw(Current.Profiler.Render())
+</div>
+</body>
+</html>
+

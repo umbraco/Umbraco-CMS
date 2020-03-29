@@ -51,6 +51,9 @@ namespace Umbraco.Web.Common.Runtime.Profiler
             _umbracoRequestLifetime.RequestStart +=
                 (sender, context) => _profiler.UmbracoApplicationBeginRequest(context);
             _umbracoRequestLifetime.RequestEnd += (sender, context) => _profiler.UmbracoApplicationEndRequest(context);
+
+            // Stop the profiling of the booting process
+            _profiler.StopBoot();
         }
     }
 }

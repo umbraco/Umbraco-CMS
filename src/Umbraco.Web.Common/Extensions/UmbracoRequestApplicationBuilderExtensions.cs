@@ -1,5 +1,6 @@
 using System;
 using Microsoft.AspNetCore.Builder;
+using StackExchange.Profiling;
 using Umbraco.Web.Common.Middleware;
 
 namespace Umbraco.Web.Common.Extensions
@@ -13,9 +14,11 @@ namespace Umbraco.Web.Common.Extensions
                 throw new ArgumentNullException(nameof(app));
             }
 
-            app.UseMiddleware<UmbracoRequestMiddleware>();
 
+            app.UseMiddleware<UmbracoRequestMiddleware>();
+            app.UseMiddleware<MiniProfilerMiddleware>();
             return app;
         }
     }
+
 }

@@ -5,13 +5,19 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using StackExchange.Profiling;
 using Umbraco.Composing;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Web.BackOffice.AspNetCore;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Extensions;
+using Umbraco.Web.Common.Runtime.Profiler;
 using Umbraco.Web.Website.AspNetCore;
 
 
@@ -43,11 +49,19 @@ namespace Umbraco.Web.UI.BackOffice
             services.AddUmbracoConfiguration(_config);
             services.AddUmbracoCore(_webHostEnvironment);
             services.AddUmbracoWebsite();
+
+            services.AddMvc();
+            services.AddMiniProfiler(options =>
+            {
+                options.ShouldProfile = request => false; // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
+        //    app.UseMiniProfiler();
             app.UseUmbracoRequest();
             if (env.IsDevelopment())
             {
@@ -59,14 +73,43 @@ namespace Umbraco.Web.UI.BackOffice
             app.UseUmbracoBackOffice();
 
             app.UseRouting();
-
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute(
+                    "backoffice-spa",
+                    "/umbraco",
+                    new
+                    {
+                        Controller = "BackOffice",
+                        Action = "Index"
+                    }
+                );
                 endpoints.MapGet("/", async context =>
                 {
                     await context.Response.WriteAsync($"<html><body>Hello World!{Current.Profiler.Render()}</body></html>");
                 });
             });
         }
+    }
+
+    public class UmbracoMiniProfilerOptions : MiniProfilerOptions
+    {
+        public UmbracoMiniProfilerOptions()
+        {
+        }
+
+        public new MiniProfiler StartProfiler(string profilerName = null)
+        {
+            return base.StartProfiler();
+        }
+
+        public new Func<HttpRequest, bool> ShouldProfile => (request) =>
+        {
+            if (new Uri(request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsClientSideRequest()) return false;
+            if (bool.TryParse(request.Query["umbDebug"], out var umbDebug)) return umbDebug;
+            if (bool.TryParse(request.Headers["X-UMB-DEBUG"], out var xUmbDebug)) return xUmbDebug;
+            if (bool.TryParse(request.Cookies["UMB-DEBUG"], out var cUmbDebug)) return cUmbDebug;
+            return false;
+        };
     }
 }

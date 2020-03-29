@@ -10,7 +10,7 @@ namespace Umbraco.Web.Common.AspNetCore
             GetAbsoluteUrl = globalSettings.UmbracoPath;
         }
 
-        public string GetAbsoluteUrl { get; }
+        public string GetAbsoluteUrl { get; } // TODO make absolute
 
     }
 }
