@@ -5,7 +5,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models
 {
-    public class ImageProcessorImageUrlGenerator : IImageUrlGenerator
+    public class ImageSharpImageUrlGenerator : IImageUrlGenerator
     {
         public string GetImageUrl(ImageUrlGenerationOptions options)
         {

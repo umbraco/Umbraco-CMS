@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using ClientDependency.Core;
 using ClientDependency.Core.CompositeFiles;
@@ -13,6 +14,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Runtime;
 
 namespace Umbraco.Web.JavaScript.CDF
@@ -25,11 +27,18 @@ namespace Umbraco.Web.JavaScript.CDF
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IManifestParser _manifestParser;
         private readonly IGlobalSettings _globalSettings;
-        private readonly HtmlHelper _htmlHelper;
+        private readonly PropertyEditorCollection _propertyEditorCollection;
 
         public string GetHashValue => ClientDependencySettings.Instance.Version.ToString();
 
-        public ClientDependencyRuntimeMinifier(IHttpContextAccessor httpContextAccessor, IIOHelper ioHelper, ILogger logger, IUmbracoVersion umbracoVersion, IManifestParser manifestParser, IGlobalSettings globalSettings)
+        public ClientDependencyRuntimeMinifier(
+            IHttpContextAccessor httpContextAccessor,
+            IIOHelper ioHelper,
+            ILogger logger,
+            IUmbracoVersion umbracoVersion,
+            IManifestParser manifestParser,
+            IGlobalSettings globalSettings,
+            PropertyEditorCollection propertyEditorCollection)
         {
             _httpContextAccessor = httpContextAccessor;
             _ioHelper = ioHelper;
@@ -37,7 +46,7 @@ namespace Umbraco.Web.JavaScript.CDF
             _umbracoVersion = umbracoVersion;
             _manifestParser = manifestParser;
             _globalSettings = globalSettings;
-            _htmlHelper = new HtmlHelper(new ViewContext(), new ViewPage());
+            _propertyEditorCollection = propertyEditorCollection;
         }
 
         private DependencyRenderer GetDependencyRenderer
@@ -55,9 +64,12 @@ namespace Umbraco.Web.JavaScript.CDF
         }
 
 
-        public void RequiresCss(string filePath, string bundleName)
+        public void RequiresCss(string bundleName, params string[] filePaths)
         {
-            GetDependencyRenderer.RegisterDependency(filePath, bundleName, ClientDependencyType.Css);
+            foreach (var filePath in filePaths)
+            {
+                GetDependencyRenderer.RegisterDependency(filePath, bundleName, ClientDependencyType.Css);
+            }
         }
 
         public string RenderCssHere(string bundleName)
@@ -79,9 +91,12 @@ namespace Umbraco.Web.JavaScript.CDF
             //    ClientDependencyType.Css, path));
         }
 
-        public void RequiresJs(string filePath, string bundleName)
+        public void RequiresJs(string bundleName, params string[] filePaths)
         {
-            GetDependencyRenderer.RegisterDependency(filePath, bundleName, ClientDependencyType.Javascript);
+            foreach (var filePath in filePaths)
+            {
+                GetDependencyRenderer.RegisterDependency(filePath, bundleName, ClientDependencyType.Javascript);
+            }
         }
 
         public string RenderJsHere(string bundleName)
@@ -101,7 +116,7 @@ namespace Umbraco.Web.JavaScript.CDF
 
         }
 
-        public IEnumerable<string> GetAssetPaths(AssetType assetType, List<IAssetFile> attributes)
+        public Task<IEnumerable<string>> GetAssetPathsAsync(AssetType assetType, List<IAssetFile> attributes)
         {
             // get the output string for these registrations which will be processed by CDF correctly to stagger the output based
             // on internal vs external resources. The output will be delimited based on our custom Umbraco.Web.JavaScript.DependencyPathRenderer
@@ -117,12 +132,12 @@ namespace Umbraco.Web.JavaScript.CDF
             renderer.RegisterDependencies(dependencies, new HashSet<IClientDependencyPath>(), out var scripts, out var stylesheets, _httpContextAccessor.HttpContext);
 
             var toParse = assetType == AssetType.Javascript ? scripts : stylesheets;
-            return toParse.Split(new[] { DependencyPathRenderer.Delimiter }, StringSplitOptions.RemoveEmptyEntries);
+            return Task.FromResult<IEnumerable<string>>(toParse.Split(new[] { DependencyPathRenderer.Delimiter }, StringSplitOptions.RemoveEmptyEntries));
         }
 
-        public string Minify(string src, AssetType assetType)
+        public async Task<string> MinifyAsync(string fileContent, AssetType assetType)
         {
-            TextReader reader = new StringReader(src);
+            TextReader reader = new StringReader(fileContent);
 
             if (assetType == AssetType.Javascript)
             {
@@ -145,27 +160,27 @@ namespace Umbraco.Web.JavaScript.CDF
             var clientDependencyTempFilesDeleted = clientDependencyConfig.ClearTempFiles(_httpContextAccessor.HttpContext);
         }
 
-        public string GetScriptForBackOffice()
+        public async Task<string> GetScriptForBackOfficeAsync()
         {
-            var initJs = new JsInitialization(_manifestParser, this);
-            var initCss = new CssInitialization(_manifestParser, this);
+            var initJs = new JsInitialization(_manifestParser, this, _propertyEditorCollection);
+            var initCss = new CssInitialization(_manifestParser, this, _propertyEditorCollection);
 
-            var httpContext = _httpContextAccessor.GetRequiredHttpContext();
-            var files = initJs.OptimizeBackOfficeScriptFiles(httpContext, JsInitialization.GetDefaultInitialization());
-            var result = JavaScriptHelper.GetJavascriptInitialization(httpContext, files, "umbraco", _globalSettings, _ioHelper);
-            result += initCss.GetStylesheetInitialization(httpContext);
+            var requestUrl = _httpContextAccessor.GetRequiredHttpContext().Request.Url;
+            var files = await initJs.OptimizeBackOfficeScriptFilesAsync(requestUrl, JsInitialization.GetDefaultInitialization());
+            var result = JavaScriptHelper.GetJavascriptInitialization(files, "umbraco", _globalSettings, _ioHelper);
+            result += await initCss.GetStylesheetInitializationAsync(requestUrl);
 
             return result;
         }
 
-        public IEnumerable<string> GetAssetList()
+        public async Task<IEnumerable<string>> GetAssetListAsync()
         {
-            var initJs = new JsInitialization(_manifestParser, this);
-            var initCss = new CssInitialization(_manifestParser, this);
+            var initJs = new JsInitialization(_manifestParser, this, _propertyEditorCollection);
+            var initCss = new CssInitialization(_manifestParser, this, _propertyEditorCollection);
             var assets = new List<string>();
-            var httpContext = _httpContextAccessor.GetRequiredHttpContext();
-            assets.AddRange(initJs.OptimizeBackOfficeScriptFiles(httpContext, Enumerable.Empty<string>()));
-            assets.AddRange(initCss.GetStylesheetFiles(httpContext));
+            var requestUrl = _httpContextAccessor.GetRequiredHttpContext().Request.Url;
+            assets.AddRange(await initJs.OptimizeBackOfficeScriptFilesAsync(requestUrl, Enumerable.Empty<string>()));
+            assets.AddRange(await initCss.GetStylesheetFilesAsync(requestUrl));
 
             return assets;
         }

@@ -5,7 +5,7 @@ namespace Umbraco.Web
     /// <summary>
     /// Implements a hybrid <see cref="IUmbracoContextAccessor"/>.
     /// </summary>
-    internal class HybridUmbracoContextAccessor : HybridAccessorBase<IUmbracoContext>, IUmbracoContextAccessor
+    public class HybridUmbracoContextAccessor : HybridAccessorBase<IUmbracoContext>, IUmbracoContextAccessor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="HybridUmbracoContextAccessor"/> class.

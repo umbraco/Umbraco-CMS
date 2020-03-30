@@ -209,7 +209,7 @@ namespace Umbraco.Web.Runtime
             composition.MediaUrlProviders()
                 .Append<DefaultMediaUrlProvider>();
 
-            composition.RegisterUnique<IImageUrlGenerator, ImageProcessorImageUrlGenerator>();
+            composition.RegisterUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
 
             composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
 

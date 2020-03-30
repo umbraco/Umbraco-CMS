@@ -130,7 +130,7 @@ namespace Umbraco.Web
         public static IHtmlString AngularValueTinyMceAssets(this HtmlHelper html, IRuntimeMinifier runtimeMinifier)
         {
             var ctx = new HttpContextWrapper(HttpContext.Current);
-            var files = JavaScriptHelper.OptimizeTinyMceScriptFiles(ctx, runtimeMinifier);
+            var files = JavaScriptHelper.OptimizeTinyMceScriptFilesAsync(ctx.Request.Url, runtimeMinifier).GetAwaiter().GetResult();
 
             var sb = new StringBuilder();
 

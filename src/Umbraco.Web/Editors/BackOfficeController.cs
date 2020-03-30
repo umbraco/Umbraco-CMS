@@ -242,9 +242,9 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [MinifyJavaScriptResult(Order = 0)]
         [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
-        public JavaScriptResult Application()
+        public async Task<JavaScriptResult> Application()
         {
-            var result = _runtimeMinifier.GetScriptForBackOffice();
+            var result = await _runtimeMinifier.GetScriptForBackOfficeAsync();
 
             return JavaScript(result);
         }
@@ -255,21 +255,22 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [UmbracoAuthorize(Order = 0)]
         [HttpGet]
-        public JsonNetResult GetManifestAssetList()
+        public async Task<JsonNetResult> GetManifestAssetList()
         {
-            JArray GetAssetList()
+            async Task<JArray> GetAssetList()
             {
-                var assets = _runtimeMinifier.GetAssetList();
+                var assets = new JArray(await _runtimeMinifier.GetAssetListAsync());
 
                 return new JArray(assets);
             }
 
+            var assetList = await GetAssetList();
             //cache the result if debugging is disabled
             var result = _hostingEnvironment.IsDebugMode
-                ? GetAssetList()
+                ? assetList
                 : AppCaches.RuntimeCache.GetCacheItem<JArray>(
                     "Umbraco.Web.Editors.BackOfficeController.GetManifestAssetList",
-                    GetAssetList,
+                    () => assetList,
                     new TimeSpan(0, 2, 0));
 
             return new JsonNetResult { Data = result, Formatting = Formatting.None };

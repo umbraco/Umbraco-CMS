@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using Umbraco.Infrastructure.RuntimeMinification;
 
 namespace Umbraco.Web.JavaScript
 {
@@ -13,7 +14,7 @@ namespace Umbraco.Web.JavaScript
 
         internal const string Token = "##Variables##";
 
-        internal static string Parse(Dictionary<string, object> items)
+        public static string Parse(Dictionary<string, object> items)
         {
             var vars = Resources.ServerVariables;
 

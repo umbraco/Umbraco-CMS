@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Umbraco.Web.JavaScript {
+namespace Umbraco.Infrastructure.RuntimeMinification {
     using System;
     
     
@@ -19,7 +19,7 @@ namespace Umbraco.Web.JavaScript {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -39,7 +39,7 @@ namespace Umbraco.Web.JavaScript {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Umbraco.Web.JavaScript.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Umbraco.Infrastructure.RuntimeMinification.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -76,9 +76,9 @@ namespace Umbraco.Web.JavaScript {
         ///
         ///    &apos;lib/angular-route/angular-route.js&apos;,
         ///    &apos;lib/angular-cookies/angular-cookies.js&apos;,
+        ///    &apos;lib/angular-aria/angular-aria.min.js&apos;,
         ///    &apos;lib/angular-touch/angular-touch.js&apos;,
-        ///    &apos;lib/angular-sanitize/angular-sanitize.js&apos;,
-        ///    &apos;lib/an [rest of string was truncated]&quot;;.
+        ///    &apos;lib/angula [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string JsInitialize {
             get {
@@ -149,9 +149,18 @@ namespace Umbraco.Web.JavaScript {
         
         /// <summary>
         ///   Looks up a localized string similar to [
-        ///    &apos;../lib/tinymce/tinymce.min.js&apos;,
-        ///]
-        ///.
+        ///    &apos;lib/tinymce/tinymce.min.js&apos;,
+        ///
+        ///    &apos;lib/tinymce/plugins/paste/plugin.min.js&apos;,
+        ///    &apos;lib/tinymce/plugins/anchor/plugin.min.js&apos;,
+        ///    &apos;lib/tinymce/plugins/charmap/plugin.min.js&apos;,
+        ///    &apos;lib/tinymce/plugins/table/plugin.min.js&apos;,
+        ///    &apos;lib/tinymce/plugins/lists/plugin.min.js&apos;,
+        ///    &apos;lib/tinymce/plugins/advlist/plugin.min.js&apos;,
+        ///    &apos;lib/tinymce/plugins/hr/plugin.min.js&apos;,
+        ///    &apos;lib/tinymce/plugins/autolink/plugin.min.js&apos;,
+        ///    &apos;lib/tinymce/plugins/directionality/plugin.min.js&apos;,
+        ///    &apos;lib/tinymce/plugins/t [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string TinyMceInitialize {
             get {

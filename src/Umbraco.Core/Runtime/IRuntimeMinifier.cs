@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Web;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Umbraco.Core.Assets;
 
 namespace Umbraco.Core.Runtime
@@ -10,23 +9,23 @@ namespace Umbraco.Core.Runtime
         string GetHashValue { get; }
 
         //return type HtmlHelper
-        void RequiresCss(string filePath, string bundleName);
+        void RequiresCss(string bundleName, params string[] filePaths);
 
         //return type IHtmlString
         //IClientDependencyPath[]
         string RenderCssHere(string bundleName);
 
         // return type HtmlHelper
-        void RequiresJs(string filePath, string bundleName);
+        void RequiresJs(string bundleName, params string[] filePaths);
 
         // return type IHtmlString
         string RenderJsHere(string bundleName);
 
-        IEnumerable<string> GetAssetPaths(AssetType assetType, List<IAssetFile> attributes);
+        Task<IEnumerable<string>> GetAssetPathsAsync(AssetType assetType, List<IAssetFile> attributes);
 
-        string Minify(string src, AssetType assetType);
+        Task<string> MinifyAsync(string fileContent, AssetType assetType);
         void Reset();
-        string GetScriptForBackOffice();
-        IEnumerable<string> GetAssetList();
+        Task<string> GetScriptForBackOfficeAsync();
+        Task<IEnumerable<string>> GetAssetListAsync();
     }
 }

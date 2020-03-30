@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Assets;
 using Umbraco.Core.Manifest;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Runtime;
+using Umbraco.Infrastructure.RuntimeMinification;
 
 namespace Umbraco.Web.JavaScript
 {
@@ -13,12 +16,12 @@ namespace Umbraco.Web.JavaScript
     /// Reads from all defined manifests and ensures that any of their initialization is output with the
     /// main Umbraco initialization output.
     /// </summary>
-    internal class JsInitialization : AssetInitialization
+    public class JsInitialization : AssetInitialization
     {
         private readonly IManifestParser _parser;
         private readonly IRuntimeMinifier _runtimeMinifier;
 
-        public JsInitialization(IManifestParser parser, IRuntimeMinifier runtimeMinifier) : base(runtimeMinifier)
+        public JsInitialization(IManifestParser parser, IRuntimeMinifier runtimeMinifier, PropertyEditorCollection propertyEditorCollection) : base(runtimeMinifier, propertyEditorCollection)
         {
             _parser = parser;
             _runtimeMinifier = runtimeMinifier;
@@ -27,7 +30,7 @@ namespace Umbraco.Web.JavaScript
         /// <summary>
         /// Returns a list of optimized script paths for the back office
         /// </summary>
-        /// <param name="httpContext"></param>
+        /// <param name="requestUrl"></param>
         /// <param name="umbracoInit"></param>
         /// <param name="additionalJsFiles"></param>
         /// <returns>
@@ -36,7 +39,7 @@ namespace Umbraco.Web.JavaScript
         /// <remarks>
         /// Used to cache bust and optimize script paths for the back office
         /// </remarks>
-        public IEnumerable<string> OptimizeBackOfficeScriptFiles(HttpContextBase httpContext, IEnumerable<string> umbracoInit, IEnumerable<string> additionalJsFiles = null)
+        public async Task<IEnumerable<string>> OptimizeBackOfficeScriptFilesAsync(Uri requestUrl, IEnumerable<string> umbracoInit, IEnumerable<string> additionalJsFiles = null)
         {
             var scripts = new HashSet<string>();
             foreach (var script in umbracoInit)
@@ -47,9 +50,9 @@ namespace Umbraco.Web.JavaScript
                 foreach (var script in additionalJsFiles)
                     scripts.Add(script);
 
-            scripts = new HashSet<string>(JavaScriptHelper.OptimizeAssetCollection(scripts, AssetType.Javascript, httpContext, _runtimeMinifier));
+            scripts = new HashSet<string>(await JavaScriptHelper.OptimizeAssetCollectionAsync(scripts, AssetType.Javascript, requestUrl, _runtimeMinifier));
 
-            foreach (var script in ScanPropertyEditors(AssetType.Javascript, httpContext))
+            foreach (var script in await ScanPropertyEditorsAsync(AssetType.Javascript))
                 scripts.Add(script);
 
             return scripts.ToArray();
@@ -59,7 +62,7 @@ namespace Umbraco.Web.JavaScript
         /// Returns the default config as a JArray
         /// </summary>
         /// <returns></returns>
-        internal static IEnumerable<string> GetDefaultInitialization()
+        public static IEnumerable<string> GetDefaultInitialization()
         {
             var resources = JsonConvert.DeserializeObject<JArray>(Resources.JsInitialize);
             return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString());

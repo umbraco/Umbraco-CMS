@@ -22,6 +22,6 @@ namespace Umbraco.Configuration.Models
         ///     Gets a value indicating whether umbraco is running in [debug mode].
         /// </summary>
         /// <value><c>true</c> if [debug mode]; otherwise, <c>false</c>.</value>
-        public bool DebugMode => _configuration.GetValue(Prefix+":Debug", false);
+        public bool DebugMode => _configuration.GetValue(Prefix+"Debug", false);
     }
 }

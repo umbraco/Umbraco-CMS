@@ -18,10 +18,7 @@
     }
     var runtimeMinifier = Current.RuntimeMinifier;
 
-    runtimeMinifier.RequiresCss("assets/css/umbraco.css", "Umbraco");
-    runtimeMinifier.RequiresCss("lib/bootstrap-social/bootstrap-social.css", "Umbraco");
-    runtimeMinifier.RequiresCss("assets/css/umbraco.css", "Umbraco");
-    runtimeMinifier.RequiresCss("lib/font-awesome/css/font-awesome.min.css", "Umbraco");
+    runtimeMinifier.RequiresCss("Umbraco", "assets/css/umbraco.css", "lib/bootstrap-social/bootstrap-social.css", "assets/css/umbraco.css", "lib/font-awesome/css/font-awesome.min.css");
 
     // Html
     //     .RequiresCss("assets/css/umbraco.css", "Umbraco")

@@ -39,9 +39,6 @@
   </PropertyGroup>
   <PropertyGroup />
   <ItemGroup>
-    <Reference Include="ClientDependency.Core.Mvc, Version=1.9.3.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>C:\Users\Berg\.nuget\packages\clientdependency-mvc5\1.9.3\lib\net45\ClientDependency.Core.Mvc.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -58,9 +55,6 @@
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Web.Mvc, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>C:\Users\Bjarke\.nuget\packages\microsoft.aspnet.mvc\5.2.7\lib\net45\System.Web.Mvc.dll</HintPath>
-    </Reference>
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
@@ -150,11 +144,7 @@
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
     <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
-    <Compile Include="JavaScript\AssetInitialization.cs" />
     <Compile Include="JavaScript\CDF\ClientDependencyRuntimeMinifier.cs" />
-    <Compile Include="JavaScript\CssInitialization.cs" />
-    <Compile Include="JavaScript\JavaScriptHelper.cs" />
-    <Compile Include="JavaScript\JsInitialization.cs" />
     <Compile Include="Models\NoNodesViewModel.cs" />
     <Compile Include="Mvc\RenderNoContentController.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
@@ -277,7 +267,6 @@
     <Compile Include="Editors\UserGroupsController.cs" />
     <Compile Include="Editors\Filters\UserGroupValidateAttribute.cs" />
     <Compile Include="Editors\UsersController.cs" />
-    <Compile Include="HybridUmbracoContextAccessor.cs" />
     <Compile Include="HttpContextUmbracoContextAccessor.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Composing\CompositionExtensions\WebMappingProfiles.cs" />
@@ -388,7 +377,6 @@
     <Compile Include="Editors\MemberTypeController.cs" />
     <Compile Include="Editors\UpdateCheckController.cs" />
     <Compile Include="Editors\StylesheetController.cs" />
-    <Compile Include="PropertyEditors\PropertyEditorAssetAttribute.cs" />
     <Compile Include="PropertyEditors\RteEmbedController.cs" />
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Editors\MemberController.cs" />
@@ -471,12 +459,6 @@
     <Compile Include="Mvc\IRenderMvcController.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
     <Compile Include="Security\WebSecurity.cs" />
-    <Compile Include="JavaScript\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="JavaScript\ServerVariablesParser.cs" />
     <Compile Include="CdfLogger.cs" />
     <Compile Include="Controllers\UmbLoginController.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
@@ -570,23 +552,10 @@
     <Compile Include="Runtime\WebFinalComposer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="JavaScript\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Mvc\Strings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="JavaScript\Main.js" />
-    <EmbeddedResource Include="JavaScript\JsInitialize.js" />
-    <EmbeddedResource Include="JavaScript\ServerVariables.js" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="JavaScript\PreviewInitialize.js" />
-    <None Include="JavaScript\TinyMceInitialize.js" />
-    <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Umbraco.Web.UI\Views\web.config">

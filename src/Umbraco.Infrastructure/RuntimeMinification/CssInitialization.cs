@@ -2,19 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using Umbraco.Core.Assets;
 using Umbraco.Core.Manifest;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Runtime;
 
 namespace Umbraco.Web.JavaScript
 {
-    internal class CssInitialization : AssetInitialization
+    public class CssInitialization : AssetInitialization
     {
         private readonly IManifestParser _parser;
         private readonly IRuntimeMinifier _runtimeMinifier;
 
-        public CssInitialization(IManifestParser parser, IRuntimeMinifier runtimeMinifier) : base(runtimeMinifier)
+        public CssInitialization(
+            IManifestParser parser,
+            IRuntimeMinifier runtimeMinifier,
+            PropertyEditorCollection propertyEditorCollection)
+            : base(runtimeMinifier, propertyEditorCollection)
         {
             _parser = parser;
             _runtimeMinifier = runtimeMinifier;
@@ -23,20 +29,20 @@ namespace Umbraco.Web.JavaScript
         /// <summary>
         /// Processes all found manifest files, and outputs css inject calls for all css files found in all manifests.
         /// </summary>
-        public string GetStylesheetInitialization(HttpContextBase httpContext)
+        public async Task<string> GetStylesheetInitializationAsync(Uri requestUrl)
         {
-            var files = GetStylesheetFiles(httpContext);
+            var files = await GetStylesheetFilesAsync(requestUrl);
             return WriteScript(files);
         }
 
-        public IEnumerable<string> GetStylesheetFiles(HttpContextBase httpContext)
+        public async Task<IEnumerable<string>> GetStylesheetFilesAsync(Uri requestUrl)
         {
             var stylesheets = new HashSet<string>();
-            var optimizedManifest = JavaScriptHelper.OptimizeAssetCollection(_parser.Manifest.Stylesheets, AssetType.Css, httpContext, _runtimeMinifier);
+            var optimizedManifest = await JavaScriptHelper.OptimizeAssetCollectionAsync(_parser.Manifest.Stylesheets, AssetType.Css, requestUrl, _runtimeMinifier);
             foreach (var stylesheet in optimizedManifest)
                 stylesheets.Add(stylesheet);
 
-            foreach (var stylesheet in ScanPropertyEditors(AssetType.Css, httpContext))
+            foreach (var stylesheet in await ScanPropertyEditorsAsync(AssetType.Css))
                 stylesheets.Add(stylesheet);
 
             return stylesheets.ToArray();

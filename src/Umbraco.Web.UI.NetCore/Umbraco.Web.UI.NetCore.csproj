@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <RootNamespace>Umbraco.Web.UI.BackOffice</RootNamespace>
+        <RootNamespace>Umbraco.Web.UI.NetCore</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,8 +15,23 @@
     </ItemGroup>
 
     <ItemGroup>
-      <_ContentIncludedByDefault Remove="wwwroot\~\App_Data\TEMP\TypesCache\umbraco-types.DESKTOP-2016.hash" />
-      <_ContentIncludedByDefault Remove="wwwroot\~\App_Data\TEMP\TypesCache\umbraco-types.DESKTOP-2016.list" />
+      <Compile Remove="Umbraco\**" />
+      <Compile Remove="wwwroot\Umbraco\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Umbraco\**" />
+      <EmbeddedResource Remove="wwwroot\Umbraco\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Umbraco\**" />
+      <None Remove="wwwroot\Umbraco\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="Umbraco\**" />
+      <Content Remove="wwwroot\Umbraco\**" />
     </ItemGroup>
 
 </Project>

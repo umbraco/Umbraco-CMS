@@ -1,92 +1,145 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
 using Smidge;
-using Smidge.Cache;
+using Smidge.CompositeFiles;
 using Smidge.FileProcessors;
 using Smidge.Nuglify;
-using Smidge.Models;
+using Umbraco.Core;
 using Umbraco.Core.Assets;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
+using Umbraco.Core.IO;
+using Umbraco.Core.Manifest;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Runtime;
+using Umbraco.Web.JavaScript;
+using CssFile = Smidge.Models.CssFile;
+using JavaScriptFile = Smidge.Models.JavaScriptFile;
 
 namespace Umbraco.Web.BackOffice.Smidge
 {
     public class SmidgeRuntimeMinifier : IRuntimeMinifier
     {
+        private readonly IGlobalSettings _globalSettings;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ISmidgeConfig _smidgeConfig;
+        private readonly IManifestParser _manifestParser;
+        private readonly PreProcessPipelineFactory _preProcessPipelineFactory;
+        private readonly PropertyEditorCollection _propertyEditorCollection;
         private readonly SmidgeHelper _smidge;
 
-        // TODO: We need to use IConfiguration to get the section (ConfigurationManager is not the way to do it)
-        public string GetHashValue => new SmidgeConfig((IConfiguration)ConfigurationManager.GetSection("Umbraco:Smidge")).Version;
+        private PreProcessPipeline _jsPipeline;
+        private PreProcessPipeline _cssPipeline;
 
-        public SmidgeRuntimeMinifier(SmidgeHelper smidge)
+        public SmidgeRuntimeMinifier(
+            SmidgeHelper smidge,
+            PreProcessPipelineFactory preProcessPipelineFactory,
+            IManifestParser manifestParser,
+            IHttpContextAccessor httpContextAccessor,
+            PropertyEditorCollection propertyEditorCollection,
+            IGlobalSettings globalSettings,
+            IIOHelper ioHelper,
+            IHostingEnvironment hostingEnvironment,
+            ISmidgeConfig smidgeConfig)
         {
             _smidge = smidge;
-        }
-        public void RequiresCss(string filePath, string bundleName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string RenderCssHere(string bundleName)
-        {
-            return _smidge.CssHereAsync(bundleName).ToString();
-        }
-
-        public void RequiresJs(string filePath, string bundleName)
-        {
-            throw new NotImplementedException();
+            _preProcessPipelineFactory = preProcessPipelineFactory;
+            _manifestParser = manifestParser;
+            _httpContextAccessor = httpContextAccessor;
+            _propertyEditorCollection = propertyEditorCollection;
+            _globalSettings = globalSettings;
+            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
+            _smidgeConfig = smidgeConfig;
         }
 
-        public string RenderJsHere(string bundleName)
+        private PreProcessPipeline JsPipeline  => _jsPipeline ??= _preProcessPipelineFactory.Create(typeof(JsMinifier));
+        private PreProcessPipeline CssPipeline  => _cssPipeline ??= _preProcessPipelineFactory.Create(typeof(NuglifyCss));
+
+        private Uri GetRequestUrl() => new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl(), UriKind.Absolute);
+        public string GetHashValue => _smidgeConfig.Version;
+
+        public void RequiresCss(string bundleName, params string[] filePaths) => _smidge.CreateCssBundle(bundleName).RequiresCss(filePaths);
+        public string RenderCssHere(string bundleName) => _smidge.CssHereAsync(bundleName).ToString();
+        public void RequiresJs(string bundleName, params string[] filePaths) =>     _smidge.CreateJsBundle(bundleName).RequiresJs(filePaths);
+        public string RenderJsHere(string bundleName) => _smidge.JsHereAsync(bundleName).ToString();
+
+        public async Task<IEnumerable<string>> GetAssetPathsAsync(AssetType assetType, List<IAssetFile> attributes)
         {
-            return _smidge.JsHereAsync(bundleName).ToString();
-        }
 
-        public IEnumerable<string> GetAssetPaths(AssetType assetType, List<IAssetFile> attributes)
-        {
-            var parsed = new List<string>();
+            var files =  attributes
+                .Where(x => x.DependencyType == assetType)
+                .Select(x=>x.FilePath)
+                .ToArray();
 
-            if (assetType == AssetType.Javascript)
-                attributes.ForEach(x => parsed.AddRange(_smidge.GenerateJsUrlsAsync(x.Bundle).Result));
-            else
-                attributes.ForEach(x => parsed.AddRange(_smidge.GenerateCssUrlsAsync(x.Bundle).Result));
+            if (files.Length == 0) return Array.Empty<string>();
 
-            return parsed;
-        }
-
-        public string Minify(string src, AssetType assetType)
-        {
             if (assetType == AssetType.Javascript)
             {
+                _smidge.RequiresJs(files);
 
-                // TODO: use NuglifyJs to minify JS files (https://github.com/Shazwazza/Smidge/blob/master/src/Smidge.Nuglify/NuglifyJs.cs)
+                return await _smidge.GenerateJsUrlsAsync(JsPipeline, _hostingEnvironment.IsDebugMode);
             }
             else
             {
-                // TODO: use NuglifyCss to minify CSS files (https://github.com/Shazwazza/Smidge/blob/master/src/Smidge.Nuglify/NuglifyCss.cs)
-            }
+                _smidge.RequiresCss(files);
 
-            throw new NotImplementedException();
+                return await _smidge.GenerateJsUrlsAsync(CssPipeline, _hostingEnvironment.IsDebugMode);
+            }
+        }
+
+        public async Task<string> MinifyAsync(string fileContent, AssetType assetType)
+        {
+            if (assetType == AssetType.Javascript)
+            {
+                return await JsPipeline
+                    .ProcessAsync(
+                        new FileProcessContext(fileContent, new JavaScriptFile(), BundleContext.CreateEmpty()));
+            }
+            else
+            {
+                return await CssPipeline
+                    .ProcessAsync(new FileProcessContext(fileContent, new CssFile(), BundleContext.CreateEmpty()));
+            }
         }
 
         public void Reset()
         {
             // TODO: Need to figure out how to delete temp directories to make sure we get fresh caches
-
-            throw new NotImplementedException();
         }
 
-        public string GetScriptForBackOffice()
+        public async Task<string> GetScriptForBackOfficeAsync()
         {
-            throw new NotImplementedException();
+            var initJs = new JsInitialization(_manifestParser, this, _propertyEditorCollection);
+            var initCss = new CssInitialization(_manifestParser, this, _propertyEditorCollection);
+
+            var requestUrl = GetRequestUrl();
+            var files = await initJs.OptimizeBackOfficeScriptFilesAsync(requestUrl, JsInitialization.GetDefaultInitialization());
+            var result = JavaScriptHelper.GetJavascriptInitialization(files, "umbraco", _globalSettings, _ioHelper);
+            result += await initCss.GetStylesheetInitializationAsync(requestUrl);
+
+            return result;
         }
 
-        public IEnumerable<string> GetAssetList()
+        public async Task<IEnumerable<string>> GetAssetListAsync()
         {
-            throw new NotImplementedException();
+            var initJs = new JsInitialization(_manifestParser, this, _propertyEditorCollection);
+            var initCss = new CssInitialization(_manifestParser, this, _propertyEditorCollection);
+            var assets = new List<string>();
+            var requestUrl = GetRequestUrl();
+            assets.AddRange(await initJs.OptimizeBackOfficeScriptFilesAsync(requestUrl, Enumerable.Empty<string>()));
+            assets.AddRange(await initCss.GetStylesheetFilesAsync(requestUrl));
+
+            return assets;
         }
+
+
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
@@ -11,6 +11,7 @@ using Umbraco.Core.Assets;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Runtime;
+using Umbraco.Infrastructure.RuntimeMinification;
 
 namespace Umbraco.Web.JavaScript
 {
@@ -28,13 +29,12 @@ namespace Umbraco.Web.JavaScript
         /// <summary>
         /// Gets the JS initialization script to boot the back office application
         /// </summary>
-        /// <param name="httpContext"></param>
         /// <param name="scripts"></param>
         /// <param name="angularModule">
         /// The angular module name to boot
         /// </param>
         /// <returns></returns>
-        public static string GetJavascriptInitialization(HttpContextBase httpContext, IEnumerable<string> scripts, string angularModule, IGlobalSettings globalSettings, IIOHelper ioHelper)
+        public static string GetJavascriptInitialization(IEnumerable<string> scripts, string angularModule, IGlobalSettings globalSettings, IIOHelper ioHelper)
         {
             var jarray = new StringBuilder();
             jarray.AppendLine("[");
@@ -80,9 +80,9 @@ namespace Umbraco.Web.JavaScript
             return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString());
         }
 
-        internal static IEnumerable<string> OptimizeTinyMceScriptFiles(HttpContextBase httpContext, IRuntimeMinifier runtimeMinifier)
+        public static async Task<IEnumerable<string>> OptimizeTinyMceScriptFilesAsync(Uri requestUrl, IRuntimeMinifier runtimeMinifier)
         {
-            return OptimizeScriptFiles(httpContext, GetTinyMceInitialization(), runtimeMinifier);
+            return await OptimizeScriptFilesAsync(requestUrl, GetTinyMceInitialization(), runtimeMinifier);
         }
 
 
@@ -90,7 +90,7 @@ namespace Umbraco.Web.JavaScript
         /// Returns the default config as a JArray
         /// </summary>
         /// <returns></returns>
-        internal static IEnumerable<string> GetPreviewInitialization()
+        public static IEnumerable<string> GetPreviewInitialization()
         {
             var resources = JsonConvert.DeserializeObject<JArray>(Resources.PreviewInitialize);
             return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString());
@@ -100,30 +100,27 @@ namespace Umbraco.Web.JavaScript
         /// <summary>
         /// Returns a list of optimized script paths
         /// </summary>
-        /// <param name="httpContext"></param>
+        /// <param name="requestUrl"></param>
         /// <param name="scriptFiles"></param>
         /// <param name="runtimeMinifier"></param>
         /// <returns></returns>
         /// <remarks>
         /// Used to cache bust and optimize script paths
         /// </remarks>
-        public static IEnumerable<string> OptimizeScriptFiles(HttpContextBase httpContext, IEnumerable<string> scriptFiles, IRuntimeMinifier runtimeMinifier)
+        public static async Task<IEnumerable<string>> OptimizeScriptFilesAsync(Uri requestUrl, IEnumerable<string> scriptFiles, IRuntimeMinifier runtimeMinifier)
         {
             var scripts = new HashSet<string>();
             foreach (var script in scriptFiles)
                 scripts.Add(script);
 
-            scripts = new HashSet<string>(OptimizeAssetCollection(scripts, AssetType.Javascript, httpContext, runtimeMinifier));
+            scripts = new HashSet<string>(await OptimizeAssetCollectionAsync(scripts, AssetType.Javascript, requestUrl, runtimeMinifier));
 
             return scripts.ToArray();
         }
 
-        internal static IEnumerable<string> OptimizeAssetCollection(IEnumerable<string> assets, AssetType assetType, HttpContextBase httpContext, IRuntimeMinifier runtimeMinifier)
+        internal static async Task<IEnumerable<string>> OptimizeAssetCollectionAsync(IEnumerable<string> assets, AssetType assetType, Uri requestUrl, IRuntimeMinifier runtimeMinifier)
         {
-            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
-
-            var requestUrl = httpContext.Request.Url;
-            if (requestUrl == null) throw new ArgumentException("HttpContext.Request.Url is null.", nameof(httpContext));
+            if (requestUrl == null) throw new ArgumentNullException(nameof(requestUrl));
 
             var dependencies = assets.Where(x => x.IsNullOrWhiteSpace() == false).Select(x =>
             {
@@ -140,7 +137,7 @@ namespace Umbraco.Web.JavaScript
             }).ToList();
 
 
-            return runtimeMinifier.GetAssetPaths(assetType, dependencies);;
+            return await runtimeMinifier.GetAssetPathsAsync(assetType, dependencies);
         }
     }
 }

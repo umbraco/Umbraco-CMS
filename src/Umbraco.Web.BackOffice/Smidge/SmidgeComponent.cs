@@ -8,12 +8,12 @@ namespace Umbraco.Web.BackOffice.Smidge
     {
         public void Initialize()
         {
-            throw new NotImplementedException();
+
         }
 
         public void Terminate()
         {
-            throw new NotImplementedException();
+
         }
     }
 }

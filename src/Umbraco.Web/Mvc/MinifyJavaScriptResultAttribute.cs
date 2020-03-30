@@ -44,7 +44,7 @@ namespace Umbraco.Web.Mvc
 
             //minify the result
             var result = jsResult.Script;
-            var minified = _runtimeMinifier.Minify(result, AssetType.Javascript);
+            var minified = _runtimeMinifier.MinifyAsync(result, AssetType.Javascript).GetAwaiter().GetResult();
             jsResult.Script = minified;
         }
     }

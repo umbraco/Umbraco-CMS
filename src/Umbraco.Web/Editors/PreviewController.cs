@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
@@ -99,10 +100,12 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [MinifyJavaScriptResult(Order = 0)]
         [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
-        public JavaScriptResult Application()
+        public async Task<JavaScriptResult> Application()
         {
-            var files = JavaScriptHelper.OptimizeScriptFiles(HttpContext, JavaScriptHelper.GetPreviewInitialization(), _runtimeMinifier);
-            var result = JavaScriptHelper.GetJavascriptInitialization(HttpContext, files, "umbraco.preview", _globalSettings, _ioHelper);
+
+
+            var files = await JavaScriptHelper.OptimizeScriptFilesAsync(HttpContext.Request.Url, JavaScriptHelper.GetPreviewInitialization(), _runtimeMinifier);
+            var result = JavaScriptHelper.GetJavascriptInitialization(files, "umbraco.preview", _globalSettings, _ioHelper);
 
             return JavaScript(result);
         }

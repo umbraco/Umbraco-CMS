@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Smidge;
 using Umbraco.Web.BackOffice.AspNetCore;
+using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Website.AspNetCore;
 
 
@@ -41,6 +43,8 @@ namespace Umbraco.Web.UI.BackOffice
             services.AddUmbracoRuntimeMinifier(_config);
             services.AddUmbracoCore(_webHostEnvironment);
             services.AddUmbracoWebsite();
+
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,14 +54,22 @@ namespace Umbraco.Web.UI.BackOffice
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.Use(async (context, next) =>
+            {
+                await next();
+            });
 
             app.UseUmbracoWebsite();
             app.UseUmbracoBackOffice();
-
             app.UseRouting();
-
+            app.UseUmbracoRuntimeMinification();
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute("Backoffice", "/umbraco/{Action}", new
+                {
+                    Controller = "BackOffice",
+                    Action = "Default"
+                });
                 endpoints.MapGet("/", async context => { await context.Response.WriteAsync("Hello World!"); });
             });
         }

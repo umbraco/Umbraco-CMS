@@ -7,12 +7,11 @@ using Umbraco.Core.Runtime;
 
 namespace Umbraco.Web.BackOffice.Smidge
 {
-    public sealed class SmidgeComposer : ComponentComposer<SmidgeComponent>
+    public sealed class SmidgeComposer : IComposer
     {
-        public override void Compose(Composition composition)
+        public void Compose(Composition composition)
         {
-            base.Compose(composition);
-            composition.RegisterUnique<IRuntimeMinifier, SmidgeRuntimeMinifier>();
+            composition.Register<IRuntimeMinifier, SmidgeRuntimeMinifier>(Lifetime.Scope);
         }
     }
 }

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Smidge;
+using Smidge.Nuglify;
 using Umbraco.Composing;
 using Umbraco.Configuration;
 using Umbraco.Core;
@@ -166,6 +167,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             IConfiguration configuration)
         {
             services.AddSmidge(configuration.GetSection(Constants.Configuration.ConfigPrefix+"RuntimeMinification"));
+            services.AddSmidgeNuglify();
 
             return services;
         }
