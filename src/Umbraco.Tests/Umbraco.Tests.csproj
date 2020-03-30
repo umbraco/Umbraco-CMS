@@ -148,6 +148,7 @@
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />
+    <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="UmbracoExamine\ExamineExtensions.cs" />
     <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionTests.cs" />
     <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />
@@ -231,11 +232,8 @@
     <Compile Include="Persistence\NPocoTests\NPocoSqlExtensionsTests.cs" />
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
-    <Compile Include="Testing\TestOptionAttributeBase.cs" />
-    <Compile Include="Testing\UmbracoTestAttribute.cs" />
     <Compile Include="Testing\UmbracoTestBase.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
-    <Compile Include="Testing\UmbracoTestOptions.cs" />
     <Compile Include="CoreThings\TryConvertToTests.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
@@ -267,7 +265,6 @@
     <Compile Include="Web\ModelStateExtensionsTests.cs" />
     <Compile Include="Web\Mvc\RenderIndexActionSelectorAttributeTests.cs" />
     <Compile Include="Persistence\NPocoTests\PetaPocoCachesTest.cs" />
-    <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\PartialViewRepositoryTests.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepositoryTest.cs" />
@@ -344,7 +341,6 @@
     <Compile Include="Persistence\Repositories\TagRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\NotificationsRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TemplateRepositoryTest.cs" />
-    <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="Models\Mapping\ContentWebModelMappingTests.cs" />
     <Compile Include="PropertyEditors\ImageCropperTest.cs" />
     <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />

@@ -462,13 +462,13 @@ namespace Umbraco.Tests.Testing
             var globalSettings = TestHelper.GetConfigs().Global();
             var connectionStrings = TestHelper.GetConfigs().ConnectionStrings();
 
-            Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(
-                Constants.System.UmbracoConnectionName,
+            Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(Logger,
                 globalSettings,
                 connectionStrings,
-                Logger,
+                Constants.System.UmbracoConnectionName,
                 new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>),
                 TestHelper.DbProviderFactoryCreator));
+
             Composition.RegisterUnique(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
             Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty

@@ -32,4 +32,10 @@
       <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+            <_Parameter1>Umbraco.Tests.Integration</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
 </Project>

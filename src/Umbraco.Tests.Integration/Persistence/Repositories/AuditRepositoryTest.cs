@@ -1,29 +1,29 @@
 ﻿using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
-using Umbraco.Core;
 
-namespace Umbraco.Tests.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
-    public class AuditRepositoryTest : TestWithDatabaseBase
+    public class AuditRepositoryTest : UmbracoIntegrationTest
     {
 
         [Test]
         public void Can_Add_Audit_Entry()
         {
-            var sp = TestObjects.GetScopeProvider(Logger);
-            using (var scope = sp.CreateScope())
+            var sp = ScopeProvider;
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new AuditRepository((IScopeAccessor) sp, Logger);
-                repo.Save(new AuditItem(-1, AuditType.System, -1, ObjectTypes.GetName(UmbracoObjectTypes.Document), "This is a System audit trail"));
+                var repo = new AuditRepository((IScopeAccessor)sp, Logger);
+                repo.Save(new AuditItem(-1, AuditType.System, -1, UmbracoObjectTypes.Document.GetName(), "This is a System audit trail"));
 
                 var dtos = scope.Database.Fetch<LogDto>("WHERE id > -1");
 
@@ -35,15 +35,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Get_Paged_Items()
         {
-            var sp = TestObjects.GetScopeProvider(Logger);
+            var sp = ScopeProvider;
             using (var scope = sp.CreateScope())
             {
-                var repo = new AuditRepository((IScopeAccessor) sp, Logger);
+                var repo = new AuditRepository((IScopeAccessor)sp, Logger);
 
                 for (var i = 0; i < 100; i++)
                 {
-                    repo.Save(new AuditItem(i, AuditType.New, -1, ObjectTypes.GetName(UmbracoObjectTypes.Document), $"Content {i} created"));
-                    repo.Save(new AuditItem(i, AuditType.Publish, -1, ObjectTypes.GetName(UmbracoObjectTypes.Document), $"Content {i} published"));
+                    repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} created"));
+                    repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} published"));
                 }
 
                 scope.Complete();
@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             using (var scope = sp.CreateScope())
             {
-                var repo = new AuditRepository((IScopeAccessor) sp, Logger);
+                var repo = new AuditRepository((IScopeAccessor)sp, Logger);
 
                 var page = repo.GetPagedResultsByQuery(sp.SqlContext.Query<IAuditItem>(), 0, 10, out var total, Direction.Descending, null, null);
 
@@ -63,15 +63,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Get_Paged_Items_By_User_Id_With_Query_And_Filter()
         {
-            var sp = TestObjects.GetScopeProvider(Logger);
+            var sp = ScopeProvider;
             using (var scope = sp.CreateScope())
             {
                 var repo = new AuditRepository((IScopeAccessor)sp, Logger);
 
                 for (var i = 0; i < 100; i++)
                 {
-                    repo.Save(new AuditItem(i, AuditType.New, -1, ObjectTypes.GetName(UmbracoObjectTypes.Document), $"Content {i} created"));
-                    repo.Save(new AuditItem(i, AuditType.Publish, -1, ObjectTypes.GetName(UmbracoObjectTypes.Document), $"Content {i} published"));
+                    repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} created"));
+                    repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} published"));
                 }
 
                 scope.Complete();
@@ -106,15 +106,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Get_Paged_Items_With_AuditType_Filter()
         {
-            var sp = TestObjects.GetScopeProvider(Logger);
+            var sp = ScopeProvider;
             using (var scope = sp.CreateScope())
             {
-                var repo = new AuditRepository((IScopeAccessor) sp, Logger);
+                var repo = new AuditRepository((IScopeAccessor)sp, Logger);
 
                 for (var i = 0; i < 100; i++)
                 {
-                    repo.Save(new AuditItem(i, AuditType.New, -1, ObjectTypes.GetName(UmbracoObjectTypes.Document), $"Content {i} created"));
-                    repo.Save(new AuditItem(i, AuditType.Publish, -1, ObjectTypes.GetName(UmbracoObjectTypes.Document), $"Content {i} published"));
+                    repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} created"));
+                    repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} published"));
                 }
 
                 scope.Complete();
@@ -122,10 +122,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             using (var scope = sp.CreateScope())
             {
-                var repo = new AuditRepository((IScopeAccessor) sp, Logger);
+                var repo = new AuditRepository((IScopeAccessor)sp, Logger);
 
                 var page = repo.GetPagedResultsByQuery(sp.SqlContext.Query<IAuditItem>(), 0, 9, out var total, Direction.Descending,
-                        new[] {AuditType.Publish}, null)
+                        new[] { AuditType.Publish }, null)
                     .ToArray();
 
                 Assert.AreEqual(9, page.Length);
@@ -137,15 +137,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Get_Paged_Items_With_Custom_Filter()
         {
-            var sp = TestObjects.GetScopeProvider(Logger);
+            var sp = ScopeProvider;
             using (var scope = sp.CreateScope())
             {
-                var repo = new AuditRepository((IScopeAccessor) sp, Logger);
+                var repo = new AuditRepository((IScopeAccessor)sp, Logger);
 
                 for (var i = 0; i < 100; i++)
                 {
-                    repo.Save(new AuditItem(i, AuditType.New, -1, ObjectTypes.GetName(UmbracoObjectTypes.Document), "Content created"));
-                    repo.Save(new AuditItem(i, AuditType.Publish, -1, ObjectTypes.GetName(UmbracoObjectTypes.Document), "Content published"));
+                    repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), "Content created"));
+                    repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), "Content published"));
                 }
 
                 scope.Complete();
@@ -153,7 +153,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             using (var scope = sp.CreateScope())
             {
-                var repo = new AuditRepository((IScopeAccessor) sp, Logger);
+                var repo = new AuditRepository((IScopeAccessor)sp, Logger);
 
                 var page = repo.GetPagedResultsByQuery(sp.SqlContext.Query<IAuditItem>(), 0, 8, out var total, Direction.Descending,
                         null, sp.SqlContext.Query<IAuditItem>().Where(item => item.Comment == "Content created"))

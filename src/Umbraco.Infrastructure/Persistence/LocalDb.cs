@@ -253,6 +253,11 @@ namespace Umbraco.Core.Persistence
                 _masterCstr = $@"Server=(localdb)\{instanceName};Integrated Security=True;";
             }
 
+            public static string GetConnectionString(string instanceName, string databaseName)
+            {
+                return $@"Server=(localdb)\{instanceName};Integrated Security=True;Database={databaseName};";
+            }
+
             /// <summary>
             /// Gets a LocalDb connection string.
             /// </summary>
