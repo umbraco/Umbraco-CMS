@@ -13,7 +13,7 @@ namespace Umbraco.Core.Configuration
         private readonly IGlobalSettings _globalSettings;
 
         public UmbracoVersion(IGlobalSettings globalSettings)
-        :this()
+        : this()
         {
             _globalSettings = globalSettings;
         }
@@ -55,7 +55,7 @@ namespace Umbraco.Core.Configuration
         /// <para>Is the one that the CLR checks for compatibility. Therefore, it changes only on
         /// hard-breaking changes (for instance, on new major versions).</para>
         /// </remarks>
-        public Version AssemblyVersion {get; }
+        public Version AssemblyVersion { get; }
 
         /// <summary>
         /// Gets the assembly file version of the Umbraco code.
@@ -83,11 +83,13 @@ namespace Umbraco.Core.Configuration
         /// and changes during an upgrade. The executing code version changes when new code is
         /// deployed. The site/files version changes during an upgrade.</para>
         /// </remarks>
-        public SemVersion LocalVersion {
+        public SemVersion LocalVersion
+        {
             get
             {
                 var value = _globalSettings.ConfigurationStatus;
                 return value.IsNullOrWhiteSpace() ? null : SemVersion.TryParse(value, out var semver) ? semver : null;
-            } }
+            }
+        }
     }
 }

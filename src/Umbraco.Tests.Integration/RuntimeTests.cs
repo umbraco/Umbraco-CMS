@@ -11,9 +11,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Umbraco.Configuration.Models;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.LightInject;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
@@ -40,7 +42,7 @@ namespace Umbraco.Tests.Integration
         [OneTimeTearDown]
         public void FixtureTearDown()
         {
-            TestLocalDb.Cleanup();
+            
         }
 
         /// <summary>
@@ -174,8 +176,6 @@ namespace Umbraco.Tests.Integration
             var testHelper = new TestHelper();
 
             var hostBuilder = new HostBuilder()
-                //TODO: Need to have a configured umb version for the runtime state
-                .UseLocalDb(Path.Combine(testHelper.CurrentAssemblyDirectory, "LocalDb"))
                 .UseUmbraco(serviceProviderFactory)
                 .ConfigureServices((hostContext, services) =>
                 {
@@ -190,26 +190,13 @@ namespace Umbraco.Tests.Integration
             var host = await hostBuilder.StartAsync();
             var app = new ApplicationBuilder(host.Services);
 
+            // This will create a db, install the schema and ensure the app is configured to run
+            app.UseTestLocalDb(Path.Combine(testHelper.CurrentAssemblyDirectory, "LocalDb"));
+
             app.UseUmbracoCore();
 
-
-            var runtimeState = (RuntimeState)app.ApplicationServices.GetRequiredService<IRuntimeState>();
-            Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
-
-            var dbBuilder = app.ApplicationServices.GetRequiredService<DatabaseBuilder>();
-            Assert.IsNotNull(dbBuilder);
-
-            var canConnect = dbBuilder.CanConnectToDatabase;
-            Assert.IsTrue(canConnect);
-
-            var dbResult = dbBuilder.CreateSchemaAndData();
-            Assert.IsTrue(dbResult.Success);
-
-            // TODO: Get this to work ... but to do that we need to mock or pass in a current umbraco version
-            //var dbFactory = app.ApplicationServices.GetRequiredService<IUmbracoDatabaseFactory>();
-            //var profilingLogger = app.ApplicationServices.GetRequiredService<IProfilingLogger>();
-            //runtimeState.DetermineRuntimeLevel(dbFactory, profilingLogger);
-            //Assert.AreEqual(RuntimeLevel.Run, runtimeState.Level);
+            var runtimeState = app.ApplicationServices.GetRequiredService<IRuntimeState>();
+            Assert.AreEqual(RuntimeLevel.Run, runtimeState.Level);
         }
 
         internal static LightInjectContainer GetUmbracoContainer(out UmbracoServiceProviderFactory serviceProviderFactory)

@@ -244,11 +244,10 @@ namespace Umbraco.Tests.TestHelpers
                 // mappersBuilder.AddCore();
                 // var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Factory.GetInstance<IMapperCollection>();
-                databaseFactory = new UmbracoDatabaseFactory(
-                    Constants.System.UmbracoConnectionName,
+                databaseFactory = new UmbracoDatabaseFactory(logger,
                     SettingsForTests.GetDefaultGlobalSettings(),
                     new ConnectionStrings(),
-                    logger,
+                    Constants.System.UmbracoConnectionName,
                     new Lazy<IMapperCollection>(() => mappers),
                     TestHelper.DbProviderFactoryCreator);
             }
