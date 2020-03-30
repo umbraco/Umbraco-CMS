@@ -29,7 +29,6 @@ namespace Umbraco.Core.Persistence
     {
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly IGlobalSettings _globalSettings;
-        private readonly IConnectionStrings _connectionStrings;
         private readonly Lazy<IMapperCollection> _mappers;
         private readonly ILogger _logger;
 
@@ -37,7 +36,6 @@ namespace Umbraco.Core.Persistence
 
         private DatabaseFactory _npocoDatabaseFactory;
         private IPocoDataFactory _pocoDataFactory;
-        private string _connectionString;
         private string _providerName;
         private DatabaseType _databaseType;
         private ISqlSyntaxProvider _sqlSyntax;
@@ -73,7 +71,7 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         /// <remarks>Used by core runtime.</remarks>
         public UmbracoDatabaseFactory(ILogger logger, IGlobalSettings globalSettings, IConnectionStrings connectionStrings, Lazy<IMapperCollection> mappers,IDbProviderFactoryCreator dbProviderFactoryCreator)
-            : this(Constants.System.UmbracoConnectionName, globalSettings, connectionStrings, logger, mappers, dbProviderFactoryCreator)
+            : this(logger, globalSettings, connectionStrings, Constants.System.UmbracoConnectionName, mappers, dbProviderFactoryCreator)
         {
 
         }
@@ -82,13 +80,12 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used by the other ctor and in tests.</remarks>
-        public UmbracoDatabaseFactory(string connectionStringName, IGlobalSettings globalSettings, IConnectionStrings connectionStrings, ILogger logger, Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator)
+        public UmbracoDatabaseFactory(ILogger logger, IGlobalSettings globalSettings, IConnectionStrings connectionStrings, string connectionStringName, Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
             if (connectionStringName == null) throw new ArgumentNullException(nameof(connectionStringName));
             if (string.IsNullOrWhiteSpace(connectionStringName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(connectionStringName));
 
             _globalSettings = globalSettings;
-            _connectionStrings = connectionStrings;
             _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
             _dbProviderFactoryCreator = dbProviderFactoryCreator  ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -118,7 +115,7 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used in tests.</remarks>
-        public UmbracoDatabaseFactory(string connectionString, string providerName, ILogger logger, Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator)
+        public UmbracoDatabaseFactory(ILogger logger, string connectionString, string providerName, Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
             _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -142,7 +139,7 @@ namespace Umbraco.Core.Persistence
             {
                 lock (_lock)
                 {
-                    return !_connectionString.IsNullOrWhiteSpace() && !_providerName.IsNullOrWhiteSpace();
+                    return !ConnectionString.IsNullOrWhiteSpace() && !_providerName.IsNullOrWhiteSpace();
                 }
             }
         }
@@ -151,13 +148,13 @@ namespace Umbraco.Core.Persistence
         public bool Initialized => Volatile.Read(ref _initialized);
 
         /// <inheritdoc />
-        public string ConnectionString => _connectionString;
+        public string ConnectionString { get; private set; }
 
         /// <inheritdoc />
         public bool CanConnect =>
             // actually tries to connect to the database (regardless of configured/initialized)
-            !_connectionString.IsNullOrWhiteSpace() && !_providerName.IsNullOrWhiteSpace() &&
-            DbConnectionExtensions.IsConnectionAvailable(_connectionString, DbProviderFactory);
+            !ConnectionString.IsNullOrWhiteSpace() && !_providerName.IsNullOrWhiteSpace() &&
+            DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DbProviderFactory);
 
         private void UpdateSqlServerDatabaseType()
         {
@@ -169,7 +166,7 @@ namespace Umbraco.Core.Persistence
             if (setting.IsNullOrWhiteSpace() || !setting.StartsWith("SqlServer.")
                 || !Enum<SqlServerSyntaxProvider.VersionName>.TryParse(setting.Substring("SqlServer.".Length), out var versionName, true))
             {
-                versionName = ((SqlServerSyntaxProvider) _sqlSyntax).GetSetVersion(_connectionString, _providerName, _logger).ProductVersionName;
+                versionName = ((SqlServerSyntaxProvider) _sqlSyntax).GetSetVersion(ConnectionString, _providerName, _logger).ProductVersionName;
             }
             else
             {
@@ -233,7 +230,7 @@ namespace Umbraco.Core.Persistence
                 if (Volatile.Read(ref _initialized))
                     throw new InvalidOperationException("Already initialized.");
 
-                _connectionString = connectionString;
+                ConnectionString = connectionString;
                 _providerName = providerName;
             }
 
@@ -249,18 +246,19 @@ namespace Umbraco.Core.Persistence
         {
             _logger.Debug<UmbracoDatabaseFactory>("Initializing.");
 
-            if (_connectionString.IsNullOrWhiteSpace()) throw new InvalidOperationException("The factory has not been configured with a proper connection string.");
+            if (ConnectionString.IsNullOrWhiteSpace()) throw new InvalidOperationException("The factory has not been configured with a proper connection string.");
             if (_providerName.IsNullOrWhiteSpace()) throw new InvalidOperationException("The factory has not been configured with a proper provider name.");
 
             if (DbProviderFactory == null)
                 throw new Exception($"Can't find a provider factory for provider name \"{_providerName}\".");
 
             // cannot initialize without being able to talk to the database
-            if (!DbConnectionExtensions.IsConnectionAvailable(_connectionString, DbProviderFactory))
+            // TODO: Why not?
+            if (!DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DbProviderFactory))
                 throw new Exception("Cannot connect to the database.");
 
-            _connectionRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(_connectionString);
-            _commandRetryPolicy = RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(_connectionString);
+            _connectionRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(ConnectionString);
+            _commandRetryPolicy = RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(ConnectionString);
 
 
             _databaseType = DatabaseType.Resolve(DbProviderFactory.GetType().Name, _providerName);
@@ -313,7 +311,7 @@ namespace Umbraco.Core.Persistence
         // method used by NPoco's UmbracoDatabaseFactory to actually create the database instance
         private UmbracoDatabase CreateDatabaseInstance()
         {
-            return new UmbracoDatabase(_connectionString, SqlContext, DbProviderFactory, _logger, _bulkSqlInsertProvider, _connectionRetryPolicy, _commandRetryPolicy);
+            return new UmbracoDatabase(ConnectionString, SqlContext, DbProviderFactory, _logger, _bulkSqlInsertProvider, _connectionRetryPolicy, _commandRetryPolicy);
         }
 
         protected override void DisposeResources()

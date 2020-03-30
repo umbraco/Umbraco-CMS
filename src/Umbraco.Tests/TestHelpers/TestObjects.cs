@@ -244,17 +244,16 @@ namespace Umbraco.Tests.TestHelpers
                 // mappersBuilder.AddCore();
                 // var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Factory.GetInstance<IMapperCollection>();
-                databaseFactory = new UmbracoDatabaseFactory(
-                    Constants.System.UmbracoConnectionName,
+                databaseFactory = new UmbracoDatabaseFactory(logger,
                     SettingsForTests.GetDefaultGlobalSettings(),
                     new ConnectionStrings(),
-                    logger,
+                    Constants.System.UmbracoConnectionName,
                     new Lazy<IMapperCollection>(() => mappers),
                     TestHelper.DbProviderFactoryCreator);
             }
 
-            typeFinder = typeFinder ?? new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly));
-            fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings());
+            typeFinder ??= new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly));
+            fileSystems ??= new FileSystems(Current.Factory, logger, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings());
             var coreDebug = TestHelper.CoreDebugSettings;
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
             var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, coreDebug, mediaFileSystem, logger, typeFinder, NoAppCache.Instance);
