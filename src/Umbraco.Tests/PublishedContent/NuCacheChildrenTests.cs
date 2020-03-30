@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Reflection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -27,7 +25,6 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
-using Umbraco.Web.PublishedCache.NuCache.Snap;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -1310,6 +1307,18 @@ namespace Umbraco.Tests.PublishedContent
             child3 = contentStore.Test.GetValues(4)[0];
             Assert.AreEqual(2, child3.gen); // there is now 2x gen's of this item
             AssertLinkedNode(child3.contentNode, 1, 3, -1, -1, -1);
+        }
+
+        [Test]
+        public void MultipleCacheIteration()
+        {
+            //see https://github.com/umbraco/Umbraco-CMS/issues/7798
+            this.Init(this.GetInvariantKits());
+            var snapshot = this._snapshotService.CreatePublishedSnapshot(previewToken: null);
+            this._snapshotAccessor.PublishedSnapshot = snapshot;
+
+            var items = snapshot.Content.GetByXPath("/root/itype");
+            Assert.AreEqual(items.Count(), items.Count());
         }
 
         private void AssertLinkedNode(ContentNode node, int parent, int prevSibling, int nextSibling, int firstChild, int lastChild)

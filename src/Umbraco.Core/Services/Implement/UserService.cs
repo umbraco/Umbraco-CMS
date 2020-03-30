@@ -372,7 +372,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         public string GetDefaultMemberType()
         {
-            return "writer";
+            return Constants.Security.WriterGroupAlias;
         }
 
         /// <summary>
