@@ -235,7 +235,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                         }
                     });
                 }
-                else if (args.filter && angular.isFunction(args.filter)) {
+                else if (args.filter && Utilities.isFunction(args.filter)) {
                     //if a filter is supplied a cacheKey must be supplied as well
                     if (!args.cacheKey) {
                         throw "args.cacheKey is required if args.filter is supplied";
@@ -315,7 +315,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                         args.node.hasChildren = true;
 
                         //Since we've removed the children &  reloaded them, we need to refresh the UI now because the tree node UI doesn't operate on normal angular $watch since that will be pretty slow
-                        if (angular.isFunction(args.node.updateNodeData)) {
+                        if (Utilities.isFunction(args.node.updateNodeData)) {
                             args.node.updateNodeData(args.node);
                         }
                     }
@@ -349,7 +349,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * @param {object} treeNode the node to remove
          */
         removeNode: function (treeNode) {
-            if (!angular.isFunction(treeNode.parent)) {
+            if (!Utilities.isFunction(treeNode.parent)) {
                 return;
             }
 
@@ -509,7 +509,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 if (current.metaData && current.metaData["treeAlias"]) {
                     root = current;
                 }
-                else if (angular.isFunction(current.parent)) {
+                else if (Utilities.isFunction(current.parent)) {
                     //we can only continue if there is a parent() method which means this
                     // tree node was loaded in as part of a real tree, not just as a single tree
                     // node from the server.
@@ -706,7 +706,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                     //to fire, instead we're just going to replace all the properties of this node.
 
                     //there should always be a method assigned but we'll check anyways
-                    if (angular.isFunction(node.parent().children[index].updateNodeData)) {
+                    if (Utilities.isFunction(node.parent().children[index].updateNodeData)) {
                         node.parent().children[index].updateNodeData(found);
                     }
                     else {
@@ -741,7 +741,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             if (!node) {
                 throw "node cannot be null";
             }
-            if (!angular.isFunction(node.parent)) {
+            if (!Utilities.isFunction(node.parent)) {
                 throw "node.parent is not a function, the path cannot be resolved";
             }
 

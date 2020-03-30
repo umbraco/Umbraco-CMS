@@ -82,7 +82,7 @@
             if (angular.isDefined(opts.firstLineNumber)) {
                 if (angular.isNumber(opts.firstLineNumber)) {
                     session.setOption('firstLineNumber', opts.firstLineNumber);
-                } else if (angular.isFunction(opts.firstLineNumber)) {
+                } else if (Utilities.isFunction(opts.firstLineNumber)) {
                     session.setOption('firstLineNumber', opts.firstLineNumber());
                 }
             }
@@ -116,7 +116,7 @@
 
             // onLoad callbacks
             angular.forEach(opts.callbacks, function(cb) {
-                if (angular.isFunction(cb)) {
+                if (Utilities.isFunction(cb)) {
                     cb(acee);
                 }
             });
@@ -208,7 +208,7 @@
 
                     if (angular.isDefined(callback)) {
                         scope.$evalAsync(function() {
-                            if (angular.isFunction(callback)) {
+                            if (Utilities.isFunction(callback)) {
                                 callback(args);
                             } else {
                                 throw new Error('ui-ace use a function as callback.');

@@ -699,7 +699,7 @@ angular.mock.dump = function (object) {
             });
             out = '[ ' + out.join(', ') + ' ]';
         } else if (angular.isObject(object)) {
-            if (angular.isFunction(object.$eval) && angular.isFunction(object.$apply)) {
+            if (Utilities.isFunction(object.$eval) && Utilities.isFunction(object.$apply)) {
                 out = serializeScope(object);
             } else if (object instanceof Error) {
                 out = object.stack || ('' + object.name + ': ' + object.message);
@@ -927,7 +927,7 @@ function createHttpBackendMock($rootScope, $delegate, $browser) {
         responsesPush = angular.bind(responses, responses.push);
 
     function createResponse(status, data, headers) {
-        if (angular.isFunction(status)) return status;
+        if (Utilities.isFunction(status)) return status;
 
         return function () {
             return angular.isNumber(status)
@@ -943,7 +943,7 @@ function createHttpBackendMock($rootScope, $delegate, $browser) {
             wasExpected = false;
 
         function prettyPrint(data) {
-            return (angular.isString(data) || angular.isFunction(data) || data instanceof RegExp)
+            return (angular.isString(data) || Utilities.isFunction(data) || data instanceof RegExp)
                 ? data
                 : angular.toJson(data);
         }
@@ -1372,19 +1372,19 @@ function MockHttpExpectation(method, url, data, headers) {
 
     this.matchUrl = function (u) {
         if (!url) return true;
-        if (angular.isFunction(url.test)) return url.test(u);
+        if (Utilities.isFunction(url.test)) return url.test(u);
         return url == u;
     };
 
     this.matchHeaders = function (h) {
         if (angular.isUndefined(headers)) return true;
-        if (angular.isFunction(headers)) return headers(h);
+        if (Utilities.isFunction(headers)) return headers(h);
         return angular.equals(headers, h);
     };
 
     this.matchData = function (d) {
         if (angular.isUndefined(data)) return true;
-        if (data && angular.isFunction(data.test)) return data.test(d);
+        if (data && Utilities.isFunction(data.test)) return data.test(d);
         if (data && !angular.isString(data)) return angular.toJson(data) == d;
         return data == d;
     };

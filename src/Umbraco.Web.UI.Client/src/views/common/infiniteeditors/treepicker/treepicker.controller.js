@@ -173,7 +173,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                 $scope.model.filterAdvanced = false;
 
                 //used advanced filtering
-                if (angular.isFunction($scope.model.filter)) {
+                if (Utilities.isFunction($scope.model.filter)) {
                     $scope.model.filterAdvanced = true;
                 }
                 else if (angular.isObject($scope.model.filter)) {
@@ -452,7 +452,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             if ($scope.model.filterAdvanced) {
 
                 //filter either based on a method or an object
-                var filtered = angular.isFunction($scope.model.filter)
+                var filtered = Utilities.isFunction($scope.model.filter)
                     ? _.filter(nodes, $scope.model.filter)
                     : _.where(nodes, $scope.model.filter);
 
