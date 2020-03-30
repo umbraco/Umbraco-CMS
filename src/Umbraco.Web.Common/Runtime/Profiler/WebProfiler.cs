@@ -13,12 +13,8 @@ namespace Umbraco.Web.Common.Runtime.Profiler
 {
     public class WebProfiler : IProfiler
     {
-        private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
-        private volatile BootPhase _bootPhase;
         private MiniProfiler _startupProfiler;
 
-
-        private const string BootRequestItemKey = "Umbraco.Core.Logging.WebProfiler__isBootRequest";
         private readonly IHttpContextAccessor _httpContextAccessor;
         private int _first;
 
@@ -26,7 +22,6 @@ namespace Umbraco.Web.Common.Runtime.Profiler
         {
             // create our own provider, which can provide a profiler even during boot
             _httpContextAccessor = httpContextAccessor;
-            _bootPhase = BootPhase.Boot;
         }
 
         /// <summary>
