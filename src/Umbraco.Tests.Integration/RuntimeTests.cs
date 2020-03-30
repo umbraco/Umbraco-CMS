@@ -1,30 +1,21 @@
-﻿using LightInject;
-using LightInject.Microsoft.DependencyInjection;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
 using NUnit.Framework;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Umbraco.Configuration.Models;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.LightInject;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
 using Umbraco.Tests.Common;
+using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Web.BackOffice.AspNetCore;
-using static Umbraco.Core.Migrations.Install.DatabaseBuilder;
 
 namespace Umbraco.Tests.Integration
 {
@@ -39,10 +30,11 @@ namespace Umbraco.Tests.Integration
             MyComposer.Reset();
         }
 
-        [OneTimeTearDown]
-        public void FixtureTearDown()
+        [SetUp]
+        public void Setup()
         {
-            
+            MyComponent.Reset();
+            MyComposer.Reset();
         }
 
         /// <summary>
@@ -95,7 +87,7 @@ namespace Umbraco.Tests.Integration
         [Test]
         public async Task AddUmbracoCore()
         {
-            var umbracoContainer = GetUmbracoContainer(out var serviceProviderFactory);
+            var umbracoContainer = UmbracoIntegrationTest.GetUmbracoContainer(out var serviceProviderFactory);
             var testHelper = new TestHelper();
 
             var hostBuilder = new HostBuilder()
@@ -103,7 +95,7 @@ namespace Umbraco.Tests.Integration
                 .ConfigureServices((hostContext, services) =>
                 {
                     var webHostEnvironment = testHelper.GetWebHostEnvironment();
-                    AddRequiredNetCoreServices(services, testHelper, webHostEnvironment);
+                    services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
 
                     // Add it!
                     services.AddUmbracoConfiguration(hostContext.Configuration);
@@ -134,7 +126,7 @@ namespace Umbraco.Tests.Integration
         [Test]
         public async Task UseUmbracoCore()
         {
-            var umbracoContainer = GetUmbracoContainer(out var serviceProviderFactory);
+            var umbracoContainer = UmbracoIntegrationTest.GetUmbracoContainer(out var serviceProviderFactory);
             var testHelper = new TestHelper();
 
             var hostBuilder = new HostBuilder()
@@ -142,7 +134,7 @@ namespace Umbraco.Tests.Integration
                 .ConfigureServices((hostContext, services) =>
                 {
                     var webHostEnvironment = testHelper.GetWebHostEnvironment();
-                    AddRequiredNetCoreServices(services, testHelper, webHostEnvironment);
+                    services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
 
                     // Add it!
                     services.AddUmbracoConfiguration(hostContext.Configuration);
@@ -169,56 +161,6 @@ namespace Umbraco.Tests.Integration
             Assert.IsTrue(MyComponent.IsTerminated);
         }
 
-        [Test]
-        public async Task Install_Database()
-        {
-            var umbracoContainer = GetUmbracoContainer(out var serviceProviderFactory);
-            var testHelper = new TestHelper();
-
-            var hostBuilder = new HostBuilder()
-                .UseUmbraco(serviceProviderFactory)
-                .ConfigureServices((hostContext, services) =>
-                {
-                    var webHostEnvironment = testHelper.GetWebHostEnvironment();
-                    AddRequiredNetCoreServices(services, testHelper, webHostEnvironment);
-
-                    // Add it!
-                    services.AddUmbracoConfiguration(hostContext.Configuration);
-                    services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly);
-                });
-
-            var host = await hostBuilder.StartAsync();
-            var app = new ApplicationBuilder(host.Services);
-
-            // This will create a db, install the schema and ensure the app is configured to run
-            app.UseTestLocalDb(Path.Combine(testHelper.CurrentAssemblyDirectory, "LocalDb"));
-
-            app.UseUmbracoCore();
-
-            var runtimeState = app.ApplicationServices.GetRequiredService<IRuntimeState>();
-            Assert.AreEqual(RuntimeLevel.Run, runtimeState.Level);
-        }
-
-        internal static LightInjectContainer GetUmbracoContainer(out UmbracoServiceProviderFactory serviceProviderFactory)
-        {
-            var container = UmbracoServiceProviderFactory.CreateServiceContainer();
-            serviceProviderFactory = new UmbracoServiceProviderFactory(container);
-            var umbracoContainer = serviceProviderFactory.GetContainer();
-            return umbracoContainer;
-        }
-
-        /// <summary>
-        /// These services need to be manually added because they do not get added by the generic host
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="testHelper"></param>
-        /// <param name="webHostEnvironment"></param>
-        private void AddRequiredNetCoreServices(IServiceCollection services, TestHelper testHelper, IWebHostEnvironment webHostEnvironment)
-        {
-            services.AddSingleton<IHttpContextAccessor>(x => testHelper.GetHttpContextAccessor());
-            // the generic host does add IHostEnvironment but not this one because we are not actually in a web context
-            services.AddSingleton<IWebHostEnvironment>(x => webHostEnvironment);
-        }
 
         [RuntimeLevel(MinLevel = RuntimeLevel.Install)]
         public class MyComposer : IUserComposer

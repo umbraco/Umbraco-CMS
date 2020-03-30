@@ -17,16 +17,8 @@ namespace Umbraco.Tests.Integration.Testing
     /// <summary>
     /// Manages a pool of LocalDb databases for integration testing
     /// </summary>
-    internal class LocalDbTestDatabase 
+    public class LocalDbTestDatabase 
     {
-        public static LocalDbTestDatabase Get(string filesPath, ILogger logger, IGlobalSettings globalSettings, IUmbracoDatabaseFactory dbFactory)
-        {
-            var localDb = new LocalDb();
-            if (localDb.IsAvailable == false)
-                throw new InvalidOperationException("LocalDB is not available.");
-            return new LocalDbTestDatabase(logger, globalSettings, localDb, filesPath, dbFactory);
-        }
-
         public const string InstanceName = "UmbracoTests";
         public const string DatabaseName = "UmbracoTests";
 
@@ -43,7 +35,8 @@ namespace Umbraco.Tests.Integration.Testing
         private static DatabasePool _schemaPool;
         private DatabasePool _currentPool;
 
-        public LocalDbTestDatabase(ILogger logger, IGlobalSettings globalSettings, LocalDb localDb, string filesPath, IUmbracoDatabaseFactory dbFactory)
+        //It's internal because `Umbraco.Core.Persistence.LocalDb` is internal
+        internal LocalDbTestDatabase(ILogger logger, IGlobalSettings globalSettings, LocalDb localDb, string filesPath, IUmbracoDatabaseFactory dbFactory)
         {
             _umbracoVersion = new UmbracoVersion();
             _logger = logger;
@@ -328,5 +321,6 @@ namespace Umbraco.Tests.Integration.Testing
                 while (_readyQueue.TryTake(out i)) { }
             }
         }
+
     }
 }
