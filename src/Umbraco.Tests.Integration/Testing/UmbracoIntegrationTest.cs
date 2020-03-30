@@ -7,12 +7,17 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.LightInject;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Strings;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Testing;
@@ -127,6 +132,8 @@ namespace Umbraco.Tests.Integration.Testing
             app.UseUmbracoCore();
         }
 
+        #region Common services
+
         /// <summary>
         /// Returns the DI container
         /// </summary>
@@ -146,5 +153,21 @@ namespace Umbraco.Tests.Integration.Testing
         /// Returns the <see cref="ILogger"/>
         /// </summary>
         protected ILogger Logger => Services.GetRequiredService<ILogger>();
+
+        protected AppCaches AppCaches => Services.GetRequiredService<AppCaches>();
+        protected IIOHelper IOHelper => Services.GetRequiredService<IIOHelper>();
+        protected IShortStringHelper ShortStringHelper => Services.GetRequiredService<IShortStringHelper>();
+        protected IGlobalSettings GlobalSettings => Services.GetRequiredService<IGlobalSettings>();
+        protected IMapperCollection Mappers => Services.GetRequiredService<IMapperCollection>();
+
+        #endregion
+
+        #region Builders
+
+        protected GlobalSettingsBuilder GlobalSettingsBuilder = new GlobalSettingsBuilder();
+        protected UserBuilder UserBuilder = new UserBuilder();
+        protected UserGroupBuilder UserGroupBuilder = new UserGroupBuilder();
+
+        #endregion
     }
 }
