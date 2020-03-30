@@ -82,25 +82,4 @@ namespace Umbraco.Web.UI.BackOffice
             });
         }
     }
-
-    public class UmbracoMiniProfilerOptions : MiniProfilerOptions
-    {
-        public UmbracoMiniProfilerOptions()
-        {
-        }
-
-        public new MiniProfiler StartProfiler(string profilerName = null)
-        {
-            return base.StartProfiler();
-        }
-
-        public new Func<HttpRequest, bool> ShouldProfile => (request) =>
-        {
-            if (new Uri(request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsClientSideRequest()) return false;
-            if (bool.TryParse(request.Query["umbDebug"], out var umbDebug)) return umbDebug;
-            if (bool.TryParse(request.Headers["X-UMB-DEBUG"], out var xUmbDebug)) return xUmbDebug;
-            if (bool.TryParse(request.Cookies["UMB-DEBUG"], out var cUmbDebug)) return cUmbDebug;
-            return false;
-        };
-    }
 }
