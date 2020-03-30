@@ -10,7 +10,7 @@ angular.module("umbraco.install").controller("Umbraco.Installer.DataBaseControll
 		{ name: 'Custom connection string', id: -1 }
 	];
 
-    if (angular.isUndefined(installerService.status.current.model.dbType) || installerService.status.current.model.dbType === null) {
+    if (Utilities.isUndefined(installerService.status.current.model.dbType) || installerService.status.current.model.dbType === null) {
 		installerService.status.current.model.dbType = 0;
 	}
 	

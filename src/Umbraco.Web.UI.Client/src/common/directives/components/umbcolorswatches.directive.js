@@ -30,15 +30,15 @@ Use this directive to generate color swatches to pick from.
         function link(scope, el, attr, ctrl) {
 
             // Set default to true if not defined
-            if (angular.isUndefined(scope.useColorClass)) {
+            if (Utilities.isUndefined(scope.useColorClass)) {
                 scope.useColorClass = false;
             }
 
             // Set default to "btn" if not defined
-            if (angular.isUndefined(scope.colorClassNamePrefix)) {
+            if (Utilities.isUndefined(scope.colorClassNamePrefix)) {
                 scope.colorClassNamePrefix = "btn";
             }
-            
+
             scope.setColor = function (color, $index, $event) {
                 if (scope.onSelect) {
                     // did the value change?

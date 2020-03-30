@@ -17,7 +17,7 @@
                 return collection;
             }
 
-            if (angular.isUndefined(property)) {
+            if (Utilities.isUndefined(property)) {
                 return collection;
             }
 
