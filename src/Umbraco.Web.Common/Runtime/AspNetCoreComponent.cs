@@ -7,18 +7,18 @@ namespace Umbraco.Web.Common.Runtime
     public sealed class AspNetCoreComponent : IComponent
     {
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
-        private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
+        private readonly IUmbracoApplicationLifetimeManager _umbracoApplicationLifetimeManager;
 
-        public AspNetCoreComponent(IHostApplicationLifetime hostApplicationLifetime, IUmbracoApplicationLifetime umbracoApplicationLifetime)
+        public AspNetCoreComponent(IHostApplicationLifetime hostApplicationLifetime, IUmbracoApplicationLifetimeManager umbracoApplicationLifetimeManager)
         {
             _hostApplicationLifetime = hostApplicationLifetime;
-            _umbracoApplicationLifetime = umbracoApplicationLifetime;
+            _umbracoApplicationLifetimeManager = umbracoApplicationLifetimeManager;
         }
 
         public void Initialize()
         {
             _hostApplicationLifetime.ApplicationStarted.Register(() => {
-                _umbracoApplicationLifetime.InvokeApplicationInit();
+                _umbracoApplicationLifetimeManager.InvokeApplicationInit();
             });
         }
 

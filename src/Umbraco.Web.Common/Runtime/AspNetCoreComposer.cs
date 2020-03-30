@@ -24,14 +24,17 @@ namespace Umbraco.Web.Common.Runtime
             composition.RegisterUnique<IHttpContextAccessor, HttpContextAccessor>();
 
             // Our own netcore implementations
-            composition.RegisterUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
+            composition.RegisterUnique<AspNetCoreUmbracoApplicationLifetime>();
+            composition.RegisterUnique<IUmbracoApplicationLifetimeManager>(factory => factory.GetInstance<AspNetCoreUmbracoApplicationLifetime>());
+            composition.RegisterUnique<IUmbracoApplicationLifetime>(factory => factory.GetInstance<AspNetCoreUmbracoApplicationLifetime>());
+
             composition.RegisterUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
 
             // The umbraco request lifetime
-           var umbracoRequestLifetime = new UmbracoRequestLifetime();
-           composition.RegisterUnique<IUmbracoRequestLifetimeManager>(factory => umbracoRequestLifetime);
-           composition.RegisterUnique<IUmbracoRequestLifetime>(factory => umbracoRequestLifetime);
-           composition.RegisterUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
+            composition.RegisterUnique<UmbracoRequestLifetime>();
+            composition.RegisterUnique<IUmbracoRequestLifetimeManager>(factory => factory.GetInstance<UmbracoRequestLifetime>());
+            composition.RegisterUnique<IUmbracoRequestLifetime>(factory => factory.GetInstance<UmbracoRequestLifetime>());
+            composition.RegisterUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
         }
     }
 }

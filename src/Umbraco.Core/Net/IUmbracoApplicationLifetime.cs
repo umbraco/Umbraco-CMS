@@ -15,7 +15,11 @@ namespace Umbraco.Net
         void Restart();
 
         event EventHandler ApplicationInit;
+    }
 
+
+    public interface IUmbracoApplicationLifetimeManager: IUmbracoApplicationLifetime
+    {
         void InvokeApplicationInit();
     }
 }
