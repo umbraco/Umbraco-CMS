@@ -130,7 +130,7 @@ namespace Umbraco.Core.Migrations.Install
 
             if (e.Cancel == false)
             {
-                var dataCreation = new DatabaseDataCreator(_database, _logger,_umbracoVersion, _globalSettings);
+                var dataCreation = new DatabaseDataCreator(_database, _logger, _umbracoVersion, _globalSettings);
                 foreach (var table in OrderedTables)
                     CreateTable(false, table, dataCreation);
             }
@@ -451,7 +451,7 @@ namespace Umbraco.Core.Migrations.Install
 
             //Execute the Create Table sql
             var created = _database.Execute(new Sql(createSql));
-                    _logger.Info<DatabaseSchemaCreator>("Create Table {TableName} ({Created}): \n {Sql}", tableName, created, createSql);
+            _logger.Info<DatabaseSchemaCreator>("Create Table {TableName} ({Created}): \n {Sql}", tableName, created, createSql);
 
             //If any statements exists for the primary key execute them here
             if (string.IsNullOrEmpty(createPrimaryKeySql) == false)
@@ -487,11 +487,11 @@ namespace Umbraco.Core.Migrations.Install
 
             if (overwrite)
             {
-                        _logger.Info<Database>("Table {TableName} was recreated", tableName);
+                _logger.Info<Database>("Table {TableName} was recreated", tableName);
             }
             else
             {
-                        _logger.Info<Database>("New table {TableName} was created", tableName);
+                _logger.Info<Database>("New table {TableName} was created", tableName);
 
             }
         }

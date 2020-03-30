@@ -319,7 +319,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private void PersistAllowedSections(IUserGroup entity)
         {
-            var userGroup = (UserGroup) entity;
+            var userGroup = entity;
 
             // First delete all
             Database.Delete<UserGroup2AppDto>("WHERE UserGroupId = @UserGroupId", new { UserGroupId = userGroup.Id });
