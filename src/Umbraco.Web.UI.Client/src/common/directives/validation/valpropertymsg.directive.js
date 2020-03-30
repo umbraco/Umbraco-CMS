@@ -94,7 +94,7 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                 if (!watcher) {
                     watcher = scope.$watch("currentProperty.value",
                         function (newValue, oldValue) {
-                            if (angular.equals(newValue, oldValue)) {
+                            if (Utilities.equals(newValue, oldValue)) {
                                 return;
                             }
 
