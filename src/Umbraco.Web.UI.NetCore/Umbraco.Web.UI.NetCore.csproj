@@ -18,7 +18,6 @@
     <ItemGroup>
       <_ContentIncludedByDefault Remove="wwwroot\~\App_Data\TEMP\TypesCache\umbraco-types.DESKTOP-2016.hash" />
       <_ContentIncludedByDefault Remove="wwwroot\~\App_Data\TEMP\TypesCache\umbraco-types.DESKTOP-2016.list" />
-      <_ContentIncludedByDefault Remove="Views\BackOffice\Index.cshtml" />
     </ItemGroup>
 
 </Project>
