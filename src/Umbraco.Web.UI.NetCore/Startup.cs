@@ -75,15 +75,6 @@ namespace Umbraco.Web.UI.BackOffice
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    "backoffice-spa",
-                    "/umbraco",
-                    new
-                    {
-                        Controller = "BackOffice",
-                        Action = "Index"
-                    }
-                );
                 endpoints.MapGet("/", async context =>
                 {
                     await context.Response.WriteAsync($"<html><body>Hello World!{Current.Profiler.Render()}</body></html>");
