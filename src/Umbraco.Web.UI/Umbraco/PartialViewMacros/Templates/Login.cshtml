@@ -1,3 +1,5 @@
+@using System.Web.Mvc.Html
+@using Umbraco.Web
 @using Umbraco.Web.Composing
 @using Umbraco.Web.Models
 @using Umbraco.Web.Controllers
@@ -12,13 +14,14 @@
 
     var runtimeMinifier = Current.RuntimeMinifier;
 
-    runtimeMinifier.RequiresJs("https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js", "umbraco");
-    runtimeMinifier.RequiresJs("https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js", "umbraco");
-    runtimeMinifier.RequiresJs("https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js", "umbraco");
+    runtimeMinifier.RequiresJs("umbraco",
+        "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js");
 }
 
 @* NOTE: This RenderJsHere code should be put on your main template page where the rest of your script tags are placed *@
-@Html.Raw(runtimeMinifier.RenderJsHere("Umbraco"))
+@Html.Raw(runtimeMinifier.RenderJsHere("umbraco"))
 
 @using (Html.BeginUmbracoForm<UmbLoginController>("HandleLogin"))
 {
