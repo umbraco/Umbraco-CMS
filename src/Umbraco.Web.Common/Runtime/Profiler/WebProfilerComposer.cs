@@ -1,7 +1,8 @@
-﻿ using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Composing;
 
-namespace Umbraco.Web.Logging
+namespace Umbraco.Web.Common.Runtime.Profiler
 {
     internal class WebProfilerComposer : ComponentComposer<WebProfilerComponent>, ICoreComposer
-    { }
+    {
+    }
 }

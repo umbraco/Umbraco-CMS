@@ -1,7 +1,7 @@
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 
-namespace Umbraco.Web.BackOffice.AspNetCore
+namespace Umbraco.Web.Common.AspNetCore
 {
     public class AspNetCoreBackOfficeInfo : IBackOfficeInfo
     {
@@ -10,7 +10,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             GetAbsoluteUrl = globalSettings.UmbracoPath;
         }
 
-        public string GetAbsoluteUrl { get; }
+        public string GetAbsoluteUrl { get; } // TODO make absolute
 
     }
 }

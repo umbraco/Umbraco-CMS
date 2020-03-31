@@ -7,16 +7,12 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
+      <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
       <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="wwwroot\Media" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="wwwroot\~\App_Data\TEMP\TypesCache\umbraco-types.DESKTOP-2016.hash" />
-      <_ContentIncludedByDefault Remove="wwwroot\~\App_Data\TEMP\TypesCache\umbraco-types.DESKTOP-2016.list" />
     </ItemGroup>
 
 </Project>

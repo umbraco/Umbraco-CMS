@@ -1,11 +1,12 @@
+using System;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Net;
 
-namespace Umbraco.Web.BackOffice.AspNetCore
+namespace Umbraco.Web.Common.AspNetCore
 {
-    public class AspNetCoreUmbracoApplicationLifetime : IUmbracoApplicationLifetime
+    public class AspNetCoreUmbracoApplicationLifetime : IUmbracoApplicationLifetime, IUmbracoApplicationLifetimeManager
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
@@ -32,5 +33,11 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             Thread.CurrentPrincipal = null;
             _hostApplicationLifetime.StopApplication();
         }
+
+        public void InvokeApplicationInit()
+        {
+            ApplicationInit?.Invoke(this, EventArgs.Empty);
+        }
+        public event EventHandler ApplicationInit;
     }
 }

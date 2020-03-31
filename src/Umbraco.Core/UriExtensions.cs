@@ -146,7 +146,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        internal static bool IsClientSideRequest(this Uri url)
+        public static bool IsClientSideRequest(this Uri url)
         {
             try
             {

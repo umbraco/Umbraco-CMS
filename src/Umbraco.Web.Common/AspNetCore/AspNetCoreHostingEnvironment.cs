@@ -6,16 +6,16 @@ using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 
-namespace Umbraco.Web.BackOffice.AspNetCore
+namespace Umbraco.Web.Common.AspNetCore
 {
     public class AspNetCoreHostingEnvironment : Umbraco.Core.Hosting.IHostingEnvironment
     {
-        
+
 
         private readonly IHostingSettings _hostingSettings;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        
+
         private string _localTempPath;
 
         public AspNetCoreHostingEnvironment(IHostingSettings hostingSettings, IWebHostEnvironment webHostEnvironment, IHttpContextAccessor httpContextAccessor)
@@ -103,7 +103,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             return applicationPath.Add(segment).Value;
         }
 
-        
+
     }
 
 
