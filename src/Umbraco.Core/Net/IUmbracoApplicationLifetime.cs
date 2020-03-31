@@ -18,7 +18,7 @@ namespace Umbraco.Net
     }
 
 
-    public interface IUmbracoApplicationLifetimeManager: IUmbracoApplicationLifetime
+    public interface IUmbracoApplicationLifetimeManager
     {
         void InvokeApplicationInit();
     }

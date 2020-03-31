@@ -34,7 +34,6 @@ namespace Umbraco.Web.Common.Runtime
             composition.RegisterUnique<UmbracoRequestLifetime>();
             composition.RegisterUnique<IUmbracoRequestLifetimeManager>(factory => factory.GetInstance<UmbracoRequestLifetime>());
             composition.RegisterUnique<IUmbracoRequestLifetime>(factory => factory.GetInstance<UmbracoRequestLifetime>());
-            composition.RegisterUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
         }
     }
 }

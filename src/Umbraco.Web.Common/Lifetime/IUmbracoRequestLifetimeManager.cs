@@ -2,7 +2,7 @@
 
 namespace Umbraco.Web.Common.Lifetime
 {
-    public interface IUmbracoRequestLifetimeManager : IUmbracoRequestLifetime
+    public interface IUmbracoRequestLifetimeManager
     {
         void InitRequest(HttpContext context);
         void EndRequest(HttpContext context);

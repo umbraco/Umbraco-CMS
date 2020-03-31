@@ -11,11 +11,11 @@ namespace Umbraco.Web.Common.Runtime.Profiler
     {
         private readonly bool _profile;
         private readonly WebProfiler _profiler;
-        private readonly IUmbracoApplicationLifetimeManager _umbracoApplicationLifetime;
+        private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
         private readonly IUmbracoRequestLifetime _umbracoRequestLifetime;
 
         public WebProfilerComponent(IProfiler profiler, ILogger logger, IUmbracoRequestLifetime umbracoRequestLifetime,
-            IUmbracoApplicationLifetimeManager umbracoApplicationLifetime)
+            IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
             _umbracoRequestLifetime = umbracoRequestLifetime;
             _umbracoApplicationLifetime = umbracoApplicationLifetime;
