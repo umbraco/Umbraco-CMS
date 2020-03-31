@@ -7,7 +7,7 @@ using Umbraco.Tests.Common.Builders.Interfaces;
 namespace Umbraco.Tests.Common.Builders
 {
     public class PropertyGroupBuilder
-        : ChildBuilderBase<MemberTypeBuilder, PropertyGroup>,   // TODO: likely want to genericise this, so can use for document and media types too.
+        : ChildBuilderBase<MemberTypeBuilder, PropertyGroup>,   // TODO: likely want to generalise this, so can use for document and media types too.
             IWithNameBuilder,
             IWithSortOrderBuilder
     {

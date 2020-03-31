@@ -11,26 +11,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
     {
         private readonly DataTypeBuilder _builder = new DataTypeBuilder();
 
-        private const int _testId = 3123;
-
-        [Test]
-        public void Is_Built_Correctly()
-        {
-            // Arrange
-            // Act
-            var dtd = _builder
-                .WithId(_testId)
-                .Build();
-
-            // Assert
-            Assert.AreEqual(_testId, dtd.Id);
-        }
-
         [Test]
         public void Can_Deep_Clone()
         {
-            var dtd = _builder
-                .WithId(_testId)
+             var dtd = _builder
+                .WithId(3123)
                 .Build();
 
             var clone = (DataType) dtd.DeepClone();
