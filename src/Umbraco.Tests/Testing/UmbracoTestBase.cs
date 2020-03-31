@@ -50,7 +50,6 @@ using FileSystems = Umbraco.Core.IO.FileSystems;
 using Umbraco.Web.Templates;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.Models;
 using Umbraco.Net;
 using Umbraco.Core.Request;
 using Umbraco.Core.Security;
@@ -63,6 +62,7 @@ using Umbraco.Web.Security.Providers;
 using Umbraco.Web.Trees;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Tests.Common;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Tests.Testing
 {
@@ -462,13 +462,13 @@ namespace Umbraco.Tests.Testing
             var globalSettings = TestHelper.GetConfigs().Global();
             var connectionStrings = TestHelper.GetConfigs().ConnectionStrings();
 
-            Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(
-                Constants.System.UmbracoConnectionName,
+            Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(Logger,
                 globalSettings,
                 connectionStrings,
-                Logger,
+                Constants.System.UmbracoConnectionName,
                 new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>),
                 TestHelper.DbProviderFactoryCreator));
+
             Composition.RegisterUnique(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
             Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty

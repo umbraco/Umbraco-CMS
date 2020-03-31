@@ -16,6 +16,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Tests.Common;
 using Umbraco.Web.BackOffice;
 using Umbraco.Web.BackOffice.AspNetCore;
+using Umbraco.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Tests.Integration.Implementations

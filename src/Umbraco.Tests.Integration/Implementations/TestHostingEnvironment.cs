@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Core.Configuration;
-using Umbraco.Web.BackOffice.AspNetCore;
+using Umbraco.Web.Common.AspNetCore;
 
 namespace Umbraco.Tests.Integration.Implementations
 {
-    
+
     public class TestHostingEnvironment : AspNetCoreHostingEnvironment, Umbraco.Core.Hosting.IHostingEnvironment
     {
         public TestHostingEnvironment(IHostingSettings hostingSettings, IWebHostEnvironment webHostEnvironment, IHttpContextAccessor httpContextAccessor) : base(hostingSettings, webHostEnvironment, httpContextAccessor)

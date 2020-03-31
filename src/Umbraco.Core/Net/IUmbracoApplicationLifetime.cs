@@ -1,3 +1,5 @@
+using System;
+
 namespace Umbraco.Net
 {
     // TODO: This shouldn't be in this namespace?
@@ -11,5 +13,13 @@ namespace Umbraco.Net
         /// Terminates the current application. The application restarts the next time a request is received for it.
         /// </summary>
         void Restart();
+
+        event EventHandler ApplicationInit;
+    }
+
+
+    public interface IUmbracoApplicationLifetimeManager
+    {
+        void InvokeApplicationInit();
     }
 }

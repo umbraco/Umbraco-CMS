@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -83,5 +84,46 @@ namespace Umbraco.Web.Editors
             return response;
         }
 
+        /// <summary>
+        /// Gets a processed image for the image at the given path
+        /// </summary>
+        /// <param name="imagePath"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="focalPointLeft"></param>
+        /// <param name="focalPointTop"></param>
+        /// <param name="animationProcessMode"></param>
+        /// <param name="mode"></param>
+        /// <param name="upscale"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// If there is no media, image property or image file is found then this will return not found.
+        /// </remarks>
+        public string GetProcessedImageUrl(string imagePath,
+                                           int? width = null,
+                                           int? height = null,
+                                           int? focalPointLeft = null,
+                                           int? focalPointTop = null,
+                                           string animationProcessMode = "first",
+                                           string mode = "max",
+                                           bool upscale = false,
+                                           string cacheBusterValue = "")
+{
+            var options = new ImageUrlGenerationOptions(imagePath)
+            {
+                AnimationProcessMode = animationProcessMode,
+                CacheBusterValue = cacheBusterValue,
+                Height = height,
+                ImageCropMode = mode,
+                UpScale = upscale,
+                Width = width,
+            };
+            if (focalPointLeft.HasValue && focalPointTop.HasValue)
+            {
+                options.FocalPoint = new ImageUrlGenerationOptions.FocalPointPosition(focalPointTop.Value, focalPointLeft.Value);
+            }
+
+            return _imageUrlGenerator.GetImageUrl(options);
+        }
     }
 }

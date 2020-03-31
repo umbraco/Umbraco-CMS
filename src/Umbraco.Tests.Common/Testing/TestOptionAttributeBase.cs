@@ -31,10 +31,14 @@ namespace Umbraco.Tests.Testing
             var test = TestContext.CurrentContext.Test;
             var typeName = test.ClassName;
             var methodName = test.MethodName;
+            // this will only get types from whatever is already loaded in the app domain
             var type = Type.GetType(typeName, false);
             if (type == null)
             {
-                type = ScanAssemblies
+                // automatically add the executing and calling assemblies to the list to scan for this type
+                var scanAssemblies = ScanAssemblies.Union(new[] {Assembly.GetExecutingAssembly(), Assembly.GetCallingAssembly()}).ToList();
+
+                type = scanAssemblies
                     .Select(assembly => assembly.GetType(typeName, false))
                     .FirstOrDefault(x => x != null);
                 if (type == null)
