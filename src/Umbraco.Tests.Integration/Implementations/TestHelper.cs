@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Integration.Implementations
     public class TestHelper : TestHelperBase
     {
         private IBackOfficeInfo _backOfficeInfo;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private IHostingEnvironment _hostingEnvironment;
         private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly IIpResolver _ipResolver;
         private readonly IWebHostEnvironment _hostEnvironment;
@@ -36,15 +36,15 @@ namespace Umbraco.Tests.Integration.Implementations
             _httpContextAccessor = Mock.Of<IHttpContextAccessor>(x => x.HttpContext == httpContext);
             _ipResolver = new AspNetIpResolver(_httpContextAccessor);
 
-            _hostEnvironment = Mock.Of<IWebHostEnvironment>(x =>
-                x.ApplicationName == "UmbracoIntegrationTests"
-                && x.ContentRootPath == CurrentAssemblyDirectory
-                && x.WebRootPath == CurrentAssemblyDirectory); // same folder for now?
+            // For Azure Devops we can only store a database in certain locations so we will need to detect if we are running
+            // on a build server and if so we'll use the %temp% path.
+            //var siteTemp = System.IO.Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", hash);
 
-            _hostingEnvironment = new TestHostingEnvironment(
-                SettingsForTests.GetDefaultHostingSettings(),
-                _hostEnvironment,
-                _httpContextAccessor);
+            var hostEnvironment = new Mock<IWebHostEnvironment>();
+            hostEnvironment.Setup(x => x.ApplicationName).Returns("UmbracoIntegrationTests");
+            hostEnvironment.Setup(x => x.ContentRootPath).Returns(() => WorkingDirectory);
+            hostEnvironment.Setup(x => x.WebRootPath).Returns(() => WorkingDirectory);
+            _hostEnvironment = hostEnvironment.Object;
 
             _hostingLifetime = new AspNetCoreApplicationShutdownRegistry(Mock.Of<IHostApplicationLifetime>());
 
@@ -76,7 +76,12 @@ namespace Umbraco.Tests.Integration.Implementations
             return _backOfficeInfo;
         }
 
-        public override IHostingEnvironment GetHostingEnvironment() => _hostingEnvironment;
+        public override IHostingEnvironment GetHostingEnvironment()
+            => _hostingEnvironment ??= new TestHostingEnvironment(
+                SettingsForTests.GetDefaultHostingSettings(),
+                _hostEnvironment,
+                _httpContextAccessor);
+
         public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime() => _hostingLifetime;
 
         public override IIpResolver GetIpResolver() => _ipResolver;

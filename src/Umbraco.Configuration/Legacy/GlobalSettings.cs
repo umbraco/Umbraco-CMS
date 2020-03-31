@@ -177,7 +177,7 @@ namespace Umbraco.Core.Configuration.Legacy
         /// <param name="value">Value of the setting to be saved.</param>
         internal static void SaveSetting(string key, string value, IIOHelper ioHelper)
         {
-            var fileName = ioHelper.MapPath(string.Format("{0}/web.config", ioHelper.Root));
+            var fileName = ioHelper.MapPath("~/web.config");
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
             var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();

@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void CreateDatabase() // FIXME: move to DatabaseBuilderTest!
         {
-            var path = TestHelper.CurrentAssemblyDirectory;
+            var path = TestHelper.WorkingDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
             // delete database file

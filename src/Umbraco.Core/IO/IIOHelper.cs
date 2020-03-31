@@ -7,8 +7,6 @@ namespace Umbraco.Core.IO
 
         string BackOfficePath { get; }
 
-        bool ForceNotHosted { get; set; }
-
         char DirSepChar { get; }
         string FindFile(string virtualPath);
         string ResolveVirtualUrl(string path);
@@ -43,24 +41,6 @@ namespace Umbraco.Core.IO
 
         bool PathStartsWith(string path, string root, char separator);
 
-        /// <summary>
-        /// Returns the path to the root of the application, by getting the path to where the assembly where this
-        /// method is included is present, then traversing until it's past the /bin directory. Ie. this makes it work
-        /// even if the assembly is in a /bin/debug or /bin/release folder
-        /// </summary>
-        /// <returns></returns>
-        string GetRootDirectorySafe();
-
-        string GetRootDirectoryBinFolder();
-
-        /// <summary>
-        /// Allows you to overwrite RootDirectory, which would otherwise be resolved
-        /// automatically upon application start.
-        /// </summary>
-        /// <remarks>The supplied path should be the absolute path to the root of the umbraco site.</remarks>
-        /// <param name="rootPath"></param>
-        void SetRootDirectory(string rootPath);
-
         void EnsurePathExists(string path);
 
         /// <summary>
@@ -73,6 +53,10 @@ namespace Umbraco.Core.IO
         /// <summary>
         /// Gets the root path of the application
         /// </summary>
+        /// <remarks>
+        /// In most cases this will be an empty string which indicates the app is not running in a virtual directory.
+        /// This is NOT a physical path.
+        /// </remarks>
         string Root
         {
             get;

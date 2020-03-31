@@ -82,10 +82,10 @@ namespace Umbraco.Tests.TestHelpers
         public static IConfigsFactory GetConfigsFactory() => _testHelperInternal.GetConfigsFactory();
 
         /// <summary>
-        /// Gets the current assembly directory.
+        /// Gets the working directory of the test project.
         /// </summary>
         /// <value>The assembly directory.</value>
-        public static string CurrentAssemblyDirectory => _testHelperInternal.CurrentAssemblyDirectory;
+        public static string WorkingDirectory => _testHelperInternal.WorkingDirectory;
 
         public static IShortStringHelper ShortStringHelper => _testHelperInternal.ShortStringHelper;
         public static IJsonSerializer JsonSerializer => _testHelperInternal.JsonSerializer;
@@ -102,12 +102,13 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IWebRoutingSettings WebRoutingSettings => _testHelperInternal.WebRoutingSettings;
 
+
         /// <summary>
-        /// Maps the given <paramref name="relativePath"/> making it rooted on <see cref="CurrentAssemblyDirectory"/>. <paramref name="relativePath"/> must start with <code>~/</code>
+        /// Some test files are copied to the /bin (/bin/debug) on build, this is a utility to return their physical path based on a virtual path name
         /// </summary>
-        /// <param name="relativePath">The relative path.</param>
+        /// <param name="relativePath"></param>
         /// <returns></returns>
-        public static string MapPathForTest(string relativePath) => _testHelperInternal.MapPathForTest(relativePath);
+        public static string MapPathForTestFiles(string relativePath) => _testHelperInternal.MapPathForTestFiles(relativePath);
 
         public static void InitializeContentDirectories()
         {
@@ -147,7 +148,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static void CleanUmbracoSettingsConfig()
         {
-            var currDir = new DirectoryInfo(CurrentAssemblyDirectory);
+            var currDir = new DirectoryInfo(WorkingDirectory);
 
             var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
             if (File.Exists(umbracoSettingsFile))

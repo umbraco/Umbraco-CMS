@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [SetUp]
         public void Init()
         {
-            var config = new FileInfo(TestHelper.MapPathForTest("~/Configurations/UmbracoSettings/web.config"));
+            var config = new FileInfo(TestHelper.MapPathForTestFiles("~/Configurations/UmbracoSettings/web.config"));
 
             var fileMap = new ExeConfigurationFileMap() { ExeConfigFilename = config.FullName };
             var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);

@@ -6,6 +6,35 @@ namespace Umbraco.Core
 {
     public static class AssemblyExtensions
     {
+        private static string _rootDir = "";
+
+        /// <summary>
+        /// Utility method that returns the path to the root of the application, by getting the path to where the assembly where this
+        /// method is included is present, then traversing until it's past the /bin directory. Ie. this makes it work
+        /// even if the assembly is in a /bin/debug or /bin/release folder
+        /// </summary>
+        /// <returns></returns>
+        public static string GetRootDirectorySafe(this Assembly executingAssembly)
+        {
+            if (string.IsNullOrEmpty(_rootDir) == false)
+            {
+                return _rootDir;
+            }
+
+            var codeBase = executingAssembly.CodeBase;
+            var uri = new Uri(codeBase);
+            var path = uri.LocalPath;
+            var baseDirectory = Path.GetDirectoryName(path);
+            if (string.IsNullOrEmpty(baseDirectory))
+                throw new Exception("No root directory could be resolved. Please ensure that your Umbraco solution is correctly configured.");
+
+            _rootDir = baseDirectory.Contains("bin")
+                ? baseDirectory.Substring(0, baseDirectory.LastIndexOf("bin", StringComparison.OrdinalIgnoreCase) - 1)
+                : baseDirectory;
+
+            return _rootDir;
+        }
+
         /// <summary>
         /// Returns the file used to load the assembly
         /// </summary>
