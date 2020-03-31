@@ -15,23 +15,23 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="Umbraco\**" />
       <Compile Remove="wwwroot\Umbraco\**" />
+        <Compile Remove="App_Data\**" />
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Remove="Umbraco\**" />
       <EmbeddedResource Remove="wwwroot\Umbraco\**" />
+        <EmbeddedResource Remove="App_Data\**" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Umbraco\**" />
       <None Remove="wwwroot\Umbraco\**" />
+        <None Remove="App_Data\**" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Remove="Umbraco\**" />
-      <Content Remove="wwwroot\Umbraco\**" />
+        <Content Remove="wwwroot\Umbraco\**" />
+        <Content Remove="App_Data\**" />
     </ItemGroup>
 
 </Project>

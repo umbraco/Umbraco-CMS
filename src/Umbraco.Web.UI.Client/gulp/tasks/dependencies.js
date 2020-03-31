@@ -6,6 +6,7 @@ var gulp = require('gulp');
 var MergeStream = require('merge-stream');
 
 var imagemin = require('gulp-imagemin');
+var _ = require('lodash');
 
 /**************************
  * Task processes and copies all dependencies, either installed by npm or stored locally in the project
@@ -242,18 +243,23 @@ function dependencies() {
 
     // add streams for node modules
     nodeModules.forEach(module => {
-        stream.add(
-            gulp.src(module.src,
-                { base: module.base, allowEmpty: true })
-                .pipe(gulp.dest(config.root + config.targets.lib + "/" + module.name))
-        );
+        var task = gulp.src(module.src, { base: module.base, allowEmpty: true });
+        
+        _.forEach(config.roots, function(root){
+            task = task.pipe(gulp.dest(root + config.targets.lib + "/" + module.name))
+        });
+        
+        stream.add(task);
     });
 
     //copy over libs which are not on npm (/lib)
-    stream.add(
-        gulp.src(config.sources.globs.lib, { allowEmpty: true })
-            .pipe(gulp.dest(config.root + config.targets.lib))
-        );
+    var libTask = gulp.src(config.sources.globs.lib, { allowEmpty: true });
+
+    _.forEach(config.roots, function(root){
+        libTask = libTask.pipe(gulp.dest(root + config.targets.lib))
+    });
+    
+    stream.add(libTask);
 
     //Copies all static assets into /root / assets folder
     //css, fonts and image files
@@ -270,28 +276,38 @@ function dependencies() {
             ]
         })
     ]));
-    
-    assetsTask = assetsTask.pipe(gulp.dest(config.root + config.targets.assets));
+
+    _.forEach(config.roots, function(root){
+        assetsTask = assetsTask.pipe(gulp.dest(root + config.targets.assets));
+    });
+   
     
     stream.add(assetsTask);
 
     // Copies all the less files related to the preview into their folder
     //these are not pre-processed as preview has its own less compiler client side
-    stream.add(
-        gulp.src("src/canvasdesigner/editors/*.less", { allowEmpty: true })
-                .pipe(gulp.dest(config.root + config.targets.assets + "/less"))
-        );
+    var lessTask = gulp.src("src/canvasdesigner/editors/*.less", { allowEmpty: true });
+
+    _.forEach(config.roots, function(root){
+        lessTask = lessTask.pipe(gulp.dest(root + config.targets.assets + "/less"));
+    });
+    stream.add(lessTask);
+
+
 
 	// TODO: check if we need these fileSize
-    stream.add(
-        gulp.src("src/views/propertyeditors/grid/config/*.*", { allowEmpty: true })
-                .pipe(gulp.dest(config.root + config.targets.views + "/propertyeditors/grid/config"))
-        );
-    stream.add(
-        gulp.src("src/views/dashboard/default/*.jpg", { allowEmpty: true })
-                .pipe(gulp.dest(config.root + config.targets.views + "/dashboard/default"))
-        );
-
+    var configTask = gulp.src("src/views/propertyeditors/grid/config/*.*", { allowEmpty: true });
+    _.forEach(config.roots, function(root){
+        configTask = configTask.pipe(gulp.dest(root + config.targets.views + "/propertyeditors/grid/config"));
+    });
+    stream.add(configTask);
+    
+    var dashboardTask = gulp.src("src/views/dashboard/default/*.jpg", { allowEmpty: true });
+    _.forEach(config.roots, function(root){
+        dashboardTask = dashboardTask .pipe(gulp.dest(root + config.targets.views + "/dashboard/default"));
+    });
+    stream.add(dashboardTask);
+  
     return stream;
 };
 
