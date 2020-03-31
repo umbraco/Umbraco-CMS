@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Assets;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.Common.ActionResults;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
@@ -20,33 +21,15 @@ namespace Umbraco.Web.BackOffice.Filters
 
                 if (context.Result is JavaScriptResult jsResult)
                 {
-
-
                     var result = jsResult.Content;
                     var minified = await runtimeMinifier.MinifyAsync(result, AssetType.Javascript);
                     jsResult.Content = minified;
                 }
             }
 
-
-
-
-
             await next(); // the actual action
 
             // logic after the action goes here
-        }
-
-        public override void OnResultExecuting(ResultExecutingContext context)
-        {
-            base.OnResultExecuting(context);
-
-
-
-
-
-            //minify the result
-
         }
     }
 }
