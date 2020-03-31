@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Integration.Implementations
                 // For Azure Devops we can only store a database in certain locations so we will need to detect if we are running
                 // on a build server and if so we'll use the %temp% path.
 
-                if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("System.DefaultWorkingDirectory")))
+                if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("System_DefaultWorkingDirectory")))
                 {
                     // we are using Azure Devops!
 
