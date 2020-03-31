@@ -6,7 +6,8 @@
 
     var runtimeMinifier = Current.RuntimeMinifier;
 
-    runtimeMinifier.RequiresCss("Umbraco", "assets/css/canvasdesigner.css");
+    runtimeMinifier.RequiresCss("umbraco-preview",
+        "assets/css/canvasdesigner.css");
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -17,7 +18,7 @@
     <meta name="pinterest" content="nopin" />
 
 
-     @Html.Raw(runtimeMinifier.RenderCssHere("Umbraco"))
+     @Html.Raw(runtimeMinifier.RenderCssHere("umbraco-preview"))
 
 
 </head>

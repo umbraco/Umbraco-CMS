@@ -8,7 +8,10 @@
 
     var runtimeMinifier = Current.RuntimeMinifier;
 
-    runtimeMinifier.RequiresCss("umbraco", "assets/css/umbraco.css", "lib/bootstrap-social/bootstrap-social.css", "lib/font-awesome/css/font-awesome.min.css");
+    runtimeMinifier.RequiresCss("umbraco", 
+        "assets/css/umbraco.css",
+        "lib/bootstrap-social/bootstrap-social.css",
+        "lib/font-awesome/css/font-awesome.min.css");
 }
 
 <!DOCTYPE html>
@@ -21,7 +24,7 @@
 
     <title>Umbraco</title>
 
-    @Html.Raw(runtimeMinifier.RenderJsHere("Umbraco"));
+    @Html.Raw(runtimeMinifier.RenderJsHere("umbraco"));
 
     @*Because we're lazy loading angular js, the embedded cloak style will not be loaded initially, but we need it*@
     <style>

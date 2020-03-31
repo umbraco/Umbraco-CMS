@@ -18,7 +18,10 @@
     }
     var runtimeMinifier = Current.RuntimeMinifier;
 
-    runtimeMinifier.RequiresCss("Umbraco", "lib/bootstrap-social/bootstrap-social.css", "assets/css/umbraco.css", "lib/font-awesome/css/font-awesome.min.css");
+    runtimeMinifier.RequiresCss("umbraco",
+        "lib/bootstrap-social/bootstrap-social.css", 
+        "assets/css/umbraco.css",
+        "lib/font-awesome/css/font-awesome.min.css");
 }
 
 <!DOCTYPE html>
@@ -36,7 +39,6 @@
     <title ng-bind="$root.locationTitle">Umbraco</title>
 
     @Html.Raw(runtimeMinifier.RenderCssHere("Umbraco"))
-    @* @Html.RenderCssHere(new BasicPath("Umbraco", Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath))) *@
 
 </head>
 <body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show, 'umb-tour-is-visible': tour.show, 'tabbing-active':tabbingActive}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
