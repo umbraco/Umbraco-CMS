@@ -2,20 +2,13 @@ using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using StackExchange.Profiling;
 using Umbraco.Composing;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Web.BackOffice.AspNetCore;
 using Umbraco.Web.Common.AspNetCore;
-using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Extensions;
-using Umbraco.Web.Common.Runtime.Profiler;
 using Umbraco.Web.Website.AspNetCore;
 
 
@@ -66,11 +59,6 @@ namespace Umbraco.Web.UI.BackOffice
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.Use(async (context, next) =>
-            {
-                await next();
-            });
-
             app.UseUmbracoCore();
             app.UseUmbracoWebsite();
             app.UseUmbracoBackOffice();
