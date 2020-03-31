@@ -13,6 +13,8 @@
             public const string ConfigPrefix = "Umbraco:CMS:";
             public const string ConfigSecurityPrefix = ConfigPrefix+"Security:";
             public const string ConfigModelsBuilderPrefix = ConfigPrefix+"ModelsBuilder:";
+            public const string ConfigRuntimeMinification = ConfigPrefix+"RuntimeMinification";
+            public const string ConfigRuntimeMinificationVersion = ConfigRuntimeMinification+":Version";
         }
     }
 }

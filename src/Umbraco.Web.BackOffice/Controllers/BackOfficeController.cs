@@ -31,6 +31,13 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             return new JavaScriptResult(result);
         }
+
+        public IActionResult Reset()
+        {
+            _runtimeMinifier.Reset();
+
+            return Content("OK");
+        }
     }
 
     public class JavaScriptResult : ContentResult

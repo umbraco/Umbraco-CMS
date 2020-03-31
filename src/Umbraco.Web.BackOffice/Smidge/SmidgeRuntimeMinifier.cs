@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.Extensions.Configuration;
 using Smidge;
 using Smidge.CompositeFiles;
 using Smidge.FileProcessors;
@@ -30,6 +29,7 @@ namespace Umbraco.Web.BackOffice.Smidge
         private readonly IIOHelper _ioHelper;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ISmidgeConfig _smidgeConfig;
+        private readonly IConfigManipulator _configManipulator;
         private readonly IManifestParser _manifestParser;
         private readonly PreProcessPipelineFactory _preProcessPipelineFactory;
         private readonly PropertyEditorCollection _propertyEditorCollection;
@@ -47,7 +47,8 @@ namespace Umbraco.Web.BackOffice.Smidge
             IGlobalSettings globalSettings,
             IIOHelper ioHelper,
             IHostingEnvironment hostingEnvironment,
-            ISmidgeConfig smidgeConfig)
+            ISmidgeConfig smidgeConfig,
+            IConfigManipulator configManipulator)
         {
             _smidge = smidge;
             _preProcessPipelineFactory = preProcessPipelineFactory;
@@ -58,6 +59,7 @@ namespace Umbraco.Web.BackOffice.Smidge
             _ioHelper = ioHelper;
             _hostingEnvironment = hostingEnvironment;
             _smidgeConfig = smidgeConfig;
+            _configManipulator = configManipulator;
         }
 
         private PreProcessPipeline JsPipeline  => _jsPipeline ??= _preProcessPipelineFactory.Create(typeof(JsMinifier));
@@ -110,9 +112,18 @@ namespace Umbraco.Web.BackOffice.Smidge
             }
         }
 
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <remarks>
+        /// Smidge uses the version number as cache buster (configurable).
+        /// We therefore can reset, by updating the version number in config
+        /// </remarks>
         public void Reset()
         {
-            // TODO: Need to figure out how to delete temp directories to make sure we get fresh caches
+            var version = DateTime.UtcNow.Ticks.ToString();
+            _configManipulator.SaveConfigValue(Constants.Configuration.ConfigRuntimeMinificationVersion, version.ToString());
         }
 
         public async Task<string> GetScriptForBackOfficeAsync()

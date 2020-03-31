@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Smidge;
 using Smidge.Nuglify;
+using Smidge.Options;
 using Umbraco.Composing;
 using Umbraco.Configuration;
 using Umbraco.Core;
@@ -166,7 +167,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         public static IServiceCollection AddUmbracoRuntimeMinifier(this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddSmidge(configuration.GetSection(Constants.Configuration.ConfigPrefix+"RuntimeMinification"));
+            services.AddSmidge(configuration.GetSection(Constants.Configuration.ConfigRuntimeMinification));
             services.AddSmidgeNuglify();
 
             return services;
