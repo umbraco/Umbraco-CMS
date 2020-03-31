@@ -947,7 +947,9 @@ namespace Umbraco.Core
         /// <returns>The filtered string.</returns>
         public static string ReplaceFirst(this string text, string search, string replace)
         {
-            var pos = text.IndexOf(search);
+            if (text == null) throw new ArgumentNullException(nameof(text));
+
+            var pos = text.IndexOf(search, StringComparison.InvariantCulture);
 
             if (pos < 0)
                 return text;

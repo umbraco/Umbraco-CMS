@@ -9,7 +9,7 @@ using Umbraco.Web.Common.ActionResults;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
-    public class MinifyJavaScriptResult : ActionFilterAttribute
+    public class MinifyJavaScriptResultAttribute : ActionFilterAttribute
     {
         public override async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
         {
