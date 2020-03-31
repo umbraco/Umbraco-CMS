@@ -119,15 +119,5 @@ namespace Umbraco.Web.Common.Runtime.Profiler
             if (bool.TryParse(request.Cookies["UMB-DEBUG"], out var cUmbDebug)) return cUmbDebug;
             return false;
         }
-
-        /// <summary>
-        ///     Indicates the boot phase.
-        /// </summary>
-        private enum BootPhase
-        {
-            Boot = 0, // boot phase (before the 1st request even begins)
-            BootRequest = 1, // request boot phase (during the 1st request)
-            Booted = 2 // done booting
-        }
     }
 }

@@ -17,9 +17,10 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
+using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Runtime.Profiler;
 
-namespace Umbraco.Web.Common.AspNetCore
+namespace Umbraco.Web.Common.Extensions
 {
     public static class UmbracoCoreServiceCollectionExtensions
     {
