@@ -93,7 +93,7 @@ namespace Umbraco.Web.BackOffice.Smidge
             {
                 _smidge.RequiresCss(files);
 
-                return await _smidge.GenerateJsUrlsAsync(CssPipeline, _hostingEnvironment.IsDebugMode);
+                return await _smidge.GenerateCssUrlsAsync(CssPipeline, _hostingEnvironment.IsDebugMode);
             }
         }
 
