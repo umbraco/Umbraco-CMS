@@ -1,9 +1,11 @@
 ﻿
+using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Moq;
 using System.Data.Common;
+using System.IO;
 using System.Net;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -28,6 +30,7 @@ namespace Umbraco.Tests.Integration.Implementations
         private readonly IIpResolver _ipResolver;
         private readonly IWebHostEnvironment _hostEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private string _tempWorkingDir;
 
         public TestHelper() : base(typeof(TestHelper).Assembly)
         {
@@ -35,10 +38,6 @@ namespace Umbraco.Tests.Integration.Implementations
             httpContext.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
             _httpContextAccessor = Mock.Of<IHttpContextAccessor>(x => x.HttpContext == httpContext);
             _ipResolver = new AspNetIpResolver(_httpContextAccessor);
-
-            // For Azure Devops we can only store a database in certain locations so we will need to detect if we are running
-            // on a build server and if so we'll use the %temp% path.
-            //var siteTemp = System.IO.Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", hash);
 
             var hostEnvironment = new Mock<IWebHostEnvironment>();
             hostEnvironment.Setup(x => x.ApplicationName).Returns("UmbracoIntegrationTests");
@@ -49,6 +48,33 @@ namespace Umbraco.Tests.Integration.Implementations
             _hostingLifetime = new AspNetCoreApplicationShutdownRegistry(Mock.Of<IHostApplicationLifetime>());
 
             Logger = new ProfilingLogger(new ConsoleLogger(new MessageTemplates()), Profiler);
+        }
+
+
+        public override string WorkingDirectory
+        {
+            get
+            {
+                // For Azure Devops we can only store a database in certain locations so we will need to detect if we are running
+                // on a build server and if so we'll use the %temp% path.
+
+                if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("System.DefaultWorkingDirectory")))
+                {
+                    // we are using Azure Devops!
+
+                    if (_tempWorkingDir != null) return _tempWorkingDir;
+
+                    var temp = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoTemp");
+                    Directory.CreateDirectory(temp);
+                    _tempWorkingDir = temp;
+                    return _tempWorkingDir;
+
+                }
+                else
+                {
+                    return base.WorkingDirectory;
+                }
+            }
         }
 
         public IUmbracoBootPermissionChecker UmbracoBootPermissionChecker { get; } = new TestUmbracoBootPermissionChecker();

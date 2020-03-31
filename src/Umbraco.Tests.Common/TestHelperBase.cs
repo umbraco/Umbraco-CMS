@@ -30,6 +30,7 @@ namespace Umbraco.Tests.Common
         private readonly ITypeFinder _typeFinder;
         private UriUtility _uriUtility;
         private IIOHelper _ioHelper;
+        private string _workingDir;
 
         protected TestHelperBase(Assembly entryAssembly)
         {
@@ -63,14 +64,18 @@ namespace Umbraco.Tests.Common
         /// <summary>
         /// Gets the working directory of the test project.
         /// </summary>
-        public string WorkingDirectory
+        public virtual string WorkingDirectory
         {
             get
             {
-                var dir = Path.Combine(IOHelper.MapPath("~"), "TEMP");
+                if (_workingDir != null) return _workingDir;
+
+                var dir = Path.Combine(Assembly.GetExecutingAssembly().GetRootDirectorySafe(), "TEMP");
+
                 if (!Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
-                return dir;
+                _workingDir = dir;
+                return _workingDir;
             }
         }
 
