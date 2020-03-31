@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;

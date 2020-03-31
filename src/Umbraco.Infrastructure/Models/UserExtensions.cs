@@ -9,6 +9,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Core.Security;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Core.Models
 {

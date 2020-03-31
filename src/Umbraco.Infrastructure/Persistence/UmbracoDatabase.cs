@@ -28,6 +28,7 @@ namespace Umbraco.Core.Persistence
         private readonly RetryPolicy _connectionRetryPolicy;
         private readonly RetryPolicy _commandRetryPolicy;
         private readonly Guid _instanceGuid = Guid.NewGuid();
+        private List<CommandInfo> _commands;
 
         #region Ctor
 
@@ -162,6 +163,14 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         public int SqlCount { get; private set; }
 
+        internal bool LogCommands
+        {
+            get => _commands != null;
+            set => _commands = value ? new List<CommandInfo>() : null;
+        }
+
+        internal IEnumerable<CommandInfo> Commands => _commands;
+
         public int BulkInsertRecords<T>(IEnumerable<T> records)
         {
             return _bulkSqlInsertProvider.BulkInsertRecords(this, records);
@@ -267,9 +276,43 @@ namespace Umbraco.Core.Persistence
             if (_enableCount)
                 SqlCount++;
 
+            _commands?.Add(new CommandInfo(cmd));
+
             base.OnExecutedCommand(cmd);
         }
 
         #endregion
+
+        // used for tracking commands
+        public class CommandInfo
+        {
+            public CommandInfo(IDbCommand cmd)
+            {
+                Text = cmd.CommandText;
+                var parameters = new List<ParameterInfo>();
+                foreach (IDbDataParameter parameter in cmd.Parameters) parameters.Add(new ParameterInfo(parameter));
+                Parameters = parameters.ToArray();
+            }
+
+            public string Text { get; }
+            public ParameterInfo[] Parameters { get; }
+        }
+
+        // used for tracking commands
+        public class ParameterInfo
+        {
+            public ParameterInfo(IDbDataParameter parameter)
+            {
+                Name = parameter.ParameterName;
+                Value = parameter.Value;
+                DbType = parameter.DbType;
+                Size = parameter.Size;
+            }
+
+            public string Name { get; }
+            public object Value { get; }
+            public DbType DbType { get; }
+            public int Size { get; }
+        }
     }
 }

@@ -18,11 +18,13 @@ namespace Umbraco.Core.Composing
             {
                 "Umbraco.Core",
                 "Umbraco.Web",
-                "Umbraco.Web.BackOffice",
                 "Umbraco.Infrastructure",
                 "Umbraco.PublishedCache.NuCache",
                 "Umbraco.ModelsBuilder.Embedded",
                 "Umbraco.Examine.Lucene",
+                "Umbraco.Web.Common",
+                "Umbraco.Web.BackOffice",
+                "Umbraco.Web.Website",
             };
 
         public DefaultUmbracoAssemblyProvider(Assembly entryPointAssembly)

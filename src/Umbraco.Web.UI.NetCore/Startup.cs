@@ -2,11 +2,20 @@ using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using StackExchange.Profiling;
+using Umbraco.Composing;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Web.BackOffice.AspNetCore;
 using Umbraco.Web.Common.AspNetCore;
+using Umbraco.Web.Common.AspNetCore;
+using Umbraco.Web.Common.Extensions;
+using Umbraco.Web.Common.Runtime.Profiler;
 using Umbraco.Web.Website.AspNetCore;
 
 
@@ -41,11 +50,18 @@ namespace Umbraco.Web.UI.BackOffice
             services.AddUmbracoWebsite();
 
             services.AddMvc();
+            services.AddMiniProfiler(options =>
+            {
+                options.ShouldProfile = request => false; // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
+        //    app.UseMiniProfiler();
+            app.UseUmbracoRequest();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -55,6 +71,7 @@ namespace Umbraco.Web.UI.BackOffice
                 await next();
             });
 
+            app.UseUmbracoCore();
             app.UseUmbracoWebsite();
             app.UseUmbracoBackOffice();
             app.UseRouting();
@@ -66,7 +83,10 @@ namespace Umbraco.Web.UI.BackOffice
                     Controller = "BackOffice",
                     Action = "Default"
                 });
-                endpoints.MapGet("/", async context => { await context.Response.WriteAsync("Hello World!"); });
+                endpoints.MapGet("/", async context =>
+                {
+                    await context.Response.WriteAsync($"<html><body>Hello World!{Current.Profiler.Render()}</body></html>");
+                });
             });
         }
     }

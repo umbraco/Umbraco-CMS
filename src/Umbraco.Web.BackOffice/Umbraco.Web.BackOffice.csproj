@@ -11,8 +11,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Smidge" Version="3.1.0" />
-      <PackageReference Include="Smidge.Nuglify" Version="2.0.0" />
       <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
     </ItemGroup>
 
@@ -20,6 +18,7 @@
         <ProjectReference Include="..\Umbraco.Configuration\Umbraco.Configuration.csproj" />
         <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
         <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+        <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
     </ItemGroup>
 
 </Project>

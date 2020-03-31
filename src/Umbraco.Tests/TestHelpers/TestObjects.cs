@@ -193,6 +193,7 @@ namespace Umbraco.Tests.TestHelpers
             var tagService = GetLazyService<ITagService>(factory, c => new TagService(scopeProvider, logger, eventMessagesFactory, GetRepo<ITagRepository>(c)));
             var redirectUrlService = GetLazyService<IRedirectUrlService>(factory, c => new RedirectUrlService(scopeProvider, logger, eventMessagesFactory, GetRepo<IRedirectUrlRepository>(c)));
             var consentService = GetLazyService<IConsentService>(factory, c => new ConsentService(scopeProvider, logger, eventMessagesFactory, GetRepo<IConsentRepository>(c)));
+            var keyValueService = GetLazyService<IKeyValueService>(factory, c => new KeyValueService(scopeProvider, GetRepo<IKeyValueRepository>(c)));
             var contentTypeServiceBaseFactory = GetLazyService<IContentTypeBaseServiceProvider>(factory, c => new ContentTypeBaseServiceProvider(factory.GetInstance<IContentTypeService>(),factory.GetInstance<IMediaTypeService>(),factory.GetInstance<IMemberTypeService>()));
 
             return new ServiceContext(
@@ -221,6 +222,7 @@ namespace Umbraco.Tests.TestHelpers
                 externalLoginService,
                 redirectUrlService,
                 consentService,
+                keyValueService,
                 contentTypeServiceBaseFactory);
         }
 
@@ -244,17 +246,16 @@ namespace Umbraco.Tests.TestHelpers
                 // mappersBuilder.AddCore();
                 // var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Factory.GetInstance<IMapperCollection>();
-                databaseFactory = new UmbracoDatabaseFactory(
-                    Constants.System.UmbracoConnectionName,
+                databaseFactory = new UmbracoDatabaseFactory(logger,
                     SettingsForTests.GetDefaultGlobalSettings(),
                     new ConnectionStrings(),
-                    logger,
+                    Constants.System.UmbracoConnectionName,
                     new Lazy<IMapperCollection>(() => mappers),
                     TestHelper.DbProviderFactoryCreator);
             }
 
-            typeFinder = typeFinder ?? new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly));
-            fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings());
+            typeFinder ??= new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly));
+            fileSystems ??= new FileSystems(Current.Factory, logger, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings());
             var coreDebug = TestHelper.CoreDebugSettings;
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
             var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, coreDebug, mediaFileSystem, logger, typeFinder, NoAppCache.Instance);

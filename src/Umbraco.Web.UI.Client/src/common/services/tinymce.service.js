@@ -7,7 +7,7 @@
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
 function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService,
-                        $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService, localStorageService) {
+                        $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService, localStorageService, mediaHelper) {
 
     //These are absolutely required in order for the macros to render inline
     //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
@@ -298,15 +298,20 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
             var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, size.w, size.h);
 
-
             editor.dom.setAttrib(imageDomElement, 'width', newSize.width);
             editor.dom.setAttrib(imageDomElement, 'height', newSize.height);
 
             // Images inserted via Media Picker will have a URL we can use for ImageResizer QueryStrings
             // Images pasted/dragged in are not persisted to media until saved & thus will need to be added
-            if(imgUrl){
-                var src = imgUrl + "?width=" + newSize.width + "&height=" + newSize.height;
-                editor.dom.setAttrib(imageDomElement, 'data-mce-src', src);
+            if (imgUrl) {
+                mediaHelper.getProcessedImageUrl(imgUrl,
+                    {
+                        height: newSize.height,
+                        width: newSize.width
+                    })
+                    .then(function (resizedImgUrl) {
+                        editor.dom.setAttrib(imageDomElement, 'data-mce-src', resizedImgUrl);
+                    });
             }
 
             editor.execCommand("mceAutoResize", false, null, null);
@@ -1495,10 +1500,17 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             });
 
             args.editor.on('ObjectResized', function (e) {
-                var qs = "?width=" + e.width + "&height=" + e.height + "&mode=max";
                 var srcAttr = $(e.target).attr("src");
                 var path = srcAttr.split("?")[0];
-                $(e.target).attr("data-mce-src", path + qs);
+                mediaHelper.getProcessedImageUrl(path,
+                    {
+                        height: e.height,
+                        moded: "max",
+                        width: e.width
+                    })
+                    .then(function (resizedPath) {
+                        $(e.target).attr("data-mce-src", resizedPath);
+                    });
 
                 syncContent();
             });

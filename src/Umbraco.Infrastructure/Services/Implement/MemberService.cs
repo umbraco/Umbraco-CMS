@@ -757,7 +757,6 @@ namespace Umbraco.Core.Services.Implement
                 }
 
                 // TODO: Since this is by property value, we need a GetByPropertyQuery on the repo!
-                // TODO: Since this is by property value, we need a GetByPropertyQuery on the repo!
                 return _memberRepository.Get(query);
             }
         }
@@ -1196,7 +1195,6 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
 
-                // TODO: What about content that has the contenttype as part of its composition?
                 // TODO: What about content that has the contenttype as part of its composition?
                 var query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
 

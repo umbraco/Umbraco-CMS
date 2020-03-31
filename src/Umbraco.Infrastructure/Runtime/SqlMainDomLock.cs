@@ -33,14 +33,12 @@ namespace Umbraco.Core.Runtime
             // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
             _lockId = Guid.NewGuid().ToString();
             _logger = logger;
-            _dbFactory = new UmbracoDatabaseFactory(
-               Constants.System.UmbracoConnectionName,
+            _dbFactory = new UmbracoDatabaseFactory(_logger,
                globalSettings,
                connectionStrings,
-               _logger,
+               Constants.System.UmbracoConnectionName,
                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())),
-               dbProviderFactoryCreator
-               );
+               dbProviderFactoryCreator);
         }
 
         public async Task<bool> AcquireLockAsync(int millisecondsTimeout)
@@ -326,7 +324,7 @@ namespace Umbraco.Core.Runtime
             {
                 Key = MainDomKey,
                 Value = id,
-                Updated = DateTime.Now
+                UpdateDate = DateTime.Now
             });
         }
 

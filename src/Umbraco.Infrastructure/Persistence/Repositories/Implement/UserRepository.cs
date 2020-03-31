@@ -637,10 +637,25 @@ ORDER BY colName";
 
         public bool Exists(string username)
         {
+            return ExistsByUserName(username);
+        }
+
+        public bool ExistsByUserName(string username)
+        {
             var sql = SqlContext.Sql()
                 .SelectCount()
                 .From<UserDto>()
                 .Where<UserDto>(x => x.UserName == username);
+
+            return Database.ExecuteScalar<int>(sql) > 0;
+        }
+
+        public bool ExistsByLogin(string login)
+        {
+            var sql = SqlContext.Sql()
+                .SelectCount()
+                .From<UserDto>()
+                .Where<UserDto>(x => x.Login == login);
 
             return Database.ExecuteScalar<int>(sql) > 0;
         }
