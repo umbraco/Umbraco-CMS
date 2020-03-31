@@ -183,26 +183,28 @@
         }
 
         function editBlock(blockModel, hideContent) {
-            if (hideContent && !blockModel.config.settingsElementTypeAlias) {
-                return;
-            }
-
+            
             // make a clone to avoid editing model directly.
-            var blockContentModelClone = angular.copy(hideContent ? null : blockModel.content);
-            var blockSettingsModelClone = angular.copy(blockModel.settings);
+            var blockContentModelClone = angular.copy(blockModel.content);
+            var blockSettingsModelClone = null;
+
+            if (blockModel.config.settingsElementTypeAlias) {
+                blockSettingsModelClone = angular.copy(blockModel.settings);
+            }
             
             var blockEditorModel = {
                 content: blockContentModelClone,
+                hideContent: hideContent,
                 settings: blockSettingsModelClone,
                 title: blockModel.label,
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
                 size: blockModel.config.overlaySize || "medium",
                 submit: function(blockEditorModel) {
                     // To ensure syncronization gets tricked we transfer
-                    if (!hideContent) {
+                    if (blockEditorModel.content !== null) {
                         blockEditorService.mapElementTypeValues(blockEditorModel.content, blockModel.content)
                     }
-                    if (blockModel.config.settingsElementTypeAlias) {
+                    if (blockModel.config.settingsElementTypeAlias !== null) {
                         blockEditorService.mapElementTypeValues(blockEditorModel.settings, blockModel.settings)
                     }
                     editorService.close();

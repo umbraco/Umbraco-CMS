@@ -4,45 +4,48 @@ angular.module("umbraco")
     function ($scope) {
         var vm = this;
 
-        function showContent() {
-            if (vm.settingsTab) vm.settingsTab.active = false;
-            vm.contentTab.active = true;
-        }
-
-        function showSettings() {
-            if (vm.settingsTab) vm.settingsTab.active = true;
-            vm.contentTab.active = false;
-        }
-
         vm.content = $scope.model.content;
         vm.settings = $scope.model.settings;
+
+        vm.model = $scope.model;
+        console.log("blockeditor model:", vm.model)
+
         vm.tabs = [];
-        var settingsOnly = vm.content && vm.content.variants ? false : true;
 
-        if (!settingsOnly) {
-            vm.contentTab = {
-                "name": "Content",
-                "alias": "content",
-                "icon": "icon-document",
-                "action": showContent,
-                "active": true
-            };
+        if (vm.content && vm.content.variants) {
 
-            vm.tabs.push(vm.contentTab);
+            var apps = vm.content.apps;
+
+            vm.tabs = apps;
+
+            // replace view of content app.
+            var contentApp = apps.find(entry => entry.alias === "umbContent");
+            contentApp.view = "views/common/infiniteeditors/elementeditor/elementeditor.content.html";
+            
+            if($scope.model.hideContent) {
+                apps.splice(apps.indexOf(contentApp), 1);
+            }
+
+            // remove info app:
+            var infoAppIndex = apps.findIndex(entry => entry.alias === "umbInfo");
+            apps.splice(infoAppIndex, 1);
+            
         }
 
         if (vm.settings && vm.settings.variants) {
-            vm.settingsTab = {
+            var settingsTab = {
                 "name": "Settings",
                 "alias": "settings",
                 "icon": "icon-settings",
-                "action": showSettings,
-                "active": settingsOnly
+                "view": "views/common/infiniteeditors/elementeditor/elementeditor.settings.html"
             };
-            vm.tabs.push(vm.settingsTab);
+            vm.tabs.push(settingsTab);
         }
 
-        vm.title = (settingsOnly ? 'SETTINGS: ' : '') + $scope.model.title;
+        // activate frst app:
+        if (vm.tabs.length > 0) {
+            vm.tabs[0].active = true;
+        }
 
         vm.saveAndClose = function () {
             if ($scope.model && $scope.model.submit) {
@@ -52,6 +55,7 @@ angular.module("umbraco")
 
         vm.close = function() {
             if ($scope.model && $scope.model.close) {
+                // TODO: If content has changed, we should notify user.
                 $scope.model.close($scope.model);
             }
         }

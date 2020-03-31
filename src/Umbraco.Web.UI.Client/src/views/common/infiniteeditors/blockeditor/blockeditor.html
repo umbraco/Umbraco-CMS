@@ -4,7 +4,7 @@
         <umb-editor-view umb-tabs ng-if="!page.loading">
 
             <umb-editor-header
-                name="vm.title"
+                name="vm.model.title"
                 name-locked="true"
                 navigation="vm.tabs"
                 hide-alias="true"
@@ -15,28 +15,17 @@
 
             <div class="umb-editor-container umb-panel-body umb-scrollable row-fluid">
 
-                <!-- Missing Deleted Message Bar (Displayed when viewing node in recycle bin), but Blocks dosnt go into trash-bin, so does not make sense currently
+                <!-- Missing Deleted Message Bar (Displayed when viewing node in recycle bin), but Blocks dosnt go into trash-bin jet...
                     <div ng-show="vm.content.trashed" class="umb-editor--trashed-message">
                         <i class="icon icon-trash"></i> <localize key="content_nodeIsInTrash">This item is in the Recycle Bin</localize>
                     </div>
                 -->
 
-                <!-- Missing content apps? — but i'm not sure content apps will or can work for ElementTypes? -->
-                <div ng-show="vm.contentTab.active">
-                    <div class="umb-pane">
-                        <div class="umb-editor-sub-views" val-sub-view>
-                            <umb-element-content-editor content="vm.content"></umb-element-content-editor>
-                        </div>
-                    </div>
+                <div class="umb-pane">
+                    <umb-editor-sub-views sub-views="vm.tabs" model="vm.model">
+                    </umb-editor-sub-views>
                 </div>
 
-                <div ng-show="vm.settingsTab.active">
-                    <div class="umb-pane" ng-if="vm.settings">
-                        <div class="umb-editor-sub-views" val-sub-view>
-                            <umb-element-content-editor content="vm.settings"></umb-element-content-editor>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <umb-editor-footer>
