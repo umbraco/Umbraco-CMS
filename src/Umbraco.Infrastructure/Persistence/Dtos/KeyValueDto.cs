@@ -21,6 +21,6 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("updated")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
-        public DateTime Updated { get; set; }
+        public DateTime UpdateDate { get; set; }
     }
 }

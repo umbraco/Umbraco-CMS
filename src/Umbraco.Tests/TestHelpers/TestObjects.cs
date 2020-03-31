@@ -193,6 +193,7 @@ namespace Umbraco.Tests.TestHelpers
             var tagService = GetLazyService<ITagService>(factory, c => new TagService(scopeProvider, logger, eventMessagesFactory, GetRepo<ITagRepository>(c)));
             var redirectUrlService = GetLazyService<IRedirectUrlService>(factory, c => new RedirectUrlService(scopeProvider, logger, eventMessagesFactory, GetRepo<IRedirectUrlRepository>(c)));
             var consentService = GetLazyService<IConsentService>(factory, c => new ConsentService(scopeProvider, logger, eventMessagesFactory, GetRepo<IConsentRepository>(c)));
+            var keyValueService = GetLazyService<IKeyValueService>(factory, c => new KeyValueService(scopeProvider, GetRepo<IKeyValueRepository>(c)));
             var contentTypeServiceBaseFactory = GetLazyService<IContentTypeBaseServiceProvider>(factory, c => new ContentTypeBaseServiceProvider(factory.GetInstance<IContentTypeService>(),factory.GetInstance<IMediaTypeService>(),factory.GetInstance<IMemberTypeService>()));
 
             return new ServiceContext(
@@ -221,6 +222,7 @@ namespace Umbraco.Tests.TestHelpers
                 externalLoginService,
                 redirectUrlService,
                 consentService,
+                keyValueService,
                 contentTypeServiceBaseFactory);
         }
 
