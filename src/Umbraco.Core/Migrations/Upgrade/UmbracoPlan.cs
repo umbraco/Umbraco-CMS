@@ -167,6 +167,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             .As("{0576E786-5C30-4000-B969-302B61E90CA3}");
 
             To<FixLanguageIsoCodeLength>("{48AD6CCD-C7A4-4305-A8AB-38728AD23FC5}");
+            To<AddPackagesSectionAccess>("{DF470D86-E5CA-42AC-9780-9D28070E25F9}");
 
             // finish migrating from v7 - recreate all keys and indexes
             To<CreateKeysAndIndexes>("{3F9764F5-73D0-4D45-8804-1240A66E43A2}");
