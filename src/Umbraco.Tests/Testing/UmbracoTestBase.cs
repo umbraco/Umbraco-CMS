@@ -50,7 +50,6 @@ using FileSystems = Umbraco.Core.IO.FileSystems;
 using Umbraco.Web.Templates;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.Models;
 using Umbraco.Net;
 using Umbraco.Core.Request;
 using Umbraco.Core.Security;
@@ -63,6 +62,7 @@ using Umbraco.Web.Security.Providers;
 using Umbraco.Web.Trees;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Tests.Common;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Tests.Testing
 {

@@ -22,8 +22,8 @@ using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Models;
 using Umbraco.Web.Routing;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Web.Editors
 {

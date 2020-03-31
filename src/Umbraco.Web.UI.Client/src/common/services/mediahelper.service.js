@@ -3,7 +3,7 @@
 * @name umbraco.services.mediaHelper
 * @description A helper object used for dealing with media items
 **/
-function mediaHelper(umbRequestHelper, $log) {
+function mediaHelper(umbRequestHelper, $http, $log) {
 
     //container of fileresolvers
     var _mediaFileResolvers = {};
@@ -304,11 +304,6 @@ function mediaHelper(umbRequestHelper, $log) {
                 return imagePath;
             }
 
-            // Check if file is a svg
-            if (this.getFileExtension(imagePath) === "svg") {
-                return imagePath;
-            }
-
             // If the path is not an image we cannot get a thumb
             if (!this.detectIfImageByExtension(imagePath)) {
                 return null;
@@ -399,6 +394,54 @@ function mediaHelper(umbRequestHelper, $log) {
             var lowered = filePath.toLowerCase();
             var ext = lowered.substr(lowered.lastIndexOf(".") + 1);
             return ext;
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.mediaHelper#getProcessedImageUrl
+         * @methodOf umbraco.services.mediaHelper
+         * @function
+         *
+         * @description
+         * Returns image URL with configured crop and other processing parameters.
+         *
+         * @param {string} imagePath Raw image path
+         * @param {object} options Object describing image generation parameters:
+         *  {
+         *      animationProcessMode: <string>
+         *      cacheBusterValue: <string>
+         *      focalPoint: {
+         *          left: <int>
+         *          top: <int>
+         *      },
+         *      height: <int>
+         *      mode: <string>
+         *      upscale: <boolean>
+         *      width: <int>
+         *  }
+         */
+        getProcessedImageUrl: function (imagePath, options) {
+
+            if (!options) {
+                return imagePath;
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "imagesApiBaseUrl",
+                        "GetProcessedImageUrl",
+                        {
+                            imagePath,
+                            animationProcessMode: options.animationProcessMode,
+                            cacheBusterValue: options.cacheBusterValue,
+                            focalPoint: options.focalPoint,
+                            height: options.height,
+                            mode: options.mode,
+                            upscale: options.upscale || false,
+                            width: options.width
+                        })),
+                "Failed to retrieve processed image URL for image: " + imagePath);
         }
 
     };

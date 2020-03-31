@@ -16,6 +16,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Services;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Web.Models.Mapping
 {
