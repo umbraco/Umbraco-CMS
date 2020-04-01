@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Umbraco.Web.PublishedCache.NuCache.Snap
+﻿namespace Umbraco.Web.PublishedCache.NuCache.Snap
 {
     //NOTE: This cannot be struct because it references itself
 
@@ -13,7 +11,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.Snap
     {
         public LinkedNode(TValue value, long gen, LinkedNode<TValue> next = null)
         {
-            Value = value ?? throw new ArgumentNullException(nameof(value));
+            Value = value; // This is allowed to be null, we actually explicitly set this to null in ClearLocked
             Gen = gen;
             Next = next;
         }

@@ -502,6 +502,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
+        /// <summary>
+        /// Validate the <see cref="ContentNodeKit"/> and try to create a parent <see cref="LinkedNode{ContentNode}"/>
+        /// </summary>
+        /// <param name="kit"></param>
+        /// <param name="parent"></param>
+        /// <returns>
+        /// Returns false if the parent was not found or if the kit validation failed
+        /// </returns>
         private bool BuildKit(ContentNodeKit kit, out LinkedNode<ContentNode> parent)
         {
             // make sure parent exists
