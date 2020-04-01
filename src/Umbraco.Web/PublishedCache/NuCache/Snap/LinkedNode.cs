@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Web.PublishedCache.NuCache.Snap
+﻿using System;
+
+namespace Umbraco.Web.PublishedCache.NuCache.Snap
 {
     //NOTE: This cannot be struct because it references itself
 
@@ -11,7 +13,7 @@
     {
         public LinkedNode(TValue value, long gen, LinkedNode<TValue> next = null)
         {
-            Value = value;
+            Value = value ?? throw new ArgumentNullException(nameof(value));
             Gen = gen;
             Next = next;
         }

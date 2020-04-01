@@ -1028,7 +1028,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             parentLink = parentLink ?? GetRequiredParentLink(content, null);
 
+            // TODO: This can result in a null value? see https://github.com/umbraco/Umbraco-CMS/issues/7868
+            // It seems to be related to having corrupt Paths in the umbracoNode table.
             var parent = parentLink.Value;
+
+            if (parent == null)
+                throw new PanicException($"A null Value was returned on the {nameof(parentLink)} LinkedNode with id={content.ParentContentId}, potentially your database paths are corrupted, please see the HealthCheck dashboard and fixup data inconsistencies.");
 
             // if parent has no children, clone parent + add as first child
             if (parent.FirstChildContentId < 0)
