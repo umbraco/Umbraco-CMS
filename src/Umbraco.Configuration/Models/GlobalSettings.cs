@@ -12,7 +12,7 @@ namespace Umbraco.Configuration.Models
     /// </summary>
     internal class GlobalSettings : IGlobalSettings
     {
-        public const string Prefix = Constants.Configuration.ConfigPrefix + "Global:";
+        private const string Prefix = Constants.Configuration.ConfigGlobalPrefix;
 
         internal const string
             StaticReservedPaths = "~/app_plugins/,~/install/,~/mini-profiler-resources/,"; //must end with a comma!

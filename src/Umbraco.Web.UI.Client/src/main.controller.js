@@ -1,19 +1,18 @@
-
-/**
+/** 
  * @ngdoc controller
- * @name Umbraco.MainController
+ * @name Umbraco.MainController  
  * @function
  * 
- * @description
+ * @description  
  * The main application controller
  * 
  */
 function MainController($scope, $location, appState, treeService, notificationsService, 
     userService, historyService, updateChecker, navigationService, eventsService, 
     tmhDynamicLocale, localStorageService, editorService, overlayService, assetsService, tinyMceAssets) {
-
+ 
     //the null is important because we do an explicit bool check on this in the view
-    $scope.authenticated = null;
+    $scope.authenticated = null; 
     $scope.touchDevice = appState.getGlobalState("touchDevice");
     $scope.infiniteMode = false;
     $scope.overlay = {};

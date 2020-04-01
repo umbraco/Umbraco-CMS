@@ -297,8 +297,6 @@
     <Compile Include="Models\ContentTypeTests.cs" />
     <Compile Include="Models\DeepCloneHelperTests.cs" />
     <Compile Include="Models\DictionaryTranslationTests.cs" />
-    <Compile Include="Models\MemberGroupTests.cs" />
-    <Compile Include="Models\MemberTests.cs" />
     <Compile Include="Models\PropertyGroupTests.cs" />
     <Compile Include="Models\PropertyTypeTests.cs" />
     <Compile Include="Models\RelationTests.cs" />
