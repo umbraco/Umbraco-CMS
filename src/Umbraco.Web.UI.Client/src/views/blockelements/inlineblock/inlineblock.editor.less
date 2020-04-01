@@ -56,13 +56,20 @@
 .blockelement-inlineblock-editor__inner {
     border-top: 1px solid @gray-8;
     background-color: @gray-12;
-    
-    .umb-group-panel {
+
+    > * > * > * > .umb-group-panel {
         background-color: transparent;
         box-shadow: none;
+        margin-top: 10px;
         margin-bottom: 0;
+        > .umb-group-panel__content > .umb-property {
+            margin-bottom: 10px;
+        }
     }
-    .umb-group-panel__header {
-        display:none;
+    .umb-group-panel + .umb-group-panel {
+        margin-top: 20px;
+    }
+    &.--singleGroup > * > * > * > .umb-group-panel .umb-group-panel__header {
+        display: none;
     }
 }
