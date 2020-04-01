@@ -8,7 +8,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using Umbraco.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Strings;
 
@@ -72,6 +71,23 @@ namespace Umbraco.Core
             }
 
             return fileName;
+
+
+        }
+
+        /// <summary>
+        /// Determines the extension of the path or URL
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns>Extension of the file</returns>
+        public static string GetFileExtension(this string file)
+        {
+            //Find any characters between the last . and the start of a query string or the end of the string
+            const string pattern = @"(?<extension>\.[^\.\?]+)(\?.*|$)";
+            var match = Regex.Match(file, pattern);
+            return match.Success
+                ? match.Groups["extension"].Value
+                : string.Empty;
         }
 
         /// <summary>
