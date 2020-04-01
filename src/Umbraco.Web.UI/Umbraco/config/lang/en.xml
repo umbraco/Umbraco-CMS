@@ -608,6 +608,7 @@
     <key alias="errorMandatoryWithoutTab">%0% is a mandatory field</key>
     <key alias="errorRegExp">%0% at %1% is not in a correct format</key>
     <key alias="errorRegExpWithoutTab">%0% is not in a correct format</key>
+    <key alias="errorPropertyEditorNotSupportedInElementTypes">Property %0% uses editor %1% which is not supported in ElementTypes.</key>
   </area>
   <area alias="errors">
     <key alias="receivedErrorFromServer">Received an error from the server</key>

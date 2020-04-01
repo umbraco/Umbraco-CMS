@@ -607,6 +607,7 @@
     <key alias="tableColMergeLeft">Du skal stå til venstre for de 2 celler du ønsker at samle!</key>
     <key alias="tableSplitNotSplittable">Du kan ikke opdele en celle, som ikke allerede er delt.</key>
     <key alias="propertyHasErrors">Denne egenskab er ugyldig</key>
+    <key alias="errorPropertyEditorNotSupportedInElementTypes">Feltet %0% bruger editor %1% som ikke er supporteret for ElementTyper.</key>
   </area>
   <area alias="general">
     <key alias="about">Om</key>

@@ -146,6 +146,28 @@
 
 
         /**
+         * Used to highlight unsupported properties for the user, changes unsupported properties into a unsupported-property.
+         */
+        var notSupportedProperties = [
+            "Umbraco.Tags",
+            "Umbraco.UploadField",
+            "Umbraco.ImageCropper"
+        ];
+        function replaceUnsupportedProperties(scaffold) {
+            scaffold.variants.forEach((variant) => {
+                variant.tabs.forEach((tab) => {
+                    tab.properties.forEach((property) => {
+                        if (notSupportedProperties.indexOf(property.editor) !== -1) {
+                            property.view = "notsupported";
+                        }
+                    });
+                });
+            });
+            return scaffold;
+        }
+
+
+        /**
         * @ngdoc factory
         * @name umbraco.factory.BlockEditorModelObject
         * @description A model object used to handle Block Editor data.
@@ -198,7 +220,7 @@
 
                 scaffoldAliases.forEach((elementTypeAlias => {
                     tasks.push(contentResource.getScaffold(-20, elementTypeAlias).then(scaffold => {
-                        this.scaffolds.push(scaffold);
+                        this.scaffolds.push(replaceUnsupportedProperties(scaffold));
                     }));
                 }));
 
