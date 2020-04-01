@@ -23,7 +23,7 @@
 
                     <umb-property-actions actions="propertyActions"></umb-property-actions>
 
-                    <small class="control-description" ng-bind-html="property.description | preserveNewLineInHtml"></small>
+                    <small class="control-description" ng-if="property.description" ng-bind-html="property.description | preserveNewLineInHtml"></small>
                 </div>
 
                 <div class="controls" ng-transclude>
