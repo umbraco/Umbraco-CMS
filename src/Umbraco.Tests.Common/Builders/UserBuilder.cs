@@ -1,3 +1,4 @@
+using Umbraco.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.Common.Builders.Interfaces;
 
@@ -25,18 +26,16 @@ namespace Umbraco.Tests.Common.Builders
         private bool? _isLockedOut;
         private string _email;
         private string _username;
-        private string _defaultLang;
         private string _suffix = string.Empty;
-        private GlobalSettingsBuilder<UserBuilder<TParent>> _globalSettingsBuilder;
+        private string _defaultLang;
 
 
         public UserBuilder(TParent parentBuilder) : base(parentBuilder)
         {
-            _globalSettingsBuilder = new GlobalSettingsBuilder<UserBuilder<TParent>>(this);
+
         }
 
-        public GlobalSettingsBuilder<UserBuilder<TParent>> AddGlobalSettings() => _globalSettingsBuilder;
-        public UserBuilder<TParent> WithDefaultUILanguage(string defaultLang)
+       public UserBuilder<TParent> WithDefaultUILanguage(string defaultLang)
         {
             _defaultLang = defaultLang;
             return this;
@@ -85,7 +84,7 @@ namespace Umbraco.Tests.Common.Builders
 
         public override User Build()
         {
-            var globalSettings = _globalSettingsBuilder.Build();
+            var globalSettings = new GlobalSettingsBuilder().WithDefaultUiLanguage(_defaultLang).Build();
             var name = _name ?? "TestUser" + _suffix;
             var email = _email ?? "test" + _suffix + "@test.com";
             var username = _username ?? "TestUser" + _suffix;
