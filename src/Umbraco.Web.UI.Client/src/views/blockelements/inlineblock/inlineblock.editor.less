@@ -63,13 +63,17 @@
         margin-top: 10px;
         margin-bottom: 0;
         > .umb-group-panel__content > .umb-property {
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
     }
     .umb-group-panel + .umb-group-panel {
         margin-top: 20px;
     }
-    &.--singleGroup > * > * > * > .umb-group-panel .umb-group-panel__header {
-        display: none;
+    &.--singleGroup > * > * > * > .umb-group-panel {
+        margin-top: 0;
+        > .umb-group-panel__header {
+            display: none;
+        }
     }
+    
 }
