@@ -403,7 +403,7 @@ namespace Umbraco.Web.Macros
                         attributeValue = _requestAccessor.GetRequestValue(name);
                         break;
                     case '%':
-                        attributeValue = _sessionManager.GetSessionValue(name)?.ToString();
+                        attributeValue = _sessionManager.GetSessionValue(name);
                         if (string.IsNullOrEmpty(attributeValue))
                             attributeValue = _cookieManager.GetCookieValue(name);
                         break;

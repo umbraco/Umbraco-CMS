@@ -164,7 +164,7 @@ namespace Umbraco.Web.Common.Extensions
             hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment, httpContextAccessor);
             ioHelper = new IOHelper(hostingEnvironment, globalSettings);
             logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,
-                new AspNetCoreSessionIdResolver(httpContextAccessor),
+                new AspNetCoreSessionManager(httpContextAccessor),
                 // TODO: We need to avoid this, surely there's a way? See ContainerTests.BuildServiceProvider_Before_Host_Is_Configured
                 () => services.BuildServiceProvider().GetService<IRequestCache>(), coreDebug, ioHelper,
                 new AspNetCoreMarchal());

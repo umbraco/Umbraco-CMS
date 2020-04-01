@@ -3,53 +3,31 @@ using System.Web.Security;
 using Examine;
 using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Cookie;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Install;
-using Umbraco.Core.Migrations.PostMigrations;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Core.Sync;
-using Umbraco.Web.Actions;
-using Umbraco.Web.Cache;
 using Umbraco.Web.Composing.CompositionExtensions;
-using Umbraco.Web.ContentApps;
-using Umbraco.Web.Editors;
-using Umbraco.Web.Features;
-using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Install;
 using Umbraco.Web.Macros;
-using Umbraco.Web.Media.EmbedProviders;
-using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Search;
-using Umbraco.Web.Sections;
 using Umbraco.Web.Security;
 using Umbraco.Web.Security.Providers;
-using Umbraco.Web.Services;
 using Umbraco.Web.SignalR;
 using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
-using Umbraco.Web.PropertyEditors;
-using Umbraco.Examine;
 using Umbraco.Net;
 using Umbraco.Core.Request;
 using Umbraco.Core.Session;
 using Umbraco.Web.AspNet;
-using Umbraco.Core.Media;
-using Umbraco.Infrastructure.Media;
 
 namespace Umbraco.Web.Runtime
 {
@@ -66,9 +44,7 @@ namespace Umbraco.Web.Runtime
             composition.Register<IIpResolver, AspNetIpResolver>();
 
             composition.Register<IUserAgentProvider, AspNetUserAgentProvider>();
-            composition.Register<AspNetSessionManager>(Lifetime.Singleton);
-            composition.Register<ISessionIdResolver>(factory => factory.GetInstance<AspNetSessionManager>(), Lifetime.Singleton);
-            composition.Register<ISessionManager>(factory => factory.GetInstance<AspNetSessionManager>(), Lifetime.Singleton);
+
 
             composition.Register<IRequestAccessor, AspNetRequestAccessor>(Lifetime.Singleton);
 
@@ -76,8 +52,7 @@ namespace Umbraco.Web.Runtime
             composition.Register<IPasswordHasher, AspNetPasswordHasher>();
             composition.Register<IFilePermissionHelper, FilePermissionHelper>(Lifetime.Singleton);
 
-            composition.RegisterUnique<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
-            composition.RegisterUnique<ICookieManager, AspNetCookieManager>();
+
 
 
             composition.ComposeWebMappingProfiles();
@@ -151,12 +126,17 @@ namespace Umbraco.Web.Runtime
                 .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
 
 
-            // Config manipulator
-            composition.RegisterUnique<IConfigManipulator, XmlConfigManipulator>();
 
-            //ApplicationShutdownRegistry
+            // STUFF that do not have to be moved to .NET CORE
+            //----------------------------------------
+            composition.RegisterUnique<ICookieManager, AspNetCookieManager>();
             composition.RegisterUnique<IApplicationShutdownRegistry, AspNetApplicationShutdownRegistry>();
+            composition.RegisterUnique<IConfigManipulator, XmlConfigManipulator>();
+            composition.RegisterUnique<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
 
+            composition.Register<AspNetSessionManager>(Lifetime.Singleton);
+            composition.Register<ISessionIdResolver>(factory => factory.GetInstance<AspNetSessionManager>(), Lifetime.Singleton);
+            composition.Register<ISessionManager>(factory => factory.GetInstance<AspNetSessionManager>(), Lifetime.Singleton);
 
         }
     }

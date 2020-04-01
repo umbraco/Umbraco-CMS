@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Cookie;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Net;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
+using Umbraco.Core.Session;
 using Umbraco.Infrastructure.Media;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Lifetime;
@@ -39,15 +41,18 @@ namespace Umbraco.Web.Common.Runtime
             composition.RegisterUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
 
             // The umbraco request lifetime
-            composition.RegisterUnique<UmbracoRequestLifetime>();
-            composition.RegisterUnique<IUmbracoRequestLifetimeManager>(factory => factory.GetInstance<UmbracoRequestLifetime>());
-            composition.RegisterUnique<IUmbracoRequestLifetime>(factory => factory.GetInstance<UmbracoRequestLifetime>());
+            composition.RegisterMultipleUnique<IUmbracoRequestLifetime, IUmbracoRequestLifetimeManager, UmbracoRequestLifetime>();
 
 
             //Password hasher
             composition.RegisterUnique<IPasswordHasher, AspNetCorePasswordHasher>();
 
 
+            composition.RegisterUnique<ICookieManager, AspNetCoreCookieManager>();
+
+            composition.RegisterMultipleUnique<ISessionIdResolver, ISessionManager, AspNetCoreSessionManager>();
+
+            composition.RegisterUnique<ISessionIdResolver, AspNetCoreSessionManager>();
 
         }
     }
