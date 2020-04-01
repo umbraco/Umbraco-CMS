@@ -1325,6 +1325,18 @@ namespace Umbraco.Tests.PublishedContent
             AssertLinkedNode(child3.contentNode, 1, 3, -1, -1, -1);
         }
 
+        [Test]
+        public void MultipleCacheIteration()
+        {
+            //see https://github.com/umbraco/Umbraco-CMS/issues/7798
+            this.Init(this.GetInvariantKits());
+            var snapshot = this._snapshotService.CreatePublishedSnapshot(previewToken: null);
+            this._snapshotAccessor.PublishedSnapshot = snapshot;
+
+            var items = snapshot.Content.GetByXPath("/root/itype");
+            Assert.AreEqual(items.Count(), items.Count());
+        }
+
         private void AssertLinkedNode(ContentNode node, int parent, int prevSibling, int nextSibling, int firstChild, int lastChild)
         {
             Assert.AreEqual(parent, node.ParentContentId);

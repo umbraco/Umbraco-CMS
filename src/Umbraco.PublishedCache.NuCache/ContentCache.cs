@@ -355,6 +355,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private static IEnumerable<IPublishedContent> GetByXPath(XPathNodeIterator iterator)
         {
+            iterator = iterator.Clone();
             while (iterator.MoveNext())
             {
                 var xnav = iterator.Current as NavigableNavigator;

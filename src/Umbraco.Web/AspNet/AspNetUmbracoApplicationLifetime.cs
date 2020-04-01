@@ -5,7 +5,7 @@ using Umbraco.Net;
 
 namespace Umbraco.Web.AspNet
 {
-    public class AspNetUmbracoApplicationLifetime : IUmbracoApplicationLifetimeManager
+    public class AspNetUmbracoApplicationLifetime : IUmbracoApplicationLifetime, IUmbracoApplicationLifetimeManager
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 

@@ -386,7 +386,7 @@
                         vm.selectedBulkUserGroups = [];
                         editorService.close();
                         clearSelection();
-                    }, angular.noop);
+                    }, Utilities.noop);
                 },
                 close: function () {
                     vm.selectedBulkUserGroups = [];

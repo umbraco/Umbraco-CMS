@@ -1811,7 +1811,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(content2, Constants.Security.SuperUserId);
             Assert.IsTrue(ServiceContext.ContentService.SaveAndPublish(content2, userId: 0).Success);
 
-            var editorGroup = ServiceContext.UserService.GetUserGroupByAlias("editor");
+            var editorGroup = ServiceContext.UserService.GetUserGroupByAlias(Constants.Security.EditorGroupAlias);
             editorGroup.StartContentId = content1.Id;
             ServiceContext.UserService.Save(editorGroup);
 
