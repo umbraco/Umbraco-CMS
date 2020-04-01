@@ -7,7 +7,7 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.ContentApps
 {
-    internal class ContentEditorContentAppFactory : IContentAppFactory
+    public class ContentEditorContentAppFactory : IContentAppFactory
     {
         // see note on ContentApp
         internal const int Weight = -100;

@@ -7,7 +7,7 @@ using Umbraco.Web.Sections;
 
 namespace Umbraco.Web.Services
 {
-    internal class SectionService : ISectionService
+    public class SectionService : ISectionService
     {
         private readonly IUserService _userService;
         private readonly SectionCollection _sectionCollection;

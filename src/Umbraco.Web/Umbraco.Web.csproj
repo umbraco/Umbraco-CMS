@@ -323,7 +323,6 @@
     <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
     <Compile Include="Editors\RedirectUrlManagementController.cs" />
-    <Compile Include="DefaultEventMessagesFactory.cs" />
     <Compile Include="Security\ExternalSignInAutoLinkOptions.cs" />
     <Compile Include="Security\FixWindowsAuthMiddlware.cs" />
     <Compile Include="Security\ForceRenewalCookieAuthenticationHandler.cs" />

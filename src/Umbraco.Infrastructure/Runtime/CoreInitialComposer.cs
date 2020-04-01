@@ -1,4 +1,5 @@
 ﻿using System;
+using Examine;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionExtensions;
@@ -7,9 +8,11 @@ using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
+using Umbraco.Core.Media;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.PostMigrations;
@@ -17,19 +20,35 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
+using Umbraco.Examine;
+using Umbraco.Infrastructure.Media;
 using Umbraco.Web;
+using Umbraco.Web.Actions;
+using Umbraco.Web.Cache;
+using Umbraco.Web.ContentApps;
+using Umbraco.Web.Editors;
+using Umbraco.Web.Features;
+using Umbraco.Web.HealthCheck;
+using Umbraco.Web.HealthCheck.NotificationMethods;
 using Umbraco.Web.Install;
+using Umbraco.Web.Macros;
+using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Migrations.PostMigrations;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Routing;
+using Umbraco.Web.Search;
+using Umbraco.Web.Sections;
 using Umbraco.Web.Services;
+using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
 
@@ -42,7 +61,7 @@ namespace Umbraco.Core.Runtime
         public override void Compose(Composition composition)
         {
             base.Compose(composition);
-            
+
             // composers
             composition
                 .ComposeRepositories()
@@ -177,6 +196,170 @@ namespace Umbraco.Core.Runtime
 
             // Config manipulator
             composition.RegisterUnique<IConfigManipulator, JsonConfigManipulator>();
+
+
+            // register the http context and umbraco context accessors
+            // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
+            // we have no http context, eg when booting Umbraco or in background threads, so instead
+            // let's use an hybrid accessor that can fall back to a ThreadStatic context.
+            composition.RegisterUnique<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
+
+            // register the umbraco context factory
+            // composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
+            composition.RegisterUnique<IPublishedUrlProvider, UrlProvider>();
+
+            composition.RegisterUnique<HtmlLocalLinkParser>();
+            composition.RegisterUnique<HtmlImageSourceParser>();
+            composition.RegisterUnique<HtmlUrlParser>();
+            composition.RegisterUnique<RichTextEditorPastedImages>();
+
+            // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
+            // discovered when CoreBootManager configures the converters. We HAVE to remove one of them
+            // here because there cannot be two converters for one property editor - and we want the full
+            // RteMacroRenderingValueConverter that converts macros, etc. So remove TinyMceValueConverter.
+            // (the limited one, defined in Core, is there for tests) - same for others
+            composition.PropertyValueConverters()
+                .Remove<TinyMceValueConverter>()
+                .Remove<TextStringValueConverter>()
+                .Remove<MarkdownEditorValueConverter>();
+
+            composition.UrlProviders()
+                .Append<AliasUrlProvider>()
+                .Append<DefaultUrlProvider>();
+
+            composition.MediaUrlProviders()
+                .Append<DefaultMediaUrlProvider>();
+
+            composition.RegisterUnique<ISiteDomainHelper, SiteDomainHelper>();
+
+            // register properties fallback
+            composition.RegisterUnique<IPublishedValueFallback, PublishedValueFallback>();
+
+            composition.RegisterUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
+
+            composition.RegisterUnique<UmbracoFeatures>();
+
+            composition.Actions()
+                .Add(() => composition.TypeLoader.GetTypes<IAction>());
+
+            composition.EditorValidators()
+                .Add(() => composition.TypeLoader.GetTypes<IEditorValidator>());
+
+
+            composition.TourFilters();
+
+            // replace with web implementation
+            composition.RegisterUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
+
+            // register OEmbed providers - no type scanning - all explicit opt-in of adding types
+            // note: IEmbedProvider is not IDiscoverable - think about it if going for type scanning
+            composition.OEmbedProviders()
+                .Append<YouTube>()
+                .Append<Instagram>()
+                .Append<Twitter>()
+                .Append<Vimeo>()
+                .Append<DailyMotion>()
+                .Append<Flickr>()
+                .Append<Slideshare>()
+                .Append<Kickstarter>()
+                .Append<GettyImages>()
+                .Append<Ted>()
+                .Append<Soundcloud>()
+                .Append<Issuu>()
+                .Append<Hulu>()
+                .Append<Giphy>();
+
+            // register back office sections in the order we want them rendered
+            composition.Sections()
+                .Append<ContentSection>()
+                .Append<MediaSection>()
+                .Append<SettingsSection>()
+                .Append<PackagesSection>()
+                .Append<UsersSection>()
+                .Append<MembersSection>()
+                .Append<FormsSection>()
+                .Append<TranslationSection>();
+
+            // register known content apps
+            composition.ContentApps()
+                .Append<ListViewContentAppFactory>()
+                .Append<ContentEditorContentAppFactory>()
+                .Append<ContentInfoContentAppFactory>();
+
+            // register published router
+            composition.RegisterUnique<IPublishedRouter, PublishedRouter>();
+
+            // register *all* checks, except those marked [HideFromTypeFinder] of course
+            composition.HealthChecks()
+                .Add(() => composition.TypeLoader.GetTypes<HealthCheck>());
+
+
+            composition.WithCollectionBuilder<HealthCheckNotificationMethodCollectionBuilder>()
+                .Add(() => composition.TypeLoader.GetTypes<IHealthCheckNotificationMethod>());
+
+            composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
+
+            composition.ContentFinders()
+                // all built-in finders in the correct order,
+                // devs can then modify this list on application startup
+                .Append<ContentFinderByPageIdQuery>()
+                .Append<ContentFinderByUrl>()
+                .Append<ContentFinderByIdPath>()
+                //.Append<ContentFinderByUrlAndTemplate>() // disabled, this is an odd finder
+                .Append<ContentFinderByUrlAlias>()
+                .Append<ContentFinderByRedirectUrl>();
+
+            composition.Register<UmbracoTreeSearcher>(Lifetime.Request);
+
+            composition.SearchableTrees()
+                .Add(() => composition.TypeLoader.GetTypes<ISearchableTree>());
+
+            // replace some services
+            composition.RegisterUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
+            composition.RegisterUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
+            composition.RegisterUnique<ITreeService, TreeService>();
+            composition.RegisterUnique<ISectionService, SectionService>();
+
+            composition.RegisterUnique<IExamineManager, ExamineManager>();
+
+            // register distributed cache
+            composition.RegisterUnique(f => new DistributedCache(f.GetInstance<IServerMessenger>(), f.GetInstance<CacheRefresherCollection>()));
+
+
+            composition.Register<ITagQuery, TagQuery>(Lifetime.Request);
+
+            composition.RegisterUnique<HtmlLocalLinkParser>();
+            composition.RegisterUnique<HtmlUrlParser>();
+            composition.RegisterUnique<HtmlImageSourceParser>();
+            composition.RegisterUnique<RichTextEditorPastedImages>();
+
+            // we should stop injecting UmbracoContext and always inject IUmbracoContextAccessor, however at the moment
+            // there are tons of places (controllers...) which require UmbracoContext in their ctor - so let's register
+            // a way to inject the UmbracoContext - DO NOT register this as Lifetime.Request since LI will dispose the context
+            // in it's own way but we don't want that to happen, we manage its lifetime ourselves.
+            composition.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext);
+            composition.RegisterUnique<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
+            composition.Register<IPublishedContentQuery>(factory =>
+            {
+                var umbCtx = factory.GetInstance<IUmbracoContextAccessor>();
+                return new PublishedContentQuery(umbCtx.UmbracoContext.PublishedSnapshot, factory.GetInstance<IVariationContextAccessor>(), factory.GetInstance<IExamineManager>());
+            }, Lifetime.Request);
+
+
+            composition.RegisterUnique<IPublishedUrlProvider, UrlProvider>();
+
+            // register the http context and umbraco context accessors
+            // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
+            // we have no http context, eg when booting Umbraco or in background threads, so instead
+            // let's use an hybrid accessor that can fall back to a ThreadStatic context.
+            composition.RegisterUnique<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
+
+            // register accessors for cultures
+            composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
+
+
+
+
         }
     }
 }

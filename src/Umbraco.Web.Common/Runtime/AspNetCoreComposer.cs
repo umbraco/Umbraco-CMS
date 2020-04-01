@@ -43,37 +43,12 @@ namespace Umbraco.Web.Common.Runtime
             composition.RegisterUnique<IUmbracoRequestLifetimeManager>(factory => factory.GetInstance<UmbracoRequestLifetime>());
             composition.RegisterUnique<IUmbracoRequestLifetime>(factory => factory.GetInstance<UmbracoRequestLifetime>());
 
+
+            //Password hasher
             composition.RegisterUnique<IPasswordHasher, AspNetCorePasswordHasher>();
 
 
-            // register the http context and umbraco context accessors
-            // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
-            // we have no http context, eg when booting Umbraco or in background threads, so instead
-            // let's use an hybrid accessor that can fall back to a ThreadStatic context.
-            composition.RegisterUnique<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
 
-            // register the umbraco context factory
-            // composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
-            composition.RegisterUnique<IPublishedUrlProvider, UrlProvider>();
-
-            composition.RegisterUnique<HtmlLocalLinkParser>();
-            composition.RegisterUnique<HtmlImageSourceParser>();
-            composition.RegisterUnique<HtmlUrlParser>();
-            composition.RegisterUnique<RichTextEditorPastedImages>();
-
-            composition.UrlProviders()
-                .Append<AliasUrlProvider>()
-                .Append<DefaultUrlProvider>();
-
-            composition.MediaUrlProviders()
-                .Append<DefaultMediaUrlProvider>();
-
-            composition.RegisterUnique<ISiteDomainHelper, SiteDomainHelper>();
-
-            // register properties fallback
-            composition.RegisterUnique<IPublishedValueFallback, PublishedValueFallback>();
-
-            composition.RegisterUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
         }
     }
 }
