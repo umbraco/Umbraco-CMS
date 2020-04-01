@@ -71,7 +71,7 @@
     opacity: 0;
     outline: none;
     height: 12px;
-    margin-top: -6px;
+    margin-top: -9px;
     padding-top: 6px;
     margin-bottom: -6px;
     transition: opacity 240ms;
@@ -79,7 +79,9 @@
     &::before {
         content: '';
         position: absolute;
-        background-color: @ui-outline;
+        background-color: @blueMid;
+        border-top:1px solid white;
+        border-bottom:1px solid white;
         border-radius: 2px;
         top:5px;
         right: 0;
@@ -92,21 +94,21 @@
             100% { opacity: 0.5; }
         }
     }
-    &::after {
-        content: "+";
-        margin-left: auto;
-        margin-right: auto;
+    > .__plus {
+        position: absolute;
+        pointer-events: none;// lets stop avoiding the mouse values in JS move event.
+        margin-left: -18px - 10px;
         margin-top: -18px;
         margin-bottom: -18px;
         width: 28px;
         height: 25px;
         padding-bottom: 3px;
         border-radius: 3em;
-        border: 2px solid @ui-outline;
+        border: 2px solid @blueMid;
         display: flex;
         justify-content: center;
         align-items: center;
-        color: @ui-outline;
+        color: @blueMid;
         font-size: 20px;
         font-weight: 800;
         background-color: rgba(255, 255, 255, .96);
@@ -115,20 +117,20 @@
         transition: transform 240ms ease-in;
         animation: umb-block-list__block--create-button_after 800ms ease-in-out infinite;
         @keyframes umb-block-list__block--create-button_after {
-            0%   { color: rgba(@ui-outline, 0.8); }
-            50% { color: rgba(@ui-outline, 1); }
-            100% { color: rgba(@ui-outline, 0.8); }
+            0%   { color: rgba(@blueMid, 0.8); }
+            50% { color: rgba(@blueMid, 1); }
+            100% { color: rgba(@blueMid, 0.8); }
         }
     }
     &:focus {
-        &::after {
+        > .__plus {
             border: 2px solid @ui-outline;
         }
     }
     &:hover, &:focus {
         opacity: 1;
         transition-duration: 120ms;
-        &::after {
+        > .__plus {
             transform: scale(1);
             transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
