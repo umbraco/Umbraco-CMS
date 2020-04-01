@@ -152,6 +152,8 @@
     <key alias="confirmActionCancel">Fortryd</key>
     <key alias="confirmActionConfirm">Bekræft</key>
 	<key alias="morePublishingOptions">Flere publiseringsmuligheder</key>
+    <key alias="submitChanges">Indsæt</key>
+    <key alias="submitChangesAndClose">Indsæt og luk</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">For</key>

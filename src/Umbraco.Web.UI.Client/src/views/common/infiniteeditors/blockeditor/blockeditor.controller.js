@@ -8,7 +8,6 @@ angular.module("umbraco")
         vm.settings = $scope.model.settings;
 
         vm.model = $scope.model;
-        console.log("blockeditor model:", vm.model)
 
         vm.tabs = [];
 
@@ -47,7 +46,7 @@ angular.module("umbraco")
             vm.tabs[0].active = true;
         }
 
-        vm.saveAndClose = function () {
+        vm.submitAndClose = function () {
             if ($scope.model && $scope.model.submit) {
                 $scope.model.submit($scope.model);
             }
