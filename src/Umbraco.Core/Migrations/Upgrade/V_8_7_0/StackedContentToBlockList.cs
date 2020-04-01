@@ -132,7 +132,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
 
         private void UpdateDataType(DataTypeDto dataType)
         {
-            dataType.DbType = ValueStorageType.Nvarchar.ToString();
+            dataType.DbType = ValueStorageType.Ntext.ToString();
             dataType.EditorAlias = Constants.PropertyEditors.Aliases.BlockList;
 
             Database.Update(dataType);
