@@ -6,7 +6,7 @@
     border-radius: @baseBorderRadius;
     transition: border-color 120ms;
 
-    &:not(.--open):hover {
+    .umb-block-list__block:not(.--open) &:hover {
         border-color: @gray-8;
     }
 
@@ -43,7 +43,7 @@
         }
     }
 
-    &.--open {
+    .umb-block-list__block.--open & {
         border-color: @gray-8;
         box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.05);
         > button {
@@ -55,7 +55,7 @@
 }
 .blockelement-inlineblock-editor__inner {
     border-top: 1px solid @gray-8;
-    background-color: @gray-11;
+    background-color: @gray-12;
     
     .umb-group-panel {
         background-color: transparent;

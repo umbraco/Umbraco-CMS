@@ -1,16 +1,12 @@
 (function () {
     'use strict';
 
-    function InlineBlockEditor($scope) {
+    function InlineBlockEditor() {
 
         const bc = this;
 
-        bc.isOpen = false;
-        bc.caretIconType = "icon-navigation-right";
-
-        bc.openBlock = function() {
-            bc.isOpen = !bc.isOpen;
-            bc.caretIconType = bc.isOpen ? "icon-navigation-down" : "icon-navigation-right";
+        bc.openBlock = function(block) {
+            block.isOpen = !block.isOpen;
         }
 
     }

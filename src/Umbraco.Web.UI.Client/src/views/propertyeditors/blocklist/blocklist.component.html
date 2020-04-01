@@ -14,7 +14,7 @@
                 >
                 </button>
 
-                <div class="umb-block-list__block">
+                <div class="umb-block-list__block" ng-class="{'--open':block.isOpen}">
                     <div class="umb-block-list__block--content" ng-if="block.view" ng-include="block.view">
                     </div>
 
