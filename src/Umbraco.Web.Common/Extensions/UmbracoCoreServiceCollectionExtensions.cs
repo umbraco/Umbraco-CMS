@@ -155,8 +155,6 @@ namespace Umbraco.Web.Common.Extensions
 
             backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
             profiler = GetWebProfiler(hostingEnvironment, httpContextAccessor);
-
-            Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
         }
 
         private static IProfiler GetWebProfiler(Umbraco.Core.Hosting.IHostingEnvironment hostingEnvironment, IHttpContextAccessor httpContextAccessor)

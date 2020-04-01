@@ -6,9 +6,20 @@ using Umbraco.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Tests.Common.Builders
 {
-    public class UserGroupBuilder
-        : BuilderBase<IUserGroup>,
-            IWithIdBuilder
+
+    public class UserGroupBuilder : UserGroupBuilder<object>
+    {
+        public UserGroupBuilder() : base(null)
+        {
+        }
+    }
+
+    public class UserGroupBuilder<TParent>
+        : ChildBuilderBase<TParent, IUserGroup>,
+            IWithIdBuilder,
+            IWithIconBuilder,
+            IWithAliasBuilder,
+            IWithNameBuilder
     {
         private int? _startContentId;
         private int? _startMediaId;
@@ -20,12 +31,16 @@ namespace Umbraco.Tests.Common.Builders
         private string _suffix;
         private int? _id;
 
+        public UserGroupBuilder(TParent parentBuilder) : base(parentBuilder)
+        {
+        }
+
         /// <summary>
         /// Will suffix the name and alias for testing
         /// </summary>
         /// <param name="suffix"></param>
         /// <returns></returns>
-        public UserGroupBuilder WithSuffix(string suffix)
+        public UserGroupBuilder<TParent> WithSuffix(string suffix)
         {
             _suffix = suffix;
             return this;
@@ -60,6 +75,25 @@ namespace Umbraco.Tests.Common.Builders
         {
             get => _id;
             set => _id = value;
+        }
+
+
+        string IWithIconBuilder.Icon
+        {
+            get => _icon;
+            set => _icon = value;
+        }
+
+        string IWithAliasBuilder.Alias
+        {
+            get => _alias;
+            set => _alias = value;
+        }
+
+        string IWithNameBuilder.Name
+        {
+            get => _name;
+            set => _name = value;
         }
     }
 }
