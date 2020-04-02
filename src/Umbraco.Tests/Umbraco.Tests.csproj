@@ -99,7 +99,7 @@
     <PackageReference Include="Microsoft.Owin.Security" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Testing" Version="4.0.1" />
     <PackageReference Include="Microsoft.Web.Infrastructure" Version="1.0.0.0" />
-    <PackageReference Include="MiniProfiler" Version="4.0.138" />
+    <PackageReference Include="MiniProfiler" Version="4.1.0" />
     <PackageReference Include="Moq" Version="4.13.1" />
     <PackageReference Include="NPoco" Version="4.0.2" />
     <PackageReference Include="NUnit" Version="3.12.0" />
@@ -148,6 +148,8 @@
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />
+    <Compile Include="Persistence\Repositories\KeyValueRepositoryTests.cs" />
+    <Compile Include="Services\KeyValueServiceTests.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="UmbracoExamine\ExamineExtensions.cs" />
     <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionTests.cs" />
@@ -295,8 +297,6 @@
     <Compile Include="Models\ContentTypeTests.cs" />
     <Compile Include="Models\DeepCloneHelperTests.cs" />
     <Compile Include="Models\DictionaryTranslationTests.cs" />
-    <Compile Include="Models\MemberGroupTests.cs" />
-    <Compile Include="Models\MemberTests.cs" />
     <Compile Include="Models\PropertyGroupTests.cs" />
     <Compile Include="Models\PropertyTypeTests.cs" />
     <Compile Include="Models\RelationTests.cs" />

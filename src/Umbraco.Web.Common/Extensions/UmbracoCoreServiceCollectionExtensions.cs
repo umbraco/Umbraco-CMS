@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Umbraco.Composing;
 using Umbraco.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -16,10 +17,11 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
+using Umbraco.Web.Common.AspNetCore;
+using Umbraco.Web.Common.Runtime.Profiler;
 
-namespace Umbraco.Web.BackOffice.AspNetCore
+namespace Umbraco.Web.Common.Extensions
 {
-    // TODO: Move to Umbraco.Web.Common
     public static class UmbracoCoreServiceCollectionExtensions
     {
         /// <summary>
@@ -50,12 +52,24 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         /// <returns></returns>
         public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment)
         {
+            return services.AddUmbracoCore(webHostEnvironment,out _);
+        }
+
+        /// <summary>
+        /// Adds the Umbraco Back Core requirements
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="webHostEnvironment"></param>
+        /// <param name="factory"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, out IFactory factory)
+        {
             if (!UmbracoServiceProviderFactory.IsActive)
                 throw new InvalidOperationException("Ensure to add UseUmbraco() in your Program.cs after ConfigureWebHostDefaults to enable Umbraco's service provider factory");
 
             var umbContainer = UmbracoServiceProviderFactory.UmbracoContainer;
 
-            return services.AddUmbracoCore(webHostEnvironment, umbContainer, Assembly.GetEntryAssembly());
+            return services.AddUmbracoCore(webHostEnvironment, umbContainer, Assembly.GetEntryAssembly(), out factory);
         }
 
         /// <summary>
@@ -65,11 +79,13 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         /// <param name="webHostEnvironment"></param>
         /// <param name="umbContainer"></param>
         /// <param name="entryAssembly"></param>
+        /// <param name="factory"></param>
         /// <returns></returns>
-        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IRegister umbContainer, Assembly entryAssembly)
+        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IRegister umbContainer, Assembly entryAssembly, out IFactory factory)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
-            if (umbContainer is null) throw new ArgumentNullException(nameof(umbContainer));
+            var container = umbContainer;
+            if (container is null) throw new ArgumentNullException(nameof(container));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
 
             // Special case! The generic host adds a few default services but we need to manually add this one here NOW because
@@ -95,7 +111,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
                 backOfficeInfo,
                 typeFinder);
 
-            var factory = coreRuntime.Configure(umbContainer);
+            factory = coreRuntime.Configure(container);
 
             return services;
         }
@@ -151,9 +167,24 @@ namespace Umbraco.Web.BackOffice.AspNetCore
                 new AspNetCoreMarchal());
 
             backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
-            profiler = new LogProfiler(logger);
+            profiler = GetWebProfiler(hostingEnvironment, httpContextAccessor);
         }
 
+        private static IProfiler GetWebProfiler(Umbraco.Core.Hosting.IHostingEnvironment hostingEnvironment, IHttpContextAccessor httpContextAccessor)
+        {
+            // create and start asap to profile boot
+            if (!hostingEnvironment.IsDebugMode)
+            {
+                // should let it be null, that's how MiniProfiler is meant to work,
+                // but our own IProfiler expects an instance so let's get one
+                return new VoidProfiler();
+            }
+
+            var webProfiler = new WebProfiler(httpContextAccessor);
+            webProfiler.StartBoot();
+
+            return webProfiler;
+        }
         private class AspNetCoreBootPermissionsChecker : IUmbracoBootPermissionChecker
         {
             public void ThrowIfNotPermissions()
@@ -162,6 +193,6 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             }
         }
 
-        
+
     }
 }

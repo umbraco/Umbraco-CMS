@@ -23,6 +23,7 @@ using Umbraco.Web.PropertyEditors;
 using System.Text;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Tests.PropertyEditors
 {

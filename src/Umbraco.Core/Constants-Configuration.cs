@@ -12,6 +12,7 @@
             /// </remarks>
             public const string ConfigPrefix = "Umbraco:CMS:";
             public const string ConfigSecurityPrefix = ConfigPrefix+"Security:";
+            public const string ConfigGlobalPrefix = ConfigPrefix + "Global:";
             public const string ConfigModelsBuilderPrefix = ConfigPrefix+"ModelsBuilder:";
         }
     }

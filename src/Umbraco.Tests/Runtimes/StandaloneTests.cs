@@ -36,6 +36,7 @@ using File = System.IO.File;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Common.Composing;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Tests.Runtimes
 {

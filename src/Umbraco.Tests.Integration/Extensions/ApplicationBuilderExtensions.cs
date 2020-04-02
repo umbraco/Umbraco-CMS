@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Integration.Extensions
                     // dynamically change the config status
                     var umbVersion = app.ApplicationServices.GetRequiredService<IUmbracoVersion>();
                     var config = app.ApplicationServices.GetRequiredService<IConfiguration>();
-                    config[GlobalSettings.Prefix + "ConfigurationStatus"] = umbVersion.SemanticVersion.ToString();
+                    config[Constants.Configuration.ConfigGlobalPrefix + "ConfigurationStatus"] = umbVersion.SemanticVersion.ToString();
 
                     // re-run the runtime level check
                     var profilingLogger = app.ApplicationServices.GetRequiredService<IProfilingLogger>();

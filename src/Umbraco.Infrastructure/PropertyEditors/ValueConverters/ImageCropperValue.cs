@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;

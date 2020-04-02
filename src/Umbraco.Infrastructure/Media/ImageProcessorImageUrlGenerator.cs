@@ -1,9 +1,10 @@
 ﻿using System.Globalization;
 using System.Text;
 using Umbraco.Core;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 
-namespace Umbraco.Web.Models
+namespace Umbraco.Infrastructure.Media
 {
     public class ImageProcessorImageUrlGenerator : IImageUrlGenerator
     {
@@ -27,18 +28,18 @@ namespace Umbraco.Web.Models
 
             //Only put quality here, if we don't have a format specified.
             //Otherwise we need to put quality at the end to avoid it being overridden by the format.
-            if (options.Quality != null && hasFormat == false) imageProcessorUrl.Append("&quality=").Append(options.Quality);
-            if (options.HeightRatio != null) imageProcessorUrl.Append("&heightratio=").Append(options.HeightRatio.Value.ToString(CultureInfo.InvariantCulture));
-            if (options.WidthRatio != null) imageProcessorUrl.Append("&widthratio=").Append(options.WidthRatio.Value.ToString(CultureInfo.InvariantCulture));
-            if (options.Width != null) imageProcessorUrl.Append("&width=").Append(options.Width);
-            if (options.Height != null) imageProcessorUrl.Append("&height=").Append(options.Height);
+            if (options.Quality.HasValue && hasFormat == false) imageProcessorUrl.Append("&quality=").Append(options.Quality);
+            if (options.HeightRatio.HasValue) imageProcessorUrl.Append("&heightratio=").Append(options.HeightRatio.Value.ToString(CultureInfo.InvariantCulture));
+            if (options.WidthRatio.HasValue) imageProcessorUrl.Append("&widthratio=").Append(options.WidthRatio.Value.ToString(CultureInfo.InvariantCulture));
+            if (options.Width.HasValue) imageProcessorUrl.Append("&width=").Append(options.Width);
+            if (options.Height.HasValue) imageProcessorUrl.Append("&height=").Append(options.Height);
             if (options.UpScale == false) imageProcessorUrl.Append("&upscale=false");
-            if (options.AnimationProcessMode != null) imageProcessorUrl.Append("&animationprocessmode=").Append(options.AnimationProcessMode);
-            if (options.FurtherOptions != null) imageProcessorUrl.Append(options.FurtherOptions);
+            if (!string.IsNullOrWhiteSpace(options.AnimationProcessMode)) imageProcessorUrl.Append("&animationprocessmode=").Append(options.AnimationProcessMode);
+            if (!string.IsNullOrWhiteSpace(options.FurtherOptions)) imageProcessorUrl.Append(options.FurtherOptions);
 
             //If furtherOptions contains a format, we need to put the quality after the format.
-            if (options.Quality != null && hasFormat) imageProcessorUrl.Append("&quality=").Append(options.Quality);
-            if (options.CacheBusterValue != null) imageProcessorUrl.Append("&rnd=").Append(options.CacheBusterValue);
+            if (options.Quality.HasValue && hasFormat) imageProcessorUrl.Append("&quality=").Append(options.Quality);
+            if (!string.IsNullOrWhiteSpace(options.CacheBusterValue)) imageProcessorUrl.Append("&rnd=").Append(options.CacheBusterValue);
 
             return imageProcessorUrl.ToString();
         }

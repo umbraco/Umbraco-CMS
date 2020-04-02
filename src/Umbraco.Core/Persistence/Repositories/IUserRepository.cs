@@ -20,7 +20,23 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="username"></param>
         /// <returns></returns>
+        [Obsolete("This method will be removed in future versions.  Please use ExistsByUserName instead.")]
         bool Exists(string username);
+
+        /// <summary>
+        /// Checks if a user with the username exists
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        bool ExistsByUserName(string username);
+
+
+        /// <summary>
+        /// Checks if a user with the login exists
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        bool ExistsByLogin(string login);
 
         /// <summary>
         /// Gets a list of <see cref="IUser"/> objects associated with a given group

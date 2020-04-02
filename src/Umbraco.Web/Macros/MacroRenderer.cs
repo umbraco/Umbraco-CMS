@@ -66,12 +66,18 @@ namespace Umbraco.Web.Macros
         #region MacroContent cache
 
         // gets this macro content cache identifier
-        private string GetContentCacheIdentifier(MacroModel model, int pageId)
+        private string GetContentCacheIdentifier(MacroModel model, int pageId, string cultureName)
         {
             var id = new StringBuilder();
 
             var alias = model.Alias;
             id.AppendFormat("{0}-", alias);
+            //always add current culture to the key to allow variants to have different cache results
+            if (!string.IsNullOrEmpty(cultureName))
+            {
+                // are there any unusual culture formats we'd need to handle?
+                id.AppendFormat("{0}-", cultureName);
+            }
 
             if (model.CacheByPage)
                 id.AppendFormat("{0}-", pageId);
@@ -220,7 +226,8 @@ namespace Umbraco.Web.Macros
                 foreach (var prop in macro.Properties)
                     prop.Value = ParseAttribute(prop.Value);
 
-                macro.CacheIdentifier = GetContentCacheIdentifier(macro, content.Id);
+                var cultureName = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
+                macro.CacheIdentifier = GetContentCacheIdentifier(macro, content.Id, cultureName);
 
                 // get the macro from cache if it is there
                 var macroContent = GetMacroContentFromCache(macro);

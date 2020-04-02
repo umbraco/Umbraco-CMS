@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -20,8 +19,8 @@ using Umbraco.Core.Strings;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
-using Umbraco.Tests.Testing;
 using Umbraco.Web.BackOffice.AspNetCore;
+using Umbraco.Web.Common.Extensions;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -119,7 +118,7 @@ namespace Umbraco.Tests.Integration.Testing
 
                     // Add it!
                     services.AddUmbracoConfiguration(hostContext.Configuration);
-                    services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly);
+                    services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly, out _);
                 });
 
             var host = await hostBuilder.StartAsync();

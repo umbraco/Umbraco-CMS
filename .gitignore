@@ -100,6 +100,9 @@ src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/loader.dev.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/main.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/app.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/canvasdesigner.*.js
+src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/navigation.controller.js
+src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/main.controller.js
+src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/utilities.js
 
 src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/
 src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/**/*.js

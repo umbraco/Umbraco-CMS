@@ -324,7 +324,7 @@ namespace Umbraco.Core.Runtime
             {
                 Key = MainDomKey,
                 Value = id,
-                Updated = DateTime.Now
+                UpdateDate = DateTime.Now
             });
         }
 

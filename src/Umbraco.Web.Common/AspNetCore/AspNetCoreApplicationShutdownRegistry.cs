@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
 
-namespace Umbraco.Web.BackOffice.AspNetCore
+namespace Umbraco.Web.Common.AspNetCore
 {
     public class AspNetCoreApplicationShutdownRegistry : IApplicationShutdownRegistry
     {
