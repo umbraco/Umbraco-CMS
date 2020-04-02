@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core;
@@ -18,7 +19,8 @@ namespace Umbraco.Web.Hosting
             _hostingSettings = hostingSettings ?? throw new ArgumentNullException(nameof(hostingSettings));
             SiteName = HostingEnvironment.SiteName;
             ApplicationId = HostingEnvironment.ApplicationID;
-            ApplicationPhysicalPath = HostingEnvironment.ApplicationPhysicalPath;
+            // when we are not hosted (i.e. unit test or otherwise) we'll need to get the root path from the executing assembly
+            ApplicationPhysicalPath = HostingEnvironment.ApplicationPhysicalPath ?? Assembly.GetExecutingAssembly().GetRootDirectorySafe();
             ApplicationVirtualPath = HostingEnvironment.ApplicationVirtualPath;
             IISVersion = HttpRuntime.IISVersion;
         }

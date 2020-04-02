@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Web.Controllers
                     var baseDir = IOHelper.MapPath("").TrimEnd(IOHelper.DirSepChar);
                     HttpContext.Current = new HttpContext(new SimpleWorkerRequest("/", baseDir, "", "", new StringWriter()));
                 }
-                IOHelper.ForceNotHosted = true;
+                
                 var usersController = new AuthenticationController(
                     new TestUserPasswordConfig(),
                     Factory.GetInstance<IGlobalSettings>(),

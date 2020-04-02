@@ -59,7 +59,7 @@ namespace Umbraco.Core.IO
             if (Path.IsPathRooted(rootPath) == false)
             {
                 // but the test suite App.config cannot really "root" anything so we have to do it here
-                var localRoot = _ioHelper.GetRootDirectorySafe();
+                var localRoot = _ioHelper.MapPath("~");
                 rootPath = Path.Combine(localRoot, rootPath);
             }
 

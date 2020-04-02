@@ -5,6 +5,7 @@ using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using Umbraco.Configuration.Models;
 using Umbraco.Core;
@@ -22,13 +23,16 @@ namespace Umbraco.Tests.Integration.Extensions
         /// Creates a LocalDb instance to use for the test
         /// </summary>
         /// <param name="app"></param>
-        /// <param name="dbFilePath"></param>
+        /// <param name="hostEnvironment"></param>
         /// <param name="integrationTest"></param>
         /// <returns></returns>
         public static IApplicationBuilder UseTestLocalDb(this IApplicationBuilder app,
-            string dbFilePath,
+            IHostEnvironment hostEnvironment,
             UmbracoIntegrationTest integrationTest)
         {
+
+            var dbFilePath = Path.Combine(hostEnvironment.ContentRootPath, "LocalDb");
+
             // get the currently set db options
             var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
 

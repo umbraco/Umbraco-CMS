@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.Packaging;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Packaging
 {
@@ -27,18 +24,17 @@ namespace Umbraco.Core.Packaging
         /// <param name="packageFileInstallation"></param>
         /// <param name="parser"></param>
         /// <param name="packageActionRunner"></param>
-        /// <param name="applicationRootFolder">
-        /// The root folder of the application
-        /// </param>
+        /// <param name="hostingEnvironment"></param>
         public PackageInstallation(PackageDataInstallation packageDataInstallation, PackageFileInstallation packageFileInstallation, CompiledPackageXmlParser parser, IPackageActionRunner packageActionRunner,
-            DirectoryInfo applicationRootFolder)
+            IHostingEnvironment hostingEnvironment)
         {
+
             _packageExtraction = new PackageExtraction();
             _packageFileInstallation = packageFileInstallation ?? throw new ArgumentNullException(nameof(packageFileInstallation));
             _packageDataInstallation = packageDataInstallation ?? throw new ArgumentNullException(nameof(packageDataInstallation));
             _parser = parser ?? throw new ArgumentNullException(nameof(parser));
             _packageActionRunner = packageActionRunner ?? throw new ArgumentNullException(nameof(packageActionRunner));
-            _applicationRootFolder = applicationRootFolder ?? throw new ArgumentNullException(nameof(applicationRootFolder));
+            _applicationRootFolder = new DirectoryInfo(hostingEnvironment.ApplicationPhysicalPath);
         }
 
         public CompiledPackage ReadPackage(FileInfo packageFile)
