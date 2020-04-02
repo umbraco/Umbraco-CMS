@@ -317,15 +317,12 @@ data: []}";
             Assert.AreEqual(2, converted.Layout.Count());
 
             var item0 = converted.Layout.ElementAt(0);
-            var item0Data = converted.GetData(item0.Udi);
-            Assert.IsNotNull(item0Data);
-            Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0Data.Key);
-            Assert.AreEqual("home", item0Data.ContentType.Alias);
+            Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Data.Key);
+            Assert.AreEqual("home", item0.Data.ContentType.Alias);
 
             var item1 = converted.Layout.ElementAt(1);
-            var item1Data = converted.GetData(item1.Udi);
-            Assert.AreEqual(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A"), item1Data.Key);
-            Assert.AreEqual("home", item1Data.ContentType.Alias);
+            Assert.AreEqual(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A"), item1.Data.Key);
+            Assert.AreEqual("home", item1.Data.ContentType.Alias);
 
         }
 
