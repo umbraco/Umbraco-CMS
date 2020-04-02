@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.WebAssets;
@@ -13,12 +16,24 @@ namespace Umbraco.Web.WebAssets
         /// <returns></returns>
         public static async Task<string> GetScriptForLoadingBackOfficeAsync(this IRuntimeMinifier minifier, IGlobalSettings globalSettings, IIOHelper ioHelper)
         {
-            var initCss = new CssInitialization(minifier);
             var files = await minifier.GetAssetPathsAsync(BackOfficeWebAssets.UmbracoJsBundleName);
-            var result = JavaScriptHelper.GetJavascriptInitialization(files, "umbraco", globalSettings, ioHelper);
-            result += await initCss.GetStylesheetInitializationAsync();
+            var result = BackOfficeJavaScriptInitializer.GetJavascriptInitialization(files, "umbraco", globalSettings, ioHelper);
+            result += await GetStylesheetInitializationAsync(minifier);
 
             return result;
         }
+
+        /// <summary>
+        /// Gets the back office css bundle paths and formats a JS call to lazy load them
+        /// </summary>
+        private static async Task<string> GetStylesheetInitializationAsync(IRuntimeMinifier minifier)
+        {
+            var files = await minifier.GetAssetPathsAsync(BackOfficeWebAssets.UmbracoCssBundleName);
+            var sb = new StringBuilder();
+            foreach (var file in files)
+                sb.AppendFormat("{0}LazyLoad.css('{1}');", Environment.NewLine, file);
+            return sb.ToString();
+        }
+
     }
 }

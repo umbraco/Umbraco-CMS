@@ -1,20 +1,15 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.WebAssets;
-using Umbraco.Infrastructure.WebAssets;
 
-namespace Umbraco.Web.JavaScript
+namespace Umbraco.Web.WebAssets
 {
-    // TODO: Rename this
-    public class JavaScriptHelper
+    /// <summary>
+    /// Creates a JavaScript block to initialize the back office
+    /// </summary>
+    public class BackOfficeJavaScriptInitializer
     {
         // deal with javascript functions inside of json (not a supported json syntax)
         private const string PrefixJavaScriptObject = "@@@@";

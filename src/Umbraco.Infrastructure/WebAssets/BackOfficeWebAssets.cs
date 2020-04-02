@@ -83,7 +83,7 @@ namespace Umbraco.Web.WebAssets
         /// <returns></returns>
         private string[] GetScriptsForBackoffice(IEnumerable<string> propertyEditorScripts)
         {
-            var umbracoInit = JsInitialization.GetDefaultInitialization();
+            var umbracoInit = GetInitBackOfficeScripts();
             var scripts = new HashSet<string>();
             foreach (var script in umbracoInit)
                 scripts.Add(script);
@@ -93,6 +93,16 @@ namespace Umbraco.Web.WebAssets
                 scripts.Add(script);
 
             return new HashSet<string>(FormatPaths(scripts)).ToArray();
+        }
+
+        /// <summary>
+        /// Returns the list of scripts for back office initialization
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerable<string> GetInitBackOfficeScripts()
+        {
+            var resources = JsonConvert.DeserializeObject<JArray>(Resources.JsInitialize);
+            return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString());
         }
 
         /// <summary>

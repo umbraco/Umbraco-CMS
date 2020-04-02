@@ -104,7 +104,7 @@ namespace Umbraco.Web.Editors
         public async Task<JavaScriptResult> Application()
         {
             var files = await _runtimeMinifier.GetAssetPathsAsync(BackOfficeWebAssets.UmbracoPreviewJsBundleName);
-            var result = JavaScriptHelper.GetJavascriptInitialization(files, "umbraco.preview", _globalSettings, _ioHelper);
+            var result = BackOfficeJavaScriptInitializer.GetJavascriptInitialization(files, "umbraco.preview", _globalSettings, _ioHelper);
 
             return JavaScript(result);
         }
