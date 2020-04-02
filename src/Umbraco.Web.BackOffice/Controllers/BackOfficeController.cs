@@ -6,7 +6,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Core.WebAssets;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.ActionResults;
-using Umbraco.Web.JavaScript;
+using Umbraco.Web.WebAssets;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {

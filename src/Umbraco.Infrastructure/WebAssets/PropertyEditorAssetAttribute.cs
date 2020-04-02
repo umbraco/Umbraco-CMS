@@ -1,7 +1,7 @@
 ﻿using System;
 using Umbraco.Core.WebAssets;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Web.WebAssets
 {
     /// <summary>
     /// Indicates that the property editor requires this asset be loaded when the back office is loaded

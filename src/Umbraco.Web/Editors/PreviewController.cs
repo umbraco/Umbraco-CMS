@@ -14,10 +14,10 @@ using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
-using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Trees;
+using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors

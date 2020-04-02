@@ -73,6 +73,9 @@ namespace Umbraco.Core.IO
         /// <summary>
         /// Gets the root path of the application
         /// </summary>
+        /// <remarks>
+        /// This is (should be) the same as IHostingEnvironment.ApplicationVirtualPath
+        /// </remarks>
         string Root
         {
             get;

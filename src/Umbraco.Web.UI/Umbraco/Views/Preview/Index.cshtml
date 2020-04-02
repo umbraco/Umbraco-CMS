@@ -1,5 +1,5 @@
 ﻿@using Umbraco.Web.Composing
-@using Umbraco.Web.JavaScript
+@using Umbraco.Web.WebAssets
 
 @inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Editors.BackOfficePreviewModel>
 @{
@@ -16,7 +16,7 @@
     <meta name="pinterest" content="nopin" />
 
 
-     @Html.Raw(runtimeMinifier.RenderCssHere(BackOfficeWebAssets.UmbracoPreviewCssBundleName))
+    @Html.Raw(runtimeMinifier.RenderCssHere(BackOfficeWebAssets.UmbracoPreviewCssBundleName))
 
 
 </head>

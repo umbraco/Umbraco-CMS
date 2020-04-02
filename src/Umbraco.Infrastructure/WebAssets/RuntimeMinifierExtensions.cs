@@ -3,7 +3,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.WebAssets;
 
-namespace Umbraco.Web.JavaScript
+namespace Umbraco.Web.WebAssets
 {
     public static class RuntimeMinifierExtensions
     {

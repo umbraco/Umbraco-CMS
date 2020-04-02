@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.IO;
 using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
@@ -10,7 +8,6 @@ using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Strings;
 using Umbraco.Core.IO;
 using Umbraco.Web.Install;
@@ -27,33 +24,24 @@ namespace Umbraco.Web.Runtime
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly SurfaceControllerTypeCollection _surfaceControllerTypes;
         private readonly UmbracoApiControllerTypeCollection _apiControllerTypes;
-        private readonly IHostingSettings _hostingSettings;
         private readonly IGlobalSettings _globalSettings;
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IIOHelper _ioHelper;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IRuntimeSettings _settings;
 
         public WebInitialComponent(
             IUmbracoContextAccessor umbracoContextAccessor,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes,
-            IHostingSettings hostingSettings,
             IGlobalSettings globalSettings,
-            IHostingEnvironment hostingEnvironment,
             IIOHelper ioHelper,
-            IShortStringHelper shortStringHelper,
-            IRuntimeSettings settings)
+            IShortStringHelper shortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _surfaceControllerTypes = surfaceControllerTypes;
             _apiControllerTypes = apiControllerTypes;
-            _hostingSettings = hostingSettings;
             _globalSettings = globalSettings;
-            _hostingEnvironment = hostingEnvironment;
             _ioHelper = ioHelper;
             _shortStringHelper = shortStringHelper;
-            _settings = settings;
         }
 
         public void Initialize()

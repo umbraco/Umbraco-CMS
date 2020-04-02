@@ -8,7 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Umbraco.Infrastructure.WebAssets {
+namespace Umbraco.Web.WebAssets
+{
     using System;
     
     

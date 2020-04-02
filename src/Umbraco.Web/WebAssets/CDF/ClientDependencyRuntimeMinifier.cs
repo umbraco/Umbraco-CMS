@@ -5,18 +5,15 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Web;
-using System.Web.Mvc;
 using ClientDependency.Core;
 using ClientDependency.Core.CompositeFiles;
 using ClientDependency.Core.Config;
-using ClientDependency.Core.Mvc;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.WebAssets;
-using Umbraco.Web.JavaScript;
 using CssFile = ClientDependency.Core.CssFile;
 using JavascriptFile = ClientDependency.Core.JavascriptFile;
 
@@ -87,13 +84,9 @@ namespace Umbraco.Web.WebAssets.CDF
 
             var assetType = bundleFiles[0].DependencyType == ClientDependencyType.Css ? AssetType.Css : AssetType.Javascript;
 
-            // get the output string for these registrations which will be processed by CDF correctly to stagger the output based
-            // on internal vs external resources. The output will be delimited based on our custom Umbraco.Web.JavaScript.DependencyPathRenderer
-            var dependencies = new List<IClientDependencyFile>();
-
             // This is a hack on CDF so that we can resolve CDF urls directly since that isn't directly supported by the lib
             var renderer = ClientDependencySettings.Instance.MvcRendererCollection["Umbraco.DependencyPathRenderer"];
-            renderer.RegisterDependencies(dependencies, new HashSet<IClientDependencyPath>(), out var scripts, out var stylesheets, _httpContextAccessor.HttpContext);
+            renderer.RegisterDependencies(bundleFiles, new HashSet<IClientDependencyPath>(), out var scripts, out var stylesheets, _httpContextAccessor.HttpContext);
 
             var toParse = assetType == AssetType.Javascript ? scripts : stylesheets;
             return Task.FromResult<IEnumerable<string>>(toParse.Split(new[] { DependencyPathRenderer.Delimiter }, StringSplitOptions.RemoveEmptyEntries));
@@ -133,28 +126,26 @@ namespace Umbraco.Web.WebAssets.CDF
                 new HashSet<IClientDependencyPath>(),
                 out var jsOutput, out var cssOutput, _httpContextAccessor.GetRequiredHttpContext());
 
-            return HttpUtility.HtmlEncode(assetType == AssetType.Css ? cssOutput : jsOutput);
+            return assetType == AssetType.Css ? cssOutput : jsOutput;
         }
 
         private IEnumerable<IClientDependencyFile> GetCssBundleFiles(string bundleName)
         {
-            // the result of this is internal too, so use dynamic
-            dynamic bundle = typeof(BundleManager)
+            // internal methods needs reflection
+            var bundle = typeof(BundleManager)
                 .GetMethod("GetCssBundle", BindingFlags.NonPublic | BindingFlags.Static)
                 .Invoke(null, new object[] { bundleName });
-            if (bundle == null) return null;
-            IEnumerable<IClientDependencyFile> bundleFiles = bundle.Files;
+            var bundleFiles = (IEnumerable<IClientDependencyFile>) bundle?.GetType().GetProperty("Files").GetValue(bundle, null);
             return bundleFiles;
         }
 
         private IEnumerable<IClientDependencyFile> GetJsBundleFiles(string bundleName)
         {
-            // the result of this is internal too, so use dynamic
-            dynamic bundle = typeof(BundleManager)
+            // internal methods needs reflection
+            var bundle = typeof(BundleManager)
                 .GetMethod("GetJsBundle", BindingFlags.NonPublic | BindingFlags.Static)
                 .Invoke(null, new object[] { bundleName });
-            if (bundle == null) return null;
-            IEnumerable<IClientDependencyFile> bundleFiles = bundle.Files;
+            var bundleFiles = (IEnumerable<IClientDependencyFile>)bundle?.GetType().GetProperty("Files").GetValue(bundle, null);
             return bundleFiles;
         }
 

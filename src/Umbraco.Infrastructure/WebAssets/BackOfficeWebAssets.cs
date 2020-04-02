@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.WebAssets;
-using Umbraco.Infrastructure.WebAssets;
-using Umbraco.Web.PropertyEditors;
 
-namespace Umbraco.Web.JavaScript
+namespace Umbraco.Web.WebAssets
 {
     public class BackOfficeWebAssets
     {
@@ -24,20 +22,20 @@ namespace Umbraco.Web.JavaScript
         public const string UmbracoTinyMceJsBundleName = "umbraco-tinymce-js";
         public const string UmbracoUpgradeCssBundleName = "umbraco-authorize-upgrade-css";
 
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IManifestParser _parser;
+        private readonly IIOHelper _ioHelper;
         private readonly PropertyEditorCollection _propertyEditorCollection;
 
         public BackOfficeWebAssets(
-            IHostingEnvironment hostingEnvironment,
             IRuntimeMinifier runtimeMinifier,
             IManifestParser parser,
+            IIOHelper ioHelper,
             PropertyEditorCollection propertyEditorCollection)
         {
-            _hostingEnvironment = hostingEnvironment;
             _runtimeMinifier = runtimeMinifier;
             _parser = parser;
+            _ioHelper = ioHelper;
             _propertyEditorCollection = propertyEditorCollection;
         }
 
@@ -64,33 +62,26 @@ namespace Umbraco.Web.JavaScript
             _runtimeMinifier.CreateJsBundle(UmbracoTinyMceJsBundleName,
                 GetScriptsForTinyMce().ToArray());
 
-            var propertyEditorAssets = ScanPropertyEditors().GroupBy(x => x.AssetType);
-            foreach (var assetGroup in propertyEditorAssets)
-            {
-                switch (assetGroup.Key)
-                {
-                    case AssetType.Javascript:
-                        _runtimeMinifier.CreateJsBundle(
-                            UmbracoJsBundleName,
-                            GetScriptsForBackoffice(assetGroup.Select(x => x.FilePath)).ToArray());
-                        break;
-                    case AssetType.Css:
-                        _runtimeMinifier.CreateCssBundle(
-                            UmbracoCssBundleName,
-                            GetStylesheetsForBackoffice(assetGroup.Select(x => x.FilePath)).ToArray());
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
+            var propertyEditorAssets = ScanPropertyEditors()
+                .GroupBy(x => x.AssetType)
+                .ToDictionary(x => x.Key, x => x.Select(c => c.FilePath));
 
+            _runtimeMinifier.CreateJsBundle(
+                UmbracoJsBundleName,
+                GetScriptsForBackoffice(
+                    propertyEditorAssets.TryGetValue(AssetType.Javascript, out var scripts) ? scripts : Enumerable.Empty<string>()));
+
+            _runtimeMinifier.CreateCssBundle(
+                UmbracoCssBundleName,
+                GetStylesheetsForBackoffice(
+                    propertyEditorAssets.TryGetValue(AssetType.Css, out var styles) ? styles : Enumerable.Empty<string>()));
         }
 
         /// <summary>
         /// Returns scripts used to load the back office
         /// </summary>
         /// <returns></returns>
-        private IEnumerable<string> GetScriptsForBackoffice(IEnumerable<string> propertyEditorScripts)
+        private string[] GetScriptsForBackoffice(IEnumerable<string> propertyEditorScripts)
         {
             var umbracoInit = JsInitialization.GetDefaultInitialization();
             var scripts = new HashSet<string>();
@@ -101,14 +92,14 @@ namespace Umbraco.Web.JavaScript
             foreach (var script in propertyEditorScripts)
                 scripts.Add(script);
 
-            return new HashSet<string>(FormatPaths(scripts));
+            return new HashSet<string>(FormatPaths(scripts)).ToArray();
         }
 
         /// <summary>
         /// Returns stylesheets used to load the back office
         /// </summary>
         /// <returns></returns>
-        private IEnumerable<string> GetStylesheetsForBackoffice(IEnumerable<string> propertyEditorStyles)
+        private string[] GetStylesheetsForBackoffice(IEnumerable<string> propertyEditorStyles)
         {
             var stylesheets = new HashSet<string>();
 
@@ -117,7 +108,7 @@ namespace Umbraco.Web.JavaScript
             foreach (var stylesheet in propertyEditorStyles)
                 stylesheets.Add(stylesheet);
 
-            return new HashSet<string>(FormatPaths(stylesheets));
+            return new HashSet<string>(FormatPaths(stylesheets)).ToArray();
         }
 
         /// <summary>
@@ -147,12 +138,14 @@ namespace Umbraco.Web.JavaScript
         /// <returns></returns>
         private IEnumerable<string> FormatPaths(IEnumerable<string> assets)
         {
+            var umbracoPath = _ioHelper.GetUmbracoMvcArea();
+
             return assets
                 .Where(x => x.IsNullOrWhiteSpace() == false)
                 .Select(x => !x.StartsWith("/") && Uri.IsWellFormedUriString(x, UriKind.Relative)
                     // most declarations with be made relative to the /umbraco folder, so things
                     // like lib/blah/blah.js so we need to turn them into absolutes here
-                    ? _hostingEnvironment.ApplicationVirtualPath.EnsureStartsWith('/').TrimEnd("/") + x.EnsureStartsWith('/')
+                    ? umbracoPath.EnsureStartsWith('/').TrimEnd("/") + x.EnsureStartsWith('/')
                     : x).ToList();
         }
 

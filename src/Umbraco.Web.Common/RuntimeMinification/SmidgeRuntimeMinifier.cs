@@ -9,9 +9,7 @@ using Smidge.Nuglify;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.WebAssets;
-using Umbraco.Web.JavaScript;
 using CssFile = Smidge.Models.CssFile;
 using JavaScriptFile = Smidge.Models.JavaScriptFile;
 
@@ -19,8 +17,6 @@ namespace Umbraco.Web.Common.RuntimeMinification
 {
     public class SmidgeRuntimeMinifier : IRuntimeMinifier
     {
-        private readonly IGlobalSettings _globalSettings;
-        private readonly IIOHelper _ioHelper;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ISmidgeConfig _smidgeConfig;
         private readonly IConfigManipulator _configManipulator;
@@ -35,8 +31,6 @@ namespace Umbraco.Web.Common.RuntimeMinification
             BundleManager bundles,
             SmidgeHelper smidge,
             PreProcessPipelineFactory preProcessPipelineFactory,
-            IGlobalSettings globalSettings,
-            IIOHelper ioHelper,
             IHostingEnvironment hostingEnvironment,
             ISmidgeConfig smidgeConfig,
             IConfigManipulator configManipulator)
@@ -44,8 +38,6 @@ namespace Umbraco.Web.Common.RuntimeMinification
             _bundles = bundles;
             _smidge = smidge;
             _preProcessPipelineFactory = preProcessPipelineFactory;
-            _globalSettings = globalSettings;
-            _ioHelper = ioHelper;
             _hostingEnvironment = hostingEnvironment;
             _smidgeConfig = smidgeConfig;
             _configManipulator = configManipulator;

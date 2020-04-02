@@ -1,7 +1,7 @@
 ﻿@using Umbraco.Core
 @using Umbraco.Web.Composing
 @using Umbraco.Web
-@using Umbraco.Web.JavaScript
+@using Umbraco.Web.WebAssets
 
 
 @inherits WebViewPage<Umbraco.Web.Editors.BackOfficeModel>
@@ -72,9 +72,8 @@
 
             </div>
 
-            <umb-tour
-                ng-if="tour.show"
-                model="tour">
+            <umb-tour ng-if="tour.show"
+                      model="tour">
             </umb-tour>
 
             <umb-notifications></umb-notifications>
@@ -102,9 +101,8 @@
                  parent-scope="overlay.parentScope">
     </umb-overlay>
 
-    <umb-login
-        ng-if="login.show"
-        on-login="hideLoginScreen()">
+    <umb-login ng-if="login.show"
+               on-login="hideLoginScreen()">
     </umb-login>
 
     @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewData.GetUmbracoPath() }), Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.ContentSettings, Model.IOHelper, Model.TreeCollection, Model.HttpContextAccessor, Model.HostingEnvironment, Model.RuntimeSettings, Model.SecuritySettings, Current.RuntimeMinifier)

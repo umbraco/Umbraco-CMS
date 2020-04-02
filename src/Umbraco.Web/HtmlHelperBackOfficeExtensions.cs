@@ -14,9 +14,9 @@ using Umbraco.Core.WebAssets;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
-using Umbraco.Web.JavaScript;
 using Umbraco.Web.Models;
 using Umbraco.Web.Trees;
+using Umbraco.Web.WebAssets;
 
 namespace Umbraco.Web
 {

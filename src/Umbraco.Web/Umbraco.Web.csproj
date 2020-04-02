@@ -547,7 +547,6 @@
     <Compile Include="UmbracoWebService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="WebAssets\WebAssetsComponent.cs" />
     <Compile Include="WebViewPageExtensions.cs" />
     <Compile Include="Runtime\WebFinalComponent.cs" />
     <Compile Include="Runtime\WebFinalComposer.cs" />

@@ -13,8 +13,8 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.ModelsBuilder.Embedded.BackOffice;
 using Umbraco.Web;
-using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.WebAssets;
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
