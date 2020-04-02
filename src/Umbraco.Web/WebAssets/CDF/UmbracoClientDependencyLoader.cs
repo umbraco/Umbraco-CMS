@@ -4,7 +4,7 @@ using ClientDependency.Core.FileRegistration.Providers;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 
-namespace Umbraco.Web.JavaScript.CDF
+namespace Umbraco.Web.WebAssets.CDF
 {
     /// <summary>
     /// Used to load in all client dependencies for Umbraco.

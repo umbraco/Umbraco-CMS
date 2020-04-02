@@ -1,17 +1,13 @@
 ﻿@using Umbraco.Core
 @using Umbraco.Web.Composing
 @using Umbraco.Web
+@using Umbraco.Web.JavaScript
 
 @inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Editors.BackOfficeModel>
 @{
     Layout = null;
 
     var runtimeMinifier = Current.RuntimeMinifier;
-
-    runtimeMinifier.RequiresCss("umbraco", 
-        "assets/css/umbraco.css",
-        "lib/bootstrap-social/bootstrap-social.css",
-        "lib/font-awesome/css/font-awesome.min.css");
 }
 
 <!DOCTYPE html>
@@ -23,8 +19,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Umbraco</title>
-
-    @Html.Raw(runtimeMinifier.RenderJsHere("umbraco"));
+     
+    @Html.Raw(runtimeMinifier.RenderCssHere(BackOfficeWebAssets.UmbracoUpgradeCssBundleName));
 
     @*Because we're lazy loading angular js, the embedded cloak style will not be loaded initially, but we need it*@
     <style>

@@ -1,8 +1,8 @@
 ﻿using System.Web.Mvc;
-using Umbraco.Core.Assets;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Runtime;
+using Umbraco.Core.WebAssets;
 
 namespace Umbraco.Web.Mvc
 {

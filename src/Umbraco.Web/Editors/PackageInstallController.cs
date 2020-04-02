@@ -20,6 +20,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Core.WebAssets;
 using Umbraco.Net;
 using Umbraco.Web.JavaScript;
 using Umbraco.Web.Models;

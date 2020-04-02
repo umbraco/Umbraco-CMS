@@ -1,6 +1,7 @@
 ﻿@using Umbraco.Core
 @using Umbraco.Web.Composing
 @using Umbraco.Web
+@using Umbraco.Web.JavaScript
 
 
 @inherits WebViewPage<Umbraco.Web.Editors.BackOfficeModel>
@@ -16,12 +17,8 @@
             isDebug = true;
         }
     }
-    var runtimeMinifier = Current.RuntimeMinifier;
 
-    runtimeMinifier.RequiresCss("umbraco",
-        "lib/bootstrap-social/bootstrap-social.css", 
-        "assets/css/umbraco.css",
-        "lib/font-awesome/css/font-awesome.min.css");
+    var runtimeMinifier = Current.RuntimeMinifier;
 }
 
 <!DOCTYPE html>
@@ -38,7 +35,7 @@
 
     <title ng-bind="$root.locationTitle">Umbraco</title>
 
-    @Html.Raw(runtimeMinifier.RenderCssHere("Umbraco"))
+    @Html.Raw(runtimeMinifier.RenderCssHere(BackOfficeWebAssets.UmbracoInitCssBundleName))
 
 </head>
 <body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show, 'umb-tour-is-visible': tour.show, 'tabbing-active':tabbingActive}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">

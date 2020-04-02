@@ -20,6 +20,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Runtime;
+using Umbraco.Core.WebAssets;
 
 namespace Umbraco.Web.Editors
 {
@@ -138,7 +139,6 @@ namespace Umbraco.Web.Editors
 
                         {"externalLoginsUrl", _urlHelper.Action("ExternalLogin", "BackOffice")},
                         {"externalLinkLoginsUrl", _urlHelper.Action("LinkLogin", "BackOffice")},
-                        {"manifestAssetList", _urlHelper.Action("GetManifestAssetList", "BackOffice")},
                         {"gridConfig", _urlHelper.Action("GetGridConfig", "BackOffice")},
                         // TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
                         {"serverVarsJs", _urlHelper.Action("Application", "BackOffice")},
@@ -478,7 +478,7 @@ namespace Umbraco.Web.Editors
             var version = _runtimeState.SemanticVersion.ToSemanticString();
 
             //the value is the hash of the version, cdf version and the configured state
-            app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{_runtimeMinifier.GetHashValue}".GenerateHash());
+            app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{_runtimeMinifier.CacheBuster}".GenerateHash());
 
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
             app.Add("applicationPath", _httpContextAccessor.GetRequiredHttpContext().Request.ApplicationPath.EnsureEndsWith('/'));

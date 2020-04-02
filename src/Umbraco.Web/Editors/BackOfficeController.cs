@@ -31,6 +31,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Runtime;
+using Umbraco.Core.WebAssets;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Editors
@@ -247,36 +248,9 @@ namespace Umbraco.Web.Editors
         [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
         public async Task<JavaScriptResult> Application()
         {
-            var result = await _runtimeMinifier.GetScriptForBackOfficeAsync();
+            var result = await _runtimeMinifier.GetScriptForLoadingBackOfficeAsync(GlobalSettings, _ioHelper);
 
             return JavaScript(result);
-        }
-
-        /// <summary>
-        /// Returns a js array of all of the manifest assets
-        /// </summary>
-        /// <returns></returns>
-        [UmbracoAuthorize(Order = 0)]
-        [HttpGet]
-        public async Task<JsonNetResult> GetManifestAssetList()
-        {
-            async Task<JArray> GetAssetList()
-            {
-                var assets = new JArray(await _runtimeMinifier.GetAssetListAsync());
-
-                return new JArray(assets);
-            }
-
-            var assetList = await GetAssetList();
-            //cache the result if debugging is disabled
-            var result = _hostingEnvironment.IsDebugMode
-                ? assetList
-                : AppCaches.RuntimeCache.GetCacheItem<JArray>(
-                    "Umbraco.Web.Editors.BackOfficeController.GetManifestAssetList",
-                    () => assetList,
-                    new TimeSpan(0, 2, 0));
-
-            return new JsonNetResult { Data = result, Formatting = Formatting.None };
         }
 
         [UmbracoAuthorize(Order = 0)]

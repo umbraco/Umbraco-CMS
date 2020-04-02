@@ -1,5 +1,5 @@
 ﻿using System;
-using Umbraco.Core.Assets;
+using Umbraco.Core.WebAssets;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -12,23 +12,13 @@ namespace Umbraco.Web.PropertyEditors
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class PropertyEditorAssetAttribute : Attribute
     {
-        public AssetType AssetType { get; private set; }
-        public string FilePath { get; private set; }
-        public int Priority { get; set; }
-
-        /// <summary>
-        /// Returns a CDF file reference
-        /// </summary>
-        public IAssetFile DependencyFile =>
-            Priority == int.MinValue
-                ? new AssetFile(AssetType) {FilePath = FilePath}
-                : new AssetFile(AssetType) {FilePath = FilePath, Priority = Priority};
+        public AssetType AssetType { get; }
+        public string FilePath { get; }
 
         public PropertyEditorAssetAttribute(AssetType assetType, string filePath)
         {
             AssetType = assetType;
             FilePath = filePath;
-            Priority = int.MinValue;
         }
     }
 }

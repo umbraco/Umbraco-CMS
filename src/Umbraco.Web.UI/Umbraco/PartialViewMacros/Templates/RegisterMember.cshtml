@@ -34,18 +34,12 @@
     Html.EnableClientValidation();
     Html.EnableUnobtrusiveJavaScript();
 
-    var runtimeMinifier = Current.RuntimeMinifier;
-
-    runtimeMinifier.RequiresJs("umbraco",
-        "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js");
-
     var success = TempData["FormSuccess"] != null;
 }
 
-@*NOTE: This RenderJsHere code should be put on your main template page where the rest of your script tags are placed*@
-@Html.Raw(runtimeMinifier.RenderJsHere("umbraco"));
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
 
 @if (success)
 {

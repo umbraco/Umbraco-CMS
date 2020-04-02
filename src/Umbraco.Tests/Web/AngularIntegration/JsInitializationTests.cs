@@ -2,7 +2,6 @@
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Web.JavaScript;
-using Umbraco.Web.JavaScript.CDF;
 
 namespace Umbraco.Tests.Web.AngularIntegration
 {

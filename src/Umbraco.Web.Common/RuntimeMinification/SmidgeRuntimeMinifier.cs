@@ -1,21 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Smidge;
 using Smidge.CompositeFiles;
 using Smidge.FileProcessors;
+using Smidge.Models;
 using Smidge.Nuglify;
 using Umbraco.Core;
-using Umbraco.Core.Assets;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Manifest;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Runtime;
+using Umbraco.Core.WebAssets;
 using Umbraco.Web.JavaScript;
 using CssFile = Smidge.Models.CssFile;
 using JavaScriptFile = Smidge.Models.JavaScriptFile;
@@ -25,36 +20,30 @@ namespace Umbraco.Web.Common.RuntimeMinification
     public class SmidgeRuntimeMinifier : IRuntimeMinifier
     {
         private readonly IGlobalSettings _globalSettings;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IIOHelper _ioHelper;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ISmidgeConfig _smidgeConfig;
         private readonly IConfigManipulator _configManipulator;
-        private readonly IManifestParser _manifestParser;
         private readonly PreProcessPipelineFactory _preProcessPipelineFactory;
-        private readonly PropertyEditorCollection _propertyEditorCollection;
+        private readonly BundleManager _bundles;
         private readonly SmidgeHelper _smidge;
 
         private PreProcessPipeline _jsPipeline;
         private PreProcessPipeline _cssPipeline;
 
         public SmidgeRuntimeMinifier(
+            BundleManager bundles,
             SmidgeHelper smidge,
             PreProcessPipelineFactory preProcessPipelineFactory,
-            IManifestParser manifestParser,
-            IHttpContextAccessor httpContextAccessor,
-            PropertyEditorCollection propertyEditorCollection,
             IGlobalSettings globalSettings,
             IIOHelper ioHelper,
             IHostingEnvironment hostingEnvironment,
             ISmidgeConfig smidgeConfig,
             IConfigManipulator configManipulator)
         {
+            _bundles = bundles;
             _smidge = smidge;
             _preProcessPipelineFactory = preProcessPipelineFactory;
-            _manifestParser = manifestParser;
-            _httpContextAccessor = httpContextAccessor;
-            _propertyEditorCollection = propertyEditorCollection;
             _globalSettings = globalSettings;
             _ioHelper = ioHelper;
             _hostingEnvironment = hostingEnvironment;
@@ -62,40 +51,41 @@ namespace Umbraco.Web.Common.RuntimeMinification
             _configManipulator = configManipulator;
         }
 
-        private PreProcessPipeline JsPipeline  => _jsPipeline ??= _preProcessPipelineFactory.Create(typeof(JsMinifier));
-        private PreProcessPipeline CssPipeline  => _cssPipeline ??= _preProcessPipelineFactory.Create(typeof(NuglifyCss));
+        private PreProcessPipeline JsPipeline => _jsPipeline ??= _preProcessPipelineFactory.Create(typeof(JsMinifier));
+        private PreProcessPipeline CssPipeline => _cssPipeline ??= _preProcessPipelineFactory.Create(typeof(NuglifyCss));
 
-        private Uri GetRequestUrl() => new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl(), UriKind.Absolute);
-        public string GetHashValue => _smidgeConfig.Version;
+        public string CacheBuster => _smidgeConfig.Version;
 
-        public void RequiresCss(string bundleName, params string[] filePaths) => _smidge.CreateCssBundle(bundleName).RequiresCss(filePaths);
-        public string RenderCssHere(string bundleName) => _smidge.CssHereAsync(bundleName).ToString();
-        public void RequiresJs(string bundleName, params string[] filePaths) =>     _smidge.CreateJsBundle(bundleName).RequiresJs(filePaths);
-        public string RenderJsHere(string bundleName) => _smidge.JsHereAsync(bundleName).ToString();
-
-        public async Task<IEnumerable<string>> GetAssetPathsAsync(AssetType assetType, List<IAssetFile> attributes)
+        // only issue with creating bundles like this is that we don't have full control over the bundle options, though that could 
+        public void CreateCssBundle(string bundleName, params string[] filePaths)
         {
+            if (_bundles.Exists(bundleName))
+                throw new InvalidOperationException($"The bundle name {bundleName} already exists");
 
-            var files =  attributes
-                .Where(x => x.DependencyType == assetType)
-                .Select(x=>x.FilePath)
-                .ToArray();
+            var bundle = _bundles.Create(bundleName, WebFileType.Css, filePaths);
 
-            if (files.Length == 0) return Array.Empty<string>();
+            // Here we could configure bundle options instead of using smidge's global defaults.
+            // For example we can use our own custom cache buster for this bundle without having the global one
+            // affect this or vice versa.
+        }   
 
-            if (assetType == AssetType.Javascript)
-            {
-                _smidge.RequiresJs(files);
+        public string RenderCssHere(string bundleName) => _smidge.CssHereAsync(bundleName, _hostingEnvironment.IsDebugMode).ToString();
 
-                return await _smidge.GenerateJsUrlsAsync(JsPipeline, _hostingEnvironment.IsDebugMode);
-            }
-            else
-            {
-                _smidge.RequiresCss(files);
+        public void CreateJsBundle(string bundleName, params string[] filePaths)
+        {
+            if (_bundles.Exists(bundleName))
+                throw new InvalidOperationException($"The bundle name {bundleName} already exists");
 
-                return await _smidge.GenerateCssUrlsAsync(CssPipeline, _hostingEnvironment.IsDebugMode);
-            }
+            var bundle = _bundles.Create(bundleName, WebFileType.Js, filePaths);
+
+            // Here we could configure bundle options instead of using smidge's global defaults.
+            // For example we can use our own custom cache buster for this bundle without having the global one
+            // affect this or vice versa.
         }
+
+        public string RenderJsHere(string bundleName) => _smidge.JsHereAsync(bundleName, _hostingEnvironment.IsDebugMode).ToString();
+
+        public async Task<IEnumerable<string>> GetAssetPathsAsync(string bundleName) => await _smidge.GenerateJsUrlsAsync(bundleName, _hostingEnvironment.IsDebugMode);
 
         public async Task<string> MinifyAsync(string fileContent, AssetType assetType)
         {
@@ -124,31 +114,6 @@ namespace Umbraco.Web.Common.RuntimeMinification
         {
             var version = DateTime.UtcNow.Ticks.ToString();
             _configManipulator.SaveConfigValue(Constants.Configuration.ConfigRuntimeMinificationVersion, version.ToString());
-        }
-
-        public async Task<string> GetScriptForBackOfficeAsync()
-        {
-            var initJs = new JsInitialization(_manifestParser, this, _propertyEditorCollection);
-            var initCss = new CssInitialization(_manifestParser, this, _propertyEditorCollection);
-
-            var requestUrl = GetRequestUrl();
-            var files = await initJs.OptimizeBackOfficeScriptFilesAsync(requestUrl, JsInitialization.GetDefaultInitialization());
-            var result = JavaScriptHelper.GetJavascriptInitialization(files, "umbraco", _globalSettings, _ioHelper);
-            result += await initCss.GetStylesheetInitializationAsync(requestUrl);
-
-            return result;
-        }
-
-        public async Task<IEnumerable<string>> GetAssetListAsync()
-        {
-            var initJs = new JsInitialization(_manifestParser, this, _propertyEditorCollection);
-            var initCss = new CssInitialization(_manifestParser, this, _propertyEditorCollection);
-            var assets = new List<string>();
-            var requestUrl = GetRequestUrl();
-            assets.AddRange(await initJs.OptimizeBackOfficeScriptFilesAsync(requestUrl, Enumerable.Empty<string>()));
-            assets.AddRange(await initCss.GetStylesheetFilesAsync(requestUrl));
-
-            return assets;
         }
 
 

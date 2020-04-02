@@ -5,21 +5,21 @@ using System.Web;
 using System.Web.Mvc;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Runtime;
+using Umbraco.Core.WebAssets;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
+using Umbraco.Web.JavaScript;
 using Umbraco.Web.Models;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web
 {
-    using Core.Configuration;
-    using Umbraco.Core.Configuration.UmbracoSettings;
-    using Umbraco.Web.JavaScript;
-
     /// <summary>
     /// HtmlHelper extensions for the back office
     /// </summary>
@@ -129,8 +129,7 @@ namespace Umbraco.Web
 
         public static IHtmlString AngularValueTinyMceAssets(this HtmlHelper html, IRuntimeMinifier runtimeMinifier)
         {
-            var ctx = new HttpContextWrapper(HttpContext.Current);
-            var files = JavaScriptHelper.OptimizeTinyMceScriptFilesAsync(ctx.Request.Url, runtimeMinifier).GetAwaiter().GetResult();
+            var files = runtimeMinifier.GetAssetPathsAsync(BackOfficeWebAssets.UmbracoTinyMceJsBundleName).GetAwaiter().GetResult();
 
             var sb = new StringBuilder();
 

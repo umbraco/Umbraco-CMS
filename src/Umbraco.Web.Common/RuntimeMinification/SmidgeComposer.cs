@@ -1,6 +1,7 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Runtime;
+using Umbraco.Core.WebAssets;
 
 namespace Umbraco.Web.Common.RuntimeMinification
 {

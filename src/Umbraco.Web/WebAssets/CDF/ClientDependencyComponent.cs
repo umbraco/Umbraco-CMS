@@ -9,7 +9,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.Runtime;
 
-namespace Umbraco.Web.JavaScript.CDF
+namespace Umbraco.Web.WebAssets.CDF
 {
     [ComposeAfter(typeof(WebInitialComponent))]
     public sealed class ClientDependencyComponent : IComponent

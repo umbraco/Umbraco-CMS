@@ -1,13 +1,11 @@
 ﻿@using Umbraco.Web.Composing
+@using Umbraco.Web.JavaScript
 
 @inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Editors.BackOfficePreviewModel>
 @{
     var disableDevicePreview = Model.DisableDevicePreview.ToString().ToLowerInvariant();
 
     var runtimeMinifier = Current.RuntimeMinifier;
-
-    runtimeMinifier.RequiresCss("umbraco-preview",
-        "assets/css/canvasdesigner.css");
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -18,7 +16,7 @@
     <meta name="pinterest" content="nopin" />
 
 
-     @Html.Raw(runtimeMinifier.RenderCssHere("umbraco-preview"))
+     @Html.Raw(runtimeMinifier.RenderCssHere(BackOfficeWebAssets.UmbracoPreviewCssBundleName))
 
 
 </head>

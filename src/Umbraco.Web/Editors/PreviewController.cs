@@ -11,6 +11,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
+using Umbraco.Core.WebAssets;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
 using Umbraco.Web.JavaScript;
@@ -36,7 +37,7 @@ namespace Umbraco.Web.Editors
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
-        private IRuntimeSettings _runtimeSettings;
+        private readonly IRuntimeSettings _runtimeSettings;
         private readonly ISecuritySettings _securitySettings;
         private readonly IRuntimeMinifier _runtimeMinifier;
 
@@ -102,9 +103,7 @@ namespace Umbraco.Web.Editors
         [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
         public async Task<JavaScriptResult> Application()
         {
-
-
-            var files = await JavaScriptHelper.OptimizeScriptFilesAsync(HttpContext.Request.Url, JavaScriptHelper.GetPreviewInitialization(), _runtimeMinifier);
+            var files = await _runtimeMinifier.GetAssetPathsAsync(BackOfficeWebAssets.UmbracoPreviewJsBundleName);
             var result = JavaScriptHelper.GetJavascriptInitialization(files, "umbraco.preview", _globalSettings, _ioHelper);
 
             return JavaScript(result);

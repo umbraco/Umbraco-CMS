@@ -43,20 +43,20 @@
 
     <ItemGroup>
       <Compile Remove="obj\**" />
-      <Compile Update="RuntimeMinification\Resources.Designer.cs">
+      <Compile Update="WebAssets\Resources.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
-        <DependentUpon>Resources2.resx</DependentUpon>
+        <DependentUpon>Resources.resx</DependentUpon>
       </Compile>
     </ItemGroup>
 
     <ItemGroup>
       <EmbeddedResource Remove="obj\**" />
-      <EmbeddedResource Include="RuntimeMinification\JsInitialize.js" />
-      <EmbeddedResource Include="RuntimeMinification\Main.js" />
-      <EmbeddedResource Include="RuntimeMinification\PreviewInitialize.js" />
-      <EmbeddedResource Include="RuntimeMinification\ServerVariables.js" />
-      <EmbeddedResource Update="RuntimeMinification\Resources.resx">
+      <EmbeddedResource Include="WebAssets\JsInitialize.js" />
+      <EmbeddedResource Include="WebAssets\Main.js" />
+      <EmbeddedResource Include="WebAssets\PreviewInitialize.js" />
+      <EmbeddedResource Include="WebAssets\ServerVariables.js" />
+      <EmbeddedResource Update="WebAssets\Resources.resx">
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       </EmbeddedResource>

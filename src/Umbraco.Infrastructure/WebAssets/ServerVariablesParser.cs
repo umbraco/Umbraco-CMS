@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using Umbraco.Infrastructure.RuntimeMinification;
+using Umbraco.Infrastructure.WebAssets;
 
 namespace Umbraco.Web.JavaScript
 {
