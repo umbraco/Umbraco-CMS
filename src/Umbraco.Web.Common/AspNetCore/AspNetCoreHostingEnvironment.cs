@@ -86,14 +86,13 @@ namespace Umbraco.Web.Common.AspNetCore
             return Path.Combine(_webHostEnvironment.WebRootPath, newPath);
         }
 
-        // TODO: Need to take into account 'root' here, maybe not, Root probably shouldn't be a param, see notes in IOHelper that calls this, we already know ApplicationVirtualPath
-        public string ToAbsolute(string virtualPath, string root)
+        public string ToAbsolute(string virtualPath)
         {
             if (!virtualPath.StartsWith("~/") && !virtualPath.StartsWith("/"))
                 throw new InvalidOperationException($"{nameof(virtualPath)} must start with ~/ or /");
-            if (!root.StartsWith("/"))
-                throw new InvalidOperationException($"{nameof(virtualPath)} must start with /");
 
+            var root = ApplicationVirtualPath.EnsureStartsWith('/');
+            
             // will occur if it starts with "/"
             if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
                 return virtualPath;

@@ -41,7 +41,7 @@ namespace Umbraco.Web.Hosting
             return HostingEnvironment.MapPath(path);
         }
 
-        public string ToAbsolute(string virtualPath, string root) => VirtualPathUtility.ToAbsolute(virtualPath, root.EnsureStartsWith('/'));
+        public string ToAbsolute(string virtualPath) => VirtualPathUtility.ToAbsolute(virtualPath, ApplicationVirtualPath.EnsureStartsWith('/'));
         
 
         public string LocalTempPath

@@ -56,8 +56,7 @@ namespace Umbraco.Core.IO
         public string ResolveUrl(string virtualPath)
         {
             if (string.IsNullOrWhiteSpace(virtualPath)) return virtualPath;
-            // TODO: This is a bit odd, the whole "Root" thing is strange, we're passing this into IHostingEnvironment, but it already should know this value in it's ApplicationVirtualPath
-            return _hostingEnvironment.ToAbsolute(virtualPath, Root);
+            return _hostingEnvironment.ToAbsolute(virtualPath);
 
         }
 
@@ -70,8 +69,7 @@ namespace Umbraco.Core.IO
                 if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
                     return Attempt.Succeed(virtualPath);
 
-                // TODO: This is a bit odd, the whole "Root" thing is strange, we're passing this into IHostingEnvironment, but it already should know this value in it's ApplicationVirtualPath
-                return Attempt.Succeed(_hostingEnvironment.ToAbsolute(virtualPath, Root));
+                return Attempt.Succeed(_hostingEnvironment.ToAbsolute(virtualPath));
             }
             catch (Exception ex)
             {
