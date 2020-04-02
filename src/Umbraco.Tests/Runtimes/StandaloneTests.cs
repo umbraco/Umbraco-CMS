@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Runtimes
             var databaseFactory = new UmbracoDatabaseFactory(logger,globalSettings, connectionStrings, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()),  TestHelper.DbProviderFactoryCreator);
             var ioHelper = TestHelper.IOHelper;
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-            var typeLoader = new TypeLoader(ioHelper, typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), profilingLogger);
+            var typeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), profilingLogger);
             var mainDom = new SimpleMainDom();
             var umbracoVersion = TestHelper.GetUmbracoVersion();
             var backOfficeInfo = TestHelper.GetBackOfficeInfo();
@@ -262,7 +262,7 @@ namespace Umbraco.Tests.Runtimes
             var databaseFactory = Mock.Of<IUmbracoDatabaseFactory>();
             var typeFinder = TestHelper.GetTypeFinder();
             var ioHelper = TestHelper.IOHelper;
-            var typeLoader = new TypeLoader(ioHelper, typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), profilingLogger);
+            var typeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), profilingLogger);
             var runtimeState = Mock.Of<IRuntimeState>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
             var backOfficeInfo = TestHelper.GetBackOfficeInfo();

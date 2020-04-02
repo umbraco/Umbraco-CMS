@@ -14,8 +14,6 @@ using File = System.IO.File;
 
 namespace Umbraco.Core.Composing
 {
-    
-
     /// <summary>
     /// Provides methods to find and instantiate types.
     /// </summary>
@@ -29,7 +27,6 @@ namespace Umbraco.Core.Composing
     {
         private const string CacheKey = "umbraco-types.list";
 
-        private readonly IIOHelper _ioHelper;
         private readonly IAppPolicyCache _runtimeCache;
         private readonly IProfilingLogger _logger;
 
@@ -49,30 +46,29 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeLoader"/> class.
         /// </summary>
-        /// <param name="ioHelper"></param>
+        /// <param name="runtimeHash"></param>
         /// <param name="typeFinder"></param>
         /// <param name="runtimeCache">The application runtime cache.</param>
         /// <param name="localTempPath">Files storage location.</param>
         /// <param name="logger">A profiling logger.</param>
         /// <param name="assembliesToScan"></param>
-        public TypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, IProfilingLogger logger, IEnumerable<Assembly> assembliesToScan = null)
-            : this(ioHelper, typeFinder, runtimeCache, localTempPath, logger, true, assembliesToScan)
+        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, IProfilingLogger logger, IEnumerable<Assembly> assembliesToScan = null)
+            : this(typeFinder, runtimeCache, localTempPath, logger, true, assembliesToScan)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeLoader"/> class.
         /// </summary>
-        /// <param name="ioHelper"></param>
+        /// <param name="runtimeHash"></param>
         /// <param name="typeFinder"></param>
         /// <param name="runtimeCache">The application runtime cache.</param>
         /// <param name="localTempPath">Files storage location.</param>
         /// <param name="logger">A profiling logger.</param>
         /// <param name="detectChanges">Whether to detect changes using hashes.</param>
         /// <param name="assembliesToScan"></param>
-        public TypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, IProfilingLogger logger, bool detectChanges, IEnumerable<Assembly> assembliesToScan = null)
+        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, IProfilingLogger logger, bool detectChanges, IEnumerable<Assembly> assembliesToScan = null)
         {
             TypeFinder = typeFinder ?? throw new ArgumentNullException(nameof(typeFinder));
-            _ioHelper = ioHelper;
             _runtimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
             _localTempPath = localTempPath;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -124,7 +120,7 @@ namespace Umbraco.Core.Composing
         /// <para>This is for unit tests.</para>
         /// </remarks>
         // internal for tests
-        public IEnumerable<Assembly> AssembliesToScan => _assemblies ?? (_assemblies = TypeFinder.AssembliesToScan);
+        public IEnumerable<Assembly> AssembliesToScan => _assemblies ??= TypeFinder.AssembliesToScan;
 
         /// <summary>
         /// Gets the type lists.
@@ -183,19 +179,7 @@ namespace Umbraco.Core.Composing
                 if (_currentAssembliesHash != null)
                     return _currentAssembliesHash;
 
-                _currentAssembliesHash = GetFileHash(new List<Tuple<FileSystemInfo, bool>>
-                    {
-                        // TODO: Would be nicer to abstract this logic out into IAssemblyHash
-
-                        // TODO: Use constants from SystemDirectories when we can (once it's ported to netstandard lib)
-
-                        // the bin folder and everything in it
-                        new Tuple<FileSystemInfo, bool>(new DirectoryInfo(_ioHelper.MapPath("~/bin")), false),
-                        // the app code folder and everything in it
-                        new Tuple<FileSystemInfo, bool>(new DirectoryInfo(_ioHelper.MapPath("~/App_Code")), false),
-                        // global.asax (the app domain also monitors this, if it changes will do a full restart)
-                        new Tuple<FileSystemInfo, bool>(new FileInfo(_ioHelper.MapPath("~/global.asax")), false)
-                    }, _logger);
+                _currentAssembliesHash = TypeFinder.GetRuntimeHash();
 
                 return _currentAssembliesHash;
             }
@@ -208,92 +192,6 @@ namespace Umbraco.Core.Composing
         {
             var typesHashFilePath = GetTypesHashFilePath();
             File.WriteAllText(typesHashFilePath, CurrentAssembliesHash, Encoding.UTF8);
-        }
-
-        /// <summary>
-        /// Returns a unique hash for a combination of FileInfo objects.
-        /// </summary>
-        /// <param name="filesAndFolders">A collection of files.</param>
-        /// <param name="logger">A profiling logger.</param>
-        /// <returns>The hash.</returns>
-        /// <remarks>Each file is a tuple containing the FileInfo object and a boolean which indicates whether to hash the
-        /// file properties (false) or the file contents (true).</remarks>
-        private static string GetFileHash(IEnumerable<Tuple<FileSystemInfo, bool>> filesAndFolders, IProfilingLogger logger)
-        {
-            using (logger.DebugDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
-            {
-                // get the distinct file infos to hash
-                var uniqInfos = new HashSet<string>();
-                var uniqContent = new HashSet<string>();
-                using (var generator = new HashGenerator())
-                {
-                    foreach (var fileOrFolder in filesAndFolders)
-                    {
-                        var info = fileOrFolder.Item1;
-                        if (fileOrFolder.Item2)
-                        {
-                            // add each unique file's contents to the hash
-                            // normalize the content for cr/lf and case-sensitivity
-                            if (uniqContent.Add(info.FullName))
-                            {
-                                if (File.Exists(info.FullName) == false) continue;
-                                var content = RemoveCrLf(File.ReadAllText(info.FullName));
-                                generator.AddCaseInsensitiveString(content);
-                            }
-                        }
-                        else
-                        {
-                            // add each unique folder/file to the hash
-                            if (uniqInfos.Add(info.FullName))
-                            {
-                                generator.AddFileSystemItem(info);
-                            }
-                        }
-                    }
-                    return generator.GenerateHash();
-                }
-            }
-        }
-
-        // fast! (yes, according to benchmarks)
-        private static string RemoveCrLf(string s)
-        {
-            var buffer = new char[s.Length];
-            var count = 0;
-            // ReSharper disable once ForCanBeConvertedToForeach - no!
-            for (var i = 0; i < s.Length; i++)
-            {
-                if (s[i] != '\r' && s[i] != '\n')
-                    buffer[count++] = s[i];
-            }
-            return new string(buffer, 0, count);
-        }
-
-        /// <summary>
-        /// Returns a unique hash for a combination of FileInfo objects.
-        /// </summary>
-        /// <param name="filesAndFolders">A collection of files.</param>
-        /// <param name="logger">A profiling logger.</param>
-        /// <returns>The hash.</returns>
-        // internal for tests
-        public static string GetFileHash(IEnumerable<FileSystemInfo> filesAndFolders, IProfilingLogger logger)
-        {
-            using (logger.DebugDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
-            {
-                using (var generator = new HashGenerator())
-                {
-                    // get the distinct file infos to hash
-                    var uniqInfos = new HashSet<string>();
-
-                    foreach (var fileOrFolder in filesAndFolders)
-                    {
-                        if (uniqInfos.Contains(fileOrFolder.FullName)) continue;
-                        uniqInfos.Add(fileOrFolder.FullName);
-                        generator.AddFileSystemItem(fileOrFolder);
-                    }
-                    return generator.GenerateHash();
-                }
-            }
         }
 
         #endregion

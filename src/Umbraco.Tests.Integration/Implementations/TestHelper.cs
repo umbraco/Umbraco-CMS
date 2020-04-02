@@ -106,8 +106,7 @@ namespace Umbraco.Tests.Integration.Implementations
         public override IHostingEnvironment GetHostingEnvironment()
             => _hostingEnvironment ??= new TestHostingEnvironment(
                 SettingsForTests.GetDefaultHostingSettings(),
-                _hostEnvironment,
-                _httpContextAccessor);
+                _hostEnvironment);
 
         public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime() => _hostingLifetime;
 

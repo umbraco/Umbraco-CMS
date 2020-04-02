@@ -25,7 +25,7 @@ namespace Umbraco.Core.IO
         {
             get
             {
-                var path = _globalSettings.Path;
+                var path = _globalSettings.UmbracoPath;
 
                 return string.IsNullOrEmpty(path) ? string.Empty : ResolveUrl(path);
             }

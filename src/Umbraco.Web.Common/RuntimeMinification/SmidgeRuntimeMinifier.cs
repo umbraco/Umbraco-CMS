@@ -22,15 +22,15 @@ namespace Umbraco.Web.Common.RuntimeMinification
         private readonly ISmidgeConfig _smidgeConfig;
         private readonly IConfigManipulator _configManipulator;
         private readonly PreProcessPipelineFactory _preProcessPipelineFactory;
-        private readonly BundleManager _bundles;
-        private readonly SmidgeHelper _smidge;
+        private readonly IBundleManager _bundles;
+        private readonly SmidgeHelperAccessor _smidge;
 
         private PreProcessPipeline _jsPipeline;
         private PreProcessPipeline _cssPipeline;
 
         public SmidgeRuntimeMinifier(
-            BundleManager bundles,
-            SmidgeHelper smidge,
+            IBundleManager bundles,
+            SmidgeHelperAccessor smidge,
             PreProcessPipelineFactory preProcessPipelineFactory,
             IHostingEnvironment hostingEnvironment,
             ISmidgeConfig smidgeConfig,
@@ -65,7 +65,7 @@ namespace Umbraco.Web.Common.RuntimeMinification
             // affect this or vice versa.
         }   
 
-        public string RenderCssHere(string bundleName) => _smidge.CssHereAsync(bundleName, _hostingEnvironment.IsDebugMode).ToString();
+        public string RenderCssHere(string bundleName) => _smidge.SmidgeHelper.CssHereAsync(bundleName, _hostingEnvironment.IsDebugMode).ToString();
 
         public void CreateJsBundle(string bundleName, params string[] filePaths)
         {
@@ -82,9 +82,9 @@ namespace Umbraco.Web.Common.RuntimeMinification
             // affect this or vice versa.
         }
 
-        public string RenderJsHere(string bundleName) => _smidge.JsHereAsync(bundleName, _hostingEnvironment.IsDebugMode).ToString();
+        public string RenderJsHere(string bundleName) => _smidge.SmidgeHelper.JsHereAsync(bundleName, _hostingEnvironment.IsDebugMode).ToString();
 
-        public async Task<IEnumerable<string>> GetAssetPathsAsync(string bundleName) => await _smidge.GenerateJsUrlsAsync(bundleName, _hostingEnvironment.IsDebugMode);
+        public async Task<IEnumerable<string>> GetAssetPathsAsync(string bundleName) => await _smidge.SmidgeHelper.GenerateJsUrlsAsync(bundleName, _hostingEnvironment.IsDebugMode);
 
         public async Task<string> MinifyAsync(string fileContent, AssetType assetType)
         {

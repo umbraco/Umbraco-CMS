@@ -51,5 +51,14 @@ namespace Umbraco.Core.Composing
             Type attributeType,
             IEnumerable<Assembly> assemblies,
             bool onlyConcreteClasses);
+
+        /// <summary>
+        /// Gets a hash value of the current runtime
+        /// </summary>
+        /// <remarks>
+        /// This is used to detect if the runtime itself has changed, like a DLL has changed or another dynamically compiled
+        /// part of the application has changed. This is used to detect if we need to re-type scan.
+        /// </remarks>
+        string GetRuntimeHash();
     }
 }

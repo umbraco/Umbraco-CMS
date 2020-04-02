@@ -163,7 +163,7 @@ namespace Umbraco.Core.Runtime
                 var databaseFactory = GetDatabaseFactory();
 
                 // type finder/loader
-                var typeLoader = new TypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), ProfilingLogger);
+                var typeLoader = new TypeLoader(TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), ProfilingLogger);
 
                 // create the composition
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs, IOHelper, appCaches);

@@ -30,8 +30,6 @@ namespace Umbraco.Configuration.Models
         public string ReservedUrls => _configuration.GetValue(Prefix + "ReservedUrls", StaticReservedUrls);
         public string ReservedPaths => _configuration.GetValue(Prefix + "ReservedPaths", StaticReservedPaths);
 
-        public string Path => _configuration.GetValue<string>(Prefix + "Path");
-
         // TODO: https://github.com/umbraco/Umbraco-CMS/issues/4238 - stop having version in web.config appSettings
         public string ConfigurationStatus
         {

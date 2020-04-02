@@ -16,6 +16,7 @@ namespace Umbraco.Core.Composing
     {
         private readonly ILogger _logger;
         private readonly IAssemblyProvider _assemblyProvider;
+        private readonly IRuntimeHash _runtimeHash;
         private volatile HashSet<Assembly> _localFilteredAssemblyCache;
         private readonly object _localFilteredAssemblyCacheLocker = new object();
         private readonly List<string> _notifiedLoadExceptionAssemblies = new List<string>();
@@ -25,10 +26,11 @@ namespace Umbraco.Core.Composing
         // used for benchmark tests
         internal bool QueryWithReferencingAssemblies = true;
 
-        public TypeFinder(ILogger logger, IAssemblyProvider assemblyProvider, ITypeFinderConfig typeFinderConfig = null)
+        public TypeFinder(ILogger logger, IAssemblyProvider assemblyProvider, IRuntimeHash runtimeHash, ITypeFinderConfig typeFinderConfig = null)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _assemblyProvider = assemblyProvider;
+            _runtimeHash = runtimeHash;
             _assembliesAcceptingLoadExceptions = typeFinderConfig?.AssembliesAcceptingLoadExceptions.Where(x => !x.IsNullOrWhiteSpace()).ToArray() ?? Array.Empty<string>();           
         }
 
@@ -207,6 +209,9 @@ namespace Umbraco.Core.Composing
 
             return GetClassesWithAttribute(attributeType, assemblyList, onlyConcreteClasses);
         }
+
+        /// <inheritdoc />
+        public string GetRuntimeHash() => _runtimeHash.GetHashValue();
 
         /// <summary>
         /// Returns a Type for the string type name

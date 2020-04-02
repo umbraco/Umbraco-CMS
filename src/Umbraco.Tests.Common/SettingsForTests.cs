@@ -24,7 +24,6 @@ namespace Umbraco.Tests.Common
                     settings.ConfigurationStatus == semanticVersion.ToSemanticString()  &&
                     settings.UseHttps == false &&
                     settings.HideTopLevelNodeFromPath == false &&
-                    settings.Path == "~/umbraco" &&
                     settings.TimeOutInMinutes == 20 &&
                     settings.DefaultUILanguage == "en" &&
                     settings.ReservedPaths == (GlobalSettings.StaticReservedPaths + "~/umbraco") &&

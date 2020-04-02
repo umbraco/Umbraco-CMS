@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Components
         private static TypeLoader MockTypeLoader()
         {
             var ioHelper = TestHelper.IOHelper;
-            return new TypeLoader(ioHelper, Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
+            return new TypeLoader(Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
         }
 
         public static IRuntimeState MockRuntimeState(RuntimeLevel level)
@@ -372,7 +372,7 @@ namespace Umbraco.Tests.Components
         {
             var ioHelper = TestHelper.IOHelper;
             var typeFinder = TestHelper.GetTypeFinder();
-            var typeLoader = new TypeLoader(ioHelper, typeFinder, AppCaches.Disabled.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
+            var typeLoader = new TypeLoader(typeFinder, AppCaches.Disabled.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
 
             var register = MockRegister();
             var composition = new Composition(register, typeLoader, Mock.Of<IProfilingLogger>(),

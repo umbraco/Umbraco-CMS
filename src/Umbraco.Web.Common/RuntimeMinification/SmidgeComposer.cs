@@ -9,7 +9,8 @@ namespace Umbraco.Web.Common.RuntimeMinification
     {
         public void Compose(Composition composition)
         {
-            composition.Register<IRuntimeMinifier, SmidgeRuntimeMinifier>(Core.Composing.Lifetime.Scope);
+            composition.RegisterUnique<IRuntimeMinifier, SmidgeRuntimeMinifier>();
+            composition.RegisterUnique<SmidgeHelperAccessor>();
         }
     }
 }

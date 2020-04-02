@@ -8,8 +8,8 @@ namespace Umbraco.Tests.Integration.Implementations
 
     public class TestHostingEnvironment : AspNetCoreHostingEnvironment, Umbraco.Core.Hosting.IHostingEnvironment
     {
-        public TestHostingEnvironment(IHostingSettings hostingSettings, IWebHostEnvironment webHostEnvironment, IHttpContextAccessor httpContextAccessor)
-            : base(hostingSettings, webHostEnvironment, httpContextAccessor)
+        public TestHostingEnvironment(IHostingSettings hostingSettings, IWebHostEnvironment webHostEnvironment)
+            : base(hostingSettings, webHostEnvironment)
         {
         }
 

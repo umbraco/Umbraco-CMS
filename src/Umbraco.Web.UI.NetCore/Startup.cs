@@ -21,7 +21,7 @@ namespace Umbraco.Web.UI.BackOffice
 {
     public class Startup
     {
-        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IWebHostEnvironment _env;
         private readonly IConfiguration _config;
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Umbraco.Web.UI.BackOffice
         /// </remarks>
         public Startup(IWebHostEnvironment webHostEnvironment, IConfiguration config)
         {
-            _webHostEnvironment = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
+            _env = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
             _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
@@ -44,7 +44,7 @@ namespace Umbraco.Web.UI.BackOffice
         {
             services.AddUmbracoConfiguration(_config);
             services.AddUmbracoRuntimeMinifier(_config);
-            services.AddUmbracoCore(_webHostEnvironment, out var factory);
+            services.AddUmbracoCore(_env, out var factory);
             services.AddUmbracoWebsite();
 
             services.AddMvc();
@@ -66,12 +66,12 @@ namespace Umbraco.Web.UI.BackOffice
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
 
         //    app.UseMiniProfiler();
             app.UseUmbracoRequest();
-            if (env.IsDevelopment())
+            if (_env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }

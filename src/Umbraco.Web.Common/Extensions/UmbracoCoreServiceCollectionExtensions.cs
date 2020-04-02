@@ -1,5 +1,6 @@
 using System;
 using System.Data.Common;
+using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -100,10 +101,6 @@ namespace Umbraco.Web.Common.Extensions
             var globalSettings = configs.Global();
             var umbracoVersion = new UmbracoVersion(globalSettings);
 
-            // TODO: Currently we are not passing in any TypeFinderConfig (with ITypeFinderSettings) which we should do, however
-            // this is not critical right now and would require loading in some config before boot time so just leaving this as-is for now.
-            var typeFinder = new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(entryAssembly));
-
             var coreRuntime = GetCoreRuntime(
                 configs,
                 umbracoVersion,
@@ -112,11 +109,21 @@ namespace Umbraco.Web.Common.Extensions
                 profiler,
                 hostingEnvironment,
                 backOfficeInfo,
-                typeFinder);
+                CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly));
 
             factory = coreRuntime.Configure(container);
 
             return services;
+        }
+
+        private static ITypeFinder CreateTypeFinder(ILogger logger, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly)
+        {
+            // TODO: Currently we are not passing in any TypeFinderConfig (with ITypeFinderSettings) which we should do, however
+            // this is not critical right now and would require loading in some config before boot time so just leaving this as-is for now.
+            var runtimeHashPaths = new RuntimeHashPaths();
+            runtimeHashPaths.AddFolder(new DirectoryInfo(Path.Combine(webHostEnvironment.ContentRootPath, "bin")));
+            var runtimeHash = new RuntimeHash(new ProfilingLogger(logger, profiler), runtimeHashPaths);
+            return new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(entryAssembly), runtimeHash);
         }
 
         private static IRuntime GetCoreRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger,
@@ -161,7 +168,7 @@ namespace Umbraco.Web.Common.Extensions
             var coreDebug = configs.CoreDebug();
             var globalSettings = configs.Global();
 
-            hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment, httpContextAccessor);
+            hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment);
             ioHelper = new IOHelper(hostingEnvironment, globalSettings);
             logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,
                 new AspNetCoreSessionIdResolver(httpContextAccessor),
