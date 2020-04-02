@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Common.Builders
 
         public override IConfigurationEditor Build()
         {
-            var  defaultConfiguration  = _defaultConfiguration ?? new Dictionary<string, object>();
+            var defaultConfiguration  = _defaultConfiguration ?? new Dictionary<string, object>();
 
             return new ConfigurationEditor()
             {

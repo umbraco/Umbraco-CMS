@@ -8,10 +8,16 @@ namespace Umbraco.Tests.Common.Builders
         : BuilderBase<DataType>,
             IWithIdBuilder,
             IWithKeyBuilder,
+            IWithCreatorIdBuilder,
             IWithCreateDateBuilder,
             IWithUpdateDateBuilder,
             IWithDeleteDateBuilder,
-            IWithNameBuilder
+            IWithNameBuilder,
+            IWithParentIdBuilder,
+            IWithTrashedBuilder,
+            IWithLevelBuilder,
+            IWithPathBuilder,
+            IWithSortOrderBuilder
     {
         private readonly DataEditorBuilder<DataTypeBuilder> _dataEditorBuilder;
         private int? _id;
@@ -34,51 +40,15 @@ namespace Umbraco.Tests.Common.Builders
             _dataEditorBuilder = new DataEditorBuilder<DataTypeBuilder>(this);
         }
 
-        public DataTypeBuilder WithParentId(int parentId)
-        {
-            _parentId = parentId;
-            return this;
-        }
-
-        public DataTypeBuilder WithTrashed(bool trashed)
-        {
-            _trashed = trashed;
-            return this;
-        }
-
         // public DataTypeBuilder WithConfiguration(object configuration)
         // {
         //     _configuration = configuration;
         //     return this;
         // }
 
-        public DataTypeBuilder WithLevel(int level)
-        {
-            _level = level;
-            return this;
-        }
-
-        public DataTypeBuilder WithPath(string path)
-        {
-            _path = path;
-            return this;
-        }
-
-        public DataTypeBuilder WithCreatorId(int creatorId)
-        {
-            _creatorId = creatorId;
-            return this;
-        }
-
         public DataTypeBuilder WithDatabaseType(ValueStorageType databaseType)
         {
             _databaseType = databaseType;
-            return this;
-        }
-
-        public DataTypeBuilder WithSortOrder(int sortOrder)
-        {
-            _sortOrder = sortOrder;
             return this;
         }
 
@@ -133,6 +103,12 @@ namespace Umbraco.Tests.Common.Builders
             set => _key = value;
         }
 
+        int? IWithCreatorIdBuilder.CreatorId
+        {
+            get => _creatorId;
+            set => _creatorId = value;
+        }
+
         DateTime? IWithCreateDateBuilder.CreateDate
         {
             get => _createDate;
@@ -155,6 +131,36 @@ namespace Umbraco.Tests.Common.Builders
         {
             get => _name;
             set => _name = value;
+        }
+
+        int? IWithParentIdBuilder.ParentId
+        {
+            get => _parentId;
+            set => _parentId = value;
+        }
+
+        bool? IWithTrashedBuilder.Trashed
+        {
+            get => _trashed;
+            set => _trashed = value;
+        }
+
+        int? IWithLevelBuilder.Level
+        {
+            get => _level;
+            set => _level = value;
+        }
+
+        string IWithPathBuilder.Path
+        {
+            get => _path;
+            set => _path = value;
+        }
+
+        int? IWithSortOrderBuilder.SortOrder
+        {
+            get => _sortOrder;
+            set => _sortOrder = value;
         }
     }
 }

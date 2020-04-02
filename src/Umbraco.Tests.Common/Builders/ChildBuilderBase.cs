@@ -9,7 +9,6 @@ namespace Umbraco.Tests.Common.Builders
             _parentBuilder = parentBuilder;
         }
 
-
         public TParent Done()
         {
             return _parentBuilder;

@@ -4,18 +4,17 @@ using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
-
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
 {
     [TestFixture]
     public class DataTypeTests
     {
-
         private readonly DataTypeBuilder _builder = new DataTypeBuilder();
+
         [Test]
         public void Can_Deep_Clone()
         {
-            var dtd = _builder
+             var dtd = _builder
                 .WithId(3123)
                 .Build();
 

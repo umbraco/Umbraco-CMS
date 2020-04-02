@@ -53,12 +53,24 @@ namespace Umbraco.Web.Common.Extensions
         /// <returns></returns>
         public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment)
         {
+            return services.AddUmbracoCore(webHostEnvironment,out _);
+        }
+
+        /// <summary>
+        /// Adds the Umbraco Back Core requirements
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="webHostEnvironment"></param>
+        /// <param name="factory"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, out IFactory factory)
+        {
             if (!UmbracoServiceProviderFactory.IsActive)
                 throw new InvalidOperationException("Ensure to add UseUmbraco() in your Program.cs after ConfigureWebHostDefaults to enable Umbraco's service provider factory");
 
             var umbContainer = UmbracoServiceProviderFactory.UmbracoContainer;
 
-            services.AddUmbracoCore(webHostEnvironment, umbContainer, Assembly.GetEntryAssembly());
+            services.AddUmbracoCore(webHostEnvironment, umbContainer, Assembly.GetEntryAssembly(), out factory);
 
             return services;
         }
@@ -70,8 +82,9 @@ namespace Umbraco.Web.Common.Extensions
         /// <param name="webHostEnvironment"></param>
         /// <param name="umbContainer"></param>
         /// <param name="entryAssembly"></param>
+        /// <param name="factory"></param>
         /// <returns></returns>
-        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IRegister umbContainer, Assembly entryAssembly)
+        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IRegister umbContainer, Assembly entryAssembly, out IFactory factory)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             var container = umbContainer;
@@ -101,7 +114,7 @@ namespace Umbraco.Web.Common.Extensions
                 backOfficeInfo,
                 typeFinder);
 
-            var factory = coreRuntime.Configure(container);
+            factory = coreRuntime.Configure(container);
 
             return services;
         }
@@ -158,8 +171,6 @@ namespace Umbraco.Web.Common.Extensions
 
             backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
             profiler = GetWebProfiler(hostingEnvironment, httpContextAccessor);
-
-            Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
 
             return services;
         }
