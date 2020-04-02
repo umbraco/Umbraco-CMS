@@ -24,11 +24,15 @@ namespace Umbraco.Tests.PropertyEditors
         /// <returns></returns>
         private IPublishedSnapshotAccessor GetPublishedSnapshotAccessor()
         {
-            var homeContentType = Mock.Of<IPublishedContentType>(x =>
+            var test1ContentType = Mock.Of<IPublishedContentType>(x =>
                 x.IsElement == true
-                && x.Alias == "home");
+                && x.Alias == "Test1");
+            var test2ContentType = Mock.Of<IPublishedContentType>(x =>
+                x.IsElement == true
+                && x.Alias == "Test2");
             var contentCache = new Mock<IPublishedContentCache>();
-            contentCache.Setup(x => x.GetContentType("home")).Returns(homeContentType);
+            contentCache.Setup(x => x.GetContentType("Test1")).Returns(test1ContentType);
+            contentCache.Setup(x => x.GetContentType("Test2")).Returns(test2ContentType);
             var publishedSnapshot = Mock.Of<IPublishedSnapshot>(x => x.Content == contentCache.Object);
             var publishedSnapshotAccessor = Mock.Of<IPublishedSnapshotAccessor>(x => x.PublishedSnapshot == publishedSnapshot);
             return publishedSnapshotAccessor;
@@ -254,8 +258,8 @@ data: []}";
     },
         data: [
         {
-            'contentTypeAlias': 'home',
-            'key': '1304E1DD-AC87-4396-84FE-8A399231CB3D'
+            'contentTypeAlias': 'Test1',
+            'udi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D'
         }
     ]
 }";
@@ -265,7 +269,7 @@ data: []}";
             Assert.AreEqual(1, converted.Data.Count());
             var item0 = converted.Data.ElementAt(0);
             Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Key);
-            Assert.AreEqual("home", item0.ContentType.Alias);
+            Assert.AreEqual("Test1", item0.ContentType.Alias);
             Assert.AreEqual(1, converted.Layout.Count());
             var layout0 = converted.Layout.ElementAt(0);
             Assert.IsNull(layout0.Settings);
@@ -296,16 +300,16 @@ data: []}";
     },
         data: [
         {
-            'contentTypeAlias': 'home',
-            'key': '1304E1DD-AC87-4396-84FE-8A399231CB3D'
+            'contentTypeAlias': 'Test1',
+            'udi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D'
         },
         {
-            'contentTypeAlias': 'home',
-            'key': 'E05A0347-0442-4AB3-A520-E048E6197E79'
+            'contentTypeAlias': 'Test2',
+            'udi': 'umb://element/E05A034704424AB3A520E048E6197E79'
         },
         {
-            'contentTypeAlias': 'home',
-            'key': '0A4A416E-547D-464F-ABCC-6F345C17809A'
+            'contentTypeAlias': 'Test2',
+            'udi': 'umb://element/0A4A416E547D464FABCC6F345C17809A'
         }
     ]
 }";
@@ -318,11 +322,11 @@ data: []}";
 
             var item0 = converted.Layout.ElementAt(0);
             Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Data.Key);
-            Assert.AreEqual("home", item0.Data.ContentType.Alias);
+            Assert.AreEqual("Test1", item0.Data.ContentType.Alias);
 
             var item1 = converted.Layout.ElementAt(1);
             Assert.AreEqual(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A"), item1.Data.Key);
-            Assert.AreEqual("home", item1.Data.ContentType.Alias);
+            Assert.AreEqual("Test2", item1.Data.ContentType.Alias);
 
         }
 
