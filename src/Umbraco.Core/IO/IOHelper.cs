@@ -52,21 +52,13 @@ namespace Umbraco.Core.IO
             return retval;
         }
 
-        public string ResolveVirtualUrl(string path)
-        {
-            if (string.IsNullOrWhiteSpace(path)) return path;
-            return path.StartsWith("~/") ? ResolveUrl(path) : path;
-        }
-
-        //Replaces tildes with the root dir
+        // TODO: This is the same as IHostingEnvironment.ToAbsolute
         public string ResolveUrl(string virtualPath)
         {
-            if (virtualPath.StartsWith("~"))
-                return virtualPath.Replace("~", Root).Replace("//", "/");
-            else if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
-                return virtualPath;
-            else
-                return _hostingEnvironment.ToAbsolute(virtualPath, Root);
+            if (string.IsNullOrWhiteSpace(virtualPath)) return virtualPath;
+            // TODO: This is a bit odd, the whole "Root" thing is strange, we're passing this into IHostingEnvironment, but it already should know this value in it's ApplicationVirtualPath
+            return _hostingEnvironment.ToAbsolute(virtualPath, Root);
+
         }
 
         public Attempt<string> TryResolveUrl(string virtualPath)
@@ -77,6 +69,8 @@ namespace Umbraco.Core.IO
                     return Attempt.Succeed(virtualPath.Replace("~", Root).Replace("//", "/"));
                 if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
                     return Attempt.Succeed(virtualPath);
+
+                // TODO: This is a bit odd, the whole "Root" thing is strange, we're passing this into IHostingEnvironment, but it already should know this value in it's ApplicationVirtualPath
                 return Attempt.Succeed(_hostingEnvironment.ToAbsolute(virtualPath, Root));
             }
             catch (Exception ex)

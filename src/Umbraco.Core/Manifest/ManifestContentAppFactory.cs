@@ -136,14 +136,14 @@ namespace Umbraco.Core.Manifest
 
             // else
             // content app can be displayed
-            return _app ?? (_app = new ContentApp
+            return _app ??= new ContentApp
             {
                 Alias = _definition.Alias,
                 Name = _definition.Name,
                 Icon = _definition.Icon,
-                View = _ioHelper.ResolveVirtualUrl(_definition.View),
+                View = _ioHelper.ResolveUrl(_definition.View),
                 Weight = _definition.Weight
-            });
+            };
         }
 
         private class ShowRule
