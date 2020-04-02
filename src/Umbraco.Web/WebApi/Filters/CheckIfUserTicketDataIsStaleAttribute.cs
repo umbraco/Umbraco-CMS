@@ -113,7 +113,7 @@ namespace Umbraco.Web.WebApi.Filters
             var owinCtx = actionContext.Request.TryGetOwinContext();
             if (owinCtx)
             {
-                var signInManager = owinCtx.Result.GetBackOfficeSignInManager();
+                var signInManager = owinCtx.Result.GetBackOfficeSignInManager2();
 
                 var backOfficeIdentityUser = Mapper.Map<BackOfficeIdentityUser>(user);
                 await signInManager.SignInAsync(backOfficeIdentityUser, isPersistent: true, rememberBrowser: false);

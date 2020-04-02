@@ -51,18 +51,7 @@ namespace Umbraco.Web
             var ctx = owinContext.Get<HttpContextBase>(typeof(HttpContextBase).FullName);
             return ctx == null ? Attempt<HttpContextBase>.Fail() : Attempt.Succeed(ctx);
         }
-
-        /// <summary>
-        /// Gets the back office sign in manager out of OWIN
-        /// </summary>
-        /// <param name="owinContext"></param>
-        /// <returns></returns>
-        public static BackOfficeSignInManager2 GetBackOfficeSignInManager(this IOwinContext owinContext)
-        {
-            return owinContext.Get<BackOfficeSignInManager2>()
-                ?? throw new NullReferenceException($"Could not resolve an instance of {typeof (BackOfficeSignInManager2)} from the {typeof(IOwinContext)}.");
-        }
-
+        
         /// <summary>
         /// Gets the back office sign in manager out of OWIN
         /// </summary>
@@ -83,24 +72,6 @@ namespace Umbraco.Web
         /// This is required because to extract the user manager we need to user a custom service since owin only deals in generics and
         /// developers could register their own user manager types
         /// </remarks>
-        public static BackOfficeUserManager2<BackOfficeIdentityUser> GetBackOfficeUserManager(this IOwinContext owinContext)
-        {
-            var marker = owinContext.Get<IBackOfficeUserManagerMarker>(BackOfficeUserManager2.OwinMarkerKey)
-                ?? throw new NullReferenceException($"No {typeof (IBackOfficeUserManagerMarker)}, i.e. no Umbraco back-office, has been registered with Owin.");
-
-            return marker.GetManager(owinContext)
-                ?? throw new NullReferenceException($"Could not resolve an instance of {typeof (BackOfficeUserManager2<BackOfficeIdentityUser>)} from the {typeof (IOwinContext)}.");
-        }
-
-        /// <summary>
-        /// Gets the back office user manager out of OWIN
-        /// </summary>
-        /// <param name="owinContext"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This is required because to extract the user manager we need to user a custom service since owin only deals in generics and
-        /// developers could register their own user manager types
-        /// </remarks>
         public static BackOfficeUserManager2<BackOfficeIdentityUser> GetBackOfficeUserManager2(this IOwinContext owinContext)
         {
             var marker = owinContext.Get<IBackOfficeUserManagerMarker2>(BackOfficeUserManager2.OwinMarkerKey)
@@ -109,8 +80,6 @@ namespace Umbraco.Web
             return marker.GetManager(owinContext)
                 ?? throw new NullReferenceException($"Could not resolve an instance of {typeof (BackOfficeUserManager2<BackOfficeIdentityUser>)} from the {typeof (IOwinContext)}.");
         }
-
-        // TODO: SB: OWIN DI
 
         /// <summary>
         /// Adapted from Microsoft.AspNet.Identity.Owin.OwinContextExtensions

@@ -2,7 +2,6 @@
 using System.Threading;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
 using Microsoft.Owin.Extensions;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
@@ -16,7 +15,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
 using Umbraco.Web.Composing;
@@ -53,11 +51,6 @@ namespace Umbraco.Web.Security
                     mapper,
                     passwordConfiguration,
                     ipResolver,
-                    new OptionsWrapper<IdentityOptions>(new IdentityOptions()),
-                    new UserAwarePasswordHasher2<BackOfficeIdentityUser>(new PasswordSecurity(passwordConfiguration)),
-                    new[] {new UserValidator<BackOfficeIdentityUser>(),},
-                    new[] {new PasswordValidator<BackOfficeIdentityUser>()},
-                    new UpperInvariantLookupNormalizer(),
                     new IdentityErrorDescriber(),
                     null,
                     new NullLogger<BackOfficeUserManager2<BackOfficeIdentityUser>>()));
@@ -88,11 +81,6 @@ namespace Umbraco.Web.Security
                     passwordConfiguration,
                     ipResolver,
                     customUserStore,
-                    new OptionsWrapper<IdentityOptions>(new IdentityOptions()),
-                    new UserAwarePasswordHasher2<BackOfficeIdentityUser>(new PasswordSecurity(passwordConfiguration)),
-                    new[] { new Microsoft.AspNetCore.Identity.UserValidator<BackOfficeIdentityUser>(), },
-                    new[] { new PasswordValidator<BackOfficeIdentityUser>() },
-                    new UpperInvariantLookupNormalizer(),
                     new IdentityErrorDescriber(),
                     null,
                     new NullLogger<BackOfficeUserManager2<BackOfficeIdentityUser>>()));

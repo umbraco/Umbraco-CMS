@@ -23,22 +23,19 @@ namespace Umbraco.Web.Security
             IIpResolver ipResolver,
             IUserStore<BackOfficeIdentityUser> store,
             IOptions<IdentityOptions> optionsAccessor,
-            IPasswordHasher<BackOfficeIdentityUser> passwordHasher,
             IEnumerable<IUserValidator<BackOfficeIdentityUser>> userValidators,
             IEnumerable<IPasswordValidator<BackOfficeIdentityUser>> passwordValidators,
             ILookupNormalizer keyNormalizer,
             IdentityErrorDescriber errors,
             IServiceProvider services,
             ILogger<UserManager<BackOfficeIdentityUser>> logger)
-            : base(passwordConfiguration, ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
+            : base(passwordConfiguration, ipResolver, store, optionsAccessor, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
         {
             InitUserManager(this, passwordConfiguration);
         }
         
         #region Static Create methods
-
-        // TODO: SB: Static Create methods for OWIN
-
+        
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager
         /// </summary>
@@ -50,25 +47,16 @@ namespace Umbraco.Web.Security
             UmbracoMapper mapper,
             IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
-            IOptions<IdentityOptions> optionsAccessor,
-            IPasswordHasher<BackOfficeIdentityUser> passwordHasher,
-            IEnumerable<IUserValidator<BackOfficeIdentityUser>> userValidators,
-            IEnumerable<IPasswordValidator<BackOfficeIdentityUser>> passwordValidators,
-            ILookupNormalizer keyNormalizer,
             IdentityErrorDescriber errors,
             IServiceProvider services,
             ILogger<UserManager<BackOfficeIdentityUser>> logger)
         {
             var store = new BackOfficeUserStore2(userService, entityService, externalLoginService, globalSettings, mapper);
-            return new BackOfficeUserManager2(
+            
+            return Create(
                 passwordConfiguration,
                 ipResolver,
                 store,
-                optionsAccessor,
-                passwordHasher,
-                userValidators,
-                passwordValidators,
-                keyNormalizer,
                 errors,
                 services,
                 logger);
@@ -81,24 +69,39 @@ namespace Umbraco.Web.Security
             IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
             IUserStore<BackOfficeIdentityUser> customUserStore,
-            IOptions<IdentityOptions> optionsAccessor,
-            IPasswordHasher<BackOfficeIdentityUser> passwordHasher,
-            IEnumerable<IUserValidator<BackOfficeIdentityUser>> userValidators,
-            IEnumerable<IPasswordValidator<BackOfficeIdentityUser>> passwordValidators,
-            ILookupNormalizer keyNormalizer,
             IdentityErrorDescriber errors,
             IServiceProvider services,
             ILogger<UserManager<BackOfficeIdentityUser>> logger)
         {
+            var options = new IdentityOptions();
+
+            // Configure validation logic for usernames
+            var userValidators = new List<UserValidator<BackOfficeIdentityUser>> { new BackOfficeUserValidator2<BackOfficeIdentityUser>() };
+            options.User.RequireUniqueEmail = true;
+
+            // Configure validation logic for passwords
+            var passwordValidators = new List<IPasswordValidator<BackOfficeIdentityUser>> { new PasswordValidator<BackOfficeIdentityUser>() };
+            options.Password.RequiredLength = passwordConfiguration.RequiredLength;
+            options.Password.RequireNonAlphanumeric = passwordConfiguration.RequireNonLetterOrDigit;
+            options.Password.RequireDigit = passwordConfiguration.RequireDigit;
+            options.Password.RequireLowercase = passwordConfiguration.RequireLowercase;
+            options.Password.RequireUppercase = passwordConfiguration.RequireUppercase;
+
+            options.Lockout.AllowedForNewUsers = true;
+            options.Lockout.MaxFailedAccessAttempts = passwordConfiguration.MaxFailedAccessAttemptsBeforeLockout;
+            //NOTE: This just needs to be in the future, we currently don't support a lockout timespan, it's either they are locked
+            // or they are not locked, but this determines what is set on the account lockout date which corresponds to whether they are
+            // locked out or not.
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(30);
+
             return new BackOfficeUserManager2(
                 passwordConfiguration,
                 ipResolver,
                 customUserStore,
-                optionsAccessor,
-                passwordHasher,
+                new OptionsWrapper<IdentityOptions>(options),
                 userValidators,
                 passwordValidators,
-                keyNormalizer,
+                new NopLookupNormalizer(), 
                 errors,
                 services,
                 logger);
@@ -117,14 +120,13 @@ namespace Umbraco.Web.Security
             IIpResolver ipResolver,
             IUserStore<T> store,
             IOptions<IdentityOptions> optionsAccessor,
-            IPasswordHasher<T> passwordHasher,
             IEnumerable<IUserValidator<T>> userValidators,
             IEnumerable<IPasswordValidator<T>> passwordValidators,
             ILookupNormalizer keyNormalizer,
             IdentityErrorDescriber errors,
             IServiceProvider services,
             ILogger<UserManager<T>> logger)
-            : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
+            : base(store, optionsAccessor, null, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
         {
             PasswordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             IpResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));
@@ -146,7 +148,6 @@ namespace Umbraco.Web.Security
         public override bool SupportsUserPhoneNumber => false;
         #endregion
 
-        // TODO: SB: INIT
         /// <summary>
         /// Initializes the user manager with the correct options
         /// </summary>
@@ -158,22 +159,8 @@ namespace Umbraco.Web.Security
             IPasswordConfiguration passwordConfig)
             // IDataProtectionProvider dataProtectionProvider
         {
-            // Configure validation logic for usernames
-            manager.UserValidators.Clear();
-            manager.UserValidators.Add(new BackOfficeUserValidator2<T>());
-            manager.Options.User.RequireUniqueEmail = true;
-
-            // Configure validation logic for passwords
-            manager.PasswordValidators.Clear();
-            manager.PasswordValidators.Add(new PasswordValidator<T>());
-            manager.Options.Password.RequiredLength = passwordConfig.RequiredLength;
-            manager.Options.Password.RequireNonAlphanumeric = passwordConfig.RequireNonLetterOrDigit;
-            manager.Options.Password.RequireDigit = passwordConfig.RequireDigit;
-            manager.Options.Password.RequireLowercase = passwordConfig.RequireLowercase;
-            manager.Options.Password.RequireUppercase = passwordConfig.RequireUppercase;
-
             //use a custom hasher based on our membership provider
-            manager.PasswordHasher = GetDefaultPasswordHasher(passwordConfig);
+            PasswordHasher = GetDefaultPasswordHasher(PasswordConfiguration);
 
             // TODO: SB: manager.Options.Tokens using OWIN data protector
             /*if (dataProtectionProvider != null)
@@ -184,12 +171,7 @@ namespace Umbraco.Web.Security
                 };
             }*/
 
-            manager.Options.Lockout.AllowedForNewUsers = true;
-            manager.Options.Lockout.MaxFailedAccessAttempts = passwordConfig.MaxFailedAccessAttemptsBeforeLockout;
-            //NOTE: This just needs to be in the future, we currently don't support a lockout timespan, it's either they are locked
-            // or they are not locked, but this determines what is set on the account lockout date which corresponds to whether they are
-            // locked out or not.
-            manager.Options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(30);
+            
         }
 
         /// <summary>
@@ -217,7 +199,6 @@ namespace Umbraco.Web.Security
             return new UserAwarePasswordHasher2<T>(new PasswordSecurity(passwordConfiguration));
         }
         
-
         /// <summary>
         /// Gets/sets the default back office user password checker
         /// </summary>

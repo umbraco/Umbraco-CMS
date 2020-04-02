@@ -198,6 +198,7 @@
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
     <Compile Include="Scheduling\SchedulerComponent.cs" />
     <Compile Include="Scheduling\SchedulerComposer.cs" />
+    <Compile Include="Security\BackOfficeClaimsPrincipalFactory.cs" />
     <Compile Include="Security\BackOfficeSignInManager2.cs" />
     <Compile Include="Security\BackOfficeUserManager2.cs" />
     <Compile Include="Security\BackOfficeUserManagerMarker.cs" />
@@ -208,6 +209,7 @@
     <Compile Include="Security\IUserSessionStore.cs" />
     <Compile Include="Security\MembershipProviderBase.cs" />
     <Compile Include="Security\MembershipProviderExtensions.cs" />
+    <Compile Include="Security\NopLookupNormalizer.cs" />
     <Compile Include="Security\PasswordSecurity.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
     <Compile Include="Security\UmbracoEmailMessage.cs" />
@@ -226,7 +228,6 @@
     <Compile Include="Routing\RedirectTrackingComposer.cs" />
     <Compile Include="Runtime\WebInitialComposer.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
-    <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
     <Compile Include="Security\BackOfficeUserPasswordCheckerResult.cs" />
     <Compile Include="Security\IBackOfficeUserManagerMarker.cs" />
     <Compile Include="Security\IBackOfficeUserPasswordChecker.cs" />

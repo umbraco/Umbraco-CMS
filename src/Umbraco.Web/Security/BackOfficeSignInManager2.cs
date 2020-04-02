@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.Owin;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
@@ -16,11 +17,13 @@ namespace Umbraco.Web.Security
 {
     /// <summary>
     /// Custom sign in manager due to SignInManager not being .NET Standard.
+    /// Code ported from Umbraco's BackOfficeSignInManager.
     /// Can be removed once the web project moves to .NET Core.
     /// </summary>
     public class BackOfficeSignInManager2 : IDisposable
     {
         private readonly BackOfficeUserManager2<BackOfficeIdentityUser> _userManager;
+        private readonly IUserClaimsPrincipalFactory<BackOfficeIdentityUser> _claimsPrincipalFactory;
         private readonly IAuthenticationManager _authenticationManager;
         private readonly ILogger _logger;
         private readonly IGlobalSettings _globalSettings;
@@ -28,27 +31,35 @@ namespace Umbraco.Web.Security
 
         public BackOfficeSignInManager2(
             BackOfficeUserManager2<BackOfficeIdentityUser> userManager,
+            IUserClaimsPrincipalFactory<BackOfficeIdentityUser> claimsPrincipalFactory,
             IAuthenticationManager authenticationManager,
             ILogger logger,
             IGlobalSettings globalSettings,
             IOwinRequest request)
         {
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            _claimsPrincipalFactory = claimsPrincipalFactory ?? throw new ArgumentNullException(nameof(claimsPrincipalFactory));
             _authenticationManager = authenticationManager ?? throw new ArgumentNullException(nameof(authenticationManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _request = request ?? throw new ArgumentNullException(nameof(request));
         }
 
-        public Task<ClaimsIdentity> CreateUserIdentityAsync(BackOfficeIdentityUser user)
+        public async Task<ClaimsIdentity> CreateUserIdentityAsync(BackOfficeIdentityUser user)
         {
-            throw new NotImplementedException();
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
+            var claimsPrincipal = await _claimsPrincipalFactory.CreateAsync(user);
+            return claimsPrincipal.Identity as ClaimsIdentity;
         }
 
         public static BackOfficeSignInManager2 Create(IOwinContext context, IGlobalSettings globalSettings, ILogger logger)
         {
+            var userManager = context.GetBackOfficeUserManager2();
+
             return new BackOfficeSignInManager2(
-                context.GetBackOfficeUserManager2(),
+                userManager,
+                new BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>(userManager, new OptionsWrapper<IdentityOptions>(userManager.Options)),
                 context.Authentication,
                 logger,
                 globalSettings,
@@ -146,7 +157,7 @@ namespace Umbraco.Web.Security
 
                     if (requestContext != null)
                     {
-                        var backofficeUserManager = requestContext.GetBackOfficeUserManager();
+                        var backofficeUserManager = requestContext.GetBackOfficeUserManager2();
                         if (backofficeUserManager != null) backofficeUserManager.RaiseAccountLockedEvent(user.Id);
                     }
 
@@ -156,7 +167,7 @@ namespace Umbraco.Web.Security
 
             if (requestContext != null)
             {
-                var backofficeUserManager = requestContext.GetBackOfficeUserManager();
+                var backofficeUserManager = requestContext.GetBackOfficeUserManager2();
                 if (backofficeUserManager != null)
                     backofficeUserManager.RaiseInvalidLoginAttemptEvent(userName);
             }
