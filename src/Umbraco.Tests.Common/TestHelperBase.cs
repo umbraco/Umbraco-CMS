@@ -30,6 +30,7 @@ namespace Umbraco.Tests.Common
         private readonly ITypeFinder _typeFinder;
         private UriUtility _uriUtility;
         private IIOHelper _ioHelper;
+        private string _workingDir;
 
         protected TestHelperBase(Assembly entryAssembly)
         {
@@ -61,17 +62,20 @@ namespace Umbraco.Tests.Common
         public IConfigsFactory GetConfigsFactory() => new ConfigsFactory();
 
         /// <summary>
-        /// Gets the current assembly directory.
+        /// Gets the working directory of the test project.
         /// </summary>
-        /// <value>The assembly directory.</value>
-        public string CurrentAssemblyDirectory
+        public virtual string WorkingDirectory
         {
             get
             {
-                var codeBase = typeof(TestHelperBase).Assembly.CodeBase;
-                var uri = new Uri(codeBase);
-                var path = uri.LocalPath;
-                return Path.GetDirectoryName(path);
+                if (_workingDir != null) return _workingDir;
+
+                var dir = Path.Combine(Assembly.GetExecutingAssembly().GetRootDirectorySafe(), "TEMP");
+
+                if (!Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+                _workingDir = dir;
+                return _workingDir;
             }
         }
 
@@ -108,16 +112,21 @@ namespace Umbraco.Tests.Common
         public IWebRoutingSettings WebRoutingSettings => SettingsForTests.GenerateMockWebRoutingSettings();
 
         /// <summary>
-        /// Maps the given <paramref name="relativePath"/> making it rooted on <see cref="CurrentAssemblyDirectory"/>. <paramref name="relativePath"/> must start with <code>~/</code>
+        /// Some test files are copied to the /bin (/bin/debug) on build, this is a utility to return their physical path based on a virtual path name
         /// </summary>
-        /// <param name="relativePath">The relative path.</param>
+        /// <param name="relativePath"></param>
         /// <returns></returns>
-        public string MapPathForTest(string relativePath)
+        public string MapPathForTestFiles(string relativePath)
         {
             if (!relativePath.StartsWith("~/"))
-                throw new ArgumentException("relativePath must start with '~/'", "relativePath");
+                throw new ArgumentException("relativePath must start with '~/'", nameof(relativePath));
 
-            return relativePath.Replace("~/", CurrentAssemblyDirectory + "/");
+            var codeBase = typeof(TestHelperBase).Assembly.CodeBase;
+            var uri = new Uri(codeBase);
+            var path = uri.LocalPath;
+            var bin = Path.GetDirectoryName(path);
+
+            return relativePath.Replace("~/", bin + "/");
         }
 
         public IUmbracoVersion GetUmbracoVersion() => new UmbracoVersion(GetConfigs().Global());

@@ -31,13 +31,6 @@ namespace Umbraco.Core.IO
             }
         }
 
-        /// <summary>
-        /// Gets or sets a value forcing Umbraco to consider it is non-hosted.
-        /// </summary>
-        /// <remarks>This should always be false, unless unit testing.</remarks>
-	    public bool ForceNotHosted { get; set; }
-
-        private static string _rootDir = "";
 
         // static compiled regex for faster performance
         //private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
@@ -113,13 +106,9 @@ namespace Umbraco.Core.IO
                     : _hostingEnvironment.MapPath("~/" + path.TrimStart('/'));
 
                 if (result != null) return result;
-
-
             }
 
-
-
-            var root = GetRootDirectorySafe();
+            var root = Assembly.GetExecutingAssembly().GetRootDirectorySafe();
             var newPath = path.TrimStart('~', '/').Replace('/', DirSepChar);
             var retval = root + DirSepChar.ToString(CultureInfo.InvariantCulture) + newPath;
 
@@ -199,71 +188,6 @@ namespace Umbraco.Core.IO
             return path[root.Length] == separator;
         }
 
-        /// <summary>
-        /// Returns the path to the root of the application, by getting the path to where the assembly where this
-        /// method is included is present, then traversing until it's past the /bin directory. Ie. this makes it work
-        /// even if the assembly is in a /bin/debug or /bin/release folder
-        /// </summary>
-        /// <returns></returns>
-        public string GetRootDirectorySafe()
-        {
-            if (String.IsNullOrEmpty(_rootDir) == false)
-            {
-                return _rootDir;
-            }
-
-            var codeBase = Assembly.GetExecutingAssembly().CodeBase;
-            var uri = new Uri(codeBase);
-            var path = uri.LocalPath;
-            var baseDirectory = Path.GetDirectoryName(path);
-            if (String.IsNullOrEmpty(baseDirectory))
-                throw new Exception("No root directory could be resolved. Please ensure that your Umbraco solution is correctly configured.");
-
-            _rootDir = baseDirectory.Contains("bin")
-                           ? baseDirectory.Substring(0, baseDirectory.LastIndexOf("bin", StringComparison.OrdinalIgnoreCase) - 1)
-                           : baseDirectory;
-
-            return _rootDir;
-        }
-
-        public string GetRootDirectoryBinFolder()
-        {
-            string binFolder = String.Empty;
-            if (String.IsNullOrEmpty(_rootDir))
-            {
-                binFolder = Assembly.GetExecutingAssembly().GetAssemblyFile().Directory.FullName;
-                return binFolder;
-            }
-
-            binFolder = Path.Combine(GetRootDirectorySafe(), "bin");
-
-            // do this all the time (no #if DEBUG) because Umbraco release
-            // can be used in tests by an app (eg Deploy) being debugged
-            var debugFolder = Path.Combine(binFolder, "debug");
-            if (Directory.Exists(debugFolder))
-                return debugFolder;
-
-            var releaseFolder = Path.Combine(binFolder, "release");
-            if (Directory.Exists(releaseFolder))
-                return releaseFolder;
-
-            if (Directory.Exists(binFolder))
-                return binFolder;
-
-            return _rootDir;
-        }
-
-        /// <summary>
-        /// Allows you to overwrite RootDirectory, which would otherwise be resolved
-        /// automatically upon application start.
-        /// </summary>
-        /// <remarks>The supplied path should be the absolute path to the root of the umbraco site.</remarks>
-        /// <param name="rootPath"></param>
-        public void SetRootDirectory(string rootPath)
-        {
-            _rootDir = rootPath;
-        }
-
         public void EnsurePathExists(string path)
         {
             var absolutePath = MapPath(path);
@@ -280,7 +204,7 @@ namespace Umbraco.Core.IO
         {
             if (path.IsFullPath())
             {
-                var rootDirectory = GetRootDirectorySafe();
+                var rootDirectory = MapPath("~");
                 var relativePath = path.ToLowerInvariant().Replace(rootDirectory.ToLowerInvariant(), string.Empty);
                 path = relativePath;
             }
@@ -293,6 +217,10 @@ namespace Umbraco.Core.IO
         /// <summary>
         /// Gets the root path of the application
         /// </summary>
+        /// <remarks>
+        /// In most cases this will be an empty string which indicates the app is not running in a virtual directory.
+        /// This is NOT a physical path.
+        /// </remarks>
         public string Root
         {
             get
@@ -301,7 +229,8 @@ namespace Umbraco.Core.IO
 
                 var appPath = _hostingEnvironment.ApplicationVirtualPath;
                 // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                if (appPath == null || appPath == "/") appPath = string.Empty;
+                if (appPath == null || appPath == "/")
+                    appPath = string.Empty;
 
                 _root = appPath;
 

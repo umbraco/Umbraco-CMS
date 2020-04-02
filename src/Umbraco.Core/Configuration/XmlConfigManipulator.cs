@@ -23,7 +23,7 @@ namespace Umbraco.Core.Configuration
         public void RemoveConnectionString()
         {
             var key = Constants.System.UmbracoConnectionName;
-            var fileName = _ioHelper.MapPath(string.Format("{0}/web.config", _ioHelper.Root));
+            var fileName = _ioHelper.MapPath("~/web.config");
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
             var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Configuration
 
 
             var fileSource = "web.config";
-            var fileName = _ioHelper.MapPath(_ioHelper.Root + "/" + fileSource);
+            var fileName = _ioHelper.MapPath("~/" + fileSource);
 
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
             if (xml.Root == null) throw new Exception($"Invalid {fileSource} file (no root).");
@@ -71,7 +71,7 @@ namespace Umbraco.Core.Configuration
             if (configSourceAttribute != null)
             {
                 fileSource = configSourceAttribute.Value;
-                fileName = _ioHelper.MapPath(_ioHelper.Root + "/" + fileSource);
+                fileName = _ioHelper.MapPath("~/" + fileSource);
 
                 if (!File.Exists(fileName))
                     throw new Exception($"Invalid configSource \"{fileSource}\" (no such file).");

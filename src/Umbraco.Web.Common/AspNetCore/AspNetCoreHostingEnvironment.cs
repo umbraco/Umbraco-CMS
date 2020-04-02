@@ -21,8 +21,8 @@ namespace Umbraco.Web.Common.AspNetCore
         public AspNetCoreHostingEnvironment(IHostingSettings hostingSettings, IWebHostEnvironment webHostEnvironment, IHttpContextAccessor httpContextAccessor)
         {
             _hostingSettings = hostingSettings ?? throw new ArgumentNullException(nameof(hostingSettings));
-            _webHostEnvironment = webHostEnvironment;
-            _httpContextAccessor = httpContextAccessor;
+            _webHostEnvironment = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
 
             SiteName = webHostEnvironment.ApplicationName;
             ApplicationId = AppDomain.CurrentDomain.Id.ToString();

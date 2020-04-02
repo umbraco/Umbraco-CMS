@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
@@ -24,8 +25,8 @@ namespace Umbraco.Core.Migrations.Install
         private readonly IRuntimeState _runtime;
         private readonly IMigrationBuilder _migrationBuilder;
         private readonly IKeyValueService _keyValueService;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILogger _logger;
-        private readonly IIOHelper _ioHelper;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly IConfigManipulator _configManipulator;
@@ -43,7 +44,7 @@ namespace Umbraco.Core.Migrations.Install
             ILogger logger,
             IMigrationBuilder migrationBuilder,
             IKeyValueService keyValueService,
-            IIOHelper ioHelper,
+            IHostingEnvironment hostingEnvironment,
             IUmbracoVersion umbracoVersion,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             IConfigManipulator configManipulator)
@@ -55,7 +56,7 @@ namespace Umbraco.Core.Migrations.Install
             _logger = logger;
             _migrationBuilder = migrationBuilder;
             _keyValueService = keyValueService;
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
             _umbracoVersion = umbracoVersion;
             _dbProviderFactoryCreator = dbProviderFactoryCreator;
             _configManipulator = configManipulator;
@@ -141,14 +142,14 @@ namespace Umbraco.Core.Migrations.Install
         /// </summary>
         public void ConfigureEmbeddedDatabaseConnection()
         {
-            ConfigureEmbeddedDatabaseConnection(_databaseFactory, _ioHelper);
+            ConfigureEmbeddedDatabaseConnection(_databaseFactory);
         }
 
-        private void ConfigureEmbeddedDatabaseConnection(IUmbracoDatabaseFactory factory, IIOHelper ioHelper)
+        private void ConfigureEmbeddedDatabaseConnection(IUmbracoDatabaseFactory factory)
         {
             _configManipulator.SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
 
-            var path = Path.Combine(ioHelper.GetRootDirectorySafe(), "App_Data", "Umbraco.sdf");
+            var path = Path.Combine(_hostingEnvironment.ApplicationPhysicalPath, "App_Data", "Umbraco.sdf");
             if (File.Exists(path) == false)
             {
                 // this should probably be in a "using (new SqlCeEngine)" clause but not sure

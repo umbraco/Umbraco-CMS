@@ -62,10 +62,11 @@ namespace Umbraco.Tests.TestHelpers
 
         public override void SetUp()
         {
-            base.SetUp();
-
-            var path = TestHelper.CurrentAssemblyDirectory;
+            // Ensure the data directory is set before continuing
+            var path = TestHelper.WorkingDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
+
+            base.SetUp();
         }
 
         protected override void Compose()
@@ -167,7 +168,7 @@ namespace Umbraco.Tests.TestHelpers
             if (Options.Database == UmbracoTestOptions.Database.None)
                 return;
 
-            var path = TestHelper.CurrentAssemblyDirectory;
+            var path = TestHelper.WorkingDirectory;
 
             //Get the connectionstring settings from config
             var settings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
@@ -337,7 +338,7 @@ namespace Umbraco.Tests.TestHelpers
 
         private void RemoveDatabaseFile(Action<Exception> onFail = null)
         {
-            var path = TestHelper.CurrentAssemblyDirectory;
+            var path = TestHelper.WorkingDirectory;
             try
             {
                 var filePath = string.Concat(path, "\\UmbracoNPocoTests.sdf");
