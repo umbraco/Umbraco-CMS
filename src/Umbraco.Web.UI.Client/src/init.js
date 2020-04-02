@@ -18,6 +18,13 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
         /** Listens for authentication and checks if our required assets are loaded, if/once they are we'll broadcast a ready event */
         eventsService.on("app.authenticated", function (evt, data) {
 
+            // Lets check if the auth'd user has a start node set (befor trying to make the app ready)
+            const user = data.user;
+            if(user.startContentIds.length === 0 && user.startMediaIds.length === 0){
+                const args = { isTimedOut: true, noAccess: true };
+                eventsService.emit("app.notAuthenticated", args);
+            }
+
             assetsService._loadInitAssets().then(function () {
 
                 appReady(data);
