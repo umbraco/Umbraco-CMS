@@ -8,7 +8,7 @@
     @foreach (var layout in Model.Layout)
     {
         if (layout?.Udi == null) { continue; }
-        var data = Model.GetData(layout.Udi);
+        var data = layout.Data;
         @Html.Partial("BlockList/" + data.ContentType.Alias, (data, layout.Settings))
     }
 </div>

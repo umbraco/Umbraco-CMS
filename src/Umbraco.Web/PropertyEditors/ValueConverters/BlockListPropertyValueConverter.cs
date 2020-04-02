@@ -114,7 +114,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     if (element != null && string.IsNullOrWhiteSpace(blockConfig.SettingsElementTypeAlias))
                         element = null;
 
-                    var layoutRef = new BlockListLayoutReference(udi, element);
+                    var layoutRef = new BlockListLayoutReference(udi, data, element);
                     layout.Add(layoutRef);
                 }
 
