@@ -1,0 +1,6 @@
+{
+    "recommendations": [
+        "editorconfig.editorconfig", // Will enable editorconfig for indent style & size (aka 4 spaces for a tab)
+    ],
+    "unwantedRecommendations": []
+}
