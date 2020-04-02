@@ -52,7 +52,7 @@ namespace Umbraco.Web.Security
                     passwordConfiguration,
                     ipResolver,
                     new IdentityErrorDescriber(),
-                    null,
+                    app.GetDataProtectionProvider(),
                     new NullLogger<BackOfficeUserManager2<BackOfficeIdentityUser>>()));
 
             app.SetBackOfficeUserManagerType<BackOfficeUserManager2, BackOfficeIdentityUser>();
@@ -82,7 +82,7 @@ namespace Umbraco.Web.Security
                     ipResolver,
                     customUserStore,
                     new IdentityErrorDescriber(),
-                    null,
+                    app.GetDataProtectionProvider(),
                     new NullLogger<BackOfficeUserManager2<BackOfficeIdentityUser>>()));
 
             app.SetBackOfficeUserManagerType<BackOfficeUserManager2, BackOfficeIdentityUser>();
@@ -90,34 +90,6 @@ namespace Umbraco.Web.Security
             //Create a sign in manager per request
             app.CreatePerOwinContext<BackOfficeSignInManager2>((options, context) => BackOfficeSignInManager2.Create(context, globalSettings, app.CreateLogger(typeof(BackOfficeSignInManager2).FullName)));
         }
-
-        // TODO: SB: ConfigureUserManagerForUmbracoBackOffice using IdentityFactoryOptions
-        /*/// <summary>
-        /// Configure a custom BackOfficeUserManager for Umbraco
-        /// </summary>
-        /// <param name="app"></param>
-        /// <param name="runtimeState"></param>
-        /// <param name="globalSettings"></param>
-        /// <param name="userManager"></param>
-        public static void ConfigureUserManagerForUmbracoBackOffice<TManager, TUser>(this IAppBuilder app,
-            IRuntimeState runtimeState,
-            IGlobalSettings globalSettings,
-            Func<IdentityFactoryOptions<TManager>, IOwinContext, TManager> userManager)
-            where TManager : BackOfficeUserManager2<TUser>
-            where TUser : BackOfficeIdentityUser
-        {
-            if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));
-            if (userManager == null) throw new ArgumentNullException(nameof(userManager));
-
-            //Configure Umbraco user manager to be created per request
-            app.CreatePerOwinContext<TManager>(userManager);
-
-            app.SetBackOfficeUserManagerType<TManager, TUser>();
-
-            //Create a sign in manager per request
-            app.CreatePerOwinContext<BackOfficeSignInManager2>(
-                (options, context) => BackOfficeSignInManager2.Create(context, globalSettings, app.CreateLogger(typeof(BackOfficeSignInManager2).FullName)));
-        }*/
 
         /// <summary>
         /// Ensures that the UmbracoBackOfficeAuthenticationMiddleware is assigned to the pipeline

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Owin.Security.DataProtection;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Security;
@@ -27,11 +28,11 @@ namespace Umbraco.Web.Security
             IEnumerable<IPasswordValidator<BackOfficeIdentityUser>> passwordValidators,
             ILookupNormalizer keyNormalizer,
             IdentityErrorDescriber errors,
-            IServiceProvider services,
+            IDataProtectionProvider dataProtectionProvider,
             ILogger<UserManager<BackOfficeIdentityUser>> logger)
-            : base(passwordConfiguration, ipResolver, store, optionsAccessor, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
+            : base(passwordConfiguration, ipResolver, store, optionsAccessor, userValidators, passwordValidators, keyNormalizer, errors, null, logger)
         {
-            InitUserManager(this, passwordConfiguration);
+            InitUserManager(this, dataProtectionProvider);
         }
         
         #region Static Create methods
@@ -48,7 +49,7 @@ namespace Umbraco.Web.Security
             IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
             IdentityErrorDescriber errors,
-            IServiceProvider services,
+            IDataProtectionProvider dataProtectionProvider,
             ILogger<UserManager<BackOfficeIdentityUser>> logger)
         {
             var store = new BackOfficeUserStore2(userService, entityService, externalLoginService, globalSettings, mapper);
@@ -58,7 +59,7 @@ namespace Umbraco.Web.Security
                 ipResolver,
                 store,
                 errors,
-                services,
+                dataProtectionProvider,
                 logger);
         }
 
@@ -70,7 +71,7 @@ namespace Umbraco.Web.Security
             IIpResolver ipResolver,
             IUserStore<BackOfficeIdentityUser> customUserStore,
             IdentityErrorDescriber errors,
-            IServiceProvider services,
+            IDataProtectionProvider dataProtectionProvider,
             ILogger<UserManager<BackOfficeIdentityUser>> logger)
         {
             var options = new IdentityOptions();
@@ -103,7 +104,7 @@ namespace Umbraco.Web.Security
                 passwordValidators,
                 new NopLookupNormalizer(), 
                 errors,
-                services,
+                dataProtectionProvider,
                 logger);
         }
 
@@ -151,27 +152,24 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Initializes the user manager with the correct options
         /// </summary>
-        /// <param name="manager"></param>
-        /// <param name="passwordConfig"></param>
-        /// <returns></returns>
         protected void InitUserManager(
             BackOfficeUserManager2<T> manager,
-            IPasswordConfiguration passwordConfig)
-            // IDataProtectionProvider dataProtectionProvider
+            IDataProtectionProvider dataProtectionProvider)
         {
             //use a custom hasher based on our membership provider
             PasswordHasher = GetDefaultPasswordHasher(PasswordConfiguration);
 
-            // TODO: SB: manager.Options.Tokens using OWIN data protector
-            /*if (dataProtectionProvider != null)
+            // TODO: SB: manager.Options.Tokens using OWIN data protector - what about the other providers???
+            // https://github.com/dotnet/aspnetcore/blob/0a0e1ea0cdbe29f2fcd2291b900db98597387d77/src/Identity/Core/src/IdentityBuilderExtensions.cs#L28
+            if (dataProtectionProvider != null)
             {
-                manager.UserTokenProvider = new DataProtectorTokenProvider<T, int>(dataProtectionProvider.Create("ASP.NET Identity"))
-                {
-                    TokenLifespan = TimeSpan.FromDays(3)
-                };
-            }*/
-
-            
+                manager.RegisterTokenProvider(
+                    "Default",
+                    new OwinDataProtectorTokenProvider<T>(dataProtectionProvider.Create("ASP.NET Identity"))
+                    {
+                        TokenLifespan = TimeSpan.FromDays(3)
+                    });
+            }
         }
 
         /// <summary>

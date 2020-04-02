@@ -210,6 +210,7 @@
     <Compile Include="Security\MembershipProviderBase.cs" />
     <Compile Include="Security\MembershipProviderExtensions.cs" />
     <Compile Include="Security\NopLookupNormalizer.cs" />
+    <Compile Include="Security\OwinDataProtectorTokenProvider.cs" />
     <Compile Include="Security\PasswordSecurity.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
     <Compile Include="Security\UmbracoEmailMessage.cs" />
