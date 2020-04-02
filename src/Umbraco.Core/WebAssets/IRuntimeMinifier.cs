@@ -19,6 +19,12 @@ namespace Umbraco.Core.WebAssets
         /// </summary>
         /// <param name="bundleName"></param>
         /// <param name="filePaths"></param>
+        /// <remarks>
+        /// All files must be absolute paths, relative paths will throw <see cref="InvalidOperationException"/>
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if any of the paths specified are not absolute
+        /// </exception>
         void CreateCssBundle(string bundleName, params string[] filePaths);
 
         /// <summary>
@@ -35,6 +41,12 @@ namespace Umbraco.Core.WebAssets
         /// </summary>
         /// <param name="bundleName"></param>
         /// <param name="filePaths"></param>
+        /// <remarks>
+        /// All files must be absolute paths, relative paths will throw <see cref="InvalidOperationException"/>
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if any of the paths specified are not absolute
+        /// </exception>
         void CreateJsBundle(string bundleName, params string[] filePaths);
 
         /// <summary>

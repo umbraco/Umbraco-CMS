@@ -25,9 +25,6 @@ namespace Umbraco.Web.WebAssets.CDF
         private readonly IIOHelper _ioHelper;
         private readonly ILogger _logger;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IManifestParser _manifestParser;
-        private readonly IGlobalSettings _globalSettings;
-        private readonly PropertyEditorCollection _propertyEditorCollection;
 
         public string CacheBuster => ClientDependencySettings.Instance.Version.ToString();
 
@@ -35,22 +32,19 @@ namespace Umbraco.Web.WebAssets.CDF
             IHttpContextAccessor httpContextAccessor,
             IIOHelper ioHelper,
             ILogger logger,
-            IUmbracoVersion umbracoVersion,
-            IManifestParser manifestParser,
-            IGlobalSettings globalSettings,
-            PropertyEditorCollection propertyEditorCollection)
+            IUmbracoVersion umbracoVersion)
         {
             _httpContextAccessor = httpContextAccessor;
             _ioHelper = ioHelper;
             _logger = logger;
             _umbracoVersion = umbracoVersion;
-            _manifestParser = manifestParser;
-            _globalSettings = globalSettings;
-            _propertyEditorCollection = propertyEditorCollection;
         }
 
         public void CreateCssBundle(string bundleName, params string[] filePaths)
         {
+            if (filePaths.Any(f => !f.StartsWith("/") && !f.StartsWith("~/")))
+                throw new InvalidOperationException("All file paths must be absolute");
+
             BundleManager.CreateCssBundle(
                 bundleName,
                 filePaths.Select(x => new CssFile(x)).ToArray());
@@ -65,6 +59,9 @@ namespace Umbraco.Web.WebAssets.CDF
 
         public void CreateJsBundle(string bundleName, params string[] filePaths)
         {
+            if (filePaths.Any(f => !f.StartsWith("/") && !f.StartsWith("~/")))
+                throw new InvalidOperationException("All file paths must be absolute");
+
             BundleManager.CreateJsBundle(
                 bundleName,
                 filePaths.Select(x => new JavascriptFile(x)).ToArray());

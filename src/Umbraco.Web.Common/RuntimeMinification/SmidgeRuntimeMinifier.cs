@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Smidge;
 using Smidge.CompositeFiles;
@@ -51,6 +52,9 @@ namespace Umbraco.Web.Common.RuntimeMinification
         // only issue with creating bundles like this is that we don't have full control over the bundle options, though that could 
         public void CreateCssBundle(string bundleName, params string[] filePaths)
         {
+            if (filePaths.Any(f => !f.StartsWith("/") && !f.StartsWith("~/")))
+                throw new InvalidOperationException("All file paths must be absolute");
+
             if (_bundles.Exists(bundleName))
                 throw new InvalidOperationException($"The bundle name {bundleName} already exists");
 
@@ -65,6 +69,9 @@ namespace Umbraco.Web.Common.RuntimeMinification
 
         public void CreateJsBundle(string bundleName, params string[] filePaths)
         {
+            if (filePaths.Any(f => !f.StartsWith("/") && !f.StartsWith("~/")))
+                throw new InvalidOperationException("All file paths must be absolute");
+
             if (_bundles.Exists(bundleName))
                 throw new InvalidOperationException($"The bundle name {bundleName} already exists");
 

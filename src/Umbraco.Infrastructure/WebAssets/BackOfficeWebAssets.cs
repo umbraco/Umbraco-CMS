@@ -44,23 +44,23 @@ namespace Umbraco.Web.WebAssets
             // Create bundles
 
             _runtimeMinifier.CreateCssBundle(UmbracoInitCssBundleName,
-                "lib/bootstrap-social/bootstrap-social.css",
+                FormatPaths("lib/bootstrap-social/bootstrap-social.css",
                 "assets/css/umbraco.css",
-                "lib/font-awesome/css/font-awesome.min.css");
+                "lib/font-awesome/css/font-awesome.min.css"));
 
             _runtimeMinifier.CreateCssBundle(UmbracoUpgradeCssBundleName,
-                "assets/css/umbraco.css",
+                FormatPaths("assets/css/umbraco.css",
                 "lib/bootstrap-social/bootstrap-social.css",
-                "lib/font-awesome/css/font-awesome.min.css");
+                "lib/font-awesome/css/font-awesome.min.css"));
 
             _runtimeMinifier.CreateCssBundle(UmbracoPreviewCssBundleName,
-                "assets/css/canvasdesigner.css");
+                FormatPaths("assets/css/canvasdesigner.css"));
 
             _runtimeMinifier.CreateJsBundle(UmbracoPreviewJsBundleName,
-                GetScriptsForPreview().ToArray());
+                FormatPaths(GetScriptsForPreview()));
 
             _runtimeMinifier.CreateJsBundle(UmbracoTinyMceJsBundleName,
-                GetScriptsForTinyMce().ToArray());
+                FormatPaths(GetScriptsForTinyMce()));
 
             var propertyEditorAssets = ScanPropertyEditors()
                 .GroupBy(x => x.AssetType)
@@ -68,13 +68,15 @@ namespace Umbraco.Web.WebAssets
 
             _runtimeMinifier.CreateJsBundle(
                 UmbracoJsBundleName,
-                GetScriptsForBackoffice(
-                    propertyEditorAssets.TryGetValue(AssetType.Javascript, out var scripts) ? scripts : Enumerable.Empty<string>()));
+                FormatPaths(
+                    GetScriptsForBackoffice(
+                        propertyEditorAssets.TryGetValue(AssetType.Javascript, out var scripts) ? scripts : Enumerable.Empty<string>())));
 
             _runtimeMinifier.CreateCssBundle(
                 UmbracoCssBundleName,
-                GetStylesheetsForBackoffice(
-                    propertyEditorAssets.TryGetValue(AssetType.Css, out var styles) ? styles : Enumerable.Empty<string>()));
+                FormatPaths(
+                    GetStylesheetsForBackoffice(
+                        propertyEditorAssets.TryGetValue(AssetType.Css, out var styles) ? styles : Enumerable.Empty<string>())));
         }
 
         /// <summary>
@@ -92,7 +94,7 @@ namespace Umbraco.Web.WebAssets
             foreach (var script in propertyEditorScripts)
                 scripts.Add(script);
 
-            return new HashSet<string>(FormatPaths(scripts)).ToArray();
+            return scripts.ToArray();
         }
 
         /// <summary>
@@ -118,27 +120,27 @@ namespace Umbraco.Web.WebAssets
             foreach (var stylesheet in propertyEditorStyles)
                 stylesheets.Add(stylesheet);
 
-            return new HashSet<string>(FormatPaths(stylesheets)).ToArray();
+            return stylesheets.ToArray();
         }
 
         /// <summary>
         /// Returns the scripts used for tinymce
         /// </summary>
         /// <returns></returns>
-        private IEnumerable<string> GetScriptsForTinyMce()
+        private string[] GetScriptsForTinyMce()
         {
             var resources = JsonConvert.DeserializeObject<JArray>(Resources.TinyMceInitialize);
-            return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString());
+            return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString()).ToArray();
         }
 
         /// <summary>
         /// Returns the scripts used for preview
         /// </summary>
         /// <returns></returns>
-        private IEnumerable<string> GetScriptsForPreview()
+        private string[] GetScriptsForPreview()
         {
             var resources = JsonConvert.DeserializeObject<JArray>(Resources.PreviewInitialize);
-            return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString());
+            return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString()).ToArray();
         }
 
         /// <summary>
@@ -146,7 +148,7 @@ namespace Umbraco.Web.WebAssets
         /// </summary>
         /// <param name="assets"></param>
         /// <returns></returns>
-        private IEnumerable<string> FormatPaths(IEnumerable<string> assets)
+        private string[] FormatPaths(params string[] assets)
         {
             var umbracoPath = _ioHelper.GetUmbracoMvcArea();
 
@@ -156,7 +158,7 @@ namespace Umbraco.Web.WebAssets
                     // most declarations with be made relative to the /umbraco folder, so things
                     // like lib/blah/blah.js so we need to turn them into absolutes here
                     ? umbracoPath.EnsureStartsWith('/').TrimEnd("/") + x.EnsureStartsWith('/')
-                    : x).ToList();
+                    : x).ToArray();
         }
 
         /// <summary>

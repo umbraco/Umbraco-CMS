@@ -170,3 +170,8 @@ build/temp/
 /src/Umbraco.Web.UI.NetCore/wwwroot/Media/*
 /src/Umbraco.Web.UI.NetCore/wwwroot/is-cache/*
 /src/Umbraco.Tests.Integration/App_Data/*
+/src/Umbraco.Web.UI.NetCore/wwwroot/Umbraco/assets/*
+/src/Umbraco.Web.UI.NetCore/wwwroot/Umbraco/js/*
+/src/Umbraco.Web.UI.NetCore/wwwroot/Umbraco/lib/*
+/src/Umbraco.Web.UI.NetCore/wwwroot/Umbraco/views/*
+/src/Umbraco.Web.UI.NetCore/wwwroot/App_Data/TEMP/*
