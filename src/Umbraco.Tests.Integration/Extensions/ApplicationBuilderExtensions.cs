@@ -23,15 +23,14 @@ namespace Umbraco.Tests.Integration.Extensions
         /// Creates a LocalDb instance to use for the test
         /// </summary>
         /// <param name="app"></param>
-        /// <param name="hostEnvironment"></param>
+        /// <param name="workingDirectory"></param>
         /// <param name="integrationTest"></param>
         /// <returns></returns>
         public static IApplicationBuilder UseTestLocalDb(this IApplicationBuilder app,
-            IHostEnvironment hostEnvironment,
+            string workingDirectory,
             UmbracoIntegrationTest integrationTest)
         {
-
-            var dbFilePath = Path.Combine(hostEnvironment.ContentRootPath, "LocalDb");
+            var dbFilePath = Path.Combine(workingDirectory, "LocalDb");
 
             // get the currently set db options
             var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
@@ -54,11 +53,11 @@ namespace Umbraco.Tests.Integration.Extensions
             {
                 case UmbracoTestOptions.Database.NewSchemaPerTest:
 
-                    // Add teardown callback
-                    integrationTest.OnTestTearDown(() => db.Detach());
-
                     // New DB + Schema
-                    db.AttachSchema();
+                    var newSchemaDbId = db.AttachSchema();
+
+                    // Add teardown callback
+                    integrationTest.OnTestTearDown(() => db.Detach(newSchemaDbId));
 
                     // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings
                     var dbFactory = app.ApplicationServices.GetRequiredService<IUmbracoDatabaseFactory>();
@@ -90,22 +89,27 @@ namespace Umbraco.Tests.Integration.Extensions
                     break;
                 case UmbracoTestOptions.Database.NewEmptyPerTest:
 
-                    // Add teardown callback
-                    integrationTest.OnTestTearDown(() => db.Detach());
+                    var newEmptyDbId = db.AttachEmpty();
 
-                    db.AttachEmpty();
+                    // Add teardown callback
+                    integrationTest.OnTestTearDown(() => db.Detach(newEmptyDbId));
+
 
                     break;
                 case UmbracoTestOptions.Database.NewSchemaPerFixture:
 
-                    // Add teardown callback
-                    integrationTest.OnFixtureTearDown(() => db.Detach());
+                    throw new NotImplementedException();
+
+                    //// Add teardown callback
+                    //integrationTest.OnFixtureTearDown(() => db.Detach());
 
                     break;
                 case UmbracoTestOptions.Database.NewEmptyPerFixture:
 
-                    // Add teardown callback
-                    integrationTest.OnFixtureTearDown(() => db.Detach());
+                    throw new NotImplementedException();
+
+                    //// Add teardown callback
+                    //integrationTest.OnFixtureTearDown(() => db.Detach());
 
                     break;
                 default:

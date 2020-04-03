@@ -1,15 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using StackExchange.Profiling;
 using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -18,7 +13,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Web.BackOffice.AspNetCore;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Extensions;
-using Umbraco.Web.Common.Runtime.Profiler;
 using Umbraco.Web.Website.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
@@ -27,7 +21,7 @@ namespace Umbraco.Web.UI.BackOffice
 {
     public class Startup
     {
-        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IWebHostEnvironment _env;
         private readonly IConfiguration _config;
 
         /// <summary>
@@ -40,7 +34,7 @@ namespace Umbraco.Web.UI.BackOffice
         /// </remarks>
         public Startup(IWebHostEnvironment webHostEnvironment, IConfiguration config)
         {
-            _webHostEnvironment = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
+            _env = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
             _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
@@ -49,7 +43,8 @@ namespace Umbraco.Web.UI.BackOffice
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddUmbracoConfiguration(_config);
-            services.AddUmbracoCore(_webHostEnvironment, out var factory);
+            services.AddUmbracoRuntimeMinifier(_config);
+            services.AddUmbracoCore(_env, out var factory);
             services.AddUmbracoWebsite();
 
             services.AddMvc();
@@ -71,23 +66,27 @@ namespace Umbraco.Web.UI.BackOffice
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
 
         //    app.UseMiniProfiler();
             app.UseUmbracoRequest();
-            if (env.IsDevelopment())
+            if (_env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-
             app.UseUmbracoCore();
             app.UseUmbracoWebsite();
             app.UseUmbracoBackOffice();
-
             app.UseRouting();
+            app.UseUmbracoRuntimeMinification();
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute("Backoffice", "/umbraco/{Action}", new
+                {
+                    Controller = "BackOffice",
+                    Action = "Default"
+                });
                 endpoints.MapGet("/", async context =>
                 {
                     await context.Response.WriteAsync($"<html><body>Hello World!{Current.Profiler.Render()}</body></html>");

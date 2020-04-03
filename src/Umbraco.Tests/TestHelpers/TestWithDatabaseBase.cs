@@ -378,10 +378,10 @@ namespace Umbraco.Tests.TestHelpers
                 httpContextAccessor,
                 service,
                 new WebSecurity(httpContextAccessor, Factory.GetInstance<IUserService>(),
-                    Factory.GetInstance<IGlobalSettings>(), IOHelper),
+                    Factory.GetInstance<IGlobalSettings>(), HostingEnvironment),
                 globalSettings ?? Factory.GetInstance<IGlobalSettings>(),
+                HostingEnvironment,
                 new TestVariationContextAccessor(),
-                IOHelper,
                 UriUtility,
                 new AspNetCookieManager(httpContextAccessor));
 

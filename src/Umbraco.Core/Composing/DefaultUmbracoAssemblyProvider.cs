@@ -18,7 +18,6 @@ namespace Umbraco.Core.Composing
             {
                 "Umbraco.Core",
                 "Umbraco.Web",
-                "Umbraco.Web.BackOffice",
                 "Umbraco.Infrastructure",
                 "Umbraco.PublishedCache.NuCache",
                 "Umbraco.ModelsBuilder.Embedded",

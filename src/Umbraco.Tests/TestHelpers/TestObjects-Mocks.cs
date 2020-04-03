@@ -127,7 +127,7 @@ namespace Umbraco.Tests.TestHelpers
                 new TestDefaultCultureAccessor(),
                 globalSettings,
                 Mock.Of<IUserService>(),
-                TestHelper.IOHelper,
+                TestHelper.GetHostingEnvironment(),
                 TestHelper.UriUtility,
                 httpContextAccessor,
                 new AspNetCookieManager(httpContextAccessor));
@@ -137,7 +137,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public IGlobalSettings GetGlobalSettings()
         {
-            return SettingsForTests.GetDefaultGlobalSettings();
+            return SettingsForTests.DefaultGlobalSettings;
         }
         public IFileSystems GetFileSystemsMock()
         {

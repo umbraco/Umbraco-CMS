@@ -36,6 +36,7 @@ using Umbraco.Web.Models.ContentEditing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Media;
 
@@ -91,7 +92,7 @@ namespace Umbraco.Tests.Web.Controllers
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IContentSettings>(),
-                    Factory.GetInstance<IIOHelper>(),
+                    Factory.GetInstance<IHostingEnvironment>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
                     Factory.GetInstance<IPublishedUrlProvider>(),
                     Factory.GetInstance<ISecuritySettings>()
@@ -164,7 +165,7 @@ namespace Umbraco.Tests.Web.Controllers
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IContentSettings>(),
-                    Factory.GetInstance<IIOHelper>(),
+                    Factory.GetInstance<IHostingEnvironment>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
                     Factory.GetInstance<IPublishedUrlProvider>(),
                     Factory.GetInstance<ISecuritySettings>()
@@ -207,7 +208,7 @@ namespace Umbraco.Tests.Web.Controllers
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IContentSettings>(),
-                    Factory.GetInstance<IIOHelper>(),
+                    Factory.GetInstance<IHostingEnvironment>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
                     Factory.GetInstance<IPublishedUrlProvider>(),
                     Factory.GetInstance<ISecuritySettings>()
@@ -285,7 +286,7 @@ namespace Umbraco.Tests.Web.Controllers
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<IContentSettings>(),
-                    Factory.GetInstance<IIOHelper>(),
+                    Factory.GetInstance<IHostingEnvironment>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
                     Factory.GetInstance<IPublishedUrlProvider>(),
                     Factory.GetInstance<ISecuritySettings>()

@@ -1,12 +1,10 @@
 ﻿using System.Web.UI;
 using ClientDependency.Core.Controls;
 using ClientDependency.Core.FileRegistration.Providers;
-using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Web.Composing;
 
-namespace Umbraco.Web.JavaScript
+namespace Umbraco.Web.WebAssets.CDF
 {
     /// <summary>
     /// Used to load in all client dependencies for Umbraco.

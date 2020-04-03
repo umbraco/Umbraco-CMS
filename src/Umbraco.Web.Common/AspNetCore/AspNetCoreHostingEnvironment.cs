@@ -14,15 +14,13 @@ namespace Umbraco.Web.Common.AspNetCore
 
         private readonly IHostingSettings _hostingSettings;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
         private string _localTempPath;
 
-        public AspNetCoreHostingEnvironment(IHostingSettings hostingSettings, IWebHostEnvironment webHostEnvironment, IHttpContextAccessor httpContextAccessor)
+        public AspNetCoreHostingEnvironment(IHostingSettings hostingSettings, IWebHostEnvironment webHostEnvironment)
         {
             _hostingSettings = hostingSettings ?? throw new ArgumentNullException(nameof(hostingSettings));
             _webHostEnvironment = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
-            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
 
             SiteName = webHostEnvironment.ApplicationName;
             ApplicationId = AppDomain.CurrentDomain.Id.ToString();
@@ -30,7 +28,6 @@ namespace Umbraco.Web.Common.AspNetCore
 
             ApplicationVirtualPath = "/"; //TODO how to find this, This is a server thing, not application thing.
             IISVersion = new Version(0, 0); // TODO not necessary IIS
-            IsDebugMode =  _hostingSettings.DebugMode;
         }
 
         public bool IsHosted { get; } = true;
@@ -39,7 +36,7 @@ namespace Umbraco.Web.Common.AspNetCore
         public string ApplicationPhysicalPath { get; }
 
         public string ApplicationVirtualPath { get; }
-        public bool IsDebugMode { get; }
+        public bool IsDebugMode => _hostingSettings.DebugMode;
 
         public Version IISVersion { get; }
         public string LocalTempPath
@@ -89,21 +86,19 @@ namespace Umbraco.Web.Common.AspNetCore
             return Path.Combine(_webHostEnvironment.WebRootPath, newPath);
         }
 
-        // TODO: Need to take into account 'root' here
-        public string ToAbsolute(string virtualPath, string root)
+        public string ToAbsolute(string virtualPath)
         {
-            if (Uri.TryCreate(virtualPath, UriKind.Absolute, out _))
-            {
+            if (!virtualPath.StartsWith("~/") && !virtualPath.StartsWith("/"))
+                throw new InvalidOperationException($"The value {virtualPath} for parameter {nameof(virtualPath)} must start with ~/ or /");
+
+            // will occur if it starts with "/"
+            if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
                 return virtualPath;
-            }
 
-            var segment = new PathString(virtualPath.Substring(1));
-            var applicationPath = _httpContextAccessor.HttpContext.Request.PathBase;
+            var fullPath = ApplicationVirtualPath.EnsureEndsWith('/') + virtualPath.TrimStart("~/");
 
-            return applicationPath.Add(segment).Value;
+            return fullPath;
         }
-
-
     }
 
 

@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new TestDefaultCultureAccessor(),
                 globalSettings,
                 Mock.Of<IUserService>(),
-                IOHelper,
+                HostingEnvironment,
                 UriUtility,
                 httpContextAccessor,
                 new AspNetCookieManager(httpContextAccessor));
@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new TestDefaultCultureAccessor(),
                 globalSettings,
                 Mock.Of<IUserService>(),
-                IOHelper,
+                HostingEnvironment,
                 UriUtility,
                 httpContextAccessor,
                 new AspNetCookieManager(httpContextAccessor));
@@ -110,7 +110,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new TestDefaultCultureAccessor(),
                 globalSettings,
                 Mock.Of<IUserService>(),
-                IOHelper,
+                HostingEnvironment,
                 UriUtility,
                 httpContextAccessor,
                 new AspNetCookieManager(httpContextAccessor));
@@ -143,7 +143,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new TestDefaultCultureAccessor(),
                 globalSettings,
                 Mock.Of<IUserService>(),
-                IOHelper,
+                HostingEnvironment,
                 UriUtility,
                 httpContextAccessor,
                 new AspNetCookieManager(httpContextAccessor));

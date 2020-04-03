@@ -36,7 +36,7 @@ namespace Umbraco.Core.PropertyEditors
 
                 ConfigurationField field;
 
-                var attributeView = ioHelper.ResolveVirtualUrl(attribute.View);
+                var attributeView = ioHelper.ResolveRelativeOrVirtualUrl(attribute.View);
                 // if the field does not have its own type, use the base type
                 if (attribute.Type == null)
                 {

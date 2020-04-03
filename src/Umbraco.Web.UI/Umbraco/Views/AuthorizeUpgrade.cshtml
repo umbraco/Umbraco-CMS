@@ -1,30 +1,26 @@
 ﻿@using Umbraco.Core
-@using ClientDependency.Core
-@using ClientDependency.Core.Mvc
 @using Umbraco.Web.Composing
 @using Umbraco.Web
+@using Umbraco.Web.WebAssets
+
 @inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Editors.BackOfficeModel>
 @{
     Layout = null;
 
-    Html
-        .RequiresCss("assets/css/umbraco.css", "Umbraco")
-        .RequiresCss("lib/bootstrap-social/bootstrap-social.css", "Umbraco")
-        .RequiresCss("lib/font-awesome/css/font-awesome.min.css", "Umbraco");
+    var runtimeMinifier = Current.RuntimeMinifier;
 }
 
 <!DOCTYPE html>
 
 <html lang="en">
 <head>
-    <base href="@Model.IOHelper.BackOfficePath.EnsureEndsWith('/')" />
+    <base href="@Model.BackOfficePath.EnsureEndsWith('/')" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Umbraco</title>
-
-    @Html.RenderCssHere(
-        new BasicPath("Umbraco", Current.IOHelper.ResolveUrl(Model.GlobalSettings.UmbracoPath)))
+     
+    @Html.Raw(runtimeMinifier.RenderCssHere(BackOfficeWebAssets.UmbracoUpgradeCssBundleName));
 
     @*Because we're lazy loading angular js, the embedded cloak style will not be loaded initially, but we need it*@
     <style>
@@ -48,9 +44,10 @@
             redirectUrl = Url.Action("AuthorizeUpgrade", "BackOffice")
         });
     }
-    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl, Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.ContentSettings, Model.IOHelper, Model.TreeCollection, Model.HttpContextAccessor, Model.HostingEnvironment, Model.RuntimeSettings, Model.SecuritySettings)
 
-    <script type="text/javascript">
+@Html.BareMinimumServerVariablesScript(Url, Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.ContentSettings, Model.TreeCollection, Model.HttpContextAccessor, Model.HostingEnvironment, Model.RuntimeSettings, Model.SecuritySettings, runtimeMinifier)
+
+<script type="text/javascript">
     document.angularReady = function (app) {
 
         @Html.AngularValueExternalLoginInfoScript(ViewData.GetExternalSignInError())

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NPoco.Expressions;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -20,6 +21,7 @@ using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Web.BackOffice.AspNetCore;
+using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Extensions;
 
 namespace Umbraco.Tests.Integration.Testing
@@ -70,37 +72,29 @@ namespace Umbraco.Tests.Integration.Testing
         private static readonly object _dbLocker = new object();
         private static LocalDbTestDatabase _dbInstance;
 
-        private readonly List<Action> _testTeardown = new List<Action>();
-        private readonly List<Action> _fixtureTeardown = new List<Action>();
+        private Action _testTeardown = null;
+        private Action _fixtureTeardown = null;
 
         public void OnTestTearDown(Action tearDown)
         {
-            _testTeardown.Add(tearDown);
+            _testTeardown = tearDown;
         }
 
         public void OnFixtureTearDown(Action tearDown)
         {
-            _fixtureTeardown.Add(tearDown);
+            _fixtureTeardown = tearDown;
         }
 
         [OneTimeTearDown]
         public void FixtureTearDown()
         {
-            // call all registered callbacks
-            foreach (var action in _fixtureTeardown)
-            {
-                action();
-            }
+            _fixtureTeardown?.Invoke();
         }
 
         [TearDown]
         public void TearDown()
         {
-            // call all registered callbacks
-            foreach (var action in _testTeardown)
-            {
-                action();
-            }
+            _testTeardown?.Invoke();
         }
 
         [SetUp]
@@ -126,7 +120,7 @@ namespace Umbraco.Tests.Integration.Testing
             Services = app.ApplicationServices;
 
             // This will create a db, install the schema and ensure the app is configured to run
-            app.UseTestLocalDb(Services.GetRequiredService<IHostEnvironment>(), this);
+            app.UseTestLocalDb(testHelper.WorkingDirectory, this);
 
             app.UseUmbracoCore();
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Web;
@@ -78,11 +79,23 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets a <see cref="ITypeFinder"/>
         /// </summary>
+        /// <param name="hostingEnvironment"></param>
+        /// <param name="logger"></param>
+        /// <param name="profiler"></param>
         /// <returns></returns>
-        protected virtual ITypeFinder GetTypeFinder()
+        protected virtual ITypeFinder GetTypeFinder(IHostingEnvironment hostingEnvironment, ILogger logger, IProfiler profiler)
+        {
             // TODO: Currently we are not passing in any TypeFinderConfig (with ITypeFinderSettings) which we should do, however
             // this is not critical right now and would require loading in some config before boot time so just leaving this as-is for now.
-            => new TypeFinder(Logger, new DefaultUmbracoAssemblyProvider(
+            var runtimeHashPaths = new RuntimeHashPaths();
+            // the bin folder and everything in it
+            runtimeHashPaths.AddFolder(new DirectoryInfo(hostingEnvironment.MapPath("~/bin")));
+            // the app code folder and everything in it
+            runtimeHashPaths.AddFile(new FileInfo(hostingEnvironment.MapPath("~/App_Code")));
+            // global.asax (the app domain also monitors this, if it changes will do a full restart)
+            runtimeHashPaths.AddFile(new FileInfo(hostingEnvironment.MapPath("~/global.asax")));
+            var runtimeHash = new RuntimeHash(new ProfilingLogger(logger, profiler), runtimeHashPaths);
+            return new TypeFinder(Logger, new DefaultUmbracoAssemblyProvider(
                 // GetEntryAssembly was actually an exposed API by request of the aspnetcore team which works in aspnet core because a website
                 // in that case is essentially an exe. However in netframework there is no entry assembly, things don't really work that way since
                 // the process that is running the site is iisexpress, so this returns null. The best we can do is fallback to GetExecutingAssembly()
@@ -94,7 +107,8 @@ namespace Umbraco.Web
                 // assembly we can get and we can only get that if we put this code into the WebRuntime since the executing assembly is the 'current' one.
                 // For this purpose, it doesn't matter if it's Umbraco.Web or Umbraco.Infrastructure since all assemblies are in that same path and we are
                 // getting rid of netframework.
-                Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly()));
+                Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly()), runtimeHash);
+        }
 
         /// <summary>
         /// Gets a runtime.

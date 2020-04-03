@@ -13,30 +13,14 @@ namespace Umbraco.Core.IO
     public class IOHelper : IIOHelper
     {
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IGlobalSettings _globalSettings;
 
         public IOHelper(IHostingEnvironment hostingEnvironment, IGlobalSettings globalSettings)
         {
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
-            _globalSettings = globalSettings;
         }
-
-        public string BackOfficePath
-        {
-            get
-            {
-                var path = _globalSettings.Path;
-
-                return string.IsNullOrEmpty(path) ? string.Empty : ResolveUrl(path);
-            }
-        }
-
 
         // static compiled regex for faster performance
         //private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-
-
-        public char DirSepChar => Path.DirectorySeparatorChar;
 
         //helper to try and match the old path to a new virtual one
         public string FindFile(string virtualPath)
@@ -44,29 +28,20 @@ namespace Umbraco.Core.IO
             string retval = virtualPath;
 
             if (virtualPath.StartsWith("~"))
-                retval = virtualPath.Replace("~", Root);
+                retval = virtualPath.Replace("~", _hostingEnvironment.ApplicationVirtualPath);
 
-            if (virtualPath.StartsWith("/") && virtualPath.StartsWith(Root) == false)
-                retval = Root + "/" + virtualPath.TrimStart('/');
+            if (virtualPath.StartsWith("/") && virtualPath.StartsWith(_hostingEnvironment.ApplicationVirtualPath) == false)
+                retval = _hostingEnvironment.ApplicationVirtualPath + "/" + virtualPath.TrimStart('/');
 
             return retval;
         }
 
-        public string ResolveVirtualUrl(string path)
-        {
-            if (string.IsNullOrWhiteSpace(path)) return path;
-            return path.StartsWith("~/") ? ResolveUrl(path) : path;
-        }
-
-        //Replaces tildes with the root dir
+        // TODO: This is the same as IHostingEnvironment.ToAbsolute
         public string ResolveUrl(string virtualPath)
         {
-            if (virtualPath.StartsWith("~"))
-                return virtualPath.Replace("~", Root).Replace("//", "/");
-            else if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
-                return virtualPath;
-            else
-                return _hostingEnvironment.ToAbsolute(virtualPath, Root);
+            if (string.IsNullOrWhiteSpace(virtualPath)) return virtualPath;
+            return _hostingEnvironment.ToAbsolute(virtualPath);
+
         }
 
         public Attempt<string> TryResolveUrl(string virtualPath)
@@ -74,10 +49,11 @@ namespace Umbraco.Core.IO
             try
             {
                 if (virtualPath.StartsWith("~"))
-                    return Attempt.Succeed(virtualPath.Replace("~", Root).Replace("//", "/"));
+                    return Attempt.Succeed(virtualPath.Replace("~", _hostingEnvironment.ApplicationVirtualPath).Replace("//", "/"));
                 if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
                     return Attempt.Succeed(virtualPath);
-                return Attempt.Succeed(_hostingEnvironment.ToAbsolute(virtualPath, Root));
+
+                return Attempt.Succeed(_hostingEnvironment.ToAbsolute(virtualPath));
             }
             catch (Exception ex)
             {
@@ -101,16 +77,17 @@ namespace Umbraco.Core.IO
 
             if (_hostingEnvironment.IsHosted)
             {
-                var result = (String.IsNullOrEmpty(path) == false && (path.StartsWith("~") || path.StartsWith(Root)))
-                        ?  _hostingEnvironment.MapPath(path)
+                var result = (!string.IsNullOrEmpty(path) && (path.StartsWith("~") || path.StartsWith(_hostingEnvironment.ApplicationVirtualPath)))
+                    ? _hostingEnvironment.MapPath(path)
                     : _hostingEnvironment.MapPath("~/" + path.TrimStart('/'));
 
                 if (result != null) return result;
             }
 
+            var dirSepChar = Path.DirectorySeparatorChar;
             var root = Assembly.GetExecutingAssembly().GetRootDirectorySafe();
-            var newPath = path.TrimStart('~', '/').Replace('/', DirSepChar);
-            var retval = root + DirSepChar.ToString(CultureInfo.InvariantCulture) + newPath;
+            var newPath = path.TrimStart('~', '/').Replace('/', dirSepChar);
+            var retval = root + dirSepChar.ToString(CultureInfo.InvariantCulture) + newPath;
 
             return retval;
         }
@@ -144,7 +121,7 @@ namespace Umbraco.Core.IO
             // TODO: what's below is dirty, there are too many ways to get the root dir, etc.
             // not going to fix everything today
 
-            var mappedRoot = MapPath(Root);
+            var mappedRoot = MapPath(_hostingEnvironment.ApplicationVirtualPath);
             if (filePath.StartsWith(mappedRoot) == false)
                 filePath = MapPath(filePath);
 
@@ -212,32 +189,5 @@ namespace Umbraco.Core.IO
             return PathUtility.EnsurePathIsApplicationRootPrefixed(path);
         }
 
-        private string _root;
-
-        /// <summary>
-        /// Gets the root path of the application
-        /// </summary>
-        /// <remarks>
-        /// In most cases this will be an empty string which indicates the app is not running in a virtual directory.
-        /// This is NOT a physical path.
-        /// </remarks>
-        public string Root
-        {
-            get
-            {
-                if (_root != null) return _root;
-
-                var appPath = _hostingEnvironment.ApplicationVirtualPath;
-                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                if (appPath == null || appPath == "/")
-                    appPath = string.Empty;
-
-                _root = appPath;
-
-                return _root;
-            }
-            //Only required for unit tests
-            set => _root = value;
-        }
     }
 }

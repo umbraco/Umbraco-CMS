@@ -1,5 +1,4 @@
 ﻿@using System.Web.Mvc.Html
-@using ClientDependency.Core.Mvc
 @using Umbraco.Web
 @using Umbraco.Web.Composing
 @using Umbraco.Web.Controllers
@@ -34,15 +33,13 @@
 
     Html.EnableClientValidation();
     Html.EnableUnobtrusiveJavaScript();
-    Html.RequiresJs("https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js");
-    Html.RequiresJs("https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js");
-    Html.RequiresJs("https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js");
 
     var success = TempData["FormSuccess"] != null;
 }
 
-@*NOTE: This RenderJsHere code should be put on your main template page where the rest of your script tags are placed*@
-@Html.RenderJsHere()
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
 
 @if (success)
 {

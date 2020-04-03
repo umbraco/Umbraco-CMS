@@ -19,7 +19,7 @@ using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.JavaScript;
+using Umbraco.Core.WebAssets;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -41,6 +41,7 @@ namespace Umbraco.Web.Editors
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IIOHelper _ioHelper;
         private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
+        private readonly IRuntimeMinifier _runtimeMinifier;
 
         public PackageInstallController(
             IGlobalSettings globalSettings,
@@ -55,12 +56,14 @@ namespace Umbraco.Web.Editors
             UmbracoMapper umbracoMapper,
             IIOHelper ioHelper,
             IPublishedUrlProvider publishedUrlProvider,
-            IUmbracoApplicationLifetime umbracoApplicationLifetime)
+            IUmbracoApplicationLifetime umbracoApplicationLifetime,
+            IRuntimeMinifier runtimeMinifier)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _umbracoVersion = umbracoVersion;
             _ioHelper = ioHelper;
             _umbracoApplicationLifetime = umbracoApplicationLifetime;
+            _runtimeMinifier = runtimeMinifier;
         }
 
         /// <summary>
@@ -381,9 +384,7 @@ namespace Umbraco.Web.Editors
             zipFile.Delete();
 
             //bump cdf to be safe
-            var clientDependencyConfig = new ClientDependencyConfiguration(Logger, _ioHelper);
-            var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
-                _umbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
+            _runtimeMinifier.Reset();
 
             var redirectUrl = "";
             if (!packageInfo.PackageView.IsNullOrWhiteSpace())

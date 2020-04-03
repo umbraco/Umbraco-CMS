@@ -35,6 +35,7 @@ using IUser = Umbraco.Core.Models.Membership.IUser;
 using Task = System.Threading.Tasks.Task;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Media;
 
@@ -48,7 +49,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IContentSettings _contentSettings;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ISqlContext _sqlContext;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly ISecuritySettings _securitySettings;
@@ -65,7 +66,7 @@ namespace Umbraco.Web.Editors
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
             IContentSettings contentSettings,
-            IIOHelper ioHelper,
+            IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
             IPublishedUrlProvider publishedUrlProvider,
             ISecuritySettings securitySettings)
@@ -73,7 +74,7 @@ namespace Umbraco.Web.Editors
         {
             _mediaFileSystem = mediaFileSystem;
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
             _sqlContext = sqlContext;
             _imageUrlGenerator = imageUrlGenerator;
             _securitySettings = securitySettings;
@@ -97,17 +98,17 @@ namespace Umbraco.Web.Editors
         [AdminUsersAuthorize]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
-            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, _mediaFileSystem, ShortStringHelper, _contentSettings, _ioHelper, _imageUrlGenerator, id);
+            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, _mediaFileSystem, ShortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, id);
         }
 
-        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IContentSettings contentSettings, IIOHelper ioHelper, IImageUrlGenerator imageUrlGenerator, int id)
+        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IContentSettings contentSettings, IHostingEnvironment hostingEnvironment, IImageUrlGenerator imageUrlGenerator, int id)
         {
             if (request.Content.IsMimeMultipartContent() == false)
             {
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = ioHelper.MapPath(Constants.SystemDirectories.TempFileUploads);
+            var root = hostingEnvironment.MapPath(Constants.SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -488,7 +489,7 @@ namespace Umbraco.Web.Editors
             var action = urlHelper.Action("VerifyInvite", "BackOffice",
                 new
                 {
-                    area = _ioHelper.GetUmbracoMvcArea(),
+                    area = GlobalSettings.GetUmbracoMvcArea(_hostingEnvironment),
                     invite = inviteToken
                 });
 

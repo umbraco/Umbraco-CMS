@@ -4,16 +4,19 @@ namespace Umbraco.Core.IO
 {
     public interface IIOHelper
     {
-
-        string BackOfficePath { get; }
-
-        char DirSepChar { get; }
         string FindFile(string virtualPath);
-        string ResolveVirtualUrl(string path);
-        string ResolveUrl(string virtualPath);
-        Attempt<string> TryResolveUrl(string virtualPath);
-        string MapPath(string path);
 
+        // TODO: This is the same as IHostingEnvironment.ToAbsolute
+        string ResolveUrl(string virtualPath);
+
+        Attempt<string> TryResolveUrl(string virtualPath);
+
+        /// <summary>
+        /// Maps a virtual path to a physical path in the content root folder (i.e. www)
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        string MapPath(string path);
 
         /// <summary>
         /// Verifies that the current filepath matches a directory where the user is allowed to edit a file.
@@ -49,19 +52,6 @@ namespace Umbraco.Core.IO
         /// <param name="path"></param>
         /// <returns></returns>
         string GetRelativePath(string path);
-
-        /// <summary>
-        /// Gets the root path of the application
-        /// </summary>
-        /// <remarks>
-        /// In most cases this will be an empty string which indicates the app is not running in a virtual directory.
-        /// This is NOT a physical path.
-        /// </remarks>
-        string Root
-        {
-            get;
-            set; //Only required for unit tests
-        }
 
     }
 }

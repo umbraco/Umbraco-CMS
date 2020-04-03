@@ -2,6 +2,7 @@
 using System.Linq;
 using Lucene.Net.Store;
 using Umbraco.Core;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -11,8 +12,8 @@ namespace Umbraco.Examine
     {
         private readonly UmbracoExamineIndex _index;
 
-        public UmbracoExamineIndexDiagnostics(UmbracoExamineIndex index, ILogger logger, IIOHelper ioHelper)
-            : base(index, logger, ioHelper)
+        public UmbracoExamineIndexDiagnostics(UmbracoExamineIndex index, ILogger logger, IHostingEnvironment hostingEnvironment)
+            : base(index, logger, hostingEnvironment)
         {
             _index = index;
         }

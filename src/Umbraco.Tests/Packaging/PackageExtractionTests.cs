@@ -17,7 +17,8 @@ namespace Umbraco.Tests.Packaging
         private static FileInfo GetTestPackagePath(string packageName)
         {
             const string testPackagesDirName = "Packaging\\Packages";
-            string path = Path.Combine(TestHelper.IOHelper.MapPath("~"), testPackagesDirName, packageName);
+            var hosting = TestHelper.GetHostingEnvironment();
+            string path = Path.Combine(hosting.ApplicationPhysicalPath, testPackagesDirName, packageName);
             return new FileInfo(path);
         }
 

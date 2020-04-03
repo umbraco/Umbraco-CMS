@@ -51,6 +51,7 @@ namespace Umbraco.Tests.Routing
         public void Is_Reserved_By_Route(string url, bool shouldMatch)
         {
             //reset the app config, we only want to test routes not the hard coded paths
+            // TODO: Why are we using and modifying the global IGlobalSettings and not just a custom one?
             var globalSettingsMock = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettingsMock.Setup(x => x.ReservedPaths).Returns("");
             globalSettingsMock.Setup(x => x.ReservedUrls).Returns("");

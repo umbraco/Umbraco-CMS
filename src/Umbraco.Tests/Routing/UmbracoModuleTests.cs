@@ -43,7 +43,8 @@ namespace Umbraco.Tests.Routing
                 new RoutableDocumentFilter(globalSettings, IOHelper),
                 UriUtility,
                 AppCaches.RequestCache,
-                IOHelper
+                globalSettings,
+                HostingEnvironment
             );
 
             runtime.Level = RuntimeLevel.Run;

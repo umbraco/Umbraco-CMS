@@ -163,7 +163,7 @@ namespace Umbraco.Core.Runtime
                 var databaseFactory = GetDatabaseFactory();
 
                 // type finder/loader
-                var typeLoader = new TypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), ProfilingLogger);
+                var typeLoader = new TypeLoader(TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), ProfilingLogger);
 
                 // create the composition
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs, IOHelper, appCaches);
@@ -231,8 +231,6 @@ namespace Umbraco.Core.Runtime
             // throws if not full-trust
             _umbracoBootPermissionChecker.ThrowIfNotPermissions();
 
-            ConfigureApplicationRootPath();
-
             // run handlers
             RuntimeOptions.DoRuntimeEssentials(_factory);
 
@@ -263,13 +261,6 @@ namespace Umbraco.Core.Runtime
                 msg += ".";
                 Logger.Error<CoreRuntime>(exception, msg);
             };
-        }
-
-        protected virtual void ConfigureApplicationRootPath()
-        {
-            var path = GetApplicationRootPath();
-            if (string.IsNullOrWhiteSpace(path) == false)
-                IOHelper.Root = path;
         }
 
         private bool AcquireMainDom(IMainDom mainDom, IApplicationShutdownRegistry applicationShutdownRegistry)

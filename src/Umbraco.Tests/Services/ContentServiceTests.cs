@@ -1898,7 +1898,7 @@ namespace Umbraco.Tests.Services
             TypedEventHandler<IContentService, CopyEventArgs<IContent>> copying = (sender, args) =>
             {
                 args.Copy.SetValue("title", "1");
-                args.Original.SetValue("title", "2");                
+                args.Original.SetValue("title", "2");
             };
 
             TypedEventHandler<IContentService, CopyEventArgs<IContent>> copied = (sender, args) =>
@@ -1911,9 +1911,9 @@ namespace Umbraco.Tests.Services
             };
 
             try
-            {                
+            {
                 var contentService = ServiceContext.ContentService;
-                
+
                 ContentService.Copying += copying;
                 ContentService.Copied += copied;
 

@@ -71,7 +71,7 @@ module.exports = {
             assets: "./src/assets/**"
         }
     },
-    root: "../Umbraco.Web.UI/",
+    roots: ["../Umbraco.Web.UI/", "../Umbraco.Web.UI.NetCore/wwwroot/"],
     targets: {
         js: "Umbraco/js/",
         lib: "Umbraco/lib/",

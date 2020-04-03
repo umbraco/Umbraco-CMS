@@ -1,11 +1,13 @@
 using System;
 using System.Data.Common;
+using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Smidge;
+using Smidge.Nuglify;
 using Umbraco.Composing;
 using Umbraco.Configuration;
 using Umbraco.Core;
@@ -69,7 +71,9 @@ namespace Umbraco.Web.Common.Extensions
 
             var umbContainer = UmbracoServiceProviderFactory.UmbracoContainer;
 
-            return services.AddUmbracoCore(webHostEnvironment, umbContainer, Assembly.GetEntryAssembly(), out factory);
+            services.AddUmbracoCore(webHostEnvironment, umbContainer, Assembly.GetEntryAssembly(), out factory);
+
+            return services;
         }
 
         /// <summary>
@@ -97,10 +101,6 @@ namespace Umbraco.Web.Common.Extensions
             var globalSettings = configs.Global();
             var umbracoVersion = new UmbracoVersion(globalSettings);
 
-            // TODO: Currently we are not passing in any TypeFinderConfig (with ITypeFinderSettings) which we should do, however
-            // this is not critical right now and would require loading in some config before boot time so just leaving this as-is for now.
-            var typeFinder = new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(entryAssembly));
-
             var coreRuntime = GetCoreRuntime(
                 configs,
                 umbracoVersion,
@@ -109,11 +109,21 @@ namespace Umbraco.Web.Common.Extensions
                 profiler,
                 hostingEnvironment,
                 backOfficeInfo,
-                typeFinder);
+                CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly));
 
             factory = coreRuntime.Configure(container);
 
             return services;
+        }
+
+        private static ITypeFinder CreateTypeFinder(ILogger logger, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly)
+        {
+            // TODO: Currently we are not passing in any TypeFinderConfig (with ITypeFinderSettings) which we should do, however
+            // this is not critical right now and would require loading in some config before boot time so just leaving this as-is for now.
+            var runtimeHashPaths = new RuntimeHashPaths();
+            runtimeHashPaths.AddFolder(new DirectoryInfo(Path.Combine(webHostEnvironment.ContentRootPath, "bin")));
+            var runtimeHash = new RuntimeHash(new ProfilingLogger(logger, profiler), runtimeHashPaths);
+            return new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(entryAssembly), runtimeHash);
         }
 
         private static IRuntime GetCoreRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger,
@@ -141,7 +151,7 @@ namespace Umbraco.Web.Common.Extensions
             return coreRuntime;
         }
 
-        private static void CreateCompositionRoot(IServiceCollection services, IWebHostEnvironment webHostEnvironment,
+        private static IServiceCollection CreateCompositionRoot(IServiceCollection services, IWebHostEnvironment webHostEnvironment,
             out ILogger logger, out Configs configs, out IIOHelper ioHelper, out Core.Hosting.IHostingEnvironment hostingEnvironment,
             out IBackOfficeInfo backOfficeInfo, out IProfiler profiler)
         {
@@ -158,7 +168,7 @@ namespace Umbraco.Web.Common.Extensions
             var coreDebug = configs.CoreDebug();
             var globalSettings = configs.Global();
 
-            hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment, httpContextAccessor);
+            hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment);
             ioHelper = new IOHelper(hostingEnvironment, globalSettings);
             logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,
                 new AspNetCoreSessionIdResolver(httpContextAccessor),
@@ -168,6 +178,17 @@ namespace Umbraco.Web.Common.Extensions
 
             backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
             profiler = GetWebProfiler(hostingEnvironment, httpContextAccessor);
+
+            return services;
+        }
+
+        public static IServiceCollection AddUmbracoRuntimeMinifier(this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            services.AddSmidge(configuration.GetSection(Constants.Configuration.ConfigRuntimeMinification));
+            services.AddSmidgeNuglify();
+
+            return services;
         }
 
         private static IProfiler GetWebProfiler(Umbraco.Core.Hosting.IHostingEnvironment hostingEnvironment, IHttpContextAccessor httpContextAccessor)

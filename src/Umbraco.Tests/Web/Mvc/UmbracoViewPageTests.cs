@@ -438,10 +438,10 @@ namespace Umbraco.Tests.Web.Mvc
             var ctx = new UmbracoContext(
                 httpContextAccessor,
                 _service,
-                new WebSecurity(httpContextAccessor, ServiceContext.UserService, globalSettings, IOHelper),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, globalSettings, HostingEnvironment),
                 globalSettings,
+                HostingEnvironment,
                 new TestVariationContextAccessor(),
-                IOHelper,
                 UriUtility,
                 new AspNetCookieManager(httpContextAccessor));
 

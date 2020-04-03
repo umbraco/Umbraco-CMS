@@ -7,6 +7,7 @@ using System.Web.SessionState;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Web.Composing;
 using Umbraco.Web.WebApi;
@@ -19,7 +20,7 @@ namespace Umbraco.Web.Mvc
         /// Creates a custom individual route for the specified controller plugin. Individual routes
         /// are required by controller plugins to map to a unique URL based on ID.
         /// </summary>
-        /// <param name="ioHelper"></param>
+        /// <param name="hostingEnvironment"></param>
         /// <param name="controllerName"></param>
         /// <param name="controllerType"></param>
         /// <param name="routes">An existing route collection</param>
@@ -39,10 +40,11 @@ namespace Umbraco.Web.Mvc
         /// if not specified, will just route like:
         ///     /umbraco/areaname
         /// </param>
+        /// <param name="globalSettings"></param>
         /// <remarks>
         /// </remarks>
         internal static Route RouteControllerPlugin(this AreaRegistration area,
-            IIOHelper ioHelper,
+            IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment,
             string controllerName, Type controllerType, RouteCollection routes,
             string controllerSuffixName, string defaultAction, object defaultId,
             string umbracoTokenValue = "backoffice",
@@ -58,7 +60,7 @@ namespace Umbraco.Web.Mvc
             if (routes == null) throw new ArgumentNullException(nameof(routes));
             if (defaultId == null) throw new ArgumentNullException(nameof(defaultId));
 
-            var umbracoArea = ioHelper.GetUmbracoMvcArea();
+            var umbracoArea = globalSettings.GetUmbracoMvcArea(hostingEnvironment);
 
             //routes are explicitly named with controller names and IDs
             var url = umbracoArea + "/" +

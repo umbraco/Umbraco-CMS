@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <RootNamespace>Umbraco.Web.UI.BackOffice</RootNamespace>
+        <RootNamespace>Umbraco.Web.UI.NetCore</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,6 +13,26 @@
 
     <ItemGroup>
       <Folder Include="wwwroot\Media" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="wwwroot\Umbraco\**" />
+        <Compile Remove="App_Data\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="wwwroot\Umbraco\**" />
+        <EmbeddedResource Remove="App_Data\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="wwwroot\Umbraco\**" />
+        <None Remove="App_Data\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Remove="wwwroot\Umbraco\**" />
+        <Content Remove="App_Data\**" />
     </ItemGroup>
 
 </Project>

@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.IO;
-using Umbraco.Core.Serialization;
-
 namespace Umbraco.Core.Configuration
 {
     public class JsonConfigManipulator : IConfigManipulator
@@ -47,6 +41,29 @@ namespace Umbraco.Core.Configuration
             SaveJson(provider, json);
         }
 
+        public void SaveConfigValue(string key, object value)
+        {
+            var provider = GetJsonConfigurationProvider();
+
+            var json = GetJson(provider);
+
+            JToken token = json;
+            foreach (var propertyName in key.Split(new[] { ':' }))
+            {
+                if (token is null) break;
+                token = CaseSelectPropertyValues(token, propertyName);
+            }
+
+            if (token is null) return;
+
+            var writer = new JTokenWriter();
+            writer.WriteValue(value);
+
+            token.Replace(writer.Token);
+
+            SaveJson(provider, json);
+
+        }
 
         private JToken GetConnectionItem(string connectionString, string providerName)
         {

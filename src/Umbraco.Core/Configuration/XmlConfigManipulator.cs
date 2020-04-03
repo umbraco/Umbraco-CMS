@@ -106,6 +106,11 @@ namespace Umbraco.Core.Configuration
             _logger.Info<XmlConfigManipulator>("Saved connection string to {ConfigFile}.", fileSource);
         }
 
+        public void SaveConfigValue(string itemPath, object value)
+        {
+            throw new NotImplementedException();
+        }
+
         private static void AddOrUpdateAttribute(XElement element, string name, string value)
         {
             var attribute = element.Attribute(name);

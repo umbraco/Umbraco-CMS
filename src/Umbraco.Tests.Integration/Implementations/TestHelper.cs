@@ -7,6 +7,7 @@ using Moq;
 using System.Data.Common;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Diagnostics;
@@ -42,7 +43,7 @@ namespace Umbraco.Tests.Integration.Implementations
 
             var hostEnvironment = new Mock<IWebHostEnvironment>();
             hostEnvironment.Setup(x => x.ApplicationName).Returns("UmbracoIntegrationTests");
-            hostEnvironment.Setup(x => x.ContentRootPath).Returns(() => WorkingDirectory);
+            hostEnvironment.Setup(x => x.ContentRootPath).Returns(() => Assembly.GetExecutingAssembly().GetRootDirectorySafe());
             hostEnvironment.Setup(x => x.WebRootPath).Returns(() => WorkingDirectory);
             _hostEnvironment = hostEnvironment.Object;
 
@@ -105,9 +106,8 @@ namespace Umbraco.Tests.Integration.Implementations
 
         public override IHostingEnvironment GetHostingEnvironment()
             => _hostingEnvironment ??= new TestHostingEnvironment(
-                SettingsForTests.GetDefaultHostingSettings(),
-                _hostEnvironment,
-                _httpContextAccessor);
+                SettingsForTests.DefaultHostingSettings,
+                _hostEnvironment);
 
         public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime() => _hostingLifetime;
 

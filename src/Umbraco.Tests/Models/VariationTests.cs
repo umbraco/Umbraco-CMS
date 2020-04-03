@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Models
             Current.Reset();
 
             var configs = TestHelper.GetConfigs();
-            configs.Add(SettingsForTests.GetDefaultGlobalSettings);
+            configs.Add(() => SettingsForTests.DefaultGlobalSettings);
             configs.Add(SettingsForTests.GenerateMockContentSettings);
 
             _factory = Mock.Of<IFactory>();

@@ -43,10 +43,23 @@
 
     <ItemGroup>
       <Compile Remove="obj\**" />
+      <Compile Update="WebAssets\Resources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Resources.resx</DependentUpon>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>
       <EmbeddedResource Remove="obj\**" />
+      <EmbeddedResource Include="WebAssets\JsInitialize.js" />
+      <EmbeddedResource Include="WebAssets\Main.js" />
+      <EmbeddedResource Include="WebAssets\PreviewInitialize.js" />
+      <EmbeddedResource Include="WebAssets\ServerVariables.js" />
+      <EmbeddedResource Update="WebAssets\Resources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>

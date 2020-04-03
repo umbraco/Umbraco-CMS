@@ -4,9 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Web.Mvc;
 using System.Web.Routing;
-using ClientDependency.Core.Config;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -18,7 +16,6 @@ namespace Umbraco.Web
     /// </summary>
     public static class UrlHelperExtensions
     {
-
         /// <summary>
         /// Return the Url for a Web Api service
         /// </summary>
@@ -149,7 +146,7 @@ namespace Umbraco.Web
             }
 
             var version = Current.UmbracoVersion.SemanticVersion.ToSemanticString();
-            return $"{version}.{ClientDependencySettings.Instance.Version}".GenerateHash();
+            return $"{version}.{Current.RuntimeMinifier.CacheBuster}".GenerateHash();
         }
     }
 }

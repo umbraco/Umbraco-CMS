@@ -33,6 +33,7 @@ using Umbraco.Web.Features;
 using Umbraco.Web.Models.ContentEditing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Web.Routing;
 
@@ -74,13 +75,14 @@ namespace Umbraco.Tests.Web.Controllers
                 }
                 else
                 {
-                    var baseDir = IOHelper.MapPath("").TrimEnd(IOHelper.DirSepChar);
+                    var baseDir = IOHelper.MapPath("").TrimEnd(Path.DirectorySeparatorChar);
                     HttpContext.Current = new HttpContext(new SimpleWorkerRequest("/", baseDir, "", "", new StringWriter()));
                 }
-                
+
                 var usersController = new AuthenticationController(
                     new TestUserPasswordConfig(),
                     Factory.GetInstance<IGlobalSettings>(),
+                    Factory.GetInstance<IHostingEnvironment>(),
                     umbracoContextAccessor,
                     Factory.GetInstance<ISqlContext>(),
                     Factory.GetInstance<ServiceContext>(),
@@ -89,7 +91,6 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IRuntimeState>(),
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<ISecuritySettings>(),
-                    Factory.GetInstance<IIOHelper>(),
                     Factory.GetInstance<IPublishedUrlProvider>()
                     );
                 return usersController;

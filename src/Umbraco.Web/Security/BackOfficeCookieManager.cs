@@ -7,6 +7,7 @@ using Microsoft.Owin.Infrastructure;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Security;
 
@@ -23,23 +24,26 @@ namespace Umbraco.Web.Security
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IRuntimeState _runtime;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IGlobalSettings _globalSettings;
         private readonly IRequestCache _requestCache;
         private readonly string[] _explicitPaths;
         private readonly string _getRemainingSecondsPath;
 
-        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtime, IIOHelper ioHelper, IRequestCache requestCache)
-            : this(umbracoContextAccessor, runtime, ioHelper,requestCache, null)
+        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtime, IHostingEnvironment hostingEnvironment, IGlobalSettings globalSettings, IRequestCache requestCache)
+            : this(umbracoContextAccessor, runtime, hostingEnvironment, globalSettings, requestCache, null)
         { }
 
-        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtime,  IIOHelper ioHelper, IRequestCache requestCache, IEnumerable<string> explicitPaths)
+        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtime,  IHostingEnvironment hostingEnvironment, IGlobalSettings globalSettings, IRequestCache requestCache, IEnumerable<string> explicitPaths)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _runtime = runtime;
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
+            _globalSettings = globalSettings;
             _requestCache = requestCache;
             _explicitPaths = explicitPaths?.ToArray();
-            _getRemainingSecondsPath = $"{ioHelper.BackOfficePath}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds";
+            var backOfficePath = _globalSettings.GetBackOfficePath(_hostingEnvironment);
+            _getRemainingSecondsPath = $"{backOfficePath}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds";
         }
 
         /// <summary>
@@ -103,9 +107,9 @@ namespace Umbraco.Web.Security
                 (checkForceAuthTokens && owinContext.Get<bool?>(Constants.Security.ForceReAuthFlag) != null)
                 || (checkForceAuthTokens && _requestCache.IsAvailable && _requestCache.Get(Constants.Security.ForceReAuthFlag) != null)
                 //check back office
-                || request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, _ioHelper)
+                || request.Uri.IsBackOfficeRequest(_globalSettings, _hostingEnvironment)
                 //check installer
-                || request.Uri.IsInstallerRequest(_ioHelper))
+                || request.Uri.IsInstallerRequest(_hostingEnvironment))
             {
                 return true;
             }
