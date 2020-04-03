@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web.Http;
 using Umbraco.Core.Composing;
@@ -17,7 +18,7 @@ namespace Umbraco.Web.Editors
 
         public BackOfficeAssetsController(IIOHelper ioHelper, ILogger logger, IGlobalSettings globalSettings)
         {
-            _jsLibFileSystem = new PhysicalFileSystem(ioHelper, logger, globalSettings.UmbracoPath + ioHelper.DirSepChar + "lib");
+            _jsLibFileSystem = new PhysicalFileSystem(ioHelper, logger, globalSettings.UmbracoPath + Path.DirectorySeparatorChar + "lib");
         }
 
         [HttpGet]

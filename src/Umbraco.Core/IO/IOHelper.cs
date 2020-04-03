@@ -22,8 +22,6 @@ namespace Umbraco.Core.IO
         // static compiled regex for faster performance
         //private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-        public char DirSepChar => Path.DirectorySeparatorChar;
-
         //helper to try and match the old path to a new virtual one
         public string FindFile(string virtualPath)
         {
@@ -86,9 +84,10 @@ namespace Umbraco.Core.IO
                 if (result != null) return result;
             }
 
+            var dirSepChar = Path.DirectorySeparatorChar;
             var root = Assembly.GetExecutingAssembly().GetRootDirectorySafe();
-            var newPath = path.TrimStart('~', '/').Replace('/', DirSepChar);
-            var retval = root + DirSepChar.ToString(CultureInfo.InvariantCulture) + newPath;
+            var newPath = path.TrimStart('~', '/').Replace('/', dirSepChar);
+            var retval = root + dirSepChar.ToString(CultureInfo.InvariantCulture) + newPath;
 
             return retval;
         }

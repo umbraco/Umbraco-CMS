@@ -4,11 +4,8 @@ namespace Umbraco.Core.IO
 {
     public interface IIOHelper
     {
-        // TODO: There is no need for this, we should just use Path.DirectorySeparatorChar which is cross platform, no need for an abstraction?
-        char DirSepChar { get; }
-
         string FindFile(string virtualPath);
-        
+
         // TODO: This is the same as IHostingEnvironment.ToAbsolute
         string ResolveUrl(string virtualPath);
 
