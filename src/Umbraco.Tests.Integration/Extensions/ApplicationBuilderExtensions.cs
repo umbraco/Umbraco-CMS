@@ -23,15 +23,14 @@ namespace Umbraco.Tests.Integration.Extensions
         /// Creates a LocalDb instance to use for the test
         /// </summary>
         /// <param name="app"></param>
-        /// <param name="hostEnvironment"></param>
+        /// <param name="workingDirectory"></param>
         /// <param name="integrationTest"></param>
         /// <returns></returns>
         public static IApplicationBuilder UseTestLocalDb(this IApplicationBuilder app,
-            IHostEnvironment hostEnvironment,
+            string workingDirectory,
             UmbracoIntegrationTest integrationTest)
         {
-
-            var dbFilePath = Path.Combine(hostEnvironment.ContentRootPath, "LocalDb");
+            var dbFilePath = Path.Combine(workingDirectory, "LocalDb");
 
             // get the currently set db options
             var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();

@@ -7,10 +7,12 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
+using Umbraco.Web.Common.RuntimeMinification;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -308,7 +310,8 @@ namespace Umbraco.Tests.Integration.Testing
                         ResetLocalDb(cmd);
                         _prepare?.Invoke(conn, cmd);
                     }
-                    _readyQueue.Add(i);
+                    if (!_readyQueue.IsAddingCompleted)
+                        _readyQueue.Add(i);
                 }
             }
 

@@ -8,6 +8,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="TEMP\**" />
+      <EmbeddedResource Remove="TEMP\**" />
+      <None Remove="TEMP\**" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="LightInject.Microsoft.DependencyInjection" Version="3.3.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
         <PackageReference Include="Moq" Version="4.13.1" />

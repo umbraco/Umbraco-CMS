@@ -89,7 +89,7 @@ namespace Umbraco.Web.Common.AspNetCore
         public string ToAbsolute(string virtualPath)
         {
             if (!virtualPath.StartsWith("~/") && !virtualPath.StartsWith("/"))
-                throw new InvalidOperationException($"{nameof(virtualPath)} must start with ~/ or /");
+                throw new InvalidOperationException($"The value {virtualPath} for parameter {nameof(virtualPath)} must start with ~/ or /");
 
             // will occur if it starts with "/"
             if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))

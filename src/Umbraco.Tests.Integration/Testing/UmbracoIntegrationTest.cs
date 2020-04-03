@@ -126,7 +126,7 @@ namespace Umbraco.Tests.Integration.Testing
             Services = app.ApplicationServices;
 
             // This will create a db, install the schema and ensure the app is configured to run
-            app.UseTestLocalDb(Services.GetRequiredService<IHostEnvironment>(), this);
+            app.UseTestLocalDb(testHelper.WorkingDirectory, this);
 
             app.UseUmbracoCore();
         }

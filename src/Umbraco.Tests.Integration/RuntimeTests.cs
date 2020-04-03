@@ -4,6 +4,7 @@ using Moq;
 using NUnit.Framework;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Smidge;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
