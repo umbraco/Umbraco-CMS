@@ -67,8 +67,17 @@ namespace Umbraco.Core.WebAssets
         /// </returns>
         Task<IEnumerable<string>> GetAssetPathsAsync(string bundleName);
 
+        /// <summary>
+        /// Minify the file content, of a given type
+        /// </summary>
+        /// <param name="fileContent"></param>
+        /// <param name="assetType"></param>
+        /// <returns></returns>
         Task<string> MinifyAsync(string fileContent, AssetType assetType);
 
+        /// <summary>
+        /// Ensures that all runtime minifications are refreshed on next request. E.g. Clearing cache.
+        /// </summary>
         void Reset();
 
     }

@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Integration.Testing
     /// <summary>
     /// Manages a pool of LocalDb databases for integration testing
     /// </summary>
-    public class LocalDbTestDatabase 
+    public class LocalDbTestDatabase
     {
         public const string InstanceName = "UmbracoTests";
         public const string DatabaseName = "UmbracoTests";
@@ -137,7 +137,7 @@ namespace Umbraco.Tests.Integration.Testing
 
                 _dbCommands = database.Commands.ToArray();
             }
-            
+
         }
 
         private static void AddParameter(IDbCommand cmd, UmbracoDatabase.ParameterInfo parameterInfo)
@@ -199,7 +199,7 @@ namespace Umbraco.Tests.Integration.Testing
                     cmd.ExecuteNonQuery();
                     return;
                 }
-                catch (SqlException ex)
+                catch (SqlException)
                 {
                     // This can occur when there's a transaction deadlock which means (i think) that the database is still in use and hasn't been closed properly yet
                     // so we need to just wait a little bit
@@ -208,7 +208,7 @@ namespace Umbraco.Tests.Integration.Testing
                         throw;
                 }
             }
-            
+
         }
 
         public static void KillLocalDb()

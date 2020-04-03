@@ -49,7 +49,7 @@ namespace Umbraco.Web.Common.RuntimeMinification
 
         public string CacheBuster => _smidgeConfig.Version;
 
-        // only issue with creating bundles like this is that we don't have full control over the bundle options, though that could 
+        // only issue with creating bundles like this is that we don't have full control over the bundle options, though that could
         public void CreateCssBundle(string bundleName, params string[] filePaths)
         {
             if (filePaths.Any(f => !f.StartsWith("/") && !f.StartsWith("~/")))
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Common.RuntimeMinification
             // Here we could configure bundle options instead of using smidge's global defaults.
             // For example we can use our own custom cache buster for this bundle without having the global one
             // affect this or vice versa.
-        }   
+        }
 
         public string RenderCssHere(string bundleName) => _smidge.SmidgeHelper.CssHereAsync(bundleName, _hostingEnvironment.IsDebugMode).ToString();
 
@@ -86,25 +86,25 @@ namespace Umbraco.Web.Common.RuntimeMinification
 
         public async Task<IEnumerable<string>> GetAssetPathsAsync(string bundleName) => await _smidge.SmidgeHelper.GenerateJsUrlsAsync(bundleName, _hostingEnvironment.IsDebugMode);
 
+        /// <inheritdoc />
         public async Task<string> MinifyAsync(string fileContent, AssetType assetType)
         {
-            if (assetType == AssetType.Javascript)
+            switch (assetType)
             {
-                return await JsPipeline
-                    .ProcessAsync(
-                        new FileProcessContext(fileContent, new JavaScriptFile(), BundleContext.CreateEmpty()));
-            }
-            else
-            {
-                return await CssPipeline
-                    .ProcessAsync(new FileProcessContext(fileContent, new CssFile(), BundleContext.CreateEmpty()));
+                case AssetType.Javascript:
+                    return await JsPipeline
+                        .ProcessAsync(
+                            new FileProcessContext(fileContent, new JavaScriptFile(), BundleContext.CreateEmpty()));
+                case AssetType.Css:
+                    return await CssPipeline
+                        .ProcessAsync(new FileProcessContext(fileContent, new CssFile(), BundleContext.CreateEmpty()));
+                default:
+                    throw new NotSupportedException("Unexpected AssetType");
             }
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
+        /// <inheritdoc />
         /// <remarks>
         /// Smidge uses the version number as cache buster (configurable).
         /// We therefore can reset, by updating the version number in config
