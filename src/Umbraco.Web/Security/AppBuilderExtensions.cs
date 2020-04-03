@@ -252,7 +252,7 @@ namespace Umbraco.Web.Security
                 Current.Configs.Global(),
                 Current.Configs.Security(),
                 app.CreateLogger<GetUserSecondsMiddleWare>(),
-                Current.IOHelper);
+                Current.HostingEnvironment);
 
             //This is required so that we can read the auth ticket format outside of this pipeline
             app.CreatePerOwinContext<UmbracoAuthTicketDataProtector>(

@@ -141,7 +141,7 @@ namespace Umbraco.Core.Manifest
                 Alias = _definition.Alias,
                 Name = _definition.Name,
                 Icon = _definition.Icon,
-                View = _ioHelper.ResolveUrl(_definition.View),
+                View = _ioHelper.ResolveRelativeOrVirtualUrl(_definition.View),
                 Weight = _definition.Weight
             };
         }

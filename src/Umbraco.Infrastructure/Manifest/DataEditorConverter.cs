@@ -140,7 +140,7 @@ namespace Umbraco.Core.Manifest
 
         private string RewriteVirtualUrl(JValue view)
         {
-            return _ioHelper.ResolveUrl(view.Value as string);
+            return _ioHelper.ResolveRelativeOrVirtualUrl(view.Value as string);
         }
 
         private void PrepareForParameterEditor(JObject jobject, DataEditor target)
