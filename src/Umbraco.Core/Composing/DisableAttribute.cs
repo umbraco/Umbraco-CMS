@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace Umbraco.Core.Composing
 {
@@ -21,9 +22,9 @@ namespace Umbraco.Core.Composing
         public DisableAttribute()
         { }
 
-        public DisableAttribute(string fullTypeName)
+        public DisableAttribute(string fullTypeName, string assemblyName)
         {
-            DisabledType = Type.GetType(fullTypeName);
+            DisabledType = Assembly.Load(assemblyName)?.GetType(fullTypeName);
         }
 
         /// <summary>
