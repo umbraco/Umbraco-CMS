@@ -9,6 +9,6 @@
     {
         if (layout?.Udi == null) { continue; }
         var data = layout.Data;
-        @Html.Partial("BlockList/" + data.ContentType.Alias, (data, layout.Settings))
+        @Html.Partial("BlockList/" + data.ContentType.Alias, layout)
     }
 </div>
