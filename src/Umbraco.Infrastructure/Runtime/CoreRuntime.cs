@@ -163,7 +163,7 @@ namespace Umbraco.Core.Runtime
                 var databaseFactory = GetDatabaseFactory();
 
                 // type finder/loader
-                var typeLoader = new TypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), ProfilingLogger);
+                var typeLoader = new TypeLoader(TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), ProfilingLogger);
 
                 // create the composition
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs, IOHelper, appCaches);
@@ -231,8 +231,6 @@ namespace Umbraco.Core.Runtime
             // throws if not full-trust
             _umbracoBootPermissionChecker.ThrowIfNotPermissions();
 
-            ConfigureApplicationRootPath();
-
             // run handlers
             RuntimeOptions.DoRuntimeEssentials(_factory);
 
@@ -263,13 +261,6 @@ namespace Umbraco.Core.Runtime
                 msg += ".";
                 Logger.Error<CoreRuntime>(exception, msg);
             };
-        }
-
-        protected virtual void ConfigureApplicationRootPath()
-        {
-            var path = GetApplicationRootPath();
-            if (string.IsNullOrWhiteSpace(path) == false)
-                IOHelper.SetRootDirectory(path);
         }
 
         private bool AcquireMainDom(IMainDom mainDom, IApplicationShutdownRegistry applicationShutdownRegistry)
@@ -363,8 +354,14 @@ namespace Umbraco.Core.Runtime
                 new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
         }
 
-        // by default, returns null, meaning that Umbraco should auto-detect the application root path.
-        // override and return the absolute path to the Umbraco site/solution, if needed
+        /// <summary>
+        /// Returns the application path of the site/solution
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// By default is null which means it's not running in any virtual folder. If the site is running in a virtual folder, this
+        /// can be overridden and the virtual path returned (i.e. /mysite/)
+        /// </remarks>
         protected virtual string GetApplicationRootPath()
             => null;
 

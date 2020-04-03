@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Security
@@ -22,9 +23,9 @@ namespace Umbraco.Web.Security
             IUmbracoContextAccessor umbracoContextAccessor,
             ISecuritySettings securitySettings,
             IGlobalSettings globalSettings,
+            IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
             ISecureDataFormat<AuthenticationTicket> secureDataFormat,
-            IIOHelper ioHelper,
             IRequestCache requestCache)
         {
             var secureDataFormat1 = secureDataFormat ?? throw new ArgumentNullException(nameof(secureDataFormat));
@@ -42,7 +43,7 @@ namespace Umbraco.Web.Security
             TicketDataFormat = new UmbracoSecureDataFormat(LoginTimeoutMinutes, secureDataFormat1);
 
             //Custom cookie manager so we can filter requests
-            CookieManager = new BackOfficeCookieManager(umbracoContextAccessor, runtimeState, ioHelper, requestCache, explicitPaths);
+            CookieManager = new BackOfficeCookieManager(umbracoContextAccessor, runtimeState, hostingEnvironment, globalSettings, requestCache, explicitPaths);
         }
 
         /// <summary>

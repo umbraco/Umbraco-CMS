@@ -69,11 +69,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             composition.RegisterUnique<IInstalledPackagesRepository>(factory => CreatePackageRepository(factory, "installedPackages.config"));
             composition.RegisterUnique<PackageDataInstallation>();
             composition.RegisterUnique<PackageFileInstallation>();
-            composition.RegisterUnique<IPackageInstallation>(factory => //factory required because we need to pass in a string path
-                new PackageInstallation(
-                    factory.GetInstance<PackageDataInstallation>(), factory.GetInstance<PackageFileInstallation>(),
-                    factory.GetInstance<CompiledPackageXmlParser>(), factory.GetInstance<IPackageActionRunner>(),
-                    new DirectoryInfo( factory.GetInstance<IIOHelper>().GetRootDirectorySafe())));
+            composition.RegisterUnique<IPackageInstallation, PackageInstallation>();
 
             return composition;
         }

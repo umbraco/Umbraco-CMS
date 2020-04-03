@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Testing.Objects
                 new TestDefaultCultureAccessor(),
                 globalSettings,
                 Mock.Of<IUserService>(),
-                TestHelper.IOHelper,
+                TestHelper.GetHostingEnvironment(),
                 TestHelper.UriUtility,
                 httpContextAccessor,
                 new AspNetCookieManager(httpContextAccessor));

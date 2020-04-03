@@ -1,10 +1,13 @@
 ﻿
+using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Moq;
 using System.Data.Common;
+using System.IO;
 using System.Net;
+using System.Reflection;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Diagnostics;
@@ -24,11 +27,12 @@ namespace Umbraco.Tests.Integration.Implementations
     public class TestHelper : TestHelperBase
     {
         private IBackOfficeInfo _backOfficeInfo;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private IHostingEnvironment _hostingEnvironment;
         private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly IIpResolver _ipResolver;
         private readonly IWebHostEnvironment _hostEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private string _tempWorkingDir;
 
         public TestHelper() : base(typeof(TestHelper).Assembly)
         {
@@ -37,19 +41,42 @@ namespace Umbraco.Tests.Integration.Implementations
             _httpContextAccessor = Mock.Of<IHttpContextAccessor>(x => x.HttpContext == httpContext);
             _ipResolver = new AspNetIpResolver(_httpContextAccessor);
 
-            _hostEnvironment = Mock.Of<IWebHostEnvironment>(x =>
-                x.ApplicationName == "UmbracoIntegrationTests"
-                && x.ContentRootPath == CurrentAssemblyDirectory
-                && x.WebRootPath == CurrentAssemblyDirectory); // same folder for now?
-
-            _hostingEnvironment = new TestHostingEnvironment(
-                SettingsForTests.GetDefaultHostingSettings(),
-                _hostEnvironment,
-                _httpContextAccessor);
+            var hostEnvironment = new Mock<IWebHostEnvironment>();
+            hostEnvironment.Setup(x => x.ApplicationName).Returns("UmbracoIntegrationTests");
+            hostEnvironment.Setup(x => x.ContentRootPath).Returns(() => Assembly.GetExecutingAssembly().GetRootDirectorySafe());
+            hostEnvironment.Setup(x => x.WebRootPath).Returns(() => WorkingDirectory);
+            _hostEnvironment = hostEnvironment.Object;
 
             _hostingLifetime = new AspNetCoreApplicationShutdownRegistry(Mock.Of<IHostApplicationLifetime>());
 
             Logger = new ProfilingLogger(new ConsoleLogger(new MessageTemplates()), Profiler);
+        }
+
+
+        public override string WorkingDirectory
+        {
+            get
+            {
+                // For Azure Devops we can only store a database in certain locations so we will need to detect if we are running
+                // on a build server and if so we'll use the %temp% path.
+
+                if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("System_DefaultWorkingDirectory")))
+                {
+                    // we are using Azure Devops!
+
+                    if (_tempWorkingDir != null) return _tempWorkingDir;
+
+                    var temp = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoTemp");
+                    Directory.CreateDirectory(temp);
+                    _tempWorkingDir = temp;
+                    return _tempWorkingDir;
+
+                }
+                else
+                {
+                    return base.WorkingDirectory;
+                }
+            }
         }
 
         public IUmbracoBootPermissionChecker UmbracoBootPermissionChecker { get; } = new TestUmbracoBootPermissionChecker();
@@ -77,7 +104,11 @@ namespace Umbraco.Tests.Integration.Implementations
             return _backOfficeInfo;
         }
 
-        public override IHostingEnvironment GetHostingEnvironment() => _hostingEnvironment;
+        public override IHostingEnvironment GetHostingEnvironment()
+            => _hostingEnvironment ??= new TestHostingEnvironment(
+                SettingsForTests.DefaultHostingSettings,
+                _hostEnvironment);
+
         public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime() => _hostingLifetime;
 
         public override IIpResolver GetIpResolver() => _ipResolver;

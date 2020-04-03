@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
@@ -25,12 +26,15 @@ namespace Umbraco.Tests.Packaging
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class PackageInstallationTest : TestWithDatabaseBase
     {
-        private Guid _testBaseFolder;
+        private DirectoryInfo _testBaseFolder;
 
         public override void SetUp()
         {
             base.SetUp();
-            _testBaseFolder = Guid.NewGuid();
+            var path = Path.Combine(TestHelper.WorkingDirectory, Guid.NewGuid().ToString());
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+            _testBaseFolder = new DirectoryInfo(path);
         }
 
         public override void TearDown()
@@ -38,9 +42,8 @@ namespace Umbraco.Tests.Packaging
             base.TearDown();
 
             //clear out files/folders
-            var path = IOHelper.MapPath("~/" + _testBaseFolder);
-            if (Directory.Exists(path))
-                Directory.Delete(path, true);
+            if (_testBaseFolder.Exists)
+                _testBaseFolder.Delete(true);
         }
 
         private CompiledPackageXmlParser Parser => new CompiledPackageXmlParser(new ConflictingPackageData(ServiceContext.MacroService, ServiceContext.FileService),Factory.GetInstance<IGlobalSettings>());
@@ -60,7 +63,8 @@ namespace Umbraco.Tests.Packaging
             PackageDataInstallation,
             new PackageFileInstallation(Parser, IOHelper, ProfilingLogger),
             Parser, Mock.Of<IPackageActionRunner>(),
-            applicationRootFolder: new DirectoryInfo(IOHelper.MapPath("~/" + _testBaseFolder))); //we don't want to extract package files to the real root, so extract to a test folder
+            //we don't want to extract package files to the real root, so extract to a test folder
+            Mock.Of<IHostingEnvironment>(x => x.ApplicationPhysicalPath == _testBaseFolder.FullName));
 
         private const string DocumentTypePickerPackage = "Document_Type_Picker_1.1.umb";
         private const string HelloPackage = "Hello_1.0.0.zip";
@@ -118,10 +122,8 @@ namespace Umbraco.Tests.Packaging
         public void Can_Read_Compiled_Package_Warnings()
         {
             //copy a file to the same path that the package will install so we can detect file conflicts
-            var path = IOHelper.MapPath("~/" + _testBaseFolder);
-            Console.WriteLine(path);
-
-            var filePath = Path.Combine(path, "bin", "Auros.DocumentTypePicker.dll");
+            
+            var filePath = Path.Combine(_testBaseFolder.FullName, "bin", "Auros.DocumentTypePicker.dll");
             Directory.CreateDirectory(Path.GetDirectoryName(filePath));
             File.WriteAllText(filePath, "test");
 
@@ -155,7 +157,7 @@ namespace Umbraco.Tests.Packaging
 
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("bin\\Auros.DocumentTypePicker.dll", result[0]);
-            Assert.IsTrue(File.Exists(Path.Combine(IOHelper.MapPath("~/" + _testBaseFolder), result[0])));
+            Assert.IsTrue(File.Exists(Path.Combine(_testBaseFolder.FullName, result[0])));
 
             //make sure the def is updated too
             Assert.AreEqual(result.Count, def.Files.Count);

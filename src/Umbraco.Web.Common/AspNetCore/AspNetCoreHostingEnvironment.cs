@@ -14,15 +14,13 @@ namespace Umbraco.Web.Common.AspNetCore
 
         private readonly IHostingSettings _hostingSettings;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
         private string _localTempPath;
 
-        public AspNetCoreHostingEnvironment(IHostingSettings hostingSettings, IWebHostEnvironment webHostEnvironment, IHttpContextAccessor httpContextAccessor)
+        public AspNetCoreHostingEnvironment(IHostingSettings hostingSettings, IWebHostEnvironment webHostEnvironment)
         {
             _hostingSettings = hostingSettings ?? throw new ArgumentNullException(nameof(hostingSettings));
-            _webHostEnvironment = webHostEnvironment;
-            _httpContextAccessor = httpContextAccessor;
+            _webHostEnvironment = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
 
             SiteName = webHostEnvironment.ApplicationName;
             ApplicationId = AppDomain.CurrentDomain.Id.ToString();
@@ -88,21 +86,19 @@ namespace Umbraco.Web.Common.AspNetCore
             return Path.Combine(_webHostEnvironment.WebRootPath, newPath);
         }
 
-        // TODO: Need to take into account 'root' here
-        public string ToAbsolute(string virtualPath, string root)
+        public string ToAbsolute(string virtualPath)
         {
-            if (Uri.TryCreate(virtualPath, UriKind.Absolute, out _))
-            {
+            if (!virtualPath.StartsWith("~/") && !virtualPath.StartsWith("/"))
+                throw new InvalidOperationException($"The value {virtualPath} for parameter {nameof(virtualPath)} must start with ~/ or /");
+
+            // will occur if it starts with "/"
+            if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
                 return virtualPath;
-            }
 
-            var segment = new PathString(virtualPath.Substring(1));
-            var applicationPath = _httpContextAccessor.HttpContext.Request.PathBase;
+            var fullPath = ApplicationVirtualPath.EnsureEndsWith('/') + virtualPath.TrimStart("~/");
 
-            return applicationPath.Add(segment).Value;
+            return fullPath;
         }
-
-
     }
 
 

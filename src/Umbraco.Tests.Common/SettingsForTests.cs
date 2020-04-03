@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using System.Collections.Generic;
+using Moq;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -24,7 +25,6 @@ namespace Umbraco.Tests.Common
                     settings.ConfigurationStatus == semanticVersion.ToSemanticString()  &&
                     settings.UseHttps == false &&
                     settings.HideTopLevelNodeFromPath == false &&
-                    settings.Path == "~/umbraco" &&
                     settings.TimeOutInMinutes == 20 &&
                     settings.DefaultUILanguage == "en" &&
                     settings.ReservedPaths == (GlobalSettings.StaticReservedPaths + "~/umbraco") &&
@@ -101,31 +101,26 @@ namespace Umbraco.Tests.Common
         /// </summary>
         private void ResetSettings()
         {
-            _defaultGlobalSettings = null;
+            _defaultGlobalSettings.Clear();
+            _defaultHostingSettings = null;
         }
 
-        private IGlobalSettings _defaultGlobalSettings;
+        private readonly Dictionary<SemVersion, IGlobalSettings> _defaultGlobalSettings = new Dictionary<SemVersion, IGlobalSettings>();
         private IHostingSettings _defaultHostingSettings;
 
         public IGlobalSettings GetDefaultGlobalSettings(IUmbracoVersion umbVersion)
         {
-            if (_defaultGlobalSettings == null)
-            {
-                _defaultGlobalSettings = GenerateMockGlobalSettings(umbVersion);
-            }
-            return _defaultGlobalSettings;
+            if (_defaultGlobalSettings.TryGetValue(umbVersion.SemanticVersion, out var settings))
+                return settings;
+
+            settings = GenerateMockGlobalSettings(umbVersion);
+            _defaultGlobalSettings[umbVersion.SemanticVersion] = settings;
+            return settings;
         }
 
-        public IHostingSettings GetDefaultHostingSettings()
-        {
-            if (_defaultHostingSettings == null)
-            {
-                _defaultHostingSettings = GenerateMockHostingSettings();
-            }
-            return _defaultHostingSettings;
-        }
+        public IHostingSettings DefaultHostingSettings => _defaultHostingSettings ?? (_defaultHostingSettings = GenerateMockHostingSettings());
 
-        private IHostingSettings GenerateMockHostingSettings()
+        public IHostingSettings GenerateMockHostingSettings()
         {
             var config = Mock.Of<IHostingSettings>(
                 settings =>

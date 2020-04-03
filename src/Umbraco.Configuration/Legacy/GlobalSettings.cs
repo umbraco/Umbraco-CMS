@@ -131,8 +131,8 @@ namespace Umbraco.Core.Configuration.Legacy
                 if (_reservedPaths != null) return _reservedPaths;
 
                 var reservedPaths = StaticReservedPaths;
-                var umbPath = ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.Path) && !ConfigurationManager.AppSettings[Constants.AppSettings.Path].IsNullOrWhiteSpace()
-                    ? ConfigurationManager.AppSettings[Constants.AppSettings.Path]
+                var umbPath = ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.UmbracoPath) && !ConfigurationManager.AppSettings[Constants.AppSettings.UmbracoPath].IsNullOrWhiteSpace()
+                    ? ConfigurationManager.AppSettings[Constants.AppSettings.UmbracoPath]
                     : "~/umbraco";
                 //always add the umbraco path to the list
                 reservedPaths += umbPath.EnsureEndsWith(',');
@@ -145,12 +145,6 @@ namespace Umbraco.Core.Configuration.Legacy
                 return _reservedPaths;
             }
         }
-
-        /// <summary>
-        /// Gets the path to umbraco's root directory (/umbraco by default).
-        /// </summary>
-        /// <value>The path.</value>
-        public string Path => ConfigurationManager.AppSettings[Constants.AppSettings.Path];
 
         /// <summary>
         /// Gets or sets the configuration status. This will return the version number of the currently installed umbraco instance.
@@ -177,7 +171,7 @@ namespace Umbraco.Core.Configuration.Legacy
         /// <param name="value">Value of the setting to be saved.</param>
         internal static void SaveSetting(string key, string value, IIOHelper ioHelper)
         {
-            var fileName = ioHelper.MapPath(string.Format("{0}/web.config", ioHelper.Root));
+            var fileName = ioHelper.MapPath("~/web.config");
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
             var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();

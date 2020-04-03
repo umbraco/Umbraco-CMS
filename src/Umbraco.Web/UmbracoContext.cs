@@ -3,6 +3,7 @@ using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Cookie;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Composing;
@@ -19,8 +20,7 @@ namespace Umbraco.Web
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IGlobalSettings _globalSettings;
-        private readonly IIOHelper _ioHelper;
-        private readonly UriUtility _uriUtility;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
         private string _previewToken;
@@ -34,8 +34,8 @@ namespace Umbraco.Web
             IPublishedSnapshotService publishedSnapshotService,
             IWebSecurity webSecurity,
             IGlobalSettings globalSettings,
+            IHostingEnvironment hostingEnvironment,
             IVariationContextAccessor variationContextAccessor,
-            IIOHelper ioHelper,
             UriUtility uriUtility,
             ICookieManager cookieManager)
         {
@@ -45,8 +45,7 @@ namespace Umbraco.Web
             VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
             _httpContextAccessor = httpContextAccessor;
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
-            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
-            _uriUtility = uriUtility;
+            _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
 
             // ensure that this instance is disposed when the request terminates, though we *also* ensure
@@ -74,7 +73,7 @@ namespace Umbraco.Web
             // see: http://issues.umbraco.org/issue/U4-1890
             //
             OriginalRequestUrl = GetRequestFromContext()?.Url ?? new Uri("http://localhost");
-            CleanedUmbracoUrl = _uriUtility.UriToUmbraco(OriginalRequestUrl);
+            CleanedUmbracoUrl = uriUtility.UriToUmbraco(OriginalRequestUrl);
         }
 
         /// <summary>
@@ -184,7 +183,7 @@ namespace Umbraco.Web
         {
             var request = GetRequestFromContext();
             if (request?.Url != null
-                && request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, _ioHelper) == false
+                && request.Url.IsBackOfficeRequest(_globalSettings, _hostingEnvironment) == false
                 && Security.CurrentUser != null)
             {
                 var previewToken = _cookieManager.GetPreviewCookieValue(); // may be null or empty

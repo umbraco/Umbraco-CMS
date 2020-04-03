@@ -3,7 +3,7 @@ using System.Web;
 using ClientDependency.Core;
 using ClientDependency.Core.FileRegistration.Providers;
 
-namespace Umbraco.Web.JavaScript.CDF
+namespace Umbraco.Web.WebAssets.CDF
 {
     /// <summary>
     /// A custom renderer that only outputs a dependency path instead of script tags - for use with the js loader with yepnope

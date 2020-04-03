@@ -16,7 +16,7 @@ namespace Umbraco.Tests.Runtimes
         {
             IList<IViewEngine> engines = new List<IViewEngine>
                 {
-                    new RenderViewEngine(TestHelper.IOHelper),
+                    new RenderViewEngine(TestHelper.GetHostingEnvironment()),
                     new PluginViewEngine()
                 };
 
@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Runtimes
         {
             IList<IViewEngine> engines = new List<IViewEngine>
                 {
-                    new RenderViewEngine(TestHelper.IOHelper),
+                    new RenderViewEngine(TestHelper.GetHostingEnvironment()),
                     new PluginViewEngine()
                 };
 

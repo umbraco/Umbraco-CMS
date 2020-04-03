@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Assets
+﻿namespace Umbraco.Core.WebAssets
 {
     public enum AssetType
     {

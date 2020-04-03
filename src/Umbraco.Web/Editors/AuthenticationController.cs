@@ -27,6 +27,7 @@ using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Core.Mapping;
 using Umbraco.Web.Models.Identity;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Web.Routing;
 
@@ -44,13 +45,14 @@ namespace Umbraco.Web.Editors
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
         private readonly IUserPasswordConfiguration _passwordConfiguration;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeState _runtimeState;
         private readonly ISecuritySettings _securitySettings;
-        private readonly IIOHelper _ioHelper;
 
         public AuthenticationController(
             IUserPasswordConfiguration passwordConfiguration,
             IGlobalSettings globalSettings,
+            IHostingEnvironment hostingEnvironment,
             IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext,
             ServiceContext services,
@@ -59,14 +61,13 @@ namespace Umbraco.Web.Editors
             IRuntimeState runtimeState,
             UmbracoMapper umbracoMapper,
             ISecuritySettings securitySettings,
-            IIOHelper ioHelper,
             IPublishedUrlProvider publishedUrlProvider)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
             _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
             _securitySettings = securitySettings ?? throw new ArgumentNullException(nameof(securitySettings));
-            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
         }
 
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager
@@ -534,7 +535,7 @@ namespace Umbraco.Web.Editors
             var action = urlHelper.Action("ValidatePasswordResetCode", "BackOffice",
                 new
                 {
-                    area = _ioHelper.GetUmbracoMvcArea(),
+                    area = GlobalSettings.GetUmbracoMvcArea(_hostingEnvironment),
                     u = userId,
                     r = code
                 });

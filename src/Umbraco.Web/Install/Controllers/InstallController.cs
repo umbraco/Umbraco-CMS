@@ -1,12 +1,10 @@
-﻿using System;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Runtime;
-using Umbraco.Web.JavaScript;
+using Umbraco.Core.WebAssets;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
 
@@ -24,30 +22,24 @@ namespace Umbraco.Web.Install.Controllers
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly InstallHelper _installHelper;
         private readonly IRuntimeState _runtime;
-        private readonly ILogger _logger;
         private readonly IGlobalSettings _globalSettings;
-        private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeMinifier _runtimeMinifier;
 
         public InstallController(
             IUmbracoContextAccessor umbracoContextAccessor,
             InstallHelper installHelper,
             IRuntimeState runtime,
-            ILogger logger,
             IGlobalSettings globalSettings,
-            IUmbracoVersion umbracoVersion,
-            IIOHelper ioHelper,
-            IRuntimeMinifier runtimeMinifier)
+            IRuntimeMinifier runtimeMinifier,
+            IHostingEnvironment hostingEnvironment)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _installHelper = installHelper;
             _runtime = runtime;
-            _logger = logger;
             _globalSettings = globalSettings;
-            _umbracoVersion = umbracoVersion;
-            _ioHelper = ioHelper;
             _runtimeMinifier = runtimeMinifier;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         [HttpGet]
@@ -76,12 +68,12 @@ namespace Umbraco.Web.Install.Controllers
             ViewData.SetInstallApiBaseUrl(Url.GetUmbracoApiService("GetSetup", "InstallApi", "UmbracoInstall").TrimEnd("GetSetup"));
 
             // get the base umbraco folder
-            ViewData.SetUmbracoBaseFolder(_ioHelper.ResolveUrl(_globalSettings.UmbracoPath));
+            ViewData.SetUmbracoBaseFolder(_hostingEnvironment.ToAbsolute(_globalSettings.UmbracoPath));
 
             _installHelper.InstallStatus(false, "");
 
             // always ensure full path (see NOTE in the class remarks)
-            return View(_ioHelper.BackOfficePath.EnsureEndsWith('/') + "install/views/index.cshtml");
+            return View(_globalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "install/views/index.cshtml");
         }
     }
 }

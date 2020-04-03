@@ -105,7 +105,7 @@ namespace Umbraco.Web.Editors
 
             //var mediaItemName = fileName.ToFriendlyName();
             var currentFile = file.LocalFileName;
-            var newFilePath = imageTempPath +  _ioHelper.DirSepChar + safeFileName;
+            var newFilePath = imageTempPath +  Path.DirectorySeparatorChar + safeFileName;
             var relativeNewFilePath = _ioHelper.GetRelativePath(newFilePath);
 
             try

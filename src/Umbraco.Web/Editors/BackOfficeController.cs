@@ -21,7 +21,6 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Core.Services;
 using Umbraco.Web.Features;
-using Umbraco.Web.JavaScript;
 using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
@@ -31,7 +30,9 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Runtime;
+using Umbraco.Core.WebAssets;
 using Umbraco.Web.Trees;
+using Umbraco.Web.WebAssets;
 
 namespace Umbraco.Web.Editors
 {
@@ -43,7 +44,6 @@ namespace Umbraco.Web.Editors
     [DisableBrowserCache]
     public class BackOfficeController : UmbracoController
     {
-        private readonly IManifestParser _manifestParser;
         private readonly UmbracoFeatures _features;
         private readonly IRuntimeState _runtimeState;
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
@@ -51,7 +51,6 @@ namespace Umbraco.Web.Editors
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IGridConfig _gridConfig;
         private readonly IContentSettings _contentSettings;
-        private readonly IIOHelper _ioHelper;
         private readonly TreeCollection _treeCollection;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -60,7 +59,6 @@ namespace Umbraco.Web.Editors
         private readonly IRuntimeMinifier _runtimeMinifier;
 
         public BackOfficeController(
-            IManifestParser manifestParser,
             UmbracoFeatures features,
             IGlobalSettings globalSettings,
             IUmbracoContextAccessor umbracoContextAccessor,
@@ -71,7 +69,6 @@ namespace Umbraco.Web.Editors
             IUmbracoVersion umbracoVersion,
             IGridConfig gridConfig,
             IContentSettings contentSettings,
-            IIOHelper ioHelper,
             TreeCollection treeCollection,
             IHostingEnvironment hostingEnvironment,
             IHttpContextAccessor httpContextAccessor,
@@ -81,13 +78,11 @@ namespace Umbraco.Web.Editors
             : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
 
         {
-            _manifestParser = manifestParser;
             _features = features;
             _runtimeState = runtimeState;
             _umbracoVersion = umbracoVersion;
             _gridConfig = gridConfig ?? throw new ArgumentNullException(nameof(gridConfig));
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
-            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));
             _hostingEnvironment = hostingEnvironment;
             _httpContextAccessor = httpContextAccessor;
@@ -110,9 +105,9 @@ namespace Umbraco.Web.Editors
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
                 () =>
-                    View(_ioHelper.BackOfficePath.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings,_ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings)),
+                    View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings)),
                 () =>
-                    View(_ioHelper.BackOfficePath.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings))
+                    View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings))
                     );
         }
 
@@ -196,7 +191,7 @@ namespace Umbraco.Web.Editors
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
                 //The default view to render when there is no external login info or errors
-                () => View(_ioHelper.BackOfficePath.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings)),
+                () => View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings)),
                 //The ActionResult to perform if external login is successful
                 () => Redirect("/"));
         }
@@ -247,36 +242,9 @@ namespace Umbraco.Web.Editors
         [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
         public async Task<JavaScriptResult> Application()
         {
-            var result = await _runtimeMinifier.GetScriptForBackOfficeAsync();
+            var result = await _runtimeMinifier.GetScriptForLoadingBackOfficeAsync(GlobalSettings, _hostingEnvironment);
 
             return JavaScript(result);
-        }
-
-        /// <summary>
-        /// Returns a js array of all of the manifest assets
-        /// </summary>
-        /// <returns></returns>
-        [UmbracoAuthorize(Order = 0)]
-        [HttpGet]
-        public async Task<JsonNetResult> GetManifestAssetList()
-        {
-            async Task<JArray> GetAssetList()
-            {
-                var assets = new JArray(await _runtimeMinifier.GetAssetListAsync());
-
-                return new JArray(assets);
-            }
-
-            var assetList = await GetAssetList();
-            //cache the result if debugging is disabled
-            var result = _hostingEnvironment.IsDebugMode
-                ? assetList
-                : AppCaches.RuntimeCache.GetCacheItem<JArray>(
-                    "Umbraco.Web.Editors.BackOfficeController.GetManifestAssetList",
-                    () => assetList,
-                    new TimeSpan(0, 2, 0));
-
-            return new JsonNetResult { Data = result, Formatting = Formatting.None };
         }
 
         [UmbracoAuthorize(Order = 0)]
@@ -296,7 +264,7 @@ namespace Umbraco.Web.Editors
         [MinifyJavaScriptResult(Order = 1)]
         public JavaScriptResult ServerVariables()
         {
-            var serverVars = new BackOfficeServerVariables(Url, _runtimeState, _features, GlobalSettings, _umbracoVersion, _contentSettings, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings, _runtimeMinifier);
+            var serverVars = new BackOfficeServerVariables(Url, _runtimeState, _features, GlobalSettings, _umbracoVersion, _contentSettings, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings, _runtimeMinifier);
 
             //cache the result if debugging is disabled
             var result = _hostingEnvironment.IsDebugMode
@@ -390,7 +358,7 @@ namespace Umbraco.Web.Editors
             if (defaultResponse == null) throw new ArgumentNullException("defaultResponse");
             if (externalSignInResponse == null) throw new ArgumentNullException("externalSignInResponse");
 
-            ViewData.SetUmbracoPath(_ioHelper.GetUmbracoMvcArea());
+            ViewData.SetUmbracoPath(GlobalSettings.GetUmbracoMvcArea(_hostingEnvironment));
 
             //check if there is the TempData with the any token name specified, if so, assign to view bag and render the view
             if (ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||

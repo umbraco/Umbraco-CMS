@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Core.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.Assets;
 using Umbraco.Core.Runtime;
+using Umbraco.Core.WebAssets;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.ActionResults;
 

@@ -1,8 +1,8 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Runtime;
+using Umbraco.Core.WebAssets;
 
-namespace Umbraco.Web.JavaScript.CDF
+namespace Umbraco.Web.WebAssets.CDF
 {
     public sealed class ClientDependencyComposer : ComponentComposer<ClientDependencyComponent>
     {

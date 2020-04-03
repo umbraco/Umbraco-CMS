@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using Umbraco.Infrastructure.RuntimeMinification;
 
-namespace Umbraco.Web.JavaScript
+namespace Umbraco.Web.WebAssets
 {
     public class ServerVariablesParser
     {

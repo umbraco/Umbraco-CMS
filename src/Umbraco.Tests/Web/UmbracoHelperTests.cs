@@ -33,7 +33,6 @@ namespace Umbraco.Tests.Web
             container
                 .Setup(x => x.GetInstance(typeof(TypeLoader)))
                 .Returns(new TypeLoader(
-                    ioHelper,
                     typeFinder,
                     NoAppCache.Instance,
                     new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")),

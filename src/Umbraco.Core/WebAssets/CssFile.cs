@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Umbraco.Core.Assets
+﻿namespace Umbraco.Core.WebAssets
 {
     /// <summary>
     /// Represents a CSS asset file

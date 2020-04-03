@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web.Hosting;
 
 namespace Umbraco.Tests.Configurations
 {
@@ -10,20 +11,6 @@ namespace Umbraco.Tests.Configurations
     [TestFixture]
     public class GlobalSettingsTests : BaseWebTest
     {
-        private string _root;
-
-        public override void SetUp()
-        {
-            base.SetUp();
-            _root = TestHelper.IOHelper.Root;
-        }
-
-        public override void TearDown()
-        {
-            base.TearDown();
-            TestHelper.IOHelper.Root = _root;
-        }
-
         [TestCase("~/umbraco", "/", "umbraco")]
         [TestCase("~/umbraco", "/MyVirtualDir", "umbraco")]
         [TestCase("~/customPath", "/MyVirtualDir/", "custompath")]
@@ -33,18 +20,15 @@ namespace Umbraco.Tests.Configurations
         {
 
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
-            var ioHelper = new IOHelper(TestHelper.GetHostingEnvironment(), globalSettings);
+            var mockHostingSettings = Mock.Get(SettingsForTests.GenerateMockHostingSettings());
+            mockHostingSettings.Setup(x => x.ApplicationVirtualPath).Returns(rootPath);
+
+            var hostingEnvironment = new AspNetHostingEnvironment(mockHostingSettings.Object);
 
             var globalSettingsMock = Mock.Get(globalSettings);
-            globalSettingsMock.Setup(x => x.Path).Returns(() => path);
+            globalSettingsMock.Setup(x => x.UmbracoPath).Returns(() => path);
 
-            ioHelper.Root = rootPath;
-            Assert.AreEqual(outcome, ioHelper.GetUmbracoMvcAreaNoCache());
+            Assert.AreEqual(outcome, globalSettingsMock.Object.GetUmbracoMvcAreaNoCache(hostingEnvironment));
         }
-
-
-
-
-
     }
 }

@@ -139,7 +139,7 @@ namespace Umbraco.Tests.Testing
 
         protected virtual IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
 
-        protected IHostingEnvironment HostingEnvironment { get; } = new AspNetHostingEnvironment(TestHelpers.SettingsForTests.GetDefaultHostingSettings());
+        protected IHostingEnvironment HostingEnvironment { get; } = new AspNetHostingEnvironment(TestHelpers.SettingsForTests.DefaultHostingSettings);
         protected IApplicationShutdownRegistry HostingLifetime { get; } = new AspNetApplicationShutdownRegistry();
         protected IIpResolver IpResolver => Factory.GetInstance<IIpResolver>();
         protected IBackOfficeInfo BackOfficeInfo => Factory.GetInstance<IBackOfficeInfo>();
@@ -173,9 +173,9 @@ namespace Umbraco.Tests.Testing
             var proflogger = new ProfilingLogger(logger, profiler);
             IOHelper = TestHelper.IOHelper;
 
-            TypeFinder = new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly));
+            TypeFinder = new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
             var appCaches = GetAppCaches();
-            var globalSettings = TestHelpers.SettingsForTests.GetDefaultGlobalSettings();
+            var globalSettings = TestHelpers.SettingsForTests.DefaultGlobalSettings;
             var settings = TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings();
 
             IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, logger, settings);
@@ -267,7 +267,7 @@ namespace Umbraco.Tests.Testing
                     profiler = Mock.Of<IProfiler>();
                     break;
                 case UmbracoTestOptions.Logger.Serilog:
-                    logger = new SerilogLogger(TestHelper.CoreDebugSettings, IOHelper, TestHelper.Marchal, new FileInfo(TestHelper.MapPathForTest("~/unit-test.config")));
+                    logger = new SerilogLogger(TestHelper.CoreDebugSettings, IOHelper, TestHelper.Marchal, new FileInfo(TestHelper.MapPathForTestFiles("~/unit-test.config")));
                     profiler = new LogProfiler(logger);
                     break;
                 case UmbracoTestOptions.Logger.Console:
@@ -376,7 +376,7 @@ namespace Umbraco.Tests.Testing
             switch (option)
             {
                 case UmbracoTestOptions.TypeLoader.Default:
-                    return _commonTypeLoader ?? (_commonTypeLoader = CreateCommonTypeLoader(ioHelper, typeFinder, runtimeCache, logger, hostingEnvironment));
+                    return _commonTypeLoader ?? (_commonTypeLoader = CreateCommonTypeLoader(typeFinder, runtimeCache, logger, hostingEnvironment));
                 case UmbracoTestOptions.TypeLoader.PerFixture:
                     return _featureTypeLoader ?? (_featureTypeLoader = CreateTypeLoader(ioHelper, typeFinder, runtimeCache, logger, hostingEnvironment));
                 case UmbracoTestOptions.TypeLoader.PerTest:
@@ -388,13 +388,13 @@ namespace Umbraco.Tests.Testing
 
         protected virtual TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IProfilingLogger logger, IHostingEnvironment hostingEnvironment)
         {
-            return CreateCommonTypeLoader(ioHelper, typeFinder, runtimeCache, logger, hostingEnvironment);
+            return CreateCommonTypeLoader(typeFinder, runtimeCache, logger, hostingEnvironment);
         }
 
         // common to all tests = cannot be overriden
-        private static TypeLoader CreateCommonTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IProfilingLogger logger, IHostingEnvironment hostingEnvironment)
+        private static TypeLoader CreateCommonTypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IProfilingLogger logger, IHostingEnvironment hostingEnvironment)
         {
-            return new TypeLoader(ioHelper, typeFinder, runtimeCache, new DirectoryInfo(hostingEnvironment.LocalTempPath), logger, false, new[]
+            return new TypeLoader(typeFinder, runtimeCache, new DirectoryInfo(hostingEnvironment.LocalTempPath), logger, false, new[]
             {
                 Assembly.Load("Umbraco.Core"),
                 Assembly.Load("Umbraco.Web"),
@@ -413,8 +413,8 @@ namespace Umbraco.Tests.Testing
 
         protected virtual void ComposeSettings()
         {
-            Composition.Configs.Add(TestHelpers.SettingsForTests.GetDefaultGlobalSettings);
-            Composition.Configs.Add(TestHelpers.SettingsForTests.GetDefaultHostingSettings);
+            Composition.Configs.Add(() => TestHelpers.SettingsForTests.DefaultGlobalSettings);
+            Composition.Configs.Add(() => TestHelpers.SettingsForTests.DefaultHostingSettings);
             Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings);
             Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings);
             Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockSecuritySettings);

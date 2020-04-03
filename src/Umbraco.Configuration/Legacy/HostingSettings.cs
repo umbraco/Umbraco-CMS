@@ -19,6 +19,8 @@ namespace Umbraco.Core.Configuration.Legacy
             }
         }
 
+        public string ApplicationVirtualPath => null;
+
         /// <summary>
         /// Gets a value indicating whether umbraco is running in [debug mode].
         /// </summary>

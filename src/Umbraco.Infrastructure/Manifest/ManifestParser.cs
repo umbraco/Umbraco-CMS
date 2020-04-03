@@ -195,21 +195,21 @@ namespace Umbraco.Core.Manifest
 
             // scripts and stylesheets are raw string, must process here
             for (var i = 0; i < manifest.Scripts.Length; i++)
-                manifest.Scripts[i] = _ioHelper.ResolveVirtualUrl(manifest.Scripts[i]);
+                manifest.Scripts[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Scripts[i]);
             for (var i = 0; i < manifest.Stylesheets.Length; i++)
-                manifest.Stylesheets[i] = _ioHelper.ResolveVirtualUrl(manifest.Stylesheets[i]);
+                manifest.Stylesheets[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Stylesheets[i]);
             foreach (var contentApp in manifest.ContentApps)
             {
-                contentApp.View = _ioHelper.ResolveVirtualUrl(contentApp.View);
+                contentApp.View = _ioHelper.ResolveRelativeOrVirtualUrl(contentApp.View);
             }
             foreach (var dashboard in manifest.Dashboards)
             {
-                dashboard.View = _ioHelper.ResolveVirtualUrl(dashboard.View);
+                dashboard.View = _ioHelper.ResolveRelativeOrVirtualUrl(dashboard.View);
             }
             foreach (var gridEditor in manifest.GridEditors)
             {
-                gridEditor.View = _ioHelper.ResolveVirtualUrl(gridEditor.View);
-                gridEditor.Render = _ioHelper.ResolveVirtualUrl(gridEditor.Render);
+                gridEditor.View = _ioHelper.ResolveRelativeOrVirtualUrl(gridEditor.View);
+                gridEditor.Render = _ioHelper.ResolveRelativeOrVirtualUrl(gridEditor.Render);
             }
 
             // add property editors that are also parameter editors, to the parameter editors list

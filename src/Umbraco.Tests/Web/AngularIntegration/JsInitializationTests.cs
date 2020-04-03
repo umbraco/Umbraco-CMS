@@ -1,8 +1,7 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Web.JavaScript;
-using Umbraco.Web.JavaScript.CDF;
+using Umbraco.Web.WebAssets;
 
 namespace Umbraco.Tests.Web.AngularIntegration
 {
@@ -11,16 +10,9 @@ namespace Umbraco.Tests.Web.AngularIntegration
     {
 
         [Test]
-        public void Get_Default_Init()
-        {
-            var init = JsInitialization.GetDefaultInitialization();
-            Assert.IsTrue(init.Any());
-        }
-
-        [Test]
         public void Parse_Main()
         {
-            var result = JavaScriptHelper.WriteScript("[World]", "Hello", "Blah");
+            var result = BackOfficeJavaScriptInitializer.WriteScript("[World]", "Hello", "Blah");
 
             Assert.AreEqual(@"LazyLoad.js([World], function () {
     //we need to set the legacy UmbClientMgr path

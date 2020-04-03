@@ -39,7 +39,7 @@ namespace Umbraco.Tests.TestHelpers
             var ioHelper = TestHelper.IOHelper;
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
             var typeFinder = TestHelper.GetTypeFinder();
-            var typeLoader = new TypeLoader(ioHelper, typeFinder, NoAppCache.Instance,
+            var typeLoader = new TypeLoader(typeFinder, NoAppCache.Instance,
                 new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")),
                 logger,
                 false);

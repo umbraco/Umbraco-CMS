@@ -15,16 +15,18 @@ namespace Umbraco.Tests.Benchmarks
         [Benchmark(Baseline = true)]
         public void WithGetReferencingAssembliesCheck()
         {
-            var typeFinder1 = new TypeFinder(new NullLogger(), new DefaultUmbracoAssemblyProvider(GetType().Assembly));
+            var typeFinder1 = new TypeFinder(new NullLogger(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
             var found = typeFinder1.FindClassesOfType<IDiscoverable>().Count();
         }
 
         [Benchmark]
         public void WithoutGetReferencingAssembliesCheck()
         {
-            var typeFinder2 = new TypeFinder(new NullLogger(), new DefaultUmbracoAssemblyProvider(GetType().Assembly));
+            var typeFinder2 = new TypeFinder(new NullLogger(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
             typeFinder2.QueryWithReferencingAssemblies = false;
             var found = typeFinder2.FindClassesOfType<IDiscoverable>().Count();
         }
+
+        
     }
 }

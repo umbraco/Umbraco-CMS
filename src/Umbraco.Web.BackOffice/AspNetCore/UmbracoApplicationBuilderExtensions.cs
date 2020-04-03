@@ -1,14 +1,13 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Smidge;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web.BackOffice.AspNetCore
 {
-    public static class UmbracoBackOfficeApplicationBuilderExtensions
+    public static class UmbracoApplicationBuilderExtensions
     {
         public static IApplicationBuilder UseUmbracoBackOffice(this IApplicationBuilder app)
         {
@@ -63,6 +62,15 @@ namespace Umbraco.Web.BackOffice.AspNetCore
                 }
 
             }
+        }
+
+        public static IApplicationBuilder UseUmbracoRuntimeMinification(this IApplicationBuilder app)
+        {
+            if (app == null) throw new ArgumentNullException(nameof(app));
+
+            app.UseSmidge();
+
+            return app;
         }
     }
 }

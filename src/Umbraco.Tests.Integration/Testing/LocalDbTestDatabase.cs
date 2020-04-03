@@ -7,17 +7,19 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
+using Umbraco.Web.Common.RuntimeMinification;
 
 namespace Umbraco.Tests.Integration.Testing
 {
     /// <summary>
     /// Manages a pool of LocalDb databases for integration testing
     /// </summary>
-    public class LocalDbTestDatabase 
+    public class LocalDbTestDatabase
     {
         public const string InstanceName = "UmbracoTests";
         public const string DatabaseName = "UmbracoTests";
@@ -76,27 +78,29 @@ namespace Umbraco.Tests.Integration.Testing
             _schemaPool = new DatabasePool(_localDb, _instance, DatabaseName + "-Schema", tempName, _filesPath, schemaSize, schemaParallel, delete: true, prepare: RebuildSchema);
         }
 
-        public void AttachEmpty()
+        public int AttachEmpty()
         {
             if (_emptyPool == null)
                 Create();
 
-            _currentCstr = _emptyPool.AttachDatabase();
+            _currentCstr = _emptyPool.AttachDatabase(out var id);
             _currentPool = _emptyPool;
+            return id;
         }
 
-        public void AttachSchema()
+        public int AttachSchema()
         {
             if (_schemaPool == null)
                 Create();
 
-            _currentCstr = _schemaPool.AttachDatabase();
+            _currentCstr = _schemaPool.AttachDatabase(out var id);
             _currentPool = _schemaPool;
+            return id;
         }
 
-        public void Detach()
+        public void Detach(int id)
         {
-            _currentPool.DetachDatabase();
+            _currentPool.DetachDatabase(id);
         }
 
         private void RebuildSchema(DbConnection conn, IDbCommand cmd)
@@ -133,7 +137,7 @@ namespace Umbraco.Tests.Integration.Testing
 
                 _dbCommands = database.Commands.ToArray();
             }
-            
+
         }
 
         private static void AddParameter(IDbCommand cmd, UmbracoDatabase.ParameterInfo parameterInfo)
@@ -186,7 +190,25 @@ namespace Umbraco.Tests.Integration.Testing
                 from sys.tables;
                 exec sp_executesql @stmt;
             ";
-            cmd.ExecuteNonQuery();
+
+            // rudimentary retry policy since a db can still be in use when we try to drop
+            for (var i = 0; i < 5; i++)
+            {
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                    return;
+                }
+                catch (SqlException)
+                {
+                    // This can occur when there's a transaction deadlock which means (i think) that the database is still in use and hasn't been closed properly yet
+                    // so we need to just wait a little bit
+                    Thread.Sleep(1000);
+                    if (i == 4)
+                        throw;
+                }
+            }
+
         }
 
         public static void KillLocalDb()
@@ -264,22 +286,19 @@ namespace Umbraco.Tests.Integration.Testing
                 }
             }
 
-            public string AttachDatabase()
+            public string AttachDatabase(out int id)
             {
-                try
-                {
-                    _current = _readyQueue.Take();
-                }
-                catch (InvalidOperationException)
-                {
-                    _current = 0;
-                    return null;
-                }
+                _current = _readyQueue.Take();
+                id = _current;
+
                 return ConnectionString(_current);
             }
 
-            public void DetachDatabase()
+            public void DetachDatabase(int id)
             {
+                if (id != _current)
+                    throw new InvalidOperationException("Cannot detatch the non-current db");
+
                 _prepareQueue.Add(_current);
             }
 
@@ -308,7 +327,8 @@ namespace Umbraco.Tests.Integration.Testing
                         ResetLocalDb(cmd);
                         _prepare?.Invoke(conn, cmd);
                     }
-                    _readyQueue.Add(i);
+                    if (!_readyQueue.IsAddingCompleted)
+                        _readyQueue.Add(i);
                 }
             }
 

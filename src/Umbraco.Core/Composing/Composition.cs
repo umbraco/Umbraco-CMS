@@ -31,6 +31,7 @@ namespace Umbraco.Core.Composing
         /// <param name="runtimeState">The runtime state.</param>
         /// <param name="configs">Optional configs.</param>
         /// <param name="ioHelper">An IOHelper</param>
+        /// <param name="appCaches"></param>
         public Composition(IRegister register,  TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState, Configs configs, IIOHelper ioHelper, AppCaches appCaches)
         {
             _register = register ?? throw new ArgumentNullException(nameof(register));

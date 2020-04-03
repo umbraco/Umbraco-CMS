@@ -6,18 +6,19 @@ using Lucene.Net.Store;
 using Umbraco.Core.IO;
 using System.Linq;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Examine
 {
     public class LuceneIndexDiagnostics : IIndexDiagnostics
     {
-        private IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public LuceneIndexDiagnostics(LuceneIndex index, ILogger logger, IIOHelper ioHelper)
+        public LuceneIndexDiagnostics(LuceneIndex index, ILogger logger, IHostingEnvironment hostingEnvironment)
         {
+            _hostingEnvironment = hostingEnvironment;
             Index = index;
             Logger = logger;
-            _ioHelper = ioHelper;
         }
 
         public LuceneIndex Index { get; }
@@ -75,7 +76,9 @@ namespace Umbraco.Examine
 
                 if (luceneDir is FSDirectory fsDir)
                 {
-                    d[nameof(UmbracoExamineIndex.LuceneIndexFolder)] = fsDir.Directory.ToString().ToLowerInvariant().TrimStart(_ioHelper.MapPath(_ioHelper.Root).ToLowerInvariant()).Replace("\\", "/").EnsureStartsWith('/');
+
+                    var rootDir = _hostingEnvironment.ApplicationPhysicalPath;
+                    d[nameof(UmbracoExamineIndex.LuceneIndexFolder)] = fsDir.Directory.ToString().ToLowerInvariant().TrimStart(rootDir.ToLowerInvariant()).Replace("\\", "/").EnsureStartsWith('/');
                 }
 
                 return d;
