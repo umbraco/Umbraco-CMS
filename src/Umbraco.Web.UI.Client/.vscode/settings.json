@@ -1,0 +1,6 @@
+{
+    // When you copy that snippet from the web - lets ensure it uses our tabsize & line endings from EditorConfig
+    // And if your working with a file that has mixed tab sizes & line endings then saving should help slowly get us consistent
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+}
