@@ -46,7 +46,6 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeLoader"/> class.
         /// </summary>
-        /// <param name="runtimeHash"></param>
         /// <param name="typeFinder"></param>
         /// <param name="runtimeCache">The application runtime cache.</param>
         /// <param name="localTempPath">Files storage location.</param>
@@ -59,7 +58,6 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeLoader"/> class.
         /// </summary>
-        /// <param name="runtimeHash"></param>
         /// <param name="typeFinder"></param>
         /// <param name="runtimeCache">The application runtime cache.</param>
         /// <param name="localTempPath">Files storage location.</param>
