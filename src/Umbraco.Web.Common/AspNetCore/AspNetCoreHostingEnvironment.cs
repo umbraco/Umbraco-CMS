@@ -91,13 +91,11 @@ namespace Umbraco.Web.Common.AspNetCore
             if (!virtualPath.StartsWith("~/") && !virtualPath.StartsWith("/"))
                 throw new InvalidOperationException($"{nameof(virtualPath)} must start with ~/ or /");
 
-            var root = ApplicationVirtualPath.EnsureStartsWith('/');
-            
             // will occur if it starts with "/"
             if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
                 return virtualPath;
 
-            var fullPath = root.EnsureEndsWith('/') + virtualPath.TrimStart("~/");
+            var fullPath = ApplicationVirtualPath.EnsureEndsWith('/') + virtualPath.TrimStart("~/");
 
             return fullPath;
         }

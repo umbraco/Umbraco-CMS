@@ -35,7 +35,6 @@ namespace Umbraco.Web.Editors
         private readonly IGlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IContentSettings _contentSettings;
-        private readonly IIOHelper _ioHelper;
         private readonly TreeCollection _treeCollection;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -50,7 +49,6 @@ namespace Umbraco.Web.Editors
             IGlobalSettings globalSettings,
             IUmbracoVersion umbracoVersion,
             IContentSettings contentSettings,
-            IIOHelper ioHelper,
             TreeCollection treeCollection,
             IHttpContextAccessor httpContextAccessor,
             IHostingEnvironment hostingEnvironment,
@@ -64,7 +62,6 @@ namespace Umbraco.Web.Editors
             _globalSettings = globalSettings;
             _umbracoVersion = umbracoVersion;
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
-            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));
             _httpContextAccessor = httpContextAccessor;
             _hostingEnvironment = hostingEnvironment;
@@ -347,9 +344,9 @@ namespace Umbraco.Web.Editors
                 {
                     "umbracoSettings", new Dictionary<string, object>
                     {
-                        {"umbracoPath", _ioHelper.BackOfficePath},
-                        {"mediaPath", _ioHelper.ResolveUrl(globalSettings.UmbracoMediaPath).TrimEnd('/')},
-                        {"appPluginsPath", _ioHelper.ResolveUrl(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
+                        {"umbracoPath", _globalSettings.GetBackOfficePath(_hostingEnvironment)},
+                        {"mediaPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath).TrimEnd('/')},
+                        {"appPluginsPath", _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
                             "imageFileTypes",
                             string.Join(",", _contentSettings.ImageFileTypes)
@@ -368,7 +365,7 @@ namespace Umbraco.Web.Editors
                         },
                         {"keepUserLoggedIn", _securitySettings.KeepUserLoggedIn},
                         {"usernameIsEmail", _securitySettings.UsernameIsEmail},
-                        {"cssPath", _ioHelper.ResolveUrl(globalSettings.UmbracoCssPath).TrimEnd('/')},
+                        {"cssPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoCssPath).TrimEnd('/')},
                         {"allowPasswordReset", _securitySettings.AllowPasswordReset},
                         {"loginBackgroundImage", _contentSettings.LoginBackgroundImage},
                         {"showUserInvite", EmailSender.CanSendRequiredEmail(globalSettings)},

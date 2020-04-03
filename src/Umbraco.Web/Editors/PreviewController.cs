@@ -32,7 +32,6 @@ namespace Umbraco.Web.Editors
         private readonly ILocalizationService _localizationService;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IContentSettings _contentSettings;
-        private readonly IIOHelper _ioHelper;
         private readonly TreeCollection _treeCollection;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -49,7 +48,6 @@ namespace Umbraco.Web.Editors
             ILocalizationService localizationService,
             IUmbracoVersion umbracoVersion,
             IContentSettings contentSettings,
-            IIOHelper ioHelper,
             TreeCollection treeCollection,
             IHttpContextAccessor httpContextAccessor,
             IHostingEnvironment hostingEnvironment,
@@ -65,7 +63,6 @@ namespace Umbraco.Web.Editors
             _localizationService = localizationService;
             _umbracoVersion = umbracoVersion;
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
-            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _treeCollection = treeCollection;
             _httpContextAccessor = httpContextAccessor;
             _hostingEnvironment = hostingEnvironment;
@@ -81,7 +78,7 @@ namespace Umbraco.Web.Editors
         {
             var availableLanguages = _localizationService.GetAllLanguages();
 
-            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _contentSettings, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings);
+            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _contentSettings, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {
@@ -92,7 +89,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            return View(_ioHelper.BackOfficePath.EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
+            return View(_globalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
         }
 
         /// <summary>
@@ -104,7 +101,7 @@ namespace Umbraco.Web.Editors
         public async Task<JavaScriptResult> Application()
         {
             var files = await _runtimeMinifier.GetAssetPathsAsync(BackOfficeWebAssets.UmbracoPreviewJsBundleName);
-            var result = BackOfficeJavaScriptInitializer.GetJavascriptInitialization(files, "umbraco.preview", _globalSettings, _ioHelper);
+            var result = BackOfficeJavaScriptInitializer.GetJavascriptInitialization(files, "umbraco.preview", _globalSettings, _hostingEnvironment);
 
             return JavaScript(result);
         }

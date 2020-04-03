@@ -105,9 +105,9 @@
                on-login="hideLoginScreen()">
     </umb-login>
 
-    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewData.GetUmbracoPath() }), Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.ContentSettings, Model.IOHelper, Model.TreeCollection, Model.HttpContextAccessor, Model.HostingEnvironment, Model.RuntimeSettings, Model.SecuritySettings, Current.RuntimeMinifier)
+@Html.BareMinimumServerVariablesScript(Url, Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.ContentSettings, Model.TreeCollection, Model.HttpContextAccessor, Model.HostingEnvironment, Model.RuntimeSettings, Model.SecuritySettings, Current.RuntimeMinifier)
 
-    <script>
+<script>
 
         document.angularReady = function(app) {
             @Html.AngularValueExternalLoginInfoScript(ViewData.GetExternalSignInError())

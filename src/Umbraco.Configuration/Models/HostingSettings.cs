@@ -18,6 +18,8 @@ namespace Umbraco.Configuration.Models
         public LocalTempStorage LocalTempStorageLocation =>
             _configuration.GetValue(Prefix+"LocalTempStorage", LocalTempStorage.Default);
 
+        public string ApplicationVirtualPath => null;
+
         /// <summary>
         ///     Gets a value indicating whether umbraco is running in [debug mode].
         /// </summary>

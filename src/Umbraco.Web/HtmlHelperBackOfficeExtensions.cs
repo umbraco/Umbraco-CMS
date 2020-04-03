@@ -30,20 +30,24 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="html"></param>
         /// <param name="uri"></param>
-        /// <param name="externalLoginsUrl">
-        /// The post url used to sign in with external logins - this can change depending on for what service the external login is service.
-        /// Example: normal back office login or authenticating upgrade login
-        /// </param>
         /// <param name="features"></param>
         /// <param name="globalSettings"></param>
+        /// <param name="umbracoVersion"></param>
+        /// <param name="contentSettings"></param>
+        /// <param name="treeCollection"></param>
+        /// <param name="httpContextAccessor"></param>
+        /// <param name="hostingEnvironment"></param>
+        /// <param name="settings"></param>
+        /// <param name="securitySettings"></param>
+        /// <param name="runtimeMinifier"></param>
         /// <returns></returns>
         /// <remarks>
         /// These are the bare minimal server variables that are required for the application to start without being authenticated,
         /// we will load the rest of the server vars after the user is authenticated.
         /// </remarks>
-        public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IContentSettings contentSettings, IIOHelper ioHelper, TreeCollection treeCollection, IHttpContextAccessor httpContextAccessor, IHostingEnvironment hostingEnvironment, IRuntimeSettings settings, ISecuritySettings securitySettings, IRuntimeMinifier runtimeMinifier)
+        public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IContentSettings contentSettings, TreeCollection treeCollection, IHttpContextAccessor httpContextAccessor, IHostingEnvironment hostingEnvironment, IRuntimeSettings settings, ISecuritySettings securitySettings, IRuntimeMinifier runtimeMinifier)
         {
-            var serverVars = new BackOfficeServerVariables(uri, Current.RuntimeState, features, globalSettings, umbracoVersion, contentSettings, ioHelper, treeCollection, httpContextAccessor, hostingEnvironment, settings, securitySettings, runtimeMinifier);
+            var serverVars = new BackOfficeServerVariables(uri, Current.RuntimeState, features, globalSettings, umbracoVersion, contentSettings, treeCollection, httpContextAccessor, hostingEnvironment, settings, securitySettings, runtimeMinifier);
             var minVars = serverVars.BareMinimumServerVariables();
 
             var str = @"<script type=""text/javascript"">

@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Web.WebAssets
@@ -28,9 +29,9 @@ namespace Umbraco.Web.WebAssets
         /// The angular module name to boot
         /// </param>
         /// <param name="globalSettings"></param>
-        /// <param name="ioHelper"></param>
+        /// <param name="hostingEnvironment"></param>
         /// <returns></returns>
-        public static string GetJavascriptInitialization(IEnumerable<string> scripts, string angularModule, IGlobalSettings globalSettings, IIOHelper ioHelper)
+        public static string GetJavascriptInitialization(IEnumerable<string> scripts, string angularModule, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             var jarray = new StringBuilder();
             jarray.AppendLine("[");
@@ -46,7 +47,7 @@ namespace Umbraco.Web.WebAssets
             }
             jarray.Append("]");
 
-            return WriteScript(jarray.ToString(), ioHelper.ResolveUrl(globalSettings.UmbracoPath), angularModule);
+            return WriteScript(jarray.ToString(), hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath), angularModule);
         }
 
         /// <summary>

@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Umbraco.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core
@@ -16,44 +17,42 @@ namespace Umbraco.Core
         ///  Checks if the current uri is a back office request
         ///  </summary>
         ///  <param name="url"></param>
-        ///  <param name="applicationPath">
-        ///  The current application path or VirtualPath
-        ///  </param>
-        /// <param name="globalSettings"></param>
-        ///  <param name="ioHelper"></param>
+        ///  <param name="globalSettings"></param>
+        ///  <param name="hostingEnvironment"></param>
         ///  <returns></returns>
         ///  <remarks>
         ///  There are some special routes we need to check to properly determine this:
-        ///
+        /// 
         ///      If any route has an extension in the path like .aspx = back office
-        ///
+        /// 
         ///      These are def back office:
         ///          /Umbraco/BackOffice     = back office
         ///          /Umbraco/Preview        = back office
         ///      If it's not any of the above, and there's no extension then we cannot determine if it's back office or front-end
         ///      so we can only assume that it is not back office. This will occur if people use an UmbracoApiController for the backoffice
         ///      but do not inherit from UmbracoAuthorizedApiController and do not use [IsBackOffice] attribute.
-        ///
+        /// 
         ///      These are def front-end:
         ///          /Umbraco/Surface        = front-end
         ///          /Umbraco/Api            = front-end
         ///      But if we've got this far we'll just have to assume it's front-end anyways.
-        ///
+        /// 
         ///  </remarks>
-        internal static bool IsBackOfficeRequest(this Uri url, string applicationPath, IIOHelper ioHelper)
+        internal static bool IsBackOfficeRequest(this Uri url, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
-            applicationPath = applicationPath ?? string.Empty;
-
+            var applicationPath = hostingEnvironment.ApplicationVirtualPath;
+            
             var fullUrlPath = url.AbsolutePath.TrimStart(new[] {'/'});
             var appPath = applicationPath.TrimStart(new[] {'/'});
             var urlPath = fullUrlPath.TrimStart(appPath).EnsureStartsWith('/');
 
             //check if this is in the umbraco back office
-            var isUmbracoPath = urlPath.InvariantStartsWith(ioHelper.BackOfficePath.EnsureStartsWith('/').TrimStart(appPath.EnsureStartsWith('/')).EnsureStartsWith('/'));
+            var backOfficePath = globalSettings.GetBackOfficePath(hostingEnvironment);
+            var isUmbracoPath = urlPath.InvariantStartsWith(backOfficePath.EnsureStartsWith('/').TrimStart(appPath.EnsureStartsWith('/')).EnsureStartsWith('/'));
             //if not, then def not back office
             if (isUmbracoPath == false) return false;
 
-            var mvcArea = ioHelper.GetUmbracoMvcArea();
+            var mvcArea = globalSettings.GetUmbracoMvcArea(hostingEnvironment);
             //if its the normal /umbraco path
             if (urlPath.InvariantEquals("/" + mvcArea)
                 || urlPath.InvariantEquals("/" + mvcArea + "/"))
@@ -108,9 +107,9 @@ namespace Umbraco.Core
         /// Checks if the current uri is an install request
         /// </summary>
         /// <param name="url"></param>
-        /// <param name="ioHelper"></param>
+        /// <param name="hostingEnvironment"></param>
         /// <returns></returns>
-        internal static bool IsInstallerRequest(this Uri url, IIOHelper ioHelper)
+        internal static bool IsInstallerRequest(this Uri url, IHostingEnvironment hostingEnvironment)
         {
             var authority = url.GetLeftPart(UriPartial.Authority);
             var afterAuthority = url.GetLeftPart(UriPartial.Query)
@@ -118,7 +117,7 @@ namespace Umbraco.Core
                                     .TrimStart("/");
 
             //check if this is in the umbraco back office
-            return afterAuthority.InvariantStartsWith(ioHelper.ResolveUrl("~/install").TrimStart("/"));
+            return afterAuthority.InvariantStartsWith(hostingEnvironment.ToAbsolute("~/install").TrimStart("/"));
         }
 
         /// <summary>
@@ -126,13 +125,15 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="url"></param>
         /// <param name="globalSettings"></param>
+        /// <param name="hostingEnvironment"></param>
         /// <returns></returns>
-        internal static bool IsDefaultBackOfficeRequest(this Uri url, IIOHelper ioHelper)
+        internal static bool IsDefaultBackOfficeRequest(this Uri url, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
-            if (url.AbsolutePath.InvariantEquals(ioHelper.BackOfficePath.TrimEnd("/"))
-                || url.AbsolutePath.InvariantEquals(ioHelper.BackOfficePath.EnsureEndsWith('/'))
-                || url.AbsolutePath.InvariantEquals(ioHelper.BackOfficePath.EnsureEndsWith('/') + "Default")
-                || url.AbsolutePath.InvariantEquals(ioHelper.BackOfficePath.EnsureEndsWith('/') + "Default/"))
+            var backOfficePath = globalSettings.GetBackOfficePath(hostingEnvironment);
+            if (url.AbsolutePath.InvariantEquals(backOfficePath.TrimEnd("/"))
+                || url.AbsolutePath.InvariantEquals(backOfficePath.EnsureEndsWith('/'))
+                || url.AbsolutePath.InvariantEquals(backOfficePath.EnsureEndsWith('/') + "Default")
+                || url.AbsolutePath.InvariantEquals(backOfficePath.EnsureEndsWith('/') + "Default/"))
             {
                 return true;
             }

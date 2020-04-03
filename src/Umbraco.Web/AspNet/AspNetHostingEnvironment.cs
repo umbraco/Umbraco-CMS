@@ -21,7 +21,7 @@ namespace Umbraco.Web.Hosting
             ApplicationId = HostingEnvironment.ApplicationID;
             // when we are not hosted (i.e. unit test or otherwise) we'll need to get the root path from the executing assembly
             ApplicationPhysicalPath = HostingEnvironment.ApplicationPhysicalPath ?? Assembly.GetExecutingAssembly().GetRootDirectorySafe();
-            ApplicationVirtualPath = HostingEnvironment.ApplicationVirtualPath;
+            ApplicationVirtualPath = hostingSettings.ApplicationVirtualPath ?? HostingEnvironment.ApplicationVirtualPath.EnsureStartsWith("/");
             IISVersion = HttpRuntime.IISVersion;
         }
 
@@ -41,7 +41,7 @@ namespace Umbraco.Web.Hosting
             return HostingEnvironment.MapPath(path);
         }
 
-        public string ToAbsolute(string virtualPath) => VirtualPathUtility.ToAbsolute(virtualPath, ApplicationVirtualPath.EnsureStartsWith('/'));
+        public string ToAbsolute(string virtualPath) => VirtualPathUtility.ToAbsolute(virtualPath, ApplicationVirtualPath);
         
 
         public string LocalTempPath

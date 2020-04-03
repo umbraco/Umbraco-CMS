@@ -11,6 +11,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web.Security
 {
@@ -19,15 +20,15 @@ namespace Umbraco.Web.Security
         private readonly IUserService _userService;
         private readonly IRuntimeState _runtimeState;
         private readonly IGlobalSettings _globalSettings;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ISecuritySettings _securitySettings;
 
-        public BackOfficeCookieAuthenticationProvider(IUserService userService, IRuntimeState runtimeState, IGlobalSettings globalSettings, IIOHelper ioHelper, ISecuritySettings securitySettings)
+        public BackOfficeCookieAuthenticationProvider(IUserService userService, IRuntimeState runtimeState, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, ISecuritySettings securitySettings)
         {
             _userService = userService;
             _runtimeState = runtimeState;
             _globalSettings = globalSettings;
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
             _securitySettings = securitySettings;
         }
 
@@ -118,7 +119,7 @@ namespace Umbraco.Web.Security
         protected virtual async Task EnsureValidSessionId(CookieValidateIdentityContext context)
         {
             if (_runtimeState.Level == RuntimeLevel.Run)
-                await SessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context, _globalSettings, _ioHelper);
+                await SessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context, _globalSettings, _hostingEnvironment);
         }
 
 

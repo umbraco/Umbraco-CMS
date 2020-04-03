@@ -74,10 +74,10 @@ namespace Umbraco.Tests.PublishedContent
             var umbracoContext = new UmbracoContext(
                 httpContextAccessor,
                 publishedSnapshotService.Object,
-                new WebSecurity(httpContextAccessor, ServiceContext.UserService, globalSettings, IOHelper),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, globalSettings, HostingEnvironment),
                 globalSettings,
+                HostingEnvironment,
                 new TestVariationContextAccessor(),
-                IOHelper,
                 UriUtility,
                 new AspNetCookieManager(httpContextAccessor));
 

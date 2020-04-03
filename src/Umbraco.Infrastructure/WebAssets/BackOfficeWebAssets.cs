@@ -4,6 +4,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
@@ -24,19 +25,22 @@ namespace Umbraco.Web.WebAssets
 
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IManifestParser _parser;
-        private readonly IIOHelper _ioHelper;
+        private readonly IGlobalSettings _globalSettings;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly PropertyEditorCollection _propertyEditorCollection;
 
         public BackOfficeWebAssets(
             IRuntimeMinifier runtimeMinifier,
             IManifestParser parser,
-            IIOHelper ioHelper,
-            PropertyEditorCollection propertyEditorCollection)
+            PropertyEditorCollection propertyEditorCollection,
+            IHostingEnvironment hostingEnvironment,
+            IGlobalSettings globalSettings)
         {
             _runtimeMinifier = runtimeMinifier;
             _parser = parser;
-            _ioHelper = ioHelper;
             _propertyEditorCollection = propertyEditorCollection;
+            _hostingEnvironment = hostingEnvironment;
+            _globalSettings = globalSettings;
         }
 
         public void CreateBundles()
@@ -150,7 +154,7 @@ namespace Umbraco.Web.WebAssets
         /// <returns></returns>
         private string[] FormatPaths(params string[] assets)
         {
-            var umbracoPath = _ioHelper.GetUmbracoMvcArea();
+            var umbracoPath = _globalSettings.GetUmbracoMvcArea(_hostingEnvironment);
 
             return assets
                 .Where(x => x.IsNullOrWhiteSpace() == false)

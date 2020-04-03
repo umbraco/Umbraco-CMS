@@ -123,10 +123,10 @@ namespace Umbraco.Tests.Scoping
             var umbracoContext = new UmbracoContext(
                 httpContextAccessor,
                 service,
-                new WebSecurity(httpContextAccessor, ServiceContext.UserService, globalSettings, IOHelper),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, globalSettings, HostingEnvironment),
                 globalSettings,
+                HostingEnvironment,
                 new TestVariationContextAccessor(),
-                IOHelper,
                 UriUtility,
                 new AspNetCookieManager(httpContextAccessor));
 

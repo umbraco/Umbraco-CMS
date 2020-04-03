@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.WebAssets;
@@ -14,13 +15,13 @@ namespace Umbraco.Web.BackOffice.Controllers
     {
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IGlobalSettings _globalSettings;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public BackOfficeController(IRuntimeMinifier runtimeMinifier, IGlobalSettings globalSettings, IIOHelper ioHelper)
+        public BackOfficeController(IRuntimeMinifier runtimeMinifier, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             _runtimeMinifier = runtimeMinifier;
             _globalSettings = globalSettings;
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         // GET
@@ -36,7 +37,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [MinifyJavaScriptResult(Order = 0)]
         public async Task<IActionResult> Application()
         {
-            var result = await _runtimeMinifier.GetScriptForLoadingBackOfficeAsync(_globalSettings, _ioHelper);
+            var result = await _runtimeMinifier.GetScriptForLoadingBackOfficeAsync(_globalSettings, _hostingEnvironment);
 
             return new JavaScriptResult(result);
         }

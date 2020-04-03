@@ -163,7 +163,7 @@ namespace Umbraco.Tests.Cache
                 new TestDefaultCultureAccessor(),
                 TestObjects.GetGlobalSettings(),
                 Mock.Of<IUserService>(),
-                IOHelper,
+                TestHelper.GetHostingEnvironment(),
                 UriUtility,
                 httpContextAccessor,
                 new AspNetCookieManager(httpContextAccessor));

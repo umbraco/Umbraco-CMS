@@ -14,7 +14,7 @@
 
 <html lang="en">
 <head>
-    <base href="@Model.IOHelper.BackOfficePath.EnsureEndsWith('/')" />
+    <base href="@Model.BackOfficePath.EnsureEndsWith('/')" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -44,9 +44,10 @@
             redirectUrl = Url.Action("AuthorizeUpgrade", "BackOffice")
         });
     }
-    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl, Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.ContentSettings, Model.IOHelper, Model.TreeCollection, Model.HttpContextAccessor, Model.HostingEnvironment, Model.RuntimeSettings, Model.SecuritySettings, runtimeMinifier)
 
-    <script type="text/javascript">
+@Html.BareMinimumServerVariablesScript(Url, Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.ContentSettings, Model.TreeCollection, Model.HttpContextAccessor, Model.HostingEnvironment, Model.RuntimeSettings, Model.SecuritySettings, runtimeMinifier)
+
+<script type="text/javascript">
     document.angularReady = function (app) {
 
         @Html.AngularValueExternalLoginInfoScript(ViewData.GetExternalSignInError())

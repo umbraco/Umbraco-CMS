@@ -4,10 +4,9 @@ namespace Umbraco.Core.IO
 {
     public interface IIOHelper
     {
-
-        string BackOfficePath { get; }
-
+        // TODO: There is no need for this, we should just use Path.DirectorySeparatorChar which is cross platform, no need for an abstraction?
         char DirSepChar { get; }
+
         string FindFile(string virtualPath);
         
         // TODO: This is the same as IHostingEnvironment.ToAbsolute
@@ -56,13 +55,6 @@ namespace Umbraco.Core.IO
         /// <param name="path"></param>
         /// <returns></returns>
         string GetRelativePath(string path);
-
-        // TODO: This is the same as IHostingEnvironment.ApplicationVirtualPath i don't think we want this
-        string Root
-        {
-            get;
-            set; //Only required for unit tests
-        }
 
     }
 }

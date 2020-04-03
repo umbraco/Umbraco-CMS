@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Web.Mvc;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Web.Models;
 
@@ -15,7 +16,7 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     public class RenderViewEngine : RazorViewEngine
     {
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         private readonly IEnumerable<string> _supplementedViewLocations = new[] { "/{0}.cshtml" };
         //NOTE: we will make the main view location the last to be searched since if it is the first to be searched and there is both a view and a partial
@@ -26,9 +27,9 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Constructor
         /// </summary>
-        public RenderViewEngine(IIOHelper ioHelper)
+        public RenderViewEngine(IHostingEnvironment hostingEnvironment)
         {
-            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
 
             const string templateFolder = Constants.ViewLocation;
 
@@ -47,7 +48,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         private void EnsureFoldersAndFiles()
         {
-            var viewFolder = _ioHelper.MapPath(Constants.ViewLocation);
+            var viewFolder = _hostingEnvironment.MapPath(Constants.ViewLocation);
 
             // ensure the web.config file is in the ~/Views folder
             Directory.CreateDirectory(viewFolder);

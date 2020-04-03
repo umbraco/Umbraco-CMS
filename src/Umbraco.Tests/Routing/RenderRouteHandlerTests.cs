@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Routing
                 ShortStringHelper,
                 new SurfaceControllerTypeCollection(Enumerable.Empty<Type>()),
                 new UmbracoApiControllerTypeCollection(Enumerable.Empty<Type>()),
-                IOHelper);
+                HostingEnvironment);
         }
 
         public class TestRuntime : WebRuntime

@@ -9,13 +9,23 @@ namespace Umbraco.Core.Hosting
         string ApplicationPhysicalPath { get; }
 
         string LocalTempPath { get; }
+
+        /// <summary>
+        /// The web application's hosted path
+        /// </summary>
+        /// <remarks>
+        /// In most cases this will return "/" but if the site is hosted in a virtual directory then this will return the virtual directory's path such as "/mysite".
+        /// This value must begin with a "/" and cannot end with "/".
+        /// </remarks>
         string ApplicationVirtualPath { get; }
 
         bool IsDebugMode { get; }
+
         /// <summary>
         /// Gets a value indicating whether Umbraco is hosted.
         /// </summary>
         bool IsHosted { get; }
+
         Version IISVersion { get; }
         string MapPath(string path);
 

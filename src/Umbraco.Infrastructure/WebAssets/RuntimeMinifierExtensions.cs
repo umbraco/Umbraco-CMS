@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.WebAssets;
 
@@ -14,10 +15,10 @@ namespace Umbraco.Web.WebAssets
         /// Returns the JavaScript to load the back office's assets
         /// </summary>
         /// <returns></returns>
-        public static async Task<string> GetScriptForLoadingBackOfficeAsync(this IRuntimeMinifier minifier, IGlobalSettings globalSettings, IIOHelper ioHelper)
+        public static async Task<string> GetScriptForLoadingBackOfficeAsync(this IRuntimeMinifier minifier, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             var files = await minifier.GetAssetPathsAsync(BackOfficeWebAssets.UmbracoJsBundleName);
-            var result = BackOfficeJavaScriptInitializer.GetJavascriptInitialization(files, "umbraco", globalSettings, ioHelper);
+            var result = BackOfficeJavaScriptInitializer.GetJavascriptInitialization(files, "umbraco", globalSettings, hostingEnvironment);
             result += await GetStylesheetInitializationAsync(minifier);
 
             return result;

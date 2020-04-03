@@ -143,8 +143,8 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 publishedSnapshotService.Object,
                 webSecurity.Object,
                 globalSettings,
+                TestHelper.GetHostingEnvironment(),
                 new TestVariationContextAccessor(),
-                TestHelper.IOHelper,
                 TestHelper.UriUtility,
                 new AspNetCookieManager(httpContextAccessor));
 
