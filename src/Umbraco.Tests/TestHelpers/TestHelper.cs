@@ -60,7 +60,7 @@ namespace Umbraco.Tests.TestHelpers
                     TestHelper.IOHelper, Mock.Of<ILogger>(), SettingsForTests.GenerateMockWebRoutingSettings());
 
             public override IHostingEnvironment GetHostingEnvironment()
-                => new AspNetHostingEnvironment(SettingsForTests.GetDefaultHostingSettings());
+                => new AspNetHostingEnvironment(SettingsForTests.DefaultHostingSettings);
 
             public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime()
                 => new AspNetApplicationShutdownRegistry();

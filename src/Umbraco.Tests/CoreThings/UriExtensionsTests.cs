@@ -35,7 +35,7 @@ namespace Umbraco.Tests.CoreThings
         public void Is_Back_Office_Request(string input, string virtualPath, bool expected)
         {
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
-            var mockHostingSettings = Mock.Get(SettingsForTests.GetDefaultHostingSettings());
+            var mockHostingSettings = Mock.Get(SettingsForTests.GenerateMockHostingSettings());
             mockHostingSettings.Setup(x => x.ApplicationVirtualPath).Returns(virtualPath);
             var hostingEnvironment = new AspNetHostingEnvironment(mockHostingSettings.Object);
 

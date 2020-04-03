@@ -137,7 +137,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public IGlobalSettings GetGlobalSettings()
         {
-            return SettingsForTests.GetDefaultGlobalSettings();
+            return SettingsForTests.DefaultGlobalSettings;
         }
         public IFileSystems GetFileSystemsMock()
         {

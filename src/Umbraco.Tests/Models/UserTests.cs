@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class UserTests
     {
-        private IGlobalSettings GlobalSettings { get; } = SettingsForTests.GetDefaultGlobalSettings();
+        private IGlobalSettings GlobalSettings { get; } = SettingsForTests.DefaultGlobalSettings;
 
         [Test]
         public void Can_Deep_Clone()

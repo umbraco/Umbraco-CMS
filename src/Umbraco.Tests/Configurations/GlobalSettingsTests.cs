@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Configurations
         {
 
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
-            var mockHostingSettings = Mock.Get(SettingsForTests.GetDefaultHostingSettings());
+            var mockHostingSettings = Mock.Get(SettingsForTests.GenerateMockHostingSettings());
             mockHostingSettings.Setup(x => x.ApplicationVirtualPath).Returns(rootPath);
 
             var hostingEnvironment = new AspNetHostingEnvironment(mockHostingSettings.Object);

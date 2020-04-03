@@ -124,7 +124,7 @@ namespace Umbraco.Tests.Runtimes
                 .Append<DistributedCacheBinderComponent>();
 
             // configure
-            composition.Configs.Add(TestHelpers.SettingsForTests.GetDefaultGlobalSettings);
+            composition.Configs.Add(() => TestHelpers.SettingsForTests.DefaultGlobalSettings);
             composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
 
             // create and register the factory
@@ -163,7 +163,7 @@ namespace Umbraco.Tests.Runtimes
                 var scopeProvider = factory.GetInstance<IScopeProvider>();
                 using (var scope = scopeProvider.CreateScope())
                 {
-                    var creator = new DatabaseSchemaCreator(scope.Database, logger, umbracoVersion, TestHelpers.SettingsForTests.GetDefaultGlobalSettings());
+                    var creator = new DatabaseSchemaCreator(scope.Database, logger, umbracoVersion, TestHelpers.SettingsForTests.DefaultGlobalSettings);
                     creator.InitializeDatabaseSchema();
                     scope.Complete();
                 }

@@ -246,7 +246,7 @@ namespace Umbraco.Tests.TestHelpers
                 // var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Factory.GetInstance<IMapperCollection>();
                 databaseFactory = new UmbracoDatabaseFactory(logger,
-                    SettingsForTests.GetDefaultGlobalSettings(),
+                    SettingsForTests.DefaultGlobalSettings,
                     new ConnectionStrings(),
                     Constants.System.UmbracoConnectionName,
                     new Lazy<IMapperCollection>(() => mappers),

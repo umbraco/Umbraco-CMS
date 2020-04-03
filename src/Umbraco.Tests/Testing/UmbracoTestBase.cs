@@ -139,7 +139,7 @@ namespace Umbraco.Tests.Testing
 
         protected virtual IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
 
-        protected IHostingEnvironment HostingEnvironment { get; } = new AspNetHostingEnvironment(TestHelpers.SettingsForTests.GetDefaultHostingSettings());
+        protected IHostingEnvironment HostingEnvironment { get; } = new AspNetHostingEnvironment(TestHelpers.SettingsForTests.DefaultHostingSettings);
         protected IApplicationShutdownRegistry HostingLifetime { get; } = new AspNetApplicationShutdownRegistry();
         protected IIpResolver IpResolver => Factory.GetInstance<IIpResolver>();
         protected IBackOfficeInfo BackOfficeInfo => Factory.GetInstance<IBackOfficeInfo>();
@@ -175,7 +175,7 @@ namespace Umbraco.Tests.Testing
 
             TypeFinder = new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
             var appCaches = GetAppCaches();
-            var globalSettings = TestHelpers.SettingsForTests.GetDefaultGlobalSettings();
+            var globalSettings = TestHelpers.SettingsForTests.DefaultGlobalSettings;
             var settings = TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings();
 
             IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, logger, settings);
@@ -413,8 +413,8 @@ namespace Umbraco.Tests.Testing
 
         protected virtual void ComposeSettings()
         {
-            Composition.Configs.Add(TestHelpers.SettingsForTests.GetDefaultGlobalSettings);
-            Composition.Configs.Add(TestHelpers.SettingsForTests.GetDefaultHostingSettings);
+            Composition.Configs.Add(() => TestHelpers.SettingsForTests.DefaultGlobalSettings);
+            Composition.Configs.Add(() => TestHelpers.SettingsForTests.DefaultHostingSettings);
             Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings);
             Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings);
             Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockSecuritySettings);
