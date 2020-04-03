@@ -21,7 +21,7 @@ namespace Umbraco.Web.Hosting
             ApplicationId = HostingEnvironment.ApplicationID;
             // when we are not hosted (i.e. unit test or otherwise) we'll need to get the root path from the executing assembly
             ApplicationPhysicalPath = HostingEnvironment.ApplicationPhysicalPath ?? Assembly.GetExecutingAssembly().GetRootDirectorySafe();
-            ApplicationVirtualPath = hostingSettings.ApplicationVirtualPath ?? HostingEnvironment.ApplicationVirtualPath.EnsureStartsWith("/");
+            ApplicationVirtualPath = hostingSettings.ApplicationVirtualPath ?? HostingEnvironment.ApplicationVirtualPath?.EnsureStartsWith("/") ?? "/";
             IISVersion = HttpRuntime.IISVersion;
         }
 

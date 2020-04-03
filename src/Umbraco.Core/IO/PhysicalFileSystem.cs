@@ -59,6 +59,7 @@ namespace Umbraco.Core.IO
             if (Path.IsPathRooted(rootPath) == false)
             {
                 // but the test suite App.config cannot really "root" anything so we have to do it here
+                // TODO: This will map to the web content root (www) not the web app root, is that what we want? Else we need to use IHostingEnvironment.ApplicationPhysicalPath
                 var localRoot = _ioHelper.MapPath("~");
                 rootPath = Path.Combine(localRoot, rootPath);
             }

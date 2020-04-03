@@ -7,6 +7,7 @@ using Lucene.Net.Store;
 using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Examine
@@ -18,13 +19,13 @@ namespace Umbraco.Examine
     public abstract class LuceneIndexCreator : IIndexCreator
     {
         private readonly ITypeFinder _typeFinder;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IIndexCreatorSettings _settings;
 
-        protected LuceneIndexCreator(ITypeFinder typeFinder, IIOHelper ioHelper, IIndexCreatorSettings settings)
+        protected LuceneIndexCreator(ITypeFinder typeFinder, IHostingEnvironment hostingEnvironment, IIndexCreatorSettings settings)
         {
             _typeFinder = typeFinder;
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
             _settings = settings;
         }
 
@@ -40,7 +41,7 @@ namespace Umbraco.Examine
         public virtual Lucene.Net.Store.Directory CreateFileSystemLuceneDirectory(string folderName)
         {
 
-            var dirInfo = new DirectoryInfo(Path.Combine(_ioHelper.MapPath(Constants.SystemDirectories.TempData), "ExamineIndexes", folderName));
+            var dirInfo = new DirectoryInfo(Path.Combine(_hostingEnvironment.MapPath(Constants.SystemDirectories.TempData), "ExamineIndexes", folderName));
             if (!dirInfo.Exists)
                 System.IO.Directory.CreateDirectory(dirInfo.FullName);
 
