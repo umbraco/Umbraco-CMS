@@ -4,7 +4,7 @@ using Umbraco.Web.Models.Identity;
 
 namespace Umbraco.Web.Security
 {
-    public class BackOfficeUserValidator2<T> : UserValidator<T>
+    public class BackOfficeUserValidator<T> : UserValidator<T>
         where T : BackOfficeIdentityUser
     {
         public override async Task<IdentityResult> ValidateAsync(UserManager<T> manager, T user)

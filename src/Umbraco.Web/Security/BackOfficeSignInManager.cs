@@ -20,17 +20,17 @@ namespace Umbraco.Web.Security
     /// Code ported from Umbraco's BackOfficeSignInManager.
     /// Can be removed once the web project moves to .NET Core.
     /// </summary>
-    public class BackOfficeSignInManager2 : IDisposable
+    public class BackOfficeSignInManager : IDisposable
     {
-        private readonly BackOfficeUserManager2<BackOfficeIdentityUser> _userManager;
+        private readonly BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private readonly IUserClaimsPrincipalFactory<BackOfficeIdentityUser> _claimsPrincipalFactory;
         private readonly IAuthenticationManager _authenticationManager;
         private readonly ILogger _logger;
         private readonly IGlobalSettings _globalSettings;
         private readonly IOwinRequest _request;
 
-        public BackOfficeSignInManager2(
-            BackOfficeUserManager2<BackOfficeIdentityUser> userManager,
+        public BackOfficeSignInManager(
+            BackOfficeUserManager<BackOfficeIdentityUser> userManager,
             IUserClaimsPrincipalFactory<BackOfficeIdentityUser> claimsPrincipalFactory,
             IAuthenticationManager authenticationManager,
             ILogger logger,
@@ -53,11 +53,11 @@ namespace Umbraco.Web.Security
             return claimsPrincipal.Identity as ClaimsIdentity;
         }
 
-        public static BackOfficeSignInManager2 Create(IOwinContext context, IGlobalSettings globalSettings, ILogger logger)
+        public static BackOfficeSignInManager Create(IOwinContext context, IGlobalSettings globalSettings, ILogger logger)
         {
-            var userManager = context.GetBackOfficeUserManager2();
+            var userManager = context.GetBackOfficeUserManager();
 
-            return new BackOfficeSignInManager2(
+            return new BackOfficeSignInManager(
                 userManager,
                 new BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>(userManager, new OptionsWrapper<IdentityOptions>(userManager.Options)),
                 context.Authentication,
@@ -157,7 +157,7 @@ namespace Umbraco.Web.Security
 
                     if (requestContext != null)
                     {
-                        var backofficeUserManager = requestContext.GetBackOfficeUserManager2();
+                        var backofficeUserManager = requestContext.GetBackOfficeUserManager();
                         if (backofficeUserManager != null) backofficeUserManager.RaiseAccountLockedEvent(user.Id);
                     }
 
@@ -167,7 +167,7 @@ namespace Umbraco.Web.Security
 
             if (requestContext != null)
             {
-                var backofficeUserManager = requestContext.GetBackOfficeUserManager2();
+                var backofficeUserManager = requestContext.GetBackOfficeUserManager();
                 if (backofficeUserManager != null)
                     backofficeUserManager.RaiseInvalidLoginAttemptEvent(userName);
             }

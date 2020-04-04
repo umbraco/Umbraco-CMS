@@ -40,8 +40,8 @@ namespace Umbraco.Web.Editors
     [IsBackOffice]
     public class AuthenticationController : UmbracoApiController
     {
-        private BackOfficeUserManager2<BackOfficeIdentityUser> _userManager;
-        private BackOfficeSignInManager2 _signInManager;
+        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
+        private BackOfficeSignInManager _signInManager;
         private readonly IUserPasswordConfiguration _passwordConfiguration;
         private readonly IRuntimeState _runtimeState;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
@@ -69,11 +69,11 @@ namespace Umbraco.Web.Editors
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
         }
 
-        protected BackOfficeUserManager2<BackOfficeIdentityUser> UserManager => _userManager
-            ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager2());
+        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager
+            ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager());
 
-        protected BackOfficeSignInManager2 SignInManager => _signInManager
-            ?? (_signInManager = TryGetOwinContext().Result.GetBackOfficeSignInManager2());
+        protected BackOfficeSignInManager SignInManager => _signInManager
+            ?? (_signInManager = TryGetOwinContext().Result.GetBackOfficeSignInManager());
 
         /// <summary>
         /// Returns the configuration for the backoffice user membership provider - used to configure the change password dialog

@@ -16,11 +16,11 @@ using Umbraco.Web.Models.Identity;
 
 namespace Umbraco.Web.Security
 {
-    public class BackOfficeUserManager2 : BackOfficeUserManager2<BackOfficeIdentityUser>
+    public class BackOfficeUserManager : BackOfficeUserManager<BackOfficeIdentityUser>
     {
         public const string OwinMarkerKey = "Umbraco.Web.Security.Identity.BackOfficeUserManagerMarker";
 
-        public BackOfficeUserManager2(
+        public BackOfficeUserManager(
             IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
             IUserStore<BackOfficeIdentityUser> store,
@@ -41,7 +41,7 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager
         /// </summary>
-        public static BackOfficeUserManager2 Create(
+        public static BackOfficeUserManager Create(
             IUserService userService,
             IEntityService entityService,
             IExternalLoginService externalLoginService,
@@ -53,7 +53,7 @@ namespace Umbraco.Web.Security
             IDataProtectionProvider dataProtectionProvider,
             ILogger<UserManager<BackOfficeIdentityUser>> logger)
         {
-            var store = new BackOfficeUserStore2(userService, entityService, externalLoginService, globalSettings, mapper);
+            var store = new BackOfficeUserStore(userService, entityService, externalLoginService, globalSettings, mapper);
             
             return Create(
                 passwordConfiguration,
@@ -67,7 +67,7 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and a custom BackOfficeUserManager instance
         /// </summary>
-        public static BackOfficeUserManager2 Create(
+        public static BackOfficeUserManager Create(
             IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
             IUserStore<BackOfficeIdentityUser> customUserStore,
@@ -78,7 +78,7 @@ namespace Umbraco.Web.Security
             var options = new IdentityOptions();
 
             // Configure validation logic for usernames
-            var userValidators = new List<UserValidator<BackOfficeIdentityUser>> { new BackOfficeUserValidator2<BackOfficeIdentityUser>() };
+            var userValidators = new List<UserValidator<BackOfficeIdentityUser>> { new BackOfficeUserValidator<BackOfficeIdentityUser>() };
             options.User.RequireUniqueEmail = true;
 
             // Configure validation logic for passwords
@@ -96,7 +96,7 @@ namespace Umbraco.Web.Security
             // locked out or not.
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(30);
 
-            return new BackOfficeUserManager2(
+            return new BackOfficeUserManager(
                 passwordConfiguration,
                 ipResolver,
                 customUserStore,
@@ -112,12 +112,12 @@ namespace Umbraco.Web.Security
         #endregion
     }
 
-    public class BackOfficeUserManager2<T> : UserManager<T>
+    public class BackOfficeUserManager<T> : UserManager<T>
         where T : BackOfficeIdentityUser
     {
         private PasswordGenerator _passwordGenerator;
 
-        public BackOfficeUserManager2(
+        public BackOfficeUserManager(
             IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
             IUserStore<T> store,
@@ -154,7 +154,7 @@ namespace Umbraco.Web.Security
         /// Initializes the user manager with the correct options
         /// </summary>
         protected void InitUserManager(
-            BackOfficeUserManager2<T> manager,
+            BackOfficeUserManager<T> manager,
             IDataProtectionProvider dataProtectionProvider)
         {
             //use a custom hasher based on our membership provider
@@ -181,7 +181,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public virtual async Task<bool> ValidateSessionIdAsync(string userId, string sessionId)
         {
-            var userSessionStore = Store as IUserSessionStore2<T>;
+            var userSessionStore = Store as IUserSessionStore<T>;
             //if this is not set, for backwards compat (which would be super rare), we'll just approve it
             if (userSessionStore == null)  return true;
 

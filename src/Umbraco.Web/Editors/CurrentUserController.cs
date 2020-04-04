@@ -211,7 +211,7 @@ namespace Umbraco.Web.Editors
 
             if (passwordChangeResult.Success)
             {
-                var userMgr = this.TryGetOwinContext().Result.GetBackOfficeUserManager2();
+                var userMgr = this.TryGetOwinContext().Result.GetBackOfficeUserManager();
 
                 //even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
                 var result = new ModelWithNotifications<string>(passwordChangeResult.Result.ResetPassword);

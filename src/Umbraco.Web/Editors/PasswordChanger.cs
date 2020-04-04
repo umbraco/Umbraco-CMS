@@ -34,7 +34,7 @@ namespace Umbraco.Web.Editors
             IUser currentUser,
             IUser savingUser,
             ChangingPasswordModel passwordModel,
-            BackOfficeUserManager2<BackOfficeIdentityUser> userMgr)
+            BackOfficeUserManager<BackOfficeIdentityUser> userMgr)
         {
             if (passwordModel == null) throw new ArgumentNullException(nameof(passwordModel));
             if (userMgr == null) throw new ArgumentNullException(nameof(userMgr));

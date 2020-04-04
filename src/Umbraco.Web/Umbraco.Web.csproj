@@ -199,11 +199,11 @@
     <Compile Include="Scheduling\SchedulerComponent.cs" />
     <Compile Include="Scheduling\SchedulerComposer.cs" />
     <Compile Include="Security\BackOfficeClaimsPrincipalFactory.cs" />
-    <Compile Include="Security\BackOfficeSignInManager2.cs" />
-    <Compile Include="Security\BackOfficeUserManager2.cs" />
+    <Compile Include="Security\BackOfficeSignInManager.cs" />
+    <Compile Include="Security\BackOfficeUserManager.cs" />
     <Compile Include="Security\BackOfficeUserManagerMarker.cs" />
-    <Compile Include="Security\BackOfficeUserStore2.cs" />
-    <Compile Include="Security\BackOfficeUserValidator2.cs" />
+    <Compile Include="Security\BackOfficeUserStore.cs" />
+    <Compile Include="Security\BackOfficeUserValidator.cs" />
     <Compile Include="Security\ConfiguredPasswordValidator.cs" />
     <Compile Include="Security\EmailService.cs" />
     <Compile Include="Security\IUserSessionStore.cs" />

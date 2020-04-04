@@ -52,17 +52,17 @@ namespace Umbraco.Web.Security
             }
         }
 
-        private BackOfficeSignInManager2 _signInManager;
-        private BackOfficeSignInManager2 SignInManager
+        private BackOfficeSignInManager _signInManager;
+        private BackOfficeSignInManager SignInManager
         {
             get
             {
                 if (_signInManager == null)
                 {
-                    var mgr = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().Get<BackOfficeSignInManager2>();
+                    var mgr = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().Get<BackOfficeSignInManager>();
                     if (mgr == null)
                     {
-                        throw new NullReferenceException("Could not resolve an instance of " + typeof(BackOfficeSignInManager2) + " from the " + typeof(IOwinContext));
+                        throw new NullReferenceException("Could not resolve an instance of " + typeof(BackOfficeSignInManager) + " from the " + typeof(IOwinContext));
                     }
                     _signInManager = mgr;
                 }
@@ -70,9 +70,9 @@ namespace Umbraco.Web.Security
             }
         }
 
-        private BackOfficeUserManager2<BackOfficeIdentityUser> _userManager;
-        protected BackOfficeUserManager2<BackOfficeIdentityUser> UserManager
-            => _userManager ?? (_userManager = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().GetBackOfficeUserManager2());
+        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
+        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
+            => _userManager ?? (_userManager = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().GetBackOfficeUserManager());
 
         [Obsolete("This needs to be removed, ASP.NET Identity should always be used for this operation, this is currently only used in the installer which needs to be updated")]
         public double PerformLogin(int userId)

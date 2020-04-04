@@ -11,14 +11,14 @@ namespace Umbraco.Web.Security
     /// </summary>
     /// <typeparam name="TManager"></typeparam>
     /// <typeparam name="TUser"></typeparam>
-    internal class BackOfficeUserManagerMarker2<TManager, TUser> : IBackOfficeUserManagerMarker2
-        where TManager : BackOfficeUserManager2<TUser>
+    internal class BackOfficeUserManagerMarker<TManager, TUser> : IBackOfficeUserManagerMarker
+        where TManager : BackOfficeUserManager<TUser>
         where TUser : BackOfficeIdentityUser
     {
-        public BackOfficeUserManager2<BackOfficeIdentityUser> GetManager(IOwinContext owin)
+        public BackOfficeUserManager<BackOfficeIdentityUser> GetManager(IOwinContext owin)
         {
-            var mgr = owin.Get<TManager>() as BackOfficeUserManager2<BackOfficeIdentityUser>;
-            if (mgr == null) throw new InvalidOperationException("Could not cast the registered back office user of type " + typeof(TManager) + " to " + typeof(BackOfficeUserManager2<BackOfficeIdentityUser>));
+            var mgr = owin.Get<TManager>() as BackOfficeUserManager<BackOfficeIdentityUser>;
+            if (mgr == null) throw new InvalidOperationException("Could not cast the registered back office user of type " + typeof(TManager) + " to " + typeof(BackOfficeUserManager<BackOfficeIdentityUser>));
             return mgr;
         }
     }

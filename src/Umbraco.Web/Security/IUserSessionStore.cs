@@ -7,7 +7,7 @@ namespace Umbraco.Core.Security
     /// An IUserStore interface part to implement if the store supports validating user session Ids
     /// </summary>
     /// <typeparam name="TUser"></typeparam>
-    public interface IUserSessionStore2<TUser> : IUserStore<TUser>
+    public interface IUserSessionStore<TUser> : IUserStore<TUser>
         where TUser : class
     {
         Task<bool> ValidateSessionIdAsync(string userId, string sessionId); // TODO: SB: Should take a user???

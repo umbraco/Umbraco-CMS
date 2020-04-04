@@ -30,7 +30,7 @@ namespace Umbraco.Web.WebApi
     [EnableDetailedErrors]
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
     {
-        private BackOfficeUserManager2<BackOfficeIdentityUser> _userManager;
+        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
 
         protected UmbracoAuthorizedApiController()
         {
@@ -44,7 +44,7 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Gets the user manager.
         /// </summary>
-        protected BackOfficeUserManager2<BackOfficeIdentityUser> UserManager
-            => _userManager ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager2());
+        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
+            => _userManager ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager());
     }
 }

@@ -20,7 +20,7 @@ using UserLoginInfo = Microsoft.AspNetCore.Identity.UserLoginInfo;
 
 namespace Umbraco.Web.Security
 {
-    public class BackOfficeUserStore2 : DisposableObjectSlim,
+    public class BackOfficeUserStore : DisposableObjectSlim,
             IUserPasswordStore<BackOfficeIdentityUser>,
             IUserEmailStore<BackOfficeIdentityUser>,
             IUserLoginStore<BackOfficeIdentityUser>,
@@ -28,7 +28,7 @@ namespace Umbraco.Web.Security
             IUserSecurityStampStore<BackOfficeIdentityUser>,
             IUserLockoutStore<BackOfficeIdentityUser>,
             IUserTwoFactorStore<BackOfficeIdentityUser>,
-            IUserSessionStore2<BackOfficeIdentityUser>
+            IUserSessionStore<BackOfficeIdentityUser>
 
     // TODO: This would require additional columns/tables for now people will need to implement this on their own
     //IUserPhoneNumberStore<BackOfficeIdentityUser, int>,
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Security
         private readonly UmbracoMapper _mapper;
         private bool _disposed = false;
 
-        public BackOfficeUserStore2(IUserService userService, IEntityService entityService, IExternalLoginService externalLoginService, IGlobalSettings globalSettings, UmbracoMapper mapper)
+        public BackOfficeUserStore(IUserService userService, IEntityService entityService, IExternalLoginService externalLoginService, IGlobalSettings globalSettings, UmbracoMapper mapper)
         {
             _userService = userService;
             _entityService = entityService;
