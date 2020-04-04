@@ -99,7 +99,8 @@ namespace Umbraco.Web.Security
 
         public Task<bool> CanGenerateTwoFactorTokenAsync(UserManager<TUser> manager, TUser user)
         {
-            return Task.FromResult(true);
+            // This token provider is designed for flows such as password reset and account confirmation
+            return Task.FromResult(false);
         }
     }
 

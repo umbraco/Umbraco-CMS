@@ -10,6 +10,6 @@ namespace Umbraco.Core.Security
     public interface IUserSessionStore<TUser> : IUserStore<TUser>
         where TUser : class
     {
-        Task<bool> ValidateSessionIdAsync(string userId, string sessionId); // TODO: SB: Should take a user???
+        Task<bool> ValidateSessionIdAsync(string userId, string sessionId);
     }
 }

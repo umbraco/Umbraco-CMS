@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -88,6 +89,12 @@ namespace Umbraco.Web.Security
             options.Password.RequireDigit = passwordConfiguration.RequireDigit;
             options.Password.RequireLowercase = passwordConfiguration.RequireLowercase;
             options.Password.RequireUppercase = passwordConfiguration.RequireUppercase;
+
+            // Ensure Umbraco security stamp claim type is used
+            options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
+            options.ClaimsIdentity.UserNameClaimType = ClaimTypes.Name;
+            options.ClaimsIdentity.RoleClaimType = ClaimTypes.Role;
+            options.ClaimsIdentity.SecurityStampClaimType = Constants.Web.SecurityStampClaimType;
 
             options.Lockout.AllowedForNewUsers = true;
             options.Lockout.MaxFailedAccessAttempts = passwordConfiguration.MaxFailedAccessAttemptsBeforeLockout;
