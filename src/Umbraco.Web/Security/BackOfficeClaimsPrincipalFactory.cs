@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Umbraco.Core;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models.Identity;
 
@@ -19,10 +21,11 @@ namespace Umbraco.Web.Security
 
         public override async Task<ClaimsPrincipal> CreateAsync(TUser user)
         {
-            var claimsPrincipal = await base.CreateAsync(user);
-
+            var baseIdentity = await base.GenerateClaimsAsync(user);
+            baseIdentity.AddClaim(new Claim("http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider", "ASP.NET Identity"));
+            
             var umbracoIdentity = new UmbracoBackOfficeIdentity(
-                claimsPrincipal.Identity as ClaimsIdentity,
+                baseIdentity,
                 user.Id,
                 user.UserName,
                 user.Name,

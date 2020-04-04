@@ -148,6 +148,7 @@
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />
+    <Compile Include="Security\BackOfficeClaimsPrincipalFactoryTests.cs" />
     <Compile Include="UmbracoExamine\ExamineExtensions.cs" />
     <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionTests.cs" />
     <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />

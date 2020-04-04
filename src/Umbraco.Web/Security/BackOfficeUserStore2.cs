@@ -66,12 +66,11 @@ namespace Umbraco.Web.Security
 
         public Task<string> GetUserIdAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken)
         {
-
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException(nameof(user));
-
-            return Task.FromResult(user.Id.ToString());
+            
+            return Task.FromResult(UserIdToString(user.Id));
         }
 
         public Task<string> GetUserNameAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken)
@@ -156,14 +155,8 @@ namespace Umbraco.Web.Security
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException(nameof(user));
-
-            var asInt = user.Id.TryConvertTo<int>();
-            if (asInt == false)
-            {
-                throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
-            }
-
-            var found = _userService.GetUserById(asInt.Result);
+            
+            var found = _userService.GetUserById(user.Id);
             if (found != null)
             {
                 // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
@@ -194,19 +187,13 @@ namespace Umbraco.Web.Security
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException(nameof(user));
-
-            var asInt = user.Id.TryConvertTo<int>();
-            if (asInt == false)
-            {
-                throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
-            }
-
-            var found = _userService.GetUserById(asInt.Result);
+            
+            var found = _userService.GetUserById(user.Id);
             if (found != null)
             {
                 _userService.Delete(found);
             }
-            _externalLoginService.DeleteUserLogins(asInt.Result);
+            _externalLoginService.DeleteUserLogins(user.Id);
 
             return Task.FromResult(IdentityResult.Success);
         }
@@ -222,10 +209,7 @@ namespace Umbraco.Web.Security
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
 
-            var asInt = userId.TryConvertTo<int>();
-            if (asInt == false) throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
-
-            var user = _userService.GetUserById(asInt.Result);
+            var user = _userService.GetUserById(UserIdToInt(userId));
             if (user == null) return null;
 
             return await Task.FromResult(AssignLoginsCallback(_mapper.Map<BackOfficeIdentityUser>(user)));
@@ -312,7 +296,7 @@ namespace Umbraco.Web.Security
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException(nameof(user));
-            if (email.IsNullOrWhiteSpace()) throw new ArgumentNullException("email");
+            // if (email.IsNullOrWhiteSpace()) throw new ArgumentNullException("email");
 
             user.Email = email;
 
@@ -898,8 +882,7 @@ namespace Umbraco.Web.Security
         
         private void ThrowIfDisposed()
         {
-            if (_disposed)
-                throw new ObjectDisposedException(GetType().Name);
+            if (_disposed) throw new ObjectDisposedException(GetType().Name);
         }
 
         public Task<bool> ValidateSessionIdAsync(string userId, string sessionId)
@@ -907,10 +890,26 @@ namespace Umbraco.Web.Security
             Guid guidSessionId;
             if (Guid.TryParse(sessionId, out guidSessionId))
             {
-                // TODO: SB: Normalize string to int conversion
-                return Task.FromResult(_userService.ValidateLoginSession(int.Parse(sessionId), guidSessionId));
+                return Task.FromResult(_userService.ValidateLoginSession(UserIdToInt(userId), guidSessionId));
             }
+
             return Task.FromResult(false);
+        }
+
+        private string UserIdToString(int userId)
+        {
+            var attempt = userId.TryConvertTo<string>();
+            if (attempt.Success) return attempt.Result;
+
+            throw new InvalidOperationException("Unable to convert user ID to string", attempt.Exception);
+        }
+
+        private int UserIdToInt(string userId)
+        {
+            var attempt = userId.TryConvertTo<int>();
+            if (attempt.Success) return attempt.Result;
+
+            throw new InvalidOperationException("Unable to convert user ID to int", attempt.Exception);
         }
     }
 }
