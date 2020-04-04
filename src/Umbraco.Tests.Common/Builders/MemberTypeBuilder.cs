@@ -10,7 +10,7 @@ using Umbraco.Tests.Common.Builders.Interfaces;
 namespace Umbraco.Tests.Common.Builders
 {
     public class MemberTypeBuilder
-        : ChildBuilderBase<MemberBuilder, MemberType>,
+        : ChildBuilderBase<MemberBuilder, IMemberType>,
             IWithIdBuilder,
             IWithAliasBuilder,
             IWithNameBuilder,
@@ -97,7 +97,7 @@ namespace Umbraco.Tests.Common.Builders
             return builder;
         }
 
-        public override MemberType Build()
+        public override IMemberType Build()
         {
             var id = _id ?? 1;
             var name = _name ?? Guid.NewGuid().ToString();

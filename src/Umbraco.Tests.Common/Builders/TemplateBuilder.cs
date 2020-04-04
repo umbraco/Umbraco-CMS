@@ -58,17 +58,17 @@ namespace Umbraco.Tests.Common.Builders
 
             var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
             return new Template(shortStringHelper, name, alias)
-                {
-                    Id = id,
-                    Key = key,
-                    CreateDate = createDate,
-                    UpdateDate = updateDate,
-                    Path = path,
-                    Content = content,
-                    IsMasterTemplate = isMasterTemplate,
-                    MasterTemplateAlias = masterTemplateAlias,
-                    MasterTemplateId = masterTemplateId,
-                };
+            {
+                Id = id,
+                Key = key,
+                CreateDate = createDate,
+                UpdateDate = updateDate,
+                Path = path,
+                Content = content,
+                IsMasterTemplate = isMasterTemplate,
+                MasterTemplateAlias = masterTemplateAlias,
+                MasterTemplateId = masterTemplateId,
+            };
         }
 
         int? IWithIdBuilder.Id

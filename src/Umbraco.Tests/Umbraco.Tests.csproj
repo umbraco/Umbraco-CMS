@@ -299,7 +299,6 @@
     <Compile Include="Models\DictionaryTranslationTests.cs" />
     <Compile Include="Models\PropertyGroupTests.cs" />
     <Compile Include="Models\PropertyTypeTests.cs" />
-    <Compile Include="Models\RelationTests.cs" />
     <Compile Include="Models\LightEntityTest.cs" />
     <Compile Include="Models\UserTests.cs" />
     <Compile Include="Web\Mvc\RenderModelBinderTests.cs" />
