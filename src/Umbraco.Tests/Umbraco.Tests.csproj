@@ -143,7 +143,6 @@
     <Compile Include="Models\CultureImpactTests.cs" />
     <Compile Include="Models\ImageProcessorImageUrlGeneratorTest.cs" />
     <Compile Include="Models\PathValidationTests.cs" />
-    <Compile Include="Models\PropertyTests.cs" />
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
@@ -297,8 +296,6 @@
     <Compile Include="Models\ContentTypeTests.cs" />
     <Compile Include="Models\DeepCloneHelperTests.cs" />
     <Compile Include="Models\DictionaryTranslationTests.cs" />
-    <Compile Include="Models\PropertyGroupTests.cs" />
-    <Compile Include="Models\PropertyTypeTests.cs" />
     <Compile Include="Models\RelationTests.cs" />
     <Compile Include="Models\TemplateTests.cs" />
     <Compile Include="Models\LightEntityTest.cs" />

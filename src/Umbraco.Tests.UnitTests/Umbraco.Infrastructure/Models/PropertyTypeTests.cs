@@ -5,32 +5,20 @@ using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core.Models;
-using Umbraco.Tests.Testing;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Tests.Models
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
 {
     [TestFixture]
-    public class PropertyTypeTests : UmbracoTestBase
+    public class PropertyTypeTests
     {
+        private readonly PropertyTypeBuilder _builder = new PropertyTypeBuilder();
+
         [Test]
         public void Can_Deep_Clone()
         {
-            var pt = new PropertyType(ShortStringHelper, "TestPropertyEditor", ValueStorageType.Nvarchar, "test")
-            {
-                Id = 3,
-                CreateDate = DateTime.Now,
-                DataTypeId = 5,
-                PropertyEditorAlias = "propTest",
-                Description = "testing",
-                Key = Guid.NewGuid(),
-                Mandatory = true,
-                Name = "Test",
-                PropertyGroupId = new Lazy<int>(() => 11),
-                SortOrder = 9,
-                UpdateDate = DateTime.Now,
-                ValidationRegExp = "xxxx",
-                ValueStorageType = ValueStorageType.Nvarchar
-            };
+            var pt = BuildPropertyType();
 
             var clone = (PropertyType)pt.DeepClone();
 
@@ -59,8 +47,8 @@ namespace Umbraco.Tests.Models
                 var actual = propertyInfo.GetValue(clone, null);
                 if (propertyInfo.PropertyType == typeof(Lazy<int>))
                 {
-                    expected = ((Lazy<int>) expected).Value;
-                    actual = ((Lazy<int>) actual).Value;
+                    expected = ((Lazy<int>)expected).Value;
+                    actual = ((Lazy<int>)actual).Value;
                 }
 
                 Assert.AreEqual(expected, actual, $"Value of propery: '{propertyInfo.Name}': {expected} != {actual}");
@@ -70,26 +58,30 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var pt = new PropertyType(ShortStringHelper, "TestPropertyEditor", ValueStorageType.Nvarchar, "test")
-            {
-                Id = 3,
-                CreateDate = DateTime.Now,
-                DataTypeId = 5,
-                PropertyEditorAlias = "propTest",
-                Description = "testing",
-                Key = Guid.NewGuid(),
-                Mandatory = true,
-                Name = "Test",
-                PropertyGroupId = new Lazy<int>(() => 11),
-                SortOrder = 9,
-                UpdateDate = DateTime.Now,
-                ValidationRegExp = "xxxx",
-                ValueStorageType = ValueStorageType.Nvarchar
-            };
+            var pt = BuildPropertyType();
 
             var json = JsonConvert.SerializeObject(pt);
             Debug.Print(json);
         }
 
+        private PropertyType BuildPropertyType()
+        {
+            return _builder
+                .WithId(3)
+                .WithPropertyEditorAlias("TestPropertyEditor")
+                .WithValueStorageType(ValueStorageType.Nvarchar)
+                .WithAlias("test")
+                .WithName("Test")
+                .WithSortOrder(9)
+                .WithDataTypeId(5)
+                .WithCreateDate(DateTime.Now)
+                .WithUpdateDate(DateTime.Now)
+                .WithDescription("testing")
+                .WithKey(Guid.NewGuid())
+                .WithPropertyGroupId(11)
+                .WithMandatory(true)
+                .WithValidationRegExp("xxxx")
+                .Build();
+        }
     }
 }

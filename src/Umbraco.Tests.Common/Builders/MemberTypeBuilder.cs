@@ -11,6 +11,7 @@ namespace Umbraco.Tests.Common.Builders
 {
     public class MemberTypeBuilder
         : ChildBuilderBase<MemberBuilder, MemberType>,
+            IBuildPropertyGroups,
             IWithIdBuilder,
             IWithAliasBuilder,
             IWithNameBuilder,
@@ -22,7 +23,7 @@ namespace Umbraco.Tests.Common.Builders
             IWithThumbnailBuilder,            
             IWithTrashedBuilder
     {
-        private readonly List<PropertyGroupBuilder> _propertyGroupBuilders = new List<PropertyGroupBuilder>();
+        private readonly List<PropertyGroupBuilder<MemberTypeBuilder>> _propertyGroupBuilders = new List<PropertyGroupBuilder<MemberTypeBuilder>>();
 
         private int? _id;
         private string _alias;
@@ -41,7 +42,8 @@ namespace Umbraco.Tests.Common.Builders
 
         public MemberTypeBuilder WithMembershipPropertyGroup()
         {
-            var builder = new PropertyGroupBuilder(this)
+            var builder = new PropertyGroupBuilder<MemberTypeBuilder>(this)
+                .WithId(99)
                 .WithName(Constants.Conventions.Member.StandardPropertiesGroupName)
                 .WithSortOrder(1)
                 .AddPropertyType()
@@ -90,9 +92,9 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-        public PropertyGroupBuilder AddPropertyGroup()
+        public PropertyGroupBuilder<MemberTypeBuilder> AddPropertyGroup()
         {
-            var builder = new PropertyGroupBuilder(this);
+            var builder = new PropertyGroupBuilder<MemberTypeBuilder>(this);
             _propertyGroupBuilders.Add(builder);
             return builder;
         }

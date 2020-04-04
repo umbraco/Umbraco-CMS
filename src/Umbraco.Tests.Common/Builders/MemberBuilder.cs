@@ -155,7 +155,7 @@ namespace Umbraco.Tests.Common.Builders
 
             if (_memberTypeBuilder == null)
             {
-                throw new InvalidOperationException("A member cannot be constructed without providing a member type (use AddMemberType).");
+                throw new InvalidOperationException("A member cannot be constructed without providing a member type. Use AddMemberType().");
             }
 
             var memberType = _memberTypeBuilder.Build();
