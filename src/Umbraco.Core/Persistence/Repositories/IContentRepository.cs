@@ -77,5 +77,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <remarks>Here, <paramref name="filter"/> can be null but <paramref name="ordering"/> cannot.</remarks>
         IEnumerable<TEntity> GetPage(IQuery<TEntity> query, long pageIndex, int pageSize, out long totalRecords,
             IQuery<TEntity> filter, Ordering ordering);
+
+        /// <summary>
+        /// Checks the data integrity of the node paths stored in the database
+        /// </summary>
+        bool VerifyNodePaths(out int[] invalidIds);
+
+        void FixNodePaths();
     }
 }

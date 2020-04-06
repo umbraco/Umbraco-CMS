@@ -1139,6 +1139,28 @@ namespace Umbraco.Core.Services.Implement
             }
 
             return true;
+
+        }
+
+
+        public bool VerifyNodePaths(out int[] invalidIds)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MediaTree);
+                return _mediaRepository.VerifyNodePaths(out invalidIds);
+            }
+        }
+
+        public void FixNodePaths()
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.WriteLock(Constants.Locks.MediaTree);
+                _mediaRepository.FixNodePaths();
+
+                // TODO: We're going to have to clear all caches
+            }
         }
 
         #endregion
@@ -1358,5 +1380,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         #endregion
+
+        
     }
 }
