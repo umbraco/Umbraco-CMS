@@ -520,6 +520,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return false;
             }
 
+            // We cannot continue if there's no value. This shouldn't happen but it can happen if the database umbracoNode.path
+            // data is invalid/corrupt. If that is the case, the parentId might be ok but not the Path which can result in null
+            // because the data sort operation is by path.
+            if (parent.Value == null)
+            {
+                _logger.Warn<ContentStore>($"Skip item id={kit.Node.Id}, no Data assigned for linked node with path {kit.Node.Path} and parent id {kit.Node.ParentContentId}. This can indicate data corruption for the Path value for node {kit.Node.Id}.");
+                return false;
+            }
+
             // make sure the kit is valid
             if (kit.DraftData == null && kit.PublishedData == null)
             {
@@ -1036,12 +1045,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             parentLink = parentLink ?? GetRequiredParentLink(content, null);
 
-            // TODO: This can result in a null value? see https://github.com/umbraco/Umbraco-CMS/issues/7868
-            // It seems to be related to having corrupt Paths in the umbracoNode table.
             var parent = parentLink.Value;
 
+            // We are doing a null check here but this should no longer be possible because we have a null check in BuildKit
+            // for the parent.Value property and we'll output a warning. However I'll leave this additional null check in place. 
+            // see https://github.com/umbraco/Umbraco-CMS/issues/7868
             if (parent == null)
-                throw new PanicException($"A null Value was returned on the {nameof(parentLink)} LinkedNode with id={content.ParentContentId}, potentially your database paths are corrupted, please see the HealthCheck dashboard and fixup data inconsistencies.");
+                throw new PanicException($"A null Value was returned on the {nameof(parentLink)} LinkedNode with id={content.ParentContentId}, potentially your database paths are corrupted.");
 
             // if parent has no children, clone parent + add as first child
             if (parent.FirstChildContentId < 0)
