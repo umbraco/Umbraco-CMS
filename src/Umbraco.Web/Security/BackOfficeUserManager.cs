@@ -89,7 +89,7 @@ namespace Umbraco.Web.Security
             options.Password.RequireDigit = passwordConfiguration.RequireDigit;
             options.Password.RequireLowercase = passwordConfiguration.RequireLowercase;
             options.Password.RequireUppercase = passwordConfiguration.RequireUppercase;
-
+            
             // Ensure Umbraco security stamp claim type is used
             options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
             options.ClaimsIdentity.UserNameClaimType = ClaimTypes.Name;
@@ -202,7 +202,7 @@ namespace Umbraco.Web.Security
         protected virtual IPasswordHasher<T> GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration)
         {
             //we can use the user aware password hasher (which will be the default and preferred way)
-            return new UserAwarePasswordHasher2<T>(new PasswordSecurity(passwordConfiguration));
+            return new UserAwarePasswordHasher<T>(new PasswordSecurity(passwordConfiguration));
         }
         
         /// <summary>

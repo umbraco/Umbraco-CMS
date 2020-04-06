@@ -4,12 +4,12 @@ using Umbraco.Web.Models.Identity;
 
 namespace Umbraco.Web.Security
 {
-    public class UserAwarePasswordHasher2<T> : IPasswordHasher<T>
+    public class UserAwarePasswordHasher<T> : IPasswordHasher<T>
         where T : BackOfficeIdentityUser
     {
         private readonly PasswordSecurity _passwordSecurity;
 
-        public UserAwarePasswordHasher2(PasswordSecurity passwordSecurity)
+        public UserAwarePasswordHasher(PasswordSecurity passwordSecurity)
         {
             _passwordSecurity = passwordSecurity;
         }

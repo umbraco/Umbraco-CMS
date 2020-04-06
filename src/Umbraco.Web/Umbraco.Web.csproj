@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -205,7 +205,6 @@
     <Compile Include="Security\BackOfficeUserStore.cs" />
     <Compile Include="Security\BackOfficeUserValidator.cs" />
     <Compile Include="Security\ConfiguredPasswordValidator.cs" />
-    <Compile Include="Security\EmailService.cs" />
     <Compile Include="Security\IUserSessionStore.cs" />
     <Compile Include="Security\MembershipProviderBase.cs" />
     <Compile Include="Security\MembershipProviderExtensions.cs" />
@@ -213,9 +212,9 @@
     <Compile Include="Security\OwinDataProtectorTokenProvider.cs" />
     <Compile Include="Security\PasswordSecurity.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
-    <Compile Include="Security\UmbracoEmailMessage.cs" />
     <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
-    <Compile Include="Security\UserAwarePasswordHasher2.cs" />
+    <Compile Include="Security\UmbracoSecurityStampValidator.cs" />
+    <Compile Include="Security\UserAwarePasswordHasher.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="Trees\TreeCollectionBuilder.cs" />
     <Compile Include="UmbracoContext.cs" />
