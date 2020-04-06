@@ -1,3 +1,9 @@
-<button type="button" class="btn-reset umb-outline blockelement-imageblock-editor blockelement__draggable-element" focus-when="{{vm.moveFocusToBlock === block}}" ng-click="vm.blockEditorApi.editBlock(block)">
-    <img src="{{block.content.temp_image}}">
+<button type="button"
+    class="btn-reset umb-outline blockelement-imageblock-editor blockelement__draggable-element"
+    focus-when="{{vm.moveFocusToBlock === block}}"
+    ng-click="vm.blockEditorApi.editBlock(block)"
+    ng-controller="Umbraco.PropertyEditors.BlockEditor.ImageBlockEditor as bc"
+    ng-style="{'backgroundColor': block.settings.backgroundColor}"
+    >
+    <img src="{{bc.imageUrl}}">
 </button>

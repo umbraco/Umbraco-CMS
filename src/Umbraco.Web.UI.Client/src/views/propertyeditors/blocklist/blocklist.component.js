@@ -121,7 +121,7 @@
             if (block === null) return null;
 
             // Lets apply fallback views, and make the view available directly on the blockModel.
-            block.view = block.config.view || vm.model.config.useInlineEditingAsDefault ? "views/blockelements/inlineblock/inlineblock.editor.html" : "views/blockelements/labelblock/labelblock.editor.html";
+            block.view = block.config.view || (vm.model.config.useInlineEditingAsDefault ? "views/blockelements/inlineblock/inlineblock.editor.html" : "views/blockelements/labelblock/labelblock.editor.html");
 
             block.showSettings = block.config.settingsElementTypeAlias != null;
 
@@ -256,7 +256,7 @@
                         added = addNewBlock(createIndex, model.selectedItem.alias);
                     }
                     vm.blockTypePicker.close();
-                    if (added && vm.blocks.length > createIndex) {
+                    if (added && vm.model.config.useInlineEditingAsDefault !== true && vm.blocks.length > createIndex) {
                         editBlock(vm.blocks[createIndex]);
                     }
                 },
