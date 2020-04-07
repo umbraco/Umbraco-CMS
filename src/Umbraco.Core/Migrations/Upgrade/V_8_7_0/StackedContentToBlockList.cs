@@ -67,16 +67,16 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
                 .From<PropertyTypeDto>()
                 .InnerJoin<DataTypeDto>()
                 .On<PropertyTypeDto, DataTypeDto>(c => c.DataTypeId, n => n.NodeId)
-                .Where<DataTypeDto>(d => d.EditorAlias == Constants.PropertyEditors.Aliases.NestedContent);
+                .WhereIn<DataTypeDto>(d => d.EditorAlias, new[] { Constants.PropertyEditors.Aliases.NestedContent, Constants.PropertyEditors.Aliases.ColorPicker });
             var props = Database.Fetch<PropertyTypeDto>(sql);
-            // Get all nested content property aliases by content type ID
+            // Get all nested content and color picker property aliases by content type ID
             var propLk = props.ToLookup(p => p.ContentTypeId, p => p.Alias);
 
             var knownMap = new Dictionary<Guid, KnownContentType>(types.Count);
             types.ForEach(t => knownMap[t.NodeDto.UniqueId] = new KnownContentType
             {
                 Alias = t.Alias,
-                NestedContentProperties = propLk[t.NodeId].Union(joinLk[t.NodeId].SelectMany(r => propLk[r])).ToArray()
+                StringToRawProperties = propLk[t.NodeId].Union(joinLk[t.NodeId].SelectMany(r => propLk[r])).ToArray()
             });
             return knownMap;
         }
@@ -244,18 +244,16 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
                 obj["udi"] = udi;
                 obj["contentTypeAlias"] = ct.Alias;
 
-                if (ct.NestedContentProperties != null && ct.NestedContentProperties.Length > 0)
+                if (ct.StringToRawProperties != null && ct.StringToRawProperties.Length > 0)
                 {
                     // Nested content inside a stacked content item used to be stored as a deserialized string of the JSON array
                     // Now we store the content as the raw JSON array, so we need to convert from the string form to the array
-                    foreach (var prop in ct.NestedContentProperties)
+                    foreach (var prop in ct.StringToRawProperties)
                     {
                         var val = obj[prop];
                         var value = val?.ToString();
-                        if (val != null && val.Type == JTokenType.String && !value.IsNullOrWhiteSpace() && value[0] == '[')
-                            obj[prop] = JArray.Parse(value);
-                        else if (val.Type != JTokenType.Array)
-                            obj[prop] = new JArray();
+                        if (val != null && val.Type == JTokenType.String && !value.IsNullOrWhiteSpace())
+                            obj[prop] = JsonConvert.DeserializeObject<JToken>(value);
                     }
                 }
 
@@ -279,7 +277,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
         private class KnownContentType
         {
             public string Alias { get; set; }
-            public string[] NestedContentProperties { get; set; }
+            public string[] StringToRawProperties { get; set; }
         }
     }
 }
