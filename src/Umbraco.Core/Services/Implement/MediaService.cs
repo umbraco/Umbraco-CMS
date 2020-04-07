@@ -1150,24 +1150,13 @@ namespace Umbraco.Core.Services.Implement
 
         }
 
-
-        public bool VerifyNodePaths(out int[] invalidIds)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MediaTree);
-                return _mediaRepository.VerifyNodePaths(out invalidIds);
-            }
-        }
-
-        public void FixNodePaths()
+        public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.WriteLock(Constants.Locks.MediaTree);
-                _mediaRepository.FixNodePaths();
-
                 // TODO: We're going to have to clear all caches
+                return _mediaRepository.CheckDataIntegrity(options);
             }
         }
 

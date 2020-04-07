@@ -525,7 +525,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // because the data sort operation is by path.
             if (parent.Value == null)
             {
-                _logger.Warn<ContentStore>($"Skip item id={kit.Node.Id}, no Data assigned for linked node with path {kit.Node.Path} and parent id {kit.Node.ParentContentId}. This can indicate data corruption for the Path value for node {kit.Node.Id}.");
+                _logger.Warn<ContentStore>($"Skip item id={kit.Node.Id}, no Data assigned for linked node with path {kit.Node.Path} and parent id {kit.Node.ParentContentId}. This can indicate data corruption for the Path value for node {kit.Node.Id}. See the Health Check dashboard in Settings to resolve data integrity issues.");
                 return false;
             }
 

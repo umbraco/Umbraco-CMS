@@ -477,9 +477,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             IQuery<TEntity> filter,
             Ordering ordering);
 
-        public bool VerifyNodePaths(out int[] invalidIds)
+        public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
         {
-            var invalid = new List<int>();
+            var report = new Dictionary<int, ContentDataIntegrityReportEntry>();
 
             var sql = SqlContext.Sql()
                 .Select<NodeDto>()
@@ -487,80 +487,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
-            // TODO: Could verify sort orders here too
-
-            var currentParentIds = new HashSet<int> { -1 };
-            var prevParentIds = currentParentIds;
-            var lastLevel = -1;
-
-            // use a forward cursor (query)
-            foreach (var node in Database.Query<NodeDto>(sql))
-            {
-                if (node.Level != lastLevel)
-                {
-                    // changing levels
-                    prevParentIds = currentParentIds;
-                    currentParentIds = null;
-                    lastLevel = node.Level;
-                }
-
-                if (currentParentIds == null)
-                {
-                    // we're reset
-                    currentParentIds = new HashSet<int>();
-                }
-
-                currentParentIds.Add(node.NodeId);
-
-                var pathParts = node.Path.Split(',');
-
-                if (!prevParentIds.Contains(node.ParentId))
-                {
-                    // invalid, this will be because the level is wrong
-                    invalid.Add(node.NodeId);
-                }
-                else if (pathParts.Length < 2)
-                {
-                    // invalid path
-                    invalid.Add(node.NodeId);
-                }
-                else if (pathParts.Length - 1 != node.Level)
-                {
-                    // invalid, either path or level is wrong
-                    invalid.Add(node.NodeId);
-                }
-                else if (pathParts[pathParts.Length - 1] != node.NodeId.ToString())
-                {
-                    // invalid path
-                    invalid.Add(node.NodeId);
-                }
-                else if (pathParts[pathParts.Length - 2] != node.ParentId.ToString())
-                {
-                    // invalid path
-                    invalid.Add(node.NodeId);
-                }
-            }
-
-            invalidIds = invalid.ToArray();
-            return invalid.Count == 0;
-        }
-
-        public void FixNodePaths()
-        {
-            // TODO: We can probably combine this logic with the above
-
-            var invalid = new List<(int child, int parent)>();
-
-            var sql = SqlContext.Sql()
-                .Select<NodeDto>()
-                .From<NodeDto>()
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
-
-            // TODO: Could verify sort orders here too
-
-            var updated = new List<NodeDto>();
-            var missingParentIds = new Dictionary<int, List<NodeDto>>();
+            var nodesToRebuild = new Dictionary<int, List<NodeDto>>();
+            var validNodes = new Dictionary<int, NodeDto>();
             var currentParentIds = new HashSet<int> { -1 };
             var prevParentIds = currentParentIds;
             var lastLevel = -1;
@@ -589,54 +517,77 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (!prevParentIds.Contains(node.ParentId))
                 {
                     // invalid, this will be because the level is wrong (which prob means path is wrong too)
-                    invalid.Add((node.NodeId, node.ParentId));
-                    if (missingParentIds.TryGetValue(node.ParentId, out var childIds))
-                        childIds.Add(node);
-                    else
-                        missingParentIds[node.ParentId] = new List<NodeDto> {node};
+                    report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathAndLevelByParentId));
+                    AppendNodeToFix(nodesToRebuild, node);
                 }
                 else if (pathParts.Length < 2)
                 {
                     // invalid path
-                    invalid.Add((node.NodeId, node.ParentId));
+                    report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathEmpty));
+                    AppendNodeToFix(nodesToRebuild, node);
                 }
                 else if (pathParts.Length - 1 != node.Level)
                 {
                     // invalid, either path or level is wrong
-                    invalid.Add((node.NodeId, node.ParentId));
+                    report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathLevelMismatch));
+                    AppendNodeToFix(nodesToRebuild, node);
                 }
                 else if (pathParts[pathParts.Length - 1] != node.NodeId.ToString())
                 {
                     // invalid path
-                    invalid.Add((node.NodeId, node.ParentId));
+                    report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathById));
+                    AppendNodeToFix(nodesToRebuild, node);
                 }
                 else if (pathParts[pathParts.Length - 2] != node.ParentId.ToString())
                 {
                     // invalid path
-                    invalid.Add((node.NodeId, node.ParentId));
+                    report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathByParentId));
+                    AppendNodeToFix(nodesToRebuild, node);
                 }
                 else
                 {
-                    // it's valid
+                    // it's valid!
 
-                    if (missingParentIds.TryGetValue(node.NodeId, out var invalidNodes))
-                    {
-                        // this parent has been flagged as missing which means one or more of it's children was ordered
-                        // wrong and was checked first. So now we can try to rebuild the invalid paths.
-
-                        foreach (var invalidNode in invalidNodes)
-                        {
-                            invalidNode.Level = (short) (node.Level + 1);
-                            invalidNode.Path = node.Path + "," + invalidNode.NodeId;
-                            updated.Add(invalidNode);
-                        }
-                    }
+                    // don't track unless we are configured to fix
+                    if (options.FixIssues)
+                        validNodes.Add(node.NodeId, node);
                 }
             }
 
-            foreach (var node in updated)
+            var updated = new List<NodeDto>();
+
+            if (options.FixIssues)
             {
-                Database.Update(node);
+                // iterate all valid nodes to see if these are parents for invalid nodes
+                foreach (var (nodeId, node) in validNodes)
+                {
+                    if (!nodesToRebuild.TryGetValue(nodeId, out var invalidNodes)) continue;
+
+                    // now we can try to rebuild the invalid paths.
+
+                    foreach (var invalidNode in invalidNodes)
+                    {
+                        invalidNode.Level = (short)(node.Level + 1);
+                        invalidNode.Path = node.Path + "," + invalidNode.NodeId;
+                        updated.Add(invalidNode);
+                    }
+                }
+
+                foreach (var node in updated)
+                {
+                    Database.Update(node);
+                }
+            }
+
+            return new ContentDataIntegrityReport(report);
+
+            // inline method used to append nodes to rebuild
+            static void AppendNodeToFix(IDictionary<int, List<NodeDto>> nodesToRebuild, NodeDto node)
+            {
+                if (nodesToRebuild.TryGetValue(node.ParentId, out var childIds))
+                    childIds.Add(node);
+                else
+                    nodesToRebuild[node.ParentId] = new List<NodeDto> { node };
             }
         }
 

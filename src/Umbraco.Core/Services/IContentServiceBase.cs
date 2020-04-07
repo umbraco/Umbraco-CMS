@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Services
+﻿using Umbraco.Core.Models;
+
+namespace Umbraco.Core.Services
 {
     /// <summary>
     /// Placeholder for sharing logic between the content, media (and member) services
@@ -6,15 +8,9 @@
     /// </summary>
     public interface IContentServiceBase : IService
     {
-
         /// <summary>
-        /// Checks the data integrity of the node paths/levels stored in the database
+        /// Checks/fixes the data integrity of node paths/levels stored in the database
         /// </summary>
-        bool VerifyNodePaths(out int[] invalidIds);
-
-        /// <summary>
-        /// Fixes the data integrity of node paths/levels stored in the database
-        /// </summary>
-        void FixNodePaths();
+        ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options);
     }
 }
