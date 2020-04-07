@@ -489,7 +489,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var nodesToRebuild = new Dictionary<int, List<NodeDto>>();
             var validNodes = new Dictionary<int, NodeDto>();
-            var currentParentIds = new HashSet<int> { -1 };
+            var rootIds = new[] {Constants.System.Root, Constants.System.RecycleBinContent, Constants.System.RecycleBinMedia};
+            var currentParentIds = new HashSet<int>(rootIds);
             var prevParentIds = currentParentIds;
             var lastLevel = -1;
 
@@ -512,7 +513,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 currentParentIds.Add(node.NodeId);
 
-                var pathParts = node.Path.Split(',');
+                // paths parts without the roots
+                var pathParts = node.Path.Split(',').Where(x => !rootIds.Contains(int.Parse(x))).ToArray();
 
                 if (!prevParentIds.Contains(node.ParentId))
                 {
@@ -520,13 +522,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathAndLevelByParentId));
                     AppendNodeToFix(nodesToRebuild, node);
                 }
-                else if (pathParts.Length < 2)
+                else if (pathParts.Length  == 0)
                 {
                     // invalid path
                     report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathEmpty));
                     AppendNodeToFix(nodesToRebuild, node);
                 }
-                else if (pathParts.Length - 1 != node.Level)
+                else if (pathParts.Length != node.Level)
                 {
                     // invalid, either path or level is wrong
                     report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathLevelMismatch));
@@ -538,7 +540,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathById));
                     AppendNodeToFix(nodesToRebuild, node);
                 }
-                else if (pathParts[pathParts.Length - 2] != node.ParentId.ToString())
+                else if (!rootIds.Contains(node.ParentId) && pathParts[pathParts.Length - 2] != node.ParentId.ToString())
                 {
                     // invalid path
                     report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathByParentId));

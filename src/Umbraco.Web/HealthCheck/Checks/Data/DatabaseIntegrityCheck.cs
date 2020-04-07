@@ -45,22 +45,22 @@ namespace Umbraco.Web.HealthCheck.Checks.Data
 
         private HealthCheckStatus CheckMedia(bool fix)
         {
-            return CheckPaths(_fixMediaPaths, _fixMediaPathsTitle, Core.Constants.UdiEntityType.Media,
+            return CheckPaths(_fixMediaPaths, _fixMediaPathsTitle, Core.Constants.UdiEntityType.Media, fix,
                 () => _mediaService.CheckDataIntegrity(new ContentDataIntegrityReportOptions {FixIssues = fix}));
         }
 
         private HealthCheckStatus CheckDocuments(bool fix)
         {
-            return CheckPaths(_fixContentPaths, _fixContentPathsTitle, Core.Constants.UdiEntityType.Document,
+            return CheckPaths(_fixContentPaths, _fixContentPathsTitle, Core.Constants.UdiEntityType.Document, fix,
                 () => _contentService.CheckDataIntegrity(new ContentDataIntegrityReportOptions {FixIssues = fix}));
         }
 
-        private HealthCheckStatus CheckPaths(string actionAlias, string actionName, string entityType, Func<ContentDataIntegrityReport> doCheck)
+        private HealthCheckStatus CheckPaths(string actionAlias, string actionName, string entityType, bool detailedReport, Func<ContentDataIntegrityReport> doCheck)
         {
-            var result = doCheck();
+            var report = doCheck();
 
             var actions = new List<HealthCheckAction>();
-            if (!result.Ok)
+            if (!report.Ok)
             {
                 actions.Add(new HealthCheckAction(actionAlias, Id)
                 {
@@ -68,13 +68,35 @@ namespace Umbraco.Web.HealthCheck.Checks.Data
                 });
             }
 
-            return new HealthCheckStatus(result.Ok
+            return new HealthCheckStatus(report.Ok
                 ? $"All {entityType} paths are valid"
-                : $"There are {result.DetectedIssues.Count} invalid {entityType} paths")
+                : GetInvalidReport(report, entityType, detailedReport))
             {
-                ResultType = result.Ok ? StatusResultType.Success : StatusResultType.Error,
+                ResultType = report.Ok ? StatusResultType.Success : StatusResultType.Error,
                 Actions = actions
             };
+        }
+
+        private static string GetInvalidReport(ContentDataIntegrityReport report, string entityType, bool detailed)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"There are {report.DetectedIssues.Count} invalid {entityType} paths");
+
+            if (true && report.DetectedIssues.Count > 0)
+            {
+                sb.AppendLine("<ul>");
+                foreach (var issueGroup in report.DetectedIssues.GroupBy(x => x.Value.IssueType))
+                {
+                    var countByGroup = issueGroup.Count();
+                    var fixedByGroup = issueGroup.Count(x => x.Value.Fixed);
+                    sb.AppendLine("<li>");
+                    sb.AppendLine($"{countByGroup} issues of type <code>{issueGroup.Key}</code> ... {fixedByGroup} fixed");
+                    sb.AppendLine("</li>");
+                }
+                sb.AppendLine("</ul>");
+            }
+
+            return sb.ToString();
         }
 
         public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
