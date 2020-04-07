@@ -580,15 +580,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             return new ContentDataIntegrityReport(report);
+        }
 
-            // inline method used to append nodes to rebuild
-            static void AppendNodeToFix(IDictionary<int, List<NodeDto>> nodesToRebuild, NodeDto node)
-            {
-                if (nodesToRebuild.TryGetValue(node.ParentId, out var childIds))
-                    childIds.Add(node);
-                else
-                    nodesToRebuild[node.ParentId] = new List<NodeDto> { node };
-            }
+        private static void AppendNodeToFix(IDictionary<int, List<NodeDto>> nodesToRebuild, NodeDto node)
+        {
+            if (nodesToRebuild.TryGetValue(node.ParentId, out var childIds))
+                childIds.Add(node);
+            else
+                nodesToRebuild[node.ParentId] = new List<NodeDto> { node };
         }
 
         // here, filter can be null and ordering cannot
