@@ -20,6 +20,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
 
         public override void Migrate()
         {
+            // Convert all Stacked Content properties to Block List properties, both in the data types and in the property data
             var refreshCache = Migrate(GetDataTypes("Our.Umbraco.StackedContent"), GetKnownDocumentTypes());
 
             // if some data types have been updated directly in the database (editing DataTypeDto and/or PropertyDataDto),
@@ -38,7 +39,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
             return Database.Fetch<DataTypeDto>(sql);
         }
 
-        private Dictionary<Guid, string> GetKnownDocumentTypes()
+        private Dictionary<Guid, KnownContentType> GetKnownDocumentTypes()
         {
             var sql = Sql()
                 .Select<ContentTypeDto>(r => r.Select(x => x.NodeDto))
@@ -47,12 +48,40 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
                 .On<ContentTypeDto, NodeDto>(c => c.NodeId, n => n.NodeId);
 
             var types = Database.Fetch<ContentTypeDto>(sql);
-            var map = new Dictionary<Guid, string>(types.Count);
-            types.ForEach(t => map[t.NodeDto.UniqueId] = t.Alias);
-            return map;
+            var typeMap = new Dictionary<int, ContentTypeDto>(types.Count);
+            types.ForEach(t => typeMap[t.NodeId] = t);
+
+            sql = Sql()
+                .Select<ContentType2ContentTypeDto>()
+                .From<ContentType2ContentTypeDto>();
+            var joins = Database.Fetch<ContentType2ContentTypeDto>(sql);
+            // Find all relationships between types, either inherited or composited
+            var joinLk = joins
+                .Union(types
+                    .Where(t => typeMap.ContainsKey(t.NodeDto.ParentId))
+                    .Select(t => new ContentType2ContentTypeDto { ChildId = t.NodeId, ParentId = t.NodeDto.ParentId }))
+                .ToLookup(j => j.ChildId, j => j.ParentId);
+
+            sql = Sql()
+                .Select<PropertyTypeDto>(r => r.Select(x => x.DataTypeDto))
+                .From<PropertyTypeDto>()
+                .InnerJoin<DataTypeDto>()
+                .On<PropertyTypeDto, DataTypeDto>(c => c.DataTypeId, n => n.NodeId)
+                .Where<DataTypeDto>(d => d.EditorAlias == Constants.PropertyEditors.Aliases.NestedContent);
+            var props = Database.Fetch<PropertyTypeDto>(sql);
+            // Get all nested content property aliases by content type ID
+            var propLk = props.ToLookup(p => p.ContentTypeId, p => p.Alias);
+
+            var knownMap = new Dictionary<Guid, KnownContentType>(types.Count);
+            types.ForEach(t => knownMap[t.NodeDto.UniqueId] = new KnownContentType
+            {
+                Alias = t.Alias,
+                NestedContentProperties = propLk[t.NodeId].Union(joinLk[t.NodeId].SelectMany(r => propLk[r])).ToArray()
+            });
+            return knownMap;
         }
 
-        private bool Migrate(IEnumerable<DataTypeDto> dataTypesToMigrate, Dictionary<Guid, string> knownDocumentTypes)
+        private bool Migrate(IEnumerable<DataTypeDto> dataTypesToMigrate, Dictionary<Guid, KnownContentType> knownDocumentTypes)
         {
             var refreshCache = false;
 
@@ -73,14 +102,14 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
             return refreshCache;
         }
 
-        private BlockListConfiguration UpdateConfiguration(DataTypeDto dataType, Dictionary<Guid, string> knownDocumentTypes)
+        private BlockListConfiguration UpdateConfiguration(DataTypeDto dataType, Dictionary<Guid, KnownContentType> knownDocumentTypes)
         {
             var old = JsonConvert.DeserializeObject<StackedContentConfiguration>(dataType.Configuration);
             var config = new BlockListConfiguration
             {
                 Blocks = old.ContentTypes?.Select(t => new BlockListConfiguration.BlockConfiguration
                 {
-                    Alias = knownDocumentTypes[t.IcContentTypeGuid],
+                    Alias = knownDocumentTypes[t.IcContentTypeGuid].Alias,
                     Label = t.NameTemplate
                 }).ToArray(),
                 UseInlineEditingAsDefault = old.SingleItemMode == "1" || old.SingleItemMode == bool.TrueString
@@ -96,7 +125,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
             return config;
         }
 
-        private void UpdatePropertyData(DataTypeDto dataType, BlockListConfiguration config, Dictionary<Guid, string> knownDocumentTypes)
+        private void UpdatePropertyData(DataTypeDto dataType, BlockListConfiguration config, Dictionary<Guid, KnownContentType> knownDocumentTypes)
         {
             // get property data dtos
             var propertyDataDtos = Database.Fetch<PropertyDataDto>(Sql()
@@ -115,7 +144,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
         }
 
 
-        private bool UpdatePropertyDataDto(PropertyDataDto dto, BlockListConfiguration config, Dictionary<Guid, string> knownDocumentTypes)
+        private bool UpdatePropertyDataDto(PropertyDataDto dto, BlockListConfiguration config, Dictionary<Guid, KnownContentType> knownDocumentTypes)
         {
             var model = new SimpleModel();
 
@@ -202,18 +231,33 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
             [JsonProperty("data")]
             public List<JObject> Data { get; } = new List<JObject>();
 
-            public void AddDataItem(JObject obj, Dictionary<Guid, string> knownDocumentTypes)
+            public void AddDataItem(JObject obj, Dictionary<Guid, KnownContentType> knownDocumentTypes)
             {
                 if (!Guid.TryParse(obj["key"].ToString(), out var key)) throw new ArgumentException("Could not find a valid key in the data item");
                 if (!Guid.TryParse(obj["icContentTypeGuid"].ToString(), out var ctGuid)) throw new ArgumentException("Could not find a valid content type GUID in the data item");
-                if (!knownDocumentTypes.TryGetValue(ctGuid, out var ctAlias)) throw new ArgumentException($"Unknown content type GUID '{ctGuid}'");
+                if (!knownDocumentTypes.TryGetValue(ctGuid, out var ct)) throw new ArgumentException($"Unknown content type GUID '{ctGuid}'");
 
                 obj.Remove("key");
                 obj.Remove("icContentTypeGuid");
 
                 var udi = new GuidUdi(Constants.UdiEntityType.Element, key).ToString();
                 obj["udi"] = udi;
-                obj["contentTypeAlias"] = ctAlias;
+                obj["contentTypeAlias"] = ct.Alias;
+
+                if (ct.NestedContentProperties != null && ct.NestedContentProperties.Length > 0)
+                {
+                    // Nested content inside a stacked content item used to be stored as a deserialized string of the JSON array
+                    // Now we store the content as the raw JSON array, so we need to convert from the string form to the array
+                    foreach (var prop in ct.NestedContentProperties)
+                    {
+                        var val = obj[prop];
+                        var value = val?.ToString();
+                        if (val != null && val.Type == JTokenType.String && !value.IsNullOrWhiteSpace() && value[0] == '[')
+                            obj[prop] = JArray.Parse(value);
+                        else if (val.Type != JTokenType.Array)
+                            obj[prop] = new JArray();
+                    }
+                }
 
                 Data.Add(obj);
                 Layout.Refs.Add(new SimpleLayout.SimpleLayoutRef { Udi = udi });
@@ -230,6 +274,12 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
                     public string Udi { get; set; }
                 }
             }
+        }
+
+        private class KnownContentType
+        {
+            public string Alias { get; set; }
+            public string[] NestedContentProperties { get; set; }
         }
     }
 }
