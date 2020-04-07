@@ -83,7 +83,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         // gets all version ids, current first
         public virtual IEnumerable<int> GetVersionIds(int nodeId, int maxRows)
         {
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersionIds", tsql =>
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepositoryGetVersionIds, tsql =>
                 tsql.Select<ContentVersionDto>(x => x.Id)
                     .From<ContentVersionDto>()
                     .Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId"))
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // TODO: test object node type?
 
             // get the version we want to delete
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersion", tsql =>
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepositoryGetVersion, tsql =>
                 tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == SqlTemplate.Arg<int>("versionId"))
             );
             var versionDto = Database.Fetch<ContentVersionDto>(template.Sql(new { versionId })).FirstOrDefault();
@@ -121,7 +121,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // TODO: test object node type?
 
             // get the versions we want to delete, excluding the current one
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersions", tsql =>
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepositoryGetVersions, tsql =>
                 tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId") && !x.Current && x.VersionDate < SqlTemplate.Arg<DateTime>("versionDate"))
             );
             var versionDtos = Database.Fetch<ContentVersionDto>(template.Sql(new { nodeId, versionDate }));
@@ -933,7 +933,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected virtual string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
         {
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.EnsureUniqueNodeName", tsql => tsql
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepositoryEnsureUniqueNodeName, tsql => tsql
                 .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text, "name"))
                 .From<NodeDto>()
                 .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId")));
@@ -946,7 +946,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected virtual int GetNewChildSortOrder(int parentId, int first)
         {
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetSortOrder", tsql =>
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepositoryGetSortOrder, tsql =>
                 tsql.Select($"COALESCE(MAX(sortOrder),{first - 1})").From<NodeDto>().Where<NodeDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId") && x.NodeObjectType == NodeObjectTypeId)
             );
 
@@ -955,7 +955,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected virtual NodeDto GetParentNodeDto(int parentId)
         {
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetParentNode", tsql =>
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepositoryGetParentNode, tsql =>
                 tsql.Select<NodeDto>().From<NodeDto>().Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId"))
             );
 
@@ -964,7 +964,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected virtual int GetReservedId(Guid uniqueId)
         {
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetReservedId", tsql =>
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepositoryGetReservedId, tsql =>
                 tsql.Select<NodeDto>(x => x.NodeId).From<NodeDto>().Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("uniqueId") && x.NodeObjectType == Constants.ObjectTypes.IdReservation)
             );
             var id = Database.ExecuteScalar<int?>(template.Sql(new { uniqueId = uniqueId }));

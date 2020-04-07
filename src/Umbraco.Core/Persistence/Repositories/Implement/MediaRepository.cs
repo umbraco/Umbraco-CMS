@@ -219,7 +219,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IMedia entity)
         {
-            var media = (Models.Media) entity;
+            var media = entity;
             entity.AddingEntity();
 
             // ensure unique name on the same level
@@ -298,26 +298,35 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IMedia entity)
         {
-            var media = (Models.Media) entity;
+            var media = entity;
 
             // update
             media.UpdatingEntity();
 
-            // ensure unique name on the same level
-            entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
+            // Check if this entity is being moved as a descendant as part of a bulk moving operations.
+            // When this occurs, only Path + Level + UpdateDate are being changed. In this case we can bypass a lot of the below
+            // operations which will make this whole operation go much faster. When moving we don't need to create
+            // new versions, etc... because we cannot roll this operation back anyways. 
+            var isMoving = entity.GetDirtyProperties().All(x => x == nameof(entity.Path) || x == nameof(entity.Level) || x == nameof(entity.UpdateDate));
 
-            // ensure that strings don't contain characters that are invalid in xml
-            // TODO: do we really want to keep doing this here?
-            entity.SanitizeEntityPropertiesForXmlStorage();
-
-            // if parent has changed, get path, level and sort order
-            if (entity.IsPropertyDirty("ParentId"))
+            if (!isMoving)
             {
-                var parent = GetParentNodeDto(entity.ParentId);
+                // ensure unique name on the same level
+                entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
 
-                entity.Path = string.Concat(parent.Path, ",", entity.Id);
-                entity.Level = parent.Level + 1;
-                entity.SortOrder = GetNewChildSortOrder(entity.ParentId, 0);
+                // ensure that strings don't contain characters that are invalid in xml
+                // TODO: do we really want to keep doing this here?
+                entity.SanitizeEntityPropertiesForXmlStorage();
+
+                // if parent has changed, get path, level and sort order
+                if (entity.IsPropertyDirty(nameof(entity.ParentId)))
+                {
+                    var parent = GetParentNodeDto(entity.ParentId);
+
+                    entity.Path = string.Concat(parent.Path, ",", entity.Id);
+                    entity.Level = parent.Level + 1;
+                    entity.SortOrder = GetNewChildSortOrder(entity.ParentId, 0);
+                }
             }
 
             // create the dto
@@ -328,26 +337,29 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             nodeDto.ValidatePathWithException();
             Database.Update(nodeDto);
 
-            // update the content dto
-            Database.Update(dto.ContentDto);
+            if (!isMoving)
+            {
+                // update the content dto
+                Database.Update(dto.ContentDto);
 
-            // update the content & media version dtos
-            var contentVersionDto = dto.MediaVersionDto.ContentVersionDto;
-            var mediaVersionDto = dto.MediaVersionDto;
-            contentVersionDto.Current = true;
-            Database.Update(contentVersionDto);
-            Database.Update(mediaVersionDto);
+                // update the content & media version dtos
+                var contentVersionDto = dto.MediaVersionDto.ContentVersionDto;
+                var mediaVersionDto = dto.MediaVersionDto;
+                contentVersionDto.Current = true;
+                Database.Update(contentVersionDto);
+                Database.Update(mediaVersionDto);
 
-            // replace the property data
-            var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == media.VersionId);
-            Database.Execute(deletePropertyDataSql);
-            var propertyDataDtos = PropertyFactory.BuildDtos(media.ContentType.Variations, media.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
-            foreach (var propertyDataDto in propertyDataDtos)
-                Database.Insert(propertyDataDto);
+                // replace the property data
+                var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == media.VersionId);
+                Database.Execute(deletePropertyDataSql);
+                var propertyDataDtos = PropertyFactory.BuildDtos(media.ContentType.Variations, media.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
+                foreach (var propertyDataDto in propertyDataDtos)
+                    Database.Insert(propertyDataDto);
 
-            SetEntityTags(entity, _tagRepository);
+                SetEntityTags(entity, _tagRepository);
 
-            PersistRelations(entity);
+                PersistRelations(entity);
+            }
 
             OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
 
