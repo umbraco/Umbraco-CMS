@@ -394,7 +394,7 @@ angular.module("umbraco")
                 });
             }, 500);
 
-            function changeSearch() {
+        function changeSearch() {
                 vm.loading = true;
                 debounceSearchMedia();
             }
@@ -411,7 +411,7 @@ angular.module("umbraco")
                 searchMedia();
             };
 
-            function searchMedia() {
+        function searchMedia() {
                 vm.loading = true;
                 entityResource.getPagedDescendants($scope.filterOptions.excludeSubFolders ? $scope.currentFolder.id : $scope.startNodeId, "Media", vm.searchOptions)
                     .then(function (data) {
@@ -442,7 +442,6 @@ angular.module("umbraco")
                 // set thumbnail and src
                 mediaItem.thumbnail = mediaHelper.resolveFileFromEntity(mediaItem, true);
                 mediaItem.image = mediaHelper.resolveFileFromEntity(mediaItem, false);
-
                 // set properties to match a media object
                 if (mediaItem.metaData) {
                     mediaItem.properties = [];
@@ -470,6 +469,9 @@ angular.module("umbraco")
                             }
                         );
                     }
+                    if (mediaItem.metaData.UpdateDate !== null) {
+                        mediaItem.updateDate = mediaItem.metaData.UpdateDate;
+                    }
                 }
             }
 
@@ -484,7 +486,9 @@ angular.module("umbraco")
                             data[i].thumbnail = mediaHelper.resolveFileFromEntity(data[i], true);
                             data[i].image = mediaHelper.resolveFileFromEntity(data[i], false);
                         }
-
+                        if (data[i].metaData.UpdateDate !== null){
+                            data[i].updateDate = data[i].metaData.UpdateDate;
+                        }
                         data[i].filtered = allowedTypes && allowedTypes.indexOf(data[i].metaData.ContentTypeAlias) < 0;
                     }
 
