@@ -1014,6 +1014,7 @@ namespace Umbraco.Core.Services.Implement
             long total;
             do
             {
+                // We always page a page 0 because for each page, we are moving the result so the resulting total will be reduced
                 var descendants = GetPagedLocked(query, 0, pageSize, out total, null, Ordering.By("Path", Direction.Ascending));
 
                 foreach (var descendant in descendants)

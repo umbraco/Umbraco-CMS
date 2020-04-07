@@ -304,10 +304,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             media.UpdatingEntity();
 
             // Check if this entity is being moved as a descendant as part of a bulk moving operations.
-            // When this occurs, only Path + Level + UpdateDate are being changed. In this case we can bypass a lot of the below
-            // operations which will make this whole operation go much faster. When moving we don't need to create
-            // new versions, etc... because we cannot roll this operation back anyways. 
-            var isMoving = entity.GetDirtyProperties().All(x => x == nameof(entity.Path) || x == nameof(entity.Level) || x == nameof(entity.UpdateDate));
+            // In this case we can bypass a lot of the below operations which will make this whole operation go much faster.
+            // When moving we don't need to create new versions, etc... because we cannot roll this operation back anyways.
+            var isMoving = entity.IsMoving();
 
             if (!isMoving)
             {
