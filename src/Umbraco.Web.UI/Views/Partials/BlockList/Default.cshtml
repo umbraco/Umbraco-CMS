@@ -1,5 +1,4 @@
 ﻿@inherits UmbracoViewPage<BlockListModel>
-@using ContentModels = Umbraco.Web.PublishedModels;
 @using Umbraco.Core.Models.Blocks
 @{
     if (Model?.Layout == null || !Model.Layout.Any()) { return; }
@@ -9,6 +8,6 @@
     {
         if (layout?.Udi == null) { continue; }
         var data = layout.Data;
-        @Html.Partial("BlockList/" + data.ContentType.Alias, layout)
+        @Html.Partial("BlockList/Components/" + data.ContentType.Alias, layout)
     }
 </div>
