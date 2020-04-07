@@ -5,7 +5,7 @@ angular.module("umbraco")
 
         var vm = this;
         
-        vm.firstProperty = $scope.blockItem.content.variants[0].tabs[0].properties[0];
+        vm.firstProperty = $scope.block.content.variants[0].tabs[0].properties[0];
         /*
         vm.onBlur = function() {
             if (vm.firstProperty.value === null || vm.firstProperty.value === "") {
@@ -13,6 +13,7 @@ angular.module("umbraco")
             }
         }
         */
+       // TODO: if text is empty and user hits backspace, then remove this block.
     }
 
 );
