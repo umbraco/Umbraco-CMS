@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Session
+namespace Umbraco.Web
 {
     public interface ISessionManager
     {

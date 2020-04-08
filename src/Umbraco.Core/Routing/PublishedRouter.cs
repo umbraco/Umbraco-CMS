@@ -8,7 +8,6 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Request;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 

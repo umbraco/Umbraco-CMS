@@ -4,7 +4,6 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Request;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;

@@ -47,7 +47,7 @@ namespace Umbraco.Web.Security
         public static async Task<bool> ValidateSessionAsync(
             TimeSpan validateInterval,
             IOwinContext owinCtx,
-            ICookieManager cookieManager,
+            Microsoft.Owin.Infrastructure.ICookieManager cookieManager,
             ISystemClock systemClock,
             DateTimeOffset? authTicketIssueDate,
             ClaimsIdentity currentIdentity,

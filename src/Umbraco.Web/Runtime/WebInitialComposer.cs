@@ -5,7 +5,6 @@ using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Cookie;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Install;
@@ -25,8 +24,6 @@ using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Net;
-using Umbraco.Core.Request;
-using Umbraco.Core.Session;
 using Umbraco.Web.AspNet;
 
 namespace Umbraco.Web.Runtime

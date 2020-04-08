@@ -1,6 +1,5 @@
 ﻿using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Request;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Routing;

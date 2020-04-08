@@ -1,21 +1,12 @@
 using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Cookie;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Media;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Net;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
-using Umbraco.Core.Session;
-using Umbraco.Infrastructure.Media;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Lifetime;
-using Umbraco.Web.Models.PublishedContent;
-using Umbraco.Web.PropertyEditors;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.Common.Runtime
 {

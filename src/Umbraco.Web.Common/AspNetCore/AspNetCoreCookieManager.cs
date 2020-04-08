@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
-using Umbraco.Core.Cookie;
 
 namespace Umbraco.Web.Common.AspNetCore
 {

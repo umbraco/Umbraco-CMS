@@ -11,7 +11,6 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Request;
 
 namespace Umbraco.Web
 {

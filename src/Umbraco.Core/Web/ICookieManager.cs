@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Cookie
+namespace Umbraco.Web
 {
     public interface ICookieManager
     {
