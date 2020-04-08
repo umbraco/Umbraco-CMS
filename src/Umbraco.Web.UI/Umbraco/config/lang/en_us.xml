@@ -2414,14 +2414,20 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="formsDescription">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</key>
   </area>
   <area alias="blockEditor">
+    <key alias="labelBackgroundColor">Background color</key>
+    <key alias="labelIconColor">Icon color</key>
     <key alias="labelContentElementType">Content model</key>
     <key alias="labelLabelTemplate">Label</key>
     <key alias="labelCustomView">Custom view</key>
     <key alias="labelSettingsElementType">Settings model</key>
+    <key alias="labelEditorSize">Overlay editor size</key>
     <key alias="addCustomView">Add custom view</key>
     <key alias="addSettingsElementType">Add settings</key>
     <key alias="labelTemplatePlaceholder">Overwrite label template</key>
     <key alias="confirmDeleteBlockMessage"><![CDATA[Are you sure you want to delete block of <strong>%0%</strong>.]]></key>
     <key alias="confirmDeleteBlockNotice">Content using this block will be lost.</key>
+    <key alias="blockConfigurationOverlayTitle"><![CDATA[Configuration of '%0%']]></key>
+    <key alias="thumbnail">Thumbnail</key>
+    <key alias="addThumbnail">Add thumbnail</key>
   </area>
 </language>

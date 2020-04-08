@@ -149,6 +149,7 @@
     <Compile Include="Dashboards\RedirectUrlDashboard.cs" />
     <Compile Include="Dashboards\SettingsDashboards.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
+    <Compile Include="Editors\ElementTypeController.cs" />
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
     <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
     <Compile Include="Editors\ImageUrlGeneratorController.cs" />
