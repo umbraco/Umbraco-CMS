@@ -50,6 +50,8 @@
         vm.$onInit = function() {
 
             vm.validationLimit = vm.model.config.validationLimit;
+
+            vm.listWrapperSyles = {'max-width': vm.model.config.maxPropertyWidth};
             
             // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
             if(typeof vm.model.value !== 'object' || vm.model.value === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
@@ -108,7 +110,7 @@
             });
 
             vm.availableContentTypes = modelObject.getAvailableAliasesForBlockContent();
-            vm.availableBlockTypes = modelObject.getAvailableBlocksForItemPicker();
+            vm.availableBlockTypes = modelObject.getAvailableBlocksForBlockPicker();
 
             $scope.$evalAsync();
 
@@ -198,7 +200,7 @@
                 settings: blockSettingsModelClone,
                 title: blockModel.label,
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
-                size: blockModel.config.overlaySize || "medium",
+                size: blockModel.config.editorSize || "medium",
                 submit: function(blockEditorModel) {
                     // To ensure syncronization gets tricked we transfer
                     if (blockEditorModel.content !== null) {
@@ -229,14 +231,13 @@
                 return;
             }
 
-            vm.blockTypePicker = {
-                show: false,
-                size: vm.availableBlockTypes.length < 7 ? "small" : "medium",
-                filter: vm.availableBlockTypes.length > 12 ? true : false,
-                orderBy: "$index",
-                view: "itempicker",
-                event: $event,
+            var amountOfAvailableTypes = vm.availableBlockTypes.length;
+            var blockPickerModel = {
                 availableItems: vm.availableBlockTypes,
+                title: vm.labels.grid_addElement,
+                orderBy: "$index",
+                view: "views/common/infiniteeditors/blockpicker/blockpicker.html",
+                size: (amountOfAvailableTypes > 8 ? "medium" : "small"),
                 clickPasteItem: function(item) {
                     if (item.type === "elementTypeArray") {
                         var indexIncrementor = 0;
@@ -248,29 +249,28 @@
                     } else {
                         requestPasteFromClipboard(createIndex, item.data);
                     }
-                    vm.blockTypePicker.close();
+                    blockPickerModel.close();
                 },
-                submit: function (model) {
+                submit: function(blockPickerModel) {
                     var added = false;
                     if (model && model.selectedItem) {
                         added = addNewBlock(createIndex, model.selectedItem.alias);
                     }
-                    vm.blockTypePicker.close();
+                    blockPickerModel.close();
                     if (added && vm.model.config.useInlineEditingAsDefault !== true && vm.blocks.length > createIndex) {
                         editBlock(vm.blocks[createIndex]);
                     }
                 },
-                close: function () {
-                    vm.blockTypePicker.show = false;
-                    delete vm.blockTypePicker;
+                close: function() {
+                    editorService.close();
                 }
             };
 
-            vm.blockTypePicker.pasteItems = [];
+            blockPickerModel.pasteItems = [];
 
             var singleEntriesForPaste = clipboardService.retriveEntriesOfType("elementType", vm.availableContentTypes);
             singleEntriesForPaste.forEach(function (entry) {
-                vm.blockTypePicker.pasteItems.push({
+                blockPickerModel.pasteItems.push({
                     type: "elementType",
                     name: entry.label,
                     data: entry.data,
@@ -280,7 +280,7 @@
             
             var arrayEntriesForPaste = clipboardService.retriveEntriesOfType("elementTypeArray", vm.availableContentTypes);
             arrayEntriesForPaste.forEach(function (entry) {
-                vm.blockTypePicker.pasteItems.push({
+                blockPickerModel.pasteItems.push({
                     type: "elementTypeArray",
                     name: entry.label,
                     data: entry.data,
@@ -288,9 +288,7 @@
                 });
             });
 
-            vm.blockTypePicker.title = vm.blockTypePicker.pasteItems.length > 0 ? labels.grid_addElement : labels.content_createEmpty;
-
-            vm.blockTypePicker.clickClearPaste = function ($event) {
+            blockPickerModel.clickClearPaste = function ($event) {
                 $event.stopPropagation();
                 $event.preventDefault();
                 clipboardService.clearEntriesOfType("elementType", vm.availableContentTypes);
@@ -298,7 +296,8 @@
                 vm.blockTypePicker.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
             };
 
-            vm.blockTypePicker.show = true;
+            // open block picker overlay
+            editorService.open(blockPickerModel);
 
         };
 

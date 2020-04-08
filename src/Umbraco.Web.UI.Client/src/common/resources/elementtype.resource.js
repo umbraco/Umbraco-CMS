@@ -9,12 +9,11 @@ function elementTypeResource($q, $http, umbRequestHelper) {
 
         getAll: function () {
 
-            // TODO: Change this into a real api (ElementTypeApi). This is a temporary fix to get data.
-                var url = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + "/backoffice/UmbracoApi/NestedContent/GetContentTypes";
-                return umbRequestHelper.resourcePromise(
-                    $http.get(url),
-                    'Failed to retrieve content types'
-                );
+            var url = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + "/backoffice/UmbracoApi/ElementType/GetAll";
+            return umbRequestHelper.resourcePromise(
+                $http.get(url),
+                'Failed to retrieve element types'
+            );
             
             /*
             return umbRequestHelper.resourcePromise(

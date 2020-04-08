@@ -10,7 +10,7 @@ namespace Umbraco.Web.PropertyEditors
     public class BlockListConfiguration
     {
 
-        [ConfigurationField("blocks", "Available Blocks", "views/propertyeditors/blocklist/prevalue/blocklist.elementtypepicker.html", Description = "Define the available blocks.")]
+        [ConfigurationField("blocks", "Available Blocks", "views/propertyeditors/blocklist/prevalue/blocklist.blockconfiguration.html", Description = "Define the available blocks.")]
         public BlockConfiguration[] Blocks { get; set; }
 
 
@@ -28,7 +28,16 @@ namespace Umbraco.Web.PropertyEditors
 
         public class BlockConfiguration
         {
-            // TODO: rename this to contentElementTypeAlias, I would like this to be specific, since we have the settings.
+
+            [JsonProperty("backgroundColor")]
+            public string BackgroundColor { get; set; }
+
+            [JsonProperty("iconColor")]
+            public string IconColor { get; set; }
+
+            [JsonProperty("thumbnail")]
+            public string Thumbnail { get; set; }
+
             [JsonProperty("contentTypeAlias")]
             public string Alias { get; set; }
 
@@ -40,10 +49,16 @@ namespace Umbraco.Web.PropertyEditors
 
             [JsonProperty("label")]
             public string Label { get; set; }
+
+            [JsonProperty("editorSize")]
+            public string EditorSize { get; set; }
         }
 
-        [ConfigurationField("useInlineEditingAsDefault", "Inline editing mode", "boolean", Description = "Use the inline editor as the default block view")]
+        [ConfigurationField("useInlineEditingAsDefault", "Inline editing mode", "boolean", Description = "Use the inline editor as the default block view.")]
         public bool UseInlineEditingAsDefault { get; set; }
+
+        [ConfigurationField("maxPropertyWidth", "Property editor width", "textstring", Description = "optional css overwrite, example: 800px or 100%")]
+        public string MaxPropertyWidth { get; set; }
 
     }
 }

@@ -235,7 +235,7 @@
                 return this.blockConfigurations.map(blockConfiguration => blockConfiguration.contentTypeAlias);
             },
 
-            getAvailableBlocksForItemPicker: function() {
+            getAvailableBlocksForBlockPicker: function() {
 
                 var blocks = [];
 
@@ -243,9 +243,8 @@
                     var scaffold = this.getScaffoldFor(blockConfiguration.contentTypeAlias);
                     if(scaffold) {
                         blocks.push({
-                            alias: scaffold.contentTypeAlias,
-                            name: scaffold.contentTypeName,
-                            icon: scaffold.icon
+                            blockConfigModel: blockConfiguration,
+                            elementTypeModel: scaffold
                         });
                     }
                 });
