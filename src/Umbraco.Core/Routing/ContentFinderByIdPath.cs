@@ -4,7 +4,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using System.Globalization;
-using Umbraco.Core.Request;
 
 namespace Umbraco.Web.Routing
 {
