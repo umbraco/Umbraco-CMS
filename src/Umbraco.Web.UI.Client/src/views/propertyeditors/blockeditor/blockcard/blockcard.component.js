@@ -5,6 +5,8 @@
         .module("umbraco")
         .component("umbBlockCard", {
             templateUrl: "views/propertyeditors/blockeditor/blockcard/blockcard.component.html",
+            controller: BlockCardController,
+            controllerAs: "vm",
             transclude: true,
             bindings: {
                 blockConfigModel: "<",
@@ -12,5 +14,10 @@
             }
         });
 
+    function BlockCardController() {
+        
+        var vm = this;
+
+    }
 
 })();
