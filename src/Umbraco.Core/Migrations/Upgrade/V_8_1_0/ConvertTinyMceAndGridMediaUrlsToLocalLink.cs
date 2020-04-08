@@ -14,11 +14,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
 {
     public class ConvertTinyMceAndGridMediaUrlsToLocalLink : MigrationBase
     {
-        private readonly IMediaService _mediaService;
-
-        public ConvertTinyMceAndGridMediaUrlsToLocalLink(IMigrationContext context, IMediaService mediaService) : base(context)
+        public ConvertTinyMceAndGridMediaUrlsToLocalLink(IMigrationContext context) : base(context)
         {
-            _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
         }
 
         public override void Migrate()
@@ -110,15 +107,57 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
                 // - 3 = anything after group 2 until the a tag is closed
                 var href = match.Groups[2].Value;
 
-                var media = _mediaService.GetMediaByPath(href);
-                return media == null
+                var mediaUdi = GetMediaUdi(href, $"{match.Groups[1].Value}{match.Groups[3].Value}");
+                return mediaUdi == null
                     ? match.Value
-                    : $"{match.Groups[1].Value}/{{localLink:{media.GetUdi()}}}{match.Groups[3].Value}";
+                    : $"{match.Groups[1].Value}/{{localLink:{mediaUdi}}}{match.Groups[3].Value}";
             });
 
             changed = matched;
 
             return result;
+        }
+
+        private static readonly Regex DataUdiPattern = new Regex(@"\bdata-udi=""([^""]+)""", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
+        private static readonly Regex ResizedPattern = new Regex(".*[_][0-9]+[x][0-9]+[.].*", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
+        private Udi GetMediaUdi(string href, string otherTagContents)
+        {
+            var match = DataUdiPattern.Match(otherTagContents);
+            if (match.Success && Udi.TryParse(match.Groups[1].Value, out var udi)) return udi;
+
+            if (ResizedPattern.IsMatch(href))
+            {
+                var underscoreIndex = href.LastIndexOf('_');
+                var dotIndex = href.LastIndexOf('.');
+                href = string.Concat(href.Substring(0, underscoreIndex), href.Substring(dotIndex));
+            }
+
+            var udis = GetMediaUdis();
+            return udis.TryGetValue(href, out udi) ? udi : null;
+        }
+
+        private Dictionary<string, Udi> _mediaUdis;
+        private Dictionary<string, Udi> GetMediaUdis()
+        {
+            if (_mediaUdis != null) return _mediaUdis;
+
+            var sql = Sql()
+                .Select<MediaVersionDto>(r => r.Select(x => x.ContentVersionDto, x => x.Select(y => y.ContentDto, y => y.Select(z => z.NodeDto))))
+                .From<MediaVersionDto>()
+                .InnerJoin<ContentVersionDto>().On<MediaVersionDto, ContentVersionDto>(left => left.Id, right => right.Id)
+                .InnerJoin<ContentDto>().On<ContentVersionDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media)
+                .Where<ContentVersionDto>(x => x.Current);
+
+            var medias = Database.Fetch<MediaVersionDto>(sql);
+            var udis = new Dictionary<string, Udi>(medias.Count, StringComparer.InvariantCultureIgnoreCase);
+
+            medias.ForEach(m => udis[m.Path] = new GuidUdi(Constants.UdiEntityType.Media, m.ContentVersionDto.ContentDto.NodeDto.UniqueId));
+
+            _mediaUdis = udis;
+
+            return udis;
         }
     }
 }
