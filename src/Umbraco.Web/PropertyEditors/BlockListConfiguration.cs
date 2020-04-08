@@ -54,8 +54,11 @@ namespace Umbraco.Web.PropertyEditors
             public string EditorSize { get; set; }
         }
 
-        [ConfigurationField("useInlineEditingAsDefault", "Inline editing mode", "boolean", Description = "Use the inline editor as the default block view")]
+        [ConfigurationField("useInlineEditingAsDefault", "Inline editing mode", "boolean", Description = "Use the inline editor as the default block view.")]
         public bool UseInlineEditingAsDefault { get; set; }
+
+        [ConfigurationField("propertyWidth", "Property editor width", "textstring", Description = "optional css overwrite, example: 800px or 100%")]
+        public string propertyWidth { get; set; }
 
     }
 }

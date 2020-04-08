@@ -151,7 +151,7 @@
                 entityType: "file",
                 isDialog: true,
                 filter: function (i) {
-                    return (i.name.indexOf(".jpg") !== -1 || i.name.indexOf(".jpeg") !== -1 || i.name.indexOf(".png") !== -1 || i.name.indexOf(".svg") !== -1 || i.name.indexOf(".webp") !== -1 || i.name.indexOf(".gif") !== -1);
+                    return !(i.name.indexOf(".jpg") !== -1 || i.name.indexOf(".jpeg") !== -1 || i.name.indexOf(".png") !== -1 || i.name.indexOf(".svg") !== -1 || i.name.indexOf(".webp") !== -1 || i.name.indexOf(".gif") !== -1);
                 },
                 select: function (file) {
                     block.thumbnail = file.name;
