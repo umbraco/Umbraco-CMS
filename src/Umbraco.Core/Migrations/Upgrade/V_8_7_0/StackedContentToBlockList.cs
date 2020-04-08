@@ -170,11 +170,11 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
         private class BlockListConfiguration
         {
 
-            [ConfigurationField("blocks", "Available Blocks", "views/propertyeditors/blocklist/prevalue/blocklist.elementtypepicker.html", Description = "Define the available blocks.")]
+            [JsonProperty("blocks")]
             public BlockConfiguration[] Blocks { get; set; }
 
 
-            [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of blocks")]
+            [JsonProperty("validationLimit")]
             public NumberRange ValidationLimit { get; set; } = new NumberRange();
 
             public class NumberRange
@@ -188,6 +188,15 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
 
             public class BlockConfiguration
             {
+                [JsonProperty("backgroundColor")]
+                public string BackgroundColor { get; set; }
+
+                [JsonProperty("iconColor")]
+                public string IconColor { get; set; }
+
+                [JsonProperty("thumbnail")]
+                public string Thumbnail { get; set; }
+
                 [JsonProperty("contentTypeAlias")]
                 public string Alias { get; set; }
 
@@ -199,11 +208,16 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
 
                 [JsonProperty("label")]
                 public string Label { get; set; }
+
+                [JsonProperty("editorSize")]
+                public string EditorSize { get; set; }
             }
 
-            [ConfigurationField("useInlineEditingAsDefault", "Inline editing mode", "boolean", Description = "Use the inline editor as the default block view")]
+            [JsonProperty("useInlineEditingAsDefault")]
             public bool UseInlineEditingAsDefault { get; set; }
 
+            [JsonProperty("maxPropertyWidth")]
+            public string MaxPropertyWidth { get; set; }
         }
 
         private class StackedContentConfiguration
