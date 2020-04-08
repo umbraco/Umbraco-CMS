@@ -194,9 +194,6 @@ namespace Umbraco.Core.Migrations.Upgrade
 
 
             To<MissingDictionaryIndex>("{a78e3369-8ea3-40ec-ad3f-5f76929d2b20}");
-
-            // to 8.7.0...
-            To<StackedContentToBlockList>("{DFA35FA2-BFBB-433F-84E5-BD75940CDDF6}");
             //FINAL
         }
     }
