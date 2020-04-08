@@ -110,12 +110,15 @@ namespace Umbraco.Web.HealthCheck.Checks.Data
 
         public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
         {
-            return action.Alias switch
+            switch (action.Alias)
             {
-                _fixContentPaths => CheckDocuments(true),
-                _fixMediaPaths => CheckMedia(true),
-                _ => throw new InvalidOperationException("Action not supported")
-            };
+                case _fixContentPaths:
+                    return CheckDocuments(true);
+                case _fixMediaPaths:
+                    return CheckMedia(true);
+                default:
+                    throw new InvalidOperationException("Action not supported");
+            }
         }
     }
 }
