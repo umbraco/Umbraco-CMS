@@ -150,7 +150,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media)
                 .Where<ContentVersionDto>(x => x.Current);
 
-            var medias = Database.Fetch<MediaVersionDto>(sql);
+            var medias = Database.Fetch<MediaVersionDto>(sql).Where(m => !m.Path.IsNullOrWhiteSpace()).ToList();
             var udis = new Dictionary<string, Udi>(medias.Count, StringComparer.InvariantCultureIgnoreCase);
 
             medias.ForEach(m => udis[m.Path] = new GuidUdi(Constants.UdiEntityType.Media, m.ContentVersionDto.ContentDto.NodeDto.UniqueId));
