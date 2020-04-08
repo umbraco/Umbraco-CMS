@@ -109,9 +109,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
             {
                 Blocks = old.ContentTypes?.Select(t => new BlockListConfiguration.BlockConfiguration
                 {
-                    Alias = knownDocumentTypes[t.IcContentTypeGuid].Alias,
+                    Alias = knownDocumentTypes.TryGetValue(t.IcContentTypeGuid, out var ct) ? ct.Alias : null,
                     Label = t.NameTemplate
-                }).ToArray(),
+                }).Where(c => c.Alias != null).ToArray(),
                 UseInlineEditingAsDefault = old.SingleItemMode == "1" || old.SingleItemMode == bool.TrueString
             };
 
@@ -247,9 +247,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
 
             public void AddDataItem(JObject obj, Dictionary<Guid, KnownContentType> knownDocumentTypes)
             {
-                if (!Guid.TryParse(obj["key"].ToString(), out var key)) throw new ArgumentException("Could not find a valid key in the data item");
-                if (!Guid.TryParse(obj["icContentTypeGuid"].ToString(), out var ctGuid)) throw new ArgumentException("Could not find a valid content type GUID in the data item");
-                if (!knownDocumentTypes.TryGetValue(ctGuid, out var ct)) throw new ArgumentException($"Unknown content type GUID '{ctGuid}'");
+                if (!Guid.TryParse(obj["key"].ToString(), out var key)) key = Guid.NewGuid();
+                if (!Guid.TryParse(obj["icContentTypeGuid"].ToString(), out var ctGuid)) ctGuid = Guid.Empty;
+                if (!knownDocumentTypes.TryGetValue(ctGuid, out var ct)) ct = new KnownContentType { Alias = ctGuid.ToString() };
 
                 obj.Remove("key");
                 obj.Remove("icContentTypeGuid");
