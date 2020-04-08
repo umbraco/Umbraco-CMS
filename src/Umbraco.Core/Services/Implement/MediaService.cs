@@ -1155,8 +1155,17 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.WriteLock(Constants.Locks.MediaTree);
-                // TODO: We're going to have to clear all caches
-                return _mediaRepository.CheckDataIntegrity(options);
+
+                var report = _mediaRepository.CheckDataIntegrity(options);
+
+                if (report.FixedIssues.Count > 0)
+                {
+                    //The event args needs a content item so we'll make a fake one with enough properties to not cause a null ref
+                    var root = new Models.Media("root", -1, new MediaType(-1)) { Id = -1, Key = Guid.Empty };
+                    scope.Events.Dispatch(TreeChanged, this, new TreeChange<IMedia>.EventArgs(new TreeChange<IMedia>(root, TreeChangeTypes.RefreshAll)));
+                }
+
+                return report;
             }
         }
 

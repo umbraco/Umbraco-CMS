@@ -2388,8 +2388,17 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
-                // TODO: We're going to have to clear all caches
-                return _documentRepository.CheckDataIntegrity(options);
+
+                var report = _documentRepository.CheckDataIntegrity(options);
+
+                if (report.FixedIssues.Count > 0)
+                {
+                    //The event args needs a content item so we'll make a fake one with enough properties to not cause a null ref
+                    var root = new Content("root", -1, new ContentType(-1)) {Id = -1, Key = Guid.Empty};
+                    scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>.EventArgs(new TreeChange<IContent>(root, TreeChangeTypes.RefreshAll)));
+                }
+
+                return report;
             }
         }
 

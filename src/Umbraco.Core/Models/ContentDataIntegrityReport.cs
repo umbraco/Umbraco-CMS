@@ -14,6 +14,9 @@ namespace Umbraco.Core.Models
 
         public IReadOnlyDictionary<int, ContentDataIntegrityReportEntry> DetectedIssues { get; }
 
+        public IReadOnlyDictionary<int, ContentDataIntegrityReportEntry> FixedIssues
+            => DetectedIssues.Where(x => x.Value.Fixed).ToDictionary(x => x.Key, x => x.Value);
+
         public enum IssueType
         {
             /// <summary>
