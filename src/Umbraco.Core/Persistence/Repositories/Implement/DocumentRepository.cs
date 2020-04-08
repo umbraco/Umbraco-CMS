@@ -538,6 +538,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // In this case we can bypass a lot of the below operations which will make this whole operation go much faster.
             // When moving we don't need to create new versions, etc... because we cannot roll this operation back anyways.
             var isMoving = entity.IsMoving();
+            // TODO: I'm sure we can also detect a "Copy" (of a descendant) operation and probably perform similar checks below.
+            // There is probably more stuff that would be required for copying but I'm sure not all of this logic would be, we could more than likely boost
+            // copy performance by 95% just like we did for Move
+
 
             var publishing = entity.PublishedState == PublishedState.Publishing;
 

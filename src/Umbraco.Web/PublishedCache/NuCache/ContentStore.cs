@@ -817,7 +817,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 //this zero's out the branch (recursively), if we're in a new gen this will add a NULL placeholder for the gen
                 ClearBranchLocked(existing);
-                //TODO: This removes the current GEN from the tree - do we really want to do that?
+                //TODO: This removes the current GEN from the tree - do we really want to do that? (not sure if this is still an issue....)
                 RemoveTreeNodeLocked(existing);
             }
 
@@ -882,6 +882,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void ClearBranchLocked(ContentNode content)
         {
+            // This should never be null, all code that calls this method is null checking but we've seen
+            // issues of null ref exceptions in issue reports so we'll double check here
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            
             SetValueLocked(_contentNodes, content.Id, null);
             if (_localDb != null) RegisterChange(content.Id, ContentNodeKit.Null);
 
@@ -890,8 +894,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var id = content.FirstChildContentId;
             while (id > 0)
             {
+                // get the required link node, this ensures that both `link` and `link.Value` are not null
                 var link = GetRequiredLinkedNode(id, "child", null);
-                ClearBranchLocked(link.Value);
+                ClearBranchLocked(link.Value); // recurse
                 id = link.Value.NextSiblingContentId;
             }
         }
