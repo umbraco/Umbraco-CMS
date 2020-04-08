@@ -32,13 +32,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.BlockList);
 
         /// <inheritdoc />
-        public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-        {
-            var contentTypes = propertyType.DataType.ConfigurationAs<BlockListConfiguration>().Blocks;
-            return contentTypes.Length == 1
-                ? typeof(IEnumerable<>).MakeGenericType(ModelType.For(contentTypes[0].Alias))
-                : typeof(IEnumerable<IPublishedElement>);
-        }
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => typeof(BlockListModel);
 
         /// <inheritdoc />
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
