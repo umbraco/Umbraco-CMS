@@ -68,21 +68,30 @@ namespace Umbraco.Web.HealthCheck.Checks.Data
                 });
             }
 
-            return new HealthCheckStatus(report.Ok
-                ? $"All {entityType} paths are valid"
-                : GetInvalidReport(report, entityType, detailedReport))
+            return new HealthCheckStatus(GetReport(report, entityType, detailedReport))
             {
                 ResultType = report.Ok ? StatusResultType.Success : StatusResultType.Error,
                 Actions = actions
             };
         }
 
-        private static string GetInvalidReport(ContentDataIntegrityReport report, string entityType, bool detailed)
+        private static string GetReport(ContentDataIntegrityReport report, string entityType, bool detailed)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"There are {report.DetectedIssues.Count} invalid {entityType} paths");
 
-            if (true && report.DetectedIssues.Count > 0)
+            if (report.Ok)
+            {
+                sb.AppendLine($"<p>All {entityType} paths are valid</p>");
+
+                if (!detailed)
+                    return sb.ToString();
+            }
+            else
+            {
+                sb.AppendLine($"<p>{report.DetectedIssues.Count} invalid {entityType} paths detected.</p>");
+            }
+
+            if (detailed && report.DetectedIssues.Count > 0)
             {
                 sb.AppendLine("<ul>");
                 foreach (var issueGroup in report.DetectedIssues.GroupBy(x => x.Value.IssueType))

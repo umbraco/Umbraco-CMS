@@ -578,6 +578,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 foreach (var node in updated)
                 {
                     Database.Update(node);
+                    if (report.TryGetValue(node.NodeId, out var entry))
+                        entry.Fixed = true;
                 }
             }
 

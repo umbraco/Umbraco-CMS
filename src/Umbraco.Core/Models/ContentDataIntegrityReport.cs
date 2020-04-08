@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Umbraco.Core.Models
 {
@@ -9,7 +10,7 @@ namespace Umbraco.Core.Models
             DetectedIssues = detectedIssues;
         }
 
-        public bool Ok => DetectedIssues.Count == 0;
+        public bool Ok => DetectedIssues.Count == 0 || DetectedIssues.Count == DetectedIssues.Values.Count(x => x.Fixed);
 
         public IReadOnlyDictionary<int, ContentDataIntegrityReportEntry> DetectedIssues { get; }
 
