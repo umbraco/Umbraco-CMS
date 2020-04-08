@@ -50,7 +50,6 @@
                                 </umb-button>
                             </div>
                         </div>
-
                     </div>
                     <div class="row umb-control-group" ng-show="vm.searchOptions.filter && images.length > 0 && !vm.loading && !activeDrag">
                         <a class="pull-right" ng-click="vm.toggleListView()"><span ng-show="!vm.showMediaList" title="Switch to ListView"><i class="icon-list"></i></span><span ng-show="vm.showMediaList" title="Switch to Grid View"><i class="icon-thumbnails-small"></i></span></a>
@@ -156,8 +155,8 @@
                     <input type="text" class="umb-property-editor umb-textstring" ng-model="target.altText" />
                 </div>
 
-                <div class="umb-control-group">
-
+                    <div class="umb-control-group">
+                       
                     <div ng-if="vm.mediaPickerDetailsOverlay.disableFocalPoint && target.thumbnail">
                         <h5>
                             <localize key="general_preview">Preview</localize>
@@ -198,7 +197,9 @@
 
                 </umb-overlay>
 
+
             </form>
+
 
         </umb-editor-container>
 
