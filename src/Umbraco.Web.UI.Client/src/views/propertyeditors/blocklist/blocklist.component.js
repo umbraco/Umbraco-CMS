@@ -50,6 +50,8 @@
         vm.$onInit = function() {
 
             vm.validationLimit = vm.model.config.validationLimit;
+
+            vm.listWrapperSyles = {'max-width': vm.model.config.maxPropertyWidth};
             
             // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
             if(typeof vm.model.value !== 'object' || vm.model.value === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
