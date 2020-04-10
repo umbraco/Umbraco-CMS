@@ -13,7 +13,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
 
           angular.forEach(array, function(arrayItem){
 
-            if(angular.isObject(arrayItem)) {
+            if(Utilities.isObject(arrayItem)) {
               newArray.push(arrayItem.id);
             } else {
               newArray.push(arrayItem);

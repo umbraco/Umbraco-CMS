@@ -30,7 +30,7 @@ function fileManager($rootScope) {
             if (!Utilities.isString(args.propertyAlias)) {
                 throw "args.propertyAlias must be a non empty string";
             }
-            if (!angular.isObject(args.files)) {
+            if (!Utilities.isObject(args.files)) {
                 throw "args.files must be an object";
             }
 

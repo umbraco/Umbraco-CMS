@@ -242,7 +242,7 @@
                 var currUsers = saveModel.users;
                 var formattedUsers = [];
                 for (var j = 0; j < currUsers.length; j++) {
-                    if (!angular.isNumber(currUsers[j])) {
+                    if (!Utilities.isNumber(currUsers[j])) {
                         formattedUsers.push(currUsers[j].id);
                     }
                     else {
