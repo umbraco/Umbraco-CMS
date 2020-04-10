@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Web;
 using Semver;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
@@ -22,7 +22,7 @@ namespace Umbraco.Core
         private readonly ILogger _logger;
         private readonly IUmbracoSettingsSection _settings;
         private readonly IGlobalSettings _globalSettings;
-        private readonly HashSet<string> _applicationUrls = new HashSet<string>();
+        private readonly ConcurrentHashSet<string> _applicationUrls = new ConcurrentHashSet<string>();
         private readonly Lazy<IMainDom> _mainDom;
         private readonly Lazy<IServerRegistrar> _serverRegistrar;
 

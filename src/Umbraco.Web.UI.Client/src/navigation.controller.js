@@ -257,6 +257,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     evts.push(eventsService.on("app.ready", function (evt, data) {
         $scope.authenticated = true;
         ensureInit();
+        ensureMainCulture();
     }));
 
     // event for infinite editors
@@ -279,8 +280,22 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         }
     }));
 
-
-    
+    /**
+     * For multi language sites, this ensures that mculture is set to either the last selected language or the default one
+     */ 
+    function ensureMainCulture() {
+        if ($location.search().mculture) {
+            return;
+        }
+        var language = lastLanguageOrDefault();
+        if (!language) {
+            return;
+        }
+        // trigger a language selection in the next digest cycle
+        $timeout(function () {
+            $scope.selectLanguage(language);
+        });
+    }    
 
     /**
      * Based on the current state of the application, this configures the scope variables that control the main tree and language drop down
@@ -385,28 +400,19 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
             if ($scope.languages.length > 1) {
                 //if there's already one set, check if it exists
-                var currCulture = null;
+                var language = null;
                 var mainCulture = $location.search().mculture;
                 if (mainCulture) {
-                    currCulture = _.find($scope.languages, function (l) {
+                    language = _.find($scope.languages, function (l) {
                         return l.culture.toLowerCase() === mainCulture.toLowerCase();
                     });
                 }
-                if (!currCulture) {
-                    // no culture in the request, let's look for one in the cookie that's set when changing language
-                    var defaultCulture = $cookies.get("UMB_MCULTURE");
-                    if (!defaultCulture || !_.find($scope.languages, function (l) {
-                            return l.culture.toLowerCase() === defaultCulture.toLowerCase();
-                        })) {
-                        // no luck either, look for the default language
-                        var defaultLang = _.find($scope.languages, function (l) {
-                            return l.isDefault;
-                        });
-                        if (defaultLang) {
-                            defaultCulture = defaultLang.culture;
-                        }
+                if (!language) {
+                    language = lastLanguageOrDefault();
+
+                    if (language) {
+                        $location.search("mculture", language.culture);
                     }
-                    $location.search("mculture", defaultCulture ? defaultCulture : null);
                 }
             }
 
@@ -431,6 +437,25 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             });
         });
     }
+
+    function lastLanguageOrDefault() {
+        if (!$scope.languages || $scope.languages.length <= 1) {
+            return null;
+        }
+        // see if we can find a culture in the cookie set when changing language
+        var lastCulture = $cookies.get("UMB_MCULTURE");
+        var language = lastCulture ? _.find($scope.languages, function (l) {
+            return l.culture.toLowerCase() === lastCulture.toLowerCase();
+        }) : null;
+        if (!language) {
+            // no luck, look for the default language
+            language = _.find($scope.languages, function (l) {
+                return l.isDefault;
+            });
+        }
+        return language;
+    }
+
     function nodeExpandedHandler(args) {
         //store the reference to the expanded node path
         if (args.node) {
@@ -510,6 +535,14 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         if (!event) {
             return;
         }
+        closeTree();
+    };
+
+    $scope.onOutsideClick = function() {
+        closeTree();
+    };
+
+    function closeTree() {
         if (!appState.getGlobalState("touchDevice")) {
             treeActive = false;
             $timeout(function () {
@@ -518,7 +551,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 }
             }, 300);
         }
-    };
+    }
 
     $scope.toggleLanguageSelector = function () {
         $scope.page.languageSelectorIsOpen = !$scope.page.languageSelectorIsOpen;

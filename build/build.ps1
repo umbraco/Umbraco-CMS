@@ -375,11 +375,14 @@
 
   })
 
+  $nugetsourceUmbraco = "https://api.nuget.org/v3/index.json"
+
   $ubuild.DefineMethod("RestoreNuGet",
   {
     Write-Host "Restore NuGet"
     Write-Host "Logging to $($this.BuildTemp)\nuget.restore.log"
-    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\Umbraco.sln" > "$($this.BuildTemp)\nuget.restore.log"
+	$params = "-Source", $nugetsourceUmbraco   
+    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\Umbraco.sln" > "$($this.BuildTemp)\nuget.restore.log" @params
     if (-not $?) { throw "Failed to restore NuGet packages." }
   })
 
@@ -456,10 +459,10 @@
   $ubuild.DefineMethod("PrepareAngularDocs",
   {
     Write-Host "Prepare Angular Documentation"
-    
+
     $src = "$($this.SolutionRoot)\src"
     $out = $this.BuildOutput
-	  
+
     "Moving to Umbraco.Web.UI.Docs folder"
     cd ..\src\Umbraco.Web.UI.Docs
 

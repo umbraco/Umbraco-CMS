@@ -1,16 +1,13 @@
 ﻿using System;
+using System.Net;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using Umbraco.Core.Exceptions;
-using Umbraco.Web.Composing;
-using Umbraco.Web.Editors;
-
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Web.Actions;
 using Umbraco.Core.Security;
-using System.Net;
+using Umbraco.Web.Actions;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -46,7 +43,9 @@ namespace Umbraco.Web.WebApi.Filters
 
         public EnsureUserPermissionForContentAttribute(string paramName)
         {
-            if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullOrEmptyException(nameof(paramName));
+            if (paramName == null) throw new ArgumentNullException(nameof(paramName));
+            if (string.IsNullOrEmpty(paramName)) throw new ArgumentException("Value can't be empty.", nameof(paramName));
+
             _paramName = paramName;
             _permissionToCheck = ActionBrowse.ActionLetter;
         }

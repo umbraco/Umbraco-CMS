@@ -10,9 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Security;
 using Newtonsoft.Json;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Strings;
 
@@ -79,6 +77,21 @@ namespace Umbraco.Core
             return fileName;
 
 
+        }
+
+        /// <summary>
+        /// Determines the extension of the path or URL
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns>Extension of the file</returns>
+        public static string GetFileExtension(this string file)
+        {
+            //Find any characters between the last . and the start of a query string or the end of the string
+            const string pattern = @"(?<extension>\.[^\.\?]+)(\?.*|$)";
+            var match = Regex.Match(file, pattern);
+            return match.Success
+                ? match.Groups["extension"].Value
+                : string.Empty;
         }
 
         /// <summary>
@@ -1091,7 +1104,8 @@ namespace Umbraco.Core
         /// <returns>The safe url segment.</returns>
         public static string ToUrlSegment(this string text)
         {
-            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentNullOrEmptyException(nameof(text));
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
 
             return Current.ShortStringHelper.CleanStringForUrlSegment(text);
         }
@@ -1104,7 +1118,8 @@ namespace Umbraco.Core
         /// <returns>The safe url segment.</returns>
         public static string ToUrlSegment(this string text, string culture)
         {
-            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentNullOrEmptyException(nameof(text));
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
 
             return Current.ShortStringHelper.CleanStringForUrlSegment(text, culture);
         }

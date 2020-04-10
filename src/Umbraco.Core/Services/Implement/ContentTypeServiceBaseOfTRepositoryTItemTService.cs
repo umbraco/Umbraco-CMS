@@ -321,6 +321,15 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public bool HasContainerInPath(params int[] ids)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                // can use same repo for both content and media
+                return Repository.HasContainerInPath(ids);
+            }
+        }
+
         public IEnumerable<TItem> GetDescendants(int id, bool andSelf)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -369,6 +378,15 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.ReadLock(ReadLockIds);
                 return Repository.Count(Query<TItem>());
+            }
+        }
+
+        public bool HasContentNodes(int id)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(ReadLockIds);
+                return Repository.HasContentNodes(id);
             }
         }
 
@@ -595,10 +613,9 @@ namespace Umbraco.Core.Services.Implement
         public TItem Copy(TItem original, string alias, string name, TItem parent)
         {
             if (original == null) throw new ArgumentNullException(nameof(original));
-            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentNullOrEmptyException(nameof(alias));
-
-            if (parent != null && parent.HasIdentity == false)
-                throw new InvalidOperationException("Parent must have an identity.");
+            if (alias == null) throw new ArgumentNullException(nameof(alias));
+            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(alias));
+            if (parent != null && parent.HasIdentity == false) throw new InvalidOperationException("Parent must have an identity.");
 
             // this is illegal
             //var originalb = (ContentTypeCompositionBase)original;

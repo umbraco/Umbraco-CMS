@@ -17,8 +17,8 @@
             scope.isNew = scope.content.state == "NotCreated";
             
             localizationService.localizeMany([
-                scope.isNew ? "placeholders_a11yCreateItem" : "placeholders_a11yEdit",
-                "placeholders_a11yName",
+                scope.isNew ? "visuallyHiddenTexts_createItem" : "visuallyHiddenTexts_edit",
+                "visuallyHiddenTexts_name",
                 scope.isNew ? "general_new" : "general_edit"]
             ).then(function (data) {
 

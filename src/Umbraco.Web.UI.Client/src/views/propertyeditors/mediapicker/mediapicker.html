@@ -36,16 +36,16 @@
                 </umb-file-icon>
 
                 <div class="umb-sortable-thumbnails__actions" data-element="sortable-thumbnail-actions">
-                    <button aria-label="Edit media" ng-if="allowEditMedia" class="umb-sortable-thumbnails__action btn-reset" data-element="action-edit" ng-click="vm.editItem(media)">
+                    <button type="button" aria-label="Edit media" ng-if="allowEditMedia" class="umb-sortable-thumbnails__action btn-reset" data-element="action-edit" ng-click="vm.editItem(media)">
                         <i class="icon icon-edit" aria-hidden="true"></i>
                     </button>
-                    <button aria-label="Remove" class="umb-sortable-thumbnails__action -red btn-reset" data-element="action-remove" ng-click="vm.remove($index)">
+                    <button type="button" aria-label="Remove" class="umb-sortable-thumbnails__action -red btn-reset" data-element="action-remove" ng-click="vm.remove($index)">
                         <i class="icon icon-delete" aria-hidden="true"></i>
                     </button>
                 </div>
             </li>
             <li style="border: none;" class="add-wrapper unsortable" ng-if="vm.showAdd() && allowAddMedia">
-                <button aria-label="Open media picker" data-element="sortable-thumbnails-add" class="add-link btn-reset" ng-click="vm.add()" ng-class="{'add-link-square': (mediaItems.length === 0 || isMultiPicker)}" prevent-default>
+                <button type="button" aria-label="Open media picker" data-element="sortable-thumbnails-add" class="add-link btn-reset umb-outline umb-outline--surrounding" ng-click="vm.add()" ng-class="{'add-link-square': (mediaItems.length === 0 || isMultiPicker)}">
                     <i class="icon icon-add large" aria-hidden="true"></i>
                 </button>
             </li>

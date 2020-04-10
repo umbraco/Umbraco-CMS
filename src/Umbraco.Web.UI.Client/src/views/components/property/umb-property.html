@@ -1,17 +1,17 @@
 <div class="umb-property">
     <ng-form name="propertyForm">
-        <div class="control-group umb-control-group" ng-class="{hidelabel:property.hideLabel}">
+        <div class="control-group umb-control-group" ng-class="{hidelabel:property.hideLabel, 'umb-control-group__listview': property.alias === '_umb_containerView'}">
 
             <val-property-msg></val-property-msg>
 
             <div class="umb-el-wrap">
 
-                <div class="control-header">
+                <div class="control-header" ng-hide="property.hideLabel === true">
                     <small ng-if="showInherit" class="db" style="padding-top: 0; margin-bottom: 5px;">
                         <localize key="contentTypeEditor_inheritedFrom"></localize> {{inheritsFrom}}
                     </small>
 
-                    <label class="control-label" ng-hide="property.hideLabel" for="{{property.alias}}" ng-attr-title="{{propertyAlias}}">
+                    <label class="control-label" for="{{property.alias}}" ng-attr-title="{{propertyAlias}}">
 
                         {{property.label}}
 
@@ -21,7 +21,7 @@
 
                     </label>
 
-                    <umb-property-actions actions="propertyEditorAPI.propertyActions"></umb-property-actions>
+                    <umb-property-actions actions="propertyActions"></umb-property-actions>
 
                     <small class="control-description" ng-bind-html="property.description | preserveNewLineInHtml"></small>
                 </div>

@@ -104,5 +104,17 @@ namespace Umbraco.Core.Services
 
             return found;
         }
+
+        /// <summary>
+        /// Gets the concrete assigned permissions for the provided user and node
+        /// </summary>
+        /// <param name="userService"></param>
+        /// <param name="user"></param>
+        /// <param name="nodeId"></param>
+        internal static string[] GetAssignedPermissions(this IUserService userService, IUser user, int nodeId)
+        {
+            var permissionCollection = userService.GetPermissions(user, nodeId);
+            return permissionCollection.SelectMany(c => c.AssignedPermissions).Distinct().ToArray();
+        }
     }
 }

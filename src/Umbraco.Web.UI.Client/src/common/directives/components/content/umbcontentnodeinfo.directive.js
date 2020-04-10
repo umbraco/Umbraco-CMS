@@ -130,6 +130,7 @@
                         view: "default",
                         content: labels.doctypeChangeWarning,
                         submitButtonLabelKey: "general_continue",
+                        submitButtonStyle: "warning",
                         closeButtonLabelKey: "general_cancel",
                         submit: function () {
                             openDocTypeEditor(documentType);
@@ -327,6 +328,9 @@
                     // invariant nodes
                     scope.currentUrls = scope.node.urls;
                 }
+
+                // figure out if multiple cultures apply across the content urls
+                scope.currentUrlsHaveMultipleCultures = _.keys(_.groupBy(scope.currentUrls, url => url.culture)).length > 1;
             }
 
             // load audit trail and redirects when on the info tab

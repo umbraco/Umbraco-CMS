@@ -70,7 +70,23 @@ namespace Umbraco.Core.Collections
         /// The number of elements contained in the <see cref="T:System.Collections.ICollection"/>.
         /// </returns>
         /// <filterpriority>2</filterpriority>
-        public int Count => GetThreadSafeClone().Count;
+        public int Count
+        {
+            get
+            {
+                try
+                {
+                    _instanceLocker.EnterReadLock();
+                    return _innerSet.Count;
+                }
+                finally
+                {
+                    if (_instanceLocker.IsReadLockHeld)
+                        _instanceLocker.ExitReadLock();
+                }
+
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
@@ -105,8 +121,7 @@ namespace Umbraco.Core.Collections
         /// <returns></returns>
         public bool TryAdd(T item)
         {
-            var clone = GetThreadSafeClone();
-            if (clone.Contains(item)) return false;
+            if (Contains(item)) return false;
             try
             {
                 _instanceLocker.EnterWriteLock();
@@ -150,7 +165,16 @@ namespace Umbraco.Core.Collections
         /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
         public bool Contains(T item)
         {
-            return GetThreadSafeClone().Contains(item);
+            try
+            {
+                _instanceLocker.EnterReadLock();
+                return _innerSet.Contains(item);
+            }
+            finally
+            {
+                if (_instanceLocker.IsReadLockHeld)
+                    _instanceLocker.ExitReadLock();
+            }
         }
 
         /// <summary>
@@ -168,13 +192,13 @@ namespace Umbraco.Core.Collections
             HashSet<T> clone = null;
             try
             {
-                _instanceLocker.EnterWriteLock();
+                _instanceLocker.EnterReadLock();
                 clone = new HashSet<T>(_innerSet, _innerSet.Comparer);
             }
             finally
             {
-                if (_instanceLocker.IsWriteLockHeld)
-                    _instanceLocker.ExitWriteLock();
+                if (_instanceLocker.IsReadLockHeld)
+                    _instanceLocker.ExitReadLock();
             }
             return clone;
         }

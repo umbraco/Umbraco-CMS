@@ -331,7 +331,7 @@ namespace Umbraco.Core.Services.Implement
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(Saved, this, saveEventArgs);
             }
-            
+
             if (withIdentity == false)
                 return;
 
@@ -816,8 +816,8 @@ namespace Umbraco.Core.Services.Implement
         {
             //trimming username and email to make sure we have no trailing space
             member.Username = member.Username.Trim();
-            member.Email = member.Email.Trim();         
-            
+            member.Email = member.Email.Trim();
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IMember>(member);
@@ -971,6 +971,35 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public IEnumerable<int> GetAllRolesIds()
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MemberTree);
+                return _memberGroupRepository.GetMany().Select(x => x.Id).Distinct();
+            }
+        }
+
+        public IEnumerable<int> GetAllRolesIds(int memberId)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MemberTree);
+                var result = _memberGroupRepository.GetMemberGroupsForMember(memberId);
+                return result.Select(x => x.Id).Distinct();
+            }
+        }
+
+        public IEnumerable<int> GetAllRolesIds(string username)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MemberTree);
+                var result = _memberGroupRepository.GetMemberGroupsForMember(username);
+                return result.Select(x => x.Id).Distinct();
+            }
+        }
+        
         public IEnumerable<IMember> GetMembersInRole(string roleName)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -1241,7 +1270,7 @@ namespace Umbraco.Core.Services.Implement
         /// Exports a member.
         /// </summary>
         /// <remarks>
-        /// This is internal for now and is used to export a member in the member editor, 
+        /// This is internal for now and is used to export a member in the member editor,
         /// it will raise an event so that auditing logs can be created.
         /// </remarks>
         internal MemberExportModel ExportMember(Guid key)
@@ -1344,7 +1373,8 @@ namespace Umbraco.Core.Services.Implement
 
         private IMemberType GetMemberType(IScope scope, string memberTypeAlias)
         {
-            if (string.IsNullOrWhiteSpace(memberTypeAlias)) throw new ArgumentNullOrEmptyException(nameof(memberTypeAlias));
+            if (memberTypeAlias == null) throw new ArgumentNullException(nameof(memberTypeAlias));
+            if (string.IsNullOrWhiteSpace(memberTypeAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(memberTypeAlias));
 
             scope.ReadLock(Constants.Locks.MemberTypes);
 
@@ -1358,7 +1388,8 @@ namespace Umbraco.Core.Services.Implement
 
         private IMemberType GetMemberType(string memberTypeAlias)
         {
-            if (string.IsNullOrWhiteSpace(memberTypeAlias)) throw new ArgumentNullOrEmptyException(nameof(memberTypeAlias));
+            if (memberTypeAlias == null) throw new ArgumentNullException(nameof(memberTypeAlias));
+            if (string.IsNullOrWhiteSpace(memberTypeAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(memberTypeAlias));
 
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
