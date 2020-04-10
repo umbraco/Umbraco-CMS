@@ -10,7 +10,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
     function isValidIdentifier(id) {
 
         //empty id <= 0
-        if (angular.isNumber(id)) {
+        if (Utilities.isNumber(id)) {
             if (id === 0) {
                 return false;
             }

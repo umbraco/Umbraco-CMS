@@ -80,7 +80,7 @@
             }
             // Advanced options
             if (Utilities.isDefined(opts.firstLineNumber)) {
-                if (angular.isNumber(opts.firstLineNumber)) {
+                if (Utilities.isNumber(opts.firstLineNumber)) {
                     session.setOption('firstLineNumber', opts.firstLineNumber);
                 } else if (angular.isFunction(opts.firstLineNumber)) {
                     session.setOption('firstLineNumber', opts.firstLineNumber());
