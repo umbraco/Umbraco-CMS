@@ -739,7 +739,7 @@ angular.module("umbraco")
                 //if nothing is found, set it to 12
                 if (!$scope.model.config.items.columns) {
                     $scope.model.config.items.columns = 12;
-                } else if (angular.isString($scope.model.config.items.columns)) {
+                } else if (Utilities.isString($scope.model.config.items.columns)) {
                     $scope.model.config.items.columns = parseInt($scope.model.config.items.columns);
                 }
 

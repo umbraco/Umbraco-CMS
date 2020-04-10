@@ -62,7 +62,7 @@ function macroService() {
                     val = val ? val : "";
                     //need to detect if the val is a string or an object
                     var keyVal;
-                    if (angular.isString(val)) {
+                    if (Utilities.isString(val)) {
                         keyVal = key + "=\"" + (val ? val : "") + "\" ";
                     }
                     else {

@@ -165,7 +165,7 @@ angular.mock.$Browser.prototype = {
             if (value == undefined) {
                 delete this.cookieHash[name];
             } else {
-                if (angular.isString(value) &&       //strings only
+                if (Utilities.isString(value) &&       //strings only
                     value.length <= 4096) {          //strict cookie storage limits
                     this.cookieHash[name] = value;
                 }
@@ -486,7 +486,7 @@ angular.mock.$LogProvider = function () {
      */
     angular.mock.TzDate = function (offset, timestamp) {
         var self = new Date(0);
-        if (angular.isString(timestamp)) {
+        if (Utilities.isString(timestamp)) {
             var tsStr = timestamp;
 
             self.origDate = jsonStringToDate(timestamp);
@@ -943,7 +943,7 @@ function createHttpBackendMock($rootScope, $delegate, $browser) {
             wasExpected = false;
 
         function prettyPrint(data) {
-            return (angular.isString(data) || angular.isFunction(data) || data instanceof RegExp)
+            return (Utilities.isString(data) || angular.isFunction(data) || data instanceof RegExp)
                 ? data
                 : angular.toJson(data);
         }
@@ -1385,7 +1385,7 @@ function MockHttpExpectation(method, url, data, headers) {
     this.matchData = function (d) {
         if (angular.isUndefined(data)) return true;
         if (data && angular.isFunction(data.test)) return data.test(d);
-        if (data && !angular.isString(data)) return angular.toJson(data) == d;
+        if (data && !Utilities.isString(data)) return angular.toJson(data) == d;
         return data == d;
     };
 

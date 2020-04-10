@@ -95,7 +95,7 @@ angular.module('umbraco')
             //move previously saved value to the editor
             if ($scope.model.value) {
                 //backwards compat with the old file upload (incase some-one swaps them..)
-                if (angular.isString($scope.model.value)) {
+                if (Utilities.isString($scope.model.value)) {
                     setModelValueWithSrc($scope.model.value);
                 }
                 else {
@@ -232,7 +232,7 @@ angular.module('umbraco')
 
                     //this is a fallback in case the cropper has been asssigned a upload field
                 }
-                else if (angular.isString(property.value)) {
+                else if (Utilities.isString(property.value)) {
                     if (thumbnail) {
 
                         if (mediaHelper.detectIfImageByExtension(property.value)) {

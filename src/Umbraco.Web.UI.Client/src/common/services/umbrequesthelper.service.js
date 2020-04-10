@@ -91,7 +91,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
             }
 
             return Umbraco.Sys.ServerVariables["umbracoUrls"][apiName] + actionName +
-                (!queryStrings ? "" : "?" + (angular.isString(queryStrings) ? queryStrings : this.dictionaryToQueryString(queryStrings)));
+                (!queryStrings ? "" : "?" + (Utilities.isString(queryStrings) ? queryStrings : this.dictionaryToQueryString(queryStrings)));
 
         },
 
@@ -129,7 +129,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
 
                 var err = {
                     //NOTE: the default error message here should never be used based on the above docs!
-                    errorMsg: (angular.isString(opts) ? opts : 'An error occurred!'),
+                    errorMsg: (Utilities.isString(opts) ? opts : 'An error occurred!'),
                     data: data,
                     status: status
                 };
@@ -342,11 +342,11 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                     //add the json data
                     if (angular.isArray(data)) {
                         _.each(data, function(item) {
-                            formData.append(item.key, !angular.isString(item.value) ? angular.toJson(item.value) : item.value);
+                            formData.append(item.key, !Utilities.isString(item.value) ? angular.toJson(item.value) : item.value);
                         });
                     }
                     else {
-                        formData.append(data.key, !angular.isString(data.value) ? angular.toJson(data.value) : data.value);
+                        formData.append(data.key, !Utilities.isString(data.value) ? angular.toJson(data.value) : data.value);
                     }
 
                     //call the callback
