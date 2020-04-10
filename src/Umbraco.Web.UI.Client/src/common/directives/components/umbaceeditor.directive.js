@@ -72,10 +72,10 @@
             }
 
             // Basic options
-            if (angular.isString(opts.theme)) {
+            if (Utilities.isString(opts.theme)) {
                 acee.setTheme('ace/theme/' + opts.theme);
             }
-            if (angular.isString(opts.mode)) {
+            if (Utilities.isString(opts.mode)) {
                 session.setMode('ace/mode/' + opts.mode);
             }
             // Advanced options

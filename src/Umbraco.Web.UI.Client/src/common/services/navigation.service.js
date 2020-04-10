@@ -88,7 +88,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
      * @param {any} requestPath
      */
     function pathToRouteParts(requestPath) {
-        if (!angular.isString(requestPath)) {
+        if (!Utilities.isString(requestPath)) {
             throw "The value for requestPath is not a string";
         }
         var pathAndQuery = requestPath.split("#")[1];
@@ -130,11 +130,11 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
          */
         isRouteChangingNavigation: function (currUrlParams, nextUrlParams) {
 
-            if (angular.isString(currUrlParams)) {
+            if (Utilities.isString(currUrlParams)) {
                 currUrlParams = pathToRouteParts(currUrlParams);
             }
 
-            if (angular.isString(nextUrlParams)) {
+            if (Utilities.isString(nextUrlParams)) {
                 nextUrlParams = pathToRouteParts(nextUrlParams);
             }
 
@@ -483,14 +483,14 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
 
             appState.setMenuState("currentNode", node);
 
-            if (action.metaData && action.metaData["actionRoute"] && angular.isString(action.metaData["actionRoute"])) {
+            if (action.metaData && action.metaData["actionRoute"] && Utilities.isString(action.metaData["actionRoute"])) {
                 //first check if the menu item simply navigates to a route
                 var parts = action.metaData["actionRoute"].split("?");
                 $location.path(parts[0]).search(parts.length > 1 ? parts[1] : "");
                 this.hideNavigation();
                 return;
             }
-            else if (action.metaData && action.metaData["jsAction"] && angular.isString(action.metaData["jsAction"])) {
+            else if (action.metaData && action.metaData["jsAction"] && Utilities.isString(action.metaData["jsAction"])) {
 
                 //we'll try to get the jsAction from the injector
                 var menuAction = action.metaData["jsAction"].split('.');

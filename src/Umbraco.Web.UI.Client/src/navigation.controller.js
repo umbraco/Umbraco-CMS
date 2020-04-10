@@ -68,7 +68,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             args.event.stopPropagation();
             args.event.preventDefault();
 
-            if (n.metaData && n.metaData["jsClickCallback"] && angular.isString(n.metaData["jsClickCallback"]) && n.metaData["jsClickCallback"] !== "") {
+            if (n.metaData && n.metaData["jsClickCallback"] && Utilities.isString(n.metaData["jsClickCallback"]) && n.metaData["jsClickCallback"] !== "") {
                 //this is a legacy tree node!
                 var jsPrefix = "javascript:";
                 var js;

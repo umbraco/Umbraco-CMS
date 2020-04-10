@@ -27,7 +27,7 @@ function fileManager($rootScope) {
         setFiles: function (args) {
 
             //propertyAlias, files
-            if (!angular.isString(args.propertyAlias)) {
+            if (!Utilities.isString(args.propertyAlias)) {
                 throw "args.propertyAlias must be a non empty string";
             }
             if (!Utilities.isObject(args.files)) {
