@@ -298,6 +298,8 @@
     <Compile Include="Models\DictionaryTranslationTests.cs" />
     <Compile Include="Models\RelationTests.cs" />
     <Compile Include="Models\TemplateTests.cs" />
+    <Compile Include="Models\PropertyGroupTests.cs" />
+    <Compile Include="Models\PropertyTypeTests.cs" />
     <Compile Include="Models\LightEntityTest.cs" />
     <Compile Include="Models\UserTests.cs" />
     <Compile Include="Web\Mvc\RenderModelBinderTests.cs" />
@@ -399,7 +401,6 @@
     <Compile Include="PropertyEditors\PropertyEditorValueConverterTests.cs" />
     <Compile Include="Models\ContentTests.cs" />
     <Compile Include="Models\ContentXmlTest.cs" />
-    <Compile Include="Models\StylesheetTests.cs" />
     <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
     <Compile Include="Persistence\DatabaseContextTests.cs" />
     <Compile Include="Persistence\Mappers\ContentMapperTest.cs" />

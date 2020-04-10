@@ -31,8 +31,6 @@ namespace Umbraco.Core.Models
             _childObjectType = childObjectType;
         }
 
-
-
         /// <summary>
         /// Gets or sets the Name of the RelationType
         /// </summary>

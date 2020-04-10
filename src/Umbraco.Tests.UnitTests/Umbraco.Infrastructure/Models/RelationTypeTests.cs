@@ -30,8 +30,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
             Assert.AreEqual(clone.Id, item.Id);
             Assert.AreEqual(clone.Key, item.Key);
             Assert.AreEqual(clone.Name, item.Name);
-            Assert.AreNotSame(clone.ParentObjectType, item.ParentObjectType);
-            Assert.AreNotSame(clone.ChildObjectType, item.ChildObjectType);
+            Assert.AreEqual(clone.CreateDate, item.CreateDate);
             Assert.AreEqual(clone.UpdateDate, item.UpdateDate);
 
             //This double verifies by reflection

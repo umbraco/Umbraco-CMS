@@ -33,6 +33,13 @@ namespace Umbraco.Tests.Common.Builders.Extensions
             return builder;
         }
 
+        public static T WithDeleteDate<T>(this T builder, DateTime deleteDate)
+            where T : IWithDeleteDateBuilder
+        {
+            builder.DeleteDate = deleteDate;
+            return builder;
+        }
+
         public static T WithAlias<T>(this T builder, string alias)
             where T : IWithAliasBuilder
         {
