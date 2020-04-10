@@ -245,7 +245,7 @@ angular.module('umbraco.services')
 		 * @param {Int} index index where the notication should be removed from
 		 */
 		remove: function (index) {
-			if(angular.isObject(index)){
+            if (Utilities.isObject(index)){
 				var i = nArray.indexOf(index);
 				angularHelper.safeApply($rootScope, function() {
 				    nArray.splice(i, 1);

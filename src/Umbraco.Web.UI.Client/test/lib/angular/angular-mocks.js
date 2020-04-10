@@ -698,7 +698,7 @@ angular.mock.dump = function (object) {
                 out.push(serialize(o));
             });
             out = '[ ' + out.join(', ') + ' ]';
-        } else if (angular.isObject(object)) {
+        } else if (Utilities.isObject(object)) {
             if (angular.isFunction(object.$eval) && angular.isFunction(object.$apply)) {
                 out = serializeScope(object);
             } else if (object instanceof Error) {
