@@ -12,7 +12,7 @@ angular.module("umbraco")
             $scope.textAreaHtmlId = $scope.model.alias + "_" + String.CreateGuid();
             
             var editorConfig = $scope.model.config ? $scope.model.config.editor : null;
-            if (!editorConfig || angular.isString(editorConfig)) {
+            if (!editorConfig || Utilities.isString(editorConfig)) {
                 editorConfig = tinyMceService.defaultPrevalues();
             }
             //make sure there's a max image size

@@ -709,7 +709,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     }
 
     function isDate(val) {
-        if (angular.isString(val)) {
+        if (Utilities.isString(val)) {
             return val.match(/^(\d{4})\-(\d{2})\-(\d{2})\ (\d{2})\:(\d{2})\:(\d{2})$/);
         }
         return false;

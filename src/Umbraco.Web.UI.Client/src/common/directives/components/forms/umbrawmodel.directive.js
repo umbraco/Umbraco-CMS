@@ -49,7 +49,7 @@ angular.module("umbraco.directives")
 				function jsonToString(object) {
 					// better than JSON.stringify(), because it formats + filters $$hashKey etc.
 					// NOTE that this will remove all $-prefixed values
-					return angular.toJson(object, true);
+					return Utilities.toJson(object, true);
 				}
 
 				function isValidJson(model) {

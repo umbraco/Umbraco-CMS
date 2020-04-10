@@ -49,12 +49,11 @@
 
         <div ng-repeat="login in externalLoginProviders">
 
-			<form ng-if="login.linkedProviderKey == undefined" method="POST" action="{{externalLinkLoginFormAction}}" id="oauthloginform" name="oauthloginform">
+			<form ng-submit="linkProvider($event)" ng-if="login.linkedProviderKey == undefined" method="POST" action="{{externalLinkLoginFormAction}}" name="oauthloginform" id="oauthloginform-{{login.authType}}">
 				<input type="hidden" name="provider" value="{{login.authType}}" />
                 <button class="btn btn-block btn-social"
                         ng-class="login.properties.SocialStyle"
-                        id="{{login.authType}}"
-                        onclick="document.forms.oauthloginform.submit();">
+                        id="{{login.authType}}">
 
                     <i class="fa" ng-class="login.properties.SocialIcon"></i>
                     <localize key="defaultdialogs_linkYour">Link your</localize>&nbsp;{{login.caption}}&nbsp;<localize key="defaultdialogs_account">account</localize>
