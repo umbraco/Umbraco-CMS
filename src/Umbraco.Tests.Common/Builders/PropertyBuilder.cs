@@ -5,7 +5,7 @@ using Umbraco.Tests.Common.Builders.Interfaces;
 namespace Umbraco.Tests.Common.Builders
 {
     public class PropertyBuilder
-        : BuilderBase<Property>,
+        : BuilderBase<IProperty>,
             IBuildPropertyTypes,
             IWithIdBuilder,
             IWithKeyBuilder,
@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Common.Builders
             return builder;
         }
 
-        public override Property Build()
+        public override IProperty Build()
         {
             var id = _id ?? 1;
             var key = _key ?? Guid.NewGuid();

@@ -38,13 +38,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
             }
         }
 
-        private Property BuildProperty()
+        private IProperty BuildProperty()
         {
             return _builder
                 .WithId(4)
-                .WithKey(Guid.NewGuid())
-                .WithCreateDate(DateTime.Now)
-                .WithUpdateDate(DateTime.Now)
                 .AddPropertyType()
                     .WithId(3)
                     .WithPropertyEditorAlias("TestPropertyEditor")
