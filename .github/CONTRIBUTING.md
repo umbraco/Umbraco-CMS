@@ -126,6 +126,7 @@ In order to build the Umbraco source code locally, first make sure you have the 
   * Visual Studio 2017 v15.9.7+
   * Node v10+
   * npm v6.4.1+
+  * Git command line
 
 The easiest way to get started is to open `src\umbraco.sln` in Visual Studio 2017 (version 15.9.7 or higher, [the community edition is free](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15) for you to use to contribute to Open Source projects). In Visual Studio, find the Task Runner Explorer (in the View menu under Other Windows) and run the build task under the gulpfile.
 
