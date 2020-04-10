@@ -42,7 +42,7 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
             .then(function (data) {
 
                 //go to next page if there are params otherwise we can just exit
-                if (!angular.isArray(data) || data.length === 0) {
+                if (!Utilities.isArray(data) || data.length === 0) {
 
                     if (insertIfNoParameters) {
                         $scope.model.submit($scope.model);
@@ -104,12 +104,12 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
     entityResource.getAll("Macro", ($scope.model.dialogData && $scope.model.dialogData.richTextEditor && $scope.model.dialogData.richTextEditor === true) ? "UseInEditor=true" : null)
         .then(function (data) {
 
-            if (angular.isArray(data) && data.length == 0) {
+            if (Utilities.isArray(data) && data.length == 0) {
                 $scope.nomacros = true;
             }
 
             //if 'allowedMacros' is specified, we need to filter
-            if (angular.isArray($scope.model.dialogData.allowedMacros) && $scope.model.dialogData.allowedMacros.length > 0) {
+            if (Utilities.isArray($scope.model.dialogData.allowedMacros) && $scope.model.dialogData.allowedMacros.length > 0) {
                 $scope.macros = _.filter(data, function(d) {
                     return _.contains($scope.model.dialogData.allowedMacros, d.alias);
                 });

@@ -31,7 +31,7 @@
 
                 if (scope.user.avatars) {
                     scope.avatar = [];
-                    if (angular.isArray(scope.user.avatars)) {
+                    if (Utilities.isArray(scope.user.avatars)) {
                         for (var i = 0; i < scope.user.avatars.length; i++) {
                             scope.avatar.push({ value: scope.user.avatars[i] });
                         }
@@ -46,7 +46,7 @@
         
                     if (scope.user.avatars) {
                         scope.avatar = [];
-                        if (angular.isArray(scope.user.avatars)) {
+                        if (Utilities.isArray(scope.user.avatars)) {
                             for (var i = 0; i < scope.user.avatars.length; i++) {
                                 scope.avatar.push({ value: scope.user.avatars[i] });
                             }

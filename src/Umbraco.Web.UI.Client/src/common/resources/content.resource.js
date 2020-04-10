@@ -1003,10 +1003,10 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 loginPageId: loginPageId,
                 errorPageId: errorPageId
             };
-            if (angular.isArray(groups) && groups.length) {
+            if (Utilities.isArray(groups) && groups.length) {
                 publicAccess.groups = groups;
             }
-            else if (angular.isArray(usernames) && usernames.length) {
+            else if (Utilities.isArray(usernames) && usernames.length) {
                 publicAccess.usernames = usernames;
             }
             else {

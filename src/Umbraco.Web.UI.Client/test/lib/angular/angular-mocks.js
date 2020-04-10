@@ -692,7 +692,7 @@ angular.mock.dump = function (object) {
                 out.append(angular.element(element).clone());
             });
             out = out.html();
-        } else if (angular.isArray(object)) {
+        } else if (Utilities.isArray(object)) {
             out = [];
             angular.forEach(object, function (o) {
                 out.push(serialize(o));

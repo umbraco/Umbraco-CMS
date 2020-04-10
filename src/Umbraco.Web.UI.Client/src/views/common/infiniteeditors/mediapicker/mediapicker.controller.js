@@ -497,7 +497,7 @@ angular.module("umbraco")
                     var folderImage = $scope.images[folderIndex];
                     var imageIsSelected = false;
 
-                    if ($scope.model && angular.isArray($scope.model.selection)) {
+                    if ($scope.model && Utilities.isArray($scope.model.selection)) {
                         for (var selectedIndex = 0;
                             selectedIndex < $scope.model.selection.length;
                             selectedIndex++) {

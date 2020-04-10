@@ -44,7 +44,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
          */
         dictionaryToQueryString: function (queryStrings) {
 
-            if (angular.isArray(queryStrings)) {
+            if (Utilities.isArray(queryStrings)) {
                 return _.map(queryStrings, function (item) {
                     var key = null;
                     var val = null;
@@ -254,7 +254,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                         // so we know which property it belongs to on the server side
                         var fileKey = "file_" + args.files[f].alias + "_" + (args.files[f].culture ? args.files[f].culture : "");
 
-                        if (angular.isArray(args.files[f].metaData) && args.files[f].metaData.length > 0) {
+                        if (Utilities.isArray(args.files[f].metaData) && args.files[f].metaData.length > 0) {
                             fileKey += ("_" + args.files[f].metaData.join("_"));
                         }
                         formData.append(fileKey, args.files[f].file);
@@ -322,7 +322,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
             //validate input, jsonData can be an array of key/value pairs or just one key/value pair.
             if (!jsonData) { throw "jsonData cannot be null"; }
 
-            if (angular.isArray(jsonData)) {
+            if (Utilities.isArray(jsonData)) {
                 _.each(jsonData, function (item) {
                     if (!item.key || !item.value) { throw "jsonData array item must have both a key and a value property"; }
                 });
@@ -340,7 +340,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                 transformRequest: function(data) {
                     var formData = new FormData();
                     //add the json data
-                    if (angular.isArray(data)) {
+                    if (Utilities.isArray(data)) {
                         _.each(data, function(item) {
                             formData.append(item.key, !Utilities.isString(item.value) ? Utilities.toJson(item.value) : item.value);
                         });
