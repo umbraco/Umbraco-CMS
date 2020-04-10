@@ -48,11 +48,11 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleCo
         if (angular.isArray($scope.model.config.items)) {
             //PP: I dont think this will happen, but we have tests that expect it to happen..
             //if array is simple values, convert to array of objects
-            if(!angular.isObject($scope.model.config.items[0])){
+            if (!Utilities.isObject($scope.model.config.items[0])){
                 $scope.model.config.items = convertArrayToDictionaryArray($scope.model.config.items);
             }
         }
-        else if (angular.isObject($scope.model.config.items)) {
+        else if (Utilities.isObject($scope.model.config.items)) {
             $scope.model.config.items = convertObjectToDictionaryArray($scope.model.config.items);
         }
         else {
