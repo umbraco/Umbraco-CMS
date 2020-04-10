@@ -3,26 +3,24 @@ using System.Linq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
-using Umbraco.Core.Serialization;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Common.Builders;
 
-namespace Umbraco.Tests.Models
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
 {
     [TestFixture]
     public class StylesheetTests
     {
-        [SetUp]
-        public virtual void Initialize()
-        {
-            SettingsForTests.Reset();
-        }
+        private readonly StylesheetBuilder _builder = new StylesheetBuilder();
 
         [Test]
         public void Can_Create_Stylesheet()
         {
             // Arrange
-            var stylesheet = new Stylesheet("/css/styles.css");
-            stylesheet.Content = @"body { color:#000; } .bold {font-weight:bold;}";
+            // Act
+            var stylesheet = _builder
+                .WithPath("/css/styles.css")
+                .WithContent(@"body { color:#000; } .bold {font-weight:bold;}")
+                .Build();
 
             // Assert
             Assert.That(stylesheet.Name, Is.EqualTo("styles.css"));
@@ -33,8 +31,12 @@ namespace Umbraco.Tests.Models
         public void Can_Add_Property()
         {
             // Arrange
-            var stylesheet = new Stylesheet("/css/styles.css") {Content = @"body { color:#000; } .bold {font-weight:bold;}"};
+            var stylesheet = _builder
+                .WithPath("/css/styles.css")
+                .WithContent(@"body { color:#000; } .bold {font-weight:bold;}")
+                .Build();
 
+            // Act
             stylesheet.AddProperty(new StylesheetProperty("Test", "p", "font-weight:bold; font-family:Arial;"));
 
             // Assert
@@ -48,13 +50,16 @@ namespace Umbraco.Tests.Models
         public void Can_Remove_Property()
         {
             // Arrange
-            var stylesheet = new Stylesheet("/css/styles.css") { Content = @"body { color:#000; } /**umb_name:Hello*/p{font-size:2em;} .bold {font-weight:bold;}" };
-
-
+            var stylesheet = _builder
+                .WithPath("/css/styles.css")
+                .WithContent(@"body { color:#000; } /**umb_name:Hello*/p{font-size:2em;} .bold {font-weight:bold;}")
+                .Build();
             Assert.AreEqual(1, stylesheet.Properties.Count());
 
+            // Act
             stylesheet.RemoveProperty("Hello");
 
+            // Assert
             Assert.AreEqual(0, stylesheet.Properties.Count());
             Assert.AreEqual(@"body { color:#000; }  .bold {font-weight:bold;}", stylesheet.Content);
         }
@@ -63,17 +68,20 @@ namespace Umbraco.Tests.Models
         public void Can_Update_Property()
         {
             // Arrange
-            var stylesheet = new Stylesheet("/css/styles.css")
-            {
-                Content = @"body { color:#000; } /**umb_name:Hello*/p{font-size:2em;} .bold {font-weight:bold;}"
-            };
+            var stylesheet = _builder
+                .WithPath("/css/styles.css")
+                .WithContent(@"body { color:#000; } /**umb_name:Hello*/p{font-size:2em;} .bold {font-weight:bold;}")
+                .Build();
 
+            // Act
             var prop = stylesheet.Properties.Single();
             prop.Alias = "li";
             prop.Value = "font-size:5em;";
 
-            //re-get
+            // - re-get
             prop = stylesheet.Properties.Single();
+
+            // Assert
             Assert.AreEqual("li", prop.Alias);
             Assert.AreEqual("font-size:5em;", prop.Value);
             Assert.AreEqual("body { color:#000; } /**umb_name:Hello*/\r\nli {\r\n\tfont-size:5em;\r\n} .bold {font-weight:bold;}", stylesheet.Content);
@@ -83,12 +91,15 @@ namespace Umbraco.Tests.Models
         public void Can_Get_Properties_From_Css()
         {
             // Arrange
-            var stylesheet = new Stylesheet("/css/styles.css");
-            stylesheet.Content = @"body { color:#000; } .bold {font-weight:bold;} /**umb_name:Hello */ p { font-size: 1em; } /**umb_name:testing123*/ li:first-child {padding:0px;}";
+            var stylesheet = _builder
+                .WithPath("/css/styles.css")
+                .WithContent(@"body { color:#000; } .bold {font-weight:bold;} /**umb_name:Hello */ p { font-size: 1em; } /**umb_name:testing123*/ li:first-child {padding:0px;}")
+                .Build();
 
             // Act
             var properties = stylesheet.Properties;
 
+            // Assert
             Assert.AreEqual(2, properties.Count());
             Assert.AreEqual("Hello", properties.First().Name);
             Assert.AreEqual("font-size: 1em;", properties.First().Value);
@@ -102,13 +113,17 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var stylesheet = new Stylesheet("/css/styles.css");
-            stylesheet.Content = @"@media screen and (min-width: 600px) and (min-width: 900px) {
-                                      .class {
-                                        background: #666;
-                                      }
-                                    }";
+            // Arrange
+            var stylesheet = _builder
+                .WithPath("/css/styles.css")
+                .WithContent(@"@media screen and (min-width: 600px) and (min-width: 900px) {
+                                    .class {
+                                    background: #666;
+                                    }
+                                }")
+                .Build();
 
+            // Act
             var json = JsonConvert.SerializeObject(stylesheet);
             Debug.Print(json);
         }

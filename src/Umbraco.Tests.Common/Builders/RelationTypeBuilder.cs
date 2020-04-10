@@ -4,15 +4,8 @@ using Umbraco.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Tests.Common.Builders
 {
-    public class RelationTypeBuilder : RelationTypeBuilder<object>
-    {
-        public RelationTypeBuilder() : base(null)
-        {
-        }
-    }
-
-    public class RelationTypeBuilder<TParent>
-        : ChildBuilderBase<TParent, IRelationType>,
+    public class RelationTypeBuilder
+        : ChildBuilderBase<RelationBuilder, IRelationType>,
             IWithIdBuilder,
             IWithAliasBuilder,
             IWithNameBuilder,
@@ -32,7 +25,11 @@ namespace Umbraco.Tests.Common.Builders
         private Guid? _parentObjectType;
         private DateTime? _updateDate;
 
-        public RelationTypeBuilder(TParent parentBuilder) : base(parentBuilder)
+        public RelationTypeBuilder() : base(null)
+        {
+        }
+
+        public RelationTypeBuilder(RelationBuilder parentBuilder) : base(parentBuilder)
         {
         }
 
@@ -91,8 +88,7 @@ namespace Umbraco.Tests.Common.Builders
             var updateDate = _updateDate ?? DateTime.Now;
             var deleteDate = _deleteDate ?? null;
 
-            return new RelationType(name, alias, isBidirectional, parentObjectType,
-                childObjectType)
+            return new RelationType(name, alias, isBidirectional, parentObjectType, childObjectType)
             {
                 Id = id,
                 Key = key,
@@ -102,19 +98,19 @@ namespace Umbraco.Tests.Common.Builders
             };
         }
 
-        public RelationTypeBuilder<TParent> WithIsBidirectional(bool isBidirectional)
+        public RelationTypeBuilder WithIsBidirectional(bool isBidirectional)
         {
             _isBidirectional = isBidirectional;
             return this;
         }
 
-        public RelationTypeBuilder<TParent> WithChildObjectType(Guid childObjectType)
+        public RelationTypeBuilder WithChildObjectType(Guid childObjectType)
         {
             _childObjectType = childObjectType;
             return this;
         }
 
-        public RelationTypeBuilder<TParent> WithParentObjectType(Guid parentObjectType)
+        public RelationTypeBuilder WithParentObjectType(Guid parentObjectType)
         {
             _parentObjectType = parentObjectType;
             return this;
