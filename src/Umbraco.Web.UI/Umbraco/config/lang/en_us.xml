@@ -139,7 +139,7 @@
     <key alias="saveToPublish">Send for approval</key>
     <key alias="saveListView">Save list view</key>
     <key alias="schedulePublish">Schedule</key>
-    <key alias="showPage">Preview</key>
+    <key alias="saveAndPreview">Save and preview</key>
     <key alias="showPageDisabled">Preview is disabled because there's no template assigned</key>
     <key alias="styleChoose">Choose style</key>
     <key alias="styleShow">Show styles</key>
@@ -676,7 +676,7 @@
     <key alias="icon">Icon</key>
     <key alias="id">Id</key>
     <key alias="import">Import</key>
-    <key alias="includeFromsubFolders">Include subfolders in search</key>
+    <key alias="excludeFromSubFolders">Search only this folder</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Inner margin</key>
     <key alias="insert">Insert</key>
@@ -738,6 +738,7 @@
     <key alias="sort">Sort</key>
     <key alias="status">Status</key>
     <key alias="submit">Submit</key>
+    <key alias="success">Success</key>
     <key alias="type">Type</key>
     <key alias="typeToSearch">Type to search...</key>
     <key alias="under">under</key>
@@ -1315,11 +1316,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="externalLinkPlaceholder">Enter the link</key>
   </area>
   <area alias="imagecropper">
-        <key alias="reset">Reset crop</key>
+    <key alias="reset">Reset crop</key>
     <key alias="saveCrop">Save crop</key>
     <key alias="addCrop">Add new crop</key>
-        <key alias="updateEditCrop">Done</key>
-        <key alias="undoEditCrop">Undo edits</key>
+    <key alias="updateEditCrop">Done</key>
+    <key alias="undoEditCrop">Undo edits</key>
+    <key alias="customCrop">User defined</key>
   </area>
   <area alias="rollback">
     <key alias="headline">Select a version to compare with the current version</key>
@@ -1852,6 +1854,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="password">Password</key>
     <key alias="resetPassword">Reset password</key>
     <key alias="passwordChanged">Your password has been changed!</key>
+    <key alias="passwordChangedGeneric">Password changed</key>
     <key alias="passwordConfirm">Please confirm the new password</key>
     <key alias="passwordEnterNew">Enter your new password</key>
     <key alias="passwordIsBlank">Your new password cannot be blank!</key>

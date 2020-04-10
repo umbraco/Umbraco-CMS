@@ -130,8 +130,8 @@
                     }
 
                     // diff requires a string
-                    property.value = property.value ? property.value : "";
-                    oldProperty.value = oldProperty.value ? oldProperty.value : "";
+                    property.value = property.value ? property.value + "" : "";
+                    oldProperty.value = oldProperty.value ? oldProperty.value + "" : "";
 
                     var diffProperty = {
                         "alias": property.alias,

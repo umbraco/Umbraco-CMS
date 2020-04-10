@@ -67,7 +67,7 @@
     <key alias="save">저장</key>
     <key alias="saveAndPublish">저장 후 발행</key>
     <key alias="saveToPublish">저장 후 승인을 위해 전송</key>
-    <key alias="showPage">미리보기</key>
+    <key alias="saveAndPreview">미리보기</key>
     <key alias="styleChoose">스타일 선택</key>
     <key alias="styleShow">스타일 보기</key>
     <key alias="tableInsert">테이블 삽입</key>

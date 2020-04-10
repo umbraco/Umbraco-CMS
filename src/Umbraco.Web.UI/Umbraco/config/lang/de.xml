@@ -140,7 +140,7 @@
     <key alias="saveToPublish">Speichern und zur Abnahme übergeben</key>
     <key alias="saveListView">Listenansicht sichern</key>
     <key alias="schedulePublish">Veröffentlichung planen</key>
-    <key alias="showPage">Vorschau</key>
+    <key alias="saveAndPreview">Vorschau</key>
     <key alias="showPageDisabled">Die Vorschaufunktion ist deaktiviert, da keine Vorlage zugewiesen ist</key>
     <key alias="styleChoose">Stil auswählen</key>
     <key alias="styleShow">Stil anzeigen</key>
@@ -1173,7 +1173,7 @@
     <key alias="installed">Installiert</key>
     <key alias="installedPackages">Installierte Pakete</key>
     <key alias="installLocal">Lokale Installation</key>
-    <key alias="installFinish">Benenden</key>
+    <key alias="installFinish">Abschließen</key>
     <key alias="noConfigurationView">Diese Paket hat keine Einstellungen</key>
     <key alias="noPackagesCreated">Es wurden noche keine Pakete angelegt</key>
     <key alias="noPackages">Sie haben keine Pakete installiert</key>

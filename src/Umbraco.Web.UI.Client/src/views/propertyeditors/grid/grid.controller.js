@@ -9,6 +9,7 @@ angular.module("umbraco")
             $element,
             eventsService,
             editorService,
+            overlayService,
             $interpolate
         ) {
 
@@ -320,21 +321,22 @@ angular.module("umbraco")
                 var title = "";
                 localizationService.localize("grid_insertControl").then(function (value) {
                     title = value;
-                    $scope.editorOverlay = {
-                        view: "itempicker", 
+                    overlayService.open({
+                        view: "itempicker",
                         filter: area.$allowedEditors.length > 15,
                         title: title,
                         availableItems: area.$allowedEditors,
                         event: event,
-                        show: true,
-                        submit: function (model) {
+                        submit: function(model) {
                             if (model.selectedItem) {
                                 $scope.addControl(model.selectedItem, area, index);
-                                $scope.editorOverlay.show = false;
-                                $scope.editorOverlay = null;
+                                overlayService.close();
                             }
+                        },
+                        close: function() {
+                            overlayService.close();
                         }
-                    };
+                    });
                 });
             };
 

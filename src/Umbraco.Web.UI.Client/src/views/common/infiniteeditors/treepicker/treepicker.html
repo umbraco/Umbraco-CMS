@@ -37,7 +37,8 @@
                                         search-from-name="{{vm.searchInfo.searchFromName}}"
                                         show-search="{{vm.searchInfo.showSearch}}"
                                         datatype-key="{{vm.searchInfo.dataTypeKey}}"
-                                        section="{{vm.section}}">
+                                        section="{{vm.section}}"
+                                        auto-focus="true">
                                     </umb-tree-search-box>
                                 </div>
 
@@ -75,6 +76,7 @@
                                 start-node-id="vm.startNodeId"
                                 on-select="vm.selectListViewNode(node)"
                                 on-close="vm.closeMiniListView()"
+                                on-items-loaded="vm.listViewItemsLoaded(items)"
                                 entity-type-filter="vm.filter">
                             </umb-mini-list-view>
 

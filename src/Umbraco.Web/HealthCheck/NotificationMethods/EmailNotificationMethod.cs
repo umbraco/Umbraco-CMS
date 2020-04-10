@@ -20,7 +20,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
         public EmailNotificationMethod(ILocalizedTextService textService, IRuntimeState runtimeState, ILogger logger)
         {
-            var recipientEmail = Settings["recipientEmail"]?.Value;
+            var recipientEmail = Settings?["recipientEmail"]?.Value;
             if (string.IsNullOrWhiteSpace(recipientEmail))
             {
                 Enabled = false;

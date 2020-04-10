@@ -75,13 +75,11 @@
                                             on-remove="model.removeSelectedItem($index, model.user.userGroups)">
                     </umb-user-group-preview>
 
-                    <a href=""
-                       style="max-width: 100%;"
-                       class="umb-node-preview-add"
-                       ng-click="model.openUserGroupPicker()"
-                       prevent-default>
+                    <button type="button"
+                            class="umb-node-preview-add"
+                            ng-click="model.openUserGroupPicker()">
                         <localize key="general_add">Add</localize>
-                    </a>
+                    </button>
 
                 </umb-control-group>
 
@@ -100,13 +98,12 @@
                                       name="model.labels.noStartNodes">
                     </umb-node-preview>
 
-                    <a href=""
-                       class="umb-node-preview-add"
-                       id="content-start-add"
-                       ng-click="model.openContentPicker()"
-                       prevent-default>
+                    <button type="button"
+                            class="umb-node-preview-add"
+                            id="content-start-add"
+                            ng-click="model.openContentPicker()">
                         <localize key="general_add">Add</localize>
-                    </a>
+                    </button>
 
                 </umb-control-group>
 
@@ -125,13 +122,12 @@
                                       name="model.labels.noStartNodes">
                     </umb-node-preview>
 
-                    <a href=""
-                       class="umb-node-preview-add"
-                       ng-click="model.openMediaPicker()"
-                       id="media-start-add"
-                       prevent-default>
+                    <button type="button"
+                            class="umb-node-preview-add"
+                            ng-click="model.openMediaPicker()"
+                            id="media-start-add">
                         <localize key="general_add">Add</localize>
-                    </a>
+                    </button>
 
                 </umb-control-group>
 
@@ -258,7 +254,7 @@
                     </div>
                     <div>
 
-                        <umb-button type="button" ng-if="model.user.userDisplayState.key !== 'Invited' && model.changePasswordModel.isChanging === false"
+                        <umb-button type="button" ng-if="model.user.userDisplayState.key !== 'Invited'"
                                     button-style="[action,block]"
                                     action="model.toggleChangePassword()"
                                     label="Change password"
@@ -277,21 +273,6 @@
                                     size="s">
                         </umb-button>
                     </div>
-
-                    <ng-form ng-if="model.changePasswordModel.isChanging" name="passwordForm" class="block-form" val-form-manager>
-
-                        <change-password password-values="model.user.changePassword"
-                                         config="model.changePasswordModel.config">
-                        </change-password>
-
-                        <umb-button type="button"
-                                    action="model.toggleChangePassword()"
-                                    label="Cancel"
-                                    label-key="general_cancel"
-                                    button-style="cancel">
-                        </umb-button>
-
-                    </ng-form>
 
                     <div ng-if="model.user.resetPasswordValue">
                         <p><br />Password reset to value: <strong>{{model.user.resetPasswordValue}}</strong></p>

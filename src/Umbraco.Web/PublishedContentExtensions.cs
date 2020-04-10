@@ -28,6 +28,20 @@ namespace Umbraco.Web
         private static UmbracoContext UmbracoContext => Current.UmbracoContext;
         private static ISiteDomainHelper SiteDomainHelper => Current.Factory.GetInstance<ISiteDomainHelper>();
 
+        #region Creator/Writer Names
+
+        public static string CreatorName(this IPublishedContent content, IUserService userService)
+        {
+            return userService.GetProfileById(content.CreatorId)?.Name;
+        }
+
+        public static string WriterName(this IPublishedContent content, IUserService userService)
+        {
+            return userService.GetProfileById(content.WriterId)?.Name;
+        }
+
+        #endregion
+
         #region IsComposedOf
 
         /// <summary>
@@ -673,7 +687,7 @@ namespace Umbraco.Web
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <returns></returns>
         /// <remarks>
-        /// This can be useful in order to return all nodes in an entire site by a type when combined with TypedContentAtRoot
+        /// This can be useful in order to return all nodes in an entire site by a type when combined with <see cref="UmbracoHelper.ContentAtRoot"/> or similar.
         /// </remarks>
         public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(this IEnumerable<IPublishedContent> parentNodes, string docTypeAlias, string culture = null)
         {
@@ -687,7 +701,7 @@ namespace Umbraco.Web
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <returns></returns>
         /// <remarks>
-        /// This can be useful in order to return all nodes in an entire site by a type when combined with TypedContentAtRoot
+        /// This can be useful in order to return all nodes in an entire site by a type when combined with <see cref="UmbracoHelper.ContentAtRoot"/> or similar.
         /// </remarks>
         public static IEnumerable<T> DescendantsOrSelf<T>(this IEnumerable<IPublishedContent> parentNodes, string culture = null)
             where T : class, IPublishedContent

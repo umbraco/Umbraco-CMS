@@ -81,7 +81,7 @@
     <key alias="save">Uložit</key>
     <key alias="saveAndPublish">Uložit a publikovat</key>
     <key alias="saveToPublish">Uložit a odeslat ke schválení</key>
-    <key alias="showPage">Náhled</key>
+    <key alias="saveAndPreview">Náhled</key>
     <key alias="showPageDisabled">Náhled je deaktivován, protože není přiřazena žádná šablona</key>
     <key alias="styleChoose">Vybrat styl</key>
     <key alias="styleShow">Zobrazit styly</key>
