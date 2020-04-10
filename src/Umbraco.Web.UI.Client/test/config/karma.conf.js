@@ -36,7 +36,6 @@ module.exports = function (config) {
             '../Umbraco.Web.UI/Umbraco/js/*.filters.js',
             '../Umbraco.Web.UI/Umbraco/js/*.services.js',
             '../Umbraco.Web.UI/Umbraco/js/*.interceptors.js',
-            '../Umbraco.Web.UI/Umbraco/js/*.security.js',
             '../Umbraco.Web.UI/Umbraco/js/*.resources.js',
 
             //mocked data and routing

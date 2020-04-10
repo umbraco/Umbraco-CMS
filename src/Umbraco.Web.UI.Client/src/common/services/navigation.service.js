@@ -225,8 +225,10 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         retainQueryStrings: function (currRouteParams, nextRouteParams) {
             var toRetain = angular.copy(nextRouteParams);
             var updated = false;
+
             _.each(retainedQueryStrings, function (r) {
-                if (currRouteParams[r] && !nextRouteParams[r]) {
+                // if mculture is set to null in nextRouteParams, the value will be undefined and we will not retain any query string that has a value of "null"
+                if (currRouteParams[r] && nextRouteParams[r] !== undefined && !nextRouteParams[r]) {
                     toRetain[r] = currRouteParams[r];
                     updated = true;
                 }
@@ -333,6 +335,22 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
 
             return navReadyPromise.promise.then(function () {
                 return mainTreeApi.syncTree(args);
+            });
+        },
+
+        /**     
+         * @ngdoc method
+         * @name umbraco.services.navigationService#hasTree
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * Checks if a tree with the given alias exists.
+         * 
+         * @param {String} treeAlias the tree alias to check
+         */
+        hasTree: function (treeAlias) {
+            return navReadyPromise.promise.then(function () {
+                return mainTreeApi.hasTree(treeAlias);
             });
         },
 
@@ -463,6 +481,8 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
                 throw "section cannot be null";
             }
 
+            appState.setMenuState("currentNode", node);
+
             if (action.metaData && action.metaData["actionRoute"] && angular.isString(action.metaData["actionRoute"])) {
                 //first check if the menu item simply navigates to a route
                 var parts = action.metaData["actionRoute"].split("?");
@@ -558,30 +578,12 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             if (args.action.metaData["actionView"]) {
                 templateUrl = args.action.metaData["actionView"];
             }
-            else {
-
-                //by convention we will look into the /views/{treetype}/{action}.html
-                // for example: /views/content/create.html
-
-                //we will also check for a 'packageName' for the current tree, if it exists then the convention will be:
-                // for example: /App_Plugins/{mypackage}/backoffice/{treetype}/create.html
-
+            else {                
                 var treeAlias = treeService.getTreeAlias(args.node);
-                var packageTreeFolder = treeService.getTreePackageFolder(treeAlias);
-
                 if (!treeAlias) {
                     throw "Could not get tree alias for node " + args.node.id;
-                }
-
-                if (packageTreeFolder) {
-                    templateUrl = Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
-                        "/" + packageTreeFolder +
-                        "/backoffice/" + treeAlias + "/" + args.action.alias + ".html";
-                }
-                else {
-                    templateUrl = "views/" + treeAlias + "/" + args.action.alias + ".html";
-                }
-
+                }                            
+                templateUrl = this.getTreeTemplateUrl(treeAlias, args.action.alias);
             }
 
             setMode("dialog");
@@ -590,6 +592,31 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
                 appState.setMenuState("dialogTemplateUrl", templateUrl);
             }
             
+        },
+        /**
+          * @ngdoc method
+          * @name umbraco.services.navigationService#getTreeTemplateUrl
+          * @methodOf umbraco.services.navigationService
+          *
+          * @param {string} treeAlias the alias of the tree to look up
+          * @param {string} action the view file name
+          * @description
+          * creates the templateUrl based on treeAlias and action
+          * by convention we will look into the /views/{treetype}/{action}.html
+          * for example: /views/content/create.html
+          * we will also check for a 'packageName' for the current tree, if it exists then the convention will be:
+          * for example: /App_Plugins/{mypackage}/backoffice/{treetype}/create.html
+          */
+        getTreeTemplateUrl: function(treeAlias, action) {
+            var packageTreeFolder = treeService.getTreePackageFolder(treeAlias);
+            if (packageTreeFolder) {
+                return Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
+                    "/" + packageTreeFolder +
+                    "/backoffice/" + treeAlias + "/" + action + ".html";
+            }
+            else {
+                return "views/" + treeAlias + "/" + action + ".html";
+            }
         },
 
         /**

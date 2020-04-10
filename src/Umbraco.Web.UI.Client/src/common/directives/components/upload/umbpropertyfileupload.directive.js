@@ -299,7 +299,7 @@
              */
             onFilesChanged: "&",
             onInit: "&",
-            required: "@"
+            required: "="
         },
         transclude: true,
         controllerAs: 'vm',

@@ -1,13 +1,12 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, $routeParams, usersResource, 
-        userGroupsResource, userService, localizationService, contentEditingHelper, 
-        usersHelper, formHelper, notificationsService, dateHelper, editorService, 
+    function UsersController($scope, $timeout, $location, $routeParams, usersResource,
+        userGroupsResource, userService, localizationService,
+        usersHelper, formHelper, dateHelper, editorService,
         listViewHelper) {
 
         var vm = this;
-        var localizeSaving = localizationService.localize("general_saving");
 
         vm.page = {};
         vm.users = [];
@@ -113,6 +112,7 @@
         vm.selectAll = selectAll;
         vm.areAllSelected = areAllSelected;
         vm.searchUsers = searchUsers;
+        vm.onBlurSearch = onBlurSearch;
         vm.getFilterName = getFilterName;
         vm.setUserStatesFilter = setUserStatesFilter;
         vm.setUserGroupFilter = setUserGroupFilter;
@@ -128,8 +128,7 @@
 
         function init() {
 
-            vm.usersOptions.orderBy = "Name";
-            vm.usersOptions.orderDirection = "Ascending";
+            initViewOptions();
 
             if ($routeParams.create) {
                 setUsersViewState("createUser");
@@ -144,8 +143,56 @@
             // Get user groups
             userGroupsResource.getUserGroups({ onlyCurrentUserGroups: false }).then(function (userGroups) {
                 vm.userGroups = userGroups;
+                initUserGroupSelections();
             });
 
+        }
+
+        function initViewOptions() {
+
+            // Start with default view options.
+            vm.usersOptions.filter = "";
+            vm.usersOptions.orderBy = "Name";
+            vm.usersOptions.orderDirection = "Ascending";
+
+            // Update from querystring if available.
+            initViewOptionFromQueryString("filter");
+            initViewOptionFromQueryString("orderBy");
+            initViewOptionFromQueryString("orderDirection");
+            initViewOptionFromQueryString("pageNumber");
+            initViewOptionFromQueryString("userStates", true);
+            initViewOptionFromQueryString("userGroups", true);
+        }
+
+        function initViewOptionFromQueryString(key, isCollection) {
+            var value = $location.search()[key];
+            if (value) {
+                if (isCollection) {
+                    value = value.split(",");
+                }
+
+                vm.usersOptions[key] = value;
+            }
+        }
+
+        function initUserStateSelections() {
+            initUsersOptionsFilterSelections(vm.userStatesFilter, vm.usersOptions.userStates, "key");
+        }
+
+        function initUserGroupSelections() {
+            initUsersOptionsFilterSelections(vm.userGroups, vm.usersOptions.userGroups, "alias");
+        }
+
+        function initUsersOptionsFilterSelections(filterCollection, selectedCollection, keyField) {
+            if (selectedCollection && selectedCollection.length > 0 && filterCollection && filterCollection.length > 0) {
+                for (var i = 0; i < selectedCollection.length; i++) {
+                    for (var j = 0; j < filterCollection.length; j++) {
+                        if (filterCollection[j][keyField] === selectedCollection[i]) {
+                            filterCollection[j].selected = true;
+                        }
+                    }
+                }
+            }
         }
 
         function getSortLabel(sortKey, sortDirection) {
@@ -339,7 +386,7 @@
                         vm.selectedBulkUserGroups = [];
                         editorService.close();
                         clearSelection();
-                    }, angular.noop);
+                    }, Utilities.noop);
                 },
                 close: function () {
                     vm.selectedBulkUserGroups = [];
@@ -407,12 +454,17 @@
 
         var search = _.debounce(function () {
             $scope.$apply(function () {
+                vm.usersOptions.pageNumber = 1;
                 getUsers();
             });
         }, 500);
 
         function searchUsers() {
             search();
+        }
+
+        function onBlurSearch() {
+            updateLocation("filter", vm.usersOptions.filter);
         }
 
         function getFilterName(array) {
@@ -467,7 +519,8 @@
                 vm.usersOptions.userStates.splice(index, 1);
             }
 
-            getUsers();
+            updateLocation("userStates", vm.usersOptions.userStates.join(","));
+            changePageNumber(1);
         }
 
         function setUserGroupFilter(userGroup) {
@@ -483,18 +536,27 @@
                 vm.usersOptions.userGroups.splice(index, 1);
             }
 
-            getUsers();
+            updateLocation("userGroups", vm.usersOptions.userGroups.join(","));
+            changePageNumber(1);
         }
 
         function setOrderByFilter(value, direction) {
             vm.usersOptions.orderBy = value;
             vm.usersOptions.orderDirection = direction;
+            updateLocation("orderBy", value);
+            updateLocation("orderDirection", direction);
             getUsers();
         }
 
         function changePageNumber(pageNumber) {
             vm.usersOptions.pageNumber = pageNumber;
+            updateLocation("pageNumber", pageNumber);
             getUsers();
+        }
+
+        function updateLocation(key, value) {
+            $location.search("filter", vm.usersOptions.filter);// update filter, but first when something else requests a url update.
+            $location.search(key, value);
         }
 
         function createUser(addUserForm) {
@@ -575,15 +637,52 @@
         }
 
         function goToUser(user) {
-            $location.path(pathToUser(user)).search("create", null).search("invite", null);
+            $location.path(pathToUser(user))
+                .search("orderBy", vm.usersOptions.orderBy)
+                .search("orderDirection", vm.usersOptions.orderDirection)
+                .search("pageNumber", vm.usersOptions.pageNumber)
+                .search("userStates", getUsersOptionsFilterCollectionAsDelimitedStringOrNull(vm.usersOptions.userStates))
+                .search("userGroups", getUsersOptionsFilterCollectionAsDelimitedStringOrNull(vm.usersOptions.userGroups))
+                .search("create", null)
+                .search("invite", null);
+        }
+
+        function getUsersOptionsFilterCollectionAsDelimitedStringOrNull(collection) {
+            if (collection && collection.length > 0) {
+                return collection.join(",");
+            }
+
+            return null;
         }
         
         function getEditPath(user) {
-            return pathToUser(user) + "?mculture=" + $location.search().mculture;
+            return pathToUser(user) + usersOptionsAsQueryString();
         }
-        
+
         function pathToUser(user) {
             return "/users/users/user/" + user.id;
+        }
+
+        function usersOptionsAsQueryString() {
+            var qs = "?orderBy=" + vm.usersOptions.orderBy +
+                "&orderDirection=" + vm.usersOptions.orderDirection +
+                "&pageNumber=" + vm.usersOptions.pageNumber +
+                "&filter=" + vm.usersOptions.filter;
+
+            qs += addUsersOptionsFilterCollectionToQueryString("userStates", vm.usersOptions.userStates);
+            qs += addUsersOptionsFilterCollectionToQueryString("userGroups", vm.usersOptions.userGroups);
+
+            qs += "&mculture=" + $location.search().mculture;
+
+            return qs;
+        }
+
+        function addUsersOptionsFilterCollectionToQueryString(name, collection) {
+            if (collection && collection.length > 0) {
+                return "&" + name + "=" + collection.join(",");
+            }
+
+            return "";
         }
 
         // helpers
@@ -604,6 +703,7 @@
                 formatDates(vm.users);
                 setUserDisplayState(vm.users);
                 vm.userStatesFilter = usersHelper.getUserStatesFilter(data.userStates);
+                initUserStateSelections();
 
                 vm.loading = false;
 

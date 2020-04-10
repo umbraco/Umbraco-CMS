@@ -11,7 +11,7 @@
     <umb-box>
         <umb-box-header title="Macro partial view"></umb-box-header>
         <umb-box-content>
-            <umb-control-group label="Macro partial view">
+            <umb-control-group label="Macro partial view" required="true">
 
                 <umb-node-preview ng-if="model.macro.node"
                                   icon="model.macro.node.icon"
@@ -21,6 +21,7 @@
                                   on-edit="model.openViewPicker()"
                                   on-remove="model.removeMacroView()">
                 </umb-node-preview>
+                <input type="hidden" ng-model="mandatoryViewValidator" ng-required="!model.macro.node" />
 
                 <a href=""
                    ng-show="!model.macro.node"

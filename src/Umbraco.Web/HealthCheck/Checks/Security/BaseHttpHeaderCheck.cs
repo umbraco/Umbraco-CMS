@@ -78,7 +78,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 var response = request.GetResponse();
 
                 // Check first for header
-                success = DoHttpHeadersContainHeader(response);
+                success = HasMatchingHeader(response.Headers.AllKeys);
 
                 // If not found, and available, check for meta-tag
                 if (success == false && _metaTagOptionAvailable)
@@ -113,9 +113,9 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 };
         }
 
-        private bool DoHttpHeadersContainHeader(WebResponse response)
+        private bool HasMatchingHeader(IEnumerable<string> headerKeys)
         {
-            return response.Headers.AllKeys.Contains(_header, StringComparer.InvariantCultureIgnoreCase);
+            return headerKeys.Contains(_header, StringComparer.InvariantCultureIgnoreCase);
         }
 
         private bool DoMetaTagsContainKeyForHeader(WebResponse response)
@@ -127,7 +127,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 {
                     var html = reader.ReadToEnd();
                     var metaTags = ParseMetaTags(html);
-                    return metaTags.ContainsKey(_header);
+                    return HasMatchingHeader(metaTags.Keys);
                 }
             }
         }

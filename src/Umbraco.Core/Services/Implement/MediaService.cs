@@ -5,7 +5,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Umbraco.Core.Events;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -1340,7 +1339,8 @@ namespace Umbraco.Core.Services.Implement
 
         private IMediaType GetMediaType(string mediaTypeAlias)
         {
-            if (string.IsNullOrWhiteSpace(mediaTypeAlias)) throw new ArgumentNullOrEmptyException(nameof(mediaTypeAlias));
+            if (mediaTypeAlias == null) throw new ArgumentNullException(nameof(mediaTypeAlias));
+            if (string.IsNullOrWhiteSpace(mediaTypeAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(mediaTypeAlias));
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1350,7 +1350,7 @@ namespace Umbraco.Core.Services.Implement
                 var mediaType = _mediaTypeRepository.Get(query).FirstOrDefault();
 
                 if (mediaType == null)
-                    throw new Exception($"No MediaType matching the passed in Alias: '{mediaTypeAlias}' was found"); // causes rollback // causes rollback
+                    throw new InvalidOperationException($"No media type matched the specified alias '{mediaTypeAlias}'.");
 
                 scope.Complete();
                 return mediaType;

@@ -58,10 +58,13 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         vm.hideSearch = hideSearch;
         vm.closeMiniListView = closeMiniListView;
         vm.selectListViewNode = selectListViewNode;
+        vm.listViewItemsLoaded = listViewItemsLoaded;
         vm.submit = submit;
         vm.close = close;
 
         var currentNode = $scope.model.currentNode;
+
+        var previouslyFocusedElement = null;
 
         function initDialogTree() {
             vm.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
@@ -75,18 +78,20 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
          */
         function onInit () {
 
-            // load languages
-            languageResource.getAll().then(function (languages) {
-                vm.languages = languages;
+            if (vm.showLanguageSelector) {
+                // load languages
+                languageResource.getAll().then(function (languages) {
+                    vm.languages = languages;
 
-                // set the default language
-                vm.languages.forEach(function (language) {
-                    if (language.isDefault) {
-                        vm.selectedLanguage = language;
-                        vm.languageSelectorIsOpen = false;
-                    }
+                    // set the default language
+                    vm.languages.forEach(function (language) {
+                        if (language.isDefault) {
+                            vm.selectedLanguage = language;
+                            vm.languageSelectorIsOpen = false;
+                        }
+                    });
                 });
-            });
+            }
 
             if (vm.treeAlias === "content") {
                 vm.entityType = "Document";
@@ -211,7 +216,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             if (vm.dataTypeKey) {
                 queryParams["dataTypeKey"] = vm.dataTypeKey;
             }
-                
+
             var queryString = $.param(queryParams); //create the query string from the params object
             
             if (!queryString) {
@@ -415,7 +420,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             if ($scope.model.selection.length > 0) {
                 for (var i = 0; $scope.model.selection.length > i; i++) {
                     var selectedItem = $scope.model.selection[i];
-                    if (selectedItem.id === item.id) {
+                    if (selectedItem.id === parseInt(item.id)) {
                         found = true;
                         foundIndex = i;
                     }
@@ -486,6 +491,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         }
 
         function openMiniListView(node) {
+            previouslyFocusedElement = document.activeElement;
             vm.miniListView = node;
         }
 
@@ -630,8 +636,8 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             _.each(vm.searchInfo.results,
                 function (result) {
                     var exists = _.find($scope.model.selection,
-                        function (selectedId) {
-                            return result.id == selectedId;
+                        function (item) {
+                            return result.id == item.id;
                         });
                     if (exists) {
                         result.selected = true;
@@ -649,6 +655,21 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
 
         function closeMiniListView() {
             vm.miniListView = undefined;
+            if (previouslyFocusedElement) {
+                $timeout(function () {
+                    previouslyFocusedElement.focus();
+                    previouslyFocusedElement = null;
+                });
+            }
+        }
+
+        function listViewItemsLoaded(items) {
+            var selectedIds = _.pluck($scope.model.selection, "id");
+            _.each(items, function (item) {
+                if (_.contains(selectedIds, item.id)) {
+                    item.selected = true;
+                }
+            });
         }
 
         function submit(model) {

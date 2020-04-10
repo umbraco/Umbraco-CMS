@@ -101,6 +101,10 @@ angular.module("umbraco")
                     }
                 });
 
+                $scope.focus = function () {
+                    tinyMceEditor.focus();
+                }
+
                 //when the element is disposed we need to unsubscribe!
                 // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom
                 // element might still be there even after the modal has been hidden.

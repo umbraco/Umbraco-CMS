@@ -5,7 +5,7 @@
            ng-model="term"
            class="umb-search-field search-query -full-width-input"
            placeholder="{{searchPlaceholderText}}"           
-           focus-when="{{showSearch}}">
+           umb-auto-focus="{{autoFocus ? 'true' : 'false'}}">
     <h4 ng-if="showSearch && searchFromName">
         <small><localize key="general_search">Search</localize>:&nbsp;</small>
         {{searchFromName}}

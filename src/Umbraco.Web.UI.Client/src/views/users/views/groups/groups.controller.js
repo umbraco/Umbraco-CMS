@@ -15,6 +15,8 @@
         vm.selectUserGroup = selectUserGroup;
         vm.deleteUserGroups = deleteUserGroups;
 
+        vm.filter = null;
+
         var currentUser = null;
 
         function onInit() {
@@ -110,7 +112,7 @@
                                 userGroupsResource.deleteUserGroups(_.pluck(vm.selection, "id")).then(function (data) {
                                     clearSelection();
                                     onInit();
-                                }, angular.noop);
+                                }, Utilities.noop);
                                 overlayService.close();
                             }
                         };

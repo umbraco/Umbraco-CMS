@@ -3,14 +3,14 @@
         <textarea ng-model="model.value" id="{{model.alias}}" name="textarea" rows="{{model.config.rows || 10}}" class="umb-property-editor umb-textarea textstring" val-server="value" ng-keyup="model.change()" ng-required="model.validation.mandatory" aria-required="{{model.validation.mandatory}}"></textarea>
 
         <span ng-messages="textareaFieldForm.textarea.$error" show-validation-on-submit >
-            <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+            <span class="help-inline" ng-message="required">{{mandatoryMessage}}</span>
             <span class="help-inline" ng-message="valServer">{{textareaFieldForm.textarea.errorMsg}}</span>
         </span>
 
         <div class="help" ng-if="model.maxlength === true && model.count >= (model.config.maxChars*.8) && model.count <= model.config.maxChars">
             <localize key="textbox_characters_left" tokens="[model.config.maxChars - model.count]" watch-tokens="true">%0% characters left.</localize>
         </div>
-        <div class="help text-error" ng-if="model.maxlength === true && model.count > model.config.maxChars">
+        <div class="help text-error" ng-if="!isLengthValid()">
             <localize key="textbox_characters_exceed" tokens="[model.config.maxChars, model.count - model.config.maxChars]" watch-tokens="true">Maximum %0% characters, <strong>%1%</strong> too many.</localize>
         </div>
 

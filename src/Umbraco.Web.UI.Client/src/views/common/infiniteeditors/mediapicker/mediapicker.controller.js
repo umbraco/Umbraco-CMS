@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-        function ($scope, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService) {
+    function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage) {
 
             var vm = this;
             
@@ -22,8 +22,8 @@ angular.module("umbraco")
 
             vm.clickHandler = clickHandler;
             vm.clickItemName = clickItemName;
-            vm.editMediaItem = editMediaItem;
             vm.gotoFolder = gotoFolder;
+            vm.shouldShowUrl = shouldShowUrl;
 
             var dialogOptions = $scope.model;
             
@@ -38,7 +38,11 @@ angular.module("umbraco")
             $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
             $scope.lockedFolder = true;
             $scope.allowMediaEdit = dialogOptions.allowMediaEdit ? dialogOptions.allowMediaEdit : false;
-            
+
+            $scope.filterOptions = {
+                excludeSubFolders: umbSessionStorage.get("mediaPickerExcludeSubFolders") || false
+            };
+
             var userStartNodes = [];
 
             var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
@@ -132,7 +136,7 @@ angular.module("umbraco")
                     
                     // ID of a UDI or legacy int ID still could be null/undefinied here
                     // As user may dragged in an image that has not been saved to media section yet
-                    if(id){
+                    if (id) {
                         entityResource.getById(id, "Media")
                         .then(function (node) {
                             $scope.target = node;
@@ -144,8 +148,7 @@ angular.module("umbraco")
                                 openDetailsDialog();
                             }
                         }, gotoStartNode);
-                    }
-                    else {
+                    } else {
                         // No ID set - then this is going to be a tmpimg that has not been uploaded
                         // User editing this will want to be changing the ALT text
                         openDetailsDialog();
@@ -254,11 +257,14 @@ angular.module("umbraco")
                 }
             }
 
-            function clickItemName(item) {
+            function clickItemName(item, event, index) {
                 if (item.isFolder) {
                     gotoFolder(item);
                 }
-            }
+                else {
+                    $scope.clickHandler(item, event, index);
+                }
+            };
 
             function selectMedia(media) {
                 if (!media.selectable) {
@@ -292,13 +298,18 @@ angular.module("umbraco")
 
             function onUploadComplete(files) {
                 gotoFolder($scope.currentFolder).then(function () {
-                    if (files.length === 1 && $scope.model.selection.length === 0) {
-                        var image = $scope.images[$scope.images.length - 1];
-                        $scope.target = image;
-                        $scope.target.url = mediaHelper.resolveFile(image);
-                        selectMedia(image);
-                    }
-                })
+                    $timeout(function () {
+                        if ($scope.multiPicker) {
+                            var images = _.rest($scope.images, $scope.images.length - files.length);
+                            _.each(images, function(image) {
+                                selectMedia(image);
+                            });
+                        } else {
+                            var image = $scope.images[$scope.images.length - 1];
+                            clickHandler(image);
+                        }
+                    });
+                });
             }
 
             function onFilesQueue() {
@@ -311,7 +322,7 @@ angular.module("umbraco")
 
                 // also make sure the node is not trashed
                 if (nodePath.indexOf($scope.startNodeId.toString()) !== -1 && node.trashed === false) {
-                    gotoFolder({ id: $scope.lastOpenedNode, name: "Media", icon: "icon-folder", path: node.path });
+                    gotoFolder({ id: $scope.lastOpenedNode || $scope.startNodeId, name: "Media", icon: "icon-folder", path: node.path });
                     return true;
                 } else {
                     gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
@@ -384,6 +395,7 @@ angular.module("umbraco")
             }
 
             function toggle() {
+                umbSessionStorage.set("mediaPickerExcludeSubFolders", $scope.filterOptions.excludeSubFolders);
                 // Make sure to activate the changeSearch function everytime the toggle is clicked
                 changeSearch();
             }
@@ -396,7 +408,7 @@ angular.module("umbraco")
 
             function searchMedia() {
                 vm.loading = true;
-                entityResource.getPagedDescendants($scope.currentFolder.id, "Media", vm.searchOptions)
+                entityResource.getPagedDescendants($scope.filterOptions.excludeSubFolders ? $scope.currentFolder.id : $scope.startNodeId, "Media", vm.searchOptions)
                     .then(function (data) {
                         // update image data to work with image grid
                         angular.forEach(data.items, function (mediaItem) {
@@ -503,30 +515,6 @@ angular.module("umbraco")
                 }
             }
 
-            function editMediaItem(item) {
-                var mediaEditor = {
-                    id: item.id,
-                    submit: function (model) {
-                        editorService.close()
-                        // update the media picker item in the picker so it matched the saved media item
-                        // the media picker is using media entities so we get the 
-                        // entity so we easily can format it for use in the media grid
-                        if (model && model.mediaNode) {
-                            entityResource.getById(model.mediaNode.id, "media")
-                                .then(function (mediaEntity) {
-                                    angular.extend(item, mediaEntity);
-                                    setMediaMetaData(item);
-                                    setUpdatedMediaNodes(item);
-                                });
-                        }
-                    },
-                    close: function (model) {
-                        setUpdatedMediaNodes(item);
-                        editorService.close();
-                    }
-                };
-                editorService.mediaEditor(mediaEditor);
-            };
 
             /**
              * Called when the umbImageGravity component updates the focal point value
@@ -546,6 +534,19 @@ angular.module("umbraco")
                 if ($scope.model.updatedMediaNodes.indexOf(item.udi) === -1) {
                     $scope.model.updatedMediaNodes.push(item.udi);
                 }
+            }
+
+            function shouldShowUrl() {
+                if (!$scope.target) {
+                    return false;
+                }
+                if ($scope.target.id) {
+                    return false;
+                }
+                if ($scope.target.url && $scope.target.url.toLower().indexOf("blob:") === 0) {
+                    return false;
+                }
+                return true;
             }
 
             function submit() {

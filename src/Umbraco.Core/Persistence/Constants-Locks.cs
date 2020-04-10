@@ -9,6 +9,11 @@ namespace Umbraco.Core
         public static class Locks
         {
             /// <summary>
+            /// The <see cref="IMainDom"/> lock
+            /// </summary>
+            public const int MainDom = -1000;
+
+            /// <summary>
             /// All servers.
             /// </summary>
             public const int Servers = -331;
