@@ -71,6 +71,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
                     .WithName(testMemberTypeName)
                     .WithMembershipPropertyGroup()
                     .AddPropertyGroup()
+                        .WithId(1)
                         .WithName(testMemberTypePropertyGroupName)
                         .WithSortOrder(1)
                         .AddPropertyType()

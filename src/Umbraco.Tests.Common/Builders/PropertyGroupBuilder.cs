@@ -6,29 +6,53 @@ using Umbraco.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Tests.Common.Builders
 {
-    public class PropertyGroupBuilder
-        : ChildBuilderBase<MemberTypeBuilder, PropertyGroup>,   // TODO: likely want to generalise this, so can use for document and media types too.
-            IWithNameBuilder,
-            IWithSortOrderBuilder
+    public class PropertyGroupBuilder : PropertyGroupBuilder<NullPropertyGroupBuilderParent>
     {
-        private readonly List<PropertyTypeBuilder> _propertyTypeBuilders = new List<PropertyTypeBuilder>();
+        public PropertyGroupBuilder() : base(null)
+        {
+        }
+    }
 
+    public class NullPropertyGroupBuilderParent : IBuildPropertyGroups
+    {
+    }
+
+    public class PropertyGroupBuilder<TParent>
+        : ChildBuilderBase<TParent, PropertyGroup>,
+            IBuildPropertyTypes,
+            IWithIdBuilder,
+            IWithKeyBuilder,
+            IWithCreateDateBuilder,
+            IWithUpdateDateBuilder,
+            IWithNameBuilder,
+            IWithSortOrderBuilder where TParent: IBuildPropertyGroups
+    {
+        private readonly List<PropertyTypeBuilder<PropertyGroupBuilder<TParent>>> _propertyTypeBuilders = new List<PropertyTypeBuilder<PropertyGroupBuilder<TParent>>>();
+
+        private int? _id;
+        private Guid? _key;
+        private DateTime? _createDate;
+        private DateTime? _updateDate;
         private string _name;
         private int? _sortOrder;
 
-        public PropertyGroupBuilder(MemberTypeBuilder parentBuilder) : base(parentBuilder)
+        public PropertyGroupBuilder(TParent parentBuilder) : base(parentBuilder)
         {
         }
 
-        public PropertyTypeBuilder AddPropertyType()
+        public PropertyTypeBuilder<PropertyGroupBuilder<TParent>> AddPropertyType()
         {
-            var builder = new PropertyTypeBuilder(this);
+            var builder = new PropertyTypeBuilder<PropertyGroupBuilder<TParent>>(this);
             _propertyTypeBuilders.Add(builder);
             return builder;
         }
 
         public override PropertyGroup Build()
         {
+            var id = _id ?? 1;
+            var key = _key ?? Guid.NewGuid();
+            var createDate = _createDate ?? DateTime.Now;
+            var updateDate = _updateDate ?? DateTime.Now;
             var name = _name ?? Guid.NewGuid().ToString();
             var sortOrder = _sortOrder ?? 0;
 
@@ -40,9 +64,25 @@ namespace Umbraco.Tests.Common.Builders
 
             return new PropertyGroup(properties)
             {
+                Id = id,
+                Key = key,
                 Name = name,
                 SortOrder = sortOrder,
+                CreateDate = createDate,
+                UpdateDate = updateDate,
             };
+        }
+
+        int? IWithIdBuilder.Id
+        {
+            get => _id;
+            set => _id = value;
+        }
+
+        Guid? IWithKeyBuilder.Key
+        {
+            get => _key;
+            set => _key = value;
         }
 
         string IWithNameBuilder.Name
@@ -50,7 +90,19 @@ namespace Umbraco.Tests.Common.Builders
             get => _name;
             set => _name = value;
         }
-        
+
+        DateTime? IWithCreateDateBuilder.CreateDate
+        {
+            get => _createDate;
+            set => _createDate = value;
+        }
+
+        DateTime? IWithUpdateDateBuilder.UpdateDate
+        {
+            get => _updateDate;
+            set => _updateDate = value;
+        }
+
         int? IWithSortOrderBuilder.SortOrder
         {
             get => _sortOrder;
