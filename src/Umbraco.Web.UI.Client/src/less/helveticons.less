@@ -36,7 +36,9 @@ span[class*=" icon-"] {
 }
 
 i[class^="icon-"],
-i[class*=" icon-"] {
+i[class*=" icon-"],
+button.icon-trash,
+span.icon-wrong {
   font-family: icomoon;
   font-weight: normal;
   font-style: normal;
@@ -45,7 +47,9 @@ i[class*=" icon-"] {
 }
 
 i[class^="icon-"]:before,
-i[class*=" icon-"]:before {
+i[class*=" icon-"]:before,
+button.icon-trash,
+span.icon-wrong {
     text-decoration: inherit;
     display: inline-block;
     speak: none;
@@ -91,7 +95,8 @@ i.icon-wrench:before {
 i.icon-wine-glass:before {
 	content: "\e009";
 }
-i.icon-wrong:before {
+i.icon-wrong:before,
+span.icon-wrong:before {
 	content: "\e00a";
 }
 i.icon-windows:before {
@@ -178,22 +183,22 @@ i.icon-umbrella:before {
 i.icon-umb-deploy:before {
 	content: "\e027";
 }
-i.icon-umb-contour:before, .traycontour:before, {
+i.icon-umb-contour:before, .traycontour:before {
 	content: "\e028";
 }
-i.icon-umb-settings:before, .traysettings:before, {
+i.icon-umb-settings:before, .traysettings:before {
 	content: "\e029";
 }
 i.icon-umb-users:before, .trayuser:before, .trayusers:before{
 	content: "\e02a";
 }
-i.icon-umb-media:before, .traymedia:before, {
+i.icon-umb-media:before, .traymedia:before {
 	content: "\e02b";
 }
 i.icon-umb-content:before, .traycontent:before{
 	content: "\e02c";
 }
-i.icon-umb-developer:before, .traydeveloper:before, {
+i.icon-umb-developer:before, .traydeveloper:before {
 	content: "\e02d";
 }
 i.icon-umb-members:before, .traymember:before {
@@ -214,13 +219,16 @@ i.icon-trophy:before {
 i.icon-tree:before {
 	content: "\e031";
 }
-i.icon-trash:before {
+i.icon-trash:before,
+button.icon-trash:before {
 	content: "\e032";
 }
-i.icon-trash-alt:before {
+i.icon-trash-alt:before,
+button.icon-trash-alt:before {
 	content: "\e033";
 }
-i.icon-trash-alt-2:before {
+i.icon-trash-alt-2:before,
+button.icon-trash-alt-2:before  {
 	content: "\e034";
 }
 i.icon-train:before {
@@ -446,7 +454,8 @@ i.icon-share-alt:before {
 i.icon-share-alt-2:before {
 	content: "\e07d";
 }
-i.icon-settings:before {
+i.icon-settings:before,
+button.icon-settings:before  {
 	content: "\e07e";
 }
 i.icon-settings-alt:before {
