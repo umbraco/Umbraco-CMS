@@ -34,7 +34,7 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
                         else {
 
                             const introTourShown = localStorageService.get("introTourShown");
-                            if(!introTourShown){
+                            if (!introTourShown) {
                                 // Go & show email marketing tour (ONLY when intro tour is completed or been dismissed)
                                 tourService.getTourByAlias("umbEmailMarketing").then(function (emailMarketingTour) {
                                     // Only show the email marketing tour one time - dismissing it or saying no will make sure it never appears again
@@ -45,7 +45,7 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
                                         // Only show the email tour once per logged in session
                                         // The localstorage key is removed on logout or user session timeout
                                         const emailMarketingTourShown = localStorageService.get("emailMarketingTourShown");
-                                        if(!emailMarketingTourShown){
+                                        if (!emailMarketingTourShown) {
                                             tourService.startTour(emailMarketingTour);
                                             localStorageService.set("emailMarketingTourShown", true);
                                         }
@@ -67,22 +67,14 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
         }
 
         var currentRouteParams = null;
-        var pageTitle = "";
-        var rootTitle = "";
-        
+
+        var originalTitle = "";
+
         $rootScope.$on('$changeTitle', function (event, titlePrefix) {
             if (titlePrefix) {
-                $rootScope.locationTitle = titlePrefix + " - " + pageTitle;
+                $rootScope.locationTitle = titlePrefix + " - " + originalTitle;
             } else {
-                $rootScope.locationTitle = pageTitle;
-            }
-        });
-
-        $rootScope.$on('$setRootTitle', function (event, titlePrefix) {
-            if (titlePrefix) {
-                $rootScope.locationTitle = titlePrefix + " - " + rootTitle;
-            } else {
-                $rootScope.locationTitle = rootTitle;
+                $rootScope.locationTitle = originalTitle;
             }
         });
 
@@ -97,13 +89,42 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
                 currentRouteParams = toRetain;
             }
             else {
-                currentRouteParams = angular.copy(current.params); 
+                currentRouteParams = angular.copy(current.params);
             }
 
-            pageTitle = getPageTitle(current);
-            rootTitle = getRootTitle(null); // need to capture the root tile of the page when there is no section, this is used when the section name shouldn't be set in the page title
-                        // eg on login
-            $rootScope.locationTitle = pageTitle;
+
+            var deployConfig = Umbraco.Sys.ServerVariables.deploy;
+            var deployEnv, deployEnvTitle;
+            if (deployConfig) {
+                deployEnv = Umbraco.Sys.ServerVariables.deploy.CurrentWorkspace;
+                deployEnvTitle = "(" + deployEnv + ") ";
+            }
+
+            if (current.params.section) {
+
+                //Uppercase the current section, content, media, settings, developer, forms
+                var currentSection = current.params.section.charAt(0).toUpperCase() + current.params.section.slice(1);
+
+                var baseTitle = currentSection + " - " + $location.$$host;
+
+                //Check deploy for Global Umbraco.Sys obj workspace
+                if (deployEnv) {
+                    $rootScope.locationTitle = deployEnvTitle + baseTitle;
+                }
+                else {
+                    $rootScope.locationTitle = baseTitle;
+                }
+
+            }
+            else {
+
+                if (deployEnv) {
+                    $rootScope.locationTitle = deployEnvTitle + "Umbraco - " + $location.$$host;
+                }
+
+                $rootScope.locationTitle = "Umbraco - " + $location.$$host;
+            }
+            originalTitle = $rootScope.locationTitle;
         });
 
         /** When the route change is rejected - based on checkAuth - we'll prevent the rejected route from executing including
@@ -170,49 +191,10 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
                         currentRouteParams.sr = null;
                         $route.updateParams(currentRouteParams);
                     }
-                    
+
                 }
             }
         });
-
-        function getDeployEnvTitle() {
-            var deployConfig = Umbraco.Sys.ServerVariables.deploy;
-            var deployEnv, deployEnvTitle;
-            if (deployConfig) {
-                deployEnv = Umbraco.Sys.ServerVariables.deploy.CurrentWorkspace;
-                deployEnvTitle = "(" + deployEnv + ") ";
-                if (deployEnv) {
-                    return deployEnvTitle;
-                }
-            }
-            return null;
-        }
-        // also sets the param "pageTitle", used in "$changeTitle"
-        function getPageTitle(current) {
-            if (current.params.section) {
-
-                //Uppercase the current section, content, media, settings, developer, forms
-                var currentSection = current.params.section.charAt(0).toUpperCase() + current.params.section.slice(1);
-                return getRootTitle(currentSection);
-            }
-            return getRootTitle(null);
-
-        }
-        
-        function getRootTitle(section) {
-                var deployEnvTitle = getDeployEnvTitle();
-                var title = " - " + $location.$$host;
-                if (section) {
-                    title = section + title;
-                } else {
-                    title = "Umbraco" + title;
-                }
-
-                if (deployEnvTitle) {
-                    return deployEnvTitle + title;
-                }
-                return title;
-        }
 
         //check for touch device, add to global appState
         //var touchDevice = ("ontouchstart" in window || window.touch || window.navigator.msMaxTouchPoints === 5 || window.DocumentTouch && document instanceof DocumentTouch);
