@@ -22,7 +22,7 @@ This project and everyone participating in it, is governed by the [our Code of C
 
 [Reviews](#reviews)
   * [Styleguides](#styleguides)
-  * [The PR team](#the-pr-team)
+  * [The Core Contributors](#the-core-contributors-team)
   * [Questions?](#questions)
 
 [Working with the code](#working-with-the-code)
@@ -98,20 +98,21 @@ To be honest, we don't like rules very much. We trust you have the best of inten
 
 That said, the Umbraco development team likes to follow the hints that ReSharper gives us (no problem if you don't have this installed) and we've added a `.editorconfig` file so that Visual Studio knows what to do with whitespace, line endings, etc.
 
-### The PR team
+### The Core Contributors team
 
-The pull request team consists of one member of Umbraco HQ, [Sebastiaan](https://github.com/nul800sebastiaan), who gets assistance from the following community members who have comitted to volunteering their free time:
+The Core Contributors team consists of one member of Umbraco HQ, [Sebastiaan](https://github.com/nul800sebastiaan), who gets assistance from the following community members who have comitted to volunteering their free time:
 
 - [Anders Bjerner](https://github.com/abjerner)
-- [Dave Woestenborghs](https://github.com/dawoe)
 - [Emma Burstow](https://github.com/emmaburstow)
 - [Poornima Nayar](https://github.com/poornimanayar)
+- [Kenn Jacobsen](https://twitter.com/KennJacobsen_DK)
+
 
 These wonderful people aim to provide you with a first reply to your PR, review and test out your changes and on occasions, they might ask more questions. If they are happy with your work, they'll let Umbraco HQ know by approving the PR. Hq will have final sign-off and will check the work again before it is merged. 
 
 ### Questions?
 
-You can get in touch with [the PR team](#the-pr-team) in multiple ways; we love open conversations and we are a friendly bunch. No question you have is stupid. Any question you have usually helps out multiple people with the same question. Ask away:
+You can get in touch with [the core contributors team](#the-core-contributors-team) in multiple ways; we love open conversations and we are a friendly bunch. No question you have is stupid. Any question you have usually helps out multiple people with the same question. Ask away:
 
 - If there's an existing issue on the issue tracker then that's a good place to leave questions and discuss how to start or move forward.
 - Unsure where to start? Did something not work as expected? Try leaving a note in the ["Contributing to Umbraco"](https://our.umbraco.com/forum/contributing-to-umbraco-cms/) forum. The team monitors that one closely, so one of us will be on hand and ready to point you in the right direction.
@@ -193,4 +194,4 @@ In this command we're syncing with the `v8/contrib` branch, but you can of cours
 
 ### And finally
 
-We welcome all kinds of contributions to this repository. If you don't feel you'd like to make code changes here, you can visit our [documentation repository](https://github.com/umbraco/UmbracoDocs) and use your experience to contribute to making the docs we have, even better. We also encourage community members to feel free to comment on others' pull requests and issues - the expertise we have is not limited to the PR team and HQ. So, if you see something on the issue tracker or pull requests you feel you can add to, please don't be shy. 
+We welcome all kinds of contributions to this repository. If you don't feel you'd like to make code changes here, you can visit our [documentation repository](https://github.com/umbraco/UmbracoDocs) and use your experience to contribute to making the docs we have, even better. We also encourage community members to feel free to comment on others' pull requests and issues - the expertise we have is not limited to the Core Contributors and HQ. So, if you see something on the issue tracker or pull requests you feel you can add to, please don't be shy. 
