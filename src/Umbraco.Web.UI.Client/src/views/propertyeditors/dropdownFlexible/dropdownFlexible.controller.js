@@ -45,7 +45,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleCo
             $scope.model.value = [$scope.model.singleDropdownValue];
         }
 
-        if (angular.isArray($scope.model.config.items)) {
+        if (Utilities.isArray($scope.model.config.items)) {
             //PP: I dont think this will happen, but we have tests that expect it to happen..
             //if array is simple values, convert to array of objects
             if(!angular.isObject($scope.model.config.items[0])){

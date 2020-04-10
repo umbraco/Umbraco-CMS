@@ -87,7 +87,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
 
             /** Helper function to emit tree events */
             function emitEvent(eventName, args) {
-                if (registeredCallbacks[eventName] && angular.isArray(registeredCallbacks[eventName])) {
+                if (registeredCallbacks[eventName] && Utilities.isArray(registeredCallbacks[eventName])) {
                     _.each(registeredCallbacks[eventName], function (c) {
                         c(args);//call it
                     });

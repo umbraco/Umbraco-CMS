@@ -40,7 +40,7 @@ function fileManager($rootScope) {
             }
 
             var metaData = [];
-            if (angular.isArray(args.metaData)) {
+            if (Utilities.isArray(args.metaData)) {
                 metaData = args.metaData;
             }
 

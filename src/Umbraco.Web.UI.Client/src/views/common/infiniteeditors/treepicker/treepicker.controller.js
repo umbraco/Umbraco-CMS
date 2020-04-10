@@ -271,7 +271,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                 openMiniListView(args.node);
             }
 
-            if (angular.isArray(args.children)) {
+            if (Utilities.isArray(args.children)) {
 
                 //iterate children
                 _.each(args.children,

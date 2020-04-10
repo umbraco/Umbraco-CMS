@@ -191,7 +191,7 @@
                         }
                     }
                 }
-                else if (angular.isArray(vm.value)) {
+                else if (Utilities.isArray(vm.value)) {
                     vm.viewModel = vm.value;
                 }
             }
