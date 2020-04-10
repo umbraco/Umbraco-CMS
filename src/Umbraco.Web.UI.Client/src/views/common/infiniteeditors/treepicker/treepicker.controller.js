@@ -176,7 +176,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                 if (angular.isFunction($scope.model.filter)) {
                     $scope.model.filterAdvanced = true;
                 }
-                else if (angular.isObject($scope.model.filter)) {
+                else if (Utilities.isObject($scope.model.filter)) {
                     $scope.model.filterAdvanced = true;
                 }
                 else {
@@ -446,7 +446,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             // be allowed to be clicked on
             nodes = _.filter(nodes,
                 function (n) {
-                    return !angular.isObject(n.metaData.listViewNode);
+                    return !Utilities.isObject(n.metaData.listViewNode);
                 });
 
             if ($scope.model.filterAdvanced) {

@@ -473,7 +473,7 @@ angular.module("umbraco")
                     config = _.filter(angular.copy($scope.model.config.items.config), function (item) { return shouldApply(item, itemType, gridItem); });
                 }
 
-                if (angular.isObject(gridItem.config)) {
+                if (Utilities.isObject(gridItem.config)) {
                     _.each(config, function (cfg) {
                         var val = gridItem.config[cfg.key];
                         if (val) {
@@ -482,7 +482,7 @@ angular.module("umbraco")
                     });
                 }
 
-                if (angular.isObject(gridItem.styles)) {
+                if (Utilities.isObject(gridItem.styles)) {
                     _.each(styles, function (style) {
                         var val = gridItem.styles[style.key];
                         if (val) {

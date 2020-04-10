@@ -59,7 +59,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                     return encodeURIComponent(key) + "=" + encodeURIComponent(val);
                 }).join("&");
             }
-            else if (angular.isObject(queryStrings)) {
+            else if (Utilities.isObject(queryStrings)) {
 
                 //this allows for a normal object to be passed in (ie. a dictionary)
                 return decodeURIComponent($.param(queryStrings));
