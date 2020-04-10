@@ -104,7 +104,7 @@ angular.mock.$Browser = function () {
      * @param {number=} number of milliseconds to flush. See {@link #defer.now}
      */
     self.defer.flush = function (delay) {
-        if (angular.isDefined(delay)) {
+        if (Utilities.isDefined(delay)) {
             self.defer.now += delay;
         } else {
             if (self.deferredFns.length) {
@@ -1267,7 +1267,7 @@ function createHttpBackendMock($rootScope, $delegate, $browser) {
         $rootScope.$digest();
         if (!responses.length) throw Error('No pending request to flush !');
 
-        if (angular.isDefined(count)) {
+        if (Utilities.isDefined(count)) {
             while (count--) {
                 if (!responses.length) throw Error('No more pending request to flush !');
                 responses.shift()();
@@ -1365,8 +1365,8 @@ function MockHttpExpectation(method, url, data, headers) {
     this.match = function (m, u, d, h) {
         if (method != m) return false;
         if (!this.matchUrl(u)) return false;
-        if (angular.isDefined(d) && !this.matchData(d)) return false;
-        if (angular.isDefined(h) && !this.matchHeaders(h)) return false;
+        if (Utilities.isDefined(d) && !this.matchData(d)) return false;
+        if (Utilities.isDefined(h) && !this.matchHeaders(h)) return false;
         return true;
     };
 
