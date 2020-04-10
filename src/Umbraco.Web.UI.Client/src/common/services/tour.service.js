@@ -251,7 +251,7 @@
          */
         function validateTourRegistration(tour) {
             // check for existing tours with the same alias
-            angular.forEach(tours, function (existingTour) {
+            tours.forEach(existingTour => {
                 if (existingTour.alias === tour.alias) {
                     throw "A tour with the alias " + tour.alias + " is already registered";
                 }
@@ -267,16 +267,19 @@
             var deferred = $q.defer();
             currentUserResource.getTours().then(function (storedTours) {
 
-                angular.forEach(storedTours, function (storedTour) {
+                storedTours.forEach(storedTour => {
+
                     if (storedTour.completed === true) {
-                        angular.forEach(tours, function (tour) {
+                        tours.forEach(tour => {
+                            console.log('tour 11');
                             if (storedTour.alias === tour.alias) {
                                 tour.completed = true;
                             }
                         });
                     }
                     if (storedTour.disabled === true) {
-                        angular.forEach(tours, function (tour) {
+                        tours.forEach(tour => {
+                            console.log('tour 22');
                             if (storedTour.alias === tour.alias) {
                                 tour.disabled = true;
                             }
