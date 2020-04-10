@@ -65,6 +65,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             vm.reloadNode = reloadNode;
             vm.syncTree = syncTree;
             vm.loadChildren = loadChildren;
+            vm.hasTree = hasTree;
 
             //wire up the exposed api object for hosting controllers
             if ($scope.api) {
@@ -72,6 +73,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 $scope.api.load = vm.load;
                 $scope.api.reloadNode = vm.reloadNode;
                 $scope.api.syncTree = vm.syncTree;
+                $scope.api.hasTree = vm.hasTree;
             }
 
             //flag to track the last loaded section when the tree 'un-loads'. We use this to determine if we should
@@ -201,6 +203,25 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 return _.filter(roots, function (node) {
                     return node && node.metaData && node.metaData.treeAlias;
                 });
+            }
+
+            //given a tree alias, this will search the current section tree for the specified tree alias and set the current active tree to it's root node
+            function hasTree(treeAlias) {
+
+                if (!$scope.tree) {
+                    throw "Err in umbtree.directive.loadActiveTree, $scope.tree is null";
+                }
+
+                if (!treeAlias) {
+                    return false;
+                }
+
+                var treeRoots = getTreeRootNodes();
+                var foundTree = _.find(treeRoots, function (node) {
+                    return node.metaData.treeAlias.toUpperCase() === treeAlias.toUpperCase();
+                });
+
+                return foundTree !== undefined;
             }
 
             //given a tree alias, this will search the current section tree for the specified tree alias and set the current active tree to it's root node

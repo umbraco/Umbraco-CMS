@@ -8,13 +8,13 @@
                 <ul class="nav nav-stacked" style="margin-bottom: 0;">
                     <li ng-repeat="url in currentUrls">
                         <a href="{{url.text}}" target="_blank" ng-if="url.isUrl">
-                            <span ng-if="node.variants.length === 1 && url.culture" style="font-size: 13px; color: #cccccc; width: 50px;display: inline-block">{{url.culture}}</span>
+                            <span ng-if="currentUrlsHaveMultipleCultures && url.culture" style="font-size: 13px; color: #cccccc; width: 50px;display: inline-block">{{url.culture}}</span>
                             <i class="icon icon-out"></i>
                             <span>{{url.text}}</span>
                         </a>
                         <div ng-if="!url.isUrl" style="margin-top: 4px;">
 
-                            <span ng-if="node.variants.length === 1 && url.culture" style="font-size: 13px; color: #cccccc; width: 50px;display: inline-block">{{url.culture}}</span>
+                            <span ng-if="currentUrlsHaveMultipleCultures && url.culture" style="font-size: 13px; color: #cccccc; width: 50px;display: inline-block">{{url.culture}}</span>
                             <em>{{url.text}}</em>
 
                         </div>
@@ -169,9 +169,9 @@
                                 ng-change="updateTemplate(node.template)">
                             <option value="">{{chooseLabel}}...</option>
                         </select>
-                        <a href="" ng-show="allowChangeTemplate && node.template !== null" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()">
+                        <button type="button" ng-show="allowChangeTemplate && node.template !== null" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()">
                             <localize key="general_open">Open</localize>
-                        </a>
+                        </button>
                     </div>
                 </umb-control-group>
 

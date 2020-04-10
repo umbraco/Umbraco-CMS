@@ -21,7 +21,8 @@
         //create the initial model for change password
         vm.changePasswordModel = {
           config: {},
-          isChanging: false
+          isChanging: false,
+          value: {}
         };
 
         vm.goToPage = goToPage;
@@ -37,7 +38,8 @@
         vm.changeAvatar = changeAvatar;
         vm.clearAvatar = clearAvatar;
         vm.save = save;
-
+        
+        vm.changePassword = changePassword;
         vm.toggleChangePassword = toggleChangePassword;
 
         function init() {
@@ -125,22 +127,33 @@
         }
 
         function toggleChangePassword() {
-          vm.changePasswordModel.isChanging = !vm.changePasswordModel.isChanging;
-          //reset it
-          vm.user.changePassword = null;
+            //reset it
+            vm.user.changePassword = null;
+
+            localizationService.localizeMany(["general_cancel", "general_confirm", "general_changePassword"])
+                .then(function (data) {
+                    const overlay = {
+                        view: "changepassword",
+                        title: data[2],
+                        changePassword: vm.user.changePassword,
+                        config: vm.changePasswordModel.config,
+                        closeButtonLabel: data[0],
+                        submitButtonLabel: data[1],
+                        submitButtonStyle: 'success',
+                        close: () => overlayService.close(),
+                        submit: model => {
+                            overlayService.close();
+                            vm.changePasswordModel.value = model.changePassword;
+                            changePassword();                            
+                        }
+                    };
+                    overlayService.open(overlay);
+              });
         }
 
         function save() {
 
             if (formHelper.submitForm({ scope: $scope })) {
-
-                //anytime a user is changing another user's password, we are in effect resetting it so we need to set that flag here
-                if (vm.user.changePassword) {
-                    //NOTE: the check for allowManuallyChangingPassword is due to this legacy user membership provider setting, if that is true, then the current user
-                    //can change their own password without entering their current one (this is a legacy setting since that is a security issue but we need to maintain compat).
-                    //if allowManuallyChangingPassword=false, then we are using default settings and the user will need to enter their old password to change their own password.
-                    vm.user.changePassword.reset = (!vm.user.changePassword.oldPassword && !vm.user.isCurrentUser) || vm.changePasswordModel.config.allowManuallyChangingPassword;
-                }
 
                 vm.page.saveButtonState = "busy";
                 vm.user.resetPasswordValue = null;
@@ -155,17 +168,13 @@
                         extendedSave(saved).then(function(result) {
                             //if all is good, then reset the form
                             formHelper.resetForm({ scope: $scope });
-                        }, angular.noop);
+                        }, Utilities.noop);
                         
                         vm.user = _.omit(saved, "navigation");
                         //restore
                         vm.user.navigation = currentNav;
                         setUserDisplayState();
-                        formatDatesToLocal(vm.user);
-
-                        vm.changePasswordModel.isChanging = false;
-                        //the user has a password if they are not states: Invited, NoCredentials
-                        vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
+                        formatDatesToLocal(vm.user);                        
 
                         vm.page.saveButtonState = "success";
 
@@ -181,6 +190,36 @@
             }
         }
 
+        /**
+         *
+         */
+        function changePassword() {
+            //anytime a user is changing another user's password, we are in effect resetting it so we need to set that flag here
+            if (vm.changePasswordModel.value) {
+                //NOTE: the check for allowManuallyChangingPassword is due to this legacy user membership provider setting, if that is true, then the current user
+                //can change their own password without entering their current one (this is a legacy setting since that is a security issue but we need to maintain compat).
+                //if allowManuallyChangingPassword=false, then we are using default settings and the user will need to enter their old password to change their own password.
+                vm.changePasswordModel.value.reset = (!vm.changePasswordModel.value.oldPassword && !vm.user.isCurrentUser) || vm.changePasswordModel.config.allowManuallyChangingPassword;
+            }
+            
+            // since we don't send the entire user model, the id is required
+            vm.changePasswordModel.value.id = vm.user.id;
+            
+            usersResource.changePassword(vm.changePasswordModel.value)
+                .then(() => {
+                    vm.changePasswordModel.isChanging = false;
+                    vm.changePasswordModel.value = {};
+                
+                    //the user has a password if they are not states: Invited, NoCredentials
+                    vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
+                }, err => {
+                    contentEditingHelper.handleSaveError({
+                        err: err,
+                        showNotifications: true
+                    });
+                });
+        }
+        
         /**
          * Used to emit the save event and await any async operations being performed by editor extensions
          * @param {any} savedUser

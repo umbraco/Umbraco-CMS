@@ -15,25 +15,85 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     var fallbackStyles = [{ title: "Page header", block: "h2" }, { title: "Section header", block: "h3" }, { title: "Paragraph header", block: "h4" }, { title: "Normal", block: "p" }, { title: "Quote", block: "blockquote" }, { title: "Code", block: "code" }];
     // these languages are available for localization
     var availableLanguages = [
+        'ar',
+        'ar_SA',
+        'hy',
+        'az',
+        'eu',
+        'be',
+        'bn_BD',
+        'bs',
+        'bg_BG',
+        'ca',
+        'zh_CN',
+        'zh_TW',
+        'hr',
+        'cs',
         'da',
-        'de',
-        'en',
-        'en_us',
+        'dv',
+        'nl',
+        'en_CA',
+        'en_GB',
+        'et',
+        'fo',
         'fi',
-        'fr',
-        'he',
+        'fr_FR',
+        'gd',
+        'gl',
+        'ka_GE',
+        'de',
+        'de_AT',
+        'el',
+        'he_IL',
+        'hi_IN',
+        'hu_HU',
+        'is_IS',
+        'id',
         'it',
         'ja',
-        'nl',
-        'no',
+        'kab',
+        'kk',
+        'km_KH',
+        'ko_KR',
+        'ku',
+        'ku_IQ',
+        'lv',
+        'lt',
+        'lb',
+        'ml',
+        'ml_IN',
+        'mn_MN',
+        'nb_NO',
+        'fa',
+        'fa_IR',
         'pl',
-        'pt',
+        'pt_BR',
+        'pt_PT',
+        'ro',
         'ru',
-        'sv',
-        'zh'
+        'sr',
+        'si_LK',
+        'sk',
+        'sl_SI',
+        'es',
+        'es_MX',
+        'sv_SE',
+        'tg',
+        'ta',
+        'ta_IN',
+        'tt',
+        'th_TH',
+        'tr',
+        'tr_TR',
+        'ug',
+        'uk',
+        'uk_UA',
+        'vi',
+        'vi_VN',
+        'cy'
     ];
     //define fallback language
-    var defaultLanguage = 'en_us';
+    var defaultLanguage = 'en_US';
 
     /**
      * Returns a promise of an object containing the stylesheets and styleFormats collections
@@ -109,7 +169,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         //wheras tinymce is in the format of ru, de, en, en_us, etc.
         var localeId = $locale.id.replace('-', '_');
         //try matching the language using full locale format
-        var languageMatch = _.find(availableLanguages, function (o) { return o === localeId; });
+        var languageMatch = _.find(availableLanguages, function (o) { return o.toLowerCase() === localeId; });
         //if no matches, try matching using only the language
         if (languageMatch === undefined) {
             var localeParts = localeId.split('_');
@@ -248,6 +308,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 var src = imgUrl + "?width=" + newSize.width + "&height=" + newSize.height;
                 editor.dom.setAttrib(imageDomElement, 'data-mce-src', src);
             }
+
+            editor.execCommand("mceAutoResize", false, null, null);
         }
     }
 
@@ -488,7 +550,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
          * @methodOf umbraco.services.tinyMceService
          *
          * @description
-         * Creates the umbrco insert embedded media tinymce plugin
+         * Creates the umbraco insert embedded media tinymce plugin
          *
          * @param {Object} editor the TinyMCE editor instance
          */
@@ -543,11 +605,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     'contenteditable': false
                 },
                 embed.preview);
-
-            if (activeElement) {
+            
+            // Only replace if activeElement is an Embed element.
+            if (activeElement && activeElement.nodeName.toUpperCase() === "DIV" && activeElement.classList.contains("embeditem")){
                 activeElement.replaceWith(wrapper); // directly replaces the html node
-            }
-            else {
+            } else {
                 editor.selection.setNode(wrapper);
             }
         },
@@ -575,7 +637,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
          * @methodOf umbraco.services.tinyMceService
          *
          * @description
-         * Creates the umbrco insert media tinymce plugin
+         * Creates the umbraco insert media tinymce plugin
          *
          * @param {Object} editor the TinyMCE editor instance
          */
@@ -705,7 +767,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
          * @methodOf umbraco.services.tinyMceService
          *
          * @description
-         * Creates the insert umbrco macro tinymce plugin
+         * Creates the insert umbraco macro tinymce plugin
          *
          * @param {Object} editor the TinyMCE editor instance
          */

@@ -21,10 +21,10 @@ namespace Umbraco.Web.Editors.Filters
     {
         private readonly IMemberTypeService _memberTypeService;
 
-        public MemberSaveModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, IMemberTypeService memberTypeService)
-            : base(logger, umbracoContextAccessor)
+        public MemberSaveModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService, IMemberTypeService memberTypeService)
+            : base(logger, umbracoContextAccessor, textService)
         {
-            _memberTypeService = memberTypeService;
+            _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
         }
 
         /// <summary>

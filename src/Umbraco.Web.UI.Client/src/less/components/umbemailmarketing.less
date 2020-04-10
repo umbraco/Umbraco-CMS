@@ -1,0 +1,44 @@
+.umb-email-marketing {
+
+    h2 {
+        font-weight: 800;
+        max-width: 26ex;
+        margin-top: 20px;
+    }
+
+    .layout {
+        display: flex;
+        align-items: center;
+        align-content: stretch;
+
+        .primary {
+            flex-basis: 50%;
+            padding-right: 40px;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            .notice {
+                color: @gray-5;
+                font-style: italic;
+                a {
+                    color: @gray-5;
+                    &:hover {
+                        color: @ui-action-type-hover;
+                    }
+                }
+            }
+        }
+
+        .secondary {
+            flex-basis: 50%;
+            svg {
+                height: 200px;
+                width: 100%;
+                margin-top: -60px;
+            }
+        }
+    }
+
+    .cta {
+        text-align: right;
+    }
+}
