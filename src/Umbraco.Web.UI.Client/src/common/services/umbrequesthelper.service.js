@@ -59,7 +59,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                     return encodeURIComponent(key) + "=" + encodeURIComponent(val);
                 }).join("&");
             }
-            else if (angular.isObject(queryStrings)) {
+            else if (Utilities.isObject(queryStrings)) {
 
                 //this allows for a normal object to be passed in (ie. a dictionary)
                 return decodeURIComponent($.param(queryStrings));
@@ -342,11 +342,11 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                     //add the json data
                     if (angular.isArray(data)) {
                         _.each(data, function(item) {
-                            formData.append(item.key, !angular.isString(item.value) ? angular.toJson(item.value) : item.value);
+                            formData.append(item.key, !angular.isString(item.value) ? Utilities.toJson(item.value) : item.value);
                         });
                     }
                     else {
-                        formData.append(data.key, !angular.isString(data.value) ? angular.toJson(data.value) : data.value);
+                        formData.append(data.key, !angular.isString(data.value) ? Utilities.toJson(data.value) : data.value);
                     }
 
                     //call the callback

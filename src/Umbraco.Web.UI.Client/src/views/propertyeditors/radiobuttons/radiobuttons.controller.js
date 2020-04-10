@@ -8,7 +8,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.RadioButtonsContro
         function init() {
 
             //we can't really do anything if the config isn't an object
-            if (angular.isObject($scope.model.config.items)) {
+            if (Utilities.isObject($scope.model.config.items)) {
 
                 // formatting the items in the dictionary into an array
                 var sortedItems = [];
