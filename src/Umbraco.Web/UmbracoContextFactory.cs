@@ -2,9 +2,7 @@
 using System.IO;
 using System.Text;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Cookie;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;

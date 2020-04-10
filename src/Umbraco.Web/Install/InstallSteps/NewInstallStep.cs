@@ -11,7 +11,6 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Cookie;
 
 namespace Umbraco.Web.Install.InstallSteps
 {

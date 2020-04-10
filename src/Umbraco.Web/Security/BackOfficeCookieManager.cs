@@ -20,7 +20,7 @@ namespace Umbraco.Web.Security
     /// Umbraco's back office cookie needs to be read on two paths: /umbraco and /install and /base therefore we cannot just set the cookie path to be /umbraco,
     /// instead we'll specify our own cookie manager and return null if the request isn't for an acceptable path.
     /// </remarks>
-    internal class BackOfficeCookieManager : ChunkingCookieManager, ICookieManager
+    internal class BackOfficeCookieManager : ChunkingCookieManager, Microsoft.Owin.Infrastructure.ICookieManager
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IRuntimeState _runtime;
@@ -52,7 +52,7 @@ namespace Umbraco.Web.Security
         /// <param name="context"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        string ICookieManager.GetRequestCookie(IOwinContext context, string key)
+        string Microsoft.Owin.Infrastructure.ICookieManager.GetRequestCookie(IOwinContext context, string key)
         {
             if (_umbracoContextAccessor.UmbracoContext == null || context.Request.Uri.IsClientSideRequest())
             {

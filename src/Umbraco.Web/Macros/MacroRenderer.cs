@@ -6,16 +6,13 @@ using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Cookie;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Request;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Core.Session;
 
 namespace Umbraco.Web.Macros
 {

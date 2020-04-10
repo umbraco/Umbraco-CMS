@@ -1,5 +1,4 @@
 using System;
-using Umbraco.Core.Request;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.AspNet

@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Cookie;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models;
