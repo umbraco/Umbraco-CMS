@@ -319,7 +319,7 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
 			}
         },
 
-         /** Returns the caches icon or undefined */
+         /** Returns the cached icon or undefined */
         _getIconFromCache: function(iconName) {
             return _.find(iconCache, {name: iconName});
         }

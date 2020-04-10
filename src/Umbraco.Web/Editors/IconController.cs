@@ -61,7 +61,7 @@ namespace Umbraco.Web.Editors
             var directory = new DirectoryInfo(IOHelper.MapPath($"{GlobalSettings.Path}/assets/icons"));
             var iconNames = directory.GetFiles("*.svg");
 
-            iconNames.ToList().ForEach(iconInfo =>
+            iconNames?.OrderBy(f => f.Name).ToList().ForEach(iconInfo =>
             {
                 var icon = GetIcon(iconInfo);
 
