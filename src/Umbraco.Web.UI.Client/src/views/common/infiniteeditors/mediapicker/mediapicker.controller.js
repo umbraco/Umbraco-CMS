@@ -1,13 +1,13 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-    function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage) {
+        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage) {
 
             var vm = this;
-            
+
             vm.submit = submit;
             vm.close = close;
-            
+
             vm.toggle = toggle;
             vm.upload = upload;
             vm.dragLeave = dragLeave;
@@ -25,11 +25,12 @@ angular.module("umbraco")
             vm.gotoFolder = gotoFolder;
             vm.shouldShowUrl = shouldShowUrl;
             vm.toggleListView = toggleListView;
+            vm.selectLayout = selectLayout;
 
             vm.showMediaList = false;
 
             var dialogOptions = $scope.model;
-            
+
             $scope.disableFolderSelect = (dialogOptions.disableFolderSelect && dialogOptions.disableFolderSelect !== "0") ? true : false;
             $scope.disableFocalPoint = (dialogOptions.disableFocalPoint && dialogOptions.disableFocalPoint !== "0") ? true : false;
             $scope.onlyImages = (dialogOptions.onlyImages && dialogOptions.onlyImages !== "0") ? true : false;
@@ -86,6 +87,13 @@ angular.module("umbraco")
                 filter: '',
                 dataTypeKey: dataTypeKey
             };
+            //Uses the umb-layout-selector directive
+            //but not sure what 'paths' should be in this context
+            vm.layout = {
+                layouts: [{ name: "Grid", icon: "icon-thumbnails-small", path: "gridpath", selected: true },
+                { name: "List", icon: "icon-list", path: "listpath", selected: true }],
+                activeLayout: { name: "Grid", icon: "icon-thumbnails-small", path: "gridpath", selected: true }
+            };
 
             // preload selected item
             $scope.target = null;
@@ -136,21 +144,21 @@ angular.module("umbraco")
                     // media object so we need to look it up
                     var id = $scope.target.udi ? $scope.target.udi : $scope.target.id;
                     var altText = $scope.target.altText;
-                    
+
                     // ID of a UDI or legacy int ID still could be null/undefinied here
                     // As user may dragged in an image that has not been saved to media section yet
                     if (id) {
                         entityResource.getById(id, "Media")
-                        .then(function (node) {
-                            $scope.target = node;
-                            if (ensureWithinStartNode(node)) {
-                                selectMedia(node);
-                                $scope.target.url = mediaHelper.resolveFileFromEntity(node);
-                                $scope.target.thumbnail = mediaHelper.resolveFileFromEntity(node, true);
-                                $scope.target.altText = altText;
-                                openDetailsDialog();
-                            }
-                        }, gotoStartNode);
+                            .then(function (node) {
+                                $scope.target = node;
+                                if (ensureWithinStartNode(node)) {
+                                    selectMedia(node);
+                                    $scope.target.url = mediaHelper.resolveFileFromEntity(node);
+                                    $scope.target.thumbnail = mediaHelper.resolveFileFromEntity(node, true);
+                                    $scope.target.altText = altText;
+                                    openDetailsDialog();
+                                }
+                            }, gotoStartNode);
                     } else {
                         // No ID set - then this is going to be a tmpimg that has not been uploaded
                         // User editing this will want to be changing the ALT text
@@ -232,9 +240,20 @@ angular.module("umbraco")
 
                 return getChildren(folder.id);
             }
-            function toggleListView() {          
-                    vm.showMediaList = !vm.showMediaList;
+            function toggleListView() {
+                vm.showMediaList = !vm.showMediaList;
             }
+
+            function selectLayout(layout) {
+                //this somehow doesn't set the 'active=true' property for the chosen layout
+                vm.layout.activeLayout = layout;
+                //workaround
+                vm.layout.layouts.forEach(element => element.active = false);
+                layout.active = true;
+                //set whether to toggle the list
+                vm.showMediaList = (layout.name === "List");
+            }
+
             function clickHandler(media, event, index) {
 
                 if (media.isFolder) {
@@ -245,16 +264,16 @@ angular.module("umbraco")
                     }
                 } else {
                     if ($scope.showDetails) {
-                        
+
                         $scope.target = media;
-                        
+
                         // handle both entity and full media object
                         if (media.image) {
                             $scope.target.url = media.image;
                         } else {
                             $scope.target.url = mediaHelper.resolveFile(media);
                         }
-                        
+
                         openDetailsDialog();
                     } else {
                         selectMedia(media);
@@ -378,7 +397,7 @@ angular.module("umbraco")
                     if (vm.searchOptions.filter) {
                         searchMedia();
                     } else {
-                        
+
                         // reset pagination
                         vm.searchOptions = {
                             pageNumber: 1,
@@ -388,13 +407,13 @@ angular.module("umbraco")
                             filter: '',
                             dataTypeKey: dataTypeKey
                         };
-                        
+
                         getChildren($scope.currentFolder.id);
                     }
                 });
             }, 500);
 
-        function changeSearch() {
+            function changeSearch() {
                 vm.loading = true;
                 debounceSearchMedia();
             }
@@ -411,7 +430,7 @@ angular.module("umbraco")
                 searchMedia();
             };
 
-        function searchMedia() {
+            function searchMedia() {
                 vm.loading = true;
                 entityResource.getPagedDescendants($scope.filterOptions.excludeSubFolders ? $scope.currentFolder.id : $scope.startNodeId, "Media", vm.searchOptions)
                     .then(function (data) {

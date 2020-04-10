@@ -52,10 +52,23 @@
                         </div>
                     </div>
                     <div class="row umb-control-group" ng-show="vm.searchOptions.filter && images.length > 0 && !vm.loading && !activeDrag">
-                        <a class="pull-right" ng-click="vm.toggleListView()"><span ng-show="!vm.showMediaList" title="Switch to ListView"><i class="icon-list"></i></span><span ng-show="vm.showMediaList" title="Switch to Grid View"><i class="icon-thumbnails-small"></i></span></a>
+                        <div class="pull-right">
+                            <umb-layout-selector ng-show="vm.layout.layouts"
+                                                 layouts="vm.layout.layouts"
+                                                 active-layout="vm.layout.activeLayout"
+                                                 on-layout-select="vm.selectLayout(layout)">
+                            </umb-layout-selector>
+                        </div>
                     </div>
                     <div class="row umb-control-group" ng-show="!vm.searchOptions.filter">
-                        <a class="pull-right" ng-click="vm.toggleListView()"><span ng-show="!vm.showMediaList" title="Switch to ListView"><i class="icon-list"></i></span><span ng-show="vm.showMediaList" title="Switch to Grid View"><i class="icon-thumbnails-small"></i></span></a>
+                        <div class="pull-right">
+                            <umb-layout-selector ng-show="vm.layout.layouts"
+                                                 layouts="vm.layout.layouts"
+                                                 active-layout="vm.layout.activeLayout"
+                                                 on-layout-select="vm.selectLayout(layout)">
+                            </umb-layout-selector>
+                        </div>
+                       
                         <ul class="umb-breadcrumbs">
                             <li ng-hide="startNodeId != -1" class="umb-breadcrumbs__ancestor">
                                 <button type="button" class="umb-breadcrumbs__action umb-outline umb-outline--surronding" ng-click="vm.gotoFolder()" ng-class="{'--current':path.length === 0}">
@@ -84,7 +97,7 @@
                                        ng-keydown="enterSubmitFolder($event)"
                                        ng-blur="vm.submitFolder()"
                                        focus-when="{{model.showFolderInput}}"
-                                />
+                                       />
                             </li>
                         </ul>
                         <div class="umb-loader" ng-if="model.creatingFolder"></div>
