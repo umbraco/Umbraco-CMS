@@ -179,6 +179,9 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<ChangeNuCacheJsonFormat>("{80C0A0CB-0DD5-4573-B000-C4B7C313C70D}");
             // release-8.0.1
 
+            //Gotta do this first...even though it wasn't introduced until 8.6
+            To<AddPropertyTypeValidationMessageColumns>("{3D67D2C8-5E65-47D0-A9E1-DC2EE0779D6B}");
+
             // to 8.1.0...
             To<ConvertTinyMceAndGridMediaUrlsToLocalLink>("{B69B6E8C-A769-4044-A27E-4A4E18D1645A}");
             To<RenameUserLoginDtoDateIndex>("{0372A42B-DECF-498D-B4D1-6379E907EB94}");
@@ -187,7 +190,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             // to 8.6.0...
             To<UpdateRelationTypeTable>("{4759A294-9860-46BC-99F9-B4C975CAE580}");
             To<AddNewRelationTypes>("{0BC866BC-0665-487A-9913-0290BD0169AD}");
-            To<AddPropertyTypeValidationMessageColumns>("{3D67D2C8-5E65-47D0-A9E1-DC2EE0779D6B}");
+            //To<AddPropertyTypeValidationMessageColumns>("{3D67D2C8-5E65-47D0-A9E1-DC2EE0779D6B}");
             To<MissingContentVersionsIndexes>("{EE288A91-531B-4995-8179-1D62D9AA3E2E}");
             To<AddMainDomLock>("{2AB29964-02A1-474D-BD6B-72148D2A53A2}");
 
