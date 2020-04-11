@@ -271,7 +271,6 @@
 
                     if (storedTour.completed === true) {
                         tours.forEach(tour => {
-                            console.log('tour 11');
                             if (storedTour.alias === tour.alias) {
                                 tour.completed = true;
                             }
@@ -279,7 +278,6 @@
                     }
                     if (storedTour.disabled === true) {
                         tours.forEach(tour => {
-                            console.log('tour 22');
                             if (storedTour.alias === tour.alias) {
                                 tour.disabled = true;
                             }
