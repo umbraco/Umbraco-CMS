@@ -51,12 +51,12 @@ angular.mock.$Browser = function () {
 
     self.onUrlChange = function (listener) {
         self.pollFns.push(
-          function () {
-              if (self.$$lastUrl != self.$$url) {
-                  self.$$lastUrl = self.$$url;
-                  listener(self.$$url);
-              }
-          }
+            function () {
+                if (self.$$lastUrl != self.$$url) {
+                    self.$$lastUrl = self.$$url;
+                    listener(self.$$url);
+                }
+            }
         );
 
         return listener;
@@ -397,7 +397,7 @@ angular.mock.$LogProvider = function () {
             });
             if (errors.length) {
                 errors.unshift("Expected $log to be empty! Either a message was logged unexpectedly, or an expected " +
-                  "log message was not checked and removed:");
+                    "log message was not checked and removed:");
                 errors.push('');
                 throw new Error(errors.join('\n---------\n'));
             }
@@ -581,12 +581,12 @@ angular.mock.$LogProvider = function () {
         if (self.toISOString) {
             self.toISOString = function () {
                 return padNumber(self.origDate.getUTCFullYear(), 4) + '-' +
-                      padNumber(self.origDate.getUTCMonth() + 1, 2) + '-' +
-                      padNumber(self.origDate.getUTCDate(), 2) + 'T' +
-                      padNumber(self.origDate.getUTCHours(), 2) + ':' +
-                      padNumber(self.origDate.getUTCMinutes(), 2) + ':' +
-                      padNumber(self.origDate.getUTCSeconds(), 2) + '.' +
-                      padNumber(self.origDate.getUTCMilliseconds(), 3) + 'Z'
+                    padNumber(self.origDate.getUTCMonth() + 1, 2) + '-' +
+                    padNumber(self.origDate.getUTCDate(), 2) + 'T' +
+                    padNumber(self.origDate.getUTCHours(), 2) + ':' +
+                    padNumber(self.origDate.getUTCMinutes(), 2) + ':' +
+                    padNumber(self.origDate.getUTCSeconds(), 2) + '.' +
+                    padNumber(self.origDate.getUTCMilliseconds(), 3) + 'Z'
             }
         }
 
@@ -686,10 +686,10 @@ angular.mock.dump = function (object) {
         var out;
 
         if (angular.isElement(object)) {
-            object = angular.element(object);
-            out = angular.element('<div></div>');
+            object = $(object);
+            out = $('<div></div>');
             angular.forEach(object, function (element) {
-                out.append(angular.element(element).clone());
+                out.append($(element).clone());
             });
             out = out.html();
         } else if (Utilities.isArray(object)) {
@@ -1004,7 +1004,7 @@ function createHttpBackendMock($rootScope, $delegate, $browser) {
         throw wasExpected ?
             Error('No response defined !') :
             Error('Unexpected request: ' + method + ' ' + url + '\n' +
-                  (expectation ? 'Expected ' + expectation : 'No more request expected'));
+                (expectation ? 'Expected ' + expectation : 'No more request expected'));
     }
 
     /**
@@ -1499,7 +1499,7 @@ angular.mock.$TimeoutDecorator = function ($delegate, $browser) {
  */
 angular.mock.$RootElementProvider = function () {
     this.$get = function () {
-        return angular.element('<div ng-app></div>');
+        return $('<div ng-app></div>');
     }
 };
 
@@ -1710,7 +1710,7 @@ angular.mock.clearDataCache = function () {
         if (cache.hasOwnProperty(key)) {
             var handle = cache[key].handle;
 
-            handle && angular.element(handle.elem).unbind();
+            handle && $(handle.elem).unbind();
             delete cache[key];
         }
     }
