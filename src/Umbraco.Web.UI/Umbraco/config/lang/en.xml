@@ -1846,7 +1846,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="resetPassword">Reset password</key>
     <key alias="passwordChanged">Your password has been changed!</key>
     <key alias="passwordChangedGeneric">Password changed</key>
-    <key alias="passwordConfirm">Please confirm the new password</key>      
+    <key alias="passwordConfirm">Please confirm the new password</key>
     <key alias="passwordEnterNew">Enter your new password</key>
     <key alias="passwordIsBlank">Your new password cannot be blank!</key>
     <key alias="passwordCurrent">Current password</key>
@@ -2223,6 +2223,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="create">Create</key>
     <key alias="edit">Edit</key>
     <key alias="name">Name</key>
+    <key alias="addNewRow">Add new row</key>    
+    <key alias="tabExpand">View more options</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2388,7 +2390,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="startupDashboard">
     <key alias="fallbackHeadline">Welcome to The Friendly CMS</key>
     <key alias="fallbackDescription">Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</key>
-  </area>  
+  </area>
   <area alias="formsDashboard">
     <key alias="formsHeadline">Umbraco Forms</key>
     <key alias="formsDescription">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</key>

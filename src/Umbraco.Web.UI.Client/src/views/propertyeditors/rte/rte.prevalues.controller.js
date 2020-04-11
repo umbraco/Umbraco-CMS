@@ -3,7 +3,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
         var cfg = tinyMceService.defaultPrevalues();
 
         if($scope.model.value){
-            if(angular.isString($scope.model.value)){
+            if(Utilities.isString($scope.model.value)){
                 $scope.model.value = cfg;
             }
         }else{

@@ -158,7 +158,7 @@
                 var currGroups = saveModel.userGroups;
                 var formattedGroups = [];
                 for (var i = 0; i < currGroups.length; i++) {
-                    if (!angular.isString(currGroups[i])) {
+                    if (!Utilities.isString(currGroups[i])) {
                         formattedGroups.push(currGroups[i].alias);
                     }
                     else {
@@ -229,7 +229,7 @@
                 var currSections = saveModel.sections;
                 var formattedSections = [];
                 for (var i = 0; i < currSections.length; i++) {
-                    if (!angular.isString(currSections[i])) {
+                    if (!Utilities.isString(currSections[i])) {
                         formattedSections.push(currSections[i].alias);
                     }
                     else {
@@ -242,7 +242,7 @@
                 var currUsers = saveModel.users;
                 var formattedUsers = [];
                 for (var j = 0; j < currUsers.length; j++) {
-                    if (!angular.isNumber(currUsers[j])) {
+                    if (!Utilities.isNumber(currUsers[j])) {
                         formattedUsers.push(currUsers[j].id);
                     }
                     else {

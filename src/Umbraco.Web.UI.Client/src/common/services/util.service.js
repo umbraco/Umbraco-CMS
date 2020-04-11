@@ -210,7 +210,7 @@ function umbSessionStorage($window) {
         },
 
         set: function (key, value) {
-            storage["umb_" + key] = angular.toJson(value);
+            storage["umb_" + key] = Utilities.toJson(value);
         }
 
     };

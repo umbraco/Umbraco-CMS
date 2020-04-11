@@ -473,7 +473,7 @@ angular.module("umbraco")
                     config = _.filter(angular.copy($scope.model.config.items.config), function (item) { return shouldApply(item, itemType, gridItem); });
                 }
 
-                if (angular.isObject(gridItem.config)) {
+                if (Utilities.isObject(gridItem.config)) {
                     _.each(config, function (cfg) {
                         var val = gridItem.config[cfg.key];
                         if (val) {
@@ -482,7 +482,7 @@ angular.module("umbraco")
                     });
                 }
 
-                if (angular.isObject(gridItem.styles)) {
+                if (Utilities.isObject(gridItem.styles)) {
                     _.each(styles, function (style) {
                         var val = gridItem.styles[style.key];
                         if (val) {
@@ -739,13 +739,13 @@ angular.module("umbraco")
                 //if nothing is found, set it to 12
                 if (!$scope.model.config.items.columns) {
                     $scope.model.config.items.columns = 12;
-                } else if (angular.isString($scope.model.config.items.columns)) {
+                } else if (Utilities.isString($scope.model.config.items.columns)) {
                     $scope.model.config.items.columns = parseInt($scope.model.config.items.columns);
                 }
 
                 if ($scope.model.value && $scope.model.value.sections && $scope.model.value.sections.length > 0 && $scope.model.value.sections[0].rows && $scope.model.value.sections[0].rows.length > 0) {
 
-                    if ($scope.model.value.name && angular.isArray($scope.model.config.items.templates)) {
+                    if ($scope.model.value.name && Utilities.isArray($scope.model.config.items.templates)) {
 
                         //This will occur if it is an existing value, in which case
                         // we need to determine which layout was applied by looking up
@@ -756,7 +756,7 @@ angular.module("umbraco")
                             return t.name === $scope.model.value.name;
                         });
 
-                        if (found && angular.isArray(found.sections) && found.sections.length === $scope.model.value.sections.length) {
+                        if (found && Utilities.isArray(found.sections) && found.sections.length === $scope.model.value.sections.length) {
 
                             //Cool, we've found the template associated with our current value with matching sections counts, now we need to
                             // merge this template data on to our current value (as if it was new) so that we can preserve what is and isn't
