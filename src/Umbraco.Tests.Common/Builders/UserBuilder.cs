@@ -1,10 +1,9 @@
-using Umbraco.Configuration.Models;
+using System;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Tests.Common.Builders
 {
-
     public class UserBuilder : UserBuilder<object>
     {
         public UserBuilder() : base(null)
@@ -15,27 +14,57 @@ namespace Umbraco.Tests.Common.Builders
     public class UserBuilder<TParent>
         : ChildBuilderBase<TParent, User>,
             IWithIdBuilder,
+            IWithKeyBuilder,
+            IWithCreateDateBuilder,
+            IWithUpdateDateBuilder,
             IWithNameBuilder,
-            IWithApprovedBuilder
+            IAccountBuilder
     {
         private int? _id;
+        private Guid? _key;
+        private DateTime? _createDate;
+        private DateTime? _updateDate;
         private string _language;
-        private bool? _approved;
         private string _name;
-        private string _rawPassword;
-        private bool? _isLockedOut;
-        private string _email;
         private string _username;
+        private string _rawPasswordValue;
+        private string _email;
+        private int? _failedPasswordAttempts;
+        private bool? _isApproved;
+        private bool? _isLockedOut;
+        private DateTime? _lastLockoutDate;
+        private DateTime? _lastLoginDate;
+        private DateTime? _lastPasswordChangeDate;
         private string _suffix = string.Empty;
         private string _defaultLang;
-
+        private string _comments;
+        private int? _sessionTimeout;
+        private int[] _startContentIds;
+        private int[] _startMediaIds;
 
         public UserBuilder(TParent parentBuilder) : base(parentBuilder)
         {
-
         }
 
-       public UserBuilder<TParent> WithDefaultUILanguage(string defaultLang)
+        Guid? IWithKeyBuilder.Key
+        {
+            get => _key;
+            set => _key = value;
+        }
+
+        DateTime? IWithCreateDateBuilder.CreateDate
+        {
+            get => _createDate;
+            set => _createDate = value;
+        }
+
+        DateTime? IWithUpdateDateBuilder.UpdateDate
+        {
+            get => _updateDate;
+            set => _updateDate = value;
+        }
+
+        public UserBuilder<TParent> WithDefaultUILanguage(string defaultLang)
         {
             _defaultLang = defaultLang;
             return this;
@@ -47,27 +76,27 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-        public UserBuilder<TParent> WithRawPassword(string rawPassword)
+        public UserBuilder<TParent> WithComments(string comments)
         {
-            _rawPassword = rawPassword;
+            _comments = comments;
             return this;
         }
 
-        public UserBuilder<TParent> WithEmail(string email)
+        public UserBuilder<TParent> WithSessionTimeout(int sessionTimeout)
         {
-            _email = email;
+            _sessionTimeout = sessionTimeout;
             return this;
         }
 
-        public UserBuilder<TParent> WithUsername(string username)
+        public UserBuilder<TParent> WithStartContentIds(int[] startContentIds)
         {
-            _username = username;
+            _startContentIds = startContentIds;
             return this;
         }
 
-        public UserBuilder<TParent> WithLockedOut(bool isLockedOut)
+        public UserBuilder<TParent> WithStartMediaIds(int[] startMediaIds)
         {
-            _isLockedOut = isLockedOut;
+            _startMediaIds = startMediaIds;
             return this;
         }
 
@@ -84,25 +113,50 @@ namespace Umbraco.Tests.Common.Builders
 
         public override User Build()
         {
-            var globalSettings = new GlobalSettingsBuilder().WithDefaultUiLanguage(_defaultLang).Build();
+            var id = _id ?? 1;
+            var defaultLang = _defaultLang ?? "en";
+            var globalSettings = new GlobalSettingsBuilder().WithDefaultUiLanguage(defaultLang).Build();
+            var key = _key ?? Guid.NewGuid();
+            var createDate = _createDate ?? DateTime.Now;
+            var updateDate = _updateDate ?? DateTime.Now;
             var name = _name ?? "TestUser" + _suffix;
-            var email = _email ?? "test" + _suffix + "@test.com";
-            var username = _username ?? "TestUser" + _suffix;
-            var rawPassword = _rawPassword ?? "abcdefghijklmnopqrstuvwxyz";
             var language = _language ?? globalSettings.DefaultUILanguage;
+            var username = _username ?? "TestUser" + _suffix;
+            var email = _email ?? "test" + _suffix + "@test.com";
+            var rawPasswordValue = _rawPasswordValue ?? "abcdefghijklmnopqrstuvwxyz";
+            var failedPasswordAttempts = _failedPasswordAttempts ?? 0;
+            var isApproved = _isApproved ?? false;
             var isLockedOut = _isLockedOut ?? false;
-            var approved = _approved ?? true;
+            var lastLockoutDate = _lastLockoutDate ?? DateTime.Now;
+            var lastLoginDate = _lastLoginDate ?? DateTime.Now;
+            var lastPasswordChangeDate = _lastPasswordChangeDate ?? DateTime.Now;
+            var comments = _comments ?? string.Empty;
+            var sessionTimeout = _sessionTimeout ?? 0;
+            var startContentIds = _startContentIds ?? new int[0];
+            var startMediaIds = _startMediaIds ?? new int[0];
 
             return new User(
                 globalSettings,
                 name,
                 email,
                 username,
-                rawPassword)
+                rawPasswordValue)
             {
+                Id = id,
+                Key = key,
+                CreateDate = createDate,
+                UpdateDate = updateDate,
                 Language = language,
+                FailedPasswordAttempts = failedPasswordAttempts,
+                IsApproved = isApproved,
                 IsLockedOut = isLockedOut,
-                IsApproved = approved
+                LastLockoutDate = lastLockoutDate,
+                LastLoginDate = lastLoginDate,
+                LastPasswordChangeDate = lastPasswordChangeDate,
+                Comments = comments,
+                SessionTimeout = sessionTimeout,
+                StartContentIds = startContentIds,
+                StartMediaIds = startMediaIds,
             };
         }
 
@@ -118,10 +172,58 @@ namespace Umbraco.Tests.Common.Builders
             set => _name = value;
         }
 
-        bool? IWithApprovedBuilder.Approved
+        string IWithLoginBuilder.Username
         {
-            get => _approved;
-            set => _approved = value;
+            get => _username;
+            set => _username = value;
+        }
+
+        string IWithLoginBuilder.RawPasswordValue
+        {
+            get => _rawPasswordValue;
+            set => _rawPasswordValue = value;
+        }
+
+        string IWithEmailBuilder.Email
+        {
+            get => _email;
+            set => _email = value;
+        }
+
+        int? IWithFailedPasswordAttemptsBuilder.FailedPasswordAttempts
+        {
+            get => _failedPasswordAttempts;
+            set => _failedPasswordAttempts = value;
+        }
+
+        bool? IWithIsApprovedBuilder.IsApproved
+        {
+            get => _isApproved;
+            set => _isApproved = value;
+        }
+
+        bool? IWithIsLockedOutBuilder.IsLockedOut
+        {
+            get => _isLockedOut;
+            set => _isLockedOut = value;
+        }
+
+        DateTime? IWithIsLockedOutBuilder.LastLockoutDate
+        {
+            get => _lastLockoutDate;
+            set => _lastLockoutDate = value;
+        }
+
+        DateTime? IWithLastLoginDateBuilder.LastLoginDate
+        {
+            get => _lastLoginDate;
+            set => _lastLoginDate = value;
+        }
+
+        DateTime? IWithLastPasswordChangeDateBuilder.LastPasswordChangeDate
+        {
+            get => _lastPasswordChangeDate;
+            set => _lastPasswordChangeDate = value;
         }
     }
 }
