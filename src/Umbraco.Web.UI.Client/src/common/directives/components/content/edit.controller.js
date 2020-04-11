@@ -678,6 +678,12 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
+
+                                    //ensure error messages are displayed
+                                    formHelper.showNotifications(err.data);
+                                    clearNotifications($scope.content);
+                                    overlayService.close();
+
                                     //don't reject, we've handled the error
                                     return $q.when(err);
                                 });
@@ -741,6 +747,12 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
+
+                                    //ensure error messages are displayed
+                                    formHelper.showNotifications(err.data);
+                                    clearNotifications($scope.content);
+                                    overlayService.close();
+
                                     //don't reject, we've handled the error
                                     return $q.when(err);
                                 });
