@@ -23,12 +23,6 @@ namespace Umbraco.Tests.Common.Builders
             };
         }
 
-        public EntitySlimBuilder WithNoId()
-        {
-            _id = 0;
-            return this;
-        }
-
         public EntitySlimBuilder WithNoParentId()
         {
             _parentId = 0;

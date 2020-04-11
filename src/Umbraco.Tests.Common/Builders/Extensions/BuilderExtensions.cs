@@ -12,6 +12,13 @@ namespace Umbraco.Tests.Common.Builders.Extensions
             return builder;
         }
 
+        public static T WithoutIdentity<T>(this T builder)
+            where T : IWithIdBuilder
+        {
+            builder.Id = 0;
+            return builder;
+        }
+
         public static T WithCreatorId<T>(this T builder, int creatorId)
             where T : IWithCreatorIdBuilder
         {

@@ -18,7 +18,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
         public void Validate_Path()
         {
             var entity = _builder
-                .WithNoId()
+                .WithoutIdentity()
                 .Build();
 
             //it's empty with no id so we need to allow it
@@ -44,7 +44,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
         public void Ensure_Path_Throws_Without_Id()
         {
             var entity = _builder
-                .WithNoId()
+                .WithoutIdentity()
                 .Build();
 
             //no id assigned
