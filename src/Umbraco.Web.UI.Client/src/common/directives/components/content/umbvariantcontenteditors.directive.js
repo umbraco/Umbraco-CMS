@@ -44,7 +44,7 @@
 
         /** Called when the component initializes */
         function onInit() {
-            prevContentDateUpdated = angular.copy(vm.content.updateDate);
+            prevContentDateUpdated = Utilities.copy(vm.content.updateDate);
             setActiveCulture();
         }
 
@@ -68,7 +68,7 @@
         function doCheck() {
             if (!angular.equals(vm.content.updateDate, prevContentDateUpdated)) {
                 setActiveCulture();
-                prevContentDateUpdated = angular.copy(vm.content.updateDate);
+                prevContentDateUpdated = Utilities.copy(vm.content.updateDate);
             }
         }
 
@@ -152,7 +152,7 @@
 
             //copy the apps from the main model if not assigned yet to the variant
             if (!variant.apps) {
-                variant.apps = angular.copy(vm.content.apps);
+                variant.apps = Utilities.copy(vm.content.apps);
             }
 
             //if this is a variant has a culture/language than we need to assign the language drop down info 
@@ -185,7 +185,7 @@
 
                 // keep track of the open variants across the different split views
                 // push the first variant then update the variant index based on the editor index
-                if(vm.openVariants && vm.openVariants.length === 0) {
+                if (vm.openVariants && vm.openVariants.length === 0) {
                     vm.openVariants.push(variant.language.culture);
                 } else {
                     vm.openVariants[editorIndex] = variant.language.culture;
@@ -205,10 +205,10 @@
             }
 
             // make sure the same app it set to active in the new variant
-            if(activeAppAlias) {
-                angular.forEach(variant.apps, function(app) {
+            if (activeAppAlias) {
+                angular.forEach(variant.apps, function (app) {
                     app.active = false;
-                    if(app.alias === activeAppAlias) {
+                    if (app.alias === activeAppAlias) {
                         app.active = true;
                     }
                 });
@@ -283,10 +283,10 @@
         function selectVariant(variant, editorIndex) {
 
             // prevent variants already open in a split view to be opened
-            if(vm.openVariants.indexOf(variant.language.culture) !== -1)  {
+            if (vm.openVariants.indexOf(variant.language.culture) !== -1) {
                 return;
             }
-            
+
             //if the editor index is zero, then update the query string to track the lang selection, otherwise if it's part
             //of a 2nd split view editor then update the model directly.
             if (editorIndex === 0) {
@@ -313,7 +313,7 @@
 
                 //update the editors collection
                 insertVariantEditor(editorIndex, contentVariant);
-                
+
             }
         }
 
@@ -322,21 +322,21 @@
          * @param {any} app This is the model of the selected app
          */
         function selectApp(app) {
-            if(vm.onSelectApp) {
-                vm.onSelectApp({"app": app});
+            if (vm.onSelectApp) {
+                vm.onSelectApp({ "app": app });
             }
         }
-        
+
         function selectAppAnchor(app, anchor) {
-            if(vm.onSelectAppAnchor) {
-                vm.onSelectAppAnchor({"app": app, "anchor": anchor});
+            if (vm.onSelectAppAnchor) {
+                vm.onSelectAppAnchor({ "app": app, "anchor": anchor });
             }
         }
-        
-        
-        $scope.$on("editors.apps.appChanged", function($event, $args) {
+
+
+        $scope.$on("editors.apps.appChanged", function ($event, $args) {
             var app = $args.app;
-            if(app && app.alias) {
+            if (app && app.alias) {
                 activeAppAlias = app.alias;
             }
         });

@@ -185,7 +185,7 @@ angular.module("umbraco")
                             var rteId = value.id;
 
                             if ($.inArray(rteId, notIncludedRte) < 0) {
-                                
+
                                 // remember this RTEs settings, cause we need to update it later.
                                 var editor = _.findWhere(tinyMCE.editors, { id: rteId })
                                 if (editor) {
@@ -197,17 +197,17 @@ angular.module("umbraco")
                     }
                     else {
                         $(event.target).find(".umb-rte").each(function () {
-                            
+
                             var rteId = $(this).attr("id");
-                            
+
                             if ($.inArray(rteId, notIncludedRte) < 0) {
-                                
+
                                 // remember this RTEs settings, cause we need to update it later.
                                 var editor = _.findWhere(tinyMCE.editors, { id: rteId })
                                 if (editor) {
                                     draggedRteSettings[rteId] = editor.settings;
                                 }
-                                
+
                                 notIncludedRte.splice(0, 0, $(this).attr("id"));
                             }
                         });
@@ -227,12 +227,12 @@ angular.module("umbraco")
                     // reset dragged RTE settings in case a RTE isn't dragged
                     draggedRteSettings = {};
                     notIncludedRte = [];
-                    
+
                     ui.item[0].style.display = "block";
                     ui.item.find(".umb-rte").each(function (key, value) {
-                        
+
                         var rteId = value.id;
-                        
+
                         // remember this RTEs settings, cause we need to update it later.
                         var editor = _.findWhere(tinyMCE.editors, { id: rteId });
 
@@ -255,17 +255,17 @@ angular.module("umbraco")
                     ui.item.offsetParent().find(".umb-rte").each(function (key, value) {
                         var rteId = value.id;
                         if ($.inArray(rteId, notIncludedRte) < 0) {
-                            
+
                             var editor = _.findWhere(tinyMCE.editors, { id: rteId });
                             if (editor) {
                                 draggedRteSettings[rteId] = editor.settings;
                             }
-                            
+
                             // add all dragged's neighbouring RTEs in the new cell
                             notIncludedRte.splice(0, 0, rteId);
                         }
                     });
-                    
+
                     // reconstruct the dragged RTE (could be undefined when dragging something else than RTE)
                     if (draggedRteSettings !== undefined) {
                         tinyMCE.init(draggedRteSettings);
@@ -327,13 +327,13 @@ angular.module("umbraco")
                         title: title,
                         availableItems: area.$allowedEditors,
                         event: event,
-                        submit: function(model) {
+                        submit: function (model) {
                             if (model.selectedItem) {
                                 $scope.addControl(model.selectedItem, area, index);
                                 overlayService.close();
                             }
                         },
-                        close: function() {
+                        close: function () {
                             overlayService.close();
                         }
                     });
@@ -345,7 +345,7 @@ angular.module("umbraco")
             // *********************************************
 
             $scope.addTemplate = function (template) {
-                $scope.model.value = angular.copy(template);
+                $scope.model.value = Utilities.copy(template);
 
                 //default row data
                 _.forEach($scope.model.value.sections, function (section) {
@@ -387,7 +387,7 @@ angular.module("umbraco")
             $scope.addRow = function (section, layout, isInit) {
 
                 //copy the selected layout into the rows collection
-                var row = angular.copy(layout);
+                var row = Utilities.copy(layout);
 
                 // Init row value
                 row = $scope.initRow(row);
@@ -408,7 +408,7 @@ angular.module("umbraco")
                 setTimeout(function () {
                     var newRowEl = $element.find("[data-rowid='" + row.$uniqueId + "']");
 
-                    if(newRowEl !== null) {
+                    if (newRowEl !== null) {
                         newRowEl.focus();
                     }
                 }, 0);
@@ -467,10 +467,10 @@ angular.module("umbraco")
                 var styles, config;
                 if (itemType === 'control') {
                     styles = null;
-                    config = angular.copy(gridItem.editor.config.settings);
+                    config = Utilities.copy(gridItem.editor.config.settings);
                 } else {
-                    styles = _.filter(angular.copy($scope.model.config.items.styles), function (item) { return shouldApply(item, itemType, gridItem); });
-                    config = _.filter(angular.copy($scope.model.config.items.config), function (item) { return shouldApply(item, itemType, gridItem); });
+                    styles = _.filter(Utilities.copy($scope.model.config.items.styles), function (item) { return shouldApply(item, itemType, gridItem); });
+                    config = _.filter(Utilities.copy($scope.model.config.items.config), function (item) { return shouldApply(item, itemType, gridItem); });
                 }
 
                 if (Utilities.isObject(gridItem.config)) {
@@ -763,7 +763,7 @@ angular.module("umbraco")
                             // allowed for this template based on the current config.
 
                             _.each(found.sections, function (templateSection, index) {
-                                angular.extend($scope.model.value.sections[index], angular.copy(templateSection));
+                                angular.extend($scope.model.value.sections[index], Utilities.copy(templateSection));
                             });
 
                         }
@@ -835,7 +835,7 @@ angular.module("umbraco")
                     return null;
                 } else {
                     //make a copy to not touch the original config
-                    original = angular.copy(original);
+                    original = Utilities.copy(original);
                     original.styles = row.styles;
                     original.config = row.config;
                     original.hasConfig = gridItemHasConfig(row.styles, row.config);
