@@ -42,7 +42,6 @@ Use this directive to lazy-load an image only when it is scrolled into view.
 
             const observer = new IntersectionObserver(loadImg);
             const img = element[0];
-            console.log(img);
             img.src = placeholder;
             observer.observe(img);
 
