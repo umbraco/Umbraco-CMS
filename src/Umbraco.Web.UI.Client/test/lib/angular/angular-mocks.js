@@ -51,12 +51,12 @@ angular.mock.$Browser = function () {
 
     self.onUrlChange = function (listener) {
         self.pollFns.push(
-          function () {
-              if (self.$$lastUrl != self.$$url) {
-                  self.$$lastUrl = self.$$url;
-                  listener(self.$$url);
-              }
-          }
+            function () {
+                if (self.$$lastUrl != self.$$url) {
+                    self.$$lastUrl = self.$$url;
+                    listener(self.$$url);
+                }
+            }
         );
 
         return listener;
@@ -172,8 +172,8 @@ angular.mock.$Browser.prototype = {
             }
         } else {
             if (!angular.equals(this.cookieHash, this.lastCookieHash)) {
-                this.lastCookieHash = angular.copy(this.cookieHash);
-                this.cookieHash = angular.copy(this.cookieHash);
+                this.lastCookieHash = Utilities.copy(this.cookieHash);
+                this.cookieHash = Utilities.copy(this.cookieHash);
             }
             return this.cookieHash;
         }
@@ -397,7 +397,7 @@ angular.mock.$LogProvider = function () {
             });
             if (errors.length) {
                 errors.unshift("Expected $log to be empty! Either a message was logged unexpectedly, or an expected " +
-                  "log message was not checked and removed:");
+                    "log message was not checked and removed:");
                 errors.push('');
                 throw new Error(errors.join('\n---------\n'));
             }
@@ -581,12 +581,12 @@ angular.mock.$LogProvider = function () {
         if (self.toISOString) {
             self.toISOString = function () {
                 return padNumber(self.origDate.getUTCFullYear(), 4) + '-' +
-                      padNumber(self.origDate.getUTCMonth() + 1, 2) + '-' +
-                      padNumber(self.origDate.getUTCDate(), 2) + 'T' +
-                      padNumber(self.origDate.getUTCHours(), 2) + ':' +
-                      padNumber(self.origDate.getUTCMinutes(), 2) + ':' +
-                      padNumber(self.origDate.getUTCSeconds(), 2) + '.' +
-                      padNumber(self.origDate.getUTCMilliseconds(), 3) + 'Z'
+                    padNumber(self.origDate.getUTCMonth() + 1, 2) + '-' +
+                    padNumber(self.origDate.getUTCDate(), 2) + 'T' +
+                    padNumber(self.origDate.getUTCHours(), 2) + ':' +
+                    padNumber(self.origDate.getUTCMinutes(), 2) + ':' +
+                    padNumber(self.origDate.getUTCSeconds(), 2) + '.' +
+                    padNumber(self.origDate.getUTCMilliseconds(), 3) + 'Z'
             }
         }
 
@@ -1004,7 +1004,7 @@ function createHttpBackendMock($rootScope, $delegate, $browser) {
         throw wasExpected ?
             Error('No response defined !') :
             Error('Unexpected request: ' + method + ' ' + url + '\n' +
-                  (expectation ? 'Expected ' + expectation : 'No more request expected'));
+                (expectation ? 'Expected ' + expectation : 'No more request expected'));
     }
 
     /**

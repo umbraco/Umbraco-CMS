@@ -18,14 +18,14 @@
             ];
 
             // when a user logs out or timesout
-            evts.push(eventsService.on("app.notAuthenticated", function() {
+            evts.push(eventsService.on("app.notAuthenticated", function () {
                 scope.authenticated = false;
                 scope.user = null;
             }));
 
             // when the application is ready and the user is authorized setup the data
-            evts.push(eventsService.on("app.ready", function(evt, data) {
-                
+            evts.push(eventsService.on("app.ready", function (evt, data) {
+
                 scope.authenticated = true;
                 scope.user = data.user;
 
@@ -40,10 +40,10 @@
 
             }));
 
-            evts.push(eventsService.on("app.userRefresh", function(evt) {
-                userService.refreshCurrentUser().then(function(data) {
+            evts.push(eventsService.on("app.userRefresh", function (evt) {
+                userService.refreshCurrentUser().then(function (data) {
                     scope.user = data;
-        
+
                     if (scope.user.avatars) {
                         scope.avatar = [];
                         if (Utilities.isArray(scope.user.avatars)) {
@@ -54,10 +54,10 @@
                     }
                 });
             }));
-            
+
             scope.rememberFocus = focusService.rememberFocus;
-            
-            scope.searchClick = function() {
+
+            scope.searchClick = function () {
                 var showSearch = appState.getSearchState("show");
                 appState.setSearchState("show", !showSearch);
             };
@@ -71,7 +71,7 @@
             };
 
             scope.avatarClick = function () {
-                if(!scope.userDialog) {
+                if (!scope.userDialog) {
                     scope.userDialog = {
                         view: "user",
                         show: true,
