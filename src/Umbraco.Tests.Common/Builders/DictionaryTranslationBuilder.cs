@@ -12,8 +12,7 @@ namespace Umbraco.Tests.Common.Builders
             IWithDeleteDateBuilder,
             IWithKeyBuilder
     {
-        private readonly LanguageBuilder<DictionaryTranslationBuilder> _languageBuilder;
-        private readonly Guid? _uniqueId = null;
+        private LanguageBuilder<DictionaryTranslationBuilder> _languageBuilder;
         private DateTime? _createDate;
         private DateTime? _deleteDate;
         private int? _id;
@@ -24,6 +23,48 @@ namespace Umbraco.Tests.Common.Builders
         public DictionaryTranslationBuilder(DictionaryItemBuilder parentBuilder) : base(parentBuilder)
         {
             _languageBuilder = new LanguageBuilder<DictionaryTranslationBuilder>(this);
+        }
+
+        public LanguageBuilder<DictionaryTranslationBuilder> AddLanguage() => _languageBuilder;
+
+        public DictionaryTranslationBuilder WithValue(string value)
+        {
+            _value = value;
+            return this;
+        }
+
+        public override IDictionaryTranslation Build()
+        {
+            var createDate = _createDate ?? DateTime.Now;
+            var updateDate = _updateDate ?? DateTime.Now;
+            var deleteDate = _deleteDate ?? null;
+            var id = _id ?? 1;
+            var key = _key ?? Guid.NewGuid();
+
+            var result = new DictionaryTranslation(
+                _languageBuilder.Build(),
+                _value ?? Guid.NewGuid().ToString(),
+                key)
+            {
+                CreateDate = createDate,
+                UpdateDate = updateDate,
+                DeleteDate = deleteDate,
+                Id = id
+            };
+
+            Reset();
+            return result;
+        }
+        
+        protected override void Reset()
+        {
+            _languageBuilder = new LanguageBuilder<DictionaryTranslationBuilder>(this);
+            _createDate = null;
+            _deleteDate = null;
+            _id = null;
+            _key = null;
+            _updateDate = null;
+            _value = null;
         }
 
         DateTime? IWithCreateDateBuilder.CreateDate
@@ -54,36 +95,6 @@ namespace Umbraco.Tests.Common.Builders
         {
             get => _updateDate;
             set => _updateDate = value;
-        }
-
-        public override IDictionaryTranslation Build()
-        {
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
-            var deleteDate = _deleteDate ?? null;
-            var id = _id ?? 1;
-            var key = _key ?? Guid.NewGuid();
-
-            var result = new DictionaryTranslation(
-                _languageBuilder.Build(),
-                _value ?? Guid.NewGuid().ToString(),
-                _uniqueId ?? key)
-            {
-                CreateDate = createDate,
-                UpdateDate = updateDate,
-                DeleteDate = deleteDate,
-                Id = id
-            };
-
-            return result;
-        }
-
-        public LanguageBuilder<DictionaryTranslationBuilder> AddLanguage() => _languageBuilder;
-
-        public DictionaryTranslationBuilder WithValue(string value)
-        {
-            _value = value;
-            return this;
         }
     }
 }

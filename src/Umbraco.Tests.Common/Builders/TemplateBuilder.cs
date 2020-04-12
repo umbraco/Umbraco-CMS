@@ -57,6 +57,8 @@ namespace Umbraco.Tests.Common.Builders
             var masterTemplateId = _masterTemplateId ?? null;
 
             var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+
+            Reset();
             return new Template(shortStringHelper, name, alias)
             {
                 Id = id,
@@ -69,6 +71,21 @@ namespace Umbraco.Tests.Common.Builders
                 MasterTemplateAlias = masterTemplateAlias,
                 MasterTemplateId = masterTemplateId,
             };
+        }
+
+        protected override void Reset()
+        {
+            _id = null;
+            _key = null;
+            _alias = null;
+            _name = null;
+            _createDate = null;
+            _updateDate = null;
+            _path = null;
+            _content = null;
+            _isMasterTemplate = null;
+            _masterTemplateAlias = null;
+            _masterTemplateId = null;
         }
 
         int? IWithIdBuilder.Id

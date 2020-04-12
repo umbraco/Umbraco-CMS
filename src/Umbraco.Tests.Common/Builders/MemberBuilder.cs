@@ -161,7 +161,32 @@ namespace Umbraco.Tests.Common.Builders
                 member.ResetDirtyProperties(false);
             }
 
+            Reset();
             return member;
+        }
+
+        protected override void Reset()
+        {
+            _id = null;
+            _key = null;
+            _createDate = null;
+            _updateDate = null;
+            _name = null;
+            _creatorId = null;
+            _level = null;
+            _path = null;
+            _username = null;
+            _rawPasswordValue = null;
+            _email = null;
+            _failedPasswordAttempts = null;
+            _isApproved = null;
+            _isLockedOut = null;
+            _lastLockoutDate = null;
+            _lastLoginDate = null;
+            _lastPasswordChangeDate = null;
+            _sortOrder = null;
+            _trashed = null;
+            _propertyIdsIncrementingFrom = null;
         }
 
         int? IWithIdBuilder.Id

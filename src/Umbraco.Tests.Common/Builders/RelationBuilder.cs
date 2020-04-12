@@ -58,6 +58,7 @@ namespace Umbraco.Tests.Common.Builders
 
             var relationType = _relationTypeBuilder.Build();
 
+            Reset();
             return new Relation(parentId, childId, relationType)
                 {
                     Comment = comment,
@@ -66,6 +67,17 @@ namespace Umbraco.Tests.Common.Builders
                     Key = key,
                     UpdateDate = updateDate
                 };
+        }
+
+        protected override void Reset()
+        {
+            _id = null;
+            _parentId = null;
+            _childId = null;
+            _key = null;
+            _createDate = null;
+            _updateDate = null;
+            _comment = null;
         }
 
         int? IWithIdBuilder.Id

@@ -108,6 +108,7 @@ namespace Umbraco.Tests.Common.Builders
 
             var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
+            Reset();
             return new PropertyType(shortStringHelper, propertyEditorAlias, valueStorageType)
             {
                 Id = id,
@@ -125,6 +126,26 @@ namespace Umbraco.Tests.Common.Builders
                 ValidationRegExp = validationRegExp,
                 ValidationRegExpMessage = validationRegExpMessage,
             };
+        }
+        
+        protected override void Reset()
+        {
+            _id = null;
+            _key = null;
+            _propertyEditorAlias = null;
+            _valueStorageType = null;
+            _alias = null;
+            _name = null;
+            _createDate = null;
+            _updateDate = null;
+            _sortOrder = null;
+            _description = null;
+            _dataTypeId = null;
+            _propertyGroupId = null;
+            _mandatory = null;
+            _mandatoryMessage = null;
+            _validationRegExp = null;
+            _validationRegExpMessage = null;
         }
 
         int? IWithIdBuilder.Id

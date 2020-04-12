@@ -1,24 +1,36 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Umbraco.Tests.Common.Builders
 {
     public class GenericCollectionBuilder<TBuilder, T>
         : ChildBuilderBase<TBuilder, IEnumerable<T>>
     {
-        private readonly IList<T> _collection;
+        private IList<T> _collection;
 
         public GenericCollectionBuilder(TBuilder parentBuilder) : base(parentBuilder)
         {
-            _collection = new List<T>();
         }        
 
         public override IEnumerable<T> Build()
         {
-            return _collection;
+            var collection = _collection?.ToList() ?? Enumerable.Empty<T>();
+            Reset();
+            return collection;
+        }
+
+        protected override void Reset()
+        {
+            _collection = null;
         }
 
         public GenericCollectionBuilder<TBuilder, T> WithValue(T value)
         {
+            if (_collection == null)
+            {
+                _collection = new List<T>();
+            }
+
             _collection.Add(value);
             return this;
         }

@@ -87,7 +87,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var user = UserBuilder.Build();
+                var user = UserBuilder.WithoutIdentity().Build();
                 repository.Save(user);
 
 
@@ -365,9 +365,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private User CreateAndCommitUserWithGroup(IUserRepository repository, IUserGroupRepository userGroupRepository)
         {
-            var user = UserBuilder.Build();
+            var user = UserBuilder.WithoutIdentity().Build();
             repository.Save(user);
-
 
             var group = UserGroupBuilder.Build();
             userGroupRepository.AddOrUpdateGroupWithUsers(@group, new[] { user.Id });

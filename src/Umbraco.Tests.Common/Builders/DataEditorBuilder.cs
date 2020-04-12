@@ -9,8 +9,8 @@ namespace Umbraco.Tests.Common.Builders
 {
     public class DataEditorBuilder<TParent> : ChildBuilderBase<TParent, IDataEditor>
     {
-        private readonly ConfigurationEditorBuilder<DataEditorBuilder<TParent>> _explicitConfigurationEditorBuilder;
-        private readonly DataValueEditorBuilder<DataEditorBuilder<TParent>> _explicitValueEditorBuilder;
+        private ConfigurationEditorBuilder<DataEditorBuilder<TParent>> _explicitConfigurationEditorBuilder;
+        private DataValueEditorBuilder<DataEditorBuilder<TParent>> _explicitValueEditorBuilder;
         private IDictionary<string, object> _defaultConfiguration;
 
         public DataEditorBuilder(TParent parentBuilder) : base(parentBuilder)
@@ -37,6 +37,7 @@ namespace Umbraco.Tests.Common.Builders
             var explicitConfigurationEditor = _explicitConfigurationEditorBuilder.Build();
             var explicitValueEditor = _explicitValueEditorBuilder.Build();
 
+            Reset();
             return new DataEditor(
                 Mock.Of<ILogger>(),
                 Mock.Of<IDataTypeService>(),
@@ -49,6 +50,13 @@ namespace Umbraco.Tests.Common.Builders
                 ExplicitConfigurationEditor = explicitConfigurationEditor,
                 ExplicitValueEditor = explicitValueEditor
             };
+        }
+
+        protected override void Reset()
+        {
+            _defaultConfiguration = null;
+            _explicitConfigurationEditorBuilder = new ConfigurationEditorBuilder<DataEditorBuilder<TParent>>(this);
+            _explicitValueEditorBuilder = new DataValueEditorBuilder<DataEditorBuilder<TParent>>(this);
         }
     }
 }

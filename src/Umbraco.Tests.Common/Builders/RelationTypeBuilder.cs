@@ -33,6 +33,62 @@ namespace Umbraco.Tests.Common.Builders
         {
         }
 
+        public RelationTypeBuilder WithIsBidirectional(bool isBidirectional)
+        {
+            _isBidirectional = isBidirectional;
+            return this;
+        }
+
+        public RelationTypeBuilder WithChildObjectType(Guid childObjectType)
+        {
+            _childObjectType = childObjectType;
+            return this;
+        }
+
+        public RelationTypeBuilder WithParentObjectType(Guid parentObjectType)
+        {
+            _parentObjectType = parentObjectType;
+            return this;
+        }
+
+        public override IRelationType Build()
+        {
+            var alias = _alias ?? Guid.NewGuid().ToString();
+            var name = _name ?? Guid.NewGuid().ToString();
+            var parentObjectType = _parentObjectType ?? null;
+            var childObjectType = _childObjectType ?? null;
+            var id = _id ?? 1;
+            var key = _key ?? Guid.NewGuid();
+            var isBidirectional = _isBidirectional ?? false;
+            var createDate = _createDate ?? DateTime.Now;
+            var updateDate = _updateDate ?? DateTime.Now;
+            var deleteDate = _deleteDate ?? null;
+
+            Reset();
+            return new RelationType(name, alias, isBidirectional, parentObjectType, childObjectType)
+            {
+                Id = id,
+                Key = key,
+                CreateDate = createDate,
+                UpdateDate = updateDate,
+                DeleteDate = deleteDate
+            };
+        }
+
+        protected override void Reset()
+        {
+            _alias = null;
+            _childObjectType = null;
+            _createDate = null;
+            _deleteDate = null;
+            _id = null;
+            _isBidirectional = null;
+            _key = null;
+            _name = null;
+            _parentObjectType = null;
+            _updateDate = null;
+        }
+
         string IWithAliasBuilder.Alias
         {
             get => _alias;
@@ -73,47 +129,6 @@ namespace Umbraco.Tests.Common.Builders
         {
             get => _updateDate;
             set => _updateDate = value;
-        }
-
-        public override IRelationType Build()
-        {
-            var alias = _alias ?? Guid.NewGuid().ToString();
-            var name = _name ?? Guid.NewGuid().ToString();
-            var parentObjectType = _parentObjectType ?? null;
-            var childObjectType = _childObjectType ?? null;
-            var id = _id ?? 1;
-            var key = _key ?? Guid.NewGuid();
-            var isBidirectional = _isBidirectional ?? false;
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
-            var deleteDate = _deleteDate ?? null;
-
-            return new RelationType(name, alias, isBidirectional, parentObjectType, childObjectType)
-            {
-                Id = id,
-                Key = key,
-                CreateDate = createDate,
-                UpdateDate = updateDate,
-                DeleteDate = deleteDate
-            };
-        }
-
-        public RelationTypeBuilder WithIsBidirectional(bool isBidirectional)
-        {
-            _isBidirectional = isBidirectional;
-            return this;
-        }
-
-        public RelationTypeBuilder WithChildObjectType(Guid childObjectType)
-        {
-            _childObjectType = childObjectType;
-            return this;
-        }
-
-        public RelationTypeBuilder WithParentObjectType(Guid parentObjectType)
-        {
-            _parentObjectType = parentObjectType;
-            return this;
         }
     }
 }
