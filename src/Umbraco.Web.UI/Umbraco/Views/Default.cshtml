@@ -73,23 +73,19 @@
 
             </div>
 
-            <umb-tour
-                ng-if="tour.show"
-                model="tour">
+            <umb-tour ng-if="tour.show"
+                      model="tour">
             </umb-tour>
 
             <umb-notifications></umb-notifications>
 
         </div>
 
-        <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
-        <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
-
         <umb-search ng-if="search.show" on-close="closeSearch()"></umb-search>
 
     </div>
 
-    <umb-backdrop ng-if="backdrop.show || infiniteMode"
+    <umb-backdrop ng-if="backdrop.show || infiniteMode || drawer.show"
                   backdrop-opacity="backdrop.opacity"
                   highlight-element="backdrop.element"
                   highlight-prevent-click="backdrop.elementPreventClick"
@@ -105,9 +101,11 @@
 
     <umb-editors ng-show="infiniteMode"></umb-editors>
 
-    <umb-login
-        ng-if="login.show"
-        on-login="hideLoginScreen()">
+    <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
+    <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
+
+    <umb-login ng-if="login.show"
+               on-login="hideLoginScreen()">
     </umb-login>
 
     @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewData.GetUmbracoPath() }), Model.Features, Current.Configs.Global())
