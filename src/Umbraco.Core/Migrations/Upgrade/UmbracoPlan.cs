@@ -197,7 +197,6 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             // to 8.7.0...
             To<StackedContentToBlockList>("{DFA35FA2-BFBB-433F-84E5-BD75940CDDF6}");
-            To<ColorPickerPreValues>("{711AC937-B11C-47AC-8D4A-5B8868A3C2C6}");
             To<ConvertToElements>("{DA434576-3DEF-46D7-942A-CE34D7F7FB8A}");
             //FINAL
         }
