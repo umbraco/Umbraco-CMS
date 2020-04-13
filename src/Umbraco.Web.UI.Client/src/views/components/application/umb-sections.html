@@ -7,7 +7,7 @@
                    ng-dblclick="sectionDblClick(section)"
                    ng-click="sectionClick($event, section)"
                    prevent-default
-                   aria-current="{{section.alias == currentSection ? 'page' : null}}"
+                   ng-attr-aria-current="{{section.alias == currentSection ? 'page' : undefined}}"
                    aria-label="{{section.name + (section.alias == currentSection ? ' (active)' : '')}}">
                     <span class="section__name">{{section.name}}</span>
                 </a>
@@ -24,7 +24,7 @@
                             ng-dblclick="sectionDblClick(section)"
                             ng-click="sectionClick($event, section)"
                             prevent-default
-                            aria-current="{{section.alias == currentSection ? 'page' : null}}"
+                            ng-attr-aria-current="{{section.alias == currentSection ? 'page' : undefined}}"
                             aria-label="{{section.name + (section.alias == currentSection ? ' (active)' : '')}}">
                             <span class="section__name">{{section.name}}</span>
                         </a>
