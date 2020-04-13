@@ -3,18 +3,36 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Tests.Models
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
 {
     [TestFixture]
     public class MacroTests
     {
+        private readonly MacroBuilder _builder = new MacroBuilder();
+
         [Test]
         public void Can_Deep_Clone()
         {
-            var macro = new Macro(TestHelper.ShortStringHelper, 1, Guid.NewGuid(), true, 3, "test", "Test", false, true, true, "~/script.cshtml");
-            macro.Properties.Add(new MacroProperty(6, Guid.NewGuid(), "rewq", "REWQ", 1, "asdfasdf"));
+            var macro = _builder
+                .WithId(1)
+                .WithUseInEditor(true)
+                .WithCacheDuration(3)
+                .WithAlias("test")
+                .WithName("Test")
+                .WithSource("~/script.cshtml")
+                .WithCacheByMember(true)
+                .WithDontRender(true)
+                .AddProperty()
+                    .WithId(6)
+                    .WithAlias("rewq")
+                    .WithName("REWQ")
+                    .WithSortOrder(1)
+                    .WithEditorAlias("asdfasdf")
+                    .Done()
+                .Build();
 
             var clone = (Macro)macro.DeepClone();
 
@@ -24,7 +42,7 @@ namespace Umbraco.Tests.Models
 
             Assert.AreEqual(clone.Properties.Count, macro.Properties.Count);
 
-            for (int i = 0; i < clone.Properties.Count; i++)
+            for (var i = 0; i < clone.Properties.Count; i++)
             {
                 Assert.AreEqual(clone.Properties[i], macro.Properties[i]);
                 Assert.AreNotSame(clone.Properties[i], macro.Properties[i]);
@@ -37,9 +55,7 @@ namespace Umbraco.Tests.Models
             //This double verifies by reflection
             var allProps = clone.GetType().GetProperties();
             foreach (var propertyInfo in allProps)
-            {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(macro, null));
-            }
 
             //need to ensure the event handlers are wired
 
@@ -51,8 +67,6 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(1, clone.AddedProperties.Count());
             clone.Properties.Remove("rewq");
             Assert.AreEqual(1, clone.RemovedProperties.Count());
-
         }
-
     }
 }
