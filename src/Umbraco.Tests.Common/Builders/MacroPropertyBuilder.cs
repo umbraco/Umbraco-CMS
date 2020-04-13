@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Common.Builders
             var sortOrder = _sortOrder ?? 0;
             var editorAlias = _editorAlias ?? string.Empty;
 
-            var macroProperty = new MacroProperty(6, Guid.NewGuid(), alias, name, sortOrder, editorAlias);
+            var macroProperty = new MacroProperty(id, key, alias, name, sortOrder, editorAlias);
 
             Reset();
             return macroProperty;
