@@ -1572,7 +1572,7 @@ angular.module('ngMockE2E', ['ng']).config(function ($provide) {
  *
  *     // adds a new phone to the phones array
  *     $httpBackend.whenPOST('/phones').respond(function(method, url, data) {
- *       phones.push(angular.fromJSON(data));
+ *       phones.push(JSON.parse(data));
  *     });
  *     $httpBackend.whenGET(/^\/templates\//).passThrough();
  *     //...

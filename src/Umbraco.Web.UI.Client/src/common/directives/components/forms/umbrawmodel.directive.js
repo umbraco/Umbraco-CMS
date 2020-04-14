@@ -39,7 +39,7 @@ angular.module("umbraco.directives")
 
                 function stringToJson(text) {
                     try {
-                        return angular.fromJson(text);
+                        return JSON.parse(text);
                     } catch (err) {
                         setInvalid();
                         return text;
@@ -55,7 +55,7 @@ angular.module("umbraco.directives")
                 function isValidJson(model) {
                     var flag = true;
                     try {
-                        angular.fromJson(model);
+                        JSON.parse(model)
                     } catch (err) {
                         flag = false;
                     }
