@@ -9,9 +9,9 @@
          * Simple mapping from property model content entry to editing model,
          * needs to stay simple to avoid deep watching.
          */
-        function mapToElementTypeModel(elementTypeModel, contentModel) {
+        function mapToElementModel(elementModel, contentModel) {
 
-            var variant = elementTypeModel.variants[0];
+            var variant = elementModel.variants[0];
             
             for (var t = 0; t < variant.tabs.length; t++) {
                 var tab = variant.tabs[t];
@@ -26,12 +26,12 @@
         }
 
         /**
-         * Simple mapping from elementTypeModel to property model content entry,
+         * Simple mapping from elementModel to property model content entry,
          * needs to stay simple to avoid deep watching.
          */
-        function mapToPropertyModel(elementTypeModel, contentModel) {
+        function mapToPropertyModel(elementModel, contentModel) {
             
-            var variant = elementTypeModel.variants[0];
+            var variant = elementModel.variants[0];
             
             for (var t = 0; t < variant.tabs.length; t++) {
                 var tab = variant.tabs[t];
@@ -50,12 +50,12 @@
         }
 
         /**
-         * Map property values from an ElementTypeModel to another ElementTypeModel.
+         * Map property values from an ElementModel to another ElementModel.
          * Used to tricker watchers for synchronization.
-         * @param {Object} fromModel ElementTypeModel to recive property values from.
-         * @param {Object} toModel ElementTypeModel to recive property values from.
+         * @param {Object} fromModel ElementModel to recive property values from.
+         * @param {Object} toModel ElementModel to recive property values from.
          */
-        function mapElementTypeValues(fromModel, toModel) {
+        function mapElementValues(fromModel, toModel) {
             if (!fromModel || !fromModel.variants) {
                 toModel.variants = null;
                 return;
@@ -244,7 +244,7 @@
                     if(scaffold) {
                         blocks.push({
                             blockConfigModel: blockConfiguration,
-                            elementTypeModel: scaffold
+                            elementTypeModel: scaffold.documentType
                         });
                     }
                 });
@@ -283,8 +283,10 @@
                 var blockModel = {};
                 blockModel.key = String.CreateGuid().replace(/-/g, "");
                 blockModel.config = angular.copy(blockConfiguration);
-                blockModel.labelInterpolator = $interpolate(blockModel.config.label);
-
+                if (blockModel.config.label) {
+                    blockModel.labelInterpolator = $interpolate(blockModel.config.label);
+                }
+                
                 var contentScaffold = this.getScaffoldFor(blockConfiguration.contentTypeAlias);
                 if(contentScaffold === null) {
                     return null;
@@ -294,7 +296,7 @@
                 blockModel.content = angular.copy(contentScaffold);
                 blockModel.content.udi = udi;
 
-                mapToElementTypeModel(blockModel.content, contentModel);
+                mapToElementModel(blockModel.content, contentModel);
 
                 blockModel.contentModel = contentModel;
                 blockModel.layoutModel = layoutEntry;
@@ -311,7 +313,7 @@
                     layoutEntry.settings = layoutEntry.settings || { key: String.CreateGuid(), contentTypeAlias: blockConfiguration.settingsElementTypeAlias };
                     if (!layoutEntry.settings.key) { layoutEntry.settings.key = String.CreateGuid(); }
                     if (!layoutEntry.settings.contentTypeAlias) { layoutEntry.settings.contentTypeAlias = blockConfiguration.settingsElementTypeAlias; }
-                    mapToElementTypeModel(blockModel.settings, layoutEntry.settings);
+                    mapToElementModel(blockModel.settings, layoutEntry.settings);
                 } else {
                     layoutEntry.settings = null;
                 }
@@ -458,7 +460,7 @@
             createModelObject: function(propertyModelValue, propertyEditorAlias, blockConfigurations, propertyScope) {
                 return new BlockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations, propertyScope);
             },
-            mapElementTypeValues: mapElementTypeValues, 
+            mapElementValues: mapElementValues, 
             getBlockLabel: getBlockLabel
         }
     }

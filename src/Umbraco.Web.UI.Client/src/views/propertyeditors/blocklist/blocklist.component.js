@@ -202,12 +202,12 @@
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
                 size: blockModel.config.editorSize || "medium",
                 submit: function(blockEditorModel) {
-                    // To ensure syncronization gets tricked we transfer
+                    // To ensure syncronization gets tricked we transfer each property.
                     if (blockEditorModel.content !== null) {
-                        blockEditorService.mapElementTypeValues(blockEditorModel.content, blockModel.content)
+                        blockEditorService.mapElementValues(blockEditorModel.content, blockModel.content)
                     }
                     if (blockModel.config.settingsElementTypeAlias !== null) {
-                        blockEditorService.mapElementTypeValues(blockEditorModel.settings, blockModel.settings)
+                        blockEditorService.mapElementValues(blockEditorModel.settings, blockModel.settings)
                     }
                     editorService.close();
                 },
@@ -253,8 +253,9 @@
                 },
                 submit: function(blockPickerModel) {
                     var added = false;
-                    if (model && model.selectedItem) {
-                        added = addNewBlock(createIndex, model.selectedItem.alias);
+                    if (blockPickerModel && blockPickerModel.selectedItem) {
+                        console.log(blockPickerModel.selectedItem)
+                        added = addNewBlock(createIndex, blockPickerModel.selectedItem.blockConfigModel.contentTypeAlias);
                     }
                     blockPickerModel.close();
                     if (added && vm.model.config.useInlineEditingAsDefault !== true && vm.blocks.length > createIndex) {
