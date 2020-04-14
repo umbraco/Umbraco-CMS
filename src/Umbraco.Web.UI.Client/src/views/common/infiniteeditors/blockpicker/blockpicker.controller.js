@@ -6,7 +6,7 @@ angular.module("umbraco")
 
         vm.model = $scope.model;
 
-        vm.selectItem = function() {
+        vm.selectItem = function(item) {
             vm.model.selectedItem = item;
             vm.model.submit($scope.model);
         }
