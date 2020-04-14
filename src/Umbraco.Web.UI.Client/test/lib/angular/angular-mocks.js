@@ -172,8 +172,8 @@ angular.mock.$Browser.prototype = {
             }
         } else {
             if (!angular.equals(this.cookieHash, this.lastCookieHash)) {
-                this.lastCookieHash = angular.copy(this.cookieHash);
-                this.cookieHash = angular.copy(this.cookieHash);
+                this.lastCookieHash = Utilities.copy(this.cookieHash);
+                this.cookieHash = Utilities.copy(this.cookieHash);
             }
             return this.cookieHash;
         }

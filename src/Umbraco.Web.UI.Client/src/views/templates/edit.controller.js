@@ -208,7 +208,7 @@
             }
 
             // save state of master template to use for comparison when syncing the tree on save
-            oldMasterTemplateAlias = angular.copy(template.masterTemplateAlias);
+            oldMasterTemplateAlias = Utilities.copy(template.masterTemplateAlias);
 
             // ace configuration
             vm.aceOption = {

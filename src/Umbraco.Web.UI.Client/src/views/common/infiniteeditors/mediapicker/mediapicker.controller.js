@@ -411,9 +411,9 @@ angular.module("umbraco")
                 entityResource.getPagedDescendants($scope.filterOptions.excludeSubFolders ? $scope.currentFolder.id : $scope.startNodeId, "Media", vm.searchOptions)
                     .then(function (data) {
                         // update image data to work with image grid
-                        angular.forEach(data.items, function (mediaItem) {
-                            setMediaMetaData(mediaItem);
-                        });
+                        if (data.items) {
+                            data.items.forEach(mediaItem => setMediaMetaData(mediaItem));
+                        }
 
                         // update images
                         $scope.images = data.items ? data.items : [];
