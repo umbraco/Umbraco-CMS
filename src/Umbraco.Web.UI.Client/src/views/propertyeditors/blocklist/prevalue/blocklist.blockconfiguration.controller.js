@@ -20,16 +20,7 @@
 
         var vm = this;
 
-        vm.enableAddBlock = true;
         vm.openBlock = null;
-
-        function evaluateStatus() {
-
-            if (!vm.elementTypes) return;// cancel if elementTypes isnt loaded jet.
-
-            vm.enableAddBlock = vm.getAvailableElementTypes().length > 0;
-
-        }
 
         function onInit() {
 
@@ -44,7 +35,6 @@
         function loadElementTypes() {
             return elementTypeResource.getAll().then(function (elementTypes) {
                 vm.elementTypes = elementTypes;
-                evaluateStatus();
             });
         }
 
@@ -196,10 +186,6 @@
 
         
         onInit();
-
-        $scope.$watchCollection('model.value', function(newVal, oldVal) {
-            evaluateStatus();
-        });
 
     }
 
