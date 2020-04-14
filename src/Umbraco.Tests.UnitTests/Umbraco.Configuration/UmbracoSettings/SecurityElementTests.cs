@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
-using Umbraco.Core;
 
-namespace Umbraco.Tests.Configurations.UmbracoSettings
+namespace Umbraco.Tests.UnitTests.Umbraco.Configuration.UmbracoSettings
 {
     [TestFixture]
     public class SecurityElementTests : UmbracoSettingsTests

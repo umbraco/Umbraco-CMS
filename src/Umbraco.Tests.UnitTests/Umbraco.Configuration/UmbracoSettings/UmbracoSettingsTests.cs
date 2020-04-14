@@ -4,9 +4,9 @@ using System.IO;
 using NUnit.Framework;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Helpers;
 
-namespace Umbraco.Tests.Configurations.UmbracoSettings
+namespace Umbraco.Tests.UnitTests.Umbraco.Configuration.UmbracoSettings
 {
     public abstract class UmbracoSettingsTests
     {
@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [SetUp]
         public void Init()
         {
-            var config = new FileInfo(TestHelper.MapPathForTestFiles("~/Configurations/UmbracoSettings/web.config"));
+            var config = new FileInfo(TestHelper.MapPathForTestFiles("~/Umbraco.Configuration/UmbracoSettings/web.config"));
 
             var fileMap = new ExeConfigurationFileMap() { ExeConfigFilename = config.FullName };
             var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);

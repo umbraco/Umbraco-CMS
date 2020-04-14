@@ -28,4 +28,19 @@
       <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Umbraco.Configuration\UmbracoSettings\umbracoSettings.config">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <SubType>Designer</SubType>
+      </None>
+      <None Update="Umbraco.Configuration\UmbracoSettings\umbracoSettings.minimal.config">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <SubType>Designer</SubType>
+      </None>
+      <None Update="Umbraco.Configuration\UmbracoSettings\web.config">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <SubType>Designer</SubType>
+      </None>
+    </ItemGroup>
+
 </Project>

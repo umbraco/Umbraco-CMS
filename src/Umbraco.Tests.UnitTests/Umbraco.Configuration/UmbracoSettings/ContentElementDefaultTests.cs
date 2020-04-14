@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 
-namespace Umbraco.Tests.Configurations.UmbracoSettings
+namespace Umbraco.Tests.UnitTests.Umbraco.Configuration.UmbracoSettings
 {
     [TestFixture]
     public class ContentElementDefaultTests : ContentElementTests

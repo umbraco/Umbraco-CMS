@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Macros;
 
-namespace Umbraco.Tests.Configurations.UmbracoSettings
+namespace Umbraco.Tests.UnitTests.Umbraco.Configuration.UmbracoSettings
 {
     [TestFixture]
     public class ContentElementTests : UmbracoSettingsTests
