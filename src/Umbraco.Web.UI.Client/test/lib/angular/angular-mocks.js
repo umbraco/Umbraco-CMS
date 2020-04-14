@@ -686,10 +686,10 @@ angular.mock.dump = function (object) {
         var out;
 
         if (angular.isElement(object)) {
-            object = angular.element(object);
-            out = angular.element('<div></div>');
+            object = $(object);
+            out = $('<div></div>');
             angular.forEach(object, function (element) {
-                out.append(angular.element(element).clone());
+                out.append($(element).clone());
             });
             out = out.html();
         } else if (Utilities.isArray(object)) {
@@ -1499,7 +1499,7 @@ angular.mock.$TimeoutDecorator = function ($delegate, $browser) {
  */
 angular.mock.$RootElementProvider = function () {
     this.$get = function () {
-        return angular.element('<div ng-app></div>');
+        return $('<div ng-app></div>');
     }
 };
 
@@ -1710,7 +1710,7 @@ angular.mock.clearDataCache = function () {
         if (cache.hasOwnProperty(key)) {
             var handle = cache[key].handle;
 
-            handle && angular.element(handle.elem).unbind();
+            handle && $(handle.elem).unbind();
             delete cache[key];
         }
     }

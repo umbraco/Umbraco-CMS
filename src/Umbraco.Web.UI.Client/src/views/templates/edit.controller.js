@@ -188,7 +188,7 @@
             // if this is a new template, bind to the blur event on the name
             if (create) {
                 $timeout(function () {
-                    var nameField = angular.element(document.querySelector('[data-element="editor-name-field"]'));
+                    var nameField = $('[data-element="editor-name-field"]');
                     if (nameField) {
                         nameField.on('blur', function (event) {
                             if (event.target.value) {

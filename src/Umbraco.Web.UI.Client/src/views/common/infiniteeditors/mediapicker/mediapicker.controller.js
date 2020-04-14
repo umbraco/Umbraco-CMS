@@ -156,15 +156,15 @@ angular.module("umbraco")
                 }
             }
 
-            function upload(v) {
-                angular.element(".umb-file-dropzone .file-select").trigger("click");
+            function upload() {
+                $(".umb-file-dropzone .file-select").trigger("click");
             }
 
-            function dragLeave(el, event) {
+            function dragLeave() {
                 $scope.activeDrag = false;
             }
 
-            function dragEnter(el, event) {
+            function dragEnter() {
                 $scope.activeDrag = true;
             }
 
@@ -341,7 +341,7 @@ angular.module("umbraco")
                 return false;
             }
 
-            function gotoStartNode(err) {
+            function gotoStartNode() {
                 gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
             }
 
