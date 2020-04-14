@@ -22,7 +22,7 @@ angular.module("umbraco.directives")
             link: function (scope, element, attrs, ngModelCtrl) {
 
                 function setEditing(value) {
-                    scope.jsonEditing = angular.copy(jsonToString(value));
+                    scope.jsonEditing = Utilities.copy(jsonToString(value));
                 }
 
                 function updateModel(value) {

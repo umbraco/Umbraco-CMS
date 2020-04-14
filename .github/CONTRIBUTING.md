@@ -72,7 +72,7 @@ Great question! The short version goes like this:
 ### Pull requests
 The most successful pull requests usually look a like this:
 
-  * Fill in the required template, linking your pull request to an issue on the [issue tracker,](https://github.com/umbraco/Umbraco-CMS/issues) if applicable.
+  * Fill in the required template (shown when starting a PR on GitHub), and link your pull request to an issue on the [issue tracker,](https://github.com/umbraco/Umbraco-CMS/issues) if applicable.
   * Include screenshots and animated GIFs in your pull request whenever possible.
   * Unit tests, while optional, are awesome. Thank you!
   * New code is commented with documentation from which [the reference documentation](https://our.umbraco.com/documentation/Reference/) is generated.
@@ -123,10 +123,10 @@ You can get in touch with [the core contributors team](#the-core-contributors-te
 
 In order to build the Umbraco source code locally, first make sure you have the following installed.
 
-  * Visual Studio 2017 v15.9.7+
-  * Node v10+
-  * npm v6.4.1+
-  * Git command line
+  * [Visual Studio 2017 v15.9.7+](https://visualstudio.microsoft.com/vs/)
+  * [Node.js v10+](https://nodejs.org/en/download/)
+  * npm v6.4.1+ (installed with Node.js)
+  * [Git command line](https://git-scm.com/download/)
 
 The easiest way to get started is to open `src\umbraco.sln` in Visual Studio 2017 (version 15.9.7 or higher, [the community edition is free](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15) for you to use to contribute to Open Source projects). In Visual Studio, find the Task Runner Explorer (in the View menu under Other Windows) and run the build task under the gulpfile.
 
