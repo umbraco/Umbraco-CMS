@@ -8,9 +8,9 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
     $scope.noMacroParams = false;
 
     function onInit() {
-        if(!$scope.model.title) {
-            localizationService.localize("defaultdialogs_selectMacro").then(function(value){
-                $scope.model.title = value;    
+        if (!$scope.model.title) {
+            localizationService.localize("defaultdialogs_selectMacro").then(function (value) {
+                $scope.model.title = value;
             });
         }
     }
@@ -26,8 +26,8 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
         }
     };
 
-    $scope.close = function() {
-        if($scope.model.close) {
+    $scope.close = function () {
+        if ($scope.model.close) {
             $scope.model.close();
         }
     }
@@ -51,7 +51,7 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
                     }
 
                 } else {
-                    
+
                     $scope.wizardStep = "paramSelect";
                     $scope.model.macroParams = data;
 
@@ -71,7 +71,7 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
                                     if (val.detectIsJson()) {
                                         try {
                                             //Parse it to json
-                                            prop.value = angular.fromJson(val);
+                                            prop.value = JSON.parse(val);
                                         }
                                         catch (e) {
                                             // not json
@@ -110,7 +110,7 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
 
             //if 'allowedMacros' is specified, we need to filter
             if (Utilities.isArray($scope.model.dialogData.allowedMacros) && $scope.model.dialogData.allowedMacros.length > 0) {
-                $scope.macros = _.filter(data, function(d) {
+                $scope.macros = _.filter(data, function (d) {
                     return _.contains($scope.model.dialogData.allowedMacros, d.alias);
                 });
             }
