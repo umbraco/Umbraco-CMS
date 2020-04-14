@@ -42,9 +42,6 @@ namespace Umbraco.Web.Common.Runtime
             composition.RegisterUnique<ICookieManager, AspNetCoreCookieManager>();
 
             composition.RegisterMultipleUnique<ISessionIdResolver, ISessionManager, AspNetCoreSessionManager>();
-
-            composition.RegisterUnique<ISessionIdResolver, AspNetCoreSessionManager>();
-
         }
     }
 }
