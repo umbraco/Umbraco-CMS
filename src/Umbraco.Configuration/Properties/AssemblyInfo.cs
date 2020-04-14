@@ -4,7 +4,6 @@ using System.Runtime.InteropServices;
 
 // Umbraco Cms
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
-[assembly: InternalsVisibleTo("Umbraco.Tests.UnitTests")]
 [assembly: InternalsVisibleTo("Umbraco.Tests.Common")]
 [assembly: InternalsVisibleTo("Umbraco.Tests.Benchmarks")]
 

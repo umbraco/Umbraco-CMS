@@ -1,9 +1,9 @@
 ﻿using NUnit.Framework;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Configuration.UmbracoSettings
+namespace Umbraco.Tests.Integration.Umbraco.Configuration.UmbracoSettings
 {
     [TestFixture]
-    public class SecurityElementDefaultTests : SecurityElementTests
+    public class RequestHandlerElementDefaultTests : RequestHandlerElementTests
     {
         protected override bool TestingDefaults
         {

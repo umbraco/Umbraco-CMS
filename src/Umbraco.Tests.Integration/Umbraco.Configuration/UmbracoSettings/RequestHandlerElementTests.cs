@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Core;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Configuration.UmbracoSettings
+namespace Umbraco.Tests.Integration.Umbraco.Configuration.UmbracoSettings
 {
     [TestFixture]
     public class RequestHandlerElementTests : UmbracoSettingsTests

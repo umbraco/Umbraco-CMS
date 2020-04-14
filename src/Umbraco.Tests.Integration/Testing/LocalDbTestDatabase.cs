@@ -12,7 +12,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
-using Umbraco.Web.Common.RuntimeMinification;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -122,7 +121,7 @@ namespace Umbraco.Tests.Integration.Testing
             }
             else
             {
-                _dbFactory.Configure(conn.ConnectionString, Umbraco.Core.Constants.DatabaseProviders.SqlServer);
+                _dbFactory.Configure(conn.ConnectionString, Constants.DatabaseProviders.SqlServer);
 
                 using var database = (UmbracoDatabase)_dbFactory.CreateDatabase();
                 // track each db command ran as part of creating the database so we can replay these

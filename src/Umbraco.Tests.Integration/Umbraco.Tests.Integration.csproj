@@ -32,4 +32,16 @@
       <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Umbraco.Configuration\Configurations\umbracoSettings.config">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Umbraco.Configuration\Configurations\umbracoSettings.minimal.config">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Umbraco.Configuration\Configurations\web.config">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

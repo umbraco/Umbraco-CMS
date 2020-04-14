@@ -6,7 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Macros;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Configuration.UmbracoSettings
+namespace Umbraco.Tests.Integration.Umbraco.Configuration.UmbracoSettings
 {
     [TestFixture]
     public class ContentElementTests : UmbracoSettingsTests
