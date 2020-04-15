@@ -42,6 +42,13 @@ namespace Umbraco.Core.Models
             Name = _alias;
         }
 
+        [Obsolete("This constructor is incomplete, use one of the other constructors instead")]
+        public RelationType(Guid childObjectType, Guid parentObjectType, string alias, string name)
+            : this(childObjectType, parentObjectType, alias)
+        {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
+            Name = name;
+        }
 
         /// <summary>
         /// Gets or sets the Name of the RelationType
