@@ -56,11 +56,8 @@ function MainController($scope, $location, appState, treeService, notificationsS
         appState.setSearchState("show", false);
     };
 
-    $scope.showLoginScreen = function(isTimedOut, noAccess) {
-        console.log('SHOW ME THE LOGIN SCREEN', isTimedOut, noAccess);
-
+    $scope.showLoginScreen = function(isTimedOut) {
         $scope.login.isTimedOut = isTimedOut;
-        $scope.login.noAccess = noAccess;
         $scope.login.show = true;
     };
 
@@ -75,9 +72,8 @@ function MainController($scope, $location, appState, treeService, notificationsS
         $scope.authenticated = null;
         $scope.user = null;
         const isTimedOut = data && data.isTimedOut ? true : false;
-        const noAccess = data && data.noAccess ? true : false;
 
-        $scope.showLoginScreen(isTimedOut, noAccess);
+        $scope.showLoginScreen(isTimedOut);
 
         // Remove the localstorage items for tours shown
         // Means that when next logged in they can be re-shown if not already dismissed etc
