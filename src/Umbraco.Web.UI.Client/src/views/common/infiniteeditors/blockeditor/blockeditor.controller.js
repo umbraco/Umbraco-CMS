@@ -32,16 +32,20 @@ angular.module("umbraco")
         }
 
         if (vm.settings && vm.settings.variants) {
-            var settingsTab = {
-                "name": "Settings",
-                "alias": "settings",
-                "icon": "icon-settings",
-                "view": "views/common/infiniteeditors/elementeditor/elementeditor.settings.html"
-            };
-            vm.tabs.push(settingsTab);
+            localizationService.localize("blockEditor_tabBlockSettings").then(
+                function (settingsName) {
+                    var settingsTab = {
+                        "name": settingsName,
+                        "alias": "settings",
+                        "icon": "icon-settings",
+                        "view": "views/common/infiniteeditors/elementeditor/elementeditor.settings.html"
+                    };
+                    vm.tabs.push(settingsTab);
+                }
+            );
         }
 
-        // activate frst app:
+        // activate first app:
         if (vm.tabs.length > 0) {
             vm.tabs[0].active = true;
         }
