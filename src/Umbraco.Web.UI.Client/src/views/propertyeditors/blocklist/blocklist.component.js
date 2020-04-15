@@ -239,7 +239,7 @@
                 view: "views/common/infiniteeditors/blockpicker/blockpicker.html",
                 size: (amountOfAvailableTypes > 8 ? "medium" : "small"),
                 filter: (amountOfAvailableTypes > 8),
-                clickPasteItem: function(item) {
+                clickPasteItem: function(item, mouseEvent) {
                     if (item.type === "elementTypeArray") {
                         var indexIncrementor = 0;
                         item.pasteData.forEach(function (entry) {
@@ -250,16 +250,21 @@
                     } else {
                         requestPasteFromClipboard(createIndex, item.pasteData);
                     }
-                    blockPickerModel.close();
+                    if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
+                        blockPickerModel.close();
+                    }
                 },
-                submit: function(blockPickerModel) {
+                submit: function(blockPickerModel, mouseEvent) {
                     var added = false;
                     if (blockPickerModel && blockPickerModel.selectedItem) {
                         added = addNewBlock(createIndex, blockPickerModel.selectedItem.blockConfigModel.contentTypeAlias);
                     }
-                    blockPickerModel.close();
-                    if (added && vm.model.config.useInlineEditingAsDefault !== true && vm.blocks.length > createIndex) {
-                        editBlock(vm.blocks[createIndex]);
+                    
+                    if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
+                        blockPickerModel.close();
+                        if (added && vm.model.config.useInlineEditingAsDefault !== true && vm.blocks.length > createIndex) {
+                            editBlock(vm.blocks[createIndex]);
+                        }
                     }
                 },
                 close: function() {

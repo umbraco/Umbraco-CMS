@@ -33,7 +33,7 @@
                         ng-repeat="block in vm.model.availableItems | filter:searchTerm"
                         block-config-model="block.blockConfigModel"
                         element-type-model="block.elementTypeModel"
-                        ng-click="vm.selectItem(block)">
+                        ng-click="vm.selectItem(block, $event)">
                     </umb-block-card>
                 </div>
             </div>
@@ -55,7 +55,7 @@
                         block-config-model="block.blockConfigModel"
                         element-type-model="block.elementTypeModel"
                         ng-repeat="block in vm.model.clipboardItems"
-                        ng-click="vm.model.clickPasteItem(block)">
+                        ng-click="vm.model.clickPasteItem(block, $event)">
                     </umb-block-card>
                 </div>
             </div>
