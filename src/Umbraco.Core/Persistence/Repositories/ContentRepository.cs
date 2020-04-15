@@ -862,21 +862,21 @@ order by (umbracoNode.{2}), (umbracoNode.parentID), (umbracoNode.sortOrder)",
 
             XmlElement last = null;
 
-            long pageSize = 500;
+            const long pageSize = 500;
             int? itemCount = null;
-            long currPage = 0;
+            long pageIndex = 0;
             do
             {
 
                 // Get the paged queries
-                Database.BuildPageQueries<dynamic>(currPage, pageSize, sql, ref args, out var sqlCount, out var sqlPage);
+                Database.BuildPageQueries<dynamic>(pageIndex * pageSize, pageSize, sql, ref args, out var sqlCount, out var sqlPage);
 
                 // get the item count once
                 if (itemCount == null)
                 {
                     itemCount = Database.ExecuteScalar<int>(sqlCount, args);
                 }
-                currPage++;
+                pageIndex++;
 
                 // iterate over rows without allocating all items to memory (Query vs Fetch)
                 foreach (var row in Database.Query<dynamic>(sqlPage, args))
@@ -906,7 +906,7 @@ order by (umbracoNode.{2}), (umbracoNode.parentID), (umbracoNode.sortOrder)",
                     last.Attributes["sortOrder"].Value = sortOrder.ToInvariantString();
                 }
 
-            } while (itemCount == pageSize);
+            } while ((pageIndex * pageSize) < itemCount);
             
             return xmlDoc;
 
