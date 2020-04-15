@@ -5,11 +5,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Configuration.UmbracoSettings
     [TestFixture]
     public class WebRoutingElementDefaultTests : WebRoutingElementTests
     {
-
-        protected override bool TestingDefaults
-        {
-            get { return true; }
-        }
+        protected override bool TestingDefaults => true;
 
         [Test]
         public override void UrlProviderMode()
