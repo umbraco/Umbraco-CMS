@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
@@ -17,8 +18,6 @@ namespace Umbraco.Core.Models
         private Guid? _parentObjectType;
         private Guid? _childObjectType;
 
-        //TODO: Should we put back the broken ctors with obsolete attributes?
-
         public RelationType(string alias, string name)
             : this(name, alias, false, null, null)
         {
@@ -33,6 +32,15 @@ namespace Umbraco.Core.Models
             _childObjectType = childObjectType;
         }
 
+        [Obsolete("This constructor is incomplete, use one of the other constructors instead")]
+        public RelationType(Guid childObjectType, Guid parentObjectType, string alias)
+        {
+            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentNullOrEmptyException(nameof(alias));
+            _childObjectType = childObjectType;
+            _parentObjectType = parentObjectType;
+            _alias = alias;
+            Name = _alias;
+        }
 
 
         /// <summary>
