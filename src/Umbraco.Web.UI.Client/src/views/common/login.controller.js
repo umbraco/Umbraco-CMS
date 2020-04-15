@@ -17,13 +17,6 @@ angular.module('umbraco').controller("Umbraco.LoginController", function (events
         $location.url(path);
     });
 
-    eventsService.on("app.notAuthenticated", function(evt, data){
-        console.log('not authenticated event back', data);
-        if(data.noAccess){
-            alert('NO NO NO YOU HAVE NO START NODES');
-        }
-    });
-
     $scope.$on('$destroy', function () {
         eventsService.unsubscribe(evtOn);
     });

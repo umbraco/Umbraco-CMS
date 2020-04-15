@@ -18,8 +18,6 @@ function eventsService($q, $rootScope) {
         /** raise an event with a given name */
         emit: function (name, args) {
 
-            console.log(`Emitting event: ${name}`, args);
-
             //there are no listeners
             if (!$rootScope.$$listeners[name]) {
                 return;

@@ -23,6 +23,7 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
             if(user.startContentIds.length === 0 && user.startMediaIds.length === 0){
                 const args = { isTimedOut: true, noAccess: true };
                 eventsService.emit("app.notAuthenticated", args);
+                return;
             }
 
             assetsService._loadInitAssets().then(function () {
