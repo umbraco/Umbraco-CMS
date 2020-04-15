@@ -238,6 +238,7 @@
                 orderBy: "$index",
                 view: "views/common/infiniteeditors/blockpicker/blockpicker.html",
                 size: (amountOfAvailableTypes > 8 ? "medium" : "small"),
+                filter: (amountOfAvailableTypes > 8),
                 clickPasteItem: function(item) {
                     if (item.type === "elementTypeArray") {
                         var indexIncrementor = 0;
