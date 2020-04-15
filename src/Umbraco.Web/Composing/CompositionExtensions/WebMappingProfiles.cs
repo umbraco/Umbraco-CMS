@@ -29,7 +29,7 @@ namespace Umbraco.Web.Composing.CompositionExtensions
                 .Add<TemplateMapDefinition>()
                 .Add<UserMapDefinition>()
                 .Add<LanguageMapDefinition>()
-                .Add<IdentityMapDefinition>();;
+                .Add<IdentityMapDefinition>();
 
             composition.Register<CommonMapper>();
             composition.Register<CommonTreeNodeMapper>();

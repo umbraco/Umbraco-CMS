@@ -9,7 +9,7 @@ namespace Umbraco.Web.Services
     /// <summary>
     /// Implements <see cref="ITreeService"/>.
     /// </summary>
-    internal class TreeService : ITreeService
+    public class TreeService : ITreeService
     {
         private readonly TreeCollection _treeCollection;
 

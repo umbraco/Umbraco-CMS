@@ -3,7 +3,7 @@ using Umbraco.Core.Events;
 
 namespace Umbraco.Web
 {
-    internal class DefaultEventMessagesFactory : IEventMessagesFactory
+    public class DefaultEventMessagesFactory : IEventMessagesFactory
     {
         private readonly IEventMessagesAccessor _eventMessagesAccessor;
 
