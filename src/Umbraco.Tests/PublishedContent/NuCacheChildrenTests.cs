@@ -47,7 +47,7 @@ namespace Umbraco.Tests.PublishedContent
             _snapshotService?.Dispose();
         }
 
-        private void Init(IEnumerable<ContentNodeKit> kits)
+        private void Init(Func<IEnumerable<ContentNodeKit>> kits)
         {
             Current.Reset();
 
@@ -136,7 +136,7 @@ namespace Umbraco.Tests.PublishedContent
             _snapshotAccessor = new TestPublishedSnapshotAccessor();
 
             // create a data source for NuCache
-            _source = new TestDataSource(kits);
+            _source = new TestDataSource(kits());
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
@@ -374,7 +374,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void EmptyTest()
         {
-            Init(Enumerable.Empty<ContentNodeKit>());
+            Init(() => Enumerable.Empty<ContentNodeKit>());
 
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
             _snapshotAccessor.PublishedSnapshot = snapshot;
@@ -386,7 +386,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void ChildrenTest()
         {
-            Init(GetInvariantKits());
+            Init(GetInvariantKits);
 
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
             _snapshotAccessor.PublishedSnapshot = snapshot;
@@ -413,7 +413,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void ParentTest()
         {
-            Init(GetInvariantKits());
+            Init(GetInvariantKits);
 
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
             _snapshotAccessor.PublishedSnapshot = snapshot;
@@ -439,7 +439,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void MoveToRootTest()
         {
-            Init(GetInvariantKits());
+            Init(GetInvariantKits);
 
             // get snapshot
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
@@ -481,7 +481,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void MoveFromRootTest()
         {
-            Init(GetInvariantKits());
+            Init(GetInvariantKits);
 
             // get snapshot
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
@@ -523,7 +523,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void ReOrderTest()
         {
-            Init(GetInvariantKits());
+            Init(GetInvariantKits);
 
             // get snapshot
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
@@ -598,7 +598,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void MoveTest()
         {
-            Init(GetInvariantKits());
+            Init(GetInvariantKits);
 
             // get snapshot
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
@@ -700,10 +700,60 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
+        public void Clear_Branch_Locked()
+        {
+            // This test replicates an issue we saw here https://github.com/umbraco/Umbraco-CMS/pull/7907#issuecomment-610259393
+            // The data was sent to me and this replicates it's structure
+
+            var paths = new Dictionary<int, string> { { -1, "-1" } };
+
+            Init(() => new List<ContentNodeKit>
+            {
+                CreateInvariantKit(1, -1, 1, paths),    // first level
+                CreateInvariantKit(2, 1, 1, paths),     // second level
+                CreateInvariantKit(3, 2, 1, paths),     // third level
+
+                CreateInvariantKit(4, 3, 1, paths),     // fourth level (we'll copy this one to the same level)
+
+                CreateInvariantKit(5, 4, 1, paths),     // 6th level
+
+                CreateInvariantKit(6, 5, 2, paths),     // 7th level
+                CreateInvariantKit(7, 5, 3, paths),
+                CreateInvariantKit(8, 5, 4, paths),
+                CreateInvariantKit(9, 5, 5, paths),
+                CreateInvariantKit(10, 5, 6, paths)
+            });
+
+            // get snapshot
+            var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
+            _snapshotAccessor.PublishedSnapshot = snapshot;
+
+            var snapshotService = (PublishedSnapshotService)_snapshotService;
+            var contentStore = snapshotService.GetContentStore();
+            //This will set a flag to force creating a new Gen next time the store is locked (i.e. In Notify)
+            contentStore.CreateSnapshot();
+
+            // notify - which ensures there are 2 generations in the cache meaning each LinkedNode has a Next value.
+            _snapshotService.Notify(new[]
+            {
+                new ContentCacheRefresher.JsonPayload(4, Guid.Empty, TreeChangeTypes.RefreshBranch)
+            }, out _, out _);
+
+            // refresh the branch again, this used to show the issue where a null ref exception would occur
+            // because in the ClearBranchLocked logic, when SetValueLocked was called within a recursive call
+            // to a child, we null out the .Value of the LinkedNode within the while loop because we didn't capture
+            // this value before recursing.
+            Assert.DoesNotThrow(() =>
+                _snapshotService.Notify(new[]
+                {
+                    new ContentCacheRefresher.JsonPayload(4, Guid.Empty, TreeChangeTypes.RefreshBranch)
+                }, out _, out _));
+        }
+
+        [Test]
         public void NestedVariationChildrenTest()
         {
-            var mixedKits = GetNestedVariantKits();
-            Init(mixedKits);
+            Init(GetNestedVariantKits);
 
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
             _snapshotAccessor.PublishedSnapshot = snapshot;
@@ -792,7 +842,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void VariantChildrenTest()
         {
-            Init(GetVariantKits());
+            Init(GetVariantKits);
 
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
             _snapshotAccessor.PublishedSnapshot = snapshot;
@@ -864,7 +914,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void RemoveTest()
         {
-            Init(GetInvariantKits());
+            Init(GetInvariantKits);
 
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
             _snapshotAccessor.PublishedSnapshot = snapshot;
@@ -913,7 +963,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void UpdateTest()
         {
-            Init(GetInvariantKits());
+            Init(GetInvariantKits);
 
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
             _snapshotAccessor.PublishedSnapshot = snapshot;
@@ -960,13 +1010,13 @@ namespace Umbraco.Tests.PublishedContent
             documents = snapshot.Content.GetById(2).Children().ToArray();
             AssertDocuments(documents, "N9", "N8", "N7");
 
-            
+
         }
 
         [Test]
         public void AtRootTest()
         {
-            Init(GetVariantWithDraftKits());
+            Init(GetVariantWithDraftKits);
 
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
             _snapshotAccessor.PublishedSnapshot = snapshot;
@@ -995,7 +1045,7 @@ namespace Umbraco.Tests.PublishedContent
                 yield return CreateInvariantKit(2, 1, 1, paths);
             }
 
-            Init(GetKits());
+            Init(GetKits);
 
             var snapshotService = (PublishedSnapshotService)_snapshotService;
             var contentStore = snapshotService.GetContentStore();
@@ -1034,7 +1084,7 @@ namespace Umbraco.Tests.PublishedContent
                 yield return CreateInvariantKit(4, 1, 3, paths);
             }
 
-            Init(GetKits());
+            Init(GetKits);
 
             var snapshotService = (PublishedSnapshotService)_snapshotService;
             var contentStore = snapshotService.GetContentStore();
@@ -1114,7 +1164,7 @@ namespace Umbraco.Tests.PublishedContent
                 yield return CreateInvariantKit(40, 1, 3, paths);
             }
 
-            Init(GetKits());
+            Init(GetKits);
 
             var snapshotService = (PublishedSnapshotService)_snapshotService;
             var contentStore = snapshotService.GetContentStore();
@@ -1133,7 +1183,7 @@ namespace Umbraco.Tests.PublishedContent
 
             _snapshotService.Notify(new[]
             {
-                new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshNode) 
+                new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshNode)
             }, out _, out _);
 
             Assert.AreEqual(2, contentStore.Test.LiveGen);
@@ -1181,12 +1231,12 @@ namespace Umbraco.Tests.PublishedContent
 
                 //children of 1
                 yield return CreateInvariantKit(20, 1, 1, paths);
-                yield return CreateInvariantKit(30, 1, 2, paths); 
+                yield return CreateInvariantKit(30, 1, 2, paths);
                 yield return CreateInvariantKit(40, 1, 3, paths);
             }
 
             //init with all published
-            Init(GetKits());
+            Init(GetKits);
 
             var snapshotService = (PublishedSnapshotService)_snapshotService;
             var contentStore = snapshotService.GetContentStore();
@@ -1203,7 +1253,7 @@ namespace Umbraco.Tests.PublishedContent
                 //Change the root publish flag
                 var kit = rootKit.Clone();
                 kit.DraftData = published ? null : kit.PublishedData;
-                kit.PublishedData = published? kit.PublishedData : null;
+                kit.PublishedData = published ? kit.PublishedData : null;
                 _source.Kits[1] = kit;
 
                 _snapshotService.Notify(new[]
@@ -1218,12 +1268,12 @@ namespace Umbraco.Tests.PublishedContent
                 var (gen, contentNode) = contentStore.Test.GetValues(1)[0];
                 Assert.AreEqual(assertGen, gen);
                 //even when unpublishing/re-publishing/etc... the linked list is always maintained
-                AssertLinkedNode(contentNode, 100, 2, 3, 20, 40); 
+                AssertLinkedNode(contentNode, 100, 2, 3, 20, 40);
             }
 
             //unpublish the root
             ChangePublishFlagOfRoot(false, 2, TreeChangeTypes.RefreshBranch);
-            
+
             //publish the root (since it's not published, it will cause a RefreshBranch)
             ChangePublishFlagOfRoot(true, 3, TreeChangeTypes.RefreshBranch);
 
@@ -1256,7 +1306,7 @@ namespace Umbraco.Tests.PublishedContent
                 yield return CreateInvariantKit(4, 1, 3, paths);
             }
 
-            Init(GetKits());
+            Init(GetKits);
 
             var snapshotService = (PublishedSnapshotService)_snapshotService;
             var contentStore = snapshotService.GetContentStore();
@@ -1312,6 +1362,17 @@ namespace Umbraco.Tests.PublishedContent
             AssertLinkedNode(child3.contentNode, 1, 3, -1, -1, -1);
         }
 
+        [Test]
+        public void MultipleCacheIteration()
+        {
+            //see https://github.com/umbraco/Umbraco-CMS/issues/7798
+            Init(GetInvariantKits);
+            var snapshot = this._snapshotService.CreatePublishedSnapshot(previewToken: null);
+            _snapshotAccessor.PublishedSnapshot = snapshot;
+
+            var items = snapshot.Content.GetByXPath("/root/itype");
+            Assert.AreEqual(items.Count(), items.Count());
+        }
         private void AssertLinkedNode(ContentNode node, int parent, int prevSibling, int nextSibling, int firstChild, int lastChild)
         {
             Assert.AreEqual(parent, node.ParentContentId);
