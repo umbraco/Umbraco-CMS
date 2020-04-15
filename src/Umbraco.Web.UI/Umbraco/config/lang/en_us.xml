@@ -2433,5 +2433,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Configuration of '%0%']]></key>
     <key alias="thumbnail">Thumbnail</key>
     <key alias="addThumbnail">Add thumbnail</key>
+    <key alias="tabCreateEmpty">Create empty</key>
+    <key alias="tabClipboard">Clipboard</key>
   </area>
 </language>

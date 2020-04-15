@@ -1,26 +1,35 @@
 //used for the media picker dialog
 angular.module("umbraco")
 .controller("Umbraco.Editors.BlockPickerController",
-    function ($scope) {
+    function ($scope, localizationService) {
         var vm = this;
 
-        vm.navigation = [
-            {
-                "alias": "empty",
-                "name": "Create empty",
-                "icon": "icon-add",
-                "active": true,
-                "view": ""
-            },
-            {
-                "alias": "clipboard",
-                "name": "Clipboard",
-                "icon": "icon-paste-in",
-                "view": ""
-            }
-        ];
 
-        vm.activeTab = vm.navigation[0];
+        vm.navigation = [];
+
+
+        localizationService.localizeMany(["blockEditor_tabCreateEmpty", "blockEditor_tabClipboard"]).then(
+            function (data) {
+
+                vm.navigation = [{
+                    "alias": "empty",
+                    "name": data[0],
+                    "icon": "icon-add",
+                    "active": true,
+                    "view": ""
+                },
+                {
+                    "alias": "clipboard",
+                    "name": data[1],
+                    "icon": "icon-paste-in",
+                    "view": ""
+                }];
+
+                vm.activeTab = vm.navigation[0];
+            }
+        );
+
+        
         vm.onNavigationChanged = function(tab) {
             vm.activeTab.active = false;
             vm.activeTab = tab;
