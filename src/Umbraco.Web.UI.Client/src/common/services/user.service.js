@@ -190,14 +190,14 @@ angular.module('umbraco.services')
                         // Check if user has a start node set.
                         if(data.startContentIds.length === 0 && data.startMediaIds.length === 0){
                             var errorMsg = "User has no start-nodes";
-                            var result = { errorMsg: errorMsg, user: data, authenticated: false, lastUserId: lastUserId, loginType: "credentials" };;
+                            var result = { errorMsg: errorMsg, user: data, authenticated: false, lastUserId: lastUserId, loginType: "credentials" };
                             eventsService.emit("app.notAuthenticated", result);
                             throw result;
                         }
                         
-                        return this.setAuthenticationSuccessful(data);
+                        return data;
                         
-                    });
+                    }).then(this.setAuthenticationSuccessful);
             },
             setAuthenticationSuccessful: function (data) {
 
