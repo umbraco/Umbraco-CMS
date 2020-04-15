@@ -4,13 +4,16 @@
     {
         public static class SqlTemplates
         {
-            public const string VersionableRepositoryGetVersionIds = "Umbraco.Core.VersionableRepository.GetVersionIds";
-            public const string VersionableRepositoryGetVersion = "Umbraco.Core.VersionableRepository.GetVersion";
-            public const string VersionableRepositoryGetVersions = "Umbraco.Core.VersionableRepository.GetVersions";
-            public const string VersionableRepositoryEnsureUniqueNodeName = "Umbraco.Core.VersionableRepository.EnsureUniqueNodeName";
-            public const string VersionableRepositoryGetSortOrder = "Umbraco.Core.VersionableRepository.GetSortOrder";
-            public const string VersionableRepositoryGetParentNode = "Umbraco.Core.VersionableRepository.GetParentNode";
-            public const string VersionableRepositoryGetReservedId = "Umbraco.Core.VersionableRepository.GetReservedId";
+            public static class VersionableRepository
+            {
+                public const string GetVersionIds = "Umbraco.Core.VersionableRepository.GetVersionIds";
+                public const string GetVersion = "Umbraco.Core.VersionableRepository.GetVersion";
+                public const string GetVersions = "Umbraco.Core.VersionableRepository.GetVersions";
+                public const string EnsureUniqueNodeName = "Umbraco.Core.VersionableRepository.EnsureUniqueNodeName";
+                public const string GetSortOrder = "Umbraco.Core.VersionableRepository.GetSortOrder";
+                public const string GetParentNode = "Umbraco.Core.VersionableRepository.GetParentNode";
+                public const string GetReservedId = "Umbraco.Core.VersionableRepository.GetReservedId";
+            }
 
         }
     }
