@@ -91,7 +91,7 @@
                 // We are just using the contentModel, since its a key/value object that is live synced. (if we need to add additional vars, we could make a shallow copy and apply those.)
                 return blockModel.labelInterpolator(blockModel.contentModel);
             }
-            return blockModel.contentTypeName;
+            return blockModel.content.contentTypeName;
         }
 
 
@@ -286,7 +286,7 @@
                 if (blockModel.config.label) {
                     blockModel.labelInterpolator = $interpolate(blockModel.config.label);
                 }
-                
+
                 var contentScaffold = this.getScaffoldFor(blockConfiguration.contentTypeAlias);
                 if(contentScaffold === null) {
                     return null;
