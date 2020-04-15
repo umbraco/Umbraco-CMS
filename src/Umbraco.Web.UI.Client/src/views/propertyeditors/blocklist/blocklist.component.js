@@ -241,20 +241,19 @@
                 clickPasteItem: function(item) {
                     if (item.type === "elementTypeArray") {
                         var indexIncrementor = 0;
-                        item.data.forEach(function (entry) {
+                        item.pasteData.forEach(function (entry) {
                             if (requestPasteFromClipboard(createIndex + indexIncrementor, entry)) {
                                 indexIncrementor++;
                             }
                         });
                     } else {
-                        requestPasteFromClipboard(createIndex, item.data);
+                        requestPasteFromClipboard(createIndex, item.pasteData);
                     }
                     blockPickerModel.close();
                 },
                 submit: function(blockPickerModel) {
                     var added = false;
                     if (blockPickerModel && blockPickerModel.selectedItem) {
-                        console.log(blockPickerModel.selectedItem)
                         added = addNewBlock(createIndex, blockPickerModel.selectedItem.blockConfigModel.contentTypeAlias);
                     }
                     blockPickerModel.close();
@@ -267,35 +266,43 @@
                 }
             };
 
-            blockPickerModel.pasteItems = [];
+            blockPickerModel.clickClearClipboard = function ($event) {
+                clipboardService.clearEntriesOfType("elementType", vm.availableContentTypes);
+                clipboardService.clearEntriesOfType("elementTypeArray", vm.availableContentTypes);
+            };
+
+            blockPickerModel.clipboardItems = [];
 
             var singleEntriesForPaste = clipboardService.retriveEntriesOfType("elementType", vm.availableContentTypes);
             singleEntriesForPaste.forEach(function (entry) {
-                blockPickerModel.pasteItems.push({
-                    type: "elementType",
-                    name: entry.label,
-                    data: entry.data,
-                    icon: entry.icon
-                });
+                console.log("paste Entry: ", entry)
+                blockPickerModel.clipboardItems.push(
+                    {
+                        type: "elementType",
+                        pasteData: entry.data,
+                        blockConfigModel: modelObject.getScaffoldFor(entry.alias),
+                        elementTypeModel: {
+                            name: entry.label,
+                            icon: entry.icon
+                        }
+                    }
+                );
             });
             
             var arrayEntriesForPaste = clipboardService.retriveEntriesOfType("elementTypeArray", vm.availableContentTypes);
             arrayEntriesForPaste.forEach(function (entry) {
-                blockPickerModel.pasteItems.push({
-                    type: "elementTypeArray",
-                    name: entry.label,
-                    data: entry.data,
-                    icon: entry.icon
-                });
+                blockPickerModel.clipboardItems.push(
+                    {
+                        type: "elementTypeArray",
+                        pasteData: entry.data,
+                        blockConfigModel: {}, // no block configuration for paste items of elementTypeArray.
+                        elementTypeModel: {
+                            name: entry.label,
+                            icon: entry.icon
+                        }
+                    }
+                );
             });
-
-            blockPickerModel.clickClearPaste = function ($event) {
-                $event.stopPropagation();
-                $event.preventDefault();
-                clipboardService.clearEntriesOfType("elementType", vm.availableContentTypes);
-                clipboardService.clearEntriesOfType("elementTypeArray", vm.availableContentTypes);
-                vm.blockTypePicker.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
-            };
 
             // open block picker overlay
             editorService.open(blockPickerModel);
