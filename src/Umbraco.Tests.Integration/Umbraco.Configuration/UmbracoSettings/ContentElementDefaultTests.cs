@@ -51,16 +51,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Configuration.UmbracoSettings
         [TestCase("config", false)]
         public override void IsFileAllowedForUpload_WithWhitelist(string extension, bool expected)
         {
-            TestContext.WriteLine("Extension being tested: {0}", extension);
-            TestContext.WriteLine("Expected IsAllowed?: {0}", expected);
-            TestContext.WriteLine("AllowedUploadFiles: {0}", ContentSettings.AllowedUploadFiles);
-            TestContext.WriteLine("DisallowedUploadFiles: {0}", ContentSettings.DisallowedUploadFiles);
+            Console.WriteLine("Extension being tested: {0}", extension);
+            Console.WriteLine("Expected IsAllowed?: {0}", expected);
+            Console.WriteLine("AllowedUploadFiles: {0}", ContentSettings.AllowedUploadFiles);
+            Console.WriteLine("DisallowedUploadFiles: {0}", ContentSettings.DisallowedUploadFiles);
 
             bool allowedContainsExtension = ContentSettings.AllowedUploadFiles.Any(x => x.InvariantEquals(extension));
             bool disallowedContainsExtension = ContentSettings.DisallowedUploadFiles.Any(x => x.InvariantEquals(extension));
 
-            TestContext.WriteLine("AllowedContainsExtension: {0}", allowedContainsExtension);
-            TestContext.WriteLine("DisallowedContainsExtension: {0}", disallowedContainsExtension);
+            Console.WriteLine("AllowedContainsExtension: {0}", allowedContainsExtension);
+            Console.WriteLine("DisallowedContainsExtension: {0}", disallowedContainsExtension);
 
             Assert.AreEqual(expected, ContentSettings.IsFileAllowedForUpload(extension));
         }
