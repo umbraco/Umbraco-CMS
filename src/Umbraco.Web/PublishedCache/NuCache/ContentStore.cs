@@ -873,8 +873,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var id = content.FirstChildContentId;
             while (id > 0)
             {
+                // get the required link node, this ensures that both `link` and `link.Value` are not null
                 var link = GetRequiredLinkedNode(id, "child", null);
-                ClearBranchLocked(link.Value);
+                ClearBranchLocked(link.Value); // recurse
                 id = link.Value.NextSiblingContentId;
             }
         }
