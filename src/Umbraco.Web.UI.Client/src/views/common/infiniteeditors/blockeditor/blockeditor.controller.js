@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
 .controller("Umbraco.Editors.BlockEditorController",
-    function ($scope) {
+    function ($scope, localizationService) {
         var vm = this;
 
         vm.content = $scope.model.content;
