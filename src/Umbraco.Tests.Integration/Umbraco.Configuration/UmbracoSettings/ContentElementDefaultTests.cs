@@ -49,6 +49,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Configuration.UmbracoSettings
         [TestCase("php", true)]
         [TestCase("ashx", false)]
         [TestCase("config", false)]
+        [TestCase("test", true)]
         public override void IsFileAllowedForUpload_WithWhitelist(string extension, bool expected)
         {
             Console.WriteLine("Extension being tested: {0}", extension);
