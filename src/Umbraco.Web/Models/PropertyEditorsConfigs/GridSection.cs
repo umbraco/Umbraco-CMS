@@ -6,6 +6,6 @@ namespace Umbraco.Web.Models.PropertyEditorsConfigs
     {
         public int Grid { set; get; }
         public bool AllowAll { get; set; }
-        public List<string> Allowed { get; set; }
+        public IList<string> Allowed { get; set; }
     }
 }
