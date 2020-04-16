@@ -93,7 +93,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
         [Test]
         public void Ensure_Path_Entity_Valid_Recursive_Parent()
         {
-            // Not using the shared class-level builder as we need to reset after each usage when creating multiple entities.
+            // Re-creating the class-level builder as we need to reset before usage when creating multiple entities.
             _builder = new EntitySlimBuilder();
             var parentA = _builder
                 .WithId(999)
