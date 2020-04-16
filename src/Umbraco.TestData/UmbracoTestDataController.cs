@@ -33,8 +33,8 @@ namespace Umbraco.TestData
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IShortStringHelper _shortStringHelper;
 
-        public UmbracoTestDataController(IScopeProvider scopeProvider, PropertyEditorCollection propertyEditors, IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper)
-            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger, umbracoHelper)
+        public UmbracoTestDataController(IScopeProvider scopeProvider, PropertyEditorCollection propertyEditors, IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, IShortStringHelper shortStringHelper)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger)
         {
             _scopeProvider = scopeProvider;
             _propertyEditors = propertyEditors;
@@ -223,7 +223,7 @@ namespace Umbraco.TestData
             {
                 var content = Services.ContentService.Create(faker.Commerce.ProductName(), currParent, docType.Alias);
                 content.SetValue("review", faker.Rant.Review());
-                content.SetValue("desc", string.Join(", ", Enumerable.Range(0, 5).Select(x => faker.Commerce.ProductAdjective()))); ;
+                content.SetValue("desc", string.Join(", ", Enumerable.Range(0, 5).Select(x => faker.Commerce.ProductAdjective())));
                 content.SetValue("media", imageIds[random.Next(0, imageIds.Count - 1)]);
 
                 Services.ContentService.Save(content);

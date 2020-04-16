@@ -3,8 +3,8 @@ using NUnit.Framework.Internal;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Testing.Objects
             IHttpContextAccessor httpContextAccessor = null,
             IPublishedUrlProvider publishedUrlProvider = null)
         {
-            if (globalSettings == null) globalSettings = SettingsForTests.GenerateMockGlobalSettings();
+            if (globalSettings == null) globalSettings = TestHelpers.SettingsForTests.GenerateMockGlobalSettings();
             if (umbracoContextAccessor == null) umbracoContextAccessor = new TestUmbracoContextAccessor();
             if (httpContextAccessor == null) httpContextAccessor = TestHelper.GetHttpContextAccessor();
             if (publishedUrlProvider == null) publishedUrlProvider = TestHelper.GetPublishedUrlProvider();
@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Testing.Objects
                 new TestDefaultCultureAccessor(),
                 globalSettings,
                 Mock.Of<IUserService>(),
-                TestHelper.IOHelper,
+                TestHelper.GetHostingEnvironment(),
                 TestHelper.UriUtility,
                 httpContextAccessor,
                 new AspNetCookieManager(httpContextAccessor));

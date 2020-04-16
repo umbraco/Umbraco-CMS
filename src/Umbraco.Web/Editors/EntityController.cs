@@ -53,6 +53,7 @@ namespace Umbraco.Web.Editors
         private readonly ITreeService _treeService;
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly SearchableTreeCollection _searchableTreeCollection;
+        private readonly IPublishedContentQuery _publishedContentQuery;
 
         public EntityController(
             IGlobalSettings globalSettings,
@@ -63,17 +64,18 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             ITreeService treeService,
-            UmbracoHelper umbracoHelper,
             SearchableTreeCollection searchableTreeCollection,
             UmbracoTreeSearcher treeSearcher,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
+            IPublishedUrlProvider publishedUrlProvider,
+            IPublishedContentQuery publishedContentQuery)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _treeService = treeService;
             _searchableTreeCollection = searchableTreeCollection;
             _treeSearcher = treeSearcher;
+            _publishedContentQuery = publishedContentQuery;
         }
 
         /// <summary>
@@ -189,7 +191,7 @@ namespace Umbraco.Web.Editors
         {
             var foundContent = GetResultForId(id, type);
 
-            return foundContent.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
+            return foundContent.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
         }
 
         /// <summary>
@@ -233,7 +235,7 @@ namespace Umbraco.Web.Editors
             if (!intId.Success)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             UmbracoEntityTypes entityType;
-            switch(udi.EntityType)
+            switch (udi.EntityType)
             {
                 case Constants.UdiEntityType.Document:
                     entityType = UmbracoEntityTypes.Document;
@@ -283,7 +285,8 @@ namespace Umbraco.Web.Editors
             var ancestors = GetResultForAncestors(id, type);
 
             //if content, skip the first node for replicating NiceUrl defaults
-            if(type == UmbracoEntityTypes.Document) {
+            if (type == UmbracoEntityTypes.Document)
+            {
                 ancestors = ancestors.Skip(1);
             }
 
@@ -313,7 +316,7 @@ namespace Umbraco.Web.Editors
 
 
             var q = ParseXPathQuery(query, nodeContextId);
-            var node = Umbraco.ContentSingleAtXPath(q);
+            var node = _publishedContentQuery.ContentSingleAtXPath(q);
 
             if (node == null)
                 return null;
@@ -332,7 +335,7 @@ namespace Umbraco.Web.Editors
                     var ent = Services.EntityService.Get(nodeid);
                     return ent.Path.Split(',').Reverse();
                 },
-                publishedContentExists: i => Umbraco.Content(i) != null);
+                publishedContentExists: i => _publishedContentQuery.Content(i) != null);
         }
 
         [HttpGet]
@@ -690,7 +693,7 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Media:
                     return Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
                 default:
-                    return  Array.Empty<int>();
+                    return Array.Empty<int>();
             }
         }
 
@@ -784,7 +787,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private IEnumerable<SearchResultEntity> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null, bool ignoreUserStartNodes = false)
         {
-            return _treeSearcher.ExamineSearch(query, entityType, 200, 0, out _, searchFrom, ignoreUserStartNodes);
+            var culture = ClientCulture();
+            return _treeSearcher.ExamineSearch(query, entityType, 200, 0, out _, culture, searchFrom, ignoreUserStartNodes);
         }
 
         private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)
@@ -1108,7 +1112,7 @@ namespace Umbraco.Web.Editors
 
                 case UmbracoEntityTypes.Language:
 
-                    if (!postFilter.IsNullOrWhiteSpace() )
+                    if (!postFilter.IsNullOrWhiteSpace())
                         throw new NotSupportedException("Filtering on languages is not currently supported");
 
                     return Services.LocalizationService.GetAllLanguages().Select(MapEntities());

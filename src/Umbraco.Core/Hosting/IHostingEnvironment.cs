@@ -9,25 +9,38 @@ namespace Umbraco.Core.Hosting
         string ApplicationPhysicalPath { get; }
 
         string LocalTempPath { get; }
+
+        /// <summary>
+        /// The web application's hosted path
+        /// </summary>
+        /// <remarks>
+        /// In most cases this will return "/" but if the site is hosted in a virtual directory then this will return the virtual directory's path such as "/mysite".
+        /// This value must begin with a "/" and cannot end with "/".
+        /// </remarks>
         string ApplicationVirtualPath { get; }
 
-        int CurrentDomainId { get; }
-
         bool IsDebugMode { get; }
+
         /// <summary>
         /// Gets a value indicating whether Umbraco is hosted.
         /// </summary>
         bool IsHosted { get; }
+
         Version IISVersion { get; }
         string MapPath(string path);
-        string ToAbsolute(string virtualPath, string root);
 
         /// <summary>
-        /// Terminates the current application. The application restarts the next time a request is received for it.
+        /// Maps a virtual path to the application's web root
         /// </summary>
-        void LazyRestartApplication();
-
-        void RegisterObject(IRegisteredObject registeredObject);
-        void UnregisterObject(IRegisteredObject registeredObject);
+        /// <param name="virtualPath">The virtual path. Must start with either ~/ or / else an exception is thrown.</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This maps the virtual path syntax to the web root. For example when hosting in a virtual directory called "site" and the value "~/pages/test" is passed in, it will
+        /// map to "/site/pages/test" where "/site" is the value of <see cref="ApplicationVirtualPath"/>.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// If virtualPath does not start with ~/ or /
+        /// </exception>
+        string ToAbsolute(string virtualPath);
     }
 }

@@ -41,8 +41,8 @@ namespace Umbraco.Tests.Scoping
             composition.RegisterUnique(factory => new FileSystems(factory, factory.TryGetInstance<ILogger>(), TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings()));
             composition.WithCollectionBuilder<MapperCollectionBuilder>();
 
-            composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
-            composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+            composition.Configs.Add(() => SettingsForTests.DefaultGlobalSettings);
+            composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
 
             Current.Reset();
             Current.Factory = composition.CreateFactory();

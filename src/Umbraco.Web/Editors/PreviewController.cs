@@ -1,22 +1,20 @@
 ﻿using System;
-using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Cookie;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Services;
+using Umbraco.Core.WebAssets;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
-using Umbraco.Web.JavaScript;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Trees;
+using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
@@ -30,12 +28,14 @@ namespace Umbraco.Web.Editors
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizationService _localizationService;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
-        private readonly IIOHelper _ioHelper;
+        private readonly IContentSettings _contentSettings;
         private readonly TreeCollection _treeCollection;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
+        private readonly IRuntimeSettings _runtimeSettings;
+        private readonly ISecuritySettings _securitySettings;
+        private readonly IRuntimeMinifier _runtimeMinifier;
 
         public PreviewController(
             UmbracoFeatures features,
@@ -44,12 +44,14 @@ namespace Umbraco.Web.Editors
             IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizationService localizationService,
             IUmbracoVersion umbracoVersion,
-            IUmbracoSettingsSection umbracoSettingsSection,
-            IIOHelper ioHelper,
+            IContentSettings contentSettings,
             TreeCollection treeCollection,
             IHttpContextAccessor httpContextAccessor,
             IHostingEnvironment hostingEnvironment,
-            ICookieManager cookieManager)
+            ICookieManager cookieManager,
+            IRuntimeSettings settings,
+            ISecuritySettings securitySettings,
+            IRuntimeMinifier runtimeMinifier)
         {
             _features = features;
             _globalSettings = globalSettings;
@@ -57,12 +59,14 @@ namespace Umbraco.Web.Editors
             _umbracoContextAccessor = umbracoContextAccessor;
             _localizationService = localizationService;
             _umbracoVersion = umbracoVersion;
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
-            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _treeCollection = treeCollection;
             _httpContextAccessor = httpContextAccessor;
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
+            _runtimeSettings = settings;
+            _securitySettings = securitySettings;
+            _runtimeMinifier = runtimeMinifier;
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
@@ -71,7 +75,7 @@ namespace Umbraco.Web.Editors
         {
             var availableLanguages = _localizationService.GetAllLanguages();
 
-            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _umbracoSettingsSection, _ioHelper, _treeCollection, _httpContextAccessor, _hostingEnvironment);
+            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _contentSettings, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {
@@ -82,7 +86,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            return View(_globalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
+            return View(_globalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
         }
 
         /// <summary>
@@ -91,10 +95,10 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [MinifyJavaScriptResult(Order = 0)]
         [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
-        public JavaScriptResult Application()
+        public async Task<JavaScriptResult> Application()
         {
-            var files = JsInitialization.OptimizeScriptFiles(HttpContext, JsInitialization.GetPreviewInitialization());
-            var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco.preview", _globalSettings, _ioHelper);
+            var files = await _runtimeMinifier.GetAssetPathsAsync(BackOfficeWebAssets.UmbracoPreviewJsBundleName);
+            var result = BackOfficeJavaScriptInitializer.GetJavascriptInitialization(files, "umbraco.preview", _globalSettings, _hostingEnvironment);
 
             return JavaScript(result);
         }

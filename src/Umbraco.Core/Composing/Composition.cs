@@ -31,15 +31,16 @@ namespace Umbraco.Core.Composing
         /// <param name="runtimeState">The runtime state.</param>
         /// <param name="configs">Optional configs.</param>
         /// <param name="ioHelper">An IOHelper</param>
+        /// <param name="appCaches"></param>
         public Composition(IRegister register,  TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState, Configs configs, IIOHelper ioHelper, AppCaches appCaches)
         {
-            _register = register;
-            TypeLoader = typeLoader;
-            Logger = logger;
-            RuntimeState = runtimeState;
-            Configs = configs;
-            IOHelper = ioHelper;
-            AppCaches = appCaches;
+            _register = register ?? throw new ArgumentNullException(nameof(register));
+            TypeLoader = typeLoader ?? throw new ArgumentNullException(nameof(typeLoader));
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            RuntimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
+            Configs = configs ?? throw new ArgumentNullException(nameof(configs));
+            IOHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            AppCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
         }
 
         #region Services
@@ -135,7 +136,7 @@ namespace Umbraco.Core.Composing
 
             IFactory factory = null;
 
-            Configs.RegisterWith(_register, () => factory);
+            Configs.RegisterWith(_register);
 
             // ReSharper disable once AccessToModifiedClosure -- on purpose
             _register.Register(_ => factory, Lifetime.Singleton);

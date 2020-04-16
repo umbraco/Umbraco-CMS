@@ -25,6 +25,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Security.Providers;
 using Umbraco.Tests.Strings;
+using Umbraco.Tests.Common;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting
 {
@@ -142,8 +143,8 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 publishedSnapshotService.Object,
                 webSecurity.Object,
                 globalSettings,
+                TestHelper.GetHostingEnvironment(),
                 new TestVariationContextAccessor(),
-                TestHelper.IOHelper,
                 TestHelper.UriUtility,
                 new AspNetCookieManager(httpContextAccessor));
 
@@ -154,18 +155,9 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             urlHelper.Setup(provider => provider.GetUrl(It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
                 .Returns(UrlInfo.Url("/hello/world/1234"));
 
-            var membershipHelper = new MembershipHelper(httpContextAccessor, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>(), new MockShortStringHelper(), Mock.Of<IEntityService>());
-
-            var umbHelper = new UmbracoHelper(Mock.Of<IPublishedContent>(),
-                Mock.Of<ITagQuery>(),
-                Mock.Of<ICultureDictionaryFactory>(),
-                Mock.Of<IUmbracoComponentRenderer>(),
-                Mock.Of<IPublishedContentQuery>(),
-                membershipHelper);
-
-            return CreateController(controllerType, request, umbracoContextAccessor, umbHelper);
+            return CreateController(controllerType, request, umbracoContextAccessor);
         }
 
-        protected abstract ApiController CreateController(Type controllerType, HttpRequestMessage msg, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper);
+        protected abstract ApiController CreateController(Type controllerType, HttpRequestMessage msg, IUmbracoContextAccessor umbracoContextAccessor);
     }
 }

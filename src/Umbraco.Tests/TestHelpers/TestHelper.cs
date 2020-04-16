@@ -21,15 +21,13 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Net;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Runtime;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Core.Sync;
-using Umbraco.Net;
-using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Tests.Common;
 using Umbraco.Web;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Routing;
@@ -42,82 +40,75 @@ namespace Umbraco.Tests.TestHelpers
     /// </summary>
     public static class TestHelper
     {
+        private static readonly TestHelperInternal _testHelperInternal = new TestHelperInternal();
+        private class TestHelperInternal : TestHelperBase
+        {
+            public TestHelperInternal() : base(typeof(TestHelperInternal).Assembly)
+            {
 
-        public static TypeLoader GetMockedTypeLoader()
-        {
-            return new TypeLoader(IOHelper, Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
+            }
+
+            public override IDbProviderFactoryCreator DbProviderFactoryCreator { get; } = new UmbracoDbProviderFactoryCreator(Constants.DbProviderNames.SqlCe);
+
+            public override IBulkSqlInsertProvider BulkSqlInsertProvider { get; } = new SqlCeBulkSqlInsertProvider();
+
+            public override IMarchal Marchal { get; } = new FrameworkMarchal();
+
+            public override IBackOfficeInfo GetBackOfficeInfo()
+                => new AspNetBackOfficeInfo(
+                    SettingsForTests.GenerateMockGlobalSettings(GetUmbracoVersion()),
+                    TestHelper.IOHelper, Mock.Of<ILogger>(), SettingsForTests.GenerateMockWebRoutingSettings());
+
+            public override IHostingEnvironment GetHostingEnvironment()
+                => new AspNetHostingEnvironment(SettingsForTests.DefaultHostingSettings);
+
+            public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime()
+                => new AspNetApplicationShutdownRegistry();
+
+            public override IIpResolver GetIpResolver()
+                => new AspNetIpResolver();
         }
 
-        public static Configs GetConfigs()
-        {
-            return GetConfigsFactory().Create(IOHelper);
-        }
-        public static IRuntimeState GetRuntimeState()
-        {
-            return new RuntimeState(
-                Mock.Of<ILogger>(),
-                Mock.Of<IUmbracoSettingsSection>(),
-                Mock.Of<IGlobalSettings>(),
-                new Lazy<IMainDom>(),
-                new Lazy<IServerRegistrar>(),
-                TestHelper.GetUmbracoVersion(),
-                TestHelper.GetHostingEnvironment(),
-                TestHelper.GetBackOfficeInfo()
-                );
-        }
+        public static ITypeFinder GetTypeFinder() => _testHelperInternal.GetTypeFinder();
 
-        public static IBackOfficeInfo GetBackOfficeInfo()
-        {
-            return new AspNetBackOfficeInfo(SettingsForTests.GenerateMockGlobalSettings(), TestHelper.IOHelper, SettingsForTests.GenerateMockUmbracoSettings(), Mock.Of<ILogger>());
-        }
+        public static TypeLoader GetMockedTypeLoader() => _testHelperInternal.GetMockedTypeLoader();
 
-        public static IConfigsFactory GetConfigsFactory()
-        {
-            return new ConfigsFactory();
-        }
+        public static Configs GetConfigs() => _testHelperInternal.GetConfigs();
+
+        public static IRuntimeState GetRuntimeState() => _testHelperInternal.GetRuntimeState();
+
+        public static IBackOfficeInfo GetBackOfficeInfo() => _testHelperInternal.GetBackOfficeInfo();
+
+        public static IConfigsFactory GetConfigsFactory() => _testHelperInternal.GetConfigsFactory();
 
         /// <summary>
-        /// Gets the current assembly directory.
+        /// Gets the working directory of the test project.
         /// </summary>
         /// <value>The assembly directory.</value>
-        public static string CurrentAssemblyDirectory
-        {
-            get
-            {
-                var codeBase = typeof(TestHelper).Assembly.CodeBase;
-                var uri = new Uri(codeBase);
-                var path = uri.LocalPath;
-                return Path.GetDirectoryName(path);
-            }
-        }
+        public static string WorkingDirectory => _testHelperInternal.WorkingDirectory;
 
-        public static IShortStringHelper ShortStringHelper { get; } = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
-        public static IJsonSerializer JsonSerializer { get; } = new JsonNetSerializer();
-        public static IVariationContextAccessor VariationContextAccessor { get; } = new TestVariationContextAccessor();
-        public static IDbProviderFactoryCreator DbProviderFactoryCreator { get; } = new UmbracoDbProviderFactoryCreator(Constants.DbProviderNames.SqlCe);
-        public static IBulkSqlInsertProvider BulkSqlInsertProvider { get; } = new SqlCeBulkSqlInsertProvider();
-        public static IMarchal Marchal { get; } = new FrameworkMarchal();
-        public static ICoreDebug CoreDebug { get; } =  new CoreDebug();
+        public static IShortStringHelper ShortStringHelper => _testHelperInternal.ShortStringHelper;
+        public static IJsonSerializer JsonSerializer => _testHelperInternal.JsonSerializer;
+        public static IVariationContextAccessor VariationContextAccessor => _testHelperInternal.VariationContextAccessor;
+        public static IDbProviderFactoryCreator DbProviderFactoryCreator => _testHelperInternal.DbProviderFactoryCreator;
+        public static IBulkSqlInsertProvider BulkSqlInsertProvider => _testHelperInternal.BulkSqlInsertProvider;
+        public static IMarchal Marchal => _testHelperInternal.Marchal;
+        public static ICoreDebugSettings CoreDebugSettings => _testHelperInternal.CoreDebugSettings;
 
 
-        public static IIOHelper IOHelper { get; } = new IOHelper(GetHostingEnvironment());
-        public static IMainDom MainDom { get; } = new MainDom(Mock.Of<ILogger>(), GetHostingEnvironment(), new MainDomSemaphoreLock(Mock.Of<ILogger>(), GetHostingEnvironment()));
-        public static UriUtility UriUtility { get; } = new UriUtility(GetHostingEnvironment());
+        public static IIOHelper IOHelper => _testHelperInternal.IOHelper;
+        public static IMainDom MainDom => _testHelperInternal.MainDom;
+        public static UriUtility UriUtility => _testHelperInternal.UriUtility;
 
-        public static IWebRoutingSection WebRoutingSection => SettingsForTests.GetDefaultUmbracoSettings().WebRouting;
+        public static IWebRoutingSettings WebRoutingSettings => _testHelperInternal.WebRoutingSettings;
+
 
         /// <summary>
-        /// Maps the given <paramref name="relativePath"/> making it rooted on <see cref="CurrentAssemblyDirectory"/>. <paramref name="relativePath"/> must start with <code>~/</code>
+        /// Some test files are copied to the /bin (/bin/debug) on build, this is a utility to return their physical path based on a virtual path name
         /// </summary>
-        /// <param name="relativePath">The relative path.</param>
+        /// <param name="relativePath"></param>
         /// <returns></returns>
-        public static string MapPathForTest(string relativePath)
-        {
-            if (!relativePath.StartsWith("~/"))
-                throw new ArgumentException("relativePath must start with '~/'", "relativePath");
-
-            return relativePath.Replace("~/", CurrentAssemblyDirectory + "/");
-        }
+        public static string MapPathForTestFiles(string relativePath) => _testHelperInternal.MapPathForTestFiles(relativePath);
 
         public static void InitializeContentDirectories()
         {
@@ -157,13 +148,14 @@ namespace Umbraco.Tests.TestHelpers
 
         public static void CleanUmbracoSettingsConfig()
         {
-            var currDir = new DirectoryInfo(CurrentAssemblyDirectory);
+            var currDir = new DirectoryInfo(WorkingDirectory);
 
             var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
             if (File.Exists(umbracoSettingsFile))
                 File.Delete(umbracoSettingsFile);
         }
 
+        // TODO: Move to Assertions or AssertHelper
         // FIXME: obsolete the dateTimeFormat thing and replace with dateDelta
         public static void AssertPropertyValuesAreEqual(object actual, object expected, string dateTimeFormat = null, Func<IEnumerable, IEnumerable> sorter = null, string[] ignoreProperties = null)
         {
@@ -307,6 +299,7 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
+        // TODO: Move to MockedValueEditors.cs
         public static DataValueEditor CreateDataValueEditor(string name)
         {
             var valueType = (ValueTypes.IsValue(name)) ? name : ValueTypes.String;
@@ -325,30 +318,17 @@ namespace Umbraco.Tests.TestHelpers
         }
 
 
-        public static IUmbracoVersion GetUmbracoVersion()
-        {
-            return new UmbracoVersion(GetConfigs().Global());
-        }
+        public static IUmbracoVersion GetUmbracoVersion() => _testHelperInternal.GetUmbracoVersion();
 
-        public static IRegister GetRegister()
-        {
-            return RegisterFactory.Create(GetConfigs().Global());
-        }
+        public static IRegister GetRegister() => _testHelperInternal.GetRegister();
 
-        public static IHostingEnvironment GetHostingEnvironment()
-        {
-            return new AspNetHostingEnvironment(SettingsForTests.GetDefaultHostingSettings());
-        }
+        public static IHostingEnvironment GetHostingEnvironment() => _testHelperInternal.GetHostingEnvironment();
 
-        public static IIpResolver GetIpResolver()
-        {
-            return new AspNetIpResolver();
-        }
+        public static IApplicationShutdownRegistry GetHostingEnvironmentLifetime() => _testHelperInternal.GetHostingEnvironmentLifetime();
 
-        public static IRequestCache GetRequestCache()
-        {
-            return new DictionaryAppCache();
-        }
+        public static IIpResolver GetIpResolver() => _testHelperInternal.GetIpResolver();
+
+        public static IRequestCache GetRequestCache() => _testHelperInternal.GetRequestCache();
 
         public static IHttpContextAccessor GetHttpContextAccessor(HttpContextBase httpContextBase = null)
         {
@@ -369,11 +349,6 @@ namespace Umbraco.Tests.TestHelpers
             return mock.Object;
         }
 
-        public static IPublishedUrlProvider GetPublishedUrlProvider()
-        {
-            var mock = new Mock<IPublishedUrlProvider>();
-
-            return mock.Object;
-        }
+        public static IPublishedUrlProvider GetPublishedUrlProvider() => _testHelperInternal.GetPublishedUrlProvider();
     }
 }

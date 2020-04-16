@@ -4,16 +4,17 @@ using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Umbraco.Configuration;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.ModelsBuilder.Embedded.BackOffice;
-using Umbraco.ModelsBuilder.Embedded.Configuration;
 using Umbraco.Web;
-using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.WebAssets;
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {

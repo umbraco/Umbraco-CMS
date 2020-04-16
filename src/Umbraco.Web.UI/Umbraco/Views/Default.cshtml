@@ -1,8 +1,8 @@
 ﻿@using Umbraco.Core
-@using ClientDependency.Core
-@using ClientDependency.Core.Mvc
 @using Umbraco.Web.Composing
 @using Umbraco.Web
+@using Umbraco.Web.WebAssets
+
 
 @inherits WebViewPage<Umbraco.Web.Editors.BackOfficeModel>
 
@@ -18,17 +18,14 @@
         }
     }
 
-    Html
-        .RequiresCss("assets/css/umbraco.css", "Umbraco")
-        .RequiresCss("lib/bootstrap-social/bootstrap-social.css", "Umbraco")
-        .RequiresCss("lib/font-awesome/css/font-awesome.min.css", "Umbraco");
+    var runtimeMinifier = Current.RuntimeMinifier;
 }
 
 <!DOCTYPE html>
 
 <html lang="en">
 <head>
-    <base href="@Model.GlobalSettings.Path.EnsureEndsWith('/')" />
+    <base href="@Model.BackOfficePath.EnsureEndsWith('/')" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -38,8 +35,8 @@
 
     <title ng-bind="$root.locationTitle">Umbraco</title>
 
-    @Html.RenderCssHere(
-        new BasicPath("Umbraco", Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath)))
+    @Html.Raw(runtimeMinifier.RenderCssHere(BackOfficeWebAssets.UmbracoInitCssBundleName))
+
 </head>
 <body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show, 'umb-tour-is-visible': tour.show, 'tabbing-active':tabbingActive}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
 
@@ -75,9 +72,8 @@
 
             </div>
 
-            <umb-tour
-                ng-if="tour.show"
-                model="tour">
+            <umb-tour ng-if="tour.show"
+                      model="tour">
             </umb-tour>
 
             <umb-notifications></umb-notifications>
@@ -105,19 +101,18 @@
                  parent-scope="overlay.parentScope">
     </umb-overlay>
 
-    <umb-login
-        ng-if="login.show"
-        on-login="hideLoginScreen()">
+    <umb-login ng-if="login.show"
+               on-login="hideLoginScreen()">
     </umb-login>
 
-    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewData.GetUmbracoPath() }), Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.UmbracoSettingsSection, Model.IOHelper, Model.TreeCollection, Model.HttpContextAccessor, Model.HostingEnvironment)
+@Html.BareMinimumServerVariablesScript(Url, Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.ContentSettings, Model.TreeCollection, Model.HttpContextAccessor, Model.HostingEnvironment, Model.RuntimeSettings, Model.SecuritySettings, Current.RuntimeMinifier)
 
-    <script>
+<script>
 
         document.angularReady = function(app) {
             @Html.AngularValueExternalLoginInfoScript(ViewData.GetExternalSignInError())
             @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
-            @Html.AngularValueTinyMceAssets()
+            @Html.AngularValueTinyMceAssets(Current.RuntimeMinifier)
 
             //required for the noscript trick
             document.getElementById("mainwrapper").style.display = "inherit";

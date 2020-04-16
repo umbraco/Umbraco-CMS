@@ -37,8 +37,13 @@ function watchTask(cb) {
         if(group.watch !== false) {
             viewWatcher = watch(group.files, { ignoreInitial: true, interval: watchInterval });
             viewWatcher.on('change', function(path, stats) {
-                console.log("copying " + group.files + " to " + config.root + config.targets.views + group.folder);
-                src(group.files).pipe( dest(config.root + config.targets.views + group.folder) );
+                
+                var task = src(group.files);
+
+                _.forEach(config.roots, function(root){
+                    console.log("copying " + group.files + " to " + root + config.targets.views + group.folder);
+                    task = task.pipe( dest(root + config.targets.views + group.folder) );
+                })
             });
         }
     });

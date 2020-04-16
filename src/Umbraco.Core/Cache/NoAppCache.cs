@@ -67,7 +67,7 @@ namespace Umbraco.Core.Cache
         { }
 
         /// <inheritdoc />
-        public virtual void ClearOfType(string typeName)
+        public virtual void ClearOfType(Type type)
         { }
 
         /// <inheritdoc />

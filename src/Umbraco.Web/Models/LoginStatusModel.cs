@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Umbraco.Core;
-using Umbraco.Web.Security;
-using Current = Umbraco.Web.Composing.Current;
+
 
 namespace Umbraco.Web.Models
 {
@@ -16,25 +14,8 @@ namespace Umbraco.Web.Models
         /// <returns></returns>
         public static LoginStatusModel CreateModel()
         {
-            return new LoginStatusModel(false);
+            return new LoginStatusModel();
         }
-
-        private LoginStatusModel(bool doLookup)
-        {
-            if (doLookup && Current.UmbracoContext != null)
-            {
-                var helper = Current.Factory.GetInstance<MembershipHelper>();
-                var model = helper.GetCurrentLoginStatus();
-                if (model != null)
-                {
-                    Name = model.Name;
-                    Username = model.Username;
-                    Email = model.Email;
-                    IsLoggedIn = true;
-                }
-            }
-        }
-
 
         /// <summary>
         /// The name of the member

@@ -25,8 +25,8 @@ namespace Umbraco.Web.Editors
     public class TourController : UmbracoAuthorizedJsonController
     {
         private readonly TourFilterCollection _filters;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
         private readonly IIOHelper _ioHelper;
+        private readonly ITourSettings _tourSettings;
 
         public TourController(
             IGlobalSettings globalSettings,
@@ -36,25 +36,24 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
             TourFilterCollection filters,
-            IUmbracoSettingsSection umbracoSettingsSection,
             IIOHelper ioHelper,
-            IPublishedUrlProvider publishedUrlProvider)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
+            IPublishedUrlProvider publishedUrlProvider,
+            ITourSettings tourSettings)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _filters = filters;
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
             _ioHelper = ioHelper;
+            _tourSettings = tourSettings;
         }
 
         public IEnumerable<BackOfficeTourFile> GetTours()
         {
             var result = new List<BackOfficeTourFile>();
 
-            if (_umbracoSettingsSection.BackOffice.Tours.EnableTours == false)
+            if (_tourSettings.EnableTours == false)
                 return result;
 
             var user = UmbracoContext.Security.CurrentUser;

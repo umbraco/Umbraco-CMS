@@ -11,15 +11,15 @@ namespace Umbraco.Web
     {
         private readonly IGlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
-        private readonly IUmbracoSettingsSection _settings;
         private readonly ILogger _logger;
+        private readonly IWebRoutingSettings _webRoutingSettings;
 
-        public AspNetBackOfficeInfo(IGlobalSettings globalSettings, IIOHelper ioHelper, IUmbracoSettingsSection settings, ILogger logger)
+        public AspNetBackOfficeInfo(IGlobalSettings globalSettings, IIOHelper ioHelper, ILogger logger, IWebRoutingSettings webRoutingSettings)
         {
             _globalSettings = globalSettings;
             _ioHelper = ioHelper;
-            _settings = settings;
             _logger = logger;
+            _webRoutingSettings = webRoutingSettings;
         }
 
         /// <inheritdoc />
@@ -27,7 +27,7 @@ namespace Umbraco.Web
 
         private string GetAbsoluteUrlFromConfig()
         {
-            var url = _settings.WebRouting.UmbracoApplicationUrl;
+            var url = _webRoutingSettings.UmbracoApplicationUrl;
             if (url.IsNullOrWhiteSpace() == false)
             {
                 var umbracoApplicationUrl = url.TrimEnd('/');

@@ -46,7 +46,7 @@ namespace Umbraco.Web.WebApi
                 }
             }
 
-            var helper = Current.Factory.GetInstance<MembershipHelper>();
+            var helper = Current.MembershipHelper;
             return helper.IsMemberAuthorized(AllowType.Split(','), AllowGroup.Split(','), members);
         }
 

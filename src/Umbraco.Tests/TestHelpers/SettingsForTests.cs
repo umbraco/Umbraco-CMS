@@ -1,73 +1,19 @@
-﻿using System.IO;
-using System.Configuration;
-using Moq;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+﻿using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
 
 namespace Umbraco.Tests.TestHelpers
 {
     public class SettingsForTests
     {
-        public static IGlobalSettings GenerateMockGlobalSettings()
-        {
-            var config = Mock.Of<IGlobalSettings>(
-                settings =>
-                    settings.ConfigurationStatus == TestHelper.GetUmbracoVersion().SemanticVersion.ToSemanticString() &&
-                    settings.UseHttps == false &&
-                    settings.HideTopLevelNodeFromPath == false &&
-                    settings.Path == TestHelper.IOHelper.ResolveUrl("~/umbraco") &&
-                    settings.TimeOutInMinutes == 20 &&
-                    settings.DefaultUILanguage == "en" &&
-                    settings.ReservedPaths == (GlobalSettings.StaticReservedPaths + "~/umbraco") &&
-                    settings.ReservedUrls == GlobalSettings.StaticReservedUrls &&
-                    settings.UmbracoPath == "~/umbraco" &&
-                    settings.UmbracoMediaPath == "~/media" &&
-                    settings.UmbracoCssPath == "~/css" &&
-                    settings.UmbracoScriptsPath == "~/scripts"
-            );
+        private static Common.SettingsForTests _settingsForTests = new Common.SettingsForTests();
 
-
-
-            return config;
-        }
+        public static IGlobalSettings GenerateMockGlobalSettings() => _settingsForTests.GenerateMockGlobalSettings(TestHelper.GetUmbracoVersion());
 
         /// <summary>
         /// Returns generated settings which can be stubbed to return whatever values necessary
         /// </summary>
         /// <returns></returns>
-        public static IUmbracoSettingsSection GenerateMockUmbracoSettings()
-        {
-            var settings = new Mock<IUmbracoSettingsSection>();
-
-            var content = new Mock<IContentSection>();
-            var security = new Mock<ISecuritySection>();
-            var requestHandler = new Mock<IRequestHandlerSection>();
-            var logging = new Mock<ILoggingSection>();
-            var routing = new Mock<IWebRoutingSection>();
-
-            var userPasswordConfig = new Mock<IUserPasswordConfigurationSection>();
-            var memberPasswordConfig = new Mock<IMemberPasswordConfigurationSection>();
-            security.Setup(x => x.UserPasswordConfiguration).Returns(userPasswordConfig.Object);
-            security.Setup(x => x.MemberPasswordConfiguration).Returns(memberPasswordConfig.Object);
-
-            settings.Setup(x => x.Content).Returns(content.Object);
-            settings.Setup(x => x.Security).Returns(security.Object);
-            settings.Setup(x => x.RequestHandler).Returns(requestHandler.Object);
-            settings.Setup(x => x.Logging).Returns(logging.Object);
-            settings.Setup(x => x.WebRouting).Returns(routing.Object);
-
-            //Now configure some defaults - the defaults in the config section classes do NOT pertain to the mocked data!!
-            settings.Setup(x => x.Content.ImageAutoFillProperties).Returns(ContentImagingElement.GetDefaultImageAutoFillProperties());
-            settings.Setup(x => x.Content.ImageFileTypes).Returns(ContentImagingElement.GetDefaultImageFileTypes());
-            settings.Setup(x => x.RequestHandler.AddTrailingSlash).Returns(true);
-            settings.Setup(x => x.RequestHandler.CharCollection).Returns(RequestHandlerElement.GetDefaultCharReplacements());
-            settings.Setup(x => x.WebRouting.UrlProviderMode).Returns("Auto");
-
-            return settings.Object;
-        }
+        public static IContentSettings GenerateMockContentSettings() => _settingsForTests.GenerateMockContentSettings();
 
         //// from appSettings
 
@@ -97,73 +43,22 @@ namespace Umbraco.Tests.TestHelpers
         //    //SaveSettings();
         //}
 
-        public static void Reset()
-        {
-            ResetSettings();
-            GlobalSettings.Reset();
+        public static void Reset() => _settingsForTests.Reset();
 
-            //foreach (var kvp in SavedAppSettings)
-            //    ConfigurationManager.AppSettings.Set(kvp.Key, kvp.Value);
+        internal static IGlobalSettings DefaultGlobalSettings => _settingsForTests.GetDefaultGlobalSettings(TestHelper.GetUmbracoVersion());
 
-            //// set some defaults that are wrong in the config file?!
-            //// this is annoying, really
-            //HideTopLevelNodeFromPath = false;
-        }
+        internal static IHostingSettings DefaultHostingSettings => _settingsForTests.DefaultHostingSettings;
 
-        /// <summary>
-        /// This sets all settings back to default settings
-        /// </summary>
-        private static void ResetSettings()
-        {
-            _defaultGlobalSettings = null;
-        }
+        public static IHostingSettings GenerateMockHostingSettings() => _settingsForTests.GenerateMockHostingSettings();
 
-        private static IUmbracoSettingsSection _defaultUmbracoSettings;
-        private static IGlobalSettings _defaultGlobalSettings;
-        private static IHostingSettings _defaultHostingSettings;
+        public static IWebRoutingSettings GenerateMockWebRoutingSettings() => _settingsForTests.GenerateMockWebRoutingSettings();
 
-        internal static IGlobalSettings GetDefaultGlobalSettings()
-        {
-            if (_defaultGlobalSettings == null)
-            {
-                _defaultGlobalSettings = GenerateMockGlobalSettings();
-            }
-            return _defaultGlobalSettings;
-        }
+        public static IRequestHandlerSettings GenerateMockRequestHandlerSettings() => _settingsForTests.GenerateMockRequestHandlerSettings();
 
-        internal static IHostingSettings GetDefaultHostingSettings()
-        {
-            if (_defaultHostingSettings == null)
-            {
-                _defaultHostingSettings = GenerateMockHostingSettings();
-            }
-            return _defaultHostingSettings;
-        }
+        public static ISecuritySettings GenerateMockSecuritySettings() => _settingsForTests.GenerateMockSecuritySettings();
 
-        private static IHostingSettings GenerateMockHostingSettings()
-        {
-            var config = Mock.Of<IHostingSettings>(
-                settings =>
-                    settings.LocalTempStorageLocation == LocalTempStorage.EnvironmentTemp &&
-                    settings.DebugMode == false
-            );
-            return config;
-        }
+        public static IUserPasswordConfiguration GenerateMockUserPasswordConfiguration() => _settingsForTests.GenerateMockUserPasswordConfiguration();
 
-        internal static IUmbracoSettingsSection GetDefaultUmbracoSettings()
-        {
-            if (_defaultUmbracoSettings == null)
-            {
-                // TODO: Just make this mocks instead of reading from the config
-
-                var config = new FileInfo(TestHelper.MapPathForTest("~/Configurations/UmbracoSettings/web.config"));
-
-                var fileMap = new ExeConfigurationFileMap { ExeConfigFilename = config.FullName };
-                var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
-                _defaultUmbracoSettings = configuration.GetSection("umbracoConfiguration/defaultSettings") as UmbracoSettingsSection;
-            }
-
-            return _defaultUmbracoSettings;
-        }
+        public static IMemberPasswordConfiguration GenerateMockMemberPasswordConfiguration() => _settingsForTests.GenerateMockMemberPasswordConfiguration();
     }
 }

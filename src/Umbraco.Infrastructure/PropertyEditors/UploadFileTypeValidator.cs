@@ -16,12 +16,12 @@ namespace Umbraco.Web.PropertyEditors
     internal class UploadFileTypeValidator : IValueValidator
     {
         private readonly ILocalizedTextService _localizedTextService;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IContentSettings _contentSettings;
 
-        public UploadFileTypeValidator(ILocalizedTextService localizedTextService, IUmbracoSettingsSection umbracoSettingsSection)
+        public UploadFileTypeValidator(ILocalizedTextService localizedTextService, IContentSettings contentSettings)
         {
             _localizedTextService = localizedTextService;
-            _umbracoSettingsSection = umbracoSettingsSection;
+            _contentSettings = contentSettings;
         }
 
         public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
@@ -46,7 +46,7 @@ namespace Umbraco.Web.PropertyEditors
 
             foreach (string filename in fileNames)
             {
-                if (IsValidFileExtension(filename, _umbracoSettingsSection) == false)
+                if (IsValidFileExtension(filename, _contentSettings) == false)
                 {
                     //we only store a single value for this editor so the 'member' or 'field'
                     // we'll associate this error with will simply be called 'value'
@@ -55,11 +55,11 @@ namespace Umbraco.Web.PropertyEditors
             }
         }
 
-        internal static bool IsValidFileExtension(string fileName, IUmbracoSettingsSection umbracoSettingsSection)
+        internal static bool IsValidFileExtension(string fileName, IContentSettings contentSettings)
         {
             if (fileName.IndexOf('.') <= 0) return false;
-            var extension = new FileInfo(fileName).Extension.TrimStart(".");
-            return umbracoSettingsSection.Content.IsFileAllowedForUpload(extension);
+            var extension = fileName.GetFileExtension().TrimStart(".");
+            return contentSettings.IsFileAllowedForUpload(extension);
         }
     }
 }

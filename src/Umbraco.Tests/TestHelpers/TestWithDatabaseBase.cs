@@ -30,8 +30,8 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.LegacyXmlPublishedCache;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.WebApi;
+using Umbraco.Tests.Common;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -62,10 +62,11 @@ namespace Umbraco.Tests.TestHelpers
 
         public override void SetUp()
         {
-            base.SetUp();
-
-            var path = TestHelper.CurrentAssemblyDirectory;
+            // Ensure the data directory is set before continuing
+            var path = TestHelper.WorkingDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
+
+            base.SetUp();
         }
 
         protected override void Compose()
@@ -89,7 +90,7 @@ namespace Umbraco.Tests.TestHelpers
                     return TestObjects.GetDatabaseFactoryMock();
 
                 var lazyMappers = new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>);
-                var factory = new UmbracoDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), f.GetInstance<ILogger>(), lazyMappers, TestHelper.DbProviderFactoryCreator);
+                var factory = new UmbracoDatabaseFactory(f.GetInstance<ILogger>(), GetDbConnectionString(), GetDbProviderName(), lazyMappers, TestHelper.DbProviderFactoryCreator);
                 factory.ResetForTests();
                 return factory;
             });
@@ -167,7 +168,7 @@ namespace Umbraco.Tests.TestHelpers
             if (Options.Database == UmbracoTestOptions.Database.None)
                 return;
 
-            var path = TestHelper.CurrentAssemblyDirectory;
+            var path = TestHelper.WorkingDirectory;
 
             //Get the connectionstring settings from config
             var settings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
@@ -265,6 +266,7 @@ namespace Umbraco.Tests.TestHelpers
                 Logger,
                 Factory.GetInstance<IGlobalSettings>(),
                 HostingEnvironment,
+                HostingLifetime,
                 ShortStringHelper,
                 new SiteDomainHelper(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
@@ -336,7 +338,7 @@ namespace Umbraco.Tests.TestHelpers
 
         private void RemoveDatabaseFile(Action<Exception> onFail = null)
         {
-            var path = TestHelper.CurrentAssemblyDirectory;
+            var path = TestHelper.WorkingDirectory;
             try
             {
                 var filePath = string.Concat(path, "\\UmbracoNPocoTests.sdf");
@@ -376,10 +378,10 @@ namespace Umbraco.Tests.TestHelpers
                 httpContextAccessor,
                 service,
                 new WebSecurity(httpContextAccessor, Factory.GetInstance<IUserService>(),
-                    Factory.GetInstance<IGlobalSettings>(), IOHelper),
+                    Factory.GetInstance<IGlobalSettings>(), HostingEnvironment),
                 globalSettings ?? Factory.GetInstance<IGlobalSettings>(),
+                HostingEnvironment,
                 new TestVariationContextAccessor(),
-                IOHelper,
                 UriUtility,
                 new AspNetCookieManager(httpContextAccessor));
 

@@ -18,11 +18,11 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
         private readonly IRuntimeState _runtimeState;
         private readonly ILogger _logger;
         private readonly IGlobalSettings _globalSettings;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IContentSettings _contentSettings;
 
-        public EmailNotificationMethod(ILocalizedTextService textService, IRuntimeState runtimeState, ILogger logger, IGlobalSettings globalSettings, IHealthChecks healthChecks, IUmbracoSettingsSection umbracoSettingsSection) : base(healthChecks)
+        public EmailNotificationMethod(ILocalizedTextService textService, IRuntimeState runtimeState, ILogger logger, IGlobalSettings globalSettings, IHealthChecksSettings healthChecksSettings, IContentSettings contentSettings) : base(healthChecksSettings)
         {
-            var recipientEmail = Settings["recipientEmail"]?.Value;
+            var recipientEmail = Settings?["recipientEmail"]?.Value;
             if (string.IsNullOrWhiteSpace(recipientEmail))
             {
                 Enabled = false;
@@ -35,7 +35,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             _runtimeState = runtimeState;
             _logger = logger;
             _globalSettings = globalSettings;
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
         public string RecipientEmail { get; }
@@ -74,7 +74,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
         private MailMessage CreateMailMessage(string subject, string message)
         {
-            var to = _umbracoSettingsSection.Content.NotificationEmailAddress;
+            var to = _contentSettings.NotificationEmailAddress;
 
             if (string.IsNullOrWhiteSpace(subject))
                 subject = "Umbraco Health Check Status";

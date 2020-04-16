@@ -18,10 +18,10 @@ namespace Umbraco.Web.Search
         private readonly IndexRebuilder _indexRebuilder;
         private readonly IMainDom _mainDom;
         private readonly IProfilingLogger _logger;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IApplicationShutdownRegistry _hostingEnvironment;
         private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
 
-        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger logger, IHostingEnvironment hostingEnvironment, IndexRebuilder indexRebuilder)
+        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger logger, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
         {
             _mainDom = mainDom;
             _logger = logger;
@@ -32,8 +32,6 @@ namespace Umbraco.Web.Search
         /// <summary>
         /// Called to rebuild empty indexes on startup
         /// </summary>
-        /// <param name="indexRebuilder"></param>
-        /// <param name="logger"></param>
         /// <param name="onlyEmptyIndexes"></param>
         /// <param name="waitMilliseconds"></param>
         public void RebuildIndexes(bool onlyEmptyIndexes, int waitMilliseconds = 0)

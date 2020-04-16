@@ -1,21 +1,16 @@
 using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+using System.Reflection;
 using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using IRegisteredObject = Umbraco.Core.IRegisteredObject;
 
 namespace Umbraco.Web.Hosting
 {
     public class AspNetHostingEnvironment : IHostingEnvironment
     {
-        private readonly ConcurrentDictionary<IRegisteredObject, RegisteredObjectWrapper> _registeredObjects =
-            new ConcurrentDictionary<IRegisteredObject, RegisteredObjectWrapper>();
+        
         private readonly IHostingSettings _hostingSettings;
         private string _localTempPath;
 
@@ -24,13 +19,13 @@ namespace Umbraco.Web.Hosting
             _hostingSettings = hostingSettings ?? throw new ArgumentNullException(nameof(hostingSettings));
             SiteName = HostingEnvironment.SiteName;
             ApplicationId = HostingEnvironment.ApplicationID;
-            ApplicationPhysicalPath = HostingEnvironment.ApplicationPhysicalPath;
-            ApplicationVirtualPath = HostingEnvironment.ApplicationVirtualPath;
-            CurrentDomainId = AppDomain.CurrentDomain.Id;
+            // when we are not hosted (i.e. unit test or otherwise) we'll need to get the root path from the executing assembly
+            ApplicationPhysicalPath = HostingEnvironment.ApplicationPhysicalPath ?? Assembly.GetExecutingAssembly().GetRootDirectorySafe();
+            ApplicationVirtualPath = hostingSettings.ApplicationVirtualPath?.EnsureStartsWith('/')
+                                     ?? HostingEnvironment.ApplicationVirtualPath?.EnsureStartsWith("/")
+                                     ?? "/";
             IISVersion = HttpRuntime.IISVersion;
         }
-
-        public int CurrentDomainId { get; }
 
         public string SiteName { get; }
         public string ApplicationId { get; }
@@ -45,32 +40,15 @@ namespace Umbraco.Web.Hosting
 
         public string MapPath(string path)
         {
-            return HostingEnvironment.MapPath(path);
+            if (HostingEnvironment.IsHosted)
+                return HostingEnvironment.MapPath(path);
+
+            // this will be the case in unit tests, we'll manually map the path
+            return ApplicationPhysicalPath + path.TrimStart("~").EnsureStartsWith("/");
         }
 
-        public string ToAbsolute(string virtualPath, string root) => VirtualPathUtility.ToAbsolute(virtualPath, root);
-        public void LazyRestartApplication()
-        {
-            HttpRuntime.UnloadAppDomain();
-        }
-
-        public void RegisterObject(IRegisteredObject registeredObject)
-        {
-            var wrapped = new RegisteredObjectWrapper(registeredObject);
-            if (!_registeredObjects.TryAdd(registeredObject, wrapped))
-            {
-                throw new InvalidOperationException("Could not register object");
-            }
-            HostingEnvironment.RegisterObject(wrapped);
-        }
-
-        public void UnregisterObject(IRegisteredObject registeredObject)
-        {
-            if (_registeredObjects.TryGetValue(registeredObject, out var wrapped))
-            {
-                HostingEnvironment.UnregisterObject(wrapped);
-            }
-        }
+        public string ToAbsolute(string virtualPath) => VirtualPathUtility.ToAbsolute(virtualPath, ApplicationVirtualPath);
+        
 
         public string LocalTempPath
         {
@@ -109,20 +87,7 @@ namespace Umbraco.Web.Hosting
                 }
             }
         }
-        private class RegisteredObjectWrapper : System.Web.Hosting.IRegisteredObject
-        {
-            private readonly IRegisteredObject _inner;
-
-            public RegisteredObjectWrapper(IRegisteredObject inner)
-            {
-                _inner = inner;
-            }
-
-            public void Stop(bool immediate)
-            {
-                _inner.Stop(immediate);
-            }
-        }
+       
     }
 
 

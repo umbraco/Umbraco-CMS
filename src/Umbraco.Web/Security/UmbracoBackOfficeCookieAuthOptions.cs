@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Security
@@ -20,11 +21,11 @@ namespace Umbraco.Web.Security
         public UmbracoBackOfficeCookieAuthOptions(
             string[] explicitPaths,
             IUmbracoContextAccessor umbracoContextAccessor,
-            ISecuritySection securitySection,
+            ISecuritySettings securitySettings,
             IGlobalSettings globalSettings,
+            IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
             ISecureDataFormat<AuthenticationTicket> secureDataFormat,
-            IIOHelper ioHelper,
             IRequestCache requestCache)
         {
             var secureDataFormat1 = secureDataFormat ?? throw new ArgumentNullException(nameof(secureDataFormat));
@@ -33,8 +34,8 @@ namespace Umbraco.Web.Security
 
             SlidingExpiration = true;
             ExpireTimeSpan = TimeSpan.FromMinutes(LoginTimeoutMinutes);
-            CookieDomain = securitySection.AuthCookieDomain;
-            CookieName = securitySection.AuthCookieName;
+            CookieDomain = securitySettings.AuthCookieDomain;
+            CookieName = securitySettings.AuthCookieName;
             CookieHttpOnly = true;
             CookieSecure = globalSettings.UseHttps ? CookieSecureOption.Always : CookieSecureOption.SameAsRequest;
             CookiePath = "/";
@@ -42,7 +43,7 @@ namespace Umbraco.Web.Security
             TicketDataFormat = new UmbracoSecureDataFormat(LoginTimeoutMinutes, secureDataFormat1);
 
             //Custom cookie manager so we can filter requests
-            CookieManager = new BackOfficeCookieManager(umbracoContextAccessor, runtimeState, globalSettings, ioHelper, requestCache, explicitPaths);
+            CookieManager = new BackOfficeCookieManager(umbracoContextAccessor, runtimeState, hostingEnvironment, globalSettings, requestCache, explicitPaths);
         }
 
         /// <summary>

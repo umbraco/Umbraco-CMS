@@ -27,8 +27,8 @@ namespace Umbraco.Tests.Composing
         public void Initialize()
         {
             // this ensures it's reset
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
-            _typeLoader = new TypeLoader(TestHelper.IOHelper, typeFinder, NoAppCache.Instance,
+            var typeFinder = TestHelper.GetTypeFinder();
+            _typeLoader = new TypeLoader(typeFinder, NoAppCache.Instance,
                 new DirectoryInfo(TestHelper.IOHelper.MapPath("~/App_Data/TEMP")),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()), false,
 
@@ -217,7 +217,7 @@ AnotherContentFinder
         }
 
         [Test]
-        public void Get_Plugins_Hash()
+        public void Get_Plugins_Hash_With_Hash_Generator()
         {
             //Arrange
             var dir = PrepareFolder();
@@ -244,16 +244,16 @@ AnotherContentFinder
             var list3 = new[] { f1, f3, f5, f7 };
 
             //Act
-            var hash1 = TypeLoader.GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-            var hash2 = TypeLoader.GetFileHash(list2, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-            var hash3 = TypeLoader.GetFileHash(list3, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            var hash1 = GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            var hash2 = GetFileHash(list2, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            var hash3 = GetFileHash(list3, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             //Assert
             Assert.AreNotEqual(hash1, hash2);
             Assert.AreNotEqual(hash1, hash3);
             Assert.AreNotEqual(hash2, hash3);
 
-            Assert.AreEqual(hash1, TypeLoader.GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
+            Assert.AreEqual(hash1, GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
         }
 
         [Test]
@@ -316,5 +316,32 @@ AnotherContentFinder
 
         }
 
+
+        /// <summary>
+        /// Returns a unique hash for a combination of FileInfo objects.
+        /// </summary>
+        /// <param name="filesAndFolders">A collection of files.</param>
+        /// <param name="logger">A profiling logger.</param>
+        /// <returns>The hash.</returns>
+        // internal for tests
+        private static string GetFileHash(IEnumerable<FileSystemInfo> filesAndFolders, IProfilingLogger logger)
+        {
+            using (logger.DebugDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
+            {
+                using (var generator = new HashGenerator())
+                {
+                    // get the distinct file infos to hash
+                    var uniqInfos = new HashSet<string>();
+
+                    foreach (var fileOrFolder in filesAndFolders)
+                    {
+                        if (uniqInfos.Contains(fileOrFolder.FullName)) continue;
+                        uniqInfos.Add(fileOrFolder.FullName);
+                        generator.AddFileSystemItem(fileOrFolder);
+                    }
+                    return generator.GenerateHash();
+                }
+            }
+        }
     }
 }

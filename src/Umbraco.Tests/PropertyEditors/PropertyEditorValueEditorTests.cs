@@ -28,7 +28,7 @@ namespace Umbraco.Tests.PropertyEditors
             var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
 
             register.Register<IShortStringHelper>(_
-                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())));
+                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())));
 
             Current.Factory = composition.CreateFactory();
         }

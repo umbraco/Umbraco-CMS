@@ -33,7 +33,9 @@ using IUser = Umbraco.Core.Models.Membership.IUser;
 using Task = System.Threading.Tasks.Task;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Web.Routing;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Web.Editors
 {
@@ -44,10 +46,11 @@ namespace Umbraco.Web.Editors
     public class UsersController : UmbracoAuthorizedJsonController
     {
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
-        private readonly IIOHelper _ioHelper;
+        private readonly IContentSettings _contentSettings;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ISqlContext _sqlContext;
         private readonly IImageUrlGenerator _imageUrlGenerator;
+        private readonly ISecuritySettings _securitySettings;
 
         public UsersController(
             IGlobalSettings globalSettings,
@@ -57,21 +60,22 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             IMediaFileSystem mediaFileSystem,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
-            IUmbracoSettingsSection umbracoSettingsSection,
-            IIOHelper ioHelper,
+            IContentSettings contentSettings,
+            IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
-            IPublishedUrlProvider publishedUrlProvider)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
+            IPublishedUrlProvider publishedUrlProvider,
+            ISecuritySettings securitySettings)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _mediaFileSystem = mediaFileSystem;
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
-            _ioHelper = ioHelper;
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _hostingEnvironment = hostingEnvironment;
             _sqlContext = sqlContext;
             _imageUrlGenerator = imageUrlGenerator;
+            _securitySettings = securitySettings;
         }
 
         /// <summary>
@@ -92,17 +96,17 @@ namespace Umbraco.Web.Editors
         [AdminUsersAuthorize]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
-            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, _mediaFileSystem, ShortStringHelper, _umbracoSettingsSection, _ioHelper, _imageUrlGenerator, id);
+            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, _mediaFileSystem, ShortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, id);
         }
 
-        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, IImageUrlGenerator imageUrlGenerator, int id)
+        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IContentSettings contentSettings, IHostingEnvironment hostingEnvironment, IImageUrlGenerator imageUrlGenerator, int id)
         {
             if (request.Content.IsMimeMultipartContent() == false)
             {
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = ioHelper.MapPath(Constants.SystemDirectories.TempFileUploads);
+            var root = hostingEnvironment.MapPath(Constants.SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -130,7 +134,7 @@ namespace Umbraco.Web.Editors
             var safeFileName = fileName.ToSafeFileName(shortStringHelper);
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
-            if (umbracoSettingsSection.Content.DisallowedUploadFiles.Contains(ext) == false)
+            if (contentSettings.DisallowedUploadFiles.Contains(ext) == false)
             {
                 //generate a path of known data, we don't want this path to be guessable
                 user.Avatar = "UserAvatars/" + (user.Id + safeFileName).GenerateHash<SHA1>() + "." + ext;
@@ -229,7 +233,7 @@ namespace Umbraco.Web.Editors
             // so to do that here, we'll need to check if this current user is an admin and if not we should exclude all user who are
             // also admins
 
-            var hideDisabledUsers = _umbracoSettingsSection.Security.HideDisabledUsersInBackoffice;
+            var hideDisabledUsers = _securitySettings.HideDisabledUsersInBackoffice;
             var excludeUserGroups = new string[0];
             var isAdmin = Security.CurrentUser.IsAdmin();
             if (isAdmin == false)
@@ -287,7 +291,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
 
-            if (_umbracoSettingsSection.Security.UsernameIsEmail)
+            if (_securitySettings.UsernameIsEmail)
             {
                 //ensure they are the same if we're using it
                 userSave.Username = userSave.Email;
@@ -374,7 +378,7 @@ namespace Umbraco.Web.Editors
             }
 
             IUser user;
-            if (_umbracoSettingsSection.Security.UsernameIsEmail)
+            if (_securitySettings.UsernameIsEmail)
             {
                 //ensure it's the same
                 userSave.Username = userSave.Email;
@@ -448,7 +452,7 @@ namespace Umbraco.Web.Editors
             if (user != null && (extraCheck == null || extraCheck(user)))
             {
                 ModelState.AddModelError(
-                    _umbracoSettingsSection.Security.UsernameIsEmail ? "Email" : "Username",
+                    _securitySettings.UsernameIsEmail ? "Email" : "Username",
                     "A user with the username already exists");
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
@@ -479,7 +483,7 @@ namespace Umbraco.Web.Editors
             var action = urlHelper.Action("VerifyInvite", "BackOffice",
                 new
                 {
-                    area = GlobalSettings.GetUmbracoMvcArea(_ioHelper),
+                    area = GlobalSettings.GetUmbracoMvcArea(_hostingEnvironment),
                     invite = inviteToken
                 });
 
@@ -570,7 +574,7 @@ namespace Umbraco.Web.Editors
 
             // if the found user has their email for username, we want to keep this synced when changing the email.
             // we have already cross-checked above that the email isn't colliding with anything, so we can safely assign it here.
-            if (_umbracoSettingsSection.Security.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
+            if (_securitySettings.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
             {
                 userSave.Username = userSave.Email;
             }

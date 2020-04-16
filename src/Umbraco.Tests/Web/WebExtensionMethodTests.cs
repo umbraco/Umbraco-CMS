@@ -7,10 +7,10 @@ using System.Web.Routing;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
@@ -32,10 +32,10 @@ namespace Umbraco.Tests.Web
             var umbCtx = new UmbracoContext(
                 httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(httpContextAccessor, ServiceContext.UserService, TestObjects.GetGlobalSettings(), IOHelper),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, TestObjects.GetGlobalSettings(), HostingEnvironment),
                 TestObjects.GetGlobalSettings(),
+                HostingEnvironment,
                 new TestVariationContextAccessor(),
-                IOHelper,
                 UriUtility,
                 new AspNetCookieManager(httpContextAccessor));
             var r1 = new RouteData();
@@ -53,10 +53,10 @@ namespace Umbraco.Tests.Web
             var umbCtx = new UmbracoContext(
                 httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(httpContextAccessor, ServiceContext.UserService, TestObjects.GetGlobalSettings(), IOHelper),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, TestObjects.GetGlobalSettings(), HostingEnvironment),
                 TestObjects.GetGlobalSettings(),
+                HostingEnvironment,
                 new TestVariationContextAccessor(),
-                IOHelper,
                 UriUtility,
                 new AspNetCookieManager(httpContextAccessor));
 
@@ -84,10 +84,10 @@ namespace Umbraco.Tests.Web
             var umbCtx = new UmbracoContext(
                 httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(httpContextAccessor, ServiceContext.UserService, TestObjects.GetGlobalSettings(), IOHelper),
+                new WebSecurity(httpContextAccessor, ServiceContext.UserService, TestObjects.GetGlobalSettings(), HostingEnvironment),
                 TestObjects.GetGlobalSettings(),
+                HostingEnvironment,
                 new TestVariationContextAccessor(),
-                IOHelper,
                 UriUtility,
                 new AspNetCookieManager(httpContextAccessor));
 

@@ -10,14 +10,15 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Packaging
 {
     [TestFixture]
-    class PackageExtractionTests
+    public class PackageExtractionTests
     {
         private const string PackageFileName = "Document_Type_Picker_1.1.umb";
 
         private static FileInfo GetTestPackagePath(string packageName)
         {
             const string testPackagesDirName = "Packaging\\Packages";
-            string path = Path.Combine(TestHelper.IOHelper.GetRootDirectorySafe(), testPackagesDirName, packageName);
+            var hosting = TestHelper.GetHostingEnvironment();
+            string path = Path.Combine(hosting.ApplicationPhysicalPath, testPackagesDirName, packageName);
             return new FileInfo(path);
         }
 

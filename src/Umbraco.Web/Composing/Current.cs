@@ -11,14 +11,16 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Mapping;
+using Umbraco.Net;
 using Umbraco.Core.PackageActions;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Runtime;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
-using Umbraco.Net;
+using Umbraco.Core.WebAssets;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Editors;
@@ -26,6 +28,7 @@ using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
@@ -114,6 +117,13 @@ namespace Umbraco.Web.Composing
 
         public static UmbracoHelper UmbracoHelper
             => Factory.GetInstance<UmbracoHelper>();
+        public static IUmbracoComponentRenderer UmbracoComponentRenderer
+            => Factory.GetInstance<IUmbracoComponentRenderer>();
+        public static ITagQuery TagQuery
+            => Factory.GetInstance<ITagQuery>();
+            
+        public static IRuntimeMinifier RuntimeMinifier
+            => Factory.GetInstance<IRuntimeMinifier>();
 
         public static DistributedCache DistributedCache
             => Factory.GetInstance<DistributedCache>();
@@ -183,7 +193,7 @@ namespace Umbraco.Web.Composing
             set
             {
                 if (value.Implements<IRenderController>() == false)
-                    throw new ArgumentException($"Type {value.FullName} does not implement {typeof (IRenderController).FullName}.", nameof(value));
+                    throw new ArgumentException($"Type {value.FullName} does not implement {typeof(IRenderController).FullName}.", nameof(value));
                 _defaultRenderMvcControllerType = value;
             }
         }
@@ -196,7 +206,7 @@ namespace Umbraco.Web.Composing
 
         public static IMediaFileSystem MediaFileSystem => Factory.GetInstance<IMediaFileSystem>();
 
-        public static UmbracoMapper Mapper =>  Factory.GetInstance<UmbracoMapper>();
+        public static UmbracoMapper Mapper => Factory.GetInstance<UmbracoMapper>();
 
         public static IRuntimeState RuntimeState => Factory.GetInstance<IRuntimeState>();
 
@@ -208,7 +218,7 @@ namespace Umbraco.Web.Composing
 
         public static CacheRefresherCollection CacheRefreshers => Factory.GetInstance<CacheRefresherCollection>();
 
-        public static DataEditorCollection DataEditors =>  Factory.GetInstance<DataEditorCollection>();
+        public static DataEditorCollection DataEditors => Factory.GetInstance<DataEditorCollection>();
 
         public static DataValueReferenceFactoryCollection DataValueReferenceFactories => Factory.GetInstance<DataValueReferenceFactoryCollection>();
 
@@ -248,7 +258,7 @@ namespace Umbraco.Web.Composing
 
         public static IFileSystems FileSystems => Factory.GetInstance<IFileSystems>();
 
-        public static ISqlContext SqlContext=> Factory.GetInstance<ISqlContext>();
+        public static ISqlContext SqlContext => Factory.GetInstance<ISqlContext>();
 
         public static IPublishedContentTypeFactory PublishedContentTypeFactory => Factory.GetInstance<IPublishedContentTypeFactory>();
 
@@ -262,6 +272,9 @@ namespace Umbraco.Web.Composing
         public static IUmbracoVersion UmbracoVersion => Factory.GetInstance<IUmbracoVersion>();
         public static IPublishedUrlProvider PublishedUrlProvider => Factory.GetInstance<IPublishedUrlProvider>();
         public static IMenuItemCollectionFactory MenuItemCollectionFactory => Factory.GetInstance<IMenuItemCollectionFactory>();
+        public static MembershipHelper MembershipHelper => Factory.GetInstance<MembershipHelper>();
+        public static IUmbracoApplicationLifetime UmbracoApplicationLifetime => Factory.GetInstance<IUmbracoApplicationLifetime>();
+        public static IPublishedContentQuery PublishedContentQuery => Factory.GetInstance<IPublishedContentQuery>();
 
         #endregion
     }

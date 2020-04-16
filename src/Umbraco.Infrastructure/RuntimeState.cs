@@ -9,7 +9,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Core
@@ -20,50 +20,24 @@ namespace Umbraco.Core
     public class RuntimeState : IRuntimeState
     {
         private readonly ILogger _logger;
-        private readonly IUmbracoSettingsSection _settings;
         private readonly IGlobalSettings _globalSettings;
         private readonly ConcurrentHashSet<string> _applicationUrls = new ConcurrentHashSet<string>();
-        private readonly Lazy<IMainDom> _mainDom;
-        private readonly Lazy<IServerRegistrar> _serverRegistrar;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IBackOfficeInfo _backOfficeInfo;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
         /// </summary>
-        public RuntimeState(ILogger logger, IUmbracoSettingsSection settings, IGlobalSettings globalSettings,
-            Lazy<IMainDom> mainDom, Lazy<IServerRegistrar> serverRegistrar, IUmbracoVersion umbracoVersion,
-            IHostingEnvironment hostingEnvironment,
+        public RuntimeState(ILogger logger, IGlobalSettings globalSettings,
+            IUmbracoVersion umbracoVersion,
             IBackOfficeInfo backOfficeInfo)
         {
             _logger = logger;
-            _settings = settings;
             _globalSettings = globalSettings;
-            _mainDom = mainDom;
-            _serverRegistrar = serverRegistrar;
             _umbracoVersion = umbracoVersion;
-            _hostingEnvironment = hostingEnvironment;
             _backOfficeInfo = backOfficeInfo;
-
-            ApplicationVirtualPath = _hostingEnvironment.ApplicationVirtualPath;
         }
 
-        /// <summary>
-        /// Gets the server registrar.
-        /// </summary>
-        /// <remarks>
-        /// <para>This is NOT exposed in the interface.</para>
-        /// </remarks>
-        private IServerRegistrar ServerRegistrar => _serverRegistrar.Value;
-
-        /// <summary>
-        /// Gets the application MainDom.
-        /// </summary>
-        /// <remarks>
-        /// <para>This is NOT exposed in the interface as MainDom is internal.</para>
-        /// </remarks>
-        public IMainDom MainDom => _mainDom.Value;
 
         /// <inheritdoc />
         public Version Version => _umbracoVersion.Current;
@@ -75,25 +49,13 @@ namespace Umbraco.Core
         public SemVersion SemanticVersion => _umbracoVersion.SemanticVersion;
 
         /// <inheritdoc />
-        public bool Debug => _hostingEnvironment.IsDebugMode;
-
-        /// <inheritdoc />
-        public bool IsMainDom => MainDom.IsMainDom;
-
-        /// <inheritdoc />
-        public ServerRole ServerRole => ServerRegistrar.GetCurrentServerRole();
-
-        /// <inheritdoc />
         public Uri ApplicationUrl { get; private set; }
 
         /// <inheritdoc />
-        public string ApplicationVirtualPath { get; }
+        public string CurrentMigrationState { get; private set; }
 
         /// <inheritdoc />
-        public string CurrentMigrationState { get; internal set; }
-
-        /// <inheritdoc />
-        public string FinalMigrationState { get; internal set; }
+        public string FinalMigrationState { get; private set; }
 
         /// <inheritdoc />
         public RuntimeLevel Level { get; internal set; } = RuntimeLevel.Unknown;
@@ -255,7 +217,7 @@ namespace Umbraco.Core
             Reason = RuntimeLevelReason.UpgradeMigrations;
         }
 
-        protected virtual bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
+        private bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
             var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion, _globalSettings));
             var stateValueKey = upgrader.StateValueKey;
@@ -263,7 +225,7 @@ namespace Umbraco.Core
             // no scope, no service - just directly accessing the database
             using (var database = databaseFactory.CreateDatabase())
             {
-                CurrentMigrationState = KeyValueService.GetValue(database, stateValueKey);
+                CurrentMigrationState = database.GetFromKeyValueTable(stateValueKey);
                 FinalMigrationState = upgrader.Plan.FinalState;
             }
 

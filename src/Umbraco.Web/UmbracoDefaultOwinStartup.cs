@@ -5,10 +5,11 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Services;
 using Umbraco.Net;
+using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
@@ -27,14 +28,15 @@ namespace Umbraco.Web
     public class UmbracoDefaultOwinStartup
     {
         protected IUmbracoContextAccessor UmbracoContextAccessor => Current.UmbracoContextAccessor;
-        protected IGlobalSettings GlobalSettings => Current.Configs.Global();
-        protected IUmbracoSettingsSection UmbracoSettings => Current.Configs.Settings();
-        protected IUserPasswordConfiguration UserPasswordConfig => Current.Configs.UserPasswordConfiguration();
+        protected IGlobalSettings GlobalSettings => Current.Factory.GetInstance<IGlobalSettings>();
+        protected IContentSettings ContentSettings => Current.Factory.GetInstance<IContentSettings>();
+        protected ISecuritySettings SecuritySettings => Current.Factory.GetInstance<ISecuritySettings>();
+        protected IUserPasswordConfiguration UserPasswordConfig => Current.Factory.GetInstance<IUserPasswordConfiguration>();
         protected IRuntimeState RuntimeState => Current.RuntimeState;
         protected ServiceContext Services => Current.Services;
         protected UmbracoMapper Mapper => Current.Mapper;
         protected IIpResolver IpResolver => Current.IpResolver;
-        protected IIOHelper IOHelper => Current.IOHelper;
+        protected IHostingEnvironment HostingEnvironment => Current.HostingEnvironment;
         protected IRequestCache RequestCache => Current.AppCaches.RequestCache;
 
         /// <summary>
@@ -75,7 +77,7 @@ namespace Umbraco.Web
             ConfigureUmbracoAuthentication(app);
 
             app
-                .UseSignalR(GlobalSettings, IOHelper)
+                .UseSignalR(GlobalSettings, HostingEnvironment)
                 .FinalizeMiddlewareConfiguration();
         }
 
@@ -103,9 +105,9 @@ namespace Umbraco.Web
             // Ensure owin is configured for Umbraco back office authentication.
             // Front-end OWIN cookie configuration must be declared after this code.
             app
-                .UseUmbracoBackOfficeCookieAuthentication(UmbracoContextAccessor, RuntimeState, Services.UserService, GlobalSettings, UmbracoSettings.Security, IOHelper, RequestCache, PipelineStage.Authenticate, UmbracoSettings)
-                .UseUmbracoBackOfficeExternalCookieAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, IOHelper, RequestCache, PipelineStage.Authenticate)
-                .UseUmbracoPreviewAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, UmbracoSettings.Security, IOHelper, RequestCache, PipelineStage.Authorize);
+                .UseUmbracoBackOfficeCookieAuthentication(UmbracoContextAccessor, RuntimeState, Services.UserService, GlobalSettings, SecuritySettings, HostingEnvironment, RequestCache, PipelineStage.Authenticate)
+                .UseUmbracoBackOfficeExternalCookieAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, HostingEnvironment, RequestCache, PipelineStage.Authenticate)
+                .UseUmbracoPreviewAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, SecuritySettings, HostingEnvironment, RequestCache, PipelineStage.Authorize);
         }
 
         public static event EventHandler<OwinMiddlewareConfiguredEventArgs> MiddlewareConfigured;

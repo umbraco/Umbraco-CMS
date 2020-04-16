@@ -3,9 +3,10 @@ using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Web.Hosting;
+using Umbraco.Configuration;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.ModelsBuilder.Embedded.Building;
-using Umbraco.ModelsBuilder.Embedded.Configuration;
 using Umbraco.Web.Editors;
 using Umbraco.Web.WebApi.Filters;
 

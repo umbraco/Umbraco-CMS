@@ -73,7 +73,6 @@ namespace Umbraco.Core.Services.Implement
                 _serverRegistrationRepository.DeactiveStaleServers(staleTimeout); // triggers a cache reload
 
                 // reload - cheap, cached
-                // reload - cheap, cached
 
                 // default role is single server, but if registrations contain more
                 // than one active server, then role is master or replica

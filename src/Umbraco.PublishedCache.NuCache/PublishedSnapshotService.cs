@@ -49,10 +49,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
-        private readonly ITypeFinder _typeFinder;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IIOHelper _ioHelper;
+        private readonly INuCacheSettings _config;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -87,10 +87,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
             UrlSegmentProviderCollection urlSegmentProviders,
-            ITypeFinder typeFinder,
             IHostingEnvironment hostingEnvironment,
             IShortStringHelper shortStringHelper,
-            IIOHelper ioHelper)
+            IIOHelper ioHelper,
+            INuCacheSettings config)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -107,10 +107,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
             _urlSegmentProviders = urlSegmentProviders;
-            _typeFinder = typeFinder;
             _hostingEnvironment = hostingEnvironment;
             _shortStringHelper = shortStringHelper;
             _ioHelper = ioHelper;
+            _config = config;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -197,8 +197,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _localMediaDbExists = File.Exists(localMediaDbPath);
 
             // if both local databases exist then GetTree will open them, else new databases will be created
-            _localContentDb = BTree.GetTree(localContentDbPath, _localContentDbExists);
-            _localMediaDb = BTree.GetTree(localMediaDbPath, _localMediaDbExists);
+            _localContentDb = BTree.GetTree(localContentDbPath, _localContentDbExists, _config);
+            _localMediaDb = BTree.GetTree(localMediaDbPath, _localMediaDbExists, _config);
 
             _logger.Info<PublishedSnapshotService>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", _localContentDbExists, _localMediaDbExists);
         }
@@ -1204,7 +1204,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     _contentGen = contentSnap.Gen;
                     _mediaGen = mediaSnap.Gen;
                     _domainGen = domainSnap.Gen;
-                    elementsCache = _elementsCache = new FastDictionaryAppCache(_typeFinder);
+                    elementsCache = _elementsCache = new FastDictionaryAppCache();
                 }
             }
 
@@ -1309,7 +1309,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var member = args.Entity;
 
             // refresh the edited data
-            OnRepositoryRefreshed(db, member, true);
+            OnRepositoryRefreshed(db, member, false);
         }
 
         private void OnRepositoryRefreshed(IUmbracoDatabase db, IContentBase content, bool published)

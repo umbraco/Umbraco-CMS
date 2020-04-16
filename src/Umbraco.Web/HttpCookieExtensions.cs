@@ -5,7 +5,6 @@ using System.Net.Http.Headers;
 using System.Web;
 using Microsoft.Owin;
 using Umbraco.Core;
-using Umbraco.Core.Cookie;
 
 namespace Umbraco.Web
 {

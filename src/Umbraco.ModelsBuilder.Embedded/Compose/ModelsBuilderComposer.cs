@@ -1,12 +1,11 @@
 ﻿using System.Linq;
 using System.Reflection;
+using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
-using Umbraco.ModelsBuilder.Embedded.Configuration;
-using Umbraco.Web;
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
@@ -20,15 +19,11 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         {
             var isLegacyModelsBuilderInstalled = IsLegacyModelsBuilderInstalled();
 
-
-            composition.Configs.Add<IModelsBuilderConfig>(() => new ModelsBuilderConfig(composition.IOHelper));
-
             if (isLegacyModelsBuilderInstalled)
             {
                 ComposeForLegacyModelsBuilder(composition);
                 return;
             }
-
 
             composition.Components().Append<ModelsBuilderComponent>();
             composition.Register<UmbracoServices>(Lifetime.Singleton);
@@ -36,7 +31,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             composition.RegisterUnique<LiveModelsProvider>();
             composition.RegisterUnique<OutOfDateModelsStatus>();
             composition.RegisterUnique<ModelsGenerationError>();
-
+            
             if (composition.Configs.ModelsBuilder().ModelsMode == ModelsMode.PureLive)
                 ComposeForLiveModels(composition);
             else if (composition.Configs.ModelsBuilder().EnableFactory)

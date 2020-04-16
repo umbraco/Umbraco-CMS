@@ -10,9 +10,9 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
@@ -163,7 +163,7 @@ namespace Umbraco.Tests.Cache
                 new TestDefaultCultureAccessor(),
                 TestObjects.GetGlobalSettings(),
                 Mock.Of<IUserService>(),
-                IOHelper,
+                TestHelper.GetHostingEnvironment(),
                 UriUtility,
                 httpContextAccessor,
                 new AspNetCookieManager(httpContextAccessor));

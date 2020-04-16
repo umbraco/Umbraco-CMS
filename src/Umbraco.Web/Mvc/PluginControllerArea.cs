@@ -6,6 +6,7 @@ using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Web.WebApi;
 
@@ -17,7 +18,7 @@ namespace Umbraco.Web.Mvc
     internal class PluginControllerArea : AreaRegistration
     {
         private readonly IGlobalSettings _globalSettings;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IEnumerable<PluginControllerMetadata> _surfaceControllers;
         private readonly IEnumerable<PluginControllerMetadata> _apiControllers;
         private readonly string _areaName;
@@ -27,11 +28,12 @@ namespace Umbraco.Web.Mvc
         /// based on their PluginControllerAttribute. If they are not the same an exception will be thrown.
         /// </summary>
         /// <param name="globalSettings"></param>
+        /// <param name="hostingEnvironment"></param>
         /// <param name="pluginControllers"></param>
-        public PluginControllerArea(IGlobalSettings globalSettings, IIOHelper ioHelper, IEnumerable<PluginControllerMetadata> pluginControllers)
+        public PluginControllerArea(IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IEnumerable<PluginControllerMetadata> pluginControllers)
         {
             _globalSettings = globalSettings;
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
             var controllers = pluginControllers.ToArray();
 
             if (controllers.Any(x => x.AreaName.IsNullOrWhiteSpace()))
@@ -77,7 +79,7 @@ namespace Umbraco.Web.Mvc
         {
             foreach (var s in surfaceControllers)
             {
-                var route = this.RouteControllerPlugin(_globalSettings, _ioHelper,  s.ControllerName, s.ControllerType, routes, "", "Index", UrlParameter.Optional, "surface");
+                var route = this.RouteControllerPlugin(_globalSettings, _hostingEnvironment,  s.ControllerName, s.ControllerType, routes, "", "Index", UrlParameter.Optional, "surface");
                 //set the route handler to our SurfaceRouteHandler
                 route.RouteHandler = new SurfaceRouteHandler();
             }
@@ -92,7 +94,7 @@ namespace Umbraco.Web.Mvc
         {
             foreach (var s in apiControllers)
             {
-                this.RouteControllerPlugin(_globalSettings, _ioHelper, s.ControllerName, s.ControllerType, routes, "", "", UrlParameter.Optional, "api",
+                this.RouteControllerPlugin(_globalSettings, _hostingEnvironment, s.ControllerName, s.ControllerType, routes, "", "", UrlParameter.Optional, "api",
                     isMvc: false,
                     areaPathPrefix: s.IsBackOffice ? "backoffice" : null);
             }

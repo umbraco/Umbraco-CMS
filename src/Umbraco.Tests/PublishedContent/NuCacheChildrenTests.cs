@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Legacy;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Install;
@@ -20,10 +21,10 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Common;
 using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
@@ -61,9 +62,9 @@ namespace Umbraco.Tests.PublishedContent
 
             var configs = TestHelper.GetConfigs();
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);
-            var globalSettings = new GlobalSettings(TestHelper.IOHelper);
+            var globalSettings = new GlobalSettings();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-            configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
+            configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
             configs.Add<IGlobalSettings>(() => globalSettings);
 
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(IPublishedModelFactory))).Returns(PublishedModelFactory);
@@ -143,7 +144,8 @@ namespace Umbraco.Tests.PublishedContent
             // create a data source for NuCache
             _source = new TestDataSource(kits);
 
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeFinder = TestHelper.GetTypeFinder();
+            var settings = Mock.Of<INuCacheSettings>();
 
 
             // at last, create the complete NuCache snapshot service!
@@ -166,10 +168,10 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IEntityXmlSerializer>(),
                 PublishedModelFactory,
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
-                typeFinder,
                 hostingEnvironment,
                 new MockShortStringHelper(),
-                TestHelper.IOHelper);
+                TestHelper.IOHelper,
+                settings);
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
@@ -1321,6 +1323,18 @@ namespace Umbraco.Tests.PublishedContent
             child3 = contentStore.Test.GetValues(4)[0];
             Assert.AreEqual(2, child3.gen); // there is now 2x gen's of this item
             AssertLinkedNode(child3.contentNode, 1, 3, -1, -1, -1);
+        }
+
+        [Test]
+        public void MultipleCacheIteration()
+        {
+            //see https://github.com/umbraco/Umbraco-CMS/issues/7798
+            this.Init(this.GetInvariantKits());
+            var snapshot = this._snapshotService.CreatePublishedSnapshot(previewToken: null);
+            this._snapshotAccessor.PublishedSnapshot = snapshot;
+
+            var items = snapshot.Content.GetByXPath("/root/itype");
+            Assert.AreEqual(items.Count(), items.Count());
         }
 
         private void AssertLinkedNode(ContentNode node, int parent, int prevSibling, int nextSibling, int firstChild, int lastChild)

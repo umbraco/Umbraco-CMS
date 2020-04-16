@@ -28,17 +28,17 @@ namespace Umbraco.Core.Runtime
         private bool _hasError;
         private object _locker = new object();
 
-        public SqlMainDomLock(ILogger logger, Configs configs, IDbProviderFactoryCreator dbProviderFactoryCreator)
+        public SqlMainDomLock(ILogger logger, IGlobalSettings globalSettings, IConnectionStrings connectionStrings, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
             // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
             _lockId = Guid.NewGuid().ToString();
             _logger = logger;
-            _dbFactory = new UmbracoDatabaseFactory(
+            _dbFactory = new UmbracoDatabaseFactory(_logger,
+               globalSettings,
+               connectionStrings,
                Constants.System.UmbracoConnectionName,
-               _logger,
                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())),
-               configs, dbProviderFactoryCreator
-               );
+               dbProviderFactoryCreator);
         }
 
         public async Task<bool> AcquireLockAsync(int millisecondsTimeout)
@@ -324,7 +324,7 @@ namespace Umbraco.Core.Runtime
             {
                 Key = MainDomKey,
                 Value = id,
-                Updated = DateTime.Now
+                UpdateDate = DateTime.Now
             });
         }
 

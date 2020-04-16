@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Web;
 using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Exceptions;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Routing;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Security;
 using Umbraco.Web.Composing;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web
@@ -33,26 +32,27 @@ namespace Umbraco.Web
     /// </remarks>
     public class UmbracoInjectedModule : IHttpModule
     {
-        private readonly IGlobalSettings _globalSettings;
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
         private readonly IPublishedRouter _publishedRouter;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly RoutableDocumentFilter _routableDocumentLookup;
         private readonly IRequestCache _requestCache;
+        private readonly IGlobalSettings _globalSettings;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly UriUtility _uriUtility;
 
         public UmbracoInjectedModule(
-            IGlobalSettings globalSettings,
             IRuntimeState runtime,
             ILogger logger,
             IPublishedRouter publishedRouter,
             IUmbracoContextFactory umbracoContextFactory,
             RoutableDocumentFilter routableDocumentLookup,
             UriUtility uriUtility,
-            IRequestCache requestCache)
+            IRequestCache requestCache,
+            IGlobalSettings globalSettings,
+            IHostingEnvironment hostingEnvironment)
         {
-            _globalSettings = globalSettings;
             _runtime = runtime;
             _logger = logger;
             _publishedRouter = publishedRouter;
@@ -60,6 +60,8 @@ namespace Umbraco.Web
             _routableDocumentLookup = routableDocumentLookup;
             _uriUtility = uriUtility;
             _requestCache = requestCache;
+            _globalSettings = globalSettings;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         #region HttpModule event handlers
@@ -113,7 +115,7 @@ namespace Umbraco.Web
             var umbracoContext = Current.UmbracoContext;
 
             // re-write for the default back office path
-            if (httpContext.Request.Url.IsDefaultBackOfficeRequest(_globalSettings))
+            if (httpContext.Request.Url.IsDefaultBackOfficeRequest(_globalSettings, _hostingEnvironment))
             {
                 if (EnsureRuntime(httpContext, umbracoContext.OriginalRequestUrl))
                     RewriteToBackOfficeHandler(httpContext);
@@ -244,8 +246,10 @@ namespace Umbraco.Web
 
             _logger.Warn<UmbracoModule>("Umbraco has no content");
 
-            const string noContentUrl = "~/config/splashes/noNodes.aspx";
-            httpContext.RewritePath(_uriUtility.ToAbsolute(noContentUrl));
+            if (RouteTable.Routes[Constants.Web.NoContentRouteName] is Route route)
+            {
+                httpContext.RewritePath(route.Url);
+            }
 
             return false;
         }
@@ -257,7 +261,7 @@ namespace Umbraco.Web
         private void RewriteToBackOfficeHandler(HttpContextBase context)
         {
             // GlobalSettings.Path has already been through IOHelper.ResolveUrl() so it begins with / and vdir (if any)
-            var rewritePath = _globalSettings.Path.TrimEnd('/') + "/Default";
+            var rewritePath = _globalSettings.GetBackOfficePath(_hostingEnvironment).TrimEnd('/') + "/Default";
             // rewrite the path to the path of the handler (i.e. /umbraco/RenderMvc)
             context.RewritePath(rewritePath, "", "", false);
 
@@ -290,7 +294,7 @@ namespace Umbraco.Web
             var query = pcr.Uri.Query.TrimStart('?');
 
             // GlobalSettings.Path has already been through IOHelper.ResolveUrl() so it begins with / and vdir (if any)
-            var rewritePath = _globalSettings.Path.TrimEnd('/') + "/RenderMvc";
+            var rewritePath = _globalSettings.GetBackOfficePath(_hostingEnvironment).TrimEnd('/') + "/RenderMvc";
             // rewrite the path to the path of the handler (i.e. /umbraco/RenderMvc)
             context.RewritePath(rewritePath, "", query, false);
 

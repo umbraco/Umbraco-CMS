@@ -9,6 +9,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Packaging;
@@ -74,31 +75,28 @@ namespace Umbraco.Tests.TestHelpers
         /// <summary>
         /// Gets a ServiceContext.
         /// </summary>
+        /// <param name="scopeProvider"></param>
         /// <param name="scopeAccessor"></param>
         /// <param name="cache">A cache.</param>
         /// <param name="logger">A logger.</param>
-        /// <param name="umbracoVersion">An Umbraco Version.</param>
         /// <param name="ioHelper">An io helper.</param>
         /// <param name="globalSettings"></param>
-        /// <param name="umbracoSettings"></param>
+        /// <param name="contentSettings"></param>
         /// <param name="eventMessagesFactory">An event messages factory.</param>
         /// <param name="urlSegmentProviders">Some url segment providers.</param>
-        /// <param name="typeLoader"></param>
+        /// <param name="umbracoVersion">An Umbraco Version.</param>
         /// <param name="factory">A container.</param>
-        /// <param name="scopeProvider"></param>
         /// <returns>A ServiceContext.</returns>
         /// <remarks>Should be used sparingly for integration tests only - for unit tests
         /// just mock the services to be passed to the ctor of the ServiceContext.</remarks>
-        public ServiceContext GetServiceContext(
-            IScopeProvider scopeProvider, IScopeAccessor scopeAccessor,
+        public ServiceContext GetServiceContext(IScopeProvider scopeProvider, IScopeAccessor scopeAccessor,
             AppCaches cache,
             ILogger logger,
             IIOHelper ioHelper,
             IGlobalSettings globalSettings,
-            IUmbracoSettingsSection umbracoSettings,
+            IContentSettings contentSettings,
             IEventMessagesFactory eventMessagesFactory,
             UrlSegmentProviderCollection urlSegmentProviders,
-            TypeLoader typeLoader,
             IUmbracoVersion umbracoVersion,
             IFactory factory = null)
         {
@@ -161,7 +159,7 @@ namespace Umbraco.Tests.TestHelpers
             var dataTypeService = GetLazyService<IDataTypeService>(factory, c => new DataTypeService(scopeProvider, logger, eventMessagesFactory, GetRepo<IDataTypeRepository>(c), GetRepo<IDataTypeContainerRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IEntityRepository>(c), GetRepo<IContentTypeRepository>(c), ioHelper, localizedTextService.Value, localizationService.Value, TestHelper.ShortStringHelper));
             var propertyValidationService = new Lazy<IPropertyValidationService>(() => new PropertyValidationService(propertyEditorCollection, dataTypeService.Value));
             var contentService = GetLazyService<IContentService>(factory, c => new ContentService(scopeProvider, logger, eventMessagesFactory, GetRepo<IDocumentRepository>(c), GetRepo<IEntityRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IContentTypeRepository>(c), GetRepo<IDocumentBlueprintRepository>(c), GetRepo<ILanguageRepository>(c), propertyValidationService));
-            var notificationService = GetLazyService<INotificationService>(factory, c => new NotificationService(scopeProvider, userService.Value, contentService.Value, localizationService.Value, logger, ioHelper, GetRepo<INotificationsRepository>(c), globalSettings, umbracoSettings.Content));
+            var notificationService = GetLazyService<INotificationService>(factory, c => new NotificationService(scopeProvider, userService.Value, contentService.Value, localizationService.Value, logger, ioHelper, GetRepo<INotificationsRepository>(c), globalSettings, contentSettings));
             var serverRegistrationService = GetLazyService<IServerRegistrationService>(factory, c => new ServerRegistrationService(scopeProvider, logger, eventMessagesFactory, GetRepo<IServerRegistrationRepository>(c), TestHelper.GetHostingEnvironment()));
             var memberGroupService = GetLazyService<IMemberGroupService>(factory, c => new MemberGroupService(scopeProvider, logger, eventMessagesFactory, GetRepo<IMemberGroupRepository>(c)));
             var memberService = GetLazyService<IMemberService>(factory, c => new MemberService(scopeProvider, logger, eventMessagesFactory, memberGroupService.Value, GetRepo<IMemberRepository>(c), GetRepo<IMemberTypeRepository>(c), GetRepo<IMemberGroupRepository>(c), GetRepo<IAuditRepository>(c)));
@@ -187,12 +185,14 @@ namespace Umbraco.Tests.TestHelpers
                         new PackageDataInstallation(logger, fileService.Value, macroService.Value, localizationService.Value, dataTypeService.Value, entityService.Value, contentTypeService.Value, contentService.Value, propertyEditorCollection, scopeProvider, shortStringHelper, GetGlobalSettings(), localizedTextService.Value),
                         new PackageFileInstallation(compiledPackageXmlParser, ioHelper, new ProfilingLogger(logger, new TestProfiler())),
                         compiledPackageXmlParser, Mock.Of<IPackageActionRunner>(),
-                        new DirectoryInfo(ioHelper.GetRootDirectorySafe())), ioHelper);
+                        Mock.Of<IHostingEnvironment>(x => x.ApplicationPhysicalPath == ioHelper.MapPath("~"))),
+                    ioHelper);
             });
             var relationService = GetLazyService<IRelationService>(factory, c => new RelationService(scopeProvider, logger, eventMessagesFactory, entityService.Value, GetRepo<IRelationRepository>(c), GetRepo<IRelationTypeRepository>(c)));
             var tagService = GetLazyService<ITagService>(factory, c => new TagService(scopeProvider, logger, eventMessagesFactory, GetRepo<ITagRepository>(c)));
             var redirectUrlService = GetLazyService<IRedirectUrlService>(factory, c => new RedirectUrlService(scopeProvider, logger, eventMessagesFactory, GetRepo<IRedirectUrlRepository>(c)));
             var consentService = GetLazyService<IConsentService>(factory, c => new ConsentService(scopeProvider, logger, eventMessagesFactory, GetRepo<IConsentRepository>(c)));
+            var keyValueService = GetLazyService<IKeyValueService>(factory, c => new KeyValueService(scopeProvider, GetRepo<IKeyValueRepository>(c)));
             var contentTypeServiceBaseFactory = GetLazyService<IContentTypeBaseServiceProvider>(factory, c => new ContentTypeBaseServiceProvider(factory.GetInstance<IContentTypeService>(),factory.GetInstance<IMediaTypeService>(),factory.GetInstance<IMemberTypeService>()));
 
             return new ServiceContext(
@@ -221,6 +221,7 @@ namespace Umbraco.Tests.TestHelpers
                 externalLoginService,
                 redirectUrlService,
                 consentService,
+                keyValueService,
                 contentTypeServiceBaseFactory);
         }
 
@@ -244,12 +245,17 @@ namespace Umbraco.Tests.TestHelpers
                 // mappersBuilder.AddCore();
                 // var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Factory.GetInstance<IMapperCollection>();
-                databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers), TestHelper.GetConfigs(), TestHelper.DbProviderFactoryCreator);
+                databaseFactory = new UmbracoDatabaseFactory(logger,
+                    SettingsForTests.DefaultGlobalSettings,
+                    new ConnectionStrings(),
+                    Constants.System.UmbracoConnectionName,
+                    new Lazy<IMapperCollection>(() => mappers),
+                    TestHelper.DbProviderFactoryCreator);
             }
 
-            typeFinder = typeFinder ?? new TypeFinder(logger);
-            fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings());
-            var coreDebug = Current.Configs.CoreDebug();
+            typeFinder ??= new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
+            fileSystems ??= new FileSystems(Current.Factory, logger, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings());
+            var coreDebug = TestHelper.CoreDebugSettings;
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
             var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, coreDebug, mediaFileSystem, logger, typeFinder, NoAppCache.Instance);
             return scopeProvider;

@@ -1,28 +1,17 @@
 ﻿using System;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web.Hosting;
 
 namespace Umbraco.Tests.CoreThings
 {
     [TestFixture]
     public class UriExtensionsTests
     {
-        private string _root;
-
-        [SetUp]
-        public void SetUp()
-        {
-            _root = TestHelper.IOHelper.Root;
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            TestHelper.IOHelper.Root = _root;
-        }
 
         [TestCase("http://www.domain.com/umbraco", "", true)]
         [TestCase("http://www.domain.com/Umbraco/", "", true)]
@@ -45,11 +34,13 @@ namespace Umbraco.Tests.CoreThings
         [TestCase("http://www.domain.com/umbraco/test/legacyAjaxCalls.ashx?some=query&blah=js", "", true)]
         public void Is_Back_Office_Request(string input, string virtualPath, bool expected)
         {
-            var ioHelper = TestHelper.IOHelper;
-            ioHelper.Root = virtualPath;
-            var globalConfig = SettingsForTests.GenerateMockGlobalSettings();
+            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
+            var mockHostingSettings = Mock.Get(SettingsForTests.GenerateMockHostingSettings());
+            mockHostingSettings.Setup(x => x.ApplicationVirtualPath).Returns(virtualPath);
+            var hostingEnvironment = new AspNetHostingEnvironment(mockHostingSettings.Object);
+
             var source = new Uri(input);
-            Assert.AreEqual(expected, source.IsBackOfficeRequest(virtualPath, globalConfig, ioHelper));
+            Assert.AreEqual(expected, source.IsBackOfficeRequest(globalSettings, hostingEnvironment));
         }
 
         [TestCase("http://www.domain.com/install", true)]
@@ -64,7 +55,7 @@ namespace Umbraco.Tests.CoreThings
         public void Is_Installer_Request(string input, bool expected)
         {
             var source = new Uri(input);
-            Assert.AreEqual(expected, source.IsInstallerRequest(TestHelper.IOHelper));
+            Assert.AreEqual(expected, source.IsInstallerRequest(TestHelper.GetHostingEnvironment()));
         }
 
         [TestCase("http://www.domain.com/foo/bar", "/", "http://www.domain.com/")]

@@ -14,7 +14,7 @@ namespace Umbraco.Tests.CoreThings
         {
             base.Compose();
 
-            Composition.RegisterUnique<IShortStringHelper>(f => new DefaultShortStringHelper(f.GetInstance<IUmbracoSettingsSection>()));
+            Composition.RegisterUnique<IShortStringHelper>(f => new DefaultShortStringHelper(f.GetInstance<IRequestHandlerSettings>()));
         }
 
         [Test]

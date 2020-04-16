@@ -6,6 +6,19 @@ namespace Umbraco.Core.IO
     public static class IOHelperExtensions
     {
         /// <summary>
+        /// Will resolve a virtual path URL to an absolute path, else if it is not a virtual path (i.e. starts with ~/) then
+        /// it will just return the path as-is (relative).
+        /// </summary>
+        /// <param name="ioHelper"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string ResolveRelativeOrVirtualUrl(this IIOHelper ioHelper, string path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) return path;
+            return path.StartsWith("~/") ? ioHelper.ResolveUrl(path) : path;
+        }
+
+        /// <summary>
         /// Tries to create a directory.
         /// </summary>
         /// <param name="ioHelper">The IOHelper.</param>
@@ -35,5 +48,7 @@ namespace Umbraco.Core.IO
         {
             return "umbraco-test." + Guid.NewGuid().ToString("N").Substring(0, 8);
         }
+
+       
     }
 }

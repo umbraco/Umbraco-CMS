@@ -28,16 +28,16 @@ namespace Umbraco.Core.Services.Implement
         private readonly ILocalizationService _localizationService;
         private readonly INotificationsRepository _notificationsRepository;
         private readonly IGlobalSettings _globalSettings;
-        private readonly IContentSection _contentSection;
+        private readonly IContentSettings _contentSettings;
         private readonly ILogger _logger;
         private readonly IIOHelper _ioHelper;
 
         public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILocalizationService localizationService,
-            ILogger logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IGlobalSettings globalSettings, IContentSection contentSection)
+            ILogger logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IGlobalSettings globalSettings, IContentSettings contentSettings)
         {
             _notificationsRepository = notificationsRepository;
             _globalSettings = globalSettings;
-            _contentSection = contentSection;
+            _contentSettings = contentSettings;
             _uowProvider = provider ?? throw new ArgumentNullException(nameof(provider));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
@@ -302,7 +302,7 @@ namespace Umbraco.Core.Services.Implement
 
             if (content.ContentType.VariesByNothing())
             {
-                if (!_contentSection.DisableHtmlEmail)
+                if (!_contentSettings.DisableHtmlEmail)
                 {
                     //create the HTML summary for invariant content
 
@@ -344,7 +344,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 //it's variant, so detect what cultures have changed
 
-                if (!_contentSection.DisableHtmlEmail)
+                if (!_contentSettings.DisableHtmlEmail)
                 {
                     //Create the HTML based summary (ul of culture names)
 
@@ -406,13 +406,13 @@ namespace Umbraco.Core.Services.Implement
                 summary.ToString());
 
             // create the mail message
-            var mail = new MailMessage(_contentSection.NotificationEmailAddress, mailingUser.Email);
+            var mail = new MailMessage(_contentSettings.NotificationEmailAddress, mailingUser.Email);
 
             // populate the message
 
 
             mail.Subject = createSubject((mailingUser, subjectVars));
-            if (_contentSection.DisableHtmlEmail)
+            if (_contentSettings.DisableHtmlEmail)
             {
                 mail.IsBodyHtml = false;
                 mail.Body = createBody((user: mailingUser, body: bodyVars, false));

@@ -20,10 +20,10 @@ using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.Security.Providers;
+using Umbraco.Tests.Common;
 
 namespace Umbraco.Tests.Services
 {
@@ -151,7 +151,17 @@ namespace Umbraco.Tests.Services
 
             Assert.AreEqual(3, found.Count());
         }
+        [Test]
+        public void Can_Get_All_Roles_IDs()
+        {
+            ServiceContext.MemberService.AddRole("MyTestRole1");
+            ServiceContext.MemberService.AddRole("MyTestRole2");
+            ServiceContext.MemberService.AddRole("MyTestRole3");
 
+            var found = ServiceContext.MemberService.GetAllRolesIds();
+
+            Assert.AreEqual(3, found.Count());
+        }
         [Test]
         public void Can_Get_All_Roles_By_Member_Id()
         {
@@ -170,7 +180,24 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(2, memberRoles.Count());
 
         }
+        [Test]
+        public void Can_Get_All_Roles_Ids_By_Member_Id()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
+            ServiceContext.MemberService.Save(member);
 
+            ServiceContext.MemberService.AddRole("MyTestRole1");
+            ServiceContext.MemberService.AddRole("MyTestRole2");
+            ServiceContext.MemberService.AddRole("MyTestRole3");
+            ServiceContext.MemberService.AssignRoles(new[] { member.Id }, new[] { "MyTestRole1", "MyTestRole2" });
+
+            var memberRoles = ServiceContext.MemberService.GetAllRolesIds(member.Id);
+
+            Assert.AreEqual(2, memberRoles.Count());
+
+        }
         [Test]
         public void Can_Get_All_Roles_By_Member_Username()
         {

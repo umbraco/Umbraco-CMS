@@ -31,7 +31,7 @@ ul.sections {
                 height: 4px;
                 bottom: 0;
                 transform: translateY(4px);
-                background-color: @ui-active;
+                background-color: @pinkLight;
                 position: absolute;
                 border-radius: 3px 3px 0 0;
                 opacity: 0;
@@ -55,8 +55,8 @@ ul.sections {
             transition: opacity .1s linear, box-shadow .1s;
         }
 
-        &.current a {
-            color: @ui-active;
+        &.current > a {
+            color: @pinkLight;
 
             &::after {
                 opacity: 1;
@@ -74,6 +74,13 @@ ul.sections {
                 margin: 0 5px 0 0;
                 opacity: 0.6;
                 transition: opacity .1s linear;
+            }
+
+            &.current {
+                i {
+                    opacity: 1;
+                    background: @pinkLight;
+                }
             }
 
             &:hover i {
@@ -104,7 +111,7 @@ ul.sections-tray {
     li {
 
         &.current a {
-            color: @ui-active;
+            color: @ui-active-border;
             opacity: 1;
 
             &::after {
@@ -124,7 +131,7 @@ ul.sections-tray {
                 content: "";
                 width: 4px;
                 height: 100%;
-                background-color: @ui-active;
+                background-color: @ui-active-border;
                 position: absolute;
                 border-radius: 0 3px 3px 0;
                 opacity: 0;

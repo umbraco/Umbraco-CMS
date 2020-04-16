@@ -30,37 +30,6 @@ namespace Umbraco.Web
     {
         #region Collection Builders
 
-        /// <summary>
-        /// Gets the actions collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        /// <returns></returns>
-        internal static ActionCollectionBuilder Actions(this Composition composition)
-            => composition.WithCollectionBuilder<ActionCollectionBuilder>();
-
-        /// <summary>
-        /// Gets the content apps collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        /// <returns></returns>
-        public static ContentAppFactoryCollectionBuilder ContentApps(this Composition composition)
-            => composition.WithCollectionBuilder<ContentAppFactoryCollectionBuilder>();
-
-        /// <summary>
-        /// Gets the content finders collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        /// <returns></returns>
-        public static ContentFinderCollectionBuilder ContentFinders(this Composition composition)
-            => composition.WithCollectionBuilder<ContentFinderCollectionBuilder>();
-
-        /// <summary>
-        /// Gets the editor validators collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        /// <returns></returns>
-        internal static EditorValidatorCollectionBuilder EditorValidators(this Composition composition)
-            => composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>();
 
         /// <summary>
         /// Gets the filtered controller factories collection builder.
@@ -70,46 +39,8 @@ namespace Umbraco.Web
         public static FilteredControllerFactoryCollectionBuilder FilteredControllerFactory(this Composition composition)
             => composition.WithCollectionBuilder<FilteredControllerFactoryCollectionBuilder>();
 
-        /// <summary>
-        /// Gets the health checks collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static HealthCheckCollectionBuilder HealthChecks(this Composition composition)
-            => composition.WithCollectionBuilder<HealthCheckCollectionBuilder>();
 
-        /// <summary>
-        /// Gets the TourFilters collection builder.
-        /// </summary>
-        public static TourFilterCollectionBuilder TourFilters(this Composition composition)
-            => composition.WithCollectionBuilder<TourFilterCollectionBuilder>();
 
-        /// <summary>
-        /// Gets the url providers collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static UrlProviderCollectionBuilder UrlProviders(this Composition composition)
-            => composition.WithCollectionBuilder<UrlProviderCollectionBuilder>();
-
-        /// <summary>
-        /// Gets the media url providers collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static MediaUrlProviderCollectionBuilder MediaUrlProviders(this Composition composition)
-            => composition.WithCollectionBuilder<MediaUrlProviderCollectionBuilder>();
-
-        /// <summary>
-        /// Gets the backoffice sections/applications collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static SectionCollectionBuilder Sections(this Composition composition)
-            => composition.WithCollectionBuilder<SectionCollectionBuilder>();
-
-        /// <summary>
-        /// Gets the backoffice OEmbed Providers collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static EmbedProvidersCollectionBuilder OEmbedProviders(this Composition composition)
-            => composition.WithCollectionBuilder<EmbedProvidersCollectionBuilder>();
 
         /// <summary>
         /// Gets the back office tree collection builder
@@ -119,13 +50,6 @@ namespace Umbraco.Web
         public static TreeCollectionBuilder Trees(this Composition composition)
             => composition.WithCollectionBuilder<TreeCollectionBuilder>();
 
-        /// <summary>
-        /// Gets the back office searchable tree collection builder
-        /// </summary>
-        /// <param name="composition"></param>
-        /// <returns></returns>
-        public static SearchableTreeCollectionBuilder SearchableTrees(this Composition composition)
-            => composition.WithCollectionBuilder<SearchableTreeCollectionBuilder>();
 
         #endregion
 

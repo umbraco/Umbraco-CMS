@@ -6,6 +6,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Models.Membership;
 using Microsoft.Owin;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.Identity;
@@ -21,14 +22,14 @@ namespace Umbraco.Web.Security
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserService _userService;
         private readonly IGlobalSettings _globalSettings;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public WebSecurity(IHttpContextAccessor httpContextAccessor, IUserService userService, IGlobalSettings globalSettings, IIOHelper ioHelper)
+        public WebSecurity(IHttpContextAccessor httpContextAccessor, IUserService userService, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             _httpContextAccessor = httpContextAccessor;
             _userService = userService;
             _globalSettings = globalSettings;
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         private IUser _currentUser;
@@ -143,7 +144,7 @@ namespace Umbraco.Web.Security
             var user = CurrentUser;
 
             // Check for console access
-            if (user == null || (requiresApproval && user.IsApproved == false) || (user.IsLockedOut && RequestIsInUmbracoApplication(_httpContextAccessor, _globalSettings, _ioHelper)))
+            if (user == null || (requiresApproval && user.IsApproved == false) || (user.IsLockedOut && RequestIsInUmbracoApplication(_httpContextAccessor, _globalSettings, _hostingEnvironment)))
             {
                 if (throwExceptions) throw new ArgumentException("You have no privileges to the umbraco console. Please contact your administrator");
                 return ValidateRequestAttempt.FailedNoPrivileges;
@@ -152,9 +153,9 @@ namespace Umbraco.Web.Security
 
         }
 
-        private static bool RequestIsInUmbracoApplication(IHttpContextAccessor httpContextAccessor, IGlobalSettings globalSettings, IIOHelper ioHelper)
+        private static bool RequestIsInUmbracoApplication(IHttpContextAccessor httpContextAccessor, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
-            return httpContextAccessor.GetRequiredHttpContext().Request.Path.ToLower().IndexOf(ioHelper.ResolveUrl(globalSettings.UmbracoPath).ToLower(), StringComparison.Ordinal) > -1;
+            return httpContextAccessor.GetRequiredHttpContext().Request.Path.ToLower().IndexOf(hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath).ToLower(), StringComparison.Ordinal) > -1;
         }
 
         /// <summary>

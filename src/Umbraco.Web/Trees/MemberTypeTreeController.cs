@@ -33,7 +33,7 @@ namespace Umbraco.Web.Trees
         {
             return Services.MemberTypeService.GetAll()
                 .OrderBy(x => x.Name)
-                .Select(dt => CreateTreeNode(dt, Constants.ObjectTypes.MemberType, id, queryStrings, Constants.Icons.MemberType, false));
+                .Select(dt => CreateTreeNode(dt, Constants.ObjectTypes.MemberType, id, queryStrings, dt?.Icon ?? Constants.Icons.MemberType, false));
         }
 
         public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)

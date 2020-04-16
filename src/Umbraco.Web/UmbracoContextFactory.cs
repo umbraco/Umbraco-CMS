@@ -2,8 +2,7 @@
 using System.IO;
 using System.Text;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Cookie;
-using Umbraco.Core.IO;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
@@ -25,7 +24,7 @@ namespace Umbraco.Web
 
         private readonly IGlobalSettings _globalSettings;
         private readonly IUserService _userService;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICookieManager _cookieManager;
         private readonly UriUtility _uriUtility;
@@ -40,7 +39,7 @@ namespace Umbraco.Web
             IDefaultCultureAccessor defaultCultureAccessor,
             IGlobalSettings globalSettings,
             IUserService userService,
-            IIOHelper ioHelper,
+            IHostingEnvironment hostingEnvironment,
             UriUtility uriUtility,
             IHttpContextAccessor httpContextAccessor,
             ICookieManager cookieManager)
@@ -51,7 +50,7 @@ namespace Umbraco.Web
             _defaultCultureAccessor = defaultCultureAccessor ?? throw new ArgumentNullException(nameof(defaultCultureAccessor));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
             _uriUtility = uriUtility;
             _httpContextAccessor = httpContextAccessor;
             _cookieManager = cookieManager;
@@ -70,10 +69,9 @@ namespace Umbraco.Web
                 _variationContextAccessor.VariationContext = new VariationContext(_defaultCultureAccessor.DefaultCulture);
             }
 
+            var webSecurity = new WebSecurity(_httpContextAccessor, _userService, _globalSettings, _hostingEnvironment);
 
-            var webSecurity = new WebSecurity(_httpContextAccessor, _userService, _globalSettings, _ioHelper);
-
-            return new UmbracoContext(_httpContextAccessor, _publishedSnapshotService, webSecurity, _globalSettings, _variationContextAccessor, _ioHelper, _uriUtility, _cookieManager);
+            return new UmbracoContext(_httpContextAccessor, _publishedSnapshotService, webSecurity, _globalSettings, _hostingEnvironment, _variationContextAccessor, _uriUtility, _cookieManager);
         }
 
         /// <inheritdoc />

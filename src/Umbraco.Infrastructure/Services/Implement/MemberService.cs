@@ -757,7 +757,6 @@ namespace Umbraco.Core.Services.Implement
                 }
 
                 // TODO: Since this is by property value, we need a GetByPropertyQuery on the repo!
-                // TODO: Since this is by property value, we need a GetByPropertyQuery on the repo!
                 return _memberRepository.Get(query);
             }
         }
@@ -959,6 +958,35 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public IEnumerable<int> GetAllRolesIds()
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MemberTree);
+                return _memberGroupRepository.GetMany().Select(x => x.Id).Distinct();
+            }
+        }
+
+        public IEnumerable<int> GetAllRolesIds(int memberId)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MemberTree);
+                var result = _memberGroupRepository.GetMemberGroupsForMember(memberId);
+                return result.Select(x => x.Id).Distinct();
+            }
+        }
+
+        public IEnumerable<int> GetAllRolesIds(string username)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MemberTree);
+                var result = _memberGroupRepository.GetMemberGroupsForMember(username);
+                return result.Select(x => x.Id).Distinct();
+            }
+        }
+        
         public IEnumerable<IMember> GetMembersInRole(string roleName)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -1196,7 +1224,6 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
 
-                // TODO: What about content that has the contenttype as part of its composition?
                 // TODO: What about content that has the contenttype as part of its composition?
                 var query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
 

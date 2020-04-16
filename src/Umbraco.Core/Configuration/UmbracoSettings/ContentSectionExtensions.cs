@@ -11,7 +11,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         /// <param name="extension">The file extension.</param>
         /// <param name="contentConfig"></param>
         /// <returns>A value indicating whether the file extension corresponds to an image.</returns>
-        public static bool IsImageFile(this IContentSection contentConfig, string extension)
+        public static bool IsImageFile(this IContentSettings contentConfig, string extension)
         {
             if (contentConfig == null) throw new ArgumentNullException(nameof(contentConfig));
             if (extension == null) return false;
@@ -24,22 +24,22 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         /// held in settings.
         /// Allow upload if extension is whitelisted OR if there is no whitelist and extension is NOT blacklisted.
         /// </summary>
-        public static bool IsFileAllowedForUpload(this IContentSection contentSection, string extension)
+        public static bool IsFileAllowedForUpload(this IContentSettings contentSettings, string extension)
         {
-            return contentSection.AllowedUploadFiles.Any(x => x.InvariantEquals(extension)) ||
-                (contentSection.AllowedUploadFiles.Any() == false &&
-                contentSection.DisallowedUploadFiles.Any(x => x.InvariantEquals(extension)) == false);
+            return contentSettings.AllowedUploadFiles.Any(x => x.InvariantEquals(extension)) ||
+                (contentSettings.AllowedUploadFiles.Any() == false &&
+                contentSettings.DisallowedUploadFiles.Any(x => x.InvariantEquals(extension)) == false);
         }
 
         /// <summary>
         /// Gets the auto-fill configuration for a specified property alias.
         /// </summary>
-        /// <param name="contentSection"></param>
+        /// <param name="contentSettings"></param>
         /// <param name="propertyTypeAlias">The property type alias.</param>
         /// <returns>The auto-fill configuration for the specified property alias, or null.</returns>
-        public static IImagingAutoFillUploadField GetConfig(this IContentSection contentSection, string propertyTypeAlias)
+        public static IImagingAutoFillUploadField GetConfig(this IContentSettings contentSettings, string propertyTypeAlias)
         {
-            var autoFillConfigs = contentSection.ImageAutoFillProperties;
+            var autoFillConfigs = contentSettings.ImageAutoFillProperties;
             return autoFillConfigs?.FirstOrDefault(x => x.Alias == propertyTypeAlias);
         }
     }

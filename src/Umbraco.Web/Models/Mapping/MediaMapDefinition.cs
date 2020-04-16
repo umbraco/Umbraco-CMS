@@ -18,20 +18,22 @@ namespace Umbraco.Web.Models.Mapping
     public class MediaMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;
+        private readonly CommonTreeNodeMapper _commonTreeNodeMapper;
         private readonly IMediaService _mediaService;
         private readonly IMediaTypeService _mediaTypeService;
         private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
         private readonly TabsAndPropertiesMapper<IMedia> _tabsAndPropertiesMapper;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IContentSettings _contentSettings;
 
-        public MediaMapDefinition(ICultureDictionary cultureDictionary, CommonMapper commonMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
-            ILocalizedTextService localizedTextService, MediaUrlGeneratorCollection mediaUrlGenerators, IUmbracoSettingsSection umbracoSettingsSection, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+        public MediaMapDefinition(ICultureDictionary cultureDictionary, CommonMapper commonMapper, CommonTreeNodeMapper commonTreeNodeMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
+            ILocalizedTextService localizedTextService, MediaUrlGeneratorCollection mediaUrlGenerators, IContentSettings contentSettings, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
         {
             _commonMapper = commonMapper;
+            _commonTreeNodeMapper = commonTreeNodeMapper;
             _mediaService = mediaService;
             _mediaTypeService = mediaTypeService;
             _mediaUrlGenerators = mediaUrlGenerators;
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
 
             _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IMedia>(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider);
         }
@@ -62,7 +64,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Id = source.Id;
             target.IsChildOfListView = DetermineIsChildOfListView(source);
             target.Key = source.Key;
-            target.MediaLink = string.Join(",", source.GetUrls(_umbracoSettingsSection.Content, _mediaUrlGenerators));
+            target.MediaLink = string.Join(",", source.GetUrls(_contentSettings, _mediaUrlGenerators));
             target.Name = source.Name;
             target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
@@ -71,7 +73,7 @@ namespace Umbraco.Web.Models.Mapping
             target.State = null;
             target.Tabs = _tabsAndPropertiesMapper.Map(source, context);
             target.Trashed = source.Trashed;
-            target.TreeNodeUrl = _commonMapper.GetTreeNodeUrl<MediaTreeController>(source);
+            target.TreeNodeUrl = _commonTreeNodeMapper.GetTreeNodeUrl<MediaTreeController>(source);
             target.Udi = Udi.Create(Constants.UdiEntityType.Media, source.Key);
             target.UpdateDate = source.UpdateDate;
             target.VariesByCulture = source.ContentType.VariesByCulture();

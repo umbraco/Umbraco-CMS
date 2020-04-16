@@ -8,7 +8,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using Umbraco.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Strings;
 
@@ -72,6 +71,23 @@ namespace Umbraco.Core
             }
 
             return fileName;
+
+
+        }
+
+        /// <summary>
+        /// Determines the extension of the path or URL
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns>Extension of the file</returns>
+        public static string GetFileExtension(this string file)
+        {
+            //Find any characters between the last . and the start of a query string or the end of the string
+            const string pattern = @"(?<extension>\.[^\.\?]+)(\?.*|$)";
+            var match = Regex.Match(file, pattern);
+            return match.Success
+                ? match.Groups["extension"].Value
+                : string.Empty;
         }
 
         /// <summary>
@@ -938,7 +954,24 @@ namespace Umbraco.Core
             return text;
         }
 
+        /// <summary>
+        /// Returns a new string in which only the first occurrence of a specified string is replaced by a specified replacement string.
+        /// </summary>
+        /// <param name="text">The string to filter.</param>
+        /// <param name="search">The string to replace.</param>
+        /// <param name="replace">The replacement string.</param>
+        /// <returns>The filtered string.</returns>
+        public static string ReplaceFirst(this string text, string search, string replace)
+        {
+            if (text == null) throw new ArgumentNullException(nameof(text));
 
+            var pos = text.IndexOf(search, StringComparison.InvariantCulture);
+
+            if (pos < 0)
+                return text;
+
+            return text.Substring(0, pos) + replace + text.Substring(pos + search.Length);
+        }
 
 
 

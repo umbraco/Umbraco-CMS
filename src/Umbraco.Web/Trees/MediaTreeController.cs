@@ -37,7 +37,7 @@ namespace Umbraco.Web.Trees
     [PluginController("UmbracoTrees")]
     [CoreTree]
     [SearchableTree("searchResultFormatter", "configureMediaResult", 20)]
-    public class MediaTreeController : ContentTreeControllerBase, ISearchableTree
+    public class MediaTreeController : ContentTreeControllerBase, ISearchableTree, ITreeNodeController
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
 
@@ -50,11 +50,10 @@ namespace Umbraco.Web.Trees
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             UmbracoMapper umbracoMapper,
             IPublishedUrlProvider publishedUrlProvider,
             IMenuItemCollectionFactory menuItemCollectionFactory)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper, publishedUrlProvider, menuItemCollectionFactory)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider, menuItemCollectionFactory)
         {
             _treeSearcher = treeSearcher;
         }

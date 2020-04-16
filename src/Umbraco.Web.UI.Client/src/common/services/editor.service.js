@@ -525,7 +525,7 @@ When building a custom infinite editor view you can use the same components as a
 
         function rollback(editor) {
             editor.view = "views/common/infiniteeditors/rollback/rollback.html";
-            if (!editor.size) editor.size = "small";
+            if (!editor.size) editor.size = "medium";
             open(editor);
         }
 
@@ -588,7 +588,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function mediaPicker(editor) {
             editor.view = "views/common/infiniteeditors/mediapicker/mediapicker.html";
-            if (!editor.size) editor.size = "small";
+            if (!editor.size) editor.size = "medium";
             editor.updatedMediaNodes = [];
             open(editor);
         }
@@ -784,7 +784,7 @@ When building a custom infinite editor view you can use the same components as a
          * @methodOf umbraco.services.editorService
          *
          * @description
-         * Opens the user group picker in infinite editing, the submit callback returns the saved template
+         * Opens the template editor in infinite editing, the submit callback returns the saved template
          * @param {Object} editor rendering options
          * @param {String} editor.id The template id
          * @param {Callback} editor.submit Submits the editor

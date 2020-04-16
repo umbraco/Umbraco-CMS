@@ -119,7 +119,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <para>Technically, it could be cached by datatype but let's keep things
         /// simple enough for now.</para>
         /// </remarks>
-        public IDataValueEditor GetValueEditor(object configuration)
+        public virtual IDataValueEditor GetValueEditor(object configuration)
         {
             // if an explicit value editor has been set (by the manifest parser)
             // then return it, and ignore the configuration, which is going to be

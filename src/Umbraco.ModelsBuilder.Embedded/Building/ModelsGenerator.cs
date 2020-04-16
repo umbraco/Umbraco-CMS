@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Text;
-using Umbraco.ModelsBuilder.Embedded.Configuration;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 
 namespace Umbraco.ModelsBuilder.Embedded.Building
 {
@@ -9,20 +10,23 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
         private readonly UmbracoServices _umbracoService;
         private readonly IModelsBuilderConfig _config;
         private readonly OutOfDateModelsStatus _outOfDateModels;
+        private readonly IIOHelper _ioHelper;
 
-        public ModelsGenerator(UmbracoServices umbracoService, IModelsBuilderConfig config, OutOfDateModelsStatus outOfDateModels)
+        public ModelsGenerator(UmbracoServices umbracoService, IModelsBuilderConfig config, OutOfDateModelsStatus outOfDateModels, IIOHelper ioHelper)
         {
             _umbracoService = umbracoService;
             _config = config;
             _outOfDateModels = outOfDateModels;
+            _ioHelper = ioHelper;
         }
 
         internal void GenerateModels()
         {
-            if (!Directory.Exists(_config.ModelsDirectory))
-                Directory.CreateDirectory(_config.ModelsDirectory);
+            var modelsDirectory = _config.ModelsDirectoryAbsolute(_ioHelper);
+            if (!Directory.Exists(modelsDirectory))
+                Directory.CreateDirectory(modelsDirectory);
 
-            foreach (var file in Directory.GetFiles(_config.ModelsDirectory, "*.generated.cs"))
+            foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                 File.Delete(file);
 
             var typeModels = _umbracoService.GetAllTypes();
@@ -33,7 +37,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
             {
                 var sb = new StringBuilder();
                 builder.Generate(sb, typeModel);
-                var filename = Path.Combine(_config.ModelsDirectory, typeModel.ClrName + ".generated.cs");
+                var filename = Path.Combine(modelsDirectory, typeModel.ClrName + ".generated.cs");
                 File.WriteAllText(filename, sb.ToString());
             }
 

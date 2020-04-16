@@ -96,7 +96,7 @@ namespace Umbraco.Tests.Cache
                 return "";
             });
 
-            Assert.AreEqual(counter, 1);
+            Assert.AreEqual(1, counter);
 
         }
 
@@ -229,7 +229,7 @@ namespace Umbraco.Tests.Cache
             Assert.AreEqual(4, GetTotalItemCount);
 
             //Provider.ClearCacheObjectTypes("umbraco.MacroCacheContent");
-            AppCache.ClearOfType(typeof(MacroCacheContent).ToString());
+            AppCache.ClearOfType<MacroCacheContent>();
 
             Assert.AreEqual(1, GetTotalItemCount);
         }

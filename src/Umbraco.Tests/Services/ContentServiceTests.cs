@@ -1811,7 +1811,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(content2, Constants.Security.SuperUserId);
             Assert.IsTrue(ServiceContext.ContentService.SaveAndPublish(content2, userId: 0).Success);
 
-            var editorGroup = ServiceContext.UserService.GetUserGroupByAlias("editor");
+            var editorGroup = ServiceContext.UserService.GetUserGroupByAlias(Constants.Security.EditorGroupAlias);
             editorGroup.StartContentId = content1.Id;
             ServiceContext.UserService.Save(editorGroup);
 
@@ -1888,6 +1888,49 @@ namespace Umbraco.Tests.Services
                 Assert.AreEqual(property.GetValue(), content.Properties[property.Alias].GetValue());
             }
             //Assert.AreNotEqual(content.Name, copy.Name);
+        }
+
+        [Test]
+        public void Can_Copy_And_Modify_Content_With_Events()
+        {
+            // see https://github.com/umbraco/Umbraco-CMS/issues/5513
+
+            TypedEventHandler<IContentService, CopyEventArgs<IContent>> copying = (sender, args) =>
+            {
+                args.Copy.SetValue("title", "1");
+                args.Original.SetValue("title", "2");
+            };
+
+            TypedEventHandler<IContentService, CopyEventArgs<IContent>> copied = (sender, args) =>
+            {
+                var copyVal = args.Copy.GetValue<string>("title");
+                var origVal = args.Original.GetValue<string>("title");
+
+                Assert.AreEqual("1", copyVal);
+                Assert.AreEqual("2", origVal);
+            };
+
+            try
+            {
+                var contentService = ServiceContext.ContentService;
+
+                ContentService.Copying += copying;
+                ContentService.Copied += copied;
+
+                var contentType = MockedContentTypes.CreateSimpleContentType();
+                ServiceContext.ContentTypeService.Save(contentType);
+                var content = MockedContent.CreateSimpleContent(contentType);
+                content.SetValue("title", "New Value");
+                contentService.Save(content);
+
+                var copy = contentService.Copy(content, content.ParentId, false, Constants.Security.SuperUserId);
+                Assert.AreEqual("1", copy.GetValue("title"));
+            }
+            finally
+            {
+                ContentService.Copying -= copying;
+                ContentService.Copied -= copied;
+            }
         }
 
         [Test]

@@ -24,7 +24,7 @@ namespace Umbraco.Web.Templates
             _publishedUrlProvider = publishedUrlProvider;
         }
 
-        internal IEnumerable<Udi> FindUdisFromLocalLinks(string text)
+        public IEnumerable<Udi> FindUdisFromLocalLinks(string text)
         {
             foreach ((int? intId, GuidUdi udi, string tagValue) in FindLocalLinkIds(text))
             {

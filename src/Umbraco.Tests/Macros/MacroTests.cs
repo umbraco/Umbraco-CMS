@@ -17,23 +17,20 @@ namespace Umbraco.Tests.Macros
         [SetUp]
         public void Setup()
         {
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
             //we DO want cache enabled for these tests
             var cacheHelper = new AppCaches(
-                new ObjectCacheAppCache(typeFinder),
+                new ObjectCacheAppCache(),
                 NoAppCache.Instance,
-                new IsolatedCaches(type => new ObjectCacheAppCache(typeFinder)));
+                new IsolatedCaches(type => new ObjectCacheAppCache()));
         }
 
-        [TestCase("PartialView", true)]
-        [TestCase("Unknown", false)]
-        public void Macro_Is_File_Based(string macroTypeString, bool expectedNonNull)
+        [TestCase("anything", true)]
+        [TestCase("", false)]
+        public void Macro_Is_File_Based(string macroSource, bool expectedNonNull)
         {
-            var macroType = Enum<MacroTypes>.Parse(macroTypeString);
             var model = new MacroModel
             {
-                MacroType = macroType,
-                MacroSource = "anything"
+                MacroSource = macroSource
             };
             var filename = MacroRenderer.GetMacroFileName(model);
             if (expectedNonNull)

@@ -90,7 +90,7 @@
     <key alias="saveAndPublish">保存并发布</key>
     <key alias="saveToPublish">保存并提交审核</key>
     <key alias="saveListView">保存列表视图</key>
-    <key alias="showPage">预览</key>
+    <key alias="saveAndPreview">预览</key>
     <key alias="showPageDisabled">因未设置模板无法预览</key>
     <key alias="styleChoose">选择样式</key>
     <key alias="styleShow">显示样式</key>

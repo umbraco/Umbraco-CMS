@@ -4,8 +4,10 @@ using Umbraco.Core.Services;
 using Lucene.Net.Analysis.Standard;
 using Examine.LuceneEngine;
 using Examine;
+using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Examine
@@ -24,20 +26,21 @@ namespace Umbraco.Examine
             IPublicAccessService publicAccessService,
             IMemberService memberService,
             IUmbracoIndexConfig umbracoIndexConfig,
-            IIOHelper ioHelper,
-            IRuntimeState runtimeState) : base(typeFinder, ioHelper)
+            IHostingEnvironment hostingEnvironment,
+            IRuntimeState runtimeState,
+            IIndexCreatorSettings settings) : base(typeFinder, hostingEnvironment, settings)
         {
             ProfilingLogger = profilingLogger ?? throw new System.ArgumentNullException(nameof(profilingLogger));
             LanguageService = languageService ?? throw new System.ArgumentNullException(nameof(languageService));
             PublicAccessService = publicAccessService ?? throw new System.ArgumentNullException(nameof(publicAccessService));
             MemberService = memberService ?? throw new System.ArgumentNullException(nameof(memberService));
             UmbracoIndexConfig = umbracoIndexConfig;
-            IOHelper = ioHelper ?? throw new System.ArgumentNullException(nameof(ioHelper));
+            HostingEnvironment = hostingEnvironment ?? throw new System.ArgumentNullException(nameof(hostingEnvironment));
             RuntimeState = runtimeState ?? throw new System.ArgumentNullException(nameof(runtimeState));
         }
 
         protected IProfilingLogger ProfilingLogger { get; }
-        protected IIOHelper IOHelper { get; }
+        protected IHostingEnvironment HostingEnvironment { get; }
         protected IRuntimeState RuntimeState { get; }
         protected ILocalizationService LanguageService { get; }
         protected IPublicAccessService PublicAccessService { get; }
@@ -66,7 +69,7 @@ namespace Umbraco.Examine
                 new UmbracoFieldDefinitionCollection(),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
-                IOHelper,
+                HostingEnvironment,
                 RuntimeState,
                 LanguageService,
                 UmbracoIndexConfig.GetContentValueSetValidator()
@@ -82,7 +85,7 @@ namespace Umbraco.Examine
                 new UmbracoFieldDefinitionCollection(),
                 new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30),
                 ProfilingLogger,
-                IOHelper,
+                HostingEnvironment,
                 RuntimeState,
                 LanguageService,
                 UmbracoIndexConfig.GetPublishedContentValueSetValidator());
@@ -97,7 +100,7 @@ namespace Umbraco.Examine
                 CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.MembersIndexPath),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
-                IOHelper,
+                HostingEnvironment,
                 RuntimeState,
                 UmbracoIndexConfig.GetMemberValueSetValidator()
                 );

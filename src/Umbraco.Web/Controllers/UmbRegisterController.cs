@@ -8,18 +8,24 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Controllers
 {
     public class UmbRegisterController : SurfaceController
     {
+        private readonly MembershipHelper _membershipHelper;
+
         public UmbRegisterController()
         {
         }
 
-        public UmbRegisterController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
-            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger, umbracoHelper)
+        public UmbRegisterController(IUmbracoContextAccessor umbracoContextAccessor,
+            IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger,
+            IProfilingLogger profilingLogger, MembershipHelper membershipHelper)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger)
         {
+            _membershipHelper = membershipHelper;
         }
 
         [HttpPost]
@@ -40,7 +46,7 @@ namespace Umbraco.Web.Controllers
             }
 
             MembershipCreateStatus status;
-            var member = Members.RegisterMember(model, out status, model.LoginOnSuccess);
+            var member = _membershipHelper.RegisterMember(model, out status, model.LoginOnSuccess);
 
             switch (status)
             {

@@ -1,12 +1,25 @@
 ﻿using System;
-using Umbraco.Core.IO;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Core.Configuration
 {
     public static class GlobalSettingsExtensions
     {
         private static string _mvcArea;
+        private static string _backOfficePath;
 
+        /// <summary>
+        /// Returns the absolute path for the Umbraco back office
+        /// </summary>
+        /// <param name="globalSettings"></param>
+        /// <param name="hostingEnvironment"></param>
+        /// <returns></returns>
+        public static string GetBackOfficePath(this IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        {
+            if (_backOfficePath != null) return _backOfficePath;
+            _backOfficePath = hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath);
+            return _backOfficePath;
+        }
 
         /// <summary>
         /// This returns the string of the MVC Area route.
@@ -19,27 +32,27 @@ namespace Umbraco.Core.Configuration
         /// We also make sure that the virtual directory (SystemDirectories.Root) is stripped off first, otherwise we'd end up with something
         /// like "MyVirtualDirectory-Umbraco" instead of just "Umbraco".
         /// </remarks>
-        public static string GetUmbracoMvcArea(this IGlobalSettings globalSettings, IIOHelper ioHelper)
+        public static string GetUmbracoMvcArea(this IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             if (_mvcArea != null) return _mvcArea;
 
-            _mvcArea = GetUmbracoMvcAreaNoCache(globalSettings, ioHelper);
+            _mvcArea = globalSettings.GetUmbracoMvcAreaNoCache(hostingEnvironment);
 
             return _mvcArea;
         }
 
-        internal static string GetUmbracoMvcAreaNoCache(this IGlobalSettings globalSettings, IIOHelper ioHelper)
+        internal static string GetUmbracoMvcAreaNoCache(this IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
-            if (globalSettings.Path.IsNullOrWhiteSpace())
-            {
-                throw new InvalidOperationException("Cannot create an MVC Area path without the umbracoPath specified");
-            }
+            var path = string.IsNullOrEmpty(globalSettings.UmbracoPath)
+                ? string.Empty
+                : hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath);
 
-            var path = globalSettings.Path;
-            if (path.StartsWith(ioHelper.Root)) // beware of TrimStart, see U4-2518
-                path = path.Substring(ioHelper.Root.Length);
+            if (path.IsNullOrWhiteSpace())
+                throw new InvalidOperationException("Cannot create an MVC Area path without the umbracoPath specified");
+
+            if (path.StartsWith(hostingEnvironment.ApplicationVirtualPath)) // beware of TrimStart, see U4-2518
+                path = path.Substring(hostingEnvironment.ApplicationVirtualPath.Length);
             return path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim().ToLower();
         }
-
     }
 }

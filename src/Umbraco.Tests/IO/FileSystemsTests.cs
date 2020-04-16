@@ -34,18 +34,18 @@ namespace Umbraco.Tests.IO
 
             composition.Register(_ => Mock.Of<ILogger>());
             composition.Register(_ => Mock.Of<IDataTypeService>());
-            composition.Register(_ => Mock.Of<IContentSection>());
+            composition.Register(_ => Mock.Of<IContentSettings>());
             composition.Register(_ => TestHelper.ShortStringHelper);
             composition.Register(_ => TestHelper.IOHelper);
             composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
             composition.RegisterUnique(TestHelper.IOHelper);
 
-            composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
-            composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+            composition.Configs.Add(() => SettingsForTests.DefaultGlobalSettings);
+            composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
 
             composition.ComposeFileSystems();
 
-            composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+            composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
 
             _factory = composition.CreateFactory();
 

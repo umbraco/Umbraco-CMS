@@ -11,18 +11,22 @@ namespace Umbraco.Web.Scheduling
 {
     public class KeepAlive : RecurringTaskBase
     {
-        private readonly IRuntimeState _runtime;
-        private readonly IKeepAliveSection _keepAliveSection;
+        private readonly IRuntimeState _runtimeState;
+        private readonly IMainDom _mainDom;
+        private readonly IKeepAliveSettings _keepAliveSettings;
         private readonly IProfilingLogger _logger;
+        private readonly IServerRegistrar _serverRegistrar;
         private static HttpClient _httpClient;
 
         public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IKeepAliveSection keepAliveSection, IProfilingLogger logger)
+            IRuntimeState runtimeState, IMainDom mainDom, IKeepAliveSettings keepAliveSettings, IProfilingLogger logger, IServerRegistrar serverRegistrar)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
-            _runtime = runtime;
-            _keepAliveSection = keepAliveSection;
+            _runtimeState = runtimeState;
+            _mainDom = mainDom;
+            _keepAliveSettings = keepAliveSettings;
             _logger = logger;
+            _serverRegistrar = serverRegistrar;
             if (_httpClient == null)
                 _httpClient = new HttpClient();
         }
@@ -30,7 +34,7 @@ namespace Umbraco.Web.Scheduling
         public override async Task<bool> PerformRunAsync(CancellationToken token)
         {
             // not on replicas nor unknown role servers
-            switch (_runtime.ServerRole)
+            switch (_serverRegistrar.GetCurrentServerRole())
             {
                 case ServerRole.Replica:
                     _logger.Debug<KeepAlive>("Does not run on replica servers.");
@@ -41,7 +45,7 @@ namespace Umbraco.Web.Scheduling
             }
 
             // ensure we do not run if not main domain, but do NOT lock it
-            if (_runtime.IsMainDom == false)
+            if (_mainDom.IsMainDom == false)
             {
                 _logger.Debug<KeepAlive>("Does not run if not MainDom.");
                 return false; // do NOT repeat, going down
@@ -49,12 +53,12 @@ namespace Umbraco.Web.Scheduling
 
             using (_logger.DebugDuration<KeepAlive>("Keep alive executing", "Keep alive complete"))
             {
-                var keepAlivePingUrl = _keepAliveSection.KeepAlivePingUrl;
+                var keepAlivePingUrl = _keepAliveSettings.KeepAlivePingUrl;
                 try
                 {
                     if (keepAlivePingUrl.Contains("{umbracoApplicationUrl}"))
                     {
-                        var umbracoAppUrl = _runtime.ApplicationUrl.ToString();
+                        var umbracoAppUrl = _runtimeState.ApplicationUrl.ToString();
                         if (umbracoAppUrl.IsNullOrWhiteSpace())
                         {
                             _logger.Warn<KeepAlive>("No umbracoApplicationUrl for service (yet), skip.");

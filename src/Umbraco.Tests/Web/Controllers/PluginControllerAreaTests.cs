@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Ensure_Same_Area1()
         {
             Assert.Throws<InvalidOperationException>(() =>
-                                                     new PluginControllerArea(TestObjects.GetGlobalSettings(), IOHelper,
+                                                     new PluginControllerArea(TestObjects.GetGlobalSettings(), HostingEnvironment,
                                                          new PluginControllerMetadata[]
                                                          {
                                                             PluginController.GetMetadata(typeof(Plugin1Controller)),
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Ensure_Same_Area3()
         {
             Assert.Throws<InvalidOperationException>(() =>
-                                                     new PluginControllerArea(TestObjects.GetGlobalSettings(), IOHelper,
+                                                     new PluginControllerArea(TestObjects.GetGlobalSettings(), HostingEnvironment,
                                                          new PluginControllerMetadata[]
                                                          {
                                                             PluginController.GetMetadata(typeof(Plugin1Controller)),
@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public void Ensure_Same_Area2()
         {
-            var area = new PluginControllerArea(TestObjects.GetGlobalSettings(), IOHelper,
+            var area = new PluginControllerArea(TestObjects.GetGlobalSettings(), HostingEnvironment,
                 new PluginControllerMetadata[]
                 {
                     PluginController.GetMetadata(typeof(Plugin1Controller)),
@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Web.Controllers
         public class Plugin1Controller : PluginController
         {
             public Plugin1Controller(IUmbracoContextAccessor umbracoContextAccessor)
-                : base(umbracoContextAccessor, null, null, null, null, null, null)
+                : base(umbracoContextAccessor, null, null, null, null, null)
             {
             }
         }
@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Web.Controllers
         public class Plugin2Controller : PluginController
         {
             public Plugin2Controller(IUmbracoContextAccessor umbracoContextAccessor)
-                : base(umbracoContextAccessor, null, null, null, null, null, null)
+                : base(umbracoContextAccessor, null, null, null, null, null)
             {
             }
         }
@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Web.Controllers
         public class Plugin3Controller : PluginController
         {
             public Plugin3Controller(IUmbracoContextAccessor umbracoContextAccessor)
-                : base(umbracoContextAccessor, null, null, null, null, null, null)
+                : base(umbracoContextAccessor, null, null, null, null, null)
             {
             }
         }
@@ -80,7 +80,7 @@ namespace Umbraco.Tests.Web.Controllers
         public class Plugin4Controller : PluginController
         {
             public Plugin4Controller(IUmbracoContextAccessor umbracoContextAccessor)
-                : base(umbracoContextAccessor, null, null, null, null, null, null)
+                : base(umbracoContextAccessor, null, null, null, null, null)
             {
             }
         }

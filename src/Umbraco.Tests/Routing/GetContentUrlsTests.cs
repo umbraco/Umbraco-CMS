@@ -11,9 +11,10 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
+using Umbraco.Tests.Common;
+using SettingsForTests = Umbraco.Tests.TestHelpers.SettingsForTests;
 
 namespace Umbraco.Tests.Routing
 {
@@ -77,15 +78,15 @@ namespace Umbraco.Tests.Routing
             content.Path = "-1,1046";
             content.Published = true;
 
-            var umbracoSettings = Current.Configs.Settings();
+            var umbracoSettings = SettingsForTests.GenerateMockRequestHandlerSettings();
 
             var umbContext = GetUmbracoContext("http://localhost:8000");
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbContext);
-            var urlProvider = new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(),
+            var urlProvider = new DefaultUrlProvider(umbracoSettings, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(),
                 umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = new UrlProvider(
                 umbracoContextAccessor,
-                TestHelper.WebRoutingSection,
+                TestHelper.WebRoutingSettings,
                 new UrlProviderCollection(new []{urlProvider}),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IVariationContextAccessor>()
@@ -122,15 +123,15 @@ namespace Umbraco.Tests.Routing
             child.Path = "-1,1046,1173";
             child.Published = true;
 
-            var umbracoSettings = Current.Configs.Settings();
+            var umbracoSettings = SettingsForTests.GenerateMockRequestHandlerSettings();
 
 
             var umbContext = GetUmbracoContext("http://localhost:8000");
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbContext);
-            var urlProvider = new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+            var urlProvider = new DefaultUrlProvider(umbracoSettings, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = new UrlProvider(
                 umbracoContextAccessor,
-                TestHelper.WebRoutingSection,
+                TestHelper.WebRoutingSettings,
                 new UrlProviderCollection(new []{urlProvider}),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IVariationContextAccessor>()

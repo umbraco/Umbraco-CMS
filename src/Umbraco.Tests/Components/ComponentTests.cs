@@ -32,10 +32,10 @@ namespace Umbraco.Tests.Components
             var mock = new Mock<IFactory>();
 
             var logger = Mock.Of<ILogger>();
-            var typeFinder = new TypeFinder(logger);
-            var f = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())), TestHelper.GetConfigs(), TestHelper.DbProviderFactoryCreator);
+            var typeFinder = TestHelper.GetTypeFinder();
+            var f = new UmbracoDatabaseFactory(logger, SettingsForTests.DefaultGlobalSettings, Mock.Of<IConnectionStrings>(), new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())), TestHelper.DbProviderFactoryCreator);
             var fs = new FileSystems(mock.Object, logger, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings());
-            var coreDebug = Mock.Of<ICoreDebug>();
+            var coreDebug = Mock.Of<ICoreDebugSettings>();
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
             var p = new ScopeProvider(f, fs, coreDebug, mediaFileSystem, logger, typeFinder, NoAppCache.Instance);
 
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Components
         private static TypeLoader MockTypeLoader()
         {
             var ioHelper = TestHelper.IOHelper;
-            return new TypeLoader(ioHelper, Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
+            return new TypeLoader(Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
         }
 
         public static IRuntimeState MockRuntimeState(RuntimeLevel level)
@@ -371,14 +371,15 @@ namespace Umbraco.Tests.Components
         public void AllComposers()
         {
             var ioHelper = TestHelper.IOHelper;
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
-            var typeLoader = new TypeLoader(ioHelper, typeFinder, AppCaches.Disabled.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
+            var typeFinder = TestHelper.GetTypeFinder();
+            var typeLoader = new TypeLoader(typeFinder, AppCaches.Disabled.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
 
             var register = MockRegister();
             var composition = new Composition(register, typeLoader, Mock.Of<IProfilingLogger>(),
                 MockRuntimeState(RuntimeLevel.Run), Configs, TestHelper.IOHelper, AppCaches.NoCache);
 
-            var types = typeLoader.GetTypes<IComposer>().Where(x => x.FullName.StartsWith("Umbraco.Core.") || x.FullName.StartsWith("Umbraco.Web"));
+            var allComposers = typeLoader.GetTypes<IComposer>().ToList();
+            var types = allComposers.Where(x => x.FullName.StartsWith("Umbraco.Core.") || x.FullName.StartsWith("Umbraco.Web")).ToList();
             var composers = new Composers(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<IProfilingLogger>());
             var requirements = composers.GetRequirements();
             var report = Composers.GetComposersReport(requirements);

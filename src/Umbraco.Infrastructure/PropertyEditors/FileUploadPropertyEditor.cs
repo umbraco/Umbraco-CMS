@@ -22,23 +22,21 @@ namespace Umbraco.Web.PropertyEditors
     public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator
     {
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly IContentSection _contentSection;
+        private readonly IContentSettings _contentSettings;
         private readonly UploadAutoFillProperties _uploadAutoFillProperties;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
         private readonly ILocalizedTextService _localizedTextService;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
-        public FileUploadPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSection contentSection, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IUmbracoSettingsSection umbracoSettingsSection)
+        public FileUploadPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSettings contentSettings, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper)
             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
-            _contentSection = contentSection;
+            _contentSettings = contentSettings;
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
             _localizedTextService = localizedTextService;
-            _uploadAutoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, contentSection);
-            _umbracoSettingsSection = umbracoSettingsSection;
+            _uploadAutoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, contentSettings);
         }
 
         /// <summary>
@@ -47,8 +45,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns>The corresponding property value editor.</returns>
         protected override IDataValueEditor CreateValueEditor()
         {
-            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem, _dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, _umbracoSettingsSection);
-            editor.Validators.Add(new UploadFileTypeValidator(_localizedTextService, _umbracoSettingsSection));
+            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem, _dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, _contentSettings);
+            editor.Validators.Add(new UploadFileTypeValidator(_localizedTextService, _contentSettings));
             return editor;
         }
 
@@ -179,7 +177,7 @@ namespace Umbraco.Web.PropertyEditors
 
             foreach (var property in properties)
             {
-                var autoFillConfig = _contentSection.GetConfig(property.Alias);
+                var autoFillConfig = _contentSettings.GetConfig(property.Alias);
                 if (autoFillConfig == null) continue;
 
                 foreach (var pvalue in property.Values)

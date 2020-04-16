@@ -4,24 +4,19 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Web;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Tests.Common;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -132,7 +127,7 @@ namespace Umbraco.Tests.TestHelpers
                 new TestDefaultCultureAccessor(),
                 globalSettings,
                 Mock.Of<IUserService>(),
-                TestHelper.IOHelper,
+                TestHelper.GetHostingEnvironment(),
                 TestHelper.UriUtility,
                 httpContextAccessor,
                 new AspNetCookieManager(httpContextAccessor));
@@ -140,21 +135,9 @@ namespace Umbraco.Tests.TestHelpers
             return umbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
         }
 
-        public IUmbracoSettingsSection GetUmbracoSettings()
-        {
-            // FIXME: Why not use the SettingsForTest.GenerateMock ... ?
-            // FIXME: Shouldn't we use the default ones so they are the same instance for each test?
-
-            var umbracoSettingsMock = new Mock<IUmbracoSettingsSection>();
-            var webRoutingSectionMock = new Mock<IWebRoutingSection>();
-            webRoutingSectionMock.Setup(x => x.UrlProviderMode).Returns(UrlMode.Auto.ToString());
-            umbracoSettingsMock.Setup(x => x.WebRouting).Returns(webRoutingSectionMock.Object);
-            return umbracoSettingsMock.Object;
-        }
-
         public IGlobalSettings GetGlobalSettings()
         {
-            return SettingsForTests.GetDefaultGlobalSettings();
+            return SettingsForTests.DefaultGlobalSettings;
         }
         public IFileSystems GetFileSystemsMock()
         {

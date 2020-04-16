@@ -11,6 +11,8 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
+using Umbraco.Web.Media.EmbedProviders;
+using Umbraco.Web.Search;
 
 namespace Umbraco.Core
 {
@@ -84,7 +86,20 @@ namespace Umbraco.Core
         public static ManifestFilterCollectionBuilder ManifestFilters(this Composition composition)
             => composition.WithCollectionBuilder<ManifestFilterCollectionBuilder>();
 
-        
+        /// <summary>
+        /// Gets the backoffice OEmbed Providers collection builder.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        public static EmbedProvidersCollectionBuilder OEmbedProviders(this Composition composition)
+            => composition.WithCollectionBuilder<EmbedProvidersCollectionBuilder>();
+
+        /// <summary>
+        /// Gets the back office searchable tree collection builder
+        /// </summary>
+        /// <param name="composition"></param>
+        /// <returns></returns>
+        public static SearchableTreeCollectionBuilder SearchableTrees(this Composition composition)
+            => composition.WithCollectionBuilder<SearchableTreeCollectionBuilder>();
 
         #endregion
 
@@ -98,7 +113,7 @@ namespace Umbraco.Core
         public static void SetCultureDictionaryFactory<T>(this Composition composition)
             where T : ICultureDictionaryFactory
         {
-            composition.RegisterUnique<ICultureDictionaryFactory, T>();            
+            composition.RegisterUnique<ICultureDictionaryFactory, T>();
         }
 
         /// <summary>

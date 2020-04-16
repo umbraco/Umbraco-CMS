@@ -46,7 +46,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _userRepository.Exists(username);
+                return _userRepository.ExistsByUserName(username);
             }
         }
 
@@ -109,9 +109,9 @@ namespace Umbraco.Core.Services.Implement
             User user;
             using (var scope = ScopeProvider.CreateScope())
             {
-                var loginExists = scope.Database.ExecuteScalar<int>("SELECT COUNT(id) FROM umbracoUser WHERE userLogin = @Login", new { Login = username }) != 0;
+                var loginExists = _userRepository.ExistsByLogin(username);
                 if (loginExists)
-                    throw new ArgumentException("Login already exists"); // causes rollback // causes rollback
+                    throw new ArgumentException("Login already exists"); // causes rollback
 
                 user = new User(_globalSettings)
                 {
@@ -341,7 +341,6 @@ namespace Umbraco.Core.Services.Implement
                     _userRepository.Save(user);
 
                     //Now we have to check for backwards compat hacks
-                    //Now we have to check for backwards compat hacks
                     var explicitUser = user as User;
                     if (explicitUser != null && explicitUser.GroupsToSave.Count > 0)
                     {
@@ -359,7 +358,6 @@ namespace Umbraco.Core.Services.Implement
                 }
 
                 //commit the whole lot in one go
-                //commit the whole lot in one go
                 scope.Complete();
             }
         }
@@ -370,7 +368,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         public string GetDefaultMemberType()
         {
-            return "writer";
+            return Constants.Security.WriterGroupAlias;
         }
 
         /// <summary>
@@ -1179,7 +1177,7 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        internal static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavingUserGroup;
+        public static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavingUserGroup;
 
         /// <summary>
         /// Occurs after Save

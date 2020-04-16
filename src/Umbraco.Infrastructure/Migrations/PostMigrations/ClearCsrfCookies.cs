@@ -1,7 +1,5 @@
 ﻿using Umbraco.Core;
-using Umbraco.Core.Cookie;
 using Umbraco.Core.Migrations;
-
 
 namespace Umbraco.Web.Migrations.PostMigrations
 {

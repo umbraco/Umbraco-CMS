@@ -33,6 +33,7 @@ using Umbraco.Web.Features;
 using Umbraco.Web.Models.ContentEditing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Web.Routing;
 
@@ -61,7 +62,7 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async System.Threading.Tasks.Task GetCurrentUser_Fips()
         {
-            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor)
             {
                 //setup some mocks
                 var userServiceMock = Mock.Get(ServiceContext.UserService);
@@ -74,23 +75,22 @@ namespace Umbraco.Tests.Web.Controllers
                 }
                 else
                 {
-                    var baseDir = IOHelper.MapPath("").TrimEnd(IOHelper.DirSepChar);
+                    var baseDir = IOHelper.MapPath("").TrimEnd(Path.DirectorySeparatorChar);
                     HttpContext.Current = new HttpContext(new SimpleWorkerRequest("/", baseDir, "", "", new StringWriter()));
                 }
-                IOHelper.ForceNotHosted = true;
+
                 var usersController = new AuthenticationController(
                     new TestUserPasswordConfig(),
                     Factory.GetInstance<IGlobalSettings>(),
+                    Factory.GetInstance<IHostingEnvironment>(),
                     umbracoContextAccessor,
                     Factory.GetInstance<ISqlContext>(),
                     Factory.GetInstance<ServiceContext>(),
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper,
                     Factory.GetInstance<UmbracoMapper>(),
-                    Factory.GetInstance<IUmbracoSettingsSection>(),
-                    Factory.GetInstance<IIOHelper>(),
+                    Factory.GetInstance<ISecuritySettings>(),
                     Factory.GetInstance<IPublishedUrlProvider>()
                     );
                 return usersController;

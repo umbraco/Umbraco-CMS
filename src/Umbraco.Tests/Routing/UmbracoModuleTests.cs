@@ -32,19 +32,19 @@ namespace Umbraco.Tests.Routing
             //create the module
             var logger = Mock.Of<ILogger>();
             var globalSettings = TestObjects.GetGlobalSettings();
-            var runtime = new RuntimeState(logger, Mock.Of<IUmbracoSettingsSection>(), globalSettings,
-                new Lazy<IMainDom>(), new Lazy<IServerRegistrar>(), UmbracoVersion, HostingEnvironment, BackOfficeInfo);
+            var runtime = new RuntimeState(logger,  globalSettings, UmbracoVersion, BackOfficeInfo);
 
             _module = new UmbracoInjectedModule
             (
-                globalSettings,
                 runtime,
                 logger,
                 null, // FIXME: PublishedRouter complexities...
                 Mock.Of<IUmbracoContextFactory>(),
                 new RoutableDocumentFilter(globalSettings, IOHelper),
                 UriUtility,
-                AppCaches.RequestCache
+                AppCaches.RequestCache,
+                globalSettings,
+                HostingEnvironment
             );
 
             runtime.Level = RuntimeLevel.Run;

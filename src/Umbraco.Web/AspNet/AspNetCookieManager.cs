@@ -1,5 +1,4 @@
 using System.Web;
-using Umbraco.Core.Cookie;
 
 namespace Umbraco.Web
 {

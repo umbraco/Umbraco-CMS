@@ -7,6 +7,7 @@ using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security.Cookies;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Constants = Umbraco.Core.Constants;
 
@@ -26,9 +27,9 @@ namespace Umbraco.Web.Security
     {
         public const string CookieName = "UMB_UCONTEXT_C";
 
-        public static async Task ValidateSessionAsync(TimeSpan validateInterval, CookieValidateIdentityContext context, IGlobalSettings globalSettings, IIOHelper ioHelper)
+        public static async Task ValidateSessionAsync(TimeSpan validateInterval, CookieValidateIdentityContext context, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
-            if (context.Request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, globalSettings, ioHelper) == false)
+            if (context.Request.Uri.IsBackOfficeRequest(globalSettings, hostingEnvironment) == false)
                 return;
 
             var valid = await ValidateSessionAsync(validateInterval, context.OwinContext, context.Options.CookieManager, context.Options.SystemClock, context.Properties.IssuedUtc, context.Identity, globalSettings);
@@ -43,7 +44,7 @@ namespace Umbraco.Web.Security
         public static async Task<bool> ValidateSessionAsync(
             TimeSpan validateInterval,
             IOwinContext owinCtx,
-            ICookieManager cookieManager,
+            Microsoft.Owin.Infrastructure.ICookieManager cookieManager,
             ISystemClock systemClock,
             DateTimeOffset? authTicketIssueDate,
             ClaimsIdentity currentIdentity,

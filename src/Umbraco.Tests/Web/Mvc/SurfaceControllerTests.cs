@@ -5,14 +5,15 @@ using System.Web.Routing;
 using System.Web.Security;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
@@ -26,6 +27,7 @@ namespace Umbraco.Tests.Web.Mvc
     [UmbracoTest(WithApplication = true)]
     public class SurfaceControllerTests : UmbracoTestBase
     {
+
         public override void SetUp()
         {
             base.SetUp();
@@ -45,7 +47,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new TestDefaultCultureAccessor(),
                 globalSettings,
                 Mock.Of<IUserService>(),
-                IOHelper,
+                HostingEnvironment,
                 UriUtility,
                 httpContextAccessor,
                 new AspNetCookieManager(httpContextAccessor));
@@ -55,7 +57,7 @@ namespace Umbraco.Tests.Web.Mvc
 
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
 
-            var ctrl = new TestSurfaceController(umbracoContextAccessor);
+            var ctrl = new TestSurfaceController(umbracoContextAccessor, Mock.Of<IPublishedContentQuery>());
 
             var result = ctrl.Index();
 
@@ -75,7 +77,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new TestDefaultCultureAccessor(),
                 globalSettings,
                 Mock.Of<IUserService>(),
-                IOHelper,
+                HostingEnvironment,
                 UriUtility,
                 httpContextAccessor,
                 new AspNetCookieManager(httpContextAccessor));
@@ -85,7 +87,7 @@ namespace Umbraco.Tests.Web.Mvc
 
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbCtx);
 
-            var ctrl = new TestSurfaceController(umbracoContextAccessor);
+            var ctrl = new TestSurfaceController(umbracoContextAccessor, Mock.Of<IPublishedContentQuery>());
 
             Assert.IsNotNull(ctrl.UmbracoContext);
         }
@@ -108,7 +110,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new TestDefaultCultureAccessor(),
                 globalSettings,
                 Mock.Of<IUserService>(),
-                IOHelper,
+                HostingEnvironment,
                 UriUtility,
                 httpContextAccessor,
                 new AspNetCookieManager(httpContextAccessor));
@@ -118,15 +120,9 @@ namespace Umbraco.Tests.Web.Mvc
 
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
 
-            var helper = new UmbracoHelper(
-                content.Object,
-                Mock.Of<ITagQuery>(),
-                Mock.Of<ICultureDictionaryFactory>(),
-                Mock.Of<IUmbracoComponentRenderer>(),
-                Mock.Of<IPublishedContentQuery>(query => query.Content(2) == content.Object),
-                new MembershipHelper(Mock.Of<IHttpContextAccessor>(), Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper, Mock.Of<IEntityService>()));
+            var publishedContentQuery = Mock.Of<IPublishedContentQuery>(query => query.Content(2) == content.Object);
 
-            var ctrl = new TestSurfaceController(umbracoContextAccessor, helper);
+            var ctrl = new TestSurfaceController(umbracoContextAccessor,publishedContentQuery);
             var result = ctrl.GetContent(2) as PublishedContentResult;
 
             Assert.IsNotNull(result);
@@ -147,7 +143,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new TestDefaultCultureAccessor(),
                 globalSettings,
                 Mock.Of<IUserService>(),
-                IOHelper,
+                HostingEnvironment,
                 UriUtility,
                 httpContextAccessor,
                 new AspNetCookieManager(httpContextAccessor));
@@ -160,7 +156,7 @@ namespace Umbraco.Tests.Web.Mvc
             var content = Mock.Of<IPublishedContent>(publishedContent => publishedContent.Id == 12345);
 
 
-            var publishedRouter = BaseWebTest.CreatePublishedRouter(TestObjects.GetUmbracoSettings().WebRouting);
+            var publishedRouter = BaseWebTest.CreatePublishedRouter(TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings());
             var frequest = publishedRouter.CreateRequest(umbracoContext, new Uri("http://localhost/test"));
             frequest.PublishedContent = content;
 
@@ -172,7 +168,7 @@ namespace Umbraco.Tests.Web.Mvc
             var routeData = new RouteData();
             routeData.DataTokens.Add(Core.Constants.Web.UmbracoRouteDefinitionDataToken, routeDefinition);
 
-            var ctrl = new TestSurfaceController(umbracoContextAccessor, new UmbracoHelper());
+            var ctrl = new TestSurfaceController(umbracoContextAccessor, Mock.Of<IPublishedContentQuery>());
             ctrl.ControllerContext = new ControllerContext(Mock.Of<HttpContextBase>(), routeData, ctrl);
 
             var result = ctrl.GetContentFromCurrentPage() as PublishedContentResult;
@@ -182,9 +178,12 @@ namespace Umbraco.Tests.Web.Mvc
 
         public class TestSurfaceController : SurfaceController
         {
-            public TestSurfaceController(IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper = null)
-                : base(umbracoContextAccessor, null, ServiceContext.CreatePartial(), AppCaches.Disabled, null, null, helper)
+            private readonly IPublishedContentQuery _publishedContentQuery;
+
+            public TestSurfaceController(IUmbracoContextAccessor umbracoContextAccessor, IPublishedContentQuery publishedContentQuery)
+                : base(umbracoContextAccessor, null, ServiceContext.CreatePartial(), AppCaches.Disabled, null, null)
             {
+                _publishedContentQuery = publishedContentQuery;
             }
 
             public ActionResult Index()
@@ -195,7 +194,7 @@ namespace Umbraco.Tests.Web.Mvc
 
             public ActionResult GetContent(int id)
             {
-                var content = Umbraco.Content(id);
+                var content = _publishedContentQuery.Content(id);
 
                 return new PublishedContentResult(content);
             }

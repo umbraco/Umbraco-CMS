@@ -26,6 +26,7 @@ using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Core.Mapping;
 using Umbraco.Web.Models.Identity;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Web.Routing;
 
@@ -43,30 +44,29 @@ namespace Umbraco.Web.Editors
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
         private readonly IUserPasswordConfiguration _passwordConfiguration;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeState _runtimeState;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
-        private readonly IIOHelper _ioHelper;
+        private readonly ISecuritySettings _securitySettings;
 
         public AuthenticationController(
             IUserPasswordConfiguration passwordConfiguration,
             IGlobalSettings globalSettings,
+            IHostingEnvironment hostingEnvironment,
             IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext,
             ServiceContext services,
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             UmbracoMapper umbracoMapper,
-            IUmbracoSettingsSection umbracoSettingsSection,
-            IIOHelper ioHelper,
+            ISecuritySettings securitySettings,
             IPublishedUrlProvider publishedUrlProvider)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper, publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
             _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
-            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _securitySettings = securitySettings ?? throw new ArgumentNullException(nameof(securitySettings));
         }
 
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager
@@ -309,7 +309,7 @@ namespace Umbraco.Web.Editors
         {
             // If this feature is switched off in configuration the UI will be amended to not make the request to reset password available.
             // So this is just a server-side secondary check.
-            if (_umbracoSettingsSection.Security.AllowPasswordReset == false)
+            if (_securitySettings.AllowPasswordReset == false)
             {
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
@@ -540,7 +540,7 @@ namespace Umbraco.Web.Editors
             var action = urlHelper.Action("ValidatePasswordResetCode", "BackOffice",
                 new
                 {
-                    area = GlobalSettings.GetUmbracoMvcArea(_ioHelper),
+                    area = GlobalSettings.GetUmbracoMvcArea(_hostingEnvironment),
                     u = userId,
                     r = code
                 });

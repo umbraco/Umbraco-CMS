@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Services
         public void Can_Export_Macro()
         {
             // Arrange
-            var macro = new Macro(ShortStringHelper, "test1", "Test", "~/views/macropartials/test.cshtml", MacroTypes.PartialView);
+            var macro = new Macro(ShortStringHelper, "test1", "Test", "~/views/macropartials/test.cshtml");
             ServiceContext.MacroService.Save(macro);
 
             // Act

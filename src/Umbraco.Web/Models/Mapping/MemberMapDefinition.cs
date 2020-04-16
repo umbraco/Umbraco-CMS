@@ -2,6 +2,7 @@
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -11,13 +12,17 @@ namespace Umbraco.Web.Models.Mapping
     public class MemberMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;
+        private readonly CommonTreeNodeMapper _commonTreeNodeMapper;
         private readonly MemberTabsAndPropertiesMapper _tabsAndPropertiesMapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public MemberMapDefinition(CommonMapper commonMapper, MemberTabsAndPropertiesMapper tabsAndPropertiesMapper)
+        public MemberMapDefinition(CommonMapper commonMapper, CommonTreeNodeMapper commonTreeNodeMapper, MemberTabsAndPropertiesMapper tabsAndPropertiesMapper, IHttpContextAccessor httpContextAccessor)
         {
             _commonMapper = commonMapper;
+            _commonTreeNodeMapper = commonTreeNodeMapper;
 
             _tabsAndPropertiesMapper = tabsAndPropertiesMapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public void DefineMaps(UmbracoMapper mapper)
@@ -48,7 +53,7 @@ namespace Umbraco.Web.Models.Mapping
             target.SortOrder = source.SortOrder;
             target.State = null;
             target.Tabs = _tabsAndPropertiesMapper.Map(source, context);
-            target.TreeNodeUrl = _commonMapper.GetMemberTreeNodeUrl(source);
+            target.TreeNodeUrl = _commonTreeNodeMapper.GetTreeNodeUrl<MemberTreeController>(source);
             target.Udi = Udi.Create(Constants.UdiEntityType.Member, source.Key);
             target.UpdateDate = source.UpdateDate;
             target.Username = source.Username;
@@ -91,6 +96,8 @@ namespace Umbraco.Web.Models.Mapping
         {
             target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties);
         }
+
+
 
     }
 }

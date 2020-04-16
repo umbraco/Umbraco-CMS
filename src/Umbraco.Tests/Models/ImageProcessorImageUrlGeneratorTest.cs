@@ -16,10 +16,10 @@ using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.Models;
 using Umbraco.Web;
 using Umbraco.Web.PropertyEditors;
 using System.Text;
+using Umbraco.Infrastructure.Media;
 
 namespace Umbraco.Tests.Models
 {
@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Models
         private static readonly ImageUrlGenerationOptions.CropCoordinates Crop = new ImageUrlGenerationOptions.CropCoordinates(0.58729977382575338m, 0.055768992440203169m, 0m, 0.32457553600198386m);
         private static readonly ImageUrlGenerationOptions.FocalPointPosition Focus1 = new ImageUrlGenerationOptions.FocalPointPosition(0.80827067669172936m, 0.96m);
         private static readonly ImageUrlGenerationOptions.FocalPointPosition Focus2 = new ImageUrlGenerationOptions.FocalPointPosition(0.41m, 0.4275m);
-        private static readonly ImageProcessorImageUrlGenerator Generator = new ImageProcessorImageUrlGenerator();
+        private static readonly ImageSharpImageUrlGenerator Generator = new ImageSharpImageUrlGenerator();
 
         [Test]
         public void GetCropUrl_CropAliasTest()

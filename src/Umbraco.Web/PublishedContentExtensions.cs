@@ -32,6 +32,31 @@ namespace Umbraco.Web
         private static IExamineManager ExamineManager => Current.Factory.GetInstance<IExamineManager>();
         private static IUserService UserService => Current.Services.UserService;
 
+
+        #region Creator/Writer Names
+
+        public static string CreatorName(this IPublishedContent content, IUserService userService)
+        {
+            return userService.GetProfileById(content.CreatorId)?.Name;
+        }
+
+        public static string WriterName(this IPublishedContent content, IUserService userService)
+        {
+            return userService.GetProfileById(content.WriterId)?.Name;
+        }
+
+        public static string CreatorName(this IPublishedContent content)
+        {
+            return content.GetCreatorName(UserService);
+        }
+
+        public static string WriterName(this IPublishedContent content)
+        {
+            return content.GetWriterName(UserService);
+        }
+
+        #endregion
+
         #region Template
 
         /// <summary>
@@ -48,8 +73,8 @@ namespace Umbraco.Web
         {
             return content.IsAllowedTemplate(
                 Current.Services.ContentTypeService,
-                Current.Configs.Settings().WebRouting.DisableAlternativeTemplates,
-                Current.Configs.Settings().WebRouting.ValidateAlternativeTemplates,
+                Current.Configs.WebRouting().DisableAlternativeTemplates,
+                Current.Configs.WebRouting().ValidateAlternativeTemplates,
                 templateId);
         }
 
@@ -58,8 +83,8 @@ namespace Umbraco.Web
             return content.IsAllowedTemplate(
                 Current.Services.FileService,
                 Current.Services.ContentTypeService,
-                Current.Configs.Settings().WebRouting.DisableAlternativeTemplates,
-                Current.Configs.Settings().WebRouting.ValidateAlternativeTemplates,
+                Current.Configs.WebRouting().DisableAlternativeTemplates,
+                Current.Configs.WebRouting().ValidateAlternativeTemplates,
                 templateAlias);
         }
 
@@ -264,7 +289,7 @@ namespace Umbraco.Web
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <returns></returns>
         /// <remarks>
-        /// This can be useful in order to return all nodes in an entire site by a type when combined with TypedContentAtRoot
+        /// This can be useful in order to return all nodes in an entire site by a type when combined with <see cref="UmbracoHelper.ContentAtRoot"/> or similar.
         /// </remarks>
         public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(this IEnumerable<IPublishedContent> parentNodes, string docTypeAlias, string culture = null)
         {
@@ -278,7 +303,7 @@ namespace Umbraco.Web
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <returns></returns>
         /// <remarks>
-        /// This can be useful in order to return all nodes in an entire site by a type when combined with TypedContentAtRoot
+        /// This can be useful in order to return all nodes in an entire site by a type when combined with <see cref="UmbracoHelper.ContentAtRoot"/> or similar.
         /// </remarks>
         public static IEnumerable<T> DescendantsOrSelf<T>(this IEnumerable<IPublishedContent> parentNodes, string culture = null)
             where T : class, IPublishedContent
@@ -684,19 +709,6 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region Writer and creator
-
-        public static string CreatorName(this IPublishedContent content)
-        {
-            return content.GetCreatorName(UserService);
-        }
-
-        public static string WriterName(this IPublishedContent content)
-        {
-            return content.GetWriterName(UserService);
-        }
-
-        #endregion
 
         #region Url
 

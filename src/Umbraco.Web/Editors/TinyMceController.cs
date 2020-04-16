@@ -32,7 +32,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly IIOHelper _ioHelper;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IContentSettings _contentSettings;
 
         public TinyMceController(
             IGlobalSettings globalSettings,
@@ -42,16 +42,15 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             UmbracoMapper umbracoMapper,
             IShortStringHelper shortStringHelper,
-            IUmbracoSettingsSection umbracoSettingsSection,
+            IContentSettings contentSettings,
             IIOHelper ioHelper,
             IPublishedUrlProvider publishedUrlProvider)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper, publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
         }
 
@@ -98,7 +97,7 @@ namespace Umbraco.Web.Editors
             var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
-            if (_umbracoSettingsSection.Content.IsFileAllowedForUpload(ext) == false || _umbracoSettingsSection.Content.ImageFileTypes.Contains(ext) == false)
+            if (_contentSettings.IsFileAllowedForUpload(ext) == false || _contentSettings.ImageFileTypes.Contains(ext) == false)
             {
                 // Throw some error - to say can't upload this IMG type
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "This is not an image filetype extension that is approved");
@@ -106,7 +105,7 @@ namespace Umbraco.Web.Editors
 
             //var mediaItemName = fileName.ToFriendlyName();
             var currentFile = file.LocalFileName;
-            var newFilePath = imageTempPath +  _ioHelper.DirSepChar + safeFileName;
+            var newFilePath = imageTempPath +  Path.DirectorySeparatorChar + safeFileName;
             var relativeNewFilePath = _ioHelper.GetRelativePath(newFilePath);
 
             try

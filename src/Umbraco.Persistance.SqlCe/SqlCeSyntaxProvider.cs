@@ -55,6 +55,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         }
 
         public override System.Data.IsolationLevel DefaultIsolationLevel => System.Data.IsolationLevel.RepeatableRead;
+        public override string DbProvider => "SqlServerCE";
 
         public override string FormatColumnRename(string tableName, string oldName, string newName)
         {

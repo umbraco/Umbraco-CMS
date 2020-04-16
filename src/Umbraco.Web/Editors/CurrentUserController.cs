@@ -22,8 +22,9 @@ using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Web.Routing;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Web.Editors
 {
@@ -34,8 +35,8 @@ namespace Umbraco.Web.Editors
     public class CurrentUserController : UmbracoAuthorizedJsonController
     {
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
-        private readonly IIOHelper _ioHelper;
+        private readonly IContentSettings _contentSettings;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IImageUrlGenerator _imageUrlGenerator;
 
         public CurrentUserController(
@@ -46,19 +47,18 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             IMediaFileSystem mediaFileSystem,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
-            IUmbracoSettingsSection umbracoSettingsSection,
-            IIOHelper ioHelper,
+            IContentSettings contentSettings,
+            IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
             IPublishedUrlProvider publishedUrlProvider)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _mediaFileSystem = mediaFileSystem;
-            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
-            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _imageUrlGenerator = imageUrlGenerator;
         }
 
@@ -194,7 +194,7 @@ namespace Umbraco.Web.Editors
         public async Task<HttpResponseMessage> PostSetAvatar()
         {
             //borrow the logic from the user controller
-            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache,  _mediaFileSystem, ShortStringHelper, _umbracoSettingsSection, _ioHelper, _imageUrlGenerator, Security.GetUserId().ResultOr(0));
+            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache,  _mediaFileSystem, ShortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, Security.GetUserId().ResultOr(0));
         }
 
         /// <summary>

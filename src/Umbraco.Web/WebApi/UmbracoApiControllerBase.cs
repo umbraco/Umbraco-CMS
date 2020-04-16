@@ -45,7 +45,6 @@ namespace Umbraco.Web.WebApi
                 Current.Factory.GetInstance<AppCaches>(),
                 Current.Factory.GetInstance<IProfilingLogger>(),
                 Current.Factory.GetInstance<IRuntimeState>(),
-                Current.Factory.GetInstance<UmbracoHelper>(),
                 Current.Factory.GetInstance<UmbracoMapper>(),
                 Current.Factory.GetInstance<IPublishedUrlProvider>()
             )
@@ -54,7 +53,7 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoApiControllerBase"/> class with all its dependencies.
         /// </summary>
-        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
+        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
         {
             UmbracoContextAccessor = umbracoContextAccessor;
             GlobalSettings = globalSettings;
@@ -63,7 +62,6 @@ namespace Umbraco.Web.WebApi
             AppCaches = appCaches;
             Logger = logger;
             RuntimeState = runtimeState;
-            Umbraco = umbracoHelper;
             Mapper = umbracoMapper;
             PublishedUrlProvider = publishedUrlProvider;
         }
@@ -119,16 +117,6 @@ namespace Umbraco.Web.WebApi
         /// Gets the application url.
         /// </summary>
         protected Uri ApplicationUrl => RuntimeState.ApplicationUrl;
-
-        /// <summary>
-        /// Gets the membership helper.
-        /// </summary>
-        public MembershipHelper Members => Umbraco.MembershipHelper;
-
-        /// <summary>
-        /// Gets the Umbraco helper.
-        /// </summary>
-        public UmbracoHelper Umbraco { get; }
 
         /// <summary>
         /// Gets the mapper.

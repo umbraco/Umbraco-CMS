@@ -21,11 +21,6 @@
         string ReservedPaths { get; }
 
         /// <summary>
-        /// Gets the path to umbraco's root directory (/umbraco by default).
-        /// </summary>
-        string Path { get; }
-
-        /// <summary>
         /// Gets or sets the configuration status. This will return the version number of the currently installed umbraco instance.
         /// </summary>
         string ConfigurationStatus { get; set; }
@@ -61,6 +56,9 @@
         /// <value>The version check period in days (0 = never).</value>
         int VersionCheckPeriod { get; }
 
+        /// <summary>
+        /// Gets the path to umbraco's root directory.
+        /// </summary>
         string UmbracoPath { get; }
         string UmbracoCssPath { get; }
         string UmbracoScriptsPath { get; }
@@ -95,5 +93,11 @@
         bool DisableElectionForSingleServer { get; }
         string RegisterType { get; }
         string DatabaseFactoryServerVersion { get; }
+        string MainDomLock { get; }
+
+        /// <summary>
+        /// Gets the path to the razor file used when no published content is available.
+        /// </summary>
+        string NoNodesViewPath { get; }
     }
 }

@@ -14,11 +14,12 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Packaging;
+using Umbraco.Net;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.JavaScript;
+using Umbraco.Core.WebAssets;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -39,6 +40,8 @@ namespace Umbraco.Web.Editors
 
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IIOHelper _ioHelper;
+        private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
+        private readonly IRuntimeMinifier _runtimeMinifier;
 
         public PackageInstallController(
             IGlobalSettings globalSettings,
@@ -48,16 +51,19 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger logger,
             IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
             IShortStringHelper shortStringHelper,
             IUmbracoVersion umbracoVersion,
             UmbracoMapper umbracoMapper,
             IIOHelper ioHelper,
-            IPublishedUrlProvider publishedUrlProvider)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
+            IPublishedUrlProvider publishedUrlProvider,
+            IUmbracoApplicationLifetime umbracoApplicationLifetime,
+            IRuntimeMinifier runtimeMinifier)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _umbracoVersion = umbracoVersion;
             _ioHelper = ioHelper;
+            _umbracoApplicationLifetime = umbracoApplicationLifetime;
+            _runtimeMinifier = runtimeMinifier;
         }
 
         /// <summary>
@@ -121,8 +127,8 @@ namespace Umbraco.Web.Editors
             model.LicenseUrl = ins.LicenseUrl;
             model.Readme = ins.Readme;
             model.ConflictingMacroAliases = ins.Warnings.ConflictingMacros.ToDictionary(x => x.Name, x => x.Alias);
-            model.ConflictingStyleSheetNames = ins.Warnings.ConflictingStylesheets.ToDictionary(x => x.Name, x => x.Alias); ;
-            model.ConflictingTemplateAliases = ins.Warnings.ConflictingTemplates.ToDictionary(x => x.Name, x => x.Alias); ;
+            model.ConflictingStyleSheetNames = ins.Warnings.ConflictingStylesheets.ToDictionary(x => x.Name, x => x.Alias);
+            model.ConflictingTemplateAliases = ins.Warnings.ConflictingTemplates.ToDictionary(x => x.Name, x => x.Alias);
             model.ContainsUnsecureFiles = ins.Warnings.UnsecureFiles.Any();
             model.Url = ins.Url;
             model.Version = ins.Version;
@@ -325,7 +331,7 @@ namespace Umbraco.Web.Editors
             var installedFiles = Services.PackagingService.InstallCompiledPackageFiles(definition, zipFile, Security.GetUserId().ResultOr(0));
 
             //set a restarting marker and reset the app pool
-            UmbracoApplication.Restart(Request.TryGetHttpContext().Result);
+            _umbracoApplicationLifetime.Restart();
 
             model.IsRestarting = true;
 
@@ -337,12 +343,8 @@ namespace Umbraco.Web.Editors
         {
             if (model.IsRestarting == false) return model;
 
-            //check for the key, if it's not there we're are restarted
-            if (Request.TryGetHttpContext().Result.Application.AllKeys.Contains("AppPoolRestarting") == false)
-            {
-                //reset it
-                model.IsRestarting = false;
-            }
+            model.IsRestarting = _umbracoApplicationLifetime.IsRestarting;
+
             return model;
         }
 
@@ -382,9 +384,7 @@ namespace Umbraco.Web.Editors
             zipFile.Delete();
 
             //bump cdf to be safe
-            var clientDependencyConfig = new ClientDependencyConfiguration(Logger, _ioHelper);
-            var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
-                _umbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
+            _runtimeMinifier.Reset();
 
             var redirectUrl = "";
             if (!packageInfo.PackageView.IsNullOrWhiteSpace())

@@ -41,32 +41,27 @@ namespace Umbraco.Core
             /// <summary>
             /// Gets the path to umbraco's root directory (/umbraco by default).
             /// </summary>
-            public const string Path = "Umbraco.Core.Path";
+            public const string UmbracoPath = "Umbraco.Core.Path";
 
             /// <summary>
             /// The reserved urls from web.config.
             /// </summary>
             public const string ReservedUrls = "Umbraco.Core.ReservedUrls";
-
-            /// <summary>
-            /// The path of backoffice.
-            /// </summary>
-            public const string UmbracoPath = "umbracoPath";
-
+            
             /// <summary>
             /// The path of the stylesheet folder.
             /// </summary>
-            public const string UmbracoCssPath = "umbracoCssPath";
+            public const string UmbracoCssPath = "Umbraco.Web.CssPath";
 
             /// <summary>
             /// The path of script folder.
             /// </summary>
-            public const string UmbracoScriptsPath = "umbracoScriptsPath";
+            public const string UmbracoScriptsPath = "Umbraco.Core.ScriptsPath";
 
             /// <summary>
             /// The path of media folder.
             /// </summary>
-            public const string UmbracoMediaPath = "umbracoMediaPath";
+            public const string UmbracoMediaPath = "Umbraco.Core.MediaPath";
 
             /// <summary>
             /// The reserved paths from web.config
@@ -114,6 +109,11 @@ namespace Umbraco.Core
             /// TODO: FILL ME IN
             /// </summary>
             public const string DisableElectionForSingleServer = "Umbraco.Core.DisableElectionForSingleServer";
+
+            /// <summary>
+            /// Gets the path to the razor file used when no published content is available.
+            /// </summary>
+            public const string NoNodesViewPath = "Umbraco.Core.NoNodesViewPath";
 
             /// <summary>
             /// Debug specific web.config AppSetting keys for Umbraco
