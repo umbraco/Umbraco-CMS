@@ -96,7 +96,7 @@ namespace Umbraco.Tests.Cache
                 return "";
             });
 
-            Assert.AreEqual(counter, 1);
+            Assert.AreEqual(1, counter);
 
         }
 
