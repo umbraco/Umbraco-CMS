@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models
     {
         private string _name;
         private string _alias;
-        private bool _isBidrectional;
+        private bool _isBidirectional;
         private Guid? _parentObjectType;
         private Guid? _childObjectType;
 
@@ -24,11 +24,11 @@ namespace Umbraco.Core.Models
         {
         }
 
-        public RelationType(string name, string alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType)
+        public RelationType(string name, string alias, bool isBidirectional, Guid? parentObjectType, Guid? childObjectType)
         {
             _name = name;
             _alias = alias;
-            _isBidrectional = isBidrectional;
+            _isBidirectional = isBidirectional;
             _parentObjectType = parentObjectType;
             _childObjectType = childObjectType;
         }
@@ -81,8 +81,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public bool IsBidirectional
         {
-            get => _isBidrectional;
-            set => SetPropertyValueAndDetectChanges(value, ref _isBidrectional, nameof(IsBidirectional));
+            get => _isBidirectional;
+            set => SetPropertyValueAndDetectChanges(value, ref _isBidirectional, nameof(IsBidirectional));
         }
 
         /// <summary>
