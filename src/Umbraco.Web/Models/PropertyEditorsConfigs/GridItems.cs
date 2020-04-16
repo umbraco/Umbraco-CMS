@@ -4,11 +4,11 @@ namespace Umbraco.Web.Models.PropertyEditorsConfigs
 {
     public class GridItems
     {
-        public List<GridStyle> Styles;
-        public List<GridConfig> Config;
-        public int Columns;
-        public List<GridTemplate> Templates;
-        public List<GridLayout> Layouts;
+        public IList<GridStyle> Styles { get; set; }
+        public IList<GridConfig> Config { get; set; }
+        public int Columns { get; set; }
+        public IList<GridTemplate> Templates { get; set; }
+        public IList<GridLayout> Layouts { get; set; }
 
     }
 }
