@@ -26,7 +26,7 @@ namespace Umbraco.Core.Models
 
         public RelationType(string name, string alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType)
         {
-            if (name == null) throw new ArgumentNullException(nameof(alias));
+            if (name == null) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
             if (alias == null) throw new ArgumentNullException(nameof(alias));
             if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(alias));
