@@ -19,7 +19,6 @@ namespace Umbraco.Core.PropertyEditors
     public class DataEditor : IDataEditor
     {
         private IDictionary<string, object> _defaultConfiguration;
-        private IDataValueEditor _dataValueEditor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataEditor"/> class.
@@ -91,7 +90,7 @@ namespace Umbraco.Core.PropertyEditors
         /// simple enough for now.</para>
         /// </remarks>
         // TODO: point of that one? shouldn't we always configure?
-        public IDataValueEditor GetValueEditor() => ExplicitValueEditor ?? (_dataValueEditor ?? (_dataValueEditor = CreateValueEditor()));
+        public IDataValueEditor GetValueEditor() => ExplicitValueEditor ?? CreateValueEditor();
 
         /// <inheritdoc />
         /// <remarks>
