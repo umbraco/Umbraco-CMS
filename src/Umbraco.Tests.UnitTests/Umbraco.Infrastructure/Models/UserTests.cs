@@ -12,7 +12,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
     [TestFixture]
     public class UserTests
     {
-        private readonly UserBuilder _builder = new UserBuilder();
+        private UserBuilder _builder;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _builder = new UserBuilder();
+        }
 
         [Test]
         public void Can_Deep_Clone()

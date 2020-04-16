@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
-
 using Umbraco.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
@@ -14,7 +13,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
     [TestFixture]
     public class TemplateTests
     {
-        private readonly TemplateBuilder _builder = new TemplateBuilder();
+        private TemplateBuilder _builder;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _builder = new TemplateBuilder();
+        }
 
         [Test]
         public void Can_Deep_Clone()

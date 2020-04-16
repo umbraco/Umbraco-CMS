@@ -11,7 +11,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
     [TestFixture]
     public class MacroTests
     {
-        private readonly MacroBuilder _builder = new MacroBuilder();
+        private MacroBuilder _builder;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _builder = new MacroBuilder();
+        }
 
         [Test]
         public void Can_Deep_Clone()

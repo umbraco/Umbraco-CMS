@@ -13,7 +13,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
     [TestFixture]
     public class UserExtensionsTests
     {
-        private readonly UserBuilder _userBuilder = new UserBuilder();
+        private UserBuilder _userBuilder;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _userBuilder = new UserBuilder();
+        }
 
         [TestCase(-1, "-1", "-1,1,2,3,4,5", true)] // below root start node
         [TestCase(2, "-1,1,2", "-1,1,2,3,4,5", true)] // below start node

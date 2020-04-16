@@ -8,7 +8,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
     [TestFixture]
     public class LanguageTests
     {
-        private readonly LanguageBuilder _builder = new LanguageBuilder();
+        private LanguageBuilder _builder = new LanguageBuilder();
+
+        [SetUp]
+        public void SetUp()
+        {
+            _builder = new LanguageBuilder();
+        }
 
         [Test]
         public void Can_Deep_Clone()
