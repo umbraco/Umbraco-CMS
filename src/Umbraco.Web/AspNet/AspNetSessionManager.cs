@@ -10,13 +10,15 @@ namespace Umbraco.Web.AspNet
         {
         }
 
-        public object GetSessionValue(string sessionName)
+        public string GetSessionValue(string sessionName)
         {
-            return HttpContext.Current.Session[sessionName];
+            return HttpContext.Current?.Session[sessionName]?.ToString();
         }
 
-        public void SetSessionValue(string sessionName, object value)
+        public void SetSessionValue(string sessionName, string value)
         {
+            var httpContext = HttpContext.Current;
+            if (httpContext is null) return;
             HttpContext.Current.Session[sessionName] = value;
         }
 

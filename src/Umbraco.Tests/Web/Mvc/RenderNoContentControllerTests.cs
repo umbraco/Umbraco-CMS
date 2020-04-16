@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Tests.Common;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
@@ -15,11 +16,12 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Redirects_To_Root_When_Content_Published()
         {
+
             var mockUmbracoContext = new Mock<IUmbracoContext>();
             mockUmbracoContext.Setup(x => x.Content.HasContent()).Returns(true);
             var mockIOHelper = new Mock<IIOHelper>();
             var mockGlobalSettings = new Mock<IGlobalSettings>();
-            var controller = new RenderNoContentController(mockUmbracoContext.Object, mockIOHelper.Object, mockGlobalSettings.Object);
+            var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), mockIOHelper.Object, mockGlobalSettings.Object);
 
             var result = controller.Index() as RedirectResult;
 
@@ -40,7 +42,7 @@ namespace Umbraco.Tests.Web.Mvc
             var mockGlobalSettings = new Mock<IGlobalSettings>();
             mockGlobalSettings.SetupGet(x => x.UmbracoPath).Returns(UmbracoPathSetting);
             mockGlobalSettings.SetupGet(x => x.NoNodesViewPath).Returns(ViewPath);
-            var controller = new RenderNoContentController(mockUmbracoContext.Object, mockIOHelper.Object, mockGlobalSettings.Object);
+            var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), mockIOHelper.Object, mockGlobalSettings.Object);
 
             var result = controller.Index() as ViewResult;
             Assert.IsNotNull(result);

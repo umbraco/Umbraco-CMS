@@ -8,20 +8,20 @@ namespace Umbraco.Web.Mvc
 {
     public class RenderNoContentController : Controller
     {
-        private readonly IUmbracoContext _umbracoContext;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IIOHelper _ioHelper;
         private readonly IGlobalSettings _globalSettings;
 
-        public RenderNoContentController(IUmbracoContext umbracoContext, IIOHelper ioHelper, IGlobalSettings globalSettings)
+        public RenderNoContentController(IUmbracoContextAccessor umbracoContextAccessor, IIOHelper ioHelper, IGlobalSettings globalSettings)
         {
-            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
         }
 
         public ActionResult Index()
         {
-            var store = _umbracoContext.Content;
+            var store = _umbracoContextAccessor.UmbracoContext.Content;
             if (store.HasContent())
             {
                 // If there is actually content, go to the root.

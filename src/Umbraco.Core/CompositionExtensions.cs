@@ -21,7 +21,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
-        internal static ActionCollectionBuilder Actions(this Composition composition)
+        public static ActionCollectionBuilder Actions(this Composition composition)
             => composition.WithCollectionBuilder<ActionCollectionBuilder>();
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
-        internal static EditorValidatorCollectionBuilder EditorValidators(this Composition composition)
+        public static EditorValidatorCollectionBuilder EditorValidators(this Composition composition)
             => composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>();
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Umbraco.Core
         /// <param name="composition">The composition.</param>
         public static SectionCollectionBuilder Sections(this Composition composition)
             => composition.WithCollectionBuilder<SectionCollectionBuilder>();
-        
+
         /// <summary>
         /// Gets the components collection builder.
         /// </summary>
