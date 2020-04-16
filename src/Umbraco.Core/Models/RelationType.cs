@@ -24,11 +24,11 @@ namespace Umbraco.Core.Models
         {
         }
 
-        public RelationType(string name, string alias, bool isBidirectional, Guid? parentObjectType, Guid? childObjectType)
+        public RelationType(string name, string alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType)
         {
             _name = name;
             _alias = alias;
-            _isBidirectional = isBidirectional;
+            _isBidirectional = isBidrectional;
             _parentObjectType = parentObjectType;
             _childObjectType = childObjectType;
         }
