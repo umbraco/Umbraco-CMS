@@ -219,7 +219,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IMedia entity)
         {
-            var media = entity;
             entity.AddingEntity();
 
             // ensure unique name on the same level
@@ -274,15 +273,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             contentVersionDto.NodeId = nodeDto.NodeId;
             contentVersionDto.Current = true;
             Database.Insert(contentVersionDto);
-            media.VersionId = contentVersionDto.Id;
+            entity.VersionId = contentVersionDto.Id;
 
             // persist the media version dto
             var mediaVersionDto = dto.MediaVersionDto;
-            mediaVersionDto.Id = media.VersionId;
+            mediaVersionDto.Id = entity.VersionId;
             Database.Insert(mediaVersionDto);
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(media.ContentType.Variations, media.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
@@ -298,10 +297,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IMedia entity)
         {
-            var media = entity;
-
             // update
-            media.UpdatingEntity();
+            entity.UpdatingEntity();
 
             // Check if this entity is being moved as a descendant as part of a bulk moving operations.
             // In this case we can bypass a lot of the below operations which will make this whole operation go much faster.
@@ -349,9 +346,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.Update(mediaVersionDto);
 
                 // replace the property data
-                var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == media.VersionId);
+                var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == entity.VersionId);
                 Database.Execute(deletePropertyDataSql);
-                var propertyDataDtos = PropertyFactory.BuildDtos(media.ContentType.Variations, media.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
+                var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
                 foreach (var propertyDataDto in propertyDataDtos)
                     Database.Insert(propertyDataDto);
 
