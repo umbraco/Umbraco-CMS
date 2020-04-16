@@ -18,6 +18,7 @@ namespace Umbraco.Core.Models
         private Guid? _parentObjectType;
         private Guid? _childObjectType;
 
+        [Obsolete("This constructor is no longer used and will be removed in future versions, use one of the other constructors instead")]
         public RelationType(string alias, string name)
             : this(name, alias, false, null, null)
         {
@@ -32,21 +33,25 @@ namespace Umbraco.Core.Models
             _childObjectType = childObjectType;
         }
 
-        [Obsolete("This constructor is incomplete, use one of the other constructors instead")]
+        [Obsolete("This constructor is no longer used and will be removed in future versions, use one of the other constructors instead")]
         public RelationType(Guid childObjectType, Guid parentObjectType, string alias)
         {
-            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentNullOrEmptyException(nameof(alias));
+            if (alias == null) throw new ArgumentNullException(nameof(alias));
+            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(alias));
+
             _childObjectType = childObjectType;
             _parentObjectType = parentObjectType;
             _alias = alias;
             Name = _alias;
         }
 
-        [Obsolete("This constructor is incomplete, use one of the other constructors instead")]
+        [Obsolete("This constructor is no longer used and will be removed in future versions, use one of the other constructors instead")]
         public RelationType(Guid childObjectType, Guid parentObjectType, string alias, string name)
             : this(childObjectType, parentObjectType, alias)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
+
             Name = name;
         }
 
