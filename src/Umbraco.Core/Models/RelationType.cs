@@ -40,13 +40,13 @@ namespace Umbraco.Core.Models
 
         [Obsolete("This constructor is no longer used and will be removed in future versions, use one of the other constructors instead")]
         public RelationType(Guid childObjectType, Guid parentObjectType, string alias)
-            : this(name: alias, alias: alias, false, parentObjectType: parentObjectType, childObjectType: childObjectType)
+            : this(name: alias, alias: alias, isBidrectional: false, parentObjectType: parentObjectType, childObjectType: childObjectType)
         {   
         }
 
         [Obsolete("This constructor is no longer used and will be removed in future versions, use one of the other constructors instead")]
         public RelationType(Guid childObjectType, Guid parentObjectType, string alias, string name)
-            : this(name: name, alias: alias, false, parentObjectType: parentObjectType, childObjectType: childObjectType)
+            : this(name: name, alias: alias, isBidrectional: false, parentObjectType: parentObjectType, childObjectType: childObjectType)
         {
         }
 
