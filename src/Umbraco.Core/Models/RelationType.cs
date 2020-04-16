@@ -20,12 +20,17 @@ namespace Umbraco.Core.Models
 
         [Obsolete("This constructor is no longer used and will be removed in future versions, use one of the other constructors instead")]
         public RelationType(string alias, string name)
-            : this(name, alias, false, null, null)
+            : this(name: name, alias: alias, false, null, null)
         {
         }
 
         public RelationType(string name, string alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType)
         {
+            if (name == null) throw new ArgumentNullException(nameof(alias));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
+            if (alias == null) throw new ArgumentNullException(nameof(alias));
+            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(alias));
+
             _name = name;
             _alias = alias;
             _isBidirectional = isBidrectional;
@@ -35,24 +40,14 @@ namespace Umbraco.Core.Models
 
         [Obsolete("This constructor is no longer used and will be removed in future versions, use one of the other constructors instead")]
         public RelationType(Guid childObjectType, Guid parentObjectType, string alias)
-        {
-            if (alias == null) throw new ArgumentNullException(nameof(alias));
-            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(alias));
-
-            _childObjectType = childObjectType;
-            _parentObjectType = parentObjectType;
-            _alias = alias;
-            Name = _alias;
+            : this(name: alias, alias: alias, false, parentObjectType: parentObjectType, childObjectType: childObjectType)
+        {   
         }
 
         [Obsolete("This constructor is no longer used and will be removed in future versions, use one of the other constructors instead")]
         public RelationType(Guid childObjectType, Guid parentObjectType, string alias, string name)
-            : this(childObjectType, parentObjectType, alias)
+            : this(name: name, alias: alias, false, parentObjectType: parentObjectType, childObjectType: childObjectType)
         {
-            if (name == null) throw new ArgumentNullException(nameof(name));
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
-
-            Name = name;
         }
 
         /// <summary>
