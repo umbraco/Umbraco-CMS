@@ -10,6 +10,6 @@ namespace Umbraco.Web.Models.PropertyEditorsConfigs
         public string View { get; set; }
         public string Modifier { get; set; }
         public object ApplyTo { get; set; }
-        public List<string> Prevalues{ get; set; }
+        public IList<string> Prevalues { get; set; }
     }
 }
