@@ -6,7 +6,7 @@ namespace Umbraco.Web.Models.PropertyEditorsConfigs
     {
         public string Mode { get; set; }
         public int MaxImageSize { get; set; }
-        public List<string> Toolbar { get; set; }
-        public List<string> stylesheets { get; set; }
+        public IList<string> Toolbar { get; set; }
+        public IList<string> Stylesheets { get; set; }
     }
 }
