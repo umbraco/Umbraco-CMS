@@ -95,23 +95,7 @@ namespace Umbraco.Tests.Common.Builders
                 macro.Properties.Add(property);
             }
 
-            Reset();
             return macro;
-        }
-
-        protected override void Reset()
-        {
-            _id = null;
-            _key = null;
-            _alias = null;
-            _name = null;
-            _useInEditor = null;
-            _cacheDuration = null;
-            _cacheByPage = null;
-            _cacheByMember = null;
-            _dontRender = null;
-            _macroSource = null;
-            _propertyBuilders = new List<MacroPropertyBuilder>();
         }
 
         int? IWithIdBuilder.Id

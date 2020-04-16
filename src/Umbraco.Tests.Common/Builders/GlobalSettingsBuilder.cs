@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Common.Builders
         private string _noNodesViewPath;
         private bool? _useHttps;
         private int? _versionCheckPeriod;
-        private SmtpSettingsBuilder<GlobalSettingsBuilder<TParent>> _smtpSettingsBuilder;
+        private readonly SmtpSettingsBuilder<GlobalSettingsBuilder<TParent>> _smtpSettingsBuilder;
 
         public GlobalSettingsBuilder(TParent parentBuilder) : base(parentBuilder)
         {
@@ -191,7 +191,6 @@ namespace Umbraco.Tests.Common.Builders
             var mainDomLock = _mainDomLock ?? string.Empty;
             var noNodesViewPath = _noNodesViewPath ?? "~/config/splashes/NoNodes.cshtml";
 
-            Reset();
             return new TestGlobalSettings
             {
                 ConfigurationStatus = configurationStatus,
@@ -217,32 +216,6 @@ namespace Umbraco.Tests.Common.Builders
                 MainDomLock = mainDomLock,
                 NoNodesViewPath = noNodesViewPath,
             };
-        }
-
-        protected override void Reset()
-        {
-            _configurationStatus = null;
-            _databaseFactoryServerVersion = null;
-            _defaultUiLanguage = null;
-            _disableElectionForSingleServer = null;
-            _hideTopLevelNodeFromPath = null;
-            _installEmptyDatabase = null;
-            _installMissingDatabase = null;
-            _isSmtpServerConfigured = null;
-            _path = null;
-            _registerType = null;
-            _reservedPaths = null;
-            _reservedUrls = null;
-            _timeOutInMinutes = null;
-            _umbracoCssPath = null;
-            _umbracoMediaPath = null;
-            _umbracoPath = null;
-            _umbracoScriptsPath = null;
-            _mainDomLock = null;
-            _noNodesViewPath = null;
-            _useHttps = null;
-            _versionCheckPeriod = null;
-            _smtpSettingsBuilder = new SmtpSettingsBuilder<GlobalSettingsBuilder<TParent>>(this);
         }
 
         private class TestGlobalSettings : IGlobalSettings

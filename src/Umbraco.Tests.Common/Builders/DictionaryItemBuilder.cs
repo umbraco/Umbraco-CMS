@@ -65,7 +65,6 @@ namespace Umbraco.Tests.Common.Builders
             var parentId = _parentId ?? null;
             var itemKey = _itemKey ?? Guid.NewGuid().ToString();
 
-            Reset();
             var result = new DictionaryItem(itemKey)
             {
                 Translations = _translationBuilders.Select(x => x.Build()),
@@ -77,17 +76,6 @@ namespace Umbraco.Tests.Common.Builders
                 Key = key,
             };
             return result;
-        }
-
-        protected override void Reset()
-        {
-            _createDate = null;
-            _deleteDate = null;
-            _id = null;
-            _itemKey = null;
-            _key = null;
-            _parentId = null;
-            _updateDate = null;
         }
 
         public DictionaryItemBuilder WithParentId(Guid parentId)

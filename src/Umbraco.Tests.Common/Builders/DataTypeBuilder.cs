@@ -66,7 +66,6 @@ namespace Umbraco.Tests.Common.Builders
             var databaseType = _databaseType ?? ValueStorageType.Ntext;
             var sortOrder = _sortOrder ?? 0;
 
-            Reset();
             return new DataType(editor, parentId)
             {
                 Id = id,
@@ -82,24 +81,6 @@ namespace Umbraco.Tests.Common.Builders
                 DatabaseType = databaseType,
                 SortOrder = sortOrder,
             };
-        }
-
-        protected override void Reset()
-        {
-            _dataEditorBuilder = new DataEditorBuilder<DataTypeBuilder>(this);
-            _id = null;
-            _parentId = null;
-            _key = null;
-            _createDate = null;
-            _updateDate = null;
-            _deleteDate = null;
-            _name = null;
-            _trashed = null;
-            _level = null;
-            _path = null;
-            _creatorId = null;
-            _databaseType = null;
-            _sortOrder = null;
         }
 
         int? IWithIdBuilder.Id

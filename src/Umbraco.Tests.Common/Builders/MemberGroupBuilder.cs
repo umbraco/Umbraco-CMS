@@ -57,18 +57,7 @@ namespace Umbraco.Tests.Common.Builders
                 }
             }
 
-            Reset();
             return memberGroup;
-        }
-
-        protected override void Reset()
-        {
-            _id = null;
-            _key = null;
-            _createDate = null;
-            _updateDate = null;
-            _name = null;
-            _creatorId = null;
         }
 
         int? IWithIdBuilder.Id

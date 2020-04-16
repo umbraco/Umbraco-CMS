@@ -21,16 +21,10 @@ namespace Umbraco.Tests.Common.Builders
         {
             var defaultConfiguration  = _defaultConfiguration ?? new Dictionary<string, object>();
 
-            Reset();
             return new ConfigurationEditor()
             {
                 DefaultConfiguration = defaultConfiguration,
             };
-        }
-
-        protected override void Reset()
-        {
-            _defaultConfiguration = null;
         }
     }
 }

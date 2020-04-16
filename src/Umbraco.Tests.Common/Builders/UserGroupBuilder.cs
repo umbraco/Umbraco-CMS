@@ -68,24 +68,10 @@ namespace Umbraco.Tests.Common.Builders
                 x.Icon == _icon &&
                 x.Permissions == _permissions &&
                 x.AllowedSections == _sectionCollection);
-            Reset();
             return userGroup;
         }
 
-        protected override void Reset()
-        {
-            _startContentId = null;
-            _startMediaId = null;
-            _alias = null;
-            _icon = null;
-            _name = null;
-            _permissions = Enumerable.Empty<string>();
-            _sectionCollection = Enumerable.Empty<string>();
-            _suffix = null;
-            _id = null;
-        }
-
-        int? IWithIdBuilder.Id
+       int? IWithIdBuilder.Id
         {
             get => _id;
             set => _id = value;

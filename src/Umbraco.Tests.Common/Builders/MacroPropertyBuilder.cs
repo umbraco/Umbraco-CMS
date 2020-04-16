@@ -39,22 +39,9 @@ namespace Umbraco.Tests.Common.Builders
             var sortOrder = _sortOrder ?? 0;
             var editorAlias = _editorAlias ?? string.Empty;
 
-            var macroProperty = new MacroProperty(id, key, alias, name, sortOrder, editorAlias);
-
-            Reset();
-            return macroProperty;
+            return new MacroProperty(id, key, alias, name, sortOrder, editorAlias);
         }
         
-        protected override void Reset()
-        {
-            _id = null;
-            _key = null;
-            _alias = null;
-            _name = null;
-            _sortOrder = null;
-            _editorAlias = null;
-        }
-
         int? IWithIdBuilder.Id
         {
             get => _id;

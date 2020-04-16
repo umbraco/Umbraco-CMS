@@ -16,18 +16,11 @@ namespace Umbraco.Tests.Common.Builders
             var id = _id ?? 1;
             var parentId = _parentId ?? -1;
 
-            Reset();
             return new EntitySlim
             {
                 Id = id,
                 ParentId = parentId,
             };
-        }
-
-        protected override void Reset()
-        {
-            _id = null;
-            _parentId = null;
         }
 
         public EntitySlimBuilder WithNoParentId()

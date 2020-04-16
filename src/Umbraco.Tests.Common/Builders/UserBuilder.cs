@@ -134,7 +134,6 @@ namespace Umbraco.Tests.Common.Builders
             var startContentIds = _startContentIds ?? new int[0];
             var startMediaIds = _startMediaIds ?? new int[0];
 
-            Reset();
             return new User(
                 globalSettings,
                 name,
@@ -158,31 +157,6 @@ namespace Umbraco.Tests.Common.Builders
                 StartContentIds = startContentIds,
                 StartMediaIds = startMediaIds,
             };
-        }
-
-        protected override void Reset()
-        {
-            _id = null;
-            _key = null;
-            _createDate = null;
-            _updateDate = null;
-            _language = null;
-            _name = null;
-            _username = null;
-            _rawPasswordValue = null;
-            _email = null;
-            _failedPasswordAttempts = null;
-            _isApproved = null;
-            _isLockedOut = null;
-            _lastLockoutDate = null;
-            _lastLoginDate = null;
-            _lastPasswordChangeDate = null;
-            _suffix = string.Empty;
-            _defaultLang = null;
-            _comments = null;
-            _sessionTimeout = null;
-            _startContentIds = null;
-            _startMediaIds = null;
         }
 
         int? IWithIdBuilder.Id

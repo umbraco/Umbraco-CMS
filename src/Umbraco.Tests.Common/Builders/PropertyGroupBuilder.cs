@@ -62,7 +62,6 @@ namespace Umbraco.Tests.Common.Builders
                 properties.Add(propertyType);
             }
 
-            Reset();
             return new PropertyGroup(properties)
             {
                 Id = id,
@@ -72,17 +71,6 @@ namespace Umbraco.Tests.Common.Builders
                 CreateDate = createDate,
                 UpdateDate = updateDate,
             };
-        }
-
-        protected override void Reset()
-        {
-            _id = null;
-            _key = null;
-            _createDate = null;
-            _updateDate = null;
-            _name = null;
-            _sortOrder = null;
-            _propertyTypeBuilders.Clear();
         }
 
         int? IWithIdBuilder.Id

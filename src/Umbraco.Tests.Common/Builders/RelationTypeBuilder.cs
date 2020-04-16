@@ -64,7 +64,6 @@ namespace Umbraco.Tests.Common.Builders
             var updateDate = _updateDate ?? DateTime.Now;
             var deleteDate = _deleteDate ?? null;
 
-            Reset();
             return new RelationType(name, alias, isBidirectional, parentObjectType, childObjectType)
             {
                 Id = id,
@@ -73,20 +72,6 @@ namespace Umbraco.Tests.Common.Builders
                 UpdateDate = updateDate,
                 DeleteDate = deleteDate
             };
-        }
-
-        protected override void Reset()
-        {
-            _alias = null;
-            _childObjectType = null;
-            _createDate = null;
-            _deleteDate = null;
-            _id = null;
-            _isBidirectional = null;
-            _key = null;
-            _name = null;
-            _parentObjectType = null;
-            _updateDate = null;
         }
 
         string IWithAliasBuilder.Alias

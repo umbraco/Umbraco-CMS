@@ -12,7 +12,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
     [TestFixture]
     public class PathValidationTests
     {
-        private readonly EntitySlimBuilder _builder = new EntitySlimBuilder();
+        private EntitySlimBuilder _builder = new EntitySlimBuilder();
 
         [Test]
         public void Validate_Path()
@@ -93,18 +93,25 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
         [Test]
         public void Ensure_Path_Entity_Valid_Recursive_Parent()
         {
+            // Not using the shared class-level builder as we need to reset after each usage when creating multiple entities.
+            _builder = new EntitySlimBuilder();
             var parentA = _builder
                 .WithId(999)
                 .Build();
+
+            _builder = new EntitySlimBuilder();
             var parentB = _builder
                 .WithId(888)
                 .WithParentId(999)
                 .Build();
+
+            _builder = new EntitySlimBuilder();
             var parentC = _builder
                 .WithId(777)
                 .WithParentId(888)
                 .Build();
 
+            _builder = new EntitySlimBuilder();
             var entity = _builder
                 .WithId(1234)
                 .WithParentId(777)

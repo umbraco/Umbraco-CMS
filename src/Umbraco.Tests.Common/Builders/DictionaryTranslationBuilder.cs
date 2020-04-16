@@ -52,19 +52,7 @@ namespace Umbraco.Tests.Common.Builders
                 Id = id
             };
 
-            Reset();
             return result;
-        }
-        
-        protected override void Reset()
-        {
-            _languageBuilder = new LanguageBuilder<DictionaryTranslationBuilder>(this);
-            _createDate = null;
-            _deleteDate = null;
-            _id = null;
-            _key = null;
-            _updateDate = null;
-            _value = null;
         }
 
         DateTime? IWithCreateDateBuilder.CreateDate

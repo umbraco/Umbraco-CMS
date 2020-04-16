@@ -37,7 +37,6 @@ namespace Umbraco.Tests.Common.Builders
             var explicitConfigurationEditor = _explicitConfigurationEditorBuilder.Build();
             var explicitValueEditor = _explicitValueEditorBuilder.Build();
 
-            Reset();
             return new DataEditor(
                 Mock.Of<ILogger>(),
                 Mock.Of<IDataTypeService>(),
@@ -50,13 +49,6 @@ namespace Umbraco.Tests.Common.Builders
                 ExplicitConfigurationEditor = explicitConfigurationEditor,
                 ExplicitValueEditor = explicitValueEditor
             };
-        }
-
-        protected override void Reset()
-        {
-            _defaultConfiguration = null;
-            _explicitConfigurationEditorBuilder = new ConfigurationEditorBuilder<DataEditorBuilder<TParent>>(this);
-            _explicitValueEditorBuilder = new DataValueEditorBuilder<DataEditorBuilder<TParent>>(this);
         }
     }
 }

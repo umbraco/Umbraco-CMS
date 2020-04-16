@@ -25,17 +25,10 @@ namespace Umbraco.Tests.Common.Builders
             var path = _path ?? string.Empty;
             var content = _content ?? string.Empty;
 
-            Reset();
             return new Stylesheet(path)
             {
                 Content = content,
             };
-        }
-
-        protected override void Reset()
-        {
-            _path = null;
-            _content = null;
         }
     }
 }

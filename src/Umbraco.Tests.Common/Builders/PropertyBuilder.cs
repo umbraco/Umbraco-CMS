@@ -36,21 +36,12 @@ namespace Umbraco.Tests.Common.Builders
             // Needs to be within collection to support publishing.
             var propertyTypeCollection = new PropertyTypeCollection(true, new[] { _propertyTypeBuilder.Build() });
 
-            Reset();
             return new Property(id, propertyTypeCollection[0])
             {
                 Key = key,
                 CreateDate = createDate,
                 UpdateDate = updateDate,
             };
-        }
-
-        protected override void Reset()
-        {
-            _id = null;
-            _key = null;
-            _createDate = null;
-            _updateDate = null;
         }
 
         int? IWithIdBuilder.Id

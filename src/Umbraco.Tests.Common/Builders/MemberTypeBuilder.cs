@@ -134,23 +134,7 @@ namespace Umbraco.Tests.Common.Builders
 
             memberType.ResetDirtyProperties(false);
 
-            Reset();
             return memberType;
-        }
-
-        protected override void Reset()
-        {
-            _id = null;
-            _alias = null;
-            _name = null;
-            _parentId = null;
-            _sortOrder = null;
-            _creatorId = null;
-            _description = null;
-            _icon = null;
-            _thumbnail = null;
-            _trashed = null;
-            _propertyGroupBuilders.Clear();
         }
 
         int? IWithIdBuilder.Id

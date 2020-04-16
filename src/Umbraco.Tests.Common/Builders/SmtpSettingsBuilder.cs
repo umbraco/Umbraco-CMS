@@ -52,7 +52,6 @@ namespace Umbraco.Tests.Common.Builders
             var port = _port ?? 25;
             var pickupDirectoryLocation = _pickupDirectoryLocation ?? null;
 
-            Reset();
             return new TestSmtpSettings()
             {
                 From = from,
@@ -60,14 +59,6 @@ namespace Umbraco.Tests.Common.Builders
                 Port = port,
                 PickupDirectoryLocation = pickupDirectoryLocation,
             };
-        }
-
-        protected override void Reset()
-        {
-            _from = null;
-            _host = null;
-            _port = null;
-            _pickupDirectoryLocation = null;
         }
 
         private class TestSmtpSettings : ISmtpSettings

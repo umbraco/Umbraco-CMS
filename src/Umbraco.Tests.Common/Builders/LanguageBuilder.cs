@@ -66,7 +66,6 @@ namespace Umbraco.Tests.Common.Builders
             var isDefault = _isDefault ?? false;
             var isMandatory = _isMandatory ?? false;
 
-            Reset();
             return new Language(Mock.Of<IGlobalSettings>(), cultureInfo.Name)
             {
                 Id = _id ?? 1,
@@ -80,19 +79,6 @@ namespace Umbraco.Tests.Common.Builders
                 IsMandatory = isMandatory,
                 FallbackLanguageId = fallbackLanguageId
             };
-        }
-
-        protected override void Reset()
-        {
-            _createDate = null;
-            _cultureInfo = null;
-            _deleteDate = null;
-            _fallbackLanguageId = null;
-            _id = null;
-            _isDefault = null;
-            _isMandatory = null;
-            _key = null;
-            _updateDate = null;
         }
 
         DateTime? IWithCreateDateBuilder.CreateDate

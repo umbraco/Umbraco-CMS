@@ -48,7 +48,6 @@ namespace Umbraco.Tests.Common.Builders
             var hideLabel = _hideLabel ?? false;
             var valueType = _valueType ?? Guid.NewGuid().ToString();
 
-            Reset();
             return new DataValueEditor(
                 Mock.Of<IDataTypeService>(),
                 Mock.Of<ILocalizationService>(),
@@ -61,14 +60,6 @@ namespace Umbraco.Tests.Common.Builders
                 HideLabel = hideLabel,
                 ValueType = valueType,
             };
-        }
-
-        protected override void Reset()
-        {
-            _configuration = null;
-            _view = null;
-            _hideLabel = null;
-            _valueType = null;
         }
     }
 }
