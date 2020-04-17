@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using CSharpTest.Net.Collections;
 using Newtonsoft.Json;
 using Umbraco.Core;
@@ -866,12 +867,24 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 //into a new DLL for the application which includes both content types and media types.
                 //Since the models in the cache are based on these actual classes, all of the objects in the cache need to be updated
                 //to use the newest version of the class.
-                using (_contentStore.GetScopedWriteLock(_scopeProvider))
-                using (_mediaStore.GetScopedWriteLock(_scopeProvider))
-                {
-                    NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out var draftChanged, out var publishedChanged);
-                    NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out var anythingChanged);
-                }
+
+                // These can be run side by side in parallel
+
+                Parallel.Invoke(
+                    () =>
+                    {
+                        using (_contentStore.GetScopedWriteLock(_scopeProvider))
+                        {
+                            NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _, out _);
+                        }
+                    },
+                    () =>
+                    {
+                        using (_mediaStore.GetScopedWriteLock(_scopeProvider))
+                        {
+                            NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _);
+                        }
+                    });
             }
 
             ((PublishedSnapshot)CurrentPublishedSnapshot)?.Resync();
