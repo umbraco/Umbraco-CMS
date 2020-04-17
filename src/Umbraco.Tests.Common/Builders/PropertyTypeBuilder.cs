@@ -126,7 +126,7 @@ namespace Umbraco.Tests.Common.Builders
                 ValidationRegExpMessage = validationRegExpMessage,
             };
         }
-
+        
         int? IWithIdBuilder.Id
         {
             get => _id;

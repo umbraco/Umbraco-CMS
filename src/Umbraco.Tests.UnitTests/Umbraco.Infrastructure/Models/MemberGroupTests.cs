@@ -11,7 +11,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
     [TestFixture]
     public class MemberGroupTests
     {
-        private readonly MemberGroupBuilder _builder = new MemberGroupBuilder();
+        private MemberGroupBuilder _builder;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _builder = new MemberGroupBuilder();
+        }
 
         [Test]
         public void Can_Deep_Clone()

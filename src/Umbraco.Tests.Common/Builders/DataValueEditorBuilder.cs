@@ -13,7 +13,6 @@ namespace Umbraco.Tests.Common.Builders
         private bool? _hideLabel;
         private string _valueType;
 
-
         public DataValueEditorBuilder(TParent parentBuilder) : base(parentBuilder)
         {
         }

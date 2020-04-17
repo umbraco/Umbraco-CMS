@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Common.Builders
             IWithPathBuilder,
             IWithSortOrderBuilder
     {
-        private readonly DataEditorBuilder<DataTypeBuilder> _dataEditorBuilder;
+        private DataEditorBuilder<DataTypeBuilder> _dataEditorBuilder;
         private int? _id;
         private int? _parentId;
         private Guid? _key;
@@ -28,7 +28,6 @@ namespace Umbraco.Tests.Common.Builders
         private DateTime? _deleteDate;
         private string _name;
         private bool? _trashed;
-      //  private object _configuration;
         private int? _level;
         private string _path;
         private int? _creatorId;
@@ -39,12 +38,6 @@ namespace Umbraco.Tests.Common.Builders
         {
             _dataEditorBuilder = new DataEditorBuilder<DataTypeBuilder>(this);
         }
-
-        // public DataTypeBuilder WithConfiguration(object configuration)
-        // {
-        //     _configuration = configuration;
-        //     return this;
-        // }
 
         public DataTypeBuilder WithDatabaseType(ValueStorageType databaseType)
         {
@@ -67,7 +60,6 @@ namespace Umbraco.Tests.Common.Builders
             var updateDate = _updateDate ?? DateTime.Now;
             var deleteDate = _deleteDate ?? null;
             var name = _name ?? Guid.NewGuid().ToString();
-         //   var configuration = _configuration ?? editor.GetConfigurationEditor().DefaultConfigurationObject;
             var level = _level ?? 0;
             var path = _path ?? string.Empty;
             var creatorId = _creatorId ?? 1;

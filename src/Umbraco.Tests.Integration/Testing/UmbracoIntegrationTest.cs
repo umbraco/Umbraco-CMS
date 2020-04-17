@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using NPoco.Expressions;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -21,7 +18,6 @@ using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Web.BackOffice.AspNetCore;
-using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Extensions;
 
 namespace Umbraco.Tests.Integration.Testing

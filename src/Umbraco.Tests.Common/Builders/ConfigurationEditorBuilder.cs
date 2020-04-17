@@ -7,11 +7,9 @@ namespace Umbraco.Tests.Common.Builders
     {
         private IDictionary<string, object> _defaultConfiguration;
 
-
         public ConfigurationEditorBuilder(TParent parentBuilder) : base(parentBuilder)
         {
         }
-
 
         public ConfigurationEditorBuilder<TParent> WithDefaultConfiguration(IDictionary<string, object> defaultConfiguration)
         {
@@ -28,6 +26,5 @@ namespace Umbraco.Tests.Common.Builders
                 DefaultConfiguration = defaultConfiguration,
             };
         }
-
     }
 }

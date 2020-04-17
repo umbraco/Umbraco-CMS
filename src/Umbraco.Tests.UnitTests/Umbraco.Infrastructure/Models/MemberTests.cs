@@ -13,7 +13,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
     [TestFixture]
     public class MemberTests
     {
-        private readonly MemberBuilder _builder = new MemberBuilder();
+        private MemberBuilder _builder;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _builder = new MemberBuilder();
+        }
 
         [Test]
         public void Can_Deep_Clone()
@@ -116,14 +122,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
                         .Done()
                     .Done()
                 .WithId(10)
-                .WithKey(Guid.NewGuid())
                 .WithName("Fred")
-                .WithUserName("fred")
-                .WithRawPasswordValue("raw pass")
+                .WithLogin("fred", "raw pass")
                 .WithEmail("email@email.com")
                 .WithCreatorId(22)
-                .WithCreateDate(DateTime.Now)
-                .WithUpdateDate(DateTime.Now)
                 .WithFailedPasswordAttempts(22)
                 .WithLevel(3)
                 .WithPath("-1, 4, 10")
