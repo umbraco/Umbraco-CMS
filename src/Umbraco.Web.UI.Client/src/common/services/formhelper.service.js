@@ -159,8 +159,15 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                 //the alias in model state can be in dot notation which indicates
                 // * the first part is the content property alias
                 // * the second part is the field to which the valiation msg is associated with
-                //There will always be at least 3 parts for content properties since all model errors for properties are prefixed with "_Properties"
+                //There will always be at least 4 parts for content properties since all model errors for properties are prefixed with "_Properties"
                 //If it is not prefixed with "_Properties" that means the error is for a field of the object directly.
+
+                // Example: "_Properties.headerImage.en-US.mySegment.myField"
+                // * it's for a property since it has a _Properties prefix
+                // * it's for the headerImage property type
+                // * it's for the en-US culture
+                // * it's for the mySegment segment
+                // * it's for the myField html field (optional)
 
                 var parts = e.split(".");
 
@@ -179,19 +186,18 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                         }
                     }
 
-                    var htmlFieldReference = "";
-                    if (parts.length > 3) {
-                        htmlFieldReference = parts[3] || "";
-                    }
-
-                    // SEGMENTS_TODO: Need to investigate wether we have updated validation to handle segments, plus could it be the third parameter, so we leave the HTML Field ref as optional and last?
                     var segment = null;
-                    if (parts.length > 4) {
-                        segment = parts[4];
+                    if (parts.length > 3) {
+                        segment = parts[3];
                         //special check in case the string is formatted this way
                         if (segment === "null") {
                             segment = null;
                         }
+                    }
+
+                    var htmlFieldReference = "";
+                    if (parts.length > 4) {
+                        htmlFieldReference = parts[4] || "";
                     }
 
                     // add a generic error for the property
