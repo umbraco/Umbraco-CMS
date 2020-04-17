@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public static IRelationType BuildEntity(RelationTypeDto dto)
         {
-            var entity = new RelationType(dto.Name, dto.Alias, dto.Dual, dto.ChildObjectType, dto.ParentObjectType);
+            var entity = new RelationType(dto.Name, dto.Alias, dto.Dual, dto.ParentObjectType, dto.ChildObjectType);
 
             try
             {
