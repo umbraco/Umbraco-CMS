@@ -296,7 +296,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var dtos = Database.FetchOneToMany<ContentTypeReferenceDto>(ct => ct.PropertyTypes, sql);
 
-            return dtos.ToDictionary(
+            return dtos.ToFastDictionary(
                 x => (Udi)new GuidUdi(ObjectTypes.GetUdiType(x.NodeDto.NodeObjectType.Value), x.NodeDto.UniqueId).EnsureClosed(),
                 x => (IEnumerable<string>)x.PropertyTypes.Select(p => p.Alias).ToList());
         }

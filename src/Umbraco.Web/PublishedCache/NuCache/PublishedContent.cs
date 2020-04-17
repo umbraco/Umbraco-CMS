@@ -200,7 +200,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     throw new PanicException("_contentDate.CultureInfos is null.");
 
                 return _cultures = ContentData.CultureInfos
-                    .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.UrlSegment, x.Value.Date), StringComparer.OrdinalIgnoreCase);
+                    .ToFastDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.UrlSegment, x.Value.Date), StringComparer.OrdinalIgnoreCase);
             }
         }
 

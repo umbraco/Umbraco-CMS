@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -60,7 +61,7 @@ namespace Umbraco.Web.Editors
 
             //remove ones that have been removed
             var existing = Services.UserService.GetPermissions(userGroupSave.PersistedUserGroup, true)
-                .ToDictionary(x => x.EntityId, x => x);
+                .ToFastDictionary(x => x.EntityId, x => x);
             var toRemove = existing.Keys.Except(userGroupSave.AssignedPermissions.Select(x => x.Key));
             foreach (var contentId in toRemove)
             {

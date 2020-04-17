@@ -14,6 +14,20 @@ namespace Umbraco.Core
     ///</summary>
     internal static class DictionaryExtensions
     {
+        /// <summary>
+        /// Efficiently copies a readonly dictionary to a normal dictionary
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="readonlyDictionary"></param>
+        /// <returns></returns>
+        public static Dictionary<TKey, TValue> CopyToDictionary<TKey, TValue>(this IReadOnlyCollection<KeyValuePair<TKey, TValue>> readonlyDictionary)
+        {
+            var d = new Dictionary<TKey, TValue>(readonlyDictionary.Count);
+            foreach (var i in readonlyDictionary)
+                d[i.Key] = i.Value;
+            return d;
+        }
 
         /// <summary>
         /// Method to Get a value by the key. If the key doesn't exist it will create a new TVal object for the key and return it.

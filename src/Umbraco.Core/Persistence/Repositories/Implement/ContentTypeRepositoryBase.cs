@@ -1096,6 +1096,7 @@ AND umbracoNode.id <> @id",
                             .WhereIn<DocumentCultureVariationDto>(x => x.LanguageId, editedLanguageVersions.Keys.Select(x => x.langId).ToList())
                             .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, editedLanguageVersions.Keys.Select(x => x.nodeId))))
                 //convert to dictionary with the same key type
+                // TODO: Could resolving the SelectMany ToList and using ToFastDictionary be faster since this is could be a large collection?
                 .ToDictionary(x => (x.NodeId, (int?)x.LanguageId), x => x);
 
             var toUpdate = new List<DocumentCultureVariationDto>();

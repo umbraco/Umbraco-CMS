@@ -839,7 +839,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             //lookup in the DB all INT ids for the GUIDs and chuck into a dictionary
             var keyToIds = Database.Fetch<NodeIdKey>(Sql().Select<NodeDto>(x => x.NodeId, x => x.UniqueId).From<NodeDto>().WhereIn<NodeDto>(x => x.UniqueId, udiToGuids.Values))
-                .ToDictionary(x => x.UniqueId, x => x.NodeId);
+                .ToFastDictionary(x => x.UniqueId, x => x.NodeId);
 
             var allRelationTypes = RelationTypeRepository.GetMany(Array.Empty<int>())
                 .ToDictionary(x => x.Alias, x => x);

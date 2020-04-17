@@ -848,7 +848,7 @@ namespace Umbraco.Core.Services.Implement
                 if (userIds != null)
                 {
                     var groupUsers = userGroup.HasIdentity ? _userRepository.GetAllInGroup(userGroup.Id).ToArray() : empty;
-                    var xGroupUsers = groupUsers.ToDictionary(x => x.Id, x => x);
+                    var xGroupUsers = groupUsers.ToFastDictionary(x => x.Id, x => x);
                     var groupIds = groupUsers.Select(x => x.Id).ToArray();
 
                     addedUsers = _userRepository.GetMany(userIds.Except(groupIds).ToArray()).Where(x => x.Id != 0).ToArray();
@@ -1043,24 +1043,20 @@ namespace Umbraco.Core.Services.Implement
 
             var resultPermissions = new EntityPermissionCollection();
 
-            //create a grouped by dictionary of another grouped by dictionary
             var permissionsByGroup = groupPermissions
-                .GroupBy(x => x.UserGroupId)
-                .ToDictionary(
-                    x => x.Key,
-                    x => x.GroupBy(a => a.EntityId).ToDictionary(a => a.Key, a => a.ToArray()));
+                .ToLookup(x => x.UserGroupId);
 
             //iterate through each group
             foreach (var byGroup in permissionsByGroup)
             {
+                var byEntity = byGroup.ToLookup(x => x.EntityId);
+
                 var added = false;
 
                 //iterate deepest to shallowest
                 foreach (var pathId in pathIds)
-                {
-                    EntityPermission[] permissionsForNodeAndGroup;
-                    if (byGroup.Value.TryGetValue(pathId, out permissionsForNodeAndGroup) == false)
-                        continue;
+                {   
+                    var permissionsForNodeAndGroup = byEntity[pathId];
 
                     //In theory there will only be one EntityPermission in this group
                     // but there's nothing stopping the logic of this method
@@ -1082,11 +1078,12 @@ namespace Umbraco.Core.Services.Implement
                         break;
                 }
 
-                if (added == false && byGroup.Value.Count > 0)
+                if (added == false && byEntity.Count > 0)
                 {
                     //if there was no explicit permissions assigned in this branch for this group, then we will
                     //add the group's default permissions
-                    resultPermissions.Add(byGroup.Value[entityId][0]);
+                    var groupsDefault = byEntity[entityId].ToList();
+                    resultPermissions.Add(groupsDefault[0]);
                 }
 
             }

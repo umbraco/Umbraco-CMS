@@ -309,7 +309,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var nodes = Database.Fetch<NodeDto>(Sql().Select<NodeDto>().From<NodeDto>()
                     .WhereIn<NodeDto>(x => x.NodeId, entityIds))
-                .ToDictionary(x => x.NodeId, x => x.NodeObjectType);
+                .ToFastDictionary(x => x.NodeId, x => x.NodeObjectType);
 
             foreach (var e in entities)
             {

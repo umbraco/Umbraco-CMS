@@ -1520,8 +1520,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // get names per culture, at same level (ie all siblings)
             var sql = SqlEnsureVariantNamesAreUnique.Sql(true, NodeObjectTypeId, content.ParentId, content.Id);
             var names = Database.Fetch<CultureNodeName>(sql)
-                .GroupBy(x => x.LanguageId)
-                .ToDictionary(x => x.Key, x => x);
+                .ToLookup(x => x.LanguageId);
 
             if (names.Count == 0) return;
 
@@ -1533,7 +1532,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 var langId = LanguageRepository.GetIdByIsoCode(cultureInfo.Culture);
                 if (!langId.HasValue) continue;
-                if (!names.TryGetValue(langId.Value, out var cultureNames)) continue;
+                var cultureNames = names[langId.Value];
+                if (!cultureNames.Any()) continue;
 
                 // get a unique name
                 var otherNames = cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name });

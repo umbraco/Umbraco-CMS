@@ -244,7 +244,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var columns = new[] { "key", "id" }.Select(x => (object) SqlSyntax.GetQuotedColumnName(x)).ToArray();
             var sql = Sql().Select(columns).From<DictionaryDto>();
-            return Database.Fetch<DictionaryItemKeyIdDto>(sql).ToDictionary(x => x.Key, x => x.Id);
+            return Database.Fetch<DictionaryItemKeyIdDto>(sql).ToFastDictionary(x => x.Key, x => x.Id);
         }
 
         private class DictionaryItemKeyIdDto

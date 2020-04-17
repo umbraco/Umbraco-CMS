@@ -80,6 +80,7 @@ namespace Umbraco.Web.Editors
                     Id = x.Id,
                     Score = x.Score,
                     //order the values by key
+                    // TODO: This is creating a new dictionary with ToDictionary and then copying that new dictionary again in this ctor?
                     Values = new Dictionary<string, string>(x.Values.OrderBy(y => y.Key).ToDictionary(y => y.Key, y => y.Value))
                 })
             };

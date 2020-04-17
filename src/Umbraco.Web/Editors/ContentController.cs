@@ -122,7 +122,7 @@ namespace Umbraco.Web.Editors
 
             //current permissions explicitly assigned to this content item
             var contentPermissions = Services.ContentService.GetPermissions(content)
-                .ToDictionary(x => x.UserGroupId, x => x);
+                .ToFastDictionary(x => x.UserGroupId, x => x);
 
             var allUserGroups = Services.UserService.GetAllUserGroups().ToArray();
 
@@ -194,7 +194,7 @@ namespace Umbraco.Web.Editors
             var defaultPermissionsByGroup = Mapper.MapEnumerable<IUserGroup, AssignedUserGroupPermissions>(allUserGroups);
 
             var defaultPermissionsAsDictionary = defaultPermissionsByGroup
-                .ToDictionary(x => Convert.ToInt32(x.Id), x => x);
+                .ToFastDictionary(x => Convert.ToInt32(x.Id), x => x);
 
             //get the actual assigned permissions
             var assignedPermissionsByGroup = Services.ContentService.GetPermissions(content).ToArray();

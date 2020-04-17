@@ -3,6 +3,7 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Services;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -58,7 +59,7 @@ namespace Umbraco.Web.PropertyEditors
             var i = 1;
             return new Dictionary<string, object>
             {
-                { "items", configuration.Items.ToDictionary(x => x.Id.ToString(), x => new { value = x.Value, sortOrder = i++ }) }
+                { "items", configuration.Items.ToFastDictionary(x => x.Id.ToString(), x => new { value = x.Value, sortOrder = i++ }) }
             };
         }
 

@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Factories
         public static IEnumerable<Property> BuildEntities(PropertyType[] propertyTypes, IReadOnlyCollection<PropertyDataDto> dtos, int publishedVersionId, ILanguageRepository languageRepository)
         {
             var properties = new List<Property>();
-            var xdtos = dtos.GroupBy(x => x.PropertyTypeId).ToDictionary(x => x.Key, x => (IEnumerable<PropertyDataDto>)x);
+            var xdtos = dtos.ToLookup(x => x.PropertyTypeId, x => x);
 
             foreach (var propertyType in propertyTypes)
             {
@@ -23,15 +23,11 @@ namespace Umbraco.Core.Persistence.Factories
                     property.DisableChangeTracking();
 
                     // see notes in BuildDtos - we always have edit+published dtos
-
-                    if (xdtos.TryGetValue(propertyType.Id, out var propDtos))
+                    var propDtos = xdtos[propertyType.Id]; // ILookup just returns an empty collection if nothing found
+                    foreach (var propDto in propDtos)
                     {
-                        foreach (var propDto in propDtos)
-                        {
-                            property.Id = propDto.Id;
-                            property.FactorySetValue(languageRepository.GetIsoCodeById(propDto.LanguageId), propDto.Segment, propDto.VersionId == publishedVersionId, propDto.Value);
-                        }
-
+                        property.Id = propDto.Id;
+                        property.FactorySetValue(languageRepository.GetIsoCodeById(propDto.LanguageId), propDto.Segment, propDto.VersionId == publishedVersionId, propDto.Value);
                     }
 
                     property.ResetDirtyProperties(false);

@@ -264,7 +264,7 @@ namespace Umbraco.Web.Routing
             // convert sites into authority sites based upon current scheme
             // because some domains in the sites might not have a scheme -- and cache
             return _qualifiedSites[current.Scheme] = _sites
-                .ToDictionary(
+                .ToFastDictionary(
                     kvp => kvp.Key,
                     kvp => kvp.Value.Select(d => new Uri(UriUtility.StartWithScheme(d, current.Scheme)).GetLeftPart(UriPartial.Authority)).ToArray()
                 );

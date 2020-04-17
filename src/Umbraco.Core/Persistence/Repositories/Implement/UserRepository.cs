@@ -306,7 +306,7 @@ ORDER BY colName";
             if (dtos.Count == 0) return;
 
             var userIds = dtos.Count == 1 ? new List<int> { dtos[0].Id } : dtos.Select(x => x.Id).ToList();
-            var xUsers = dtos.Count == 1 ? null : dtos.ToDictionary(x => x.Id, x => x);
+            var xUsers = dtos.Count == 1 ? null : dtos.ToFastDictionary(x => x.Id, x => x);
 
             // get users2groups
 
@@ -326,7 +326,7 @@ ORDER BY colName";
                 .WhereIn<UserGroupDto>(x => x.Id, groupIds);
 
             var groups = Database.Fetch<UserGroupDto>(sql)
-                .ToDictionary(x => x.Id, x => x);
+                .ToFastDictionary(x => x.Id, x => x);
 
             // get groups2apps
 
@@ -336,8 +336,7 @@ ORDER BY colName";
                 .WhereIn<UserGroup2AppDto>(x => x.UserGroupId, groupIds);
 
             var groups2apps = Database.Fetch<UserGroup2AppDto>(sql)
-                .GroupBy(x => x.UserGroupId)
-                .ToDictionary(x => x.Key, x => x);
+                .ToLookup(x => x.UserGroupId);
 
             // get start nodes
 
@@ -371,8 +370,7 @@ ORDER BY colName";
 
             foreach (var group in groups.Values)
             {
-                if (groups2apps.TryGetValue(group.Id, out var list))
-                    group.UserGroup2AppDtos = list.ToList(); // groups2apps is distinct
+                group.UserGroup2AppDtos = groups2apps[group.Id].ToList(); // groups2apps is distinct
             }
         }
 

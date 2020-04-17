@@ -92,8 +92,8 @@ namespace Umbraco.Core.Scoping
             {
                 lock (StaticCallContextObjectsLock)
                 {
-                    // capture in a dictionary
-                    return StaticCallContextObjects.ToDictionary(x => x.Key, x => x.Value);
+                    // capture/copy dictionary
+                    return new Dictionary<Guid, object>(StaticCallContextObjects);
                 }
             }
         }

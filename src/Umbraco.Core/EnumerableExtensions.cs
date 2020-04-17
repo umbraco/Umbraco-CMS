@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
@@ -10,6 +11,39 @@ namespace Umbraco.Core
     ///</summary>
     public static class EnumerableExtensions
     {
+        /// <summary>
+        /// Returns a dictionary from a collection
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TVal"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="keySelector"></param>
+        /// <param name="elementSelector"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Similar to the IEnumerable.ToDictionary ext method but this does it in a more efficient way since we already have a
+        /// resolved IReadOnlyCollection which means we already know the size of the dictionary before hand.
+        /// see https://github.com/umbraco/Umbraco-CMS/pull/7910/files#r409689045
+        ///
+        /// NOTE: unfortunately due to no overlap between IReadOnlyCollection and ICollection we can't have this ext for both else we get
+        /// ambiguous errors. More collections in use implement both of these so we get more from extending IReadOnlyCollection than ICollection.
+        /// We could also support just ICollection too but we'd have to have a different ext method name which is kinda ugly.
+        /// </remarks>
+        public static Dictionary<TKey, TVal> ToFastDictionary<TSource, TKey, TVal>(
+            this IReadOnlyCollection<TSource> source,
+            Func<TSource, TKey> keySelector,
+            Func<TSource, TVal> elementSelector,
+            IEqualityComparer<TKey> comparer = null)
+        {
+            var result = comparer != null ? new Dictionary<TKey, TVal>(source.Count, comparer) : new Dictionary<TKey, TVal>();
+            foreach (var d in source)
+            {
+                result[keySelector(d)] = elementSelector(d);
+            }
+            return result;
+        }
+
         internal static bool IsCollectionEmpty<T>(this IReadOnlyCollection<T> list) => list == null || list.Count == 0;
 
         internal static bool HasDuplicates<T>(this IEnumerable<T> items, bool includeNull)
