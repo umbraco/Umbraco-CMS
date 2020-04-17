@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services.Changes;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services.Implement
 {
@@ -25,6 +26,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly IAuditRepository _auditRepository;
         private readonly IEntityRepository _entityRepository;
+        private readonly IShortStringHelper _shortStringHelper;
 
         private readonly IMediaFileSystem _mediaFileSystem;
 
@@ -32,7 +34,7 @@ namespace Umbraco.Core.Services.Implement
 
         public MediaService(IScopeProvider provider, IMediaFileSystem mediaFileSystem, ILogger logger, IEventMessagesFactory eventMessagesFactory,
             IMediaRepository mediaRepository, IAuditRepository auditRepository, IMediaTypeRepository mediaTypeRepository,
-            IEntityRepository entityRepository)
+            IEntityRepository entityRepository, IShortStringHelper shortStringHelper)
             : base(provider, logger, eventMessagesFactory)
         {
             _mediaFileSystem = mediaFileSystem;
@@ -40,6 +42,7 @@ namespace Umbraco.Core.Services.Implement
             _auditRepository = auditRepository;
             _mediaTypeRepository = mediaTypeRepository;
             _entityRepository = entityRepository;
+            _shortStringHelper = shortStringHelper;
         }
 
         #endregion
@@ -530,22 +533,26 @@ namespace Umbraco.Core.Services.Implement
                         totalChildren = 0;
                         return Enumerable.Empty<IMedia>();
                     }
-                    return GetPagedDescendantsLocked(mediaPath[0].Path, pageIndex, pageSize, out totalChildren, filter, ordering);
+                    return GetPagedLocked(GetPagedDescendantQuery(mediaPath[0].Path), pageIndex, pageSize, out totalChildren, filter, ordering);
                 }
-                return GetPagedDescendantsLocked(null, pageIndex, pageSize, out totalChildren, filter, ordering);
+                return GetPagedLocked(GetPagedDescendantQuery(null), pageIndex, pageSize, out totalChildren, filter, ordering);
             }
         }
 
-        private IEnumerable<IMedia> GetPagedDescendantsLocked(string mediaPath, long pageIndex, int pageSize, out long totalChildren,
+        private IQuery<IMedia> GetPagedDescendantQuery(string mediaPath)
+        {
+            var query = Query<IMedia>();
+            if (!mediaPath.IsNullOrWhiteSpace())
+                query.Where(x => x.Path.SqlStartsWith(mediaPath + ",", TextColumnType.NVarchar));
+            return query;
+        }
+
+        private IEnumerable<IMedia> GetPagedLocked(IQuery<IMedia> query, long pageIndex, int pageSize, out long totalChildren,
             IQuery<IMedia> filter, Ordering ordering)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
             if (ordering == null) throw new ArgumentNullException(nameof(ordering));
-
-            var query = Query<IMedia>();
-            if (!mediaPath.IsNullOrWhiteSpace())
-                query.Where(x => x.Path.SqlStartsWith(mediaPath + ",", TextColumnType.NVarchar));
 
             return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
         }
@@ -888,7 +895,7 @@ namespace Umbraco.Core.Services.Implement
         public Attempt<OperationResult> MoveToRecycleBin(IMedia media, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            var moves = new List<Tuple<IMedia, string>>();
+            var moves = new List<(IMedia, string)>();
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -940,7 +947,7 @@ namespace Umbraco.Core.Services.Implement
                 return OperationResult.Attempt.Succeed(evtMsgs);
             }
 
-            var moves = new List<Tuple<IMedia, string>>();
+            var moves = new List<(IMedia, string)>();
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -979,7 +986,7 @@ namespace Umbraco.Core.Services.Implement
 
         // MUST be called from within WriteLock
         // trash indicates whether we are trashing, un-trashing, or not changing anything
-        private void PerformMoveLocked(IMedia media, int parentId, IMedia parent, int userId, ICollection<Tuple<IMedia, string>> moves, bool? trash)
+        private void PerformMoveLocked(IMedia media, int parentId, IMedia parent, int userId, ICollection<(IMedia, string)> moves, bool? trash)
         {
             media.ParentId = parentId;
 
@@ -989,7 +996,7 @@ namespace Umbraco.Core.Services.Implement
 
             var paths = new Dictionary<int, string>();
 
-            moves.Add(Tuple.Create(media, media.Path)); // capture original path
+            moves.Add((media, media.Path)); // capture original path
 
             //need to store the original path to lookup descendants based on it below
             var originalPath = media.Path;
@@ -1006,21 +1013,25 @@ namespace Umbraco.Core.Services.Implement
             paths[media.Id] = (parent == null ? (parentId == Constants.System.RecycleBinMedia ? "-1,-21" : Constants.System.RootString) : parent.Path) + "," + media.Id;
 
             const int pageSize = 500;
-            var page = 0;
-            var total = long.MaxValue;
-            while (page * pageSize < total)
+            var query = GetPagedDescendantQuery(originalPath);
+            long total;
+            do
             {
-                var descendants = GetPagedDescendantsLocked(originalPath, page++, pageSize, out total, null, Ordering.By("Path", Direction.Ascending));
+                // We always page a page 0 because for each page, we are moving the result so the resulting total will be reduced
+                var descendants = GetPagedLocked(query, 0, pageSize, out total, null, Ordering.By("Path", Direction.Ascending));
+
                 foreach (var descendant in descendants)
                 {
-                    moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path
+                    moves.Add((descendant, descendant.Path)); // capture original path
 
                     // update path and level since we do not update parentId
                     descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
                     descendant.Level += levelDelta;
                     PerformMoveMediaLocked(descendant, userId, trash);
                 }
-            }
+
+            } while (total > pageSize);
+
         }
 
         private void PerformMoveMediaLocked(IMedia media, int userId, bool? trash)
@@ -1132,6 +1143,26 @@ namespace Umbraco.Core.Services.Implement
             }
 
             return true;
+
+        }
+
+        public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.WriteLock(Constants.Locks.MediaTree);
+
+                var report = _mediaRepository.CheckDataIntegrity(options);
+
+                if (report.FixedIssues.Count > 0)
+                {
+                    //The event args needs a content item so we'll make a fake one with enough properties to not cause a null ref
+                    var root = new Models.Media("root", -1, new MediaType(_shortStringHelper, -1)) { Id = -1, Key = Guid.Empty };
+                    scope.Events.Dispatch(TreeChanged, this, new TreeChange<IMedia>.EventArgs(new TreeChange<IMedia>(root, TreeChangeTypes.RefreshAll)));
+                }
+
+                return report;
+            }
         }
 
         #endregion
@@ -1270,7 +1301,7 @@ namespace Umbraco.Core.Services.Implement
             // which we need for many things like keeping caches in sync, but we can surely do this MUCH better.
 
             var changes = new List<TreeChange<IMedia>>();
-            var moves = new List<Tuple<IMedia, string>>();
+            var moves = new List<(IMedia, string)>();
             var mediaTypeIdsA = mediaTypeIds.ToArray();
 
             using (var scope = ScopeProvider.CreateScope())
@@ -1351,5 +1382,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         #endregion
+
+
     }
 }
