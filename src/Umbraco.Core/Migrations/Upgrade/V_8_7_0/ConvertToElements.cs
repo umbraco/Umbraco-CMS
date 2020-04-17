@@ -36,6 +36,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
             elementTypeIds = elementTypeIds.Union(parentElementTypeIds).ToList();
 
             // Convert all those document types to element type
+            // TODO: We need to wait on an update from @benjaminc to make this 'safe'
+            // see https://github.com/umbraco/Umbraco-CMS/pull/7910#discussion_r409927495
             foreach (var docType in docTypes)
             {
                 if (!elementTypeIds.Contains(docType.NodeId)) continue;
