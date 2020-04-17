@@ -15,7 +15,8 @@ namespace Umbraco.Tests.Common.Builders
             IWithTrashedBuilder,
             IWithLevelBuilder,
             IWithPathBuilder,
-            IWithSortOrderBuilder
+            IWithSortOrderBuilder,
+            IAccountBuilder
     {
         private MemberTypeBuilder _memberTypeBuilder;
         private GenericCollectionBuilder<MemberBuilder, string> _memberGroupsBuilder;
@@ -28,12 +29,12 @@ namespace Umbraco.Tests.Common.Builders
         private DateTime? _updateDate;
         private string _name;
         private int? _creatorId;
+        private int? _level;
+        private string _path;
         private string _username;
         private string _rawPasswordValue;
         private string _email;
         private int? _failedPasswordAttempts;
-        private int? _level;
-        private string _path;
         private bool? _isApproved;
         private bool? _isLockedOut;
         private DateTime? _lastLockoutDate;
@@ -42,60 +43,6 @@ namespace Umbraco.Tests.Common.Builders
         private int? _sortOrder;
         private bool? _trashed;
         private int? _propertyIdsIncrementingFrom;
-
-        public MemberBuilder WithUserName(string username)
-        {
-            _username = username;
-            return this;
-        }
-
-        public MemberBuilder WithEmail(string email)
-        {
-            _email = email;
-            return this;
-        }
-
-        public MemberBuilder WithRawPasswordValue(string rawPasswordValue)
-        {
-            _rawPasswordValue = rawPasswordValue;
-            return this;
-        }
-
-        public MemberBuilder WithFailedPasswordAttempts(int failedPasswordAttempts)
-        {
-            _failedPasswordAttempts = failedPasswordAttempts;
-            return this;
-        }
-
-        public MemberBuilder WithIsApproved(bool isApproved)
-        {
-            _isApproved = isApproved;
-            return this;
-        }
-
-        public MemberBuilder WithIsLockedOut(bool isLockedOut)
-        {
-            _isLockedOut = isLockedOut;
-            return this;
-        }
-
-        public MemberBuilder WithLastLockoutDate(DateTime lastLockoutDate)
-        {
-            _lastLockoutDate = lastLockoutDate;
-            return this;
-        }
-
-        public MemberBuilder WithLastLoginDate(DateTime lastLoginDate)
-        {
-            _lastLoginDate = lastLoginDate;
-            return this;
-        }
-
-        public MemberBuilder WithLastPasswordChangeDate(DateTime lastPasswordChangeDate)
-        {
-            _lastPasswordChangeDate = lastPasswordChangeDate;
-            return this;
-        }
 
         public MemberBuilder WithPropertyIdsIncrementingFrom(int propertyIdsIncrementingFrom)
         {
@@ -139,19 +86,19 @@ namespace Umbraco.Tests.Common.Builders
             var updateDate = _updateDate ?? DateTime.Now;
             var name = _name ?? Guid.NewGuid().ToString();
             var creatorId = _creatorId ?? 1;
+            var level = _level ?? 1;
+            var path = _path ?? "-1";
+            var sortOrder = _sortOrder ?? 0;
+            var trashed = _trashed ?? false;
             var username = _username ?? string.Empty;
             var email = _email ?? string.Empty;
             var rawPasswordValue = _rawPasswordValue ?? string.Empty;
             var failedPasswordAttempts = _failedPasswordAttempts ?? 0;
-            var level = _level ?? 1;
-            var path = _path ?? "-1";
             var isApproved = _isApproved ?? false;
             var isLockedOut = _isLockedOut ?? false;
             var lastLockoutDate = _lastLockoutDate ?? DateTime.Now;
             var lastLoginDate = _lastLoginDate ?? DateTime.Now;
             var lastPasswordChangeDate = _lastPasswordChangeDate ?? DateTime.Now;
-            var sortOrder = _sortOrder ?? 0;
-            var trashed = _trashed ?? false;
 
             if (_memberTypeBuilder == null)
             {
@@ -275,6 +222,60 @@ namespace Umbraco.Tests.Common.Builders
         {
             get => _sortOrder;
             set => _sortOrder = value;
+        }
+
+        string IWithLoginBuilder.Username
+        {
+            get => _username;
+            set => _username = value;
+        }
+
+        string IWithLoginBuilder.RawPasswordValue
+        {
+            get => _rawPasswordValue;
+            set => _rawPasswordValue = value;
+        }
+
+        string IWithEmailBuilder.Email
+        {
+            get => _email;
+            set => _email = value;
+        }
+
+        int? IWithFailedPasswordAttemptsBuilder.FailedPasswordAttempts
+        {
+            get => _failedPasswordAttempts;
+            set => _failedPasswordAttempts = value;
+        }
+
+        bool? IWithIsApprovedBuilder.IsApproved
+        {
+            get => _isApproved;
+            set => _isApproved = value;
+        }
+
+        bool? IWithIsLockedOutBuilder.IsLockedOut
+        {
+            get => _isLockedOut;
+            set => _isLockedOut = value;
+        }
+
+        DateTime? IWithIsLockedOutBuilder.LastLockoutDate
+        {
+            get => _lastLockoutDate;
+            set => _lastLockoutDate = value;
+        }
+
+        DateTime? IWithLastLoginDateBuilder.LastLoginDate
+        {
+            get => _lastLoginDate;
+            set => _lastLoginDate = value;
+        }
+
+        DateTime? IWithLastPasswordChangeDateBuilder.LastPasswordChangeDate
+        {
+            get => _lastPasswordChangeDate;
+            set => _lastPasswordChangeDate = value;
         }
     }
 }

@@ -6,7 +6,6 @@ using Umbraco.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Tests.Common.Builders
 {
-
     public class UserGroupBuilder : UserGroupBuilder<object>
     {
         public UserGroupBuilder() : base(null)
@@ -61,7 +60,7 @@ namespace Umbraco.Tests.Common.Builders
 
         public override IUserGroup Build()
         {
-            return Mock.Of<IUserGroup>(x =>
+            var userGroup = Mock.Of<IUserGroup>(x =>
                 x.StartContentId == _startContentId &&
                 x.StartMediaId == _startMediaId &&
                 x.Name == (_name ?? ("TestUserGroup" + _suffix)) &&
@@ -69,9 +68,10 @@ namespace Umbraco.Tests.Common.Builders
                 x.Icon == _icon &&
                 x.Permissions == _permissions &&
                 x.AllowedSections == _sectionCollection);
+            return userGroup;
         }
 
-        int? IWithIdBuilder.Id
+       int? IWithIdBuilder.Id
         {
             get => _id;
             set => _id = value;

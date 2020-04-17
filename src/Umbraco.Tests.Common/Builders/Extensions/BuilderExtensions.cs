@@ -12,6 +12,13 @@ namespace Umbraco.Tests.Common.Builders.Extensions
             return builder;
         }
 
+        public static T WithoutIdentity<T>(this T builder)
+            where T : IWithIdBuilder
+        {
+            builder.Id = 0;
+            return builder;
+        }
+
         public static T WithCreatorId<T>(this T builder, int creatorId)
             where T : IWithCreatorIdBuilder
         {
@@ -114,6 +121,61 @@ namespace Umbraco.Tests.Common.Builders.Extensions
             where T : IWithThumbnailBuilder
         {
             builder.Thumbnail = thumbnail;
+            return builder;
+        }
+
+        public static T WithLogin<T>(this T builder, string username, string rawPasswordValue)
+            where T : IWithLoginBuilder
+        {
+            builder.Username = username;
+            builder.RawPasswordValue = rawPasswordValue;
+            return builder;
+        }
+
+        public static T WithEmail<T>(this T builder, string email)
+            where T : IWithEmailBuilder
+        {
+            builder.Email = email;
+            return builder;
+        }
+
+        public static T WithFailedPasswordAttempts<T>(this T builder, int failedPasswordAttempts)
+            where T : IWithFailedPasswordAttemptsBuilder
+        {
+            builder.FailedPasswordAttempts = failedPasswordAttempts;
+            return builder;
+        }
+
+        public static T WithIsApproved<T>(this T builder, bool isApproved)
+            where T : IWithIsApprovedBuilder
+        {
+            builder.IsApproved = isApproved;
+            return builder;
+        }
+
+        public static T WithIsLockedOut<T>(this T builder, bool isLockedOut, DateTime? lastLockoutDate = null)
+            where T : IWithIsLockedOutBuilder
+        {
+            builder.IsLockedOut = isLockedOut;
+            if (lastLockoutDate.HasValue)
+            {
+                builder.LastLockoutDate = lastLockoutDate.Value;
+            }
+
+            return builder;
+        }
+
+        public static T WithLastLoginDate<T>(this T builder, DateTime lastLoginDate)
+            where T : IWithLastLoginDateBuilder
+        {
+            builder.LastLoginDate = lastLoginDate;
+            return builder;
+        }
+
+        public static T WithLastPasswordChangeDate<T>(this T builder, DateTime lastPasswordChangeDate)
+            where T : IWithLastPasswordChangeDateBuilder
+        {
+            builder.LastPasswordChangeDate = lastPasswordChangeDate;
             return builder;
         }
     }

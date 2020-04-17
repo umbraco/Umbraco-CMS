@@ -9,7 +9,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
     [TestFixture]
     public class DictionaryItemTests
     {
-        private readonly DictionaryItemBuilder _builder = new DictionaryItemBuilder();
+        private DictionaryItemBuilder _builder = new DictionaryItemBuilder();
+
+        [SetUp]
+        public void SetUp()
+        {
+            _builder = new DictionaryItemBuilder();
+        }
 
         [Test]
         public void Can_Deep_Clone()

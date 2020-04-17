@@ -9,7 +9,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
     [TestFixture]
     public class RelationTypeTests
     {
-        private readonly RelationTypeBuilder _builder = new RelationTypeBuilder();
+        private RelationTypeBuilder _builder;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _builder = new RelationTypeBuilder();
+        }
 
         [Test]
         public void Can_Deep_Clone()

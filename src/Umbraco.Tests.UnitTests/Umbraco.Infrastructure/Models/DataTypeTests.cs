@@ -9,7 +9,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
     [TestFixture]
     public class DataTypeTests
     {
-        private readonly DataTypeBuilder _builder = new DataTypeBuilder();
+        private DataTypeBuilder _builder;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _builder = new DataTypeBuilder();
+        }
 
         [Test]
         public void Can_Deep_Clone()

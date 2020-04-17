@@ -34,7 +34,6 @@ namespace Umbraco.Tests.Common.Builders
         private int? _versionCheckPeriod;
         private readonly SmtpSettingsBuilder<GlobalSettingsBuilder<TParent>> _smtpSettingsBuilder;
 
-
         public GlobalSettingsBuilder(TParent parentBuilder) : base(parentBuilder)
         {
             _smtpSettingsBuilder = new SmtpSettingsBuilder<GlobalSettingsBuilder<TParent>>(this);
@@ -191,7 +190,6 @@ namespace Umbraco.Tests.Common.Builders
             var smtpSettings = _smtpSettingsBuilder.Build();
             var mainDomLock = _mainDomLock ?? string.Empty;
             var noNodesViewPath = _noNodesViewPath ?? "~/config/splashes/NoNodes.cshtml";
-
 
             return new TestGlobalSettings
             {

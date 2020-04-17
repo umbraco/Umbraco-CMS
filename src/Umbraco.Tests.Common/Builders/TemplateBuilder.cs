@@ -57,6 +57,7 @@ namespace Umbraco.Tests.Common.Builders
             var masterTemplateId = _masterTemplateId ?? null;
 
             var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+
             return new Template(shortStringHelper, name, alias)
             {
                 Id = id,

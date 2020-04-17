@@ -10,7 +10,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
     [TestFixture]
     public class StylesheetTests
     {
-        private readonly StylesheetBuilder _builder = new StylesheetBuilder();
+        private StylesheetBuilder _builder;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _builder = new StylesheetBuilder();
+        }
 
         [Test]
         public void Can_Create_Stylesheet()
