@@ -1,10 +1,10 @@
 (function () {
     describe('Utilities', function () {
+        var dateA = new Date('December 25, 1995 03:24:00');
+        var dateB = new Date('1995-12-25T03:24:00');
+        var dateC = new Date('2020-11-26T15:21:10');
+        
         describe('equals', function () {
-            var dateA = new Date('December 25, 1995 03:24:00');
-            var dateB = new Date('1995-12-25T03:24:00');
-            var dateC = new Date('2020-11-26T15:21:10');
-
             it('should be true for identical objects', function () {
                 expect(Utilities.equals('john', 'john')).toEqual(true);
                 expect(Utilities.equals(['john', 'doe'], ['john', 'doe'])).toEqual(true);
@@ -28,7 +28,7 @@
 
             it('should be true if the object is a Date', function () {
                 expect(angular.isDate(dateA)).toEqual(true);
-                expect(Utilities.isDate(dateA)).toEqual(true); 
+                expect(Utilities.isDate(dateA)).toEqual(true);
             });
 
             it('should be false if the object is not a Date', function () {
