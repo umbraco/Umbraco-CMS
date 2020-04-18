@@ -294,7 +294,6 @@
     <Compile Include="Models\ContentTypeTests.cs" />
     <Compile Include="Models\DeepCloneHelperTests.cs" />
     <Compile Include="Models\DictionaryTranslationTests.cs" />
-    <Compile Include="Models\LightEntityTest.cs" />
     <Compile Include="Web\Mvc\RenderModelBinderTests.cs" />
     <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />
     <Compile Include="Web\Mvc\UmbracoViewPageTests.cs" />
