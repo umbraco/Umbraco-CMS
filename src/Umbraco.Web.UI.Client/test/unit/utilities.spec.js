@@ -1,14 +1,14 @@
 (function () {
-    describe("Utilities", function () {
-        describe("toJson", function () {
-            it("should delegate to JSON.stringify", function () {
-                var spy = spyOn(JSON, "stringify").and.callThrough();
+    describe('Utilities', function () {
+        describe('toJson', function () {
+            it('should delegate to JSON.stringify', function () {
+                var spy = spyOn(JSON, 'stringify').and.callThrough();
 
-                expect(Utilities.toJson({})).toEqual("{}");
+                expect(Utilities.toJson({})).toEqual('{}');
                 expect(spy).toHaveBeenCalled();
             });
 
-            it("should format objects pretty", function () {
+            it('should format objects pretty', function () {
                 expect(Utilities.toJson({ a: 1, b: 2 }, true)).toBe(
                     '{\n  "a": 1,\n  "b": 2\n}'
                 );
@@ -25,29 +25,29 @@
                 );
             });
 
-            it("should not serialize properties starting with $$", function () {
-                expect(Utilities.toJson({ $$some: "value" }, false)).toEqual("{}");
+            it('should not serialize properties starting with $$', function () {
+                expect(Utilities.toJson({ $$some: 'value' }, false)).toEqual('{}');
             });
 
-            it("should serialize properties starting with $", function () {
-                expect(Utilities.toJson({ $few: "v" }, false)).toEqual('{"$few":"v"}');
+            it('should serialize properties starting with $', function () {
+                expect(Utilities.toJson({ $few: 'v' }, false)).toEqual('{"$few":"v"}');
             });
 
-            it("should not serialize $window object", function () {
+            it('should not serialize $window object', function () {
                 expect(Utilities.toJson(window)).toEqual('"$WINDOW"');
             });
 
-            it("should not serialize $document object", function () {
+            it('should not serialize $document object', function () {
                 expect(Utilities.toJson(document)).toEqual('"$DOCUMENT"');
             });
 
-            it("should not serialize scope instances", inject(function (
+            it('should not serialize scope instances', inject(function (
                 $rootScope
             ) {
                 expect(Utilities.toJson({ key: $rootScope })).toEqual('{"key":"$SCOPE"}');
             }));
 
-            it("should serialize undefined as undefined", function () {
+            it('should serialize undefined as undefined', function () {
                 expect(Utilities.toJson(undefined)).toEqual(undefined);
             });
         });
