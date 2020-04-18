@@ -66,7 +66,7 @@
 
         /** Allows us to deep watch whatever we want - executes on every digest cycle */
         function doCheck() {
-            if (!angular.equals(vm.content.updateDate, prevContentDateUpdated)) {
+            if (!Utilities.equals(vm.content.updateDate, prevContentDateUpdated)) {
                 setActiveCulture();
                 prevContentDateUpdated = Utilities.copy(vm.content.updateDate);
             }
