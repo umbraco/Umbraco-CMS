@@ -28,41 +28,41 @@
   /**
    * Equivalent to angular.equals
    */
-  const equals = (a, b) => {
-    if (o1 === o2) return true;
-    if (o1 === null || o2 === null) return false;
+  const equals = (a, b) => { 
+    if (a === b) return true; 
+    if (a === null || b === null) return false; 
     // eslint-disable-next-line no-self-compare
-    if (o1 !== o1 && o2 !== o2) return true; // NaN === NaN
-    var t1 = typeof o1, t2 = typeof o2, length, key, keySet;
+    if (a !== a && b !== b) return true; // NaN === NaN
+    var t1 = typeof a, t2 = typeof b, length, key, keySet;
     if (t1 === t2 && t1 === 'object') {
-      if (isArray(o1)) {
-        if (!isArray(o2)) return false;
-        if ((length = o1.length) === o2.length) {
+      if (isArray(a)) {
+        if (!isArray(b)) return false;
+        if ((length = a.length) === b.length) {
           for (key = 0; key < length; key++) {
-            if (!equals(o1[key], o2[key])) return false;
+            if (!equals(a[key], b[key])) return false;
           }
           return true;
         }
-      } else if (isDate(o1)) {
-        if (!isDate(o2)) return false;
-        return simpleCompare(o1.getTime(), o2.getTime());
-      } else if (isRegExp(o1)) {
-        if (!isRegExp(o2)) return false;
-        return o1.toString() === o2.toString();
+      } else if (isDate(a)) {
+        if (!isDate(b)) return false;
+        return simpleCompare(a.getTime(), b.getTime());
+      } else if (isRegExp(a)) {
+        if (!isRegExp(b)) return false;
+        return a.toString() === b.toString();
       } else {
-        if (isScope(o1) || isScope(o2) || isWindow(o1) || isWindow(o2) ||
-          isArray(o2) || isDate(o2) || isRegExp(o2)) return false;
+        if (isScope(a) || isScope(b) || isWindow(a) || isWindow(b) ||
+          isArray(b) || isDate(b) || isRegExp(b)) return false;
         keySet = createMap();
-        for (key in o1) {
-          if (key.charAt(0) === '$' || isFunction(o1[key])) continue;
-          if (!equals(o1[key], o2[key])) return false;
+        for (key in a) {
+          if (key.charAt(0) === '$' || isFunction(a[key])) continue;
+          if (!equals(a[key], b[key])) return false;
           keySet[key] = true;
         }
-        for (key in o2) {
+        for (key in b) {
           if (!(key in keySet) &&
             key.charAt(0) !== '$' &&
-            isDefined(o2[key]) &&
-            !isFunction(o2[key])) return false;
+            isDefined(b[key]) &&
+            !isFunction(b[key])) return false;
         }
         return true;
       }
@@ -74,7 +74,7 @@
   /** 
    * Equivalent to angular.isDate
    */
-  const isDate = val => {
+  const isDate = value => {
     return toString.call(value) === '[object Date]';
   }
 
