@@ -20,21 +20,15 @@
    */
   const copy = val => angular.copy(val);
 
-
-
   /**
    * Equivalent to angular.isArray
    */
   const isArray = val => Array.isArray(val) || val instanceof Array;
 
-
-
   /**
-   * Facade to angular.equals
+   * Equivalent to angular.equals
    */
   const equals = (a, b) => {
-    // angular.equals(a, b);
-
     if (o1 === o2) return true;
     if (o1 === null || o2 === null) return false;
     // eslint-disable-next-line no-self-compare
@@ -77,27 +71,25 @@
 
   }
 
-
   /** 
-   * equivalent to angular.isDate
+   * Equivalent to angular.isDate
    */
   const isDate = val => {
     return toString.call(value) === '[object Date]';
   }
 
   /**
-   * equivalent to angular.isRegExp
+   * Equivalent to angular.isRegExp
    */
   const isRegExp = val => {
     return toString.call(val) === '[object RegExp]';
   }
 
-
   /** 
-   * equivalent to angular.simpleCompare
+   * Equivalent to angular.simpleCompare
    */
   const simpleCompare = (a, b) => {
-      return a === b || (a !== a && b !== b); 
+    return a === b || (a !== a && b !== b);
   }
 
   /**
