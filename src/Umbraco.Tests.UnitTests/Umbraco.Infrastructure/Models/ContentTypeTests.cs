@@ -18,7 +18,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
         [Ignore("Ignoring this test until we actually enforce this, see comments in ContentTypeBase.PropertyTypesChanged")]
         public void Cannot_Add_Duplicate_Property_Aliases()
         {
-            var contentType = (ContentType)BuildContentType();
+            var contentType = BuildContentType();
 
             var propertyTypeBuilder = new PropertyTypeBuilder();
             var additionalPropertyType = propertyTypeBuilder
@@ -33,7 +33,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
         [Ignore("Ignoring this test until we actually enforce this, see comments in ContentTypeBase.PropertyTypesChanged")]
         public void Cannot_Update_Duplicate_Property_Aliases()
         {
-            var contentType = (ContentType)BuildContentType();
+            var contentType = BuildContentType();
 
             var propertyTypeBuilder = new PropertyTypeBuilder();
             var additionalPropertyType = propertyTypeBuilder
@@ -134,7 +134,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
             Assert.AreEqual(clone.SortOrder, contentType.SortOrder);
             Assert.AreNotSame(clone.DefaultTemplate, contentType.DefaultTemplate);
             Assert.AreEqual(clone.DefaultTemplate, contentType.DefaultTemplate);
-            Assert.AreEqual(clone.DefaultTemplateId, ((ContentType)contentType).DefaultTemplateId);
+            Assert.AreEqual(clone.DefaultTemplateId, contentType.DefaultTemplateId);
             Assert.AreEqual(clone.Trashed, contentType.Trashed);
             Assert.AreEqual(clone.UpdateDate, contentType.UpdateDate);
             Assert.AreEqual(clone.Thumbnail, contentType.Thumbnail);
@@ -176,84 +176,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
             Debug.Print(json);
         }
 
-        private static IContentType BuildContentType()
+        private static ContentType BuildContentType()
         {
             var builder = new ContentTypeBuilder();
-            return builder
-                .WithId(10)
-                .WithAlias("textPage")
-                .WithName("Text Page")
-                .WithCreatorId(22)
-                .WithDescription("test")
-                .WithIsContainer(true)
-                .WithIcon("icon")
-                .WithThumbnail("thumb")
-                .WithSortOrder(5)
-                .WithLevel(3)
-                .WithPath("-1,4,10")
-                .WithPropertyTypeIdsIncrementingFrom(200)
-                .AddPropertyGroup()
-                    .WithName("Content")
-                    .WithSortOrder(1)
-                    .AddPropertyType()
-                        .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
-                        .WithValueStorageType(ValueStorageType.Nvarchar)
-                        .WithAlias("title")
-                        .WithName("Title")
-                        .WithSortOrder(1)
-                        .WithDataTypeId(-88)
-                        .Done()
-                    .AddPropertyType()
-                        .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
-                        .WithValueStorageType(ValueStorageType.Ntext)
-                        .WithAlias("bodyText")
-                        .WithName("Body text")
-                        .WithSortOrder(2)
-                        .WithDataTypeId(-87)
-                        .Done()
-                    .Done()
-                .AddPropertyGroup()
-                    .WithName("Meta")
-                    .WithSortOrder(2)
-                    .AddPropertyType()
-                        .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
-                        .WithValueStorageType(ValueStorageType.Nvarchar)
-                        .WithAlias("keywords")
-                        .WithName("Keywords")
-                        .WithSortOrder(1)
-                        .WithDataTypeId(-88)
-                        .Done()
-                    .AddPropertyType()
-                        .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
-                        .WithValueStorageType(ValueStorageType.Nvarchar)
-                        .WithAlias("description")
-                        .WithName("description")
-                        .WithSortOrder(1)
-                        .WithDataTypeId(-88)
-                        .Done()
-                    .Done()
-                .AddAllowedTemplate()
-                    .WithId(200)
-                    .WithAlias("textPage")
-                    .WithName("Text Page")
-                    .Done()
-                .AddAllowedTemplate()
-                    .WithId(201)
-                    .WithAlias("textPage2")
-                    .WithName("Text Page 2")
-                    .Done()
-                .WithDefaultTemplateId(200)
-                .AddAllowedContentType()
-                    .WithId(888)
-                    .WithAlias("sub")
-                    .WithSortOrder(8)
-                    .Done()
-                .AddAllowedContentType()
-                    .WithId(889)
-                    .WithAlias("sub2")
-                    .WithSortOrder(9)
-                    .Done()
-                .Build();
+            return builder.BuildSimpleContentType();
         }
 
         [Test]
@@ -309,23 +235,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
             Debug.Print(json);
         }
 
-        private static IMediaType BuildMediaType()
+        private static MediaType BuildMediaType()
         {
             var builder = new MediaTypeBuilder();
-            return builder
-                .WithId(10)
-                .WithAlias(Constants.Conventions.MediaTypes.Image)
-                .WithName("Image")
-                .WithCreatorId(22)
-                .WithDescription("test")
-                .WithIcon("icon")
-                .WithThumbnail("thumb")
-                .WithSortOrder(5)
-                .WithLevel(3)
-                .WithPath("-1,4,10")
-                .WithPropertyTypeIdsIncrementingFrom(200)
-                .WithMediaPropertyGroup()
-                .Build();
+            return builder.BuildImageMediaType();
         }
 
         [Test]
@@ -364,7 +277,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
             Assert.AreEqual(clone.Thumbnail, contentType.Thumbnail);
             Assert.AreEqual(clone.Icon, contentType.Icon);
             Assert.AreEqual(clone.IsContainer, contentType.IsContainer);
-            Assert.AreEqual(clone.MemberTypePropertyTypes, ((MemberType)contentType).MemberTypePropertyTypes);
+            Assert.AreEqual(clone.MemberTypePropertyTypes, contentType.MemberTypePropertyTypes);
 
             // This double verifies by reflection
             var allProps = clone.GetType().GetProperties();
@@ -382,43 +295,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
             Debug.Print(json);
         }
 
-        private static IMemberType BuildMemberType()
+        private static MemberType BuildMemberType()
         {
             var builder = new MemberTypeBuilder();
-            return builder
-                .WithId(10)
-                .WithAlias("memberType")
-                .WithName("Member type")
-                .WithCreatorId(22)
-                .WithDescription("test")
-                .WithIcon("icon")
-                .WithThumbnail("thumb")
-                .WithSortOrder(5)
-                .WithLevel(3)
-                .WithPath("-1,4,10")
-                .WithPropertyTypeIdsIncrementingFrom(200)
-                .AddPropertyGroup()
-                    .WithName("Content")
-                    .AddPropertyType()
-                        .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
-                        .WithValueStorageType(ValueStorageType.Nvarchar)
-                        .WithAlias("title")
-                        .WithName("Title")
-                        .WithSortOrder(1)
-                        .WithDataTypeId(-88)
-                        .Done()
-                    .AddPropertyType()
-                        .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
-                        .WithValueStorageType(ValueStorageType.Ntext)
-                        .WithAlias("bodyText")
-                        .WithName("Body text")
-                        .WithSortOrder(2)
-                        .WithDataTypeId(-87)
-                        .Done()
-                    .Done()
-                .WithMemberCanEditProperty("title", true)
-                .WithMemberCanViewProperty("bodyText", true)
-                .Build();
+            return builder.BuildSimpleMemberType();
         }
     }
 }
