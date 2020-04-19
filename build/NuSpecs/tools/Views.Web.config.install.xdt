@@ -11,7 +11,7 @@
         <host factoryType="System.Web.Mvc.MvcWebRazorHostFactory, System.Web.Mvc, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" xdt:Locator="Match(factoryType)" xdt:Transform="SetAttributes(factoryType)" />
         <pages pageBaseType="System.Web.Mvc.WebViewPage">
             <namespaces>
-                <add namespace="Umbraco.Web.PublishedContentModels" xdt:Transform="InsertIfMissing" />
+                <add namespace="Umbraco.Web.PublishedModels" xdt:Transform="InsertIfMissing" />
             </namespaces>
         </pages>
     </system.web.webPages.razor>
