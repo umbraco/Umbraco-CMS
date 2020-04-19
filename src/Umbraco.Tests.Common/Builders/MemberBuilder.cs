@@ -6,6 +6,7 @@ namespace Umbraco.Tests.Common.Builders
 {
     public class MemberBuilder
         : BuilderBase<Member>,
+            IBuildContentTypes,
             IWithIdBuilder,
             IWithKeyBuilder,
             IWithCreatorIdBuilder,

@@ -178,5 +178,19 @@ namespace Umbraco.Tests.Common.Builders.Extensions
             builder.LastPasswordChangeDate = lastPasswordChangeDate;
             return builder;
         }
+
+        public static T WithPropertyTypeIdsIncrementingFrom<T>(this T builder, int propertyTypeIdsIncrementingFrom)
+            where T : IWithPropertyTypeIdsIncrementingFrom
+        {
+            builder.PropertyTypeIdsIncrementingFrom = propertyTypeIdsIncrementingFrom;
+            return builder;
+        }
+
+        public static T WithIsContainer<T>(this T builder, bool isContainer)
+            where T : IWithIsContainerBuilder
+        {
+            builder.IsContainer = isContainer;
+            return builder;
+        }
     }
 }

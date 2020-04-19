@@ -7,7 +7,7 @@ using Umbraco.Tests.Common.Builders.Interfaces;
 namespace Umbraco.Tests.Common.Builders
 {
     public class TemplateBuilder
-        : BuilderBase<Template>,
+        : ChildBuilderBase<ContentTypeBuilder, ITemplate>,
             IWithIdBuilder,
             IWithKeyBuilder,
             IWithAliasBuilder,
@@ -28,6 +28,14 @@ namespace Umbraco.Tests.Common.Builders
         private string _masterTemplateAlias;
         private Lazy<int> _masterTemplateId;
 
+        public TemplateBuilder() : base(null)
+        {
+        }
+
+        public TemplateBuilder(ContentTypeBuilder parentBuilder) : base(parentBuilder)
+        {
+        }
+
         public TemplateBuilder WithContent(string content)
         {
             _content = content;
@@ -42,7 +50,7 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-        public override Template Build()
+        public override ITemplate Build()
         {
             var id = _id ?? 0;
             var key = _key ?? Guid.NewGuid();

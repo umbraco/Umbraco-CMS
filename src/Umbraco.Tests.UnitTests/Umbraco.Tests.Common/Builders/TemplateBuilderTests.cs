@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
@@ -49,7 +50,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             Assert.AreEqual(content, template.Content);
             Assert.IsTrue(template.IsMasterTemplate);
             Assert.AreEqual(masterTemplateAlias, template.MasterTemplateAlias);
-            Assert.AreEqual(masterTemplateId, template.MasterTemplateId.Value);
+            Assert.AreEqual(masterTemplateId, ((Template)template).MasterTemplateId.Value);
         }
     }
 }

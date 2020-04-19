@@ -3,38 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Strings;
 using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Tests.Common.Builders
 {
     public class MemberTypeBuilder
-        : ChildBuilderBase<MemberBuilder, IMemberType>,
-            IBuildPropertyGroups,
-            IWithIdBuilder,
-            IWithAliasBuilder,
-            IWithNameBuilder,
-            IWithParentIdBuilder,
-            IWithSortOrderBuilder,
-            IWithCreatorIdBuilder,
-            IWithDescriptionBuilder,
-            IWithIconBuilder,
-            IWithThumbnailBuilder,            
-            IWithTrashedBuilder
+        : ContentTypeBaseBuilder<MemberBuilder, IMemberType>,
+            IWithPropertyTypeIdsIncrementingFrom
     {
-        private readonly List<PropertyGroupBuilder<MemberTypeBuilder>> _propertyGroupBuilders = new List<PropertyGroupBuilder<MemberTypeBuilder>>();
+        private List<PropertyGroupBuilder<MemberTypeBuilder>> _propertyGroupBuilders = new List<PropertyGroupBuilder<MemberTypeBuilder>>();
+        private Dictionary<string, bool> _memberCanEditProperties = new Dictionary<string, bool>();
+        private Dictionary<string, bool> _memberCanViewProperties = new Dictionary<string, bool>();
+        private int? _propertyTypeIdsIncrementingFrom;
 
-        private int? _id;
-        private string _alias;
-        private string _name;
-        private int? _parentId;
-        private int? _sortOrder;
-        private int? _creatorId;
-        private string _description;
-        private string _icon;
-        private string _thumbnail;
-        private bool? _trashed;
+        public MemberTypeBuilder() : base(null)
+        {
+        }
 
         public MemberTypeBuilder(MemberBuilder parentBuilder) : base(parentBuilder)
         {
@@ -92,6 +77,18 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
+        public MemberTypeBuilder WithMemberCanEditProperty(string alias, bool canEdit)
+        {
+            _memberCanEditProperties.Add(alias, canEdit);
+            return this;
+        }
+
+        public MemberTypeBuilder WithMemberCanViewProperty(string alias, bool canView)
+        {
+            _memberCanViewProperties.Add(alias, canView);
+            return this;
+        }
+
         public PropertyGroupBuilder<MemberTypeBuilder> AddPropertyGroup()
         {
             var builder = new PropertyGroupBuilder<MemberTypeBuilder>(this);
@@ -101,35 +98,36 @@ namespace Umbraco.Tests.Common.Builders
 
         public override IMemberType Build()
         {
-            var id = _id ?? 1;
-            var name = _name ?? Guid.NewGuid().ToString();
-            var alias = _alias ?? name.ToCamelCase();
-            var parentId = _parentId ?? -1;
-            var sortOrder = _sortOrder ?? 0;
-            var description = _description ?? string.Empty;
-            var icon = _icon ?? string.Empty;
-            var thumbnail = _thumbnail ?? string.Empty;
-            var creatorId = _creatorId ?? 0;
-            var trashed = _trashed ?? false;
-
-            var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
-
-            var memberType = new MemberType(shortStringHelper, parentId)
+            var memberType = new MemberType(ShortStringHelper, GetParentId())
             {
-                Id = id,
-                Alias = alias,
-                Name = name,
-                SortOrder = sortOrder,
-                Description = description,
-                Icon = icon,
-                Thumbnail = thumbnail,
-                CreatorId = creatorId,
-                Trashed = trashed,
+                Id = GetId(),
+                Key = GetKey(),
+                CreateDate = GetCreateDate(),
+                UpdateDate = GetUpdateDate(),
+                Alias = GetAlias(),
+                Name = GetName(),
+                Level = GetLevel(),
+                Path = GetPath(),
+                SortOrder = GetSortOrder(),
+                Description = GetDescription(),
+                Icon = GetIcon(),
+                Thumbnail = GetThumbnail(),
+                CreatorId = GetCreatorId(),
+                Trashed = GetTrashed(),
+                IsContainer = GetIsContainer(),
             };
 
-            foreach (var propertyGroup in _propertyGroupBuilders.Select(x => x.Build()))
+            BuildPropertyGroups(memberType, _propertyGroupBuilders.Select(x => x.Build()));
+            BuildPropertyTypeIds(memberType, _propertyTypeIdsIncrementingFrom);
+
+            foreach (var kvp in _memberCanEditProperties)
             {
-                memberType.PropertyGroups.Add(propertyGroup);
+                memberType.SetMemberCanEditProperty(kvp.Key, kvp.Value);
+            }
+
+            foreach (var kvp in _memberCanViewProperties)
+            {
+                memberType.SetMemberCanViewProperty(kvp.Key, kvp.Value);
             }
 
             memberType.ResetDirtyProperties(false);
@@ -137,64 +135,10 @@ namespace Umbraco.Tests.Common.Builders
             return memberType;
         }
 
-        int? IWithIdBuilder.Id
+        int? IWithPropertyTypeIdsIncrementingFrom.PropertyTypeIdsIncrementingFrom
         {
-            get => _id;
-            set => _id = value;
-        }
-
-        string IWithAliasBuilder.Alias
-        {
-            get => _alias;
-            set => _alias = value;
-        }
-
-        string IWithNameBuilder.Name
-        {
-            get => _name;
-            set => _name = value;
-        }
-
-        int? IWithParentIdBuilder.ParentId
-        {
-            get => _parentId;
-            set => _parentId = value;
-        }
-
-        int? IWithSortOrderBuilder.SortOrder
-        {
-            get => _sortOrder;
-            set => _sortOrder = value;
-        }
-
-        int? IWithCreatorIdBuilder.CreatorId
-        {
-            get => _creatorId;
-            set => _creatorId = value;
-        }
-
-        string IWithDescriptionBuilder.Description
-        {
-            get => _description;
-            set => _description = value;
-        }
-
-        string IWithIconBuilder.Icon
-        {
-            get => _icon;
-            set => _icon = value;
-        }
-
-        string IWithThumbnailBuilder.Thumbnail
-        {
-            get => _thumbnail;
-            set => _thumbnail = value;
-        }
-
-        bool? IWithTrashedBuilder.Trashed
-        {
-            get => _trashed;
-            set => _trashed = value;
+            get => _propertyTypeIdsIncrementingFrom;
+            set => _propertyTypeIdsIncrementingFrom = value;
         }
     }
 }

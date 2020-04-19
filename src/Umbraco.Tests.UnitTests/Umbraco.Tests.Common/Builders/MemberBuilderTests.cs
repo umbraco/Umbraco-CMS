@@ -12,19 +12,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
     [TestFixture]
     public class MemberBuilderTests
     {
-        private class PropertyTypeDetail
-        {
-            public string Alias { get; set; }
-
-            public string Name { get; set; }
-
-            public string Description { get; set; } = string.Empty;
-
-            public int SortOrder { get; set; }
-
-            public int DataTypeId { get; set; }
-        }
-
         [Test]
         public void Is_Built_Correctly()
         {
@@ -61,6 +48,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var testPropertyData3 = new KeyValuePair<string, object>("author", "John Doe");
             var testAdditionalData1 = new KeyValuePair<string, object>("test1", 123);
             var testAdditionalData2 = new KeyValuePair<string, object>("test2", "hello");
+            const int testPropertyIdsIncrementingFrom = 200;
 
             var builder = new MemberBuilder();
 
@@ -156,6 +144,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             Assert.AreEqual(testPropertyData1.Value, member.GetValue<string>(testPropertyData1.Key));
             Assert.AreEqual(testPropertyData2.Value, member.GetValue<string>(testPropertyData2.Key));
             Assert.AreEqual(testPropertyData3.Value, member.GetValue<string>(testPropertyData3.Key));
+
+            var propertyIds = member.Properties.Select(x => x.Id).OrderBy(x => x);
+            Assert.AreEqual(testPropertyIdsIncrementingFrom + 1, propertyIds.Min());
+            Assert.AreEqual(testPropertyIdsIncrementingFrom + 10, propertyIds.Max());
+
             Assert.AreEqual(2, member.AdditionalData.Count);
             Assert.AreEqual(testAdditionalData1.Value, member.AdditionalData[testAdditionalData1.Key]);
             Assert.AreEqual(testAdditionalData2.Value, member.AdditionalData[testAdditionalData2.Key]);
