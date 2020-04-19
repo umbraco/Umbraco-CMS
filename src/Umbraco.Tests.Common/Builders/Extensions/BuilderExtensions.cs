@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using Umbraco.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Tests.Common.Builders.Extensions
@@ -190,6 +191,13 @@ namespace Umbraco.Tests.Common.Builders.Extensions
             where T : IWithIsContainerBuilder
         {
             builder.IsContainer = isContainer;
+            return builder;
+        }
+
+        public static T WithCultureInfo<T>(this T builder, string name)
+            where T : IWithCultureInfoBuilder
+        {
+            builder.CultureInfo = new CultureInfo(name);
             return builder;
         }
     }
