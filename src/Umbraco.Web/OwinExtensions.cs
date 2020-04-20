@@ -90,6 +90,12 @@ namespace Umbraco.Web
             return context.Get<T>(GetKey(typeof(T)));
         }
 
+        public static IOwinContext Set<T>(this IOwinContext context, T value)
+        {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            return context.Set(GetKey(typeof(T)), value);
+        }
+
         private static string GetKey(Type t)
         {
             return "AspNet.Identity.Owin:" + t.AssemblyQualifiedName;

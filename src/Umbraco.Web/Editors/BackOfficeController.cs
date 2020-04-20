@@ -374,7 +374,7 @@ namespace Umbraco.Web.Editors
             return await ExternalSignInAsync(loginInfo, externalSignInResponse);
         }
 
-        private async Task<ActionResult> ExternalSignInAsync(ExternalLoginInfo2 loginInfo, Func<ActionResult> response)
+        private async Task<ActionResult> ExternalSignInAsync(ExternalLoginInfo loginInfo, Func<ActionResult> response)
         {
             if (loginInfo == null) throw new ArgumentNullException("loginInfo");
             if (response == null) throw new ArgumentNullException("response");
@@ -437,7 +437,7 @@ namespace Umbraco.Web.Editors
             return response();
         }
 
-        private async Task<bool> AutoLinkAndSignInExternalAccount(ExternalLoginInfo2 loginInfo, ExternalSignInAutoLinkOptions autoLinkOptions)
+        private async Task<bool> AutoLinkAndSignInExternalAccount(ExternalLoginInfo loginInfo, ExternalSignInAutoLinkOptions autoLinkOptions)
         {
             if (autoLinkOptions == null)
                 return false;

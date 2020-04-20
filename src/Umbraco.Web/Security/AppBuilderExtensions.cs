@@ -2,6 +2,7 @@
 using System.Threading;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Owin;
 using Microsoft.Owin.Extensions;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
@@ -14,11 +15,8 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Net;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Identity;
@@ -420,6 +418,42 @@ namespace Umbraco.Web.Security
                 requestCache);
 
             return authOptions;
+        }
+        public static IAppBuilder CreatePerOwinContext<T>(this IAppBuilder app, Func<T> createCallback)
+            where T : class, IDisposable
+        {
+            return CreatePerOwinContext<T>(app, (options, context) => createCallback());
+        }
+
+        public static IAppBuilder CreatePerOwinContext<T>(this IAppBuilder app,
+            Func<IdentityFactoryOptions<T>, IOwinContext, T> createCallback) where T : class, IDisposable
+        {
+            if (app == null)
+            {
+                throw new ArgumentNullException("app");
+            }
+            return app.CreatePerOwinContext(createCallback, (options, instance) => instance.Dispose());
+        }
+
+        public static IAppBuilder CreatePerOwinContext<T>(this IAppBuilder app,
+            Func<IdentityFactoryOptions<T>, IOwinContext, T> createCallback,
+            Action<IdentityFactoryOptions<T>, T> disposeCallback) where T : class, IDisposable
+        {
+            if (app == null) throw new ArgumentNullException(nameof(app));
+            if (createCallback == null) throw new ArgumentNullException(nameof(createCallback));
+            if (disposeCallback == null) throw new ArgumentNullException(nameof(disposeCallback));
+
+            app.Use(typeof(IdentityFactoryMiddleware<T, IdentityFactoryOptions<T>>),
+                new IdentityFactoryOptions<T>
+                {
+                    DataProtectionProvider = app.GetDataProtectionProvider(),
+                    Provider = new IdentityFactoryProvider<T>
+                    {
+                        OnCreate = createCallback,
+                        OnDispose = disposeCallback
+                    }
+                });
+            return app;
         }
     }
 }

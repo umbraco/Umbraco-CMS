@@ -1,14 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
+using UserLoginInfo = Microsoft.AspNetCore.Identity.UserLoginInfo;
 
 namespace Umbraco.Web.Security
 {
     public static class AuthenticationManagerExtensions
     {
-        private static ExternalLoginInfo2 GetExternalLoginInfo(AuthenticateResult result)
+        private static ExternalLoginInfo GetExternalLoginInfo(AuthenticateResult result)
         {
             if (result == null || result.Identity == null)
             {
@@ -27,7 +29,7 @@ namespace Umbraco.Web.Security
             }
 
             var email = result.Identity.FindFirst(ClaimTypes.Email)?.Value;
-            return new ExternalLoginInfo2
+            return new ExternalLoginInfo
             {
                 ExternalIdentity = result.Identity,
                 Login = new UserLoginInfo(idClaim.Issuer, idClaim.Value, idClaim.Issuer),
@@ -47,7 +49,7 @@ namespace Umbraco.Web.Security
         ///     dictionary
         /// </param>
         /// <returns></returns>
-        public static async Task<ExternalLoginInfo2> GetExternalLoginInfoAsync(this IAuthenticationManager manager,
+        public static async Task<ExternalLoginInfo> GetExternalLoginInfoAsync(this IAuthenticationManager manager,
             string authenticationType,
             string xsrfKey, string expectedValue)
         {
@@ -74,7 +76,7 @@ namespace Umbraco.Web.Security
         /// <param name="manager"></param>
         /// <param name="authenticationType"></param>
         /// <returns></returns>
-        public static async Task<ExternalLoginInfo2> GetExternalLoginInfoAsync(this IAuthenticationManager manager, string authenticationType)
+        public static async Task<ExternalLoginInfo> GetExternalLoginInfoAsync(this IAuthenticationManager manager, string authenticationType)
         {
             if (manager == null)
             {
@@ -82,9 +84,25 @@ namespace Umbraco.Web.Security
             }
             return GetExternalLoginInfo(await manager.AuthenticateAsync(authenticationType));
         }
+        
+        public static IEnumerable<AuthenticationDescription> GetExternalAuthenticationTypes(this IAuthenticationManager manager)
+        {
+            if (manager == null) throw new ArgumentNullException(nameof(manager));
+            return manager.GetAuthenticationTypes(d => d.Properties != null && d.Properties.ContainsKey("Caption"));
+        }
+
+        public static ClaimsIdentity CreateTwoFactorRememberBrowserIdentity(this IAuthenticationManager manager, string userId)
+        {
+            if (manager == null) throw new ArgumentNullException(nameof(manager));
+
+            var rememberBrowserIdentity = new ClaimsIdentity(DefaultAuthenticationTypes.TwoFactorRememberBrowserCookie);
+            rememberBrowserIdentity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId));
+
+            return rememberBrowserIdentity;
+        }
     }
 
-    public class ExternalLoginInfo2
+    public class ExternalLoginInfo
     {
         /// <summary>Associated login data</summary>
         public UserLoginInfo Login { get; set; }
