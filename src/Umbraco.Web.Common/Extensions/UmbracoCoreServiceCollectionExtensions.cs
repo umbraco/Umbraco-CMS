@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
 using System.Reflection;
@@ -71,7 +73,13 @@ namespace Umbraco.Web.Common.Extensions
 
             var umbContainer = UmbracoServiceProviderFactory.UmbracoContainer;
 
-            services.AddUmbracoCore(webHostEnvironment, umbContainer, Assembly.GetEntryAssembly(), out factory);
+
+            IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
+            services.AddSingleton<IHttpContextAccessor>(httpContextAccessor);
+
+            var requestCache = new GenericDictionaryRequestAppCache(() => httpContextAccessor.HttpContext.Items);
+
+            services.AddUmbracoCore(webHostEnvironment, umbContainer, Assembly.GetEntryAssembly(), requestCache, httpContextAccessor, out factory);
 
             return services;
         }
@@ -83,20 +91,28 @@ namespace Umbraco.Web.Common.Extensions
         /// <param name="webHostEnvironment"></param>
         /// <param name="umbContainer"></param>
         /// <param name="entryAssembly"></param>
+        /// <param name="requestCache"></param>
         /// <param name="factory"></param>
         /// <returns></returns>
-        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IRegister umbContainer, Assembly entryAssembly, out IFactory factory)
+        public static IServiceCollection AddUmbracoCore(
+            this IServiceCollection services,
+            IWebHostEnvironment webHostEnvironment,
+            IRegister umbContainer,
+            Assembly entryAssembly,
+            IRequestCache requestCache,
+            IHttpContextAccessor httpContextAccessor,
+            out IFactory factory)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             var container = umbContainer;
             if (container is null) throw new ArgumentNullException(nameof(container));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
 
-            // Special case! The generic host adds a few default services but we need to manually add this one here NOW because
-            // we resolve it before the host finishes configuring in the call to CreateCompositionRoot
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            var serviceProvider = services.BuildServiceProvider();
+            var configs = serviceProvider.GetService<Configs>();
 
-            CreateCompositionRoot(services, webHostEnvironment, out var logger, out var configs, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
+
+            CreateCompositionRoot(services, configs, httpContextAccessor, webHostEnvironment, out var logger,  out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
 
             var globalSettings = configs.Global();
             var umbracoVersion = new UmbracoVersion(globalSettings);
@@ -109,7 +125,8 @@ namespace Umbraco.Web.Common.Extensions
                 profiler,
                 hostingEnvironment,
                 backOfficeInfo,
-                CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly));
+                CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly),
+                requestCache);
 
             factory = coreRuntime.Configure(container);
 
@@ -126,9 +143,10 @@ namespace Umbraco.Web.Common.Extensions
             return new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(entryAssembly), runtimeHash);
         }
 
-        private static IRuntime GetCoreRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger,
+        private static IRuntime GetCoreRuntime(
+            Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger,
             IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
-            ITypeFinder typeFinder)
+            ITypeFinder typeFinder, IRequestCache requestCache)
         {
             var connectionStringConfig = configs.ConnectionStrings()[Constants.System.UmbracoConnectionName];
             var dbProviderFactoryCreator = new SqlServerDbProviderFactoryCreator(
@@ -145,22 +163,27 @@ namespace Umbraco.Web.Common.Extensions
 
             var mainDom = new MainDom(logger, mainDomLock);
 
-            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetCoreBootPermissionsChecker(),
-                hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom, typeFinder);
+            var coreRuntime = new CoreRuntime(
+                configs,
+                umbracoVersion,
+                ioHelper,
+                logger,
+                profiler,
+                new AspNetCoreBootPermissionsChecker(),
+                hostingEnvironment,
+                backOfficeInfo,
+                dbProviderFactoryCreator,
+                mainDom,
+                typeFinder,
+                requestCache);
 
             return coreRuntime;
         }
 
-        private static IServiceCollection CreateCompositionRoot(IServiceCollection services, IWebHostEnvironment webHostEnvironment,
-            out ILogger logger, out Configs configs, out IIOHelper ioHelper, out Core.Hosting.IHostingEnvironment hostingEnvironment,
+        private static IServiceCollection CreateCompositionRoot(IServiceCollection services, Configs configs, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment,
+            out ILogger logger, out IIOHelper ioHelper, out Core.Hosting.IHostingEnvironment hostingEnvironment,
             out IBackOfficeInfo backOfficeInfo, out IProfiler profiler)
         {
-            // TODO: We need to avoid this, surely there's a way? See ContainerTests.BuildServiceProvider_Before_Host_Is_Configured
-            var serviceProvider = services.BuildServiceProvider();
-
-            var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
-
-            configs = serviceProvider.GetService<Configs>();
             if (configs == null)
                 throw new InvalidOperationException($"Could not resolve type {typeof(Configs)} from the container, ensure {nameof(AddUmbracoConfiguration)} is called before calling {nameof(AddUmbracoCore)}");
 
@@ -216,4 +239,5 @@ namespace Umbraco.Web.Common.Extensions
 
 
     }
+
 }

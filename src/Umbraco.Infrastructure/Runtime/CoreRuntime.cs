@@ -25,6 +25,7 @@ namespace Umbraco.Core.Runtime
         private IFactory _factory;
         private readonly RuntimeState _state;
         private readonly IUmbracoBootPermissionChecker _umbracoBootPermissionChecker;
+        private readonly IRequestCache _requestCache;
         private readonly IGlobalSettings _globalSettings;
         private readonly IConnectionStrings _connectionStrings;
 
@@ -39,7 +40,8 @@ namespace Umbraco.Core.Runtime
             IBackOfficeInfo backOfficeInfo,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             IMainDom mainDom,
-            ITypeFinder typeFinder)
+            ITypeFinder typeFinder,
+            IRequestCache requestCache)
         {
             IOHelper = ioHelper;
             Configs = configs;
@@ -50,6 +52,7 @@ namespace Umbraco.Core.Runtime
             DbProviderFactoryCreator = dbProviderFactoryCreator;
 
             _umbracoBootPermissionChecker = umbracoBootPermissionChecker;
+            _requestCache = requestCache;
 
             Logger = logger;
             MainDom = mainDom;
@@ -110,6 +113,7 @@ namespace Umbraco.Core.Runtime
         {
             if (register is null) throw new ArgumentNullException(nameof(register));
 
+
             // create and register the essential services
             // ie the bare minimum required to boot
 
@@ -129,12 +133,25 @@ namespace Umbraco.Core.Runtime
                 "Booted.",
                 "Boot failed."))
             {
-                Logger.Info<CoreRuntime>("Booting Core");
+
+                Logger.Info<CoreRuntime>("Booting site '{HostingSiteName}', app '{HostingApplicationId}', path '{HostingPhysicalPath}', server '{MachineName}'.",
+                    HostingEnvironment?.SiteName,
+                    HostingEnvironment?.ApplicationId,
+                    HostingEnvironment?.ApplicationPhysicalPath,
+                    NetworkHelper.MachineName);
                 Logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
 
                 // application environment
                 ConfigureUnhandledException();
-                return _factory = Configure(register, timer);
+                _factory = Configure(register, timer);
+
+                // now (and only now) is the time to switch over to perWebRequest scopes.
+                // up until that point we may not have a request, and scoped services would
+                // fail to resolve - but we run Initialize within a factory scope - and then,
+                // here, we switch the factory to bind scopes to requests
+                _factory.EnablePerWebRequestScope();
+
+                return _factory;
             }
         }
 
@@ -151,7 +168,7 @@ namespace Umbraco.Core.Runtime
 
             try
             {
-                
+
 
                 // run handlers
                 RuntimeOptions.DoRuntimeBoot(ProfilingLogger);
@@ -350,7 +367,7 @@ namespace Umbraco.Core.Runtime
 
             return new AppCaches(
                 new DeepCloneAppCache(new ObjectCacheAppCache()),
-                NoAppCache.Instance,
+                _requestCache,
                 new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
         }
 
