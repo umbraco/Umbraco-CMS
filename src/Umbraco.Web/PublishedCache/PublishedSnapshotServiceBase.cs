@@ -49,8 +49,5 @@ namespace Umbraco.Web.PublishedCache
 
         public virtual void Dispose()
         { }
-
-        protected void OnNotified(NotifiedEventArgs<ContentTypeCacheRefresher.JsonPayload> args) => Notified?.Invoke(this, args);
-        public event EventHandler<NotifiedEventArgs<ContentTypeCacheRefresher.JsonPayload>> Notified;
     }
 }

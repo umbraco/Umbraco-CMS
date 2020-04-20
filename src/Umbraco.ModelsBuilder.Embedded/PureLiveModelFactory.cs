@@ -135,6 +135,9 @@ namespace Umbraco.ModelsBuilder.Embedded
         }
 
         /// <inheritdoc />
+        public bool Enabled => _config.Enable;
+
+        /// <inheritdoc />
         public void Reset()
         {
             if (_config.Enable)

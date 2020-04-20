@@ -17,6 +17,20 @@ namespace Umbraco.Core
         /// <returns></returns>
         public static bool IsLiveFactory(this IPublishedModelFactory factory) => factory is ILivePublishedModelFactory;
 
+        /// <summary>
+        /// Returns true if the current <see cref="IPublishedModelFactory"/> is an implementation of <see cref="ILivePublishedModelFactory2"/> and is enabled
+        /// </summary>
+        /// <param name="factory"></param>
+        /// <returns></returns>
+        public static bool IsLiveFactoryEnabled(this IPublishedModelFactory factory)
+        {
+            if (factory is ILivePublishedModelFactory2 liveFactory2)
+                return liveFactory2.Enabled;
+
+            // if it's not ILivePublishedModelFactory2 we can't determine if it's enabled or not so return true
+            return factory is ILivePublishedModelFactory;
+        }
+
         [Obsolete("This method is no longer used or necessary and will be removed from future")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void WithSafeLiveFactory(this IPublishedModelFactory factory, Action action)
@@ -61,7 +75,6 @@ namespace Umbraco.Core
                         if (resetMethod != null)
                             resetMethod.Invoke(liveFactory, null);
                     }
-
                     action();
                 }
             }

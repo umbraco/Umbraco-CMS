@@ -9,6 +9,11 @@
         /// Tells the factory that it should build a new generation of models
         /// </summary>
         void Reset();
+
+        /// <summary>
+        /// If the live model factory 
+        /// </summary>
+        bool Enabled { get; }
     }
 
     /// <summary>
