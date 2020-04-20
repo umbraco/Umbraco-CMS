@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Owin.Security;
-using UserLoginInfo = Microsoft.AspNetCore.Identity.UserLoginInfo;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Security
 {
@@ -95,7 +95,7 @@ namespace Umbraco.Web.Security
         {
             if (manager == null) throw new ArgumentNullException(nameof(manager));
 
-            var rememberBrowserIdentity = new ClaimsIdentity(DefaultAuthenticationTypes.TwoFactorRememberBrowserCookie);
+            var rememberBrowserIdentity = new ClaimsIdentity(Constants.Web.TwoFactorRememberBrowserCookie);
             rememberBrowserIdentity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId));
 
             return rememberBrowserIdentity;
