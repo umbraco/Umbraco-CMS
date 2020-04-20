@@ -50,14 +50,17 @@ namespace Umbraco.Core
             {
                 lock (liveFactory.SyncRoot)
                 {
-                    // TODO: Fix this in 8.3! - We need to change the ILivePublishedModelFactory interface to have a Reset method and then when we have an embedded MB
-                    // version we will publicize the ResetModels (and change the name to Reset).
-                    // For now, this will suffice and we'll use reflection, there should be no other implementation of ILivePublishedModelFactory.
-                    // Calling ResetModels resets the MB flag so that the next time EnsureModels is called (which is called when nucache lazily calls CreateModel) it will
-                    // trigger the recompiling of pure live models.
-                    var resetMethod = liveFactory.GetType().GetMethod("ResetModels", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                    if (resetMethod != null)
-                        resetMethod.Invoke(liveFactory, null);
+                    if (liveFactory is ILivePublishedModelFactory2 liveFactory2)
+                    {
+                        liveFactory2.Reset();
+                    }
+                    else
+                    {
+                        // This is purely here for backwards compat and to avoid breaking changes but this code will probably never get executed
+                        var resetMethod = liveFactory.GetType().GetMethod("ResetModels", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                        if (resetMethod != null)
+                            resetMethod.Invoke(liveFactory, null);
+                    }
 
                     action();
                 }
