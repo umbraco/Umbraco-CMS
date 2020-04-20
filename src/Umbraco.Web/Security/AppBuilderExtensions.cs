@@ -155,7 +155,7 @@ namespace Umbraco.Web.Security
                 // logs in. This is a security feature which is used when you
                 // change a password or add an external login to your account.
                 OnValidateIdentity = UmbracoSecurityStampValidator
-                    .OnValidateIdentity<BackOfficeUserManager, BackOfficeIdentityUser>(
+                    .OnValidateIdentity<BackOfficeSignInManager, BackOfficeUserManager, BackOfficeIdentityUser>(
                         TimeSpan.FromMinutes(3),
                         (signInManager, manager, user) => signInManager.CreateUserIdentityAsync(user),
                         identity => identity.GetUserId()),

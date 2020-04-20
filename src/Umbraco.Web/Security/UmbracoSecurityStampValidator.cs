@@ -12,10 +12,11 @@ namespace Umbraco.Web.Security
     /// </summary>
     public class UmbracoSecurityStampValidator
     {
-        public static Func<CookieValidateIdentityContext, Task> OnValidateIdentity<TManager, TUser>(
+        public static Func<CookieValidateIdentityContext, Task> OnValidateIdentity<TSignInManager, TManager, TUser>(
             TimeSpan validateInterval,
             Func<BackOfficeSignInManager, TManager, TUser, Task<ClaimsIdentity>> regenerateIdentityCallback,
             Func<ClaimsIdentity, string> getUserIdCallback)
+            where TSignInManager : BackOfficeSignInManager
             where TManager : BackOfficeUserManager<TUser>
             where TUser : BackOfficeIdentityUser
         {
@@ -42,11 +43,14 @@ namespace Umbraco.Web.Security
                 if (validate)
                 {
                     var manager = context.OwinContext.Get<TManager>();
-                    var signInManager = context.OwinContext.GetBackOfficeSignInManager();
+                    if (manager == null) throw new InvalidOperationException("Unable to load BackOfficeUserManager");
+
+                    var signInManager = context.OwinContext.Get<TSignInManager>();
+                    if (signInManager == null) throw new InvalidOperationException("Unable to load BackOfficeSignInManager");
 
                     var userId = getUserIdCallback(context.Identity);
 
-                    if (manager != null && userId != null)
+                    if (userId != null)
                     {
                         var user = await manager.FindByIdAsync(userId);
                         var reject = true;
@@ -55,7 +59,9 @@ namespace Umbraco.Web.Security
                         if (user != null && manager.SupportsUserSecurityStamp)
                         {
                             var securityStamp = context.Identity.FindFirst(Constants.Web.SecurityStampClaimType)?.Value;
-                            if (securityStamp == await manager.GetSecurityStampAsync(user))
+                            var newSecurityStamp = await manager.GetSecurityStampAsync(user);
+
+                            if (securityStamp == newSecurityStamp)
                             {
                                 reject = false;
                                 // Regenerate fresh claims if possible and resign in
