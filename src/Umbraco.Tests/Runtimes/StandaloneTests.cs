@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Runtimes
             var runtimeState = new RuntimeState(logger, null, umbracoVersion, backOfficeInfo);
             var configs = TestHelper.GetConfigs();
             var variationContextAccessor = TestHelper.VariationContextAccessor;
-            
+
 
             // create the register and the composition
             var register = TestHelper.GetRegister();
@@ -115,7 +115,7 @@ namespace Umbraco.Tests.Runtimes
             composition.RegisterUnique<IDistributedCacheBinder, DistributedCacheBinder>();
             composition.RegisterUnique<IExamineManager, ExamineManager>();
             composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
-            composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
+            //composition.RegisterUnique<IMacroRenderer, MacroRenderer>(); // TODO new reference?
             composition.RegisterUnique<MediaUrlProviderCollection>(_ => new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()));
 
             // initialize some components only/individually
@@ -322,8 +322,8 @@ namespace Umbraco.Tests.Runtimes
             Assert.AreEqual(0, results.Count);
         }
 
-        
 
-        
+
+
     }
 }

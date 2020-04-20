@@ -142,8 +142,10 @@
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
-    <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
+    <Compile Include="Macros\MemberUserKeyProvider.cs" />
+    <Compile Include="Macros\PartialViewMacroEngine.cs" />
+    <Compile Include="Mvc\UmbracoViewPageOfTModel.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyRuntimeMinifier.cs" />
     <Compile Include="Models\NoNodesViewModel.cs" />
     <Compile Include="Mvc\RenderNoContentController.cs" />
@@ -169,8 +171,6 @@
     <Compile Include="Logging\WebProfilerComponent.cs" />
     <Compile Include="Logging\WebProfilerComposer.cs" />
     <Compile Include="Logging\WebProfilerProvider.cs" />
-    <Compile Include="Macros\MacroRenderer.cs" />
-    <Compile Include="Macros\MemberUserKeyProvider.cs" />
     <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
@@ -272,7 +272,6 @@
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Composing\CompositionExtensions\WebMappingProfiles.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
-    <Compile Include="Install\InstallStepCollection.cs" />
     <Compile Include="Editors\MemberGroupController.cs" />
     <Compile Include="Composing\CompositionExtensions\Controllers.cs" />
     <Compile Include="HealthCheck\HealthCheckController.cs" />
@@ -356,11 +355,7 @@
     <Compile Include="Editors\RelationController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
     <Compile Include="Editors\TemplateQueryController.cs" />
-    <Compile Include="Install\InstallSteps\NewInstallStep.cs" />
     <Compile Include="Install\UmbracoInstallArea.cs" />
-    <Compile Include="Install\Controllers\InstallApiController.cs" />
-    <Compile Include="Install\Controllers\InstallController.cs" />
-    <Compile Include="Install\InstallAuthorizeAttribute.cs" />
     <Compile Include="Mvc\ActionExecutedEventArgs.cs" />
     <Compile Include="Mvc\AdminTokenAuthorizeAttribute.cs" />
     <Compile Include="Mvc\NotFoundHandler.cs" />
@@ -446,10 +441,6 @@
     <Compile Include="Trees\UrlHelperExtensions.cs" />
     <Compile Include="HttpRequestExtensions.cs" />
     <Compile Include="HttpUrlHelperExtensions.cs" />
-    <Compile Include="Install\FilePermissionHelper.cs" />
-    <Compile Include="Install\HttpInstallAuthorizeAttribute.cs" />
-    <Compile Include="Macros\PartialViewMacroController.cs" />
-    <Compile Include="Macros\PartialViewMacroEngine.cs" />
     <Compile Include="Macros\PartialViewMacroPage.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
     <Compile Include="Mvc\QueryStringFilterAttribute.cs" />
@@ -491,7 +482,6 @@
     <Compile Include="Mvc\UmbracoController.cs" />
     <Compile Include="Mvc\UmbracoControllerFactory.cs" />
     <Compile Include="Mvc\UmbracoMvcHandler.cs" />
-    <Compile Include="Mvc\UmbracoViewPageOfTModel.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="HtmlHelperRenderExtensions.cs" />
     <Compile Include="ModelStateExtensions.cs" />
@@ -511,7 +501,6 @@
     <Compile Include="Mvc\SurfaceController.cs" />
     <Compile Include="Mvc\PluginControllerArea.cs" />
     <Compile Include="Mvc\PluginControllerAttribute.cs" />
-    <Compile Include="Mvc\PluginControllerMetadata.cs" />
     <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
@@ -562,6 +551,5 @@
       <Link>Mvc\web.config</Link>
     </None>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

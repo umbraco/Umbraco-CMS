@@ -10,6 +10,7 @@ using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Install;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Media;
@@ -352,7 +353,7 @@ namespace Umbraco.Core.Runtime
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
 
-
+            composition.Register<IFilePermissionHelper, FilePermissionHelper>(Lifetime.Singleton);
 
 
         }

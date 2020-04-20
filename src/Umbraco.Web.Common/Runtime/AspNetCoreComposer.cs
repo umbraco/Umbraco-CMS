@@ -6,7 +6,11 @@ using Umbraco.Net;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
 using Umbraco.Web.Common.AspNetCore;
+using Umbraco.Web.Common.Formatters;
 using Umbraco.Web.Common.Lifetime;
+using Umbraco.Web.Common.Macros;
+using Umbraco.Web.Composing.CompositionExtensions;
+using Umbraco.Web.Macros;
 
 namespace Umbraco.Web.Common.Runtime
 {
@@ -23,11 +27,10 @@ namespace Umbraco.Web.Common.Runtime
 
             // AspNetCore specific services
             composition.RegisterUnique<IHttpContextAccessor, HttpContextAccessor>();
+            composition.RegisterUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
 
             // Our own netcore implementations
-            composition.RegisterUnique<AspNetCoreUmbracoApplicationLifetime>();
-            composition.RegisterUnique<IUmbracoApplicationLifetimeManager>(factory => factory.GetInstance<AspNetCoreUmbracoApplicationLifetime>());
-            composition.RegisterUnique<IUmbracoApplicationLifetime>(factory => factory.GetInstance<AspNetCoreUmbracoApplicationLifetime>());
+            composition.RegisterMultipleUnique<IUmbracoApplicationLifetimeManager, IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
 
             composition.RegisterUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
 
@@ -40,8 +43,20 @@ namespace Umbraco.Web.Common.Runtime
 
 
             composition.RegisterUnique<ICookieManager, AspNetCoreCookieManager>();
+            composition.RegisterUnique<IUserAgentProvider, AspNetCoreUserAgentProvider>();
 
             composition.RegisterMultipleUnique<ISessionIdResolver, ISessionManager, AspNetCoreSessionManager>();
+
+            composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
+            composition.RegisterUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
+
+            composition.RegisterUnique<AngularJsonMediaTypeFormatter>();
+
+            //register the install components
+            //NOTE: i tried to not have these registered if we weren't installing or upgrading but post install when the site restarts
+            //it still needs to use the install controller so we can't do that
+            composition.ComposeInstaller();
+
         }
     }
 }

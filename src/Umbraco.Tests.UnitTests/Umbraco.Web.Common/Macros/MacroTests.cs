@@ -1,11 +1,5 @@
-﻿using Moq;
-using NUnit.Framework;
-using Umbraco.Core;
+﻿using NUnit.Framework;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Macros;
 
 namespace Umbraco.Tests.Macros

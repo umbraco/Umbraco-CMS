@@ -2,6 +2,7 @@
 using Umbraco.Core.Composing;
 using Umbraco.Web.Install;
 using Umbraco.Web.Install.InstallSteps;
+using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Composing.CompositionExtensions
 {
@@ -19,11 +20,11 @@ namespace Umbraco.Web.Composing.CompositionExtensions
             composition.Register<DatabaseUpgradeStep>(Lifetime.Scope);
 
             // TODO: Add these back once we have a compatible Starter kit
-            // composition.Register<StarterKitDownloadStep>(Lifetime.Scope);
-            // composition.Register<StarterKitInstallStep>(Lifetime.Scope);
-            // composition.Register<StarterKitCleanupStep>(Lifetime.Scope);
+            // composition.Register<InstallSetupStep, StarterKitDownloadStep>(Lifetime.Scope);
+            // composition.Register<InstallSetupStep, StarterKitInstallStep>(Lifetime.Scope);
+            // composition.Register<InstallSetupStep, StarterKitCleanupStep>(Lifetime.Scope);
 
-            composition.Register<SetUmbracoVersionStep>(Lifetime.Scope);
+            composition.Register<InstallSetupStep, SetUmbracoVersionStep>(Lifetime.Scope);
 
             composition.Register<InstallStepCollection>();
             composition.Register<InstallHelper>();

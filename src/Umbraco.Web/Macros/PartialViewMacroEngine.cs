@@ -75,17 +75,18 @@ namespace Umbraco.Web.Macros
 
             var request = new RequestContext(httpContext, routeVals);
 
-            string output;
-            using (var controller = new PartialViewMacroController(macro, content))
-            {
-                controller.ViewData = viewContext.ViewData;
-
-                controller.ControllerContext = new ControllerContext(request, controller);
-
-                //call the action to render
-                var result = controller.Index();
-                output = controller.RenderViewResultAsString(result);
-            }
+            string output = String.Empty;
+            //TODO Render!!
+            // using (var controller = new PartialViewMacroController(macro, content))
+            // {
+            //     controller.ViewData = viewContext.ViewData;
+            //
+            //     controller.ControllerContext = new ControllerContext(request, controller);
+            //
+            //     //call the action to render
+            //     var result = controller.Index();
+            //     output = controller.RenderViewResultAsString(result);
+            // }
 
             return new MacroContent { Text = output };
         }

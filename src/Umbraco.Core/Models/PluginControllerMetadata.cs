@@ -5,17 +5,17 @@ namespace Umbraco.Web.Mvc
     /// <summary>
     /// Represents some metadata about the controller
     /// </summary>
-    internal class PluginControllerMetadata
+    public class PluginControllerMetadata
     {
-        internal Type ControllerType { get; set; }
-        internal string ControllerName { get; set; }
-        internal string ControllerNamespace { get; set; }
-        internal string AreaName { get; set; }
+        public Type ControllerType { get; set; }
+        public string ControllerName { get; set; }
+        public string ControllerNamespace { get; set; }
+        public string AreaName { get; set; }
 
         /// <summary>
         /// This is determined by another attribute [IsBackOffice] which slightly modifies the route path
         /// allowing us to determine if it is indeed a back office request or not
         /// </summary>
-        internal bool IsBackOffice { get; set; }
+        public bool IsBackOffice { get; set; }
     }
 }

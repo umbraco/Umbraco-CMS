@@ -3,7 +3,6 @@ using System.Collections.Specialized;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -25,7 +24,6 @@ namespace Umbraco.Web.Install.InstallSteps
     [InstallSetupStep(InstallationType.NewInstall, "User", 20, "")]
     internal class NewInstallStep : InstallSetupStep<UserModel>
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserService _userService;
         private readonly DatabaseBuilder _databaseBuilder;
         private static HttpClient _httpClient;
@@ -35,9 +33,8 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly IConnectionStrings _connectionStrings;
         private readonly ICookieManager _cookieManager;
 
-        public NewInstallStep(IHttpContextAccessor httpContextAccessor, IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration, ISecuritySettings securitySettings, IConnectionStrings connectionStrings, ICookieManager cookieManager)
+        public NewInstallStep(IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration, ISecuritySettings securitySettings, IConnectionStrings connectionStrings, ICookieManager cookieManager)
         {
-            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
@@ -55,22 +52,23 @@ namespace Umbraco.Web.Install.InstallSteps
                 throw new InvalidOperationException("Could not find the super user!");
             }
 
-            var userManager = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().GetBackOfficeUserManager();
-            var membershipUser = await userManager.FindByIdAsync(Constants.Security.SuperUserId);
-            if (membershipUser == null)
-            {
-                throw new InvalidOperationException(
-                    $"No user found in membership provider with id of {Constants.Security.SuperUserId}.");
-            }
-
-            //To change the password here we actually need to reset it since we don't have an old one to use to change
-            var resetToken = await userManager.GeneratePasswordResetTokenAsync(membershipUser.Id);
-            var resetResult =
-                await userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
-            if (!resetResult.Succeeded)
-            {
-                throw new InvalidOperationException("Could not reset password: " + string.Join(", ", resetResult.Errors));
-            }
+            //TODO: This needs to be reintroduced, when members are compatible with ASP.NET Core Identity.
+            // var userManager = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().GetBackOfficeUserManager();
+            // var membershipUser = await userManager.FindByIdAsync(Constants.Security.SuperUserId);
+            // if (membershipUser == null)
+            // {
+            //     throw new InvalidOperationException(
+            //         $"No user found in membership provider with id of {Constants.Security.SuperUserId}.");
+            // }
+            //
+            // //To change the password here we actually need to reset it since we don't have an old one to use to change
+            // var resetToken = await userManager.GeneratePasswordResetTokenAsync(membershipUser.Id);
+            // var resetResult =
+            //     await userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
+            // if (!resetResult.Succeeded)
+            // {
+            //     throw new InvalidOperationException("Could not reset password: " + string.Join(", ", resetResult.Errors));
+            // }
 
             admin.Email = user.Email.Trim();
             admin.Name = user.Name.Trim();

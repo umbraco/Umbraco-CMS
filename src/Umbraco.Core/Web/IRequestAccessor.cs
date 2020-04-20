@@ -6,7 +6,7 @@ namespace Umbraco.Web
     public interface IRequestAccessor
     {
         string GetRequestValue(string name);
-        string GetQueryStringValue(string culture);
+        string GetQueryStringValue(string name);
         event EventHandler<UmbracoRequestEventArgs> EndRequest;
         event EventHandler<RoutableAttemptEventArgs> RouteAttempt;
     }

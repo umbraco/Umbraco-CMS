@@ -36,23 +36,20 @@ namespace Umbraco.Web.Install
         {
             report = new Dictionary<string, IEnumerable<string>>();
 
-            using (ChangesMonitor.Suspended()) // hack: ensure this does not trigger a restart
-            {
-                if (EnsureDirectories(_permissionDirs, out var errors) == false)
-                    report["Folder creation failed"] = errors.ToList();
+            if (EnsureDirectories(_permissionDirs, out var errors) == false)
+                report["Folder creation failed"] = errors.ToList();
 
-                if (EnsureDirectories(_packagesPermissionsDirs, out errors) == false)
-                    report["File writing for packages failed"] = errors.ToList();
+            if (EnsureDirectories(_packagesPermissionsDirs, out errors) == false)
+                report["File writing for packages failed"] = errors.ToList();
 
-                if (EnsureFiles(_permissionFiles, out errors) == false)
-                    report["File writing failed"] = errors.ToList();
+            if (EnsureFiles(_permissionFiles, out errors) == false)
+                report["File writing failed"] = errors.ToList();
 
-                if (TestPublishedSnapshotService(out errors) == false)
-                    report["Published snapshot environment check failed"] = errors.ToList();
+            if (TestPublishedSnapshotService(out errors) == false)
+                report["Published snapshot environment check failed"] = errors.ToList();
 
-                if (EnsureCanCreateSubDirectory(_globalSettings.UmbracoMediaPath, out errors) == false)
-                    report["Media folder creation failed"] = errors.ToList();
-            }
+            if (EnsureCanCreateSubDirectory(_globalSettings.UmbracoMediaPath, out errors) == false)
+                report["Media folder creation failed"] = errors.ToList();
 
             return report.Count == 0;
         }
@@ -191,7 +188,7 @@ namespace Umbraco.Web.Install
         {
             var writeAllow = false;
             var writeDeny = false;
-            var accessControlList = Directory.GetAccessControl(path);
+            var accessControlList = new DirectorySecurity(path, AccessControlSections.Access | AccessControlSections.Owner | AccessControlSections.Group);
             if (accessControlList == null)
                 return false;
             AuthorizationRuleCollection accessRules;

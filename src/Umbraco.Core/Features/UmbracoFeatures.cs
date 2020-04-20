@@ -29,7 +29,7 @@ namespace Umbraco.Web.Features
         /// <summary>
         /// Determines whether a controller is enabled.
         /// </summary>
-        internal bool IsControllerEnabled(Type feature)
+        public bool IsControllerEnabled(Type feature)
         {
             if (typeof(IUmbracoFeature).IsAssignableFrom(feature))
                 return Disabled.Controllers.Contains(feature) == false;

@@ -1,18 +1,22 @@
 using System;
+using System.Data.Common;
+using System.Data.SqlClient;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json.Serialization;
 using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.BackOffice.AspNetCore;
-using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Extensions;
+using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Website.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
@@ -44,10 +48,24 @@ namespace Umbraco.Web.UI.BackOffice
         {
             services.AddUmbracoConfiguration(_config);
             services.AddUmbracoRuntimeMinifier(_config);
+
+            // need to manually register this factory
+            DbProviderFactories.RegisterFactory(Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
+
             services.AddUmbracoCore(_env, out var factory);
             services.AddUmbracoWebsite();
 
-            services.AddMvc();
+            services.AddMvc(options =>
+            {
+                options.Filters.Add<HttpResponseExceptionFilter>();
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                .AddNewtonsoftJson(options =>
+                {
+                    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+
+                })
+            ;
+
             services.AddMiniProfiler(options =>
             {
                 options.ShouldProfile = request => false; // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
@@ -87,6 +105,16 @@ namespace Umbraco.Web.UI.BackOffice
                     Controller = "BackOffice",
                     Action = "Default"
                 });
+
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller}/{action=Index}/{id?}");
+
+                endpoints.MapControllerRoute("Install", "/install/{controller}/{Action}", defaults:new { Area = "Install"});
+
+                //TODO register routing correct: Name must be like this
+                endpoints.MapControllerRoute("umbraco-api-UmbracoInstall-InstallApi", "/install/api/{Action}", defaults:new { Area = "Install", Controller = "InstallApi"});
+
                 endpoints.MapGet("/", async context =>
                 {
                     await context.Response.WriteAsync($"<html><body>Hello World!{Current.Profiler.Render()}</body></html>");

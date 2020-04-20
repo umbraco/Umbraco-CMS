@@ -1,29 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
+using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Install;
 using Umbraco.Web.Install.Models;
-using Umbraco.Web.WebApi;
 
-namespace Umbraco.Web.Install.Controllers
+namespace Umbraco.Web.Common.Install
 {
     [AngularJsonOnlyConfiguration]
     [HttpInstallAuthorize]
-    public class InstallApiController : ApiController
+    [Area("Install")]
+    public class InstallApiController : Controller
     {
         private readonly DatabaseBuilder _databaseBuilder;
-        private readonly IProfilingLogger _proflog;
-        private readonly InstallStepCollection _installSteps;
         private readonly InstallStatusTracker _installStatusTracker;
+        private readonly InstallStepCollection _installSteps;
         private readonly ILogger _logger;
+        private readonly IProfilingLogger _proflog;
 
-        public InstallApiController(DatabaseBuilder databaseBuilder, IProfilingLogger proflog, InstallHelper installHelper, InstallStepCollection installSteps, InstallStatusTracker installStatusTracker)
+        public InstallApiController(DatabaseBuilder databaseBuilder, IProfilingLogger proflog,
+            InstallHelper installHelper, InstallStepCollection installSteps, InstallStatusTracker installStatusTracker)
         {
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
             _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
@@ -37,12 +42,13 @@ namespace Umbraco.Web.Install.Controllers
 
         public bool PostValidateDatabaseConnection(DatabaseModel model)
         {
-            var canConnect = _databaseBuilder.CanConnect(model.DatabaseType.ToString(), model.ConnectionString, model.Server, model.DatabaseName, model.Login, model.Password, model.IntegratedAuth);
+            var canConnect = _databaseBuilder.CanConnect(model.DatabaseType.ToString(), model.ConnectionString,
+                model.Server, model.DatabaseName, model.Login, model.Password, model.IntegratedAuth);
             return canConnect;
         }
 
         /// <summary>
-        /// Gets the install setup.
+        ///     Gets the install setup.
         /// </summary>
         public InstallSetup GetSetup()
         {
@@ -70,9 +76,9 @@ namespace Umbraco.Web.Install.Controllers
         }
 
         /// <summary>
-        /// Installs.
+        ///     Installs.
         /// </summary>
-        public async Task<InstallProgressResultModel> PostPerformInstall(InstallInstructions installModel)
+        public async Task<InstallProgressResultModel> PostPerformInstall([FromBody] InstallInstructions installModel)
         {
             if (installModel == null) throw new ArgumentNullException(nameof(installModel));
 
@@ -114,15 +120,16 @@ namespace Umbraco.Web.Install.Controllers
                     // check if there's a custom view to return for this step
                     if (setupData != null && setupData.View.IsNullOrWhiteSpace() == false)
                     {
-                        return new InstallProgressResultModel(false, step.Name, nextStep, setupData.View, setupData.ViewModel);
+                        return new InstallProgressResultModel(false, step.Name, nextStep, setupData.View,
+                            setupData.ViewModel);
                     }
 
                     return new InstallProgressResultModel(false, step.Name, nextStep);
                 }
                 catch (Exception ex)
                 {
-
-                    _logger.Error<InstallApiController>(ex, "An error occurred during installation step {Step}", step.Name);
+                    _logger.Error<InstallApiController>(ex, "An error occurred during installation step {Step}",
+                        step.Name);
 
                     if (ex is TargetInvocationException && ex.InnerException != null)
                     {
@@ -132,20 +139,32 @@ namespace Umbraco.Web.Install.Controllers
                     var installException = ex as InstallException;
                     if (installException != null)
                     {
-                        throw new HttpResponseException(Request.CreateValidationErrorResponse(new
+                        throw new HttpResponseException(HttpStatusCode.BadRequest, new
                         {
                             view = installException.View,
                             model = installException.ViewModel,
                             message = installException.Message
-                        }));
+                        })
+                        {
+                         AdditionalHeaders   =
+                         {
+                             ["X-Status-Reason"] =  "Validation failed"
+                         }
+                        };
                     }
 
-                    throw new HttpResponseException(Request.CreateValidationErrorResponse(new
+                    throw new HttpResponseException(HttpStatusCode.BadRequest,new
                     {
                         step = step.Name,
                         view = "error",
                         message = ex.Message
-                    }));
+                    })
+                    {
+                        AdditionalHeaders   =
+                        {
+                            ["X-Status-Reason"] =  "Validation failed"
+                        }
+                    };
                 }
             }
 
@@ -153,7 +172,8 @@ namespace Umbraco.Web.Install.Controllers
             return new InstallProgressResultModel(true, "", "");
         }
 
-        private static object GetInstruction(InstallInstructions installModel, InstallTrackingItem item, InstallSetupStep step)
+        private static object GetInstruction(InstallInstructions installModel, InstallTrackingItem item,
+            InstallSetupStep step)
         {
             installModel.Instructions.TryGetValue(item.Name, out var instruction); // else null
 
@@ -166,15 +186,16 @@ namespace Umbraco.Web.Install.Controllers
         }
 
         /// <summary>
-        /// We'll peek ahead and check if it's RequiresExecution is returning true. If it
-        /// is not, we'll dequeue that step and peek ahead again (recurse)
+        ///     We'll peek ahead and check if it's RequiresExecution is returning true. If it
+        ///     is not, we'll dequeue that step and peek ahead again (recurse)
         /// </summary>
         /// <param name="current"></param>
         /// <param name="queue"></param>
         /// <param name="installId"></param>
         /// <param name="installModel"></param>
         /// <returns></returns>
-        private string IterateSteps(InstallSetupStep current, Queue<InstallTrackingItem> queue, Guid installId, InstallInstructions installModel)
+        private string IterateSteps(InstallSetupStep current, Queue<InstallTrackingItem> queue, Guid installId,
+            InstallInstructions installModel)
         {
             while (queue.Count > 0)
             {
@@ -217,7 +238,8 @@ namespace Umbraco.Web.Install.Controllers
             var modelAttempt = instruction.TryConvertTo(step.StepType);
             if (!modelAttempt.Success)
             {
-                throw new InvalidCastException($"Cannot cast/convert {step.GetType().FullName} into {step.StepType.FullName}");
+                throw new InvalidCastException(
+                    $"Cannot cast/convert {step.GetType().FullName} into {step.StepType.FullName}");
             }
 
             var model = modelAttempt.Result;
@@ -231,7 +253,8 @@ namespace Umbraco.Web.Install.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error<InstallApiController>(ex, "Checking if step requires execution ({Step}) failed.", step.Name);
+                _logger.Error<InstallApiController>(ex, "Checking if step requires execution ({Step}) failed.",
+                    step.Name);
                 throw;
             }
         }
@@ -239,13 +262,16 @@ namespace Umbraco.Web.Install.Controllers
         // executes the step
         internal async Task<InstallSetupResult> ExecuteStepAsync(InstallSetupStep step, object instruction)
         {
-            using (_proflog.TraceDuration<InstallApiController>($"Executing installation step: '{step.Name}'.", "Step completed"))
+            using (_proflog.TraceDuration<InstallApiController>($"Executing installation step: '{step.Name}'.",
+                "Step completed"))
             {
                 var modelAttempt = instruction.TryConvertTo(step.StepType);
                 if (!modelAttempt.Success)
                 {
-                    throw new InvalidCastException($"Cannot cast/convert {step.GetType().FullName} into {step.StepType.FullName}");
+                    throw new InvalidCastException(
+                        $"Cannot cast/convert {step.GetType().FullName} into {step.StepType.FullName}");
                 }
+
                 var model = modelAttempt.Result;
                 var genericStepType = typeof(InstallSetupStep<>);
                 Type[] typeArgs = { step.StepType };

@@ -1,14 +1,13 @@
-﻿using System.Web.Mvc;
+﻿using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.WebAssets;
-using Umbraco.Web.Mvc;
+using Umbraco.Web.Install;
 using Umbraco.Web.Security;
 
-namespace Umbraco.Web.Install.Controllers
+namespace Umbraco.Web.Common.Install
 {
     /// <summary>
     /// The MVC Installation controller
@@ -43,7 +42,7 @@ namespace Umbraco.Web.Install.Controllers
         }
 
         [HttpGet]
-        [StatusCodeResult(System.Net.HttpStatusCode.ServiceUnavailable)]
+       // [StatusCodeResult(System.Net.HttpStatusCode.ServiceUnavailable)] //TODO reintroduce
         public ActionResult Index()
         {
             if (_runtime.Level == RuntimeLevel.Run)
@@ -60,7 +59,7 @@ namespace Umbraco.Web.Install.Controllers
                 {
                     case ValidateRequestAttempt.FailedNoPrivileges:
                     case ValidateRequestAttempt.FailedNoContextId:
-                        return Redirect(_globalSettings.UmbracoPath + "/AuthorizeUpgrade?redir=" + Server.UrlEncode(Request.RawUrl));
+                        return Redirect(_globalSettings.UmbracoPath + "/AuthorizeUpgrade?redir=" + Request.GetEncodedUrl());
                 }
             }
 
@@ -73,7 +72,7 @@ namespace Umbraco.Web.Install.Controllers
             _installHelper.InstallStatus(false, "");
 
             // always ensure full path (see NOTE in the class remarks)
-            return View(_globalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "install/views/index.cshtml");
+            return View();
         }
     }
 }

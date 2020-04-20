@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -347,8 +348,9 @@ namespace Umbraco.Web.Macros
         /// <returns>The text output of the macro execution.</returns>
         private MacroContent ExecutePartialView(MacroModel macro, IPublishedContent content)
         {
-            var engine = new PartialViewMacroEngine(_umbracoContextAccessor, _httpContextAccessor, _ioHelper);
-            return engine.Execute(macro, content);
+            throw new NotImplementedException();
+            // var engine = new PartialViewMacroEngine(_umbracoContextAccessor, _httpContextAccessor, _ioHelper);
+            // return engine.Execute(macro, content);
         }
 
         #endregion
