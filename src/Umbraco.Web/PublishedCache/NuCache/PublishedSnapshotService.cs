@@ -858,6 +858,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             Notify<IContentType>(_contentStore, payloads, RefreshContentTypesLocked);
             Notify<IMediaType>(_mediaStore, payloads, RefreshMediaTypesLocked);
 
+            OnNotified(new NotifiedEventArgs<ContentTypeCacheRefresher.JsonPayload>(payloads));
+
             if (_publishedModelFactory.IsLiveFactory())
             {
                 //In the case of Pure Live - we actually need to refresh all of the content and the media

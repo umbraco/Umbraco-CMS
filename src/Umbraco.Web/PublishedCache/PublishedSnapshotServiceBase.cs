@@ -1,11 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.PublishedCache
 {
-    abstract class PublishedSnapshotServiceBase : IPublishedSnapshotService
+    internal class NotifiedEventArgs<T> : EventArgs
+    {
+        public NotifiedEventArgs(T[] payloads)
+        {
+            Payloads = payloads;
+        }
+
+        public T[] Payloads { get; }
+    }
+
+    internal abstract class PublishedSnapshotServiceBase : IPublishedSnapshotService
     {
         protected PublishedSnapshotServiceBase(IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor)
         {
@@ -38,5 +49,8 @@ namespace Umbraco.Web.PublishedCache
 
         public virtual void Dispose()
         { }
+
+        protected void OnNotified(NotifiedEventArgs<ContentTypeCacheRefresher.JsonPayload> args) => Notified?.Invoke(this, args);
+        public event EventHandler<NotifiedEventArgs<ContentTypeCacheRefresher.JsonPayload>> Notified;
     }
 }
