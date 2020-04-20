@@ -8,6 +8,7 @@ namespace Umbraco.Web.Mvc
     /// <summary>
     /// Forces the response to have a specific http status code
     /// </summary>
+    /// Migrated already to .Net Core
     internal class StatusCodeResultAttribute : ActionFilterAttribute
     {
         private readonly HttpStatusCode _statusCode;
