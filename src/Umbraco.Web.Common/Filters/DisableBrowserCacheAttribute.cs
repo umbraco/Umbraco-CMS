@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Net.Http.Headers;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Web.Common.Filters
 {
     /// <summary>
     /// Ensures that the request is not cached by the browser
@@ -14,9 +14,11 @@ namespace Umbraco.Web.BackOffice.Filters
         {
             base.OnResultExecuting(context);
 
-            if (context.HttpContext.Response.StatusCode != 200) return;
+            var httpResponse = context.HttpContext.Response;
 
-            context.HttpContext.Response.GetTypedHeaders().CacheControl =
+            if (httpResponse.StatusCode != 200) return;
+
+            httpResponse.GetTypedHeaders().CacheControl =
                 new CacheControlHeaderValue()
                 {
                     NoCache = true,
@@ -25,9 +27,9 @@ namespace Umbraco.Web.BackOffice.Filters
                     NoStore = true
                 };
 
-            context.HttpContext.Response.Headers[HeaderNames.LastModified] = DateTime.Now.ToString("R"); // Format RFC1123
-            context.HttpContext.Response.Headers[HeaderNames.Pragma] = "no-cache";
-            context.HttpContext.Response.Headers[HeaderNames.Expires] = new DateTime(1990, 1, 1, 0, 0, 0).ToString("R");
+            httpResponse.Headers[HeaderNames.LastModified] = DateTime.Now.ToString("R"); // Format RFC1123
+            httpResponse.Headers[HeaderNames.Pragma] = "no-cache";
+            httpResponse.Headers[HeaderNames.Expires] = new DateTime(1990, 1, 1, 0, 0, 0).ToString("R");
         }
     }
 }

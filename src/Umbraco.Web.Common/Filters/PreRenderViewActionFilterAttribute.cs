@@ -1,8 +1,9 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Umbraco.Web.Common.Events;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Web.Common.Filters
 {
     public class PreRenderViewActionFilterAttribute : ActionFilterAttribute
     {

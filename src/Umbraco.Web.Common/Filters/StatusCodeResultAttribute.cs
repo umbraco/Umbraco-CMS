@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
-using System.Net;
+﻿using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Configuration.UmbracoSettings;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Web.Common.Filters
 {
     /// <summary>
     /// Forces the response to have a specific http status code
@@ -22,10 +22,12 @@ namespace Umbraco.Web.BackOffice.Filters
         {
             base.OnActionExecuted(context);
 
-            context.HttpContext.Response.StatusCode = (int)_statusCode;
+            var httpContext = context.HttpContext;
 
-            var disableIisCustomErrors = context.HttpContext.RequestServices.GetService<IWebRoutingSettings>().TrySkipIisCustomErrors;
-            var statusCodePagesFeature = context.HttpContext.Features.Get<IStatusCodePagesFeature>();
+            httpContext.Response.StatusCode = (int)_statusCode;
+
+            var disableIisCustomErrors = httpContext.RequestServices.GetService<IWebRoutingSettings>().TrySkipIisCustomErrors;
+            var statusCodePagesFeature = httpContext.Features.Get<IStatusCodePagesFeature>();
 
             if (statusCodePagesFeature != null)
             {
