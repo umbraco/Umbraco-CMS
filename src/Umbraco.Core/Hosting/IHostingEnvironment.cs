@@ -6,6 +6,10 @@ namespace Umbraco.Core.Hosting
     {
         string SiteName { get; }
         string ApplicationId { get; }
+
+        /// <summary>
+        /// Will return the physical path to the root of the application
+        /// </summary>
         string ApplicationPhysicalPath { get; }
 
         string LocalTempPath { get; }
@@ -27,10 +31,22 @@ namespace Umbraco.Core.Hosting
         bool IsHosted { get; }
 
         Version IISVersion { get; }
+
+        // TODO: Should we change this name to MapPathWebRoot ? and also have a new MapPathContentRoot ?
+
+        /// <summary>
+        /// Maps a virtual path to a physical path to the application's web root
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Depending on the runtime 'web root', this result can vary. For example in Net Framework the web root and the content root are the same, however
+        /// in netcore the web root is /www therefore this will Map to a physical path within www.
+        /// </remarks>
         string MapPath(string path);
 
         /// <summary>
-        /// Maps a virtual path to the application's web root
+        /// Converts a virtual path to an absolute URL path based on the application's web root
         /// </summary>
         /// <param name="virtualPath">The virtual path. Must start with either ~/ or / else an exception is thrown.</param>
         /// <returns></returns>

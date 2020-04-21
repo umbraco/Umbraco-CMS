@@ -35,4 +35,12 @@
         <Content Remove="App_Data\**" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Config\logviewer.searches.config.js" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Config\logviewer.searches.config.js" />
+    </ItemGroup>
+
 </Project>

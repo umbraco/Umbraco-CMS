@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Serilog;
 using Umbraco.Core.Composing;
+using Umbraco.Web.Common.Extensions;
 
 namespace Umbraco.Web.UI.BackOffice
 {

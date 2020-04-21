@@ -32,6 +32,8 @@ namespace Umbraco.Core.Logging.Serilog
             _ioHelper = ioHelper;
             _marchal = marchal;
 
+            // TODO: we can't use AppDomain.CurrentDomain.BaseDirectory, need a consistent approach between netcore/netframework
+
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.AppSettings(filePath: AppDomain.CurrentDomain.BaseDirectory + logConfigFile)
                 .CreateLogger();

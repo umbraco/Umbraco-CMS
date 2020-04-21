@@ -5,6 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Logging.Viewer
@@ -13,14 +14,19 @@ namespace Umbraco.Core.Logging.Viewer
     {
         private readonly string _logsPath;
         private readonly ILogger _logger;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public JsonLogViewer(ILogger logger, IIOHelper ioHelper, string logsPath = "", string searchPath = "") : base(ioHelper, searchPath)
+        public JsonLogViewer(ILogger logger, ILogViewerConfig logViewerConfig, IHostingEnvironment hostingEnvironment) : base(logViewerConfig)
         {
-            if (string.IsNullOrEmpty(logsPath))
-                logsPath = $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\";
-
-            _logsPath = logsPath;
+            _hostingEnvironment = hostingEnvironment;
             _logger = logger;
+
+            // TODO: this path is hard coded but it can actually be configured, but that is done via Serilog and we don't have a different abstraction/config
+            // for the logging path. We could make that, but then how would we get that abstraction into the Serilog config? I'm sure there is a way but
+            // don't have time right now to resolve that (since this was hard coded before). We could have a single/simple ILogConfig for umbraco that purely specifies
+            // the logging path and then we can have a special token that we replace in the serilog config that maps to that location? then at least we could inject
+            // that config in places where we are hard coding this path.
+            _logsPath = Path.Combine(_hostingEnvironment.ApplicationPhysicalPath, @"App_Data\Logs\");
         }
 
         private const int FileSizeCap = 100;
@@ -62,9 +68,6 @@ namespace Umbraco.Core.Logging.Viewer
         {
             var logs = new List<LogEvent>();
 
-            //Log Directory
-            var logDirectory = $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\";
-
             var count = 0;
 
             //foreach full day in the range - see if we can find one or more filenames that end with
@@ -74,7 +77,7 @@ namespace Umbraco.Core.Logging.Viewer
                 //Filename ending to search for (As could be multiple)
                 var filesToFind = GetSearchPattern(day);
 
-                var filesForCurrentDay = Directory.GetFiles(logDirectory, filesToFind);
+                var filesForCurrentDay = Directory.GetFiles(_logsPath, filesToFind);
 
                 //Foreach file we find - open it
                 foreach (var filePath in filesForCurrentDay)

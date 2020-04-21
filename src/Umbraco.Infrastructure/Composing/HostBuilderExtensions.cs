@@ -11,10 +11,8 @@ namespace Umbraco.Core.Composing
         /// Assigns a custom service provider factory to use Umbraco's container
         /// </summary>
         /// <param name="builder"></param>
+        /// <param name="umbracoServiceProviderFactory"></param>
         /// <returns></returns>
-        public static IHostBuilder UseUmbraco(this IHostBuilder builder)
-            => builder.UseUmbraco(new UmbracoServiceProviderFactory());
-
         public static IHostBuilder UseUmbraco(this IHostBuilder builder, UmbracoServiceProviderFactory umbracoServiceProviderFactory)
             => builder.UseServiceProviderFactory(umbracoServiceProviderFactory);
     }

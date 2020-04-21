@@ -33,13 +33,14 @@ namespace Umbraco.Tests.Logging
             //Create an example JSON log file to check results
             //As a one time setup for all tets in this class/fixture
             var ioHelper = TestHelper.IOHelper;
+            var hostingEnv = TestHelper.GetHostingEnvironment();
 
             var exampleLogfilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Logging\", _logfileName);
-            _newLogfileDirPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"App_Data\Logs\");
+            _newLogfileDirPath = Path.Combine(hostingEnv.ApplicationPhysicalPath, @"App_Data\Logs\");
             _newLogfilePath = Path.Combine(_newLogfileDirPath, _logfileName);
 
             var exampleSearchfilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Logging\", _searchfileName);
-            _newSearchfileDirPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Config\");
+            _newSearchfileDirPath = Path.Combine(hostingEnv.ApplicationPhysicalPath, @"Config\");
             _newSearchfilePath = Path.Combine(_newSearchfileDirPath, _searchfileName);
 
             //Create/ensure Directory exists
@@ -51,7 +52,8 @@ namespace Umbraco.Tests.Logging
             File.Copy(exampleSearchfilePath, _newSearchfilePath, true);
 
             var logger = Mock.Of<Core.Logging.ILogger>();
-            _logViewer = new JsonLogViewer(logger, ioHelper, logsPath: _newLogfileDirPath, searchPath: _newSearchfilePath);
+            var logViewerConfig = new LogViewerConfig(hostingEnv);
+            _logViewer = new JsonLogViewer(logger, logViewerConfig, hostingEnv);
         }
 
         [OneTimeTearDown]
