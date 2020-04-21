@@ -145,12 +145,6 @@ namespace Umbraco.Core.Runtime
                 ConfigureUnhandledException();
                 _factory = Configure(register, timer);
 
-                // now (and only now) is the time to switch over to perWebRequest scopes.
-                // up until that point we may not have a request, and scoped services would
-                // fail to resolve - but we run Initialize within a factory scope - and then,
-                // here, we switch the factory to bind scopes to requests
-                _factory.EnablePerWebRequestScope();
-
                 return _factory;
             }
         }
@@ -261,6 +255,13 @@ namespace Umbraco.Core.Runtime
             // create & initialize the components
             _components = _factory.GetInstance<ComponentCollection>();
             _components.Initialize();
+
+
+            // now (and only now) is the time to switch over to perWebRequest scopes.
+            // up until that point we may not have a request, and scoped services would
+            // fail to resolve - but we run Initialize within a factory scope - and then,
+            // here, we switch the factory to bind scopes to requests
+            _factory.EnablePerWebRequestScope();
         }
 
         protected virtual void ConfigureUnhandledException()
