@@ -10,19 +10,12 @@ namespace Umbraco.Web.BackOffice.Filters
     {
         public override async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
         {
-            if (context.HttpContext == null || context.HttpContext.Response == null)
+            if (context.HttpContext?.Response?.StatusCode == 200)
             {
-                await next();
+                context.HttpContext.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+                context.HttpContext.Response.Headers["Expires"] = "-1";
+                context.HttpContext.Response.Headers["Pragma"] = "no-cache";
             }
-
-            if (context.HttpContext.Response.StatusCode != 200)
-            {
-                await next();
-            }
-
-            context.HttpContext.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
-            context.HttpContext.Response.Headers["Expires"] = "-1";
-            context.HttpContext.Response.Headers["Pragma"] = "no-cache";
 
             await next();
         }
