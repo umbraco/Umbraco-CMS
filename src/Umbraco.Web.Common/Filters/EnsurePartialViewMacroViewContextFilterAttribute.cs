@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Umbraco.Web.Common.Constants;
 using Umbraco.Web.Common.Controllers;
 
 namespace Umbraco.Web.Common.Filters
@@ -71,7 +72,7 @@ namespace Umbraco.Web.Common.Filters
                 new HtmlHelperOptions());
 
             //set the special data token
-            context.RouteData.DataTokens[Constants.Constants.DataTokenCurrentViewContext] = viewCtx;
+            context.RouteData.DataTokens[ViewConstants.DataTokenCurrentViewContext] = viewCtx;
         }
 
         private class DummyView : IView

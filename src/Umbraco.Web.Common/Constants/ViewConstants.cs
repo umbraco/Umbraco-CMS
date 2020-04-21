@@ -3,7 +3,7 @@
     /// <summary>
     /// constants
     /// </summary>
-    internal static class Constants
+    internal static class ViewConstants
     {
         internal const string ViewLocation = "~/Views";
 
