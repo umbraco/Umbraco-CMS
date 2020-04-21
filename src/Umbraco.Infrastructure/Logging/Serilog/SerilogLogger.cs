@@ -19,30 +19,28 @@ namespace Umbraco.Core.Logging.Serilog
     public class SerilogLogger : ILogger, IDisposable
     {
         private readonly ICoreDebugSettings _coreDebugSettings;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IMarchal _marchal;
 
         /// <summary>
         /// Initialize a new instance of the <see cref="SerilogLogger"/> class with a configuration file.
         /// </summary>
         /// <param name="logConfigFile"></param>
-        public SerilogLogger(ICoreDebugSettings coreDebugSettings, IIOHelper ioHelper, IMarchal marchal, FileInfo logConfigFile)
+        public SerilogLogger(ICoreDebugSettings coreDebugSettings, IHostingEnvironment hostingEnvironment, IMarchal marchal, FileInfo logConfigFile)
         {
             _coreDebugSettings = coreDebugSettings;
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
             _marchal = marchal;
 
-            // TODO: we can't use AppDomain.CurrentDomain.BaseDirectory, need a consistent approach between netcore/netframework
-
             Log.Logger = new LoggerConfiguration()
-                .ReadFrom.AppSettings(filePath: AppDomain.CurrentDomain.BaseDirectory + logConfigFile)
+                .ReadFrom.AppSettings(filePath: logConfigFile.FullName)
                 .CreateLogger();
         }
 
-        public SerilogLogger(ICoreDebugSettings coreDebugSettings, IIOHelper ioHelper, IMarchal marchal, LoggerConfiguration logConfig)
+        public SerilogLogger(ICoreDebugSettings coreDebugSettings, IHostingEnvironment hostingEnvironment, IMarchal marchal, LoggerConfiguration logConfig)
         {
             _coreDebugSettings = coreDebugSettings;
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
             _marchal = marchal;
 
             //Configure Serilog static global logger with config passed in
@@ -58,10 +56,10 @@ namespace Umbraco.Core.Logging.Serilog
             var loggerConfig = new LoggerConfiguration();
             loggerConfig
                 .MinimalConfiguration(hostingEnvironment, sessionIdResolver, requestCacheGetter)
-                .ReadFromConfigFile()
-                .ReadFromUserConfigFile();
+                .ReadFromConfigFile(hostingEnvironment)
+                .ReadFromUserConfigFile(hostingEnvironment);
 
-            return new SerilogLogger(coreDebugSettings, ioHelper, marchal, loggerConfig);
+            return new SerilogLogger(coreDebugSettings, hostingEnvironment, marchal, loggerConfig);
         }
 
         /// <summary>
@@ -184,14 +182,14 @@ namespace Umbraco.Core.Logging.Serilog
                 dump = _coreDebugSettings.DumpOnTimeoutThreadAbort || IsMonitorEnterThreadAbortException(exception);
 
                 // dump if it is ok to dump (might have a cap on number of dump...)
-                dump &= MiniDump.OkToDump(_ioHelper);
+                dump &= MiniDump.OkToDump(_hostingEnvironment);
             }
 
             if (dump)
             {
                 try
                 {
-                    var dumped = MiniDump.Dump(_marchal, _ioHelper, withException: true);
+                    var dumped = MiniDump.Dump(_marchal, _hostingEnvironment, withException: true);
                     messageTemplate += dumped
                         ? "\r\nA minidump was created in App_Data/MiniDump"
                         : "\r\nFailed to create a minidump";

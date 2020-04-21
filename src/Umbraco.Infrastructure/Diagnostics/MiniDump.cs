@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Diagnostics
@@ -100,7 +101,7 @@ namespace Umbraco.Core.Diagnostics
             return bRet;
         }
 
-        public static bool Dump(IMarchal marchal, IIOHelper ioHelper, Option options = Option.WithFullMemory, bool withException = false)
+        public static bool Dump(IMarchal marchal, IHostingEnvironment hostingEnvironment, Option options = Option.WithFullMemory, bool withException = false)
         {
             lock (LockO)
             {
@@ -110,7 +111,7 @@ namespace Umbraco.Core.Diagnostics
                 // filter everywhere in our code = not!
                 var stacktrace = withException ? Environment.StackTrace : string.Empty;
 
-                var filepath = ioHelper.MapPath("~/App_Data/MiniDump");
+                var filepath = Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data/MiniDump");
                 if (Directory.Exists(filepath) == false)
                     Directory.CreateDirectory(filepath);
 
@@ -122,11 +123,11 @@ namespace Umbraco.Core.Diagnostics
             }
         }
 
-        public static bool OkToDump(IIOHelper ioHelper)
+        public static bool OkToDump(IHostingEnvironment hostingEnvironment)
         {
             lock (LockO)
             {
-                var filepath = ioHelper.MapPath("~/App_Data/MiniDump");
+                var filepath = Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data/MiniDump");
                 if (Directory.Exists(filepath) == false) return true;
                 var count = Directory.GetFiles(filepath, "*.dmp").Length;
                 return count < 8;
