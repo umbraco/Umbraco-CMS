@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Core.Composing;
-using Umbraco.Web.Common.Extensions;
 
 namespace Umbraco.Web.UI.BackOffice
 {
