@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Umbraco.Tests.Common.Builders
 {
@@ -14,7 +15,8 @@ namespace Umbraco.Tests.Common.Builders
 
         public override IEnumerable<T> Build()
         {
-            return _collection;
+            var collection = _collection?.ToList() ?? Enumerable.Empty<T>();
+            return collection;
         }
 
         public GenericCollectionBuilder<TBuilder, T> WithValue(T value)

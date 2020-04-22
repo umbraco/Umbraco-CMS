@@ -2,7 +2,7 @@ namespace Umbraco.Web
 {
     public interface ISessionManager
     {
-        object GetSessionValue(string sessionName);
-        void SetSessionValue(string sessionName, object value);
+        string GetSessionValue(string sessionName);
+        void SetSessionValue(string sessionName, string value);
     }
 }

@@ -160,6 +160,7 @@
     <Compile Include="Editors\TinyMceController.cs" />
     <Compile Include="HttpContextAccessorExtensions.cs" />
     <Compile Include="HttpContextExtensions.cs" />
+    <Compile Include="HealthCheck\Checks\Data\DatabaseIntegrityCheck.cs" />
     <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
     <Compile Include="Install\ChangesMonitor.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
@@ -323,7 +324,6 @@
     <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
     <Compile Include="Editors\RedirectUrlManagementController.cs" />
-    <Compile Include="DefaultEventMessagesFactory.cs" />
     <Compile Include="Security\ExternalSignInAutoLinkOptions.cs" />
     <Compile Include="Security\FixWindowsAuthMiddlware.cs" />
     <Compile Include="Security\ForceRenewalCookieAuthenticationHandler.cs" />

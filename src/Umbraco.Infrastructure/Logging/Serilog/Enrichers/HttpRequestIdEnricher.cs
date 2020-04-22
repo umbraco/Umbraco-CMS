@@ -11,13 +11,13 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
     /// Original source - https://github.com/serilog-web/classic/blob/master/src/SerilogWeb.Classic/Classic/Enrichers/HttpRequestIdEnricher.cs
     /// Nupkg: 'Serilog.Web.Classic' contains handlers & extra bits we do not want
     /// </summary>
-    internal class HttpRequestIdEnricher : ILogEventEnricher
+    public class HttpRequestIdEnricher : ILogEventEnricher
     {
-        private readonly Func<IRequestCache> _requestCacheGetter;
+        private readonly IRequestCache _requestCache;
 
-        public HttpRequestIdEnricher(Func<IRequestCache> requestCacheGetter)
+        public HttpRequestIdEnricher(IRequestCache requestCache)
         {
-            _requestCacheGetter = requestCacheGetter;
+            _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
         }
 
         /// <summary>
@@ -34,11 +34,8 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
         {
             if (logEvent == null) throw new ArgumentNullException(nameof(logEvent));
 
-            var requestCache = _requestCacheGetter();
-            if(requestCache is null) return;
-
             Guid requestId;
-            if (!LogHttpRequest.TryGetCurrentHttpRequestId(out requestId, requestCache))
+            if (!LogHttpRequest.TryGetCurrentHttpRequestId(out requestId, _requestCache))
                 return;
 
             var requestIdProperty = new LogEventProperty(HttpRequestIdPropertyName, new ScalarValue(requestId));

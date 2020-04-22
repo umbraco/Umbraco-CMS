@@ -9,8 +9,8 @@ namespace Umbraco.Tests.Common.Builders
 {
     public class DataEditorBuilder<TParent> : ChildBuilderBase<TParent, IDataEditor>
     {
-        private readonly ConfigurationEditorBuilder<DataEditorBuilder<TParent>> _explicitConfigurationEditorBuilder;
-        private readonly DataValueEditorBuilder<DataEditorBuilder<TParent>> _explicitValueEditorBuilder;
+        private ConfigurationEditorBuilder<DataEditorBuilder<TParent>> _explicitConfigurationEditorBuilder;
+        private DataValueEditorBuilder<DataEditorBuilder<TParent>> _explicitValueEditorBuilder;
         private IDictionary<string, object> _defaultConfiguration;
 
         public DataEditorBuilder(TParent parentBuilder) : base(parentBuilder)

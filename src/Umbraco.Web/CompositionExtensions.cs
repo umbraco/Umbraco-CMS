@@ -40,12 +40,7 @@ namespace Umbraco.Web
             => composition.WithCollectionBuilder<FilteredControllerFactoryCollectionBuilder>();
 
 
-        /// <summary>
-        /// Gets the backoffice OEmbed Providers collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static EmbedProvidersCollectionBuilder OEmbedProviders(this Composition composition)
-            => composition.WithCollectionBuilder<EmbedProvidersCollectionBuilder>();
+
 
         /// <summary>
         /// Gets the back office tree collection builder
@@ -54,14 +49,6 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static TreeCollectionBuilder Trees(this Composition composition)
             => composition.WithCollectionBuilder<TreeCollectionBuilder>();
-
-        /// <summary>
-        /// Gets the back office searchable tree collection builder
-        /// </summary>
-        /// <param name="composition"></param>
-        /// <returns></returns>
-        public static SearchableTreeCollectionBuilder SearchableTrees(this Composition composition)
-            => composition.WithCollectionBuilder<SearchableTreeCollectionBuilder>();
 
 
         #endregion

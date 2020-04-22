@@ -16,14 +16,14 @@ namespace Umbraco.Core.Logging
         // but it only has a pre-release NuGet package. So, we've got to use Serilog's code, which
         // means we cannot get rid of Serilog entirely. We may want to revisit this at some point.
 
+        // TODO: Do we still need this, is there a non-pre release package shipped?
+
         private static readonly Lazy<global::Serilog.ILogger> MinimalLogger = new Lazy<global::Serilog.ILogger>(() => new LoggerConfiguration().CreateLogger());
 
         public string Render(string messageTemplate, params object[] args)
         {
-            // by default, unless initialized otherwise, Log.Logger is SilentLogger which cannot bind message
-            // templates. Log.Logger is set to a true Logger when initializing Umbraco's logger, but in case
-            // that has not been done already - use a temp minimal logger (eg for tests).
-            var logger = Log.Logger as global::Serilog.Core.Logger ?? MinimalLogger.Value;
+            // resolve a minimal logger instance which is used to bind message templates
+            var logger = MinimalLogger.Value;
 
             var bound = logger.BindMessageTemplate(messageTemplate, args, out var parsedTemplate, out var boundProperties);
 

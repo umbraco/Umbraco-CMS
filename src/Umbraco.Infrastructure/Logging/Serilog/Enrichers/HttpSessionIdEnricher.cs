@@ -10,7 +10,7 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
     /// Original source - https://github.com/serilog-web/classic/blob/master/src/SerilogWeb.Classic/Classic/Enrichers/HttpSessionIdEnricher.cs
     /// Nupkg: 'Serilog.Web.Classic' contains handlers & extra bits we do not want
     /// </summary>
-    internal class HttpSessionIdEnricher : ILogEventEnricher
+    public class HttpSessionIdEnricher : ILogEventEnricher
     {
         private readonly ISessionIdResolver _sessionIdResolver;
 

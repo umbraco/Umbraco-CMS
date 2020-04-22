@@ -10,7 +10,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
     [TestFixture]
     public class PropertyTests
     {
-        private readonly PropertyBuilder _builder = new PropertyBuilder();
+        private PropertyBuilder _builder;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _builder = new PropertyBuilder();
+        }
 
         [Test]
         public void Can_Deep_Clone()

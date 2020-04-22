@@ -4,16 +4,28 @@ using NUnit.Framework;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Tests.Models
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
 {
     [TestFixture]
     public class PathValidationTests
     {
+        private EntitySlimBuilder _builder;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _builder = new EntitySlimBuilder();
+        }
+
         [Test]
         public void Validate_Path()
         {
-            var entity = new EntitySlim();
+            var entity = _builder
+                .WithoutIdentity()
+                .Build();
 
             //it's empty with no id so we need to allow it
             Assert.IsTrue(entity.ValidatePath());
@@ -37,7 +49,9 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Ensure_Path_Throws_Without_Id()
         {
-            var entity = new EntitySlim();
+            var entity = _builder
+                .WithoutIdentity()
+                .Build();
 
             //no id assigned
             Assert.Throws<InvalidOperationException>(() => entity.EnsureValidPath(Mock.Of<ILogger>(), umbracoEntity => new EntitySlim(), umbracoEntity => { }));
@@ -46,7 +60,10 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Ensure_Path_Throws_Without_Parent()
         {
-            var entity = new EntitySlim { Id = 1234 };
+            var entity = _builder
+                .WithId(1234)
+                .WithNoParentId()
+                .Build();
 
             //no parent found
             Assert.Throws<NullReferenceException>(() => entity.EnsureValidPath(Mock.Of<ILogger>(), umbracoEntity => null, umbracoEntity => { }));
@@ -55,12 +72,9 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Ensure_Path_Entity_At_Root()
         {
-            var entity = new EntitySlim
-            {
-                Id = 1234,
-                ParentId = -1
-            };
-
+            var entity = _builder
+                .WithId(1234)
+                .Build();
 
             entity.EnsureValidPath(Mock.Of<ILogger>(), umbracoEntity => null, umbracoEntity => { });
 
@@ -71,11 +85,10 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Ensure_Path_Entity_Valid_Parent()
         {
-            var entity = new EntitySlim
-            {
-                Id = 1234,
-                ParentId = 888
-            };
+            var entity = _builder
+                .WithId(1234)
+                .WithParentId(888)
+                .Build();
 
             entity.EnsureValidPath(Mock.Of<ILogger>(), umbracoEntity => umbracoEntity.ParentId == 888 ? new EntitySlim { Id = 888, Path = "-1,888" } : null, umbracoEntity => { });
 
@@ -86,29 +99,28 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Ensure_Path_Entity_Valid_Recursive_Parent()
         {
-            var parentA = new EntitySlim
-            {
-                Id = 999,
-                ParentId = -1
-            };
+            var parentA = _builder
+                .WithId(999)
+                .Build();
 
-            var parentB = new EntitySlim
-            {
-                Id = 888,
-                ParentId = 999
-            };
+            // Re-creating the class-level builder as we need to reset before usage when creating multiple entities.
+            _builder = new EntitySlimBuilder();
+            var parentB = _builder
+                .WithId(888)
+                .WithParentId(999)
+                .Build();
 
-            var parentC = new EntitySlim
-            {
-                Id = 777,
-                ParentId = 888
-            };
+            _builder = new EntitySlimBuilder();
+            var parentC = _builder
+                .WithId(777)
+                .WithParentId(888)
+                .Build();
 
-            var entity = new EntitySlim
-            {
-                Id = 1234,
-                ParentId = 777
-            };
+            _builder = new EntitySlimBuilder();
+            var entity = _builder
+                .WithId(1234)
+                .WithParentId(777)
+                .Build();
 
             Func<IUmbracoEntity, IUmbracoEntity> getParent = umbracoEntity =>
             {

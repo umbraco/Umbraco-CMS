@@ -5,14 +5,22 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
 
-namespace Umbraco.Tests.Models
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
 {
     [TestFixture]
     public class UserExtensionsTests
     {
+        private UserBuilder _userBuilder;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _userBuilder = new UserBuilder();
+        }
+
         [TestCase(-1, "-1", "-1,1,2,3,4,5", true)] // below root start node
         [TestCase(2, "-1,1,2", "-1,1,2,3,4,5", true)] // below start node
         [TestCase(5, "-1,1,2,3,4,5", "-1,1,2,3,4,5", true)] // at start node
@@ -24,9 +32,10 @@ namespace Umbraco.Tests.Models
 
         public void Determines_Path_Based_Access_To_Content(int startNodeId, string startNodePath, string contentPath, bool outcome)
         {
-            var userMock = new Mock<IUser>();
-            userMock.Setup(u => u.StartContentIds).Returns(new[] { startNodeId });
-            var user = userMock.Object;
+            var user = _userBuilder
+                .WithStartContentIds(new[] { startNodeId })
+                .Build();
+
             var content = Mock.Of<IContent>(c => c.Path == contentPath && c.Id == 5);
 
             var esmock = new Mock<IEntityService>();

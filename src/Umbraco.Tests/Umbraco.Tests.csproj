@@ -142,7 +142,6 @@
     <Compile Include="Models\ContentScheduleTests.cs" />
     <Compile Include="Models\CultureImpactTests.cs" />
     <Compile Include="Models\ImageProcessorImageUrlGeneratorTest.cs" />
-    <Compile Include="Models\PathValidationTests.cs" />
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
@@ -289,7 +288,6 @@
     <Compile Include="Migrations\Stubs\FourElevenMigration.cs" />
     <Compile Include="Migrations\Stubs\SixZeroMigration2.cs" />
     <Compile Include="Testing\TestingTests\MockTests.cs" />
-    <Compile Include="Models\MacroTests.cs" />
     <Compile Include="Models\Collections\Item.cs" />
     <Compile Include="Models\Collections\OrderItem.cs" />
     <Compile Include="Models\Collections\SimpleOrder.cs" />
@@ -297,7 +295,6 @@
     <Compile Include="Models\DeepCloneHelperTests.cs" />
     <Compile Include="Models\DictionaryTranslationTests.cs" />
     <Compile Include="Models\LightEntityTest.cs" />
-    <Compile Include="Models\UserTests.cs" />
     <Compile Include="Web\Mvc\RenderModelBinderTests.cs" />
     <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />
     <Compile Include="Web\Mvc\UmbracoViewPageTests.cs" />
@@ -314,7 +311,6 @@
     <Compile Include="Clr\ReflectionTests.cs" />
     <Compile Include="Macros\MacroParserTests.cs" />
     <Compile Include="Models\ContentExtensionsTests.cs" />
-    <Compile Include="Models\UserExtensionsTests.cs" />
     <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoBulkInsertTests.cs" />

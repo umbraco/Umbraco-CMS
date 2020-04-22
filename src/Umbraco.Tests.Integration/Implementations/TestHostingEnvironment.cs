@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 

@@ -3,7 +3,7 @@ using Umbraco.Core.Events;
 
 namespace Umbraco.Web
 {
-    internal class HybridEventMessagesAccessor : HybridAccessorBase<EventMessages>, IEventMessagesAccessor
+    public class HybridEventMessagesAccessor : HybridAccessorBase<EventMessages>, IEventMessagesAccessor
     {
         protected override string ItemKey => "Umbraco.Core.Events.HybridEventMessagesAccessor";
 

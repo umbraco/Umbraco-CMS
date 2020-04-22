@@ -48,6 +48,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var testKey = Guid.NewGuid();
             var testCreateDate = DateTime.Now.AddHours(-1);
             var testUpdateDate = DateTime.Now;
+            const int testFailedPasswordAttempts = 22;
             var testLastLockoutDate = DateTime.Now.AddHours(-2);
             var testLastLoginDate = DateTime.Now.AddHours(-3);
             var testLastPasswordChangeDate = DateTime.Now.AddHours(-4);
@@ -104,18 +105,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
                 .WithId(testId)
                 .WithKey(testKey)
                 .WithName(testName)
-                .WithUserName(testUsername)
-                .WithRawPasswordValue(testRawPasswordValue)
+                .WithLogin(testUsername, testRawPasswordValue)
                 .WithEmail(testEmail)
                 .WithCreatorId(testCreatorId)
                 .WithCreateDate(testCreateDate)
                 .WithUpdateDate(testUpdateDate)
-                .WithFailedPasswordAttempts(22)
                 .WithLevel(testLevel)
                 .WithPath(testPath)
+                .WithFailedPasswordAttempts(testFailedPasswordAttempts)
                 .WithIsApproved(testIsApproved)
-                .WithIsLockedOut(testIsLockedOut)
-                .WithLastLockoutDate(testLastLockoutDate)
+                .WithIsLockedOut(testIsLockedOut, testLastLockoutDate)
                 .WithLastLoginDate(testLastLoginDate)
                 .WithLastPasswordChangeDate(testLastPasswordChangeDate)
                 .WithSortOrder(testSortOrder)
@@ -146,6 +145,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             Assert.AreEqual(testCreateDate, member.CreateDate);
             Assert.AreEqual(testUpdateDate, member.UpdateDate);
             Assert.AreEqual(testCreatorId, member.CreatorId);
+            Assert.AreEqual(testFailedPasswordAttempts, member.FailedPasswordAttempts);
+            Assert.AreEqual(testIsApproved, member.IsApproved);
+            Assert.AreEqual(testIsLockedOut, member.IsLockedOut);
+            Assert.AreEqual(testLastLockoutDate, member.LastLockoutDate);
+            Assert.AreEqual(testLastLoginDate, member.LastLoginDate);
+            Assert.AreEqual(testLastPasswordChangeDate, member.LastPasswordChangeDate);
             Assert.AreEqual(testGroups, member.Groups.ToArray());
             Assert.AreEqual(10, member.Properties.Count);   // 7 from membership properties group, 3 custom
             Assert.AreEqual(testPropertyData1.Value, member.GetValue<string>(testPropertyData1.Key));

@@ -1,21 +1,19 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.Testing;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.PropertyEditors;
-using System;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Services.Implement;
+using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Tests.Integration.Testing;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -89,7 +87,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var user = UserBuilder.Build();
+                var user = UserBuilder.WithoutIdentity().Build();
                 repository.Save(user);
 
 
@@ -367,9 +365,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private User CreateAndCommitUserWithGroup(IUserRepository repository, IUserGroupRepository userGroupRepository)
         {
-            var user = UserBuilder.Build();
+            var user = UserBuilder.WithoutIdentity().Build();
             repository.Save(user);
-
 
             var group = UserGroupBuilder.Build();
             userGroupRepository.AddOrUpdateGroupWithUsers(@group, new[] { user.Id });
@@ -381,9 +378,9 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IUser[] CreateAndCommitMultipleUsers(IUserRepository repository)
         {
-            var user1 = UserBuilder.WithSuffix("1").Build();
-            var user2 = UserBuilder.WithSuffix("2").Build();
-            var user3 = UserBuilder.WithSuffix("3").Build();
+            var user1 = UserBuilder.WithoutIdentity().WithSuffix("1").Build();
+            var user2 = UserBuilder.WithoutIdentity().WithSuffix("2").Build();
+            var user3 = UserBuilder.WithoutIdentity().WithSuffix("3").Build();
             repository.Save(user1);
             repository.Save(user2);
             repository.Save(user3);

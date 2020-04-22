@@ -12,6 +12,7 @@ namespace Umbraco.Web.Mvc
     /// <remarks>
     /// Only minifies in release mode
     /// </remarks>
+    /// Migrated already to .Net Core
     public class MinifyJavaScriptResultAttribute : ActionFilterAttribute
     {
         private readonly IHostingEnvironment _hostingEnvironment;

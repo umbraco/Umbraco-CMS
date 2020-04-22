@@ -5,6 +5,7 @@ using Examine;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -16,6 +17,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Scoping;
+using Umbraco.Net;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
@@ -116,7 +118,7 @@ namespace Umbraco.Tests.Runtimes
         public class TestRuntime : CoreRuntime
         {
             public TestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
-                :base(configs, umbracoVersion, ioHelper, logger,  profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder())
+                :base(configs, umbracoVersion, ioHelper, logger,  profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), NoAppCache.Instance)
             {
 
             }
@@ -134,6 +136,7 @@ namespace Umbraco.Tests.Runtimes
             public override IFactory Configure(IRegister container)
             {
                 container.Register<IApplicationShutdownRegistry, AspNetApplicationShutdownRegistry>(Lifetime.Singleton);
+                container.Register<ISessionIdResolver, NullSessionIdResolver>(Lifetime.Singleton);
 
                 var factory = base.Configure(container);
                 return factory;

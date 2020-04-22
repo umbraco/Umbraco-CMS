@@ -2,18 +2,14 @@ using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Media;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Net;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
-using Umbraco.Infrastructure.Media;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Lifetime;
-using Umbraco.Web.Models.PublishedContent;
-using Umbraco.Web.PropertyEditors;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Templates;
+using Umbraco.Core.Diagnostics;
+using Umbraco.Web.Common.Runtime.Profiler;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Common.Runtime
 {
@@ -39,41 +35,20 @@ namespace Umbraco.Web.Common.Runtime
             composition.RegisterUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
 
             // The umbraco request lifetime
-            composition.RegisterUnique<UmbracoRequestLifetime>();
-            composition.RegisterUnique<IUmbracoRequestLifetimeManager>(factory => factory.GetInstance<UmbracoRequestLifetime>());
-            composition.RegisterUnique<IUmbracoRequestLifetime>(factory => factory.GetInstance<UmbracoRequestLifetime>());
+            composition.RegisterMultipleUnique<IUmbracoRequestLifetime, IUmbracoRequestLifetimeManager, UmbracoRequestLifetime>();
 
+
+            //Password hasher
             composition.RegisterUnique<IPasswordHasher, AspNetCorePasswordHasher>();
 
 
-            // register the http context and umbraco context accessors
-            // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
-            // we have no http context, eg when booting Umbraco or in background threads, so instead
-            // let's use an hybrid accessor that can fall back to a ThreadStatic context.
-            composition.RegisterUnique<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
+            composition.RegisterUnique<ICookieManager, AspNetCoreCookieManager>();
 
-            // register the umbraco context factory
-            // composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
-            composition.RegisterUnique<IPublishedUrlProvider, UrlProvider>();
+            composition.RegisterMultipleUnique<ISessionIdResolver, ISessionManager, AspNetCoreSessionManager>();
 
-            composition.RegisterUnique<HtmlLocalLinkParser>();
-            composition.RegisterUnique<HtmlImageSourceParser>();
-            composition.RegisterUnique<HtmlUrlParser>();
-            composition.RegisterUnique<RichTextEditorPastedImages>();
+            composition.RegisterUnique<IMarchal, AspNetCoreMarchal>();
 
-            composition.UrlProviders()
-                .Append<AliasUrlProvider>()
-                .Append<DefaultUrlProvider>();
-
-            composition.MediaUrlProviders()
-                .Append<DefaultMediaUrlProvider>();
-
-            composition.RegisterUnique<ISiteDomainHelper, SiteDomainHelper>();
-
-            // register properties fallback
-            composition.RegisterUnique<IPublishedValueFallback, PublishedValueFallback>();
-
-            composition.RegisterUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
+            composition.RegisterUnique<IProfilerHtml, WebProfilerHtml>();
         }
     }
 }
