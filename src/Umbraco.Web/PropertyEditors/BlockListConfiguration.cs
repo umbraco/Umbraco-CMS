@@ -47,6 +47,9 @@ namespace Umbraco.Web.PropertyEditors
             [JsonProperty("view")]
             public string View { get; set; }
 
+            [JsonProperty("stylesheet")]
+            public string Stylesheet { get; set; }
+
             [JsonProperty("label")]
             public string Label { get; set; }
 

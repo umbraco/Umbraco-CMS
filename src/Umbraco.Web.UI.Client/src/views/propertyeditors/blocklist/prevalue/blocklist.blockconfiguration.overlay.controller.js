@@ -108,12 +108,10 @@
                 treeAlias: "files",
                 entityType: "file",
                 isDialog: true,
-                filter: function (i) {
-                    return i.name.indexOf(".html" !== -1);
-                },
-                select: function (file) {
-                    console.log(file);
-                    block.view = file.name;
+                select: function (node) {
+                    console.log(node)
+                    const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
+                    block.view = filepath;
                     editorService.close();
                 },
                 close: function () {
@@ -139,6 +137,45 @@
         };
         vm.removeViewForBlock = function(block) {
             block.view = null;
+        };
+
+
+        
+        vm.addStylesheetForBlock = function(block) {
+            const filePicker = {
+                title: "Select Stylesheet (TODO need translation)",
+                section: "settings",
+                treeAlias: "files",
+                entityType: "file",
+                isDialog: true,
+                select: function (node) {
+                    const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
+                    block.stylesheet = filepath;
+                    editorService.close();
+                },
+                close: function () {
+                    editorService.close();
+                }
+            };
+            editorService.treePicker(filePicker);
+        }
+        vm.requestRemoveStylesheetForBlock = function(block) {
+            localizationService.localizeMany(["general_remove", "defaultdialogs_confirmremoveusageof"]).then(function (data) {
+                overlayService.confirmRemove({
+                    title: data[0],
+                    content: localizationService.tokenReplace(data[1], [block.stylesheet]),
+                    close: function () {
+                        overlayService.close();
+                    },
+                    submit: function () {
+                        vm.removeStylesheetForBlock(block);
+                        overlayService.close();
+                    }
+                });
+            });
+        };
+        vm.removeStylesheetForBlock = function(block) {
+            block.stylesheet = null;
         };
 
 

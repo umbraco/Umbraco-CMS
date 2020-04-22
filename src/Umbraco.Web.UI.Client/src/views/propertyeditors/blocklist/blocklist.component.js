@@ -1,6 +1,15 @@
 (function () {
     "use strict";
 
+
+    /**
+     * @ngdoc component
+     * @name Umbraco.Editors.BlockList.blockListPropertyEditor
+     * @function
+     *
+     * @description
+     * The component for the block list property editor.
+     */
     angular
         .module("umbraco")
         .component("blockListPropertyEditor", {
@@ -17,7 +26,7 @@
             }
         });
 
-    function BlockListController($scope, $interpolate, editorService, clipboardService, localizationService, overlayService, blockEditorService, contentResource, eventsService) {
+    function BlockListController($scope, $interpolate, editorService, clipboardService, localizationService, overlayService, blockEditorService) {
         
         var unsubscribe = [];
         var modelObject;
@@ -51,8 +60,12 @@
 
             vm.validationLimit = vm.model.config.validationLimit;
 
-            vm.listWrapperSyles = {'max-width': vm.model.config.maxPropertyWidth};
+            vm.listWrapperStyles = {};
             
+            if (vm.model.config.maxPropertyWidth) {
+                vm.listWrapperStyles['max-width'] = vm.model.config.maxPropertyWidth;
+            }
+
             // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
             if(typeof vm.model.value !== 'object' || vm.model.value === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
                 vm.model.value = {};
@@ -123,7 +136,7 @@
             if (block === null) return null;
 
             // Lets apply fallback views, and make the view available directly on the blockModel.
-            block.view = block.config.view || (vm.model.config.useInlineEditingAsDefault ? "views/blockelements/inlineblock/inlineblock.editor.html" : "views/blockelements/labelblock/labelblock.editor.html");
+            block.view = (block.config.view ? "/" + block.config.view : (vm.model.config.useInlineEditingAsDefault ? "views/blockelements/inlineblock/inlineblock.editor.html" : "views/blockelements/labelblock/labelblock.editor.html"));
 
             block.showSettings = block.config.settingsElementTypeAlias != null;
 
@@ -185,7 +198,7 @@
         }
 
         function editBlock(blockModel, hideContent) {
-            
+
             // make a clone to avoid editing model directly.
             var blockContentModelClone = angular.copy(blockModel.content);
             var blockSettingsModelClone = null;
@@ -281,7 +294,6 @@
 
             var singleEntriesForPaste = clipboardService.retriveEntriesOfType("elementType", vm.availableContentTypes);
             singleEntriesForPaste.forEach(function (entry) {
-                console.log("paste Entry: ", entry)
                 blockPickerModel.clipboardItems.push(
                     {
                         type: "elementType",

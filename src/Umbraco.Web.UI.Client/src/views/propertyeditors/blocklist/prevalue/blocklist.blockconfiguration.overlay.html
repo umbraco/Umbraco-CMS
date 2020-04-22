@@ -54,6 +54,27 @@
                                 </div>
                             </div>
 
+                            <!-- custom stylesheet -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="iconcolor"><localize key="blockEditor_labelCustomStylesheet">Custom stylesheet</localize></label>
+                                    <div class="controls">
+                                        <div class="__settings-input --hasValue" ng-if="vm.block.stylesheet !== null" >
+
+                                            <umb-node-preview icon="'icon-document'" name="vm.block.stylesheet"></umb-node-preview>
+                                            <div class="__control-actions">
+                                                <button type="button" class="btn-reset __control-actions-btn --remove umb-outline" ng-click="vm.requestRemoveStylesheetForBlock(vm.block)">
+                                                    <i class="icon icon-wrong"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn-reset __settings-input --noValue umb-outline" ng-if="vm.block.stylesheet === null" ng-click="vm.addStylesheetForBlock(vm.block)">
+                                            <localize key="blockEditor_addCustomStylesheet">Add custom stylesheet</localize>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- editor overlay size -->
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
