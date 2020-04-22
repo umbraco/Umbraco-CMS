@@ -11,6 +11,9 @@ namespace Umbraco.Core.Services
         IEnumerable<string> GetAllRoles();
         IEnumerable<string> GetAllRoles(int memberId);
         IEnumerable<string> GetAllRoles(string username);
+        IEnumerable<int> GetAllRolesIds();
+        IEnumerable<int> GetAllRolesIds(int memberId);
+        IEnumerable<int> GetAllRolesIds(string username);
         IEnumerable<T> GetMembersInRole(string roleName);
         IEnumerable<T> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
         bool DeleteRole(string roleName, bool throwIfBeingUsed);

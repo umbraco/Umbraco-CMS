@@ -140,7 +140,7 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
                     returnPath = encodeURIComponent($location.url());
                 }
 
-                $location.path(rejection.path);
+                $location.path(rejection.path)
                 if (returnPath) {
                     $location.search("returnPath", returnPath);
                 }
