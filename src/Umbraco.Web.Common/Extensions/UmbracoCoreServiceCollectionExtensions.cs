@@ -130,7 +130,7 @@ namespace Umbraco.Web.Common.Extensions
             IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder)
         {
-            var connectionStringConfig = configs.ConnectionStrings()[Constants.System.UmbracoConnectionName];
+            var connectionStringConfig = configs.ConnectionStrings()[Core.Constants.System.UmbracoConnectionName];
             var dbProviderFactoryCreator = new SqlServerDbProviderFactoryCreator(
                 connectionStringConfig?.ProviderName,
                 DbProviderFactories.GetFactory);
@@ -185,7 +185,7 @@ namespace Umbraco.Web.Common.Extensions
         public static IServiceCollection AddUmbracoRuntimeMinifier(this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddSmidge(configuration.GetSection(Constants.Configuration.ConfigRuntimeMinification));
+            services.AddSmidge(configuration.GetSection(Core.Constants.Configuration.ConfigRuntimeMinification));
             services.AddSmidgeNuglify();
 
             return services;

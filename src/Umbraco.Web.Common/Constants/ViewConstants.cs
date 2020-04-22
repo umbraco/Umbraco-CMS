@@ -1,10 +1,9 @@
-﻿namespace Umbraco.Web.Mvc
+﻿namespace Umbraco.Web.Common.Constants
 {
     /// <summary>
     /// constants
     /// </summary>
-    /// Migrated already to .Net Core
-    internal static class Constants
+    internal static class ViewConstants
     {
         internal const string ViewLocation = "~/Views";
 
