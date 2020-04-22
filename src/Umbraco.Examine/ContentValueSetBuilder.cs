@@ -89,7 +89,7 @@ namespace Umbraco.Examine
                     {"path", c.Path?.Yield() ?? Enumerable.Empty<string>()},
                     {"nodeType", c.ContentType.Id.ToString().Yield() ?? Enumerable.Empty<string>()},
                     {"creatorName", (creatorIds.TryGetValue(c.CreatorId, out var creatorProfile) ? creatorProfile.Name : "??").Yield() },
-                    {"writerName", (writerIds.TryGetValue(c.CreatorId, out var writerProfile) ? writerProfile.Name : "??").Yield() },
+                    {"writerName", (writerIds.TryGetValue(c.WriterId, out var writerProfile) ? writerProfile.Name : "??").Yield() },
                     {"writerID", new object[] {c.WriterId}},
                     {"templateID", new object[] {c.TemplateId ?? 0}},
                     {UmbracoContentIndex.VariesByCultureFieldName, new object[] {"n"}},
