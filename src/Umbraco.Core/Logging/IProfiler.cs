@@ -2,18 +2,12 @@
 
 namespace Umbraco.Core.Logging
 {
+
     /// <summary>
     /// Defines the profiling service.
     /// </summary>
     public interface IProfiler
     {
-        /// <summary>
-        /// Renders the profiling results.
-        /// </summary>
-        /// <returns>The profiling results.</returns>
-        /// <remarks>Generally used for HTML rendering.</remarks>
-        string Render();
-
         /// <summary>
         /// Gets an <see cref="IDisposable"/> that will time the code between its creation and disposal.
         /// </summary>

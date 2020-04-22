@@ -4,7 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog.Context;
 using Smidge;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
+using Umbraco.Infrastructure.Logging.Serilog.Enrichers;
 using Umbraco.Web.Common.Middleware;
 
 namespace Umbraco.Web.BackOffice.AspNetCore
@@ -32,6 +34,10 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
             var runtimeShutdown = new CoreRuntimeShutdown(runtime, hostLifetime);
             hostLifetime.RegisterObject(runtimeShutdown);
+
+            // Register our global threadabort enricher for logging
+            var threadAbortEnricher = app.ApplicationServices.GetRequiredService<ThreadAbortExceptionEnricher>();
+            LogContext.Push(threadAbortEnricher); // NOTE: We are not in a using clause because we are not removing it, it is on the global context
 
             // Start the runtime!
             runtime.Start();

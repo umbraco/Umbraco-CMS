@@ -91,7 +91,8 @@ namespace Umbraco.Web.UI.BackOffice
                 });
                 endpoints.MapGet("/", async context =>
                 {
-                    await context.Response.WriteAsync($"<html><body>Hello World!{Current.Profiler.Render()}</body></html>");
+                    var profilerHtml = app.ApplicationServices.GetRequiredService<IProfilerHtml>();
+                    await context.Response.WriteAsync($"<html><body>Hello World!{profilerHtml.Render()}</body></html>");
                 });
             });
         }

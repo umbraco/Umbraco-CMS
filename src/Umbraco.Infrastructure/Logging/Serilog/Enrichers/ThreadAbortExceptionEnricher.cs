@@ -7,7 +7,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Hosting;
 
-namespace Umbraco.Core.Logging.Serilog
+namespace Umbraco.Infrastructure.Logging.Serilog.Enrichers
 {
     /// <summary>
     /// Enriches the log if there are ThreadAbort exceptions and will automatically create a minidump if it can
@@ -54,7 +54,6 @@ namespace Umbraco.Core.Logging.Serilog
                 logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("ThreadAbortExceptionInfo", message));
             }
             else
-            {
                 try
                 {
                     var dumped = MiniDump.Dump(_marchal, _hostingEnvironment, withException: true);
@@ -68,7 +67,6 @@ namespace Umbraco.Core.Logging.Serilog
                     message = "Failed to create a minidump. " + ex;
                     logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("ThreadAbortExceptionInfo", message));
                 }
-            }
         }
 
         private static bool IsTimeoutThreadAbortException(Exception exception)
@@ -93,6 +91,6 @@ namespace Umbraco.Core.Logging.Serilog
             return stacktrace.Contains("System.Threading.Monitor.ReliableEnter");
         }
 
-       
+
     }
 }

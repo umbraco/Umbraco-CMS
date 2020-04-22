@@ -10,14 +10,19 @@ namespace Umbraco.Web.Common.Middleware
     public class UmbracoRequestLoggingMiddleware
     {
         readonly RequestDelegate _next;
-        private readonly ISessionIdResolver _sessionIdResolver;
-        private readonly IRequestCache _requestCache;
+        private readonly HttpSessionIdEnricher _sessionIdEnricher;
+        private readonly HttpRequestNumberEnricher _requestNumberEnricher;
+        private readonly HttpRequestIdEnricher _requestIdEnricher;        
 
-        public UmbracoRequestLoggingMiddleware(RequestDelegate next, ISessionIdResolver sessionIdResolver, IRequestCache requestCache)
+        public UmbracoRequestLoggingMiddleware(RequestDelegate next,
+            HttpSessionIdEnricher sessionIdEnricher,
+            HttpRequestNumberEnricher requestNumberEnricher,
+            HttpRequestIdEnricher requestIdEnricher)
         {
             _next = next;
-            _sessionIdResolver = sessionIdResolver;
-            _requestCache = requestCache;
+            _sessionIdEnricher = sessionIdEnricher;
+            _requestNumberEnricher = requestNumberEnricher;
+            _requestIdEnricher = requestIdEnricher;
         }
 
         public async Task Invoke(HttpContext httpContext)
@@ -25,9 +30,9 @@ namespace Umbraco.Web.Common.Middleware
             // TODO: Need to decide if we want this stuff still, there's new request logging in serilog:
             // https://github.com/serilog/serilog-aspnetcore#request-logging which i think would suffice and replace all of this?
 
-            using (LogContext.Push(new HttpSessionIdEnricher(_sessionIdResolver)))
-            using (LogContext.Push(new HttpRequestNumberEnricher(_requestCache)))
-            using (LogContext.Push(new HttpRequestIdEnricher(_requestCache)))
+            using (LogContext.Push(_sessionIdEnricher))
+            using (LogContext.Push(_requestNumberEnricher))
+            using (LogContext.Push(_requestIdEnricher))
             {
                 await _next(httpContext);
             }

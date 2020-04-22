@@ -19,11 +19,6 @@ namespace Umbraco.Tests.TestHelpers.Stubs
 
         private static bool _enabled;
 
-        public string Render()
-        {
-            return string.Empty;
-        }
-
         public IDisposable Step(string name)
         {
             return _enabled ? MiniProfiler.Current.Step(name) : null;

@@ -7,6 +7,9 @@ using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Lifetime;
+using Umbraco.Core.Diagnostics;
+using Umbraco.Web.Common.Runtime.Profiler;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Common.Runtime
 {
@@ -42,6 +45,10 @@ namespace Umbraco.Web.Common.Runtime
             composition.RegisterUnique<ICookieManager, AspNetCoreCookieManager>();
 
             composition.RegisterMultipleUnique<ISessionIdResolver, ISessionManager, AspNetCoreSessionManager>();
+
+            composition.RegisterUnique<IMarchal, AspNetCoreMarchal>();
+
+            composition.RegisterUnique<IProfilerHtml, WebProfilerHtml>();
         }
     }
 }

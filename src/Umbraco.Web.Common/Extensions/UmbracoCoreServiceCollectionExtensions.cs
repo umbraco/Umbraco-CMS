@@ -177,14 +177,11 @@ namespace Umbraco.Web.Common.Extensions
             // TODO: We need to avoid this, surely there's a way? See ContainerTests.BuildServiceProvider_Before_Host_Is_Configured
             var serviceProvider = services.BuildServiceProvider();
 
-            var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
-
             configs = serviceProvider.GetService<Configs>();
             if (configs == null)
                 throw new InvalidOperationException($"Could not resolve type {typeof(Configs)} from the container, ensure {nameof(AddUmbracoConfiguration)} is called before calling {nameof(AddUmbracoCore)}");
 
             var hostingSettings = configs.Hosting();
-            var coreDebug = configs.CoreDebug();
             var globalSettings = configs.Global();
 
             hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment);
@@ -192,7 +189,7 @@ namespace Umbraco.Web.Common.Extensions
             logger = AddLogger(services, hostingEnvironment, loggingConfiguration);
 
             backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
-            profiler = GetWebProfiler(hostingEnvironment, httpContextAccessor);
+            profiler = GetWebProfiler(hostingEnvironment);
 
             return services;
         }
@@ -238,7 +235,7 @@ namespace Umbraco.Web.Common.Extensions
             return services;
         }
 
-        private static IProfiler GetWebProfiler(Umbraco.Core.Hosting.IHostingEnvironment hostingEnvironment, IHttpContextAccessor httpContextAccessor)
+        private static IProfiler GetWebProfiler(Umbraco.Core.Hosting.IHostingEnvironment hostingEnvironment)
         {
             // create and start asap to profile boot
             if (!hostingEnvironment.IsDebugMode)
@@ -248,7 +245,7 @@ namespace Umbraco.Web.Common.Extensions
                 return new VoidProfiler();
             }
 
-            var webProfiler = new WebProfiler(httpContextAccessor);
+            var webProfiler = new WebProfiler();
             webProfiler.StartBoot();
 
             return webProfiler;
