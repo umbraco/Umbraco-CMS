@@ -13,9 +13,9 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
     /// Original source - https://github.com/serilog-web/classic/blob/master/src/SerilogWeb.Classic/Classic/Enrichers/HttpRequestNumberEnricher.cs
     /// Nupkg: 'Serilog.Web.Classic' contains handlers & extra bits we do not want
     /// </summary>
-    internal class HttpRequestNumberEnricher : ILogEventEnricher
+    public class HttpRequestNumberEnricher : ILogEventEnricher
     {
-        private readonly Func<IRequestCache> _requestCacheGetter;
+        private readonly IRequestCache _requestCache;
         private static int _lastRequestNumber;
         private static readonly string _requestNumberItemName = typeof(HttpRequestNumberEnricher).Name + "+RequestNumber";
 
@@ -25,9 +25,9 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
         private const string _httpRequestNumberPropertyName = "HttpRequestNumber";
 
 
-        public HttpRequestNumberEnricher(Func<IRequestCache> requestCacheGetter)
+        public HttpRequestNumberEnricher(IRequestCache requestCache)
         {
-            _requestCacheGetter = requestCacheGetter;
+            _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
         }
 
         /// <summary>
@@ -39,10 +39,7 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
         {
             if (logEvent == null) throw new ArgumentNullException(nameof(logEvent));
 
-            var requestCache = _requestCacheGetter();
-            if (requestCache is null) return;
-
-            var requestNumber = requestCache.Get(_requestNumberItemName,
+            var requestNumber = _requestCache.Get(_requestNumberItemName,
                     () => Interlocked.Increment(ref _lastRequestNumber));
 
             var requestNumberProperty = new LogEventProperty(_httpRequestNumberPropertyName, new ScalarValue(requestNumber));

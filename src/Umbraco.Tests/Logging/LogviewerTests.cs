@@ -1,9 +1,11 @@
 ﻿using Moq;
 using NUnit.Framework;
+using Serilog;
 using System;
 using System.IO;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Viewer;
 using Umbraco.Tests.TestHelpers;
 
@@ -35,8 +37,10 @@ namespace Umbraco.Tests.Logging
             var ioHelper = TestHelper.IOHelper;
             var hostingEnv = TestHelper.GetHostingEnvironment();
 
+            var loggingConfiguration = TestHelper.GetLoggingConfiguration(hostingEnv);
+
             var exampleLogfilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Logging\", _logfileName);
-            _newLogfileDirPath = Path.Combine(hostingEnv.ApplicationPhysicalPath, @"App_Data\Logs\");
+            _newLogfileDirPath = loggingConfiguration.LogDirectory;
             _newLogfilePath = Path.Combine(_newLogfileDirPath, _logfileName);
 
             var exampleSearchfilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Logging\", _searchfileName);
@@ -53,7 +57,7 @@ namespace Umbraco.Tests.Logging
 
             var logger = Mock.Of<Core.Logging.ILogger>();
             var logViewerConfig = new LogViewerConfig(hostingEnv);
-            _logViewer = new JsonLogViewer(logger, logViewerConfig, hostingEnv);
+            _logViewer = new SerilogJsonLogViewer(logger, logViewerConfig, loggingConfiguration, Log.Logger);
         }
 
         [OneTimeTearDown]

@@ -10,23 +10,20 @@ using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Logging.Viewer
 {
-    internal class JsonLogViewer : LogViewerSourceBase
+    internal class SerilogJsonLogViewer : SerilogLogViewerSourceBase
     {
         private readonly string _logsPath;
         private readonly ILogger _logger;
-        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public JsonLogViewer(ILogger logger, ILogViewerConfig logViewerConfig, IHostingEnvironment hostingEnvironment) : base(logViewerConfig)
+        public SerilogJsonLogViewer(
+            ILogger logger,
+            ILogViewerConfig logViewerConfig,
+            ILoggingConfiguration loggingConfiguration,
+            global::Serilog.ILogger serilogLog)
+            : base(logViewerConfig, serilogLog)
         {
-            _hostingEnvironment = hostingEnvironment;
             _logger = logger;
-
-            // TODO: this path is hard coded but it can actually be configured, but that is done via Serilog and we don't have a different abstraction/config
-            // for the logging path. We could make that, but then how would we get that abstraction into the Serilog config? I'm sure there is a way but
-            // don't have time right now to resolve that (since this was hard coded before). We could have a single/simple ILogConfig for umbraco that purely specifies
-            // the logging path and then we can have a special token that we replace in the serilog config that maps to that location? then at least we could inject
-            // that config in places where we are hard coding this path.
-            _logsPath = Path.Combine(_hostingEnvironment.ApplicationPhysicalPath, @"App_Data\Logs\");
+            _logsPath = loggingConfiguration.LogDirectory;
         }
 
         private const int FileSizeCap = 100;
@@ -133,7 +130,7 @@ namespace Umbraco.Core.Logging.Viewer
             {
                 // As we are reading/streaming one line at a time in the JSON file
                 // Thus we can not report the line number, as it will always be 1
-                _logger.Error<JsonLogViewer>(ex, "Unable to parse a line in the JSON log file");
+                _logger.Error<SerilogJsonLogViewer>(ex, "Unable to parse a line in the JSON log file");
 
                 evt = null;
                 return true;

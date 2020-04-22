@@ -10,7 +10,7 @@ namespace Umbraco.Core.Logging.Viewer
         public void Compose(Composition composition)
         {
             composition.RegisterUnique<ILogViewerConfig, LogViewerConfig>();
-            composition.SetLogViewer<JsonLogViewer>();
+            composition.SetLogViewer<SerilogJsonLogViewer>();
         }
     }
 }

@@ -54,6 +54,7 @@ namespace Umbraco.Web.UI.BackOffice
             });
 
             //Finally initialize Current
+            // TODO: This should be moved to the UmbracoServiceProviderFactory when the container is cross-wired and then don't use the overload above to `out var factory`
             Current.Initialize(
                 factory.GetInstance<ILogger> (),
                 factory.GetInstance<Configs>(),
@@ -76,6 +77,7 @@ namespace Umbraco.Web.UI.BackOffice
                 app.UseDeveloperExceptionPage();
             }
             app.UseUmbracoCore();
+            app.UseUmbracoRequestLogging();
             app.UseUmbracoWebsite();
             app.UseUmbracoBackOffice();
             app.UseRouting();

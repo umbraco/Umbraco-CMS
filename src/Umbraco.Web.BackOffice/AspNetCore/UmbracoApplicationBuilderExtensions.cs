@@ -1,9 +1,11 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog.Context;
 using Smidge;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
+using Umbraco.Web.Common.Middleware;
 
 namespace Umbraco.Web.BackOffice.AspNetCore
 {
@@ -62,6 +64,15 @@ namespace Umbraco.Web.BackOffice.AspNetCore
                 }
 
             }
+        }
+
+        public static IApplicationBuilder UseUmbracoRequestLogging(this IApplicationBuilder app)
+        {
+            if (app == null) throw new ArgumentNullException(nameof(app));
+
+            app.UseMiddleware<UmbracoRequestLoggingMiddleware>();
+
+            return app;
         }
 
         public static IApplicationBuilder UseUmbracoRuntimeMinification(this IApplicationBuilder app)

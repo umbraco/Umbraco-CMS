@@ -108,7 +108,7 @@ namespace Umbraco.Tests.Integration.Testing
 
                     // Add it!
                     services.AddUmbracoConfiguration(hostContext.Configuration);
-                    services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly, out _);
+                    services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly, testHelper.GetLoggingConfiguration(), out _);
                 });
 
             var host = await hostBuilder.StartAsync();

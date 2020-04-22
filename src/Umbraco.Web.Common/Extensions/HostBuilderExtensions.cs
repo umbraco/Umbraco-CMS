@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Hosting;
-using Serilog;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Common.Extensions
@@ -13,8 +12,7 @@ namespace Umbraco.Web.Common.Extensions
         /// <returns></returns>
         public static IHostBuilder UseUmbraco(this IHostBuilder builder)
         {
-            return builder
-                .UseSerilog()
+            return builder            
                 .UseUmbraco(new UmbracoServiceProviderFactory());
         }
     }

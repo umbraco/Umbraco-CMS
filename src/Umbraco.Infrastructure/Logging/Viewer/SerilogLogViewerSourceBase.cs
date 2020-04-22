@@ -8,13 +8,15 @@ using Umbraco.Core.Models;
 namespace Umbraco.Core.Logging.Viewer
 {
 
-    public abstract class LogViewerSourceBase : ILogViewer
+    public abstract class SerilogLogViewerSourceBase : ILogViewer
     {
         private readonly ILogViewerConfig _logViewerConfig;
+        private readonly global::Serilog.ILogger _serilogLog;
 
-        protected LogViewerSourceBase(ILogViewerConfig logViewerConfig)
+        protected SerilogLogViewerSourceBase(ILogViewerConfig logViewerConfig, global::Serilog.ILogger serilogLog)
         {            
             _logViewerConfig = logViewerConfig;
+            _serilogLog = serilogLog;
         }
 
         public abstract bool CanHandleLargeLogs { get; }
@@ -48,7 +50,7 @@ namespace Umbraco.Core.Logging.Viewer
         /// <returns></returns>
         public string GetLogLevel()
         {
-            var logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>().Where(Log.Logger.IsEnabled)?.Min() ?? null;
+            var logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>().Where(_serilogLog.IsEnabled)?.Min() ?? null;
             return logLevel?.ToString() ?? "";
         }
 
