@@ -40,7 +40,7 @@ namespace Umbraco.Web.Security
         public Func<BackOfficeIdentityUser, ExternalLoginInfo, bool> OnExternalLogin { get; set; }
 
 
-        /// <summary>B
+        /// <summary>
         /// The default User group aliases to use for auto-linking users
         /// </summary>
         /// <param name="umbracoContext"></param>

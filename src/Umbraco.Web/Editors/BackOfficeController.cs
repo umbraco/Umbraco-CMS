@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
 using Umbraco.Core;
@@ -31,7 +32,6 @@ using Umbraco.Core.Runtime;
 using Umbraco.Core.WebAssets;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebAssets;
-using UserLoginInfo = Microsoft.AspNetCore.Identity.UserLoginInfo;
 
 namespace Umbraco.Web.Editors
 {
