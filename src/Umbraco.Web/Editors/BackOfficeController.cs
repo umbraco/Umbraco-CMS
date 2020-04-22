@@ -300,7 +300,7 @@ namespace Umbraco.Web.Editors
             var user = await UserManager.FindByIdAsync(userId.ToString());
             if (user != null)
             {
-                var result = await UserManager.VerifyUserTokenAsync(user, "ResetPassword", "ResetPassword", resetCode); // TODO: SB: password reset token provider
+                var result = await UserManager.VerifyUserTokenAsync(user, "ResetPassword", "ResetPassword", resetCode);
                 if (result)
                 {
                     //Add a flag and redirect for it to be displayed

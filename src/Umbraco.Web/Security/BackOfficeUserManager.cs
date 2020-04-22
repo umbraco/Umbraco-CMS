@@ -164,20 +164,24 @@ namespace Umbraco.Web.Security
             BackOfficeUserManager<T> manager,
             IDataProtectionProvider dataProtectionProvider)
         {
-            //use a custom hasher based on our membership provider
+            // use a custom hasher based on our membership provider
             PasswordHasher = GetDefaultPasswordHasher(PasswordConfiguration);
 
-            // TODO: SB: manager.Options.Tokens using OWIN data protector - what about the other providers???
-            // https://github.com/dotnet/aspnetcore/blob/0a0e1ea0cdbe29f2fcd2291b900db98597387d77/src/Identity/Core/src/IdentityBuilderExtensions.cs#L28
+            // set OWIN data protection token provider as default
             if (dataProtectionProvider != null)
             {
                 manager.RegisterTokenProvider(
-                    "Default",
+                    TokenOptions.DefaultProvider,
                     new OwinDataProtectorTokenProvider<T>(dataProtectionProvider.Create("ASP.NET Identity"))
                     {
                         TokenLifespan = TimeSpan.FromDays(3)
                     });
             }
+
+            // register ASP.NET Core Identity token providers
+            manager.RegisterTokenProvider(TokenOptions.DefaultEmailProvider, new EmailTokenProvider<T>());
+            manager.RegisterTokenProvider(TokenOptions.DefaultPhoneProvider, new PhoneNumberTokenProvider<T>());
+            manager.RegisterTokenProvider(TokenOptions.DefaultAuthenticatorProvider, new AuthenticatorTokenProvider<T>());
         }
 
         /// <summary>
