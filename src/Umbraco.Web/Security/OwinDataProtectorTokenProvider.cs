@@ -15,6 +15,7 @@ namespace Umbraco.Web.Security
     public class OwinDataProtectorTokenProvider<TUser> : IUserTwoFactorTokenProvider<TUser> where TUser : BackOfficeIdentityUser
     {
         public TimeSpan TokenLifespan { get; set; }
+        private static readonly Encoding _defaultEncoding = new UTF8Encoding(false, true);
         private readonly IDataProtector _protector;
 
         public OwinDataProtectorTokenProvider(IDataProtector protector)
@@ -25,12 +26,13 @@ namespace Umbraco.Web.Security
 
         public async Task<string> GenerateAsync(string purpose, UserManager<TUser> manager, TUser user)
         {
+            if (manager == null) throw new ArgumentNullException(nameof(manager));
             if (user == null) throw new ArgumentNullException(nameof(user));
 
             var ms = new MemoryStream();
-            using (var writer = ms.CreateWriter())
+            using (var writer = new BinaryWriter(ms, _defaultEncoding, true))
             {
-                writer.Write(DateTimeOffset.UtcNow);
+                writer.Write(DateTimeOffset.UtcNow.UtcTicks);
                 writer.Write(Convert.ToString(user.Id, CultureInfo.InvariantCulture));
                 writer.Write(purpose ?? "");
 
@@ -48,13 +50,17 @@ namespace Umbraco.Web.Security
 
         public async Task<bool> ValidateAsync(string purpose, string token, UserManager<TUser> manager, TUser user)
         {
+            if (string.IsNullOrWhiteSpace(token)) throw new ArgumentNullException(nameof(token));
+            if (manager == null) throw new ArgumentNullException(nameof(manager));
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
             try
             {
                 var unprotectedData = _protector.Unprotect(Convert.FromBase64String(token));
                 var ms = new MemoryStream(unprotectedData);
-                using (var reader = ms.CreateReader())
+                using (var reader = new BinaryReader(ms, _defaultEncoding, true))
                 {
-                    var creationTime = reader.ReadDateTimeOffset();
+                    var creationTime = new DateTimeOffset(reader.ReadInt64(), TimeSpan.Zero);
                     var expirationTime = creationTime + TokenLifespan;
                     if (expirationTime < DateTimeOffset.UtcNow)
                     {
@@ -101,31 +107,6 @@ namespace Umbraco.Web.Security
         {
             // This token provider is designed for flows such as password reset and account confirmation
             return Task.FromResult(false);
-        }
-    }
-
-    internal static class StreamExtensions
-    {
-        private static readonly Encoding DefaultEncoding = new UTF8Encoding(false, true);
-
-        public static BinaryReader CreateReader(this Stream stream)
-        {
-            return new BinaryReader(stream, DefaultEncoding, true);
-        }
-
-        public static BinaryWriter CreateWriter(this Stream stream)
-        {
-            return new BinaryWriter(stream, DefaultEncoding, true);
-        }
-
-        public static DateTimeOffset ReadDateTimeOffset(this BinaryReader reader)
-        {
-            return new DateTimeOffset(reader.ReadInt64(), TimeSpan.Zero);
-        }
-
-        public static void Write(this BinaryWriter writer, DateTimeOffset value)
-        {
-            writer.Write(value.UtcTicks);
         }
     }
 }

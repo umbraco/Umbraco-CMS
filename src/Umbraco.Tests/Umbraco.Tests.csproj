@@ -149,6 +149,8 @@
     <Compile Include="Security\BackOfficeClaimsPrincipalFactoryTests.cs" />
     <Compile Include="Persistence\Repositories\KeyValueRepositoryTests.cs" />
     <Compile Include="Security\BackOfficeUserManagerTests.cs" />
+    <Compile Include="Security\NopLookupNormalizerTests.cs" />
+    <Compile Include="Security\OwinDataProtectorTokenProviderTests.cs" />
     <Compile Include="Security\UmbracoSecurityStampValidatorTests.cs" />
     <Compile Include="Services\KeyValueServiceTests.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
