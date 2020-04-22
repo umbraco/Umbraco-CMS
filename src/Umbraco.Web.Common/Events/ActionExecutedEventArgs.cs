@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Web.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
-namespace Umbraco.Web.Mvc
+namespace Umbraco.Web.Common.Events
 {
-    /// Migrated already to .Net Core
     public class ActionExecutedEventArgs : EventArgs
     {
         public Controller Controller { get; set; }

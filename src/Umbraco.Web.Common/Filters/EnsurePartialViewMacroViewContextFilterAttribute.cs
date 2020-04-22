@@ -1,7 +1,14 @@
 ﻿using System.IO;
-using System.Web.Mvc;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Umbraco.Web.Common.Constants;
+using Umbraco.Web.Common.Controllers;
 
-namespace Umbraco.Web.Mvc
+namespace Umbraco.Web.Common.Filters
 {
     /// <summary>
     /// This is a special filter which is required for the RTE to be able to render Partial View Macros that
@@ -19,22 +26,23 @@ namespace Umbraco.Web.Mvc
     /// this DataToken exists before the action executes in case the developer resolves an RTE value that contains
     /// a partial view macro form.
     /// </remarks>
-    /// Migrated already to .Net Core
-    internal class EnsurePartialViewMacroViewContextFilterAttribute : ActionFilterAttribute
+    public class EnsurePartialViewMacroViewContextFilterAttribute : ActionFilterAttribute
     {
+        
         /// <summary>
         /// Ensures the custom ViewContext datatoken is set before the RenderController action is invoked,
         /// this ensures that any calls to GetPropertyValue with regards to RTE or Grid editors can still
         /// render any PartialViewMacro with a form and maintain ModelState
         /// </summary>
-        /// <param name="filterContext"></param>
-        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        /// <param name="context"></param>
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
-            //ignore anything that is not IRenderController
-            if ((filterContext.Controller is IRenderController) == false && filterContext.IsChildAction == false)
-                return;
+            if (!(context.Controller is Controller controller)) return;
 
-            SetViewContext(filterContext);
+            //ignore anything that is not IRenderController
+            if (!(controller is RenderController)) return;
+
+            SetViewContext(context, controller);
         }
 
         /// <summary>
@@ -42,33 +50,39 @@ namespace Umbraco.Web.Mvc
         /// this ensures that any custom ModelState that may have been added in the RenderController itself is
         /// passed onwards in case it is required when rendering a PartialViewMacro with a form
         /// </summary>
-        /// <param name="filterContext">The filter context.</param>
-        public override void OnResultExecuting(ResultExecutingContext filterContext)
+        /// <param name="context">The filter context.</param>
+        public override void OnResultExecuting(ResultExecutingContext context)
         {
-            //ignore anything that is not IRenderController
-            if ((filterContext.Controller is IRenderController) == false && filterContext.IsChildAction == false)
-                return;
+            if (!(context.Controller is Controller controller)) return;
 
-            SetViewContext(filterContext);
+            //ignore anything that is not IRenderController
+            if (!(controller is RenderController)) return;
+
+            SetViewContext(context, controller);
         }
 
-        private void SetViewContext(ControllerContext controllerContext)
+        private void SetViewContext(ActionContext context, Controller controller)
         {
             var viewCtx = new ViewContext(
-                controllerContext,
+                context,
                 new DummyView(),
-                controllerContext.Controller.ViewData, controllerContext.Controller.TempData,
-                new StringWriter());
+                controller.ViewData,
+                controller.TempData,
+                new StringWriter(),
+                new HtmlHelperOptions());
 
             //set the special data token
-            controllerContext.RequestContext.RouteData.DataTokens[Constants.DataTokenCurrentViewContext] = viewCtx;
+            context.RouteData.DataTokens[ViewConstants.DataTokenCurrentViewContext] = viewCtx;
         }
 
         private class DummyView : IView
         {
-            public void Render(ViewContext viewContext, TextWriter writer)
+            public Task RenderAsync(ViewContext context)
             {
+                return Task.CompletedTask;
             }
+
+            public string Path { get; }
         }
     }
 }

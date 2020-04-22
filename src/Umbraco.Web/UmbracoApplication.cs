@@ -1,4 +1,7 @@
-﻿using System.Threading;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -34,10 +37,12 @@ namespace Umbraco.Web
 
             var mainDom = new MainDom(logger, mainDomLock);
 
-            var requestCache = new HttpRequestAppCache(() => HttpContext.Current?.Items);
+            var requestCache = new HttpRequestAppCache(() => HttpContext.Current != null ? HttpContext.Current.Items : null);
             var umbracoBootPermissionChecker = new AspNetUmbracoBootPermissionChecker();
-            return new WebRuntime(configs, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom,
-                GetTypeFinder(hostingEnvironment, logger, profiler), requestCache, umbracoBootPermissionChecker);
+            return new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, umbracoBootPermissionChecker, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom,
+                GetTypeFinder(hostingEnvironment, logger, profiler), requestCache);
         }
+
+
     }
 }

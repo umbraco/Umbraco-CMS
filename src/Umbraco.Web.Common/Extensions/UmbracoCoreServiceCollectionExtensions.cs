@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
 using System.Reflection;
@@ -80,7 +82,17 @@ namespace Umbraco.Web.Common.Extensions
                 Path.Combine(webHostEnvironment.ContentRootPath, "config\\serilog.config"),
                 Path.Combine(webHostEnvironment.ContentRootPath, "config\\serilog.user.config"));
 
-            services.AddUmbracoCore(webHostEnvironment, umbContainer, Assembly.GetEntryAssembly(), loggingConfig, out factory);
+            IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
+            services.AddSingleton<IHttpContextAccessor>(httpContextAccessor);
+
+            var requestCache = new GenericDictionaryRequestAppCache(() => httpContextAccessor.HttpContext.Items);
+
+            services.AddUmbracoCore(webHostEnvironment,
+                umbContainer,
+                Assembly.GetEntryAssembly(),
+                requestCache,
+                loggingConfig,
+                out factory);
 
             return services;
         }
@@ -92,6 +104,8 @@ namespace Umbraco.Web.Common.Extensions
         /// <param name="webHostEnvironment"></param>
         /// <param name="umbContainer"></param>
         /// <param name="entryAssembly"></param>
+        /// <param name="requestCache"></param>
+        /// <param name="httpContextAccessor"></param>
         /// <param name="loggingConfiguration"></param>
         /// <param name="factory"></param>
         /// <returns></returns>
@@ -100,6 +114,7 @@ namespace Umbraco.Web.Common.Extensions
             IWebHostEnvironment webHostEnvironment,
             IRegister umbContainer,
             Assembly entryAssembly,
+            IRequestCache requestCache,
             ILoggingConfiguration loggingConfiguration,
             out IFactory factory)
         {
@@ -108,11 +123,15 @@ namespace Umbraco.Web.Common.Extensions
             if (container is null) throw new ArgumentNullException(nameof(container));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
 
-            // Special case! The generic host adds a few default services but we need to manually add this one here NOW because
-            // we resolve it before the host finishes configuring in the call to CreateCompositionRoot
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            var serviceProvider = services.BuildServiceProvider();
+            var configs = serviceProvider.GetService<Configs>();
 
-            CreateCompositionRoot(services, webHostEnvironment, loggingConfiguration, out var logger, out var configs, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
+
+            CreateCompositionRoot(services,
+                configs,
+                webHostEnvironment,
+                loggingConfiguration,
+                out var logger,  out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
 
             var globalSettings = configs.Global();
             var umbracoVersion = new UmbracoVersion(globalSettings);
@@ -125,7 +144,8 @@ namespace Umbraco.Web.Common.Extensions
                 profiler,
                 hostingEnvironment,
                 backOfficeInfo,
-                CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly));
+                CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly),
+                requestCache);
 
             factory = coreRuntime.Configure(container);
 
@@ -142,11 +162,12 @@ namespace Umbraco.Web.Common.Extensions
             return new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(entryAssembly), runtimeHash);
         }
 
-        private static IRuntime GetCoreRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, Core.Logging.ILogger logger,
+        private static IRuntime GetCoreRuntime(
+            Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, Core.Logging.ILogger logger,
             IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
-            ITypeFinder typeFinder)
+            ITypeFinder typeFinder, IRequestCache requestCache)
         {
-            var connectionStringConfig = configs.ConnectionStrings()[Constants.System.UmbracoConnectionName];
+            var connectionStringConfig = configs.ConnectionStrings()[Core.Constants.System.UmbracoConnectionName];
             var dbProviderFactoryCreator = new SqlServerDbProviderFactoryCreator(
                 connectionStringConfig?.ProviderName,
                 DbProviderFactories.GetFactory);
@@ -161,23 +182,34 @@ namespace Umbraco.Web.Common.Extensions
 
             var mainDom = new MainDom(logger, mainDomLock);
 
-            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetCoreBootPermissionsChecker(),
-                hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom, typeFinder);
+            var coreRuntime = new CoreRuntime(
+                configs,
+                umbracoVersion,
+                ioHelper,
+                logger,
+                profiler,
+                new AspNetCoreBootPermissionsChecker(),
+                hostingEnvironment,
+                backOfficeInfo,
+                dbProviderFactoryCreator,
+                mainDom,
+                typeFinder,
+                requestCache);
 
             return coreRuntime;
         }
 
         private static IServiceCollection CreateCompositionRoot(
             IServiceCollection services,
+            Configs configs,
             IWebHostEnvironment webHostEnvironment,
-            ILoggingConfiguration loggingConfiguration, 
-            out Core.Logging.ILogger logger, out Configs configs, out IIOHelper ioHelper, out Core.Hosting.IHostingEnvironment hostingEnvironment,
-            out IBackOfficeInfo backOfficeInfo, out IProfiler profiler)
+            ILoggingConfiguration loggingConfiguration,
+            out Core.Logging.ILogger logger,
+            out IIOHelper ioHelper,
+            out Core.Hosting.IHostingEnvironment hostingEnvironment,
+            out IBackOfficeInfo backOfficeInfo,
+            out IProfiler profiler)
         {
-            // TODO: We need to avoid this, surely there's a way? See ContainerTests.BuildServiceProvider_Before_Host_Is_Configured
-            var serviceProvider = services.BuildServiceProvider();
-
-            configs = serviceProvider.GetService<Configs>();
             if (configs == null)
                 throw new InvalidOperationException($"Could not resolve type {typeof(Configs)} from the container, ensure {nameof(AddUmbracoConfiguration)} is called before calling {nameof(AddUmbracoCore)}");
 
@@ -205,13 +237,13 @@ namespace Umbraco.Web.Common.Extensions
 
             // Wire up all the bits that serilog needs. We need to use our own code since the Serilog ext methods don't cater to our needs since
             // we don't want to use the global serilog `Log` object and we don't have our own ILogger implementation before the HostBuilder runs which
-            // is the only other option that these ext methods allow. 
+            // is the only other option that these ext methods allow.
             // I have created a PR to make this nicer https://github.com/serilog/serilog-extensions-hosting/pull/19 but we'll need to wait for that.
             // Also see : https://github.com/serilog/serilog-extensions-hosting/blob/dev/src/Serilog.Extensions.Hosting/SerilogHostBuilderExtensions.cs
 
             services.AddSingleton<ILoggerFactory>(services => new SerilogLoggerFactory(logger.SerilogLog, false));
 
-            // This won't (and shouldn't) take ownership of the logger. 
+            // This won't (and shouldn't) take ownership of the logger.
             services.AddSingleton(logger.SerilogLog);
 
             // Registered to provide two services...
@@ -229,7 +261,7 @@ namespace Umbraco.Web.Common.Extensions
         public static IServiceCollection AddUmbracoRuntimeMinifier(this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddSmidge(configuration.GetSection(Constants.Configuration.ConfigRuntimeMinification));
+            services.AddSmidge(configuration.GetSection(Core.Constants.Configuration.ConfigRuntimeMinification));
             services.AddSmidgeNuglify();
 
             return services;
@@ -260,4 +292,5 @@ namespace Umbraco.Web.Common.Extensions
 
 
     }
+
 }

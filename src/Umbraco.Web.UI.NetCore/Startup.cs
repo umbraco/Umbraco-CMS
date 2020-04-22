@@ -76,6 +76,7 @@ namespace Umbraco.Web.UI.BackOffice
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseStatusCodePages();
             app.UseUmbracoCore();
             app.UseUmbracoRequestLogging();
             app.UseUmbracoWebsite();
