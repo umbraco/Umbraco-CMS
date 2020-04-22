@@ -5,22 +5,25 @@ using System.Linq;
 using Newtonsoft.Json;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Logging.Viewer
 {
-    internal class JsonLogViewer : LogViewerSourceBase
+    internal class SerilogJsonLogViewer : SerilogLogViewerSourceBase
     {
         private readonly string _logsPath;
         private readonly ILogger _logger;
 
-        public JsonLogViewer(ILogger logger, IIOHelper ioHelper, string logsPath = "", string searchPath = "") : base(ioHelper, searchPath)
+        public SerilogJsonLogViewer(
+            ILogger logger,
+            ILogViewerConfig logViewerConfig,
+            ILoggingConfiguration loggingConfiguration,
+            global::Serilog.ILogger serilogLog)
+            : base(logViewerConfig, serilogLog)
         {
-            if (string.IsNullOrEmpty(logsPath))
-                logsPath = $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\";
-
-            _logsPath = logsPath;
             _logger = logger;
+            _logsPath = loggingConfiguration.LogDirectory;
         }
 
         private const int FileSizeCap = 100;
@@ -62,9 +65,6 @@ namespace Umbraco.Core.Logging.Viewer
         {
             var logs = new List<LogEvent>();
 
-            //Log Directory
-            var logDirectory = $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\";
-
             var count = 0;
 
             //foreach full day in the range - see if we can find one or more filenames that end with
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Logging.Viewer
                 //Filename ending to search for (As could be multiple)
                 var filesToFind = GetSearchPattern(day);
 
-                var filesForCurrentDay = Directory.GetFiles(logDirectory, filesToFind);
+                var filesForCurrentDay = Directory.GetFiles(_logsPath, filesToFind);
 
                 //Foreach file we find - open it
                 foreach (var filePath in filesForCurrentDay)
@@ -130,7 +130,7 @@ namespace Umbraco.Core.Logging.Viewer
             {
                 // As we are reading/streaming one line at a time in the JSON file
                 // Thus we can not report the line number, as it will always be 1
-                _logger.Error<JsonLogViewer>(ex, "Unable to parse a line in the JSON log file");
+                _logger.Error<SerilogJsonLogViewer>(ex, "Unable to parse a line in the JSON log file");
 
                 evt = null;
                 return true;

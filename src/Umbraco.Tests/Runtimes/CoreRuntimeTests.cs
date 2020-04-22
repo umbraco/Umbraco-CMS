@@ -17,6 +17,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Scoping;
+using Umbraco.Net;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
@@ -135,6 +136,7 @@ namespace Umbraco.Tests.Runtimes
             public override IFactory Configure(IRegister container)
             {
                 container.Register<IApplicationShutdownRegistry, AspNetApplicationShutdownRegistry>(Lifetime.Singleton);
+                container.Register<ISessionIdResolver, NullSessionIdResolver>(Lifetime.Singleton);
 
                 var factory = base.Configure(container);
                 return factory;

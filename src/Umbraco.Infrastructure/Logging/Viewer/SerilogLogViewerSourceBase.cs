@@ -1,31 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml;
-using Newtonsoft.Json;
 using Serilog;
 using Serilog.Events;
-using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Formatting = Newtonsoft.Json.Formatting;
 
 namespace Umbraco.Core.Logging.Viewer
 {
-    public abstract class LogViewerSourceBase : ILogViewer
+
+    public abstract class SerilogLogViewerSourceBase : ILogViewer
     {
-        private readonly string _searchesConfigPath;
-        private readonly IIOHelper _ioHelper;
+        private readonly ILogViewerConfig _logViewerConfig;
+        private readonly global::Serilog.ILogger _serilogLog;
 
-        protected LogViewerSourceBase(IIOHelper ioHelper, string pathToSearches = "")
-        {
-            if (string.IsNullOrEmpty(pathToSearches))
-                // ReSharper disable once StringLiteralTypo
-                pathToSearches = ioHelper.MapPath("~/Config/logviewer.searches.config.js");
-
-            _searchesConfigPath = pathToSearches;
-            _ioHelper = ioHelper;
+        protected SerilogLogViewerSourceBase(ILogViewerConfig logViewerConfig, global::Serilog.ILogger serilogLog)
+        {            
+            _logViewerConfig = logViewerConfig;
+            _serilogLog = serilogLog;
         }
 
         public abstract bool CanHandleLargeLogs { get; }
@@ -38,55 +29,13 @@ namespace Umbraco.Core.Logging.Viewer
         public abstract bool CheckCanOpenLogs(LogTimePeriod logTimePeriod);
 
         public virtual IReadOnlyList<SavedLogSearch> GetSavedSearches()
-        {
-            //Our default implementation
-
-            //If file does not exist - lets create it with an empty array
-            EnsureFileExists(_searchesConfigPath, "[]", _ioHelper);
-
-            var rawJson = System.IO.File.ReadAllText(_searchesConfigPath);
-            return JsonConvert.DeserializeObject<SavedLogSearch[]>(rawJson);
-        }
+            => _logViewerConfig.GetSavedSearches();
 
         public virtual IReadOnlyList<SavedLogSearch> AddSavedSearch(string name, string query)
-        {
-            //Get the existing items
-            var searches = GetSavedSearches().ToList();
-
-            //Add the new item to the bottom of the list
-            searches.Add(new SavedLogSearch { Name = name, Query = query });
-
-            //Serialize to JSON string
-            var rawJson = JsonConvert.SerializeObject(searches, Formatting.Indented);
-
-            //If file does not exist - lets create it with an empty array
-            EnsureFileExists(_searchesConfigPath, "[]", _ioHelper);
-
-            //Write it back down to file
-            System.IO.File.WriteAllText(_searchesConfigPath, rawJson);
-
-            //Return the updated object - so we can instantly reset the entire array from the API response
-            //As opposed to push a new item into the array
-            return searches;
-        }
+            => _logViewerConfig.AddSavedSearch(name, query);
 
         public virtual IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name, string query)
-        {
-            //Get the existing items
-            var searches = GetSavedSearches().ToList();
-
-            //Removes the search
-            searches.RemoveAll(s => s.Name.Equals(name) && s.Query.Equals(query));
-
-            //Serialize to JSON string
-            var rawJson = JsonConvert.SerializeObject(searches, Formatting.Indented);
-
-            //Write it back down to file
-            System.IO.File.WriteAllText(_searchesConfigPath, rawJson);
-
-            //Return the updated object - so we can instantly reset the entire array from the API response
-            return searches;
-        }
+            => _logViewerConfig.DeleteSavedSearch(name, query);
 
         public int GetNumberOfErrors(LogTimePeriod logTimePeriod)
         {
@@ -101,7 +50,7 @@ namespace Umbraco.Core.Logging.Viewer
         /// <returns></returns>
         public string GetLogLevel()
         {
-            var logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>().Where(Log.Logger.IsEnabled)?.Min() ?? null;
+            var logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>().Where(_serilogLog.IsEnabled)?.Min() ?? null;
             return logLevel?.ToString() ?? "";
         }
 
@@ -182,15 +131,6 @@ namespace Umbraco.Core.Logging.Viewer
             };
         }
 
-        private static void EnsureFileExists(string path, string contents, IIOHelper ioHelper)
-        {
-            var absolutePath = ioHelper.MapPath(path);
-            if (System.IO.File.Exists(absolutePath)) return;
-
-            using (var writer = System.IO.File.CreateText(absolutePath))
-            {
-                writer.Write(contents);
-            }
-        }
+        
     }
 }

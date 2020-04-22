@@ -248,6 +248,8 @@ namespace Umbraco.Web.Composing
 
         public static IProfiler Profiler => Factory.GetInstance<IProfiler>();
 
+        public static IProfilerHtml ProfilerHtml => Factory.GetInstance<IProfilerHtml>();
+
         public static IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
 
         public static AppCaches AppCaches => Factory.GetInstance<AppCaches>();
