@@ -19,6 +19,7 @@ namespace Umbraco.Web.Mvc
     /// this DataToken exists before the action executes in case the developer resolves an RTE value that contains
     /// a partial view macro form.
     /// </remarks>
+    /// Migrated already to .Net Core
     internal class EnsurePartialViewMacroViewContextFilterAttribute : ActionFilterAttribute
     {
         /// <summary>

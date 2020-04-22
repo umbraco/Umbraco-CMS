@@ -6,6 +6,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Umbraco.Web.Common.Security;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security;
 
@@ -28,6 +29,7 @@ namespace Umbraco.Web
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICookieManager _cookieManager;
+        private readonly IRequestAccessor _requestAccessor;
         private readonly UriUtility _uriUtility;
 
         /// <summary>
@@ -43,7 +45,8 @@ namespace Umbraco.Web
             IHostingEnvironment hostingEnvironment,
             UriUtility uriUtility,
             IHttpContextAccessor httpContextAccessor,
-            ICookieManager cookieManager)
+            ICookieManager cookieManager,
+            IRequestAccessor requestAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -55,6 +58,7 @@ namespace Umbraco.Web
             _uriUtility = uriUtility;
             _httpContextAccessor = httpContextAccessor;
             _cookieManager = cookieManager;
+            _requestAccessor = requestAccessor;
         }
 
         private IUmbracoContext CreateUmbracoContext()
@@ -70,9 +74,17 @@ namespace Umbraco.Web
                 _variationContextAccessor.VariationContext = new VariationContext(_defaultCultureAccessor.DefaultCulture);
             }
 
-            var webSecurity = new WebSecurity(_httpContextAccessor, _userService, _globalSettings, _hostingEnvironment);
+            var webSecurity = new WebSecurity();
 
-            return new UmbracoContext(_httpContextAccessor, _publishedSnapshotService, webSecurity, _globalSettings, _hostingEnvironment, _variationContextAccessor, _uriUtility, _cookieManager);
+            return new UmbracoContext(
+                _publishedSnapshotService,
+                webSecurity,
+                _globalSettings,
+                _hostingEnvironment,
+                _variationContextAccessor,
+                _uriUtility,
+                _cookieManager,
+                _requestAccessor);
         }
 
         /// <inheritdoc />

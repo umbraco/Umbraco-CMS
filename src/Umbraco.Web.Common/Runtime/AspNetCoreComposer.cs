@@ -11,6 +11,9 @@ using Umbraco.Web.Common.Lifetime;
 using Umbraco.Web.Common.Macros;
 using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.Macros;
+using Umbraco.Core.Diagnostics;
+using Umbraco.Web.Common.Runtime.Profiler;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Common.Runtime
 {
@@ -46,6 +49,10 @@ namespace Umbraco.Web.Common.Runtime
             composition.RegisterUnique<IUserAgentProvider, AspNetCoreUserAgentProvider>();
 
             composition.RegisterMultipleUnique<ISessionIdResolver, ISessionManager, AspNetCoreSessionManager>();
+
+            composition.RegisterUnique<IMarchal, AspNetCoreMarchal>();
+
+            composition.RegisterUnique<IProfilerHtml, WebProfilerHtml>();
 
             composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
             composition.RegisterUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();

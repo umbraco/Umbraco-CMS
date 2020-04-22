@@ -176,3 +176,4 @@ build/temp/
 /src/Umbraco.Web.UI.NetCore/wwwroot/Umbraco/lib/*
 /src/Umbraco.Web.UI.NetCore/wwwroot/Umbraco/views/*
 /src/Umbraco.Web.UI.NetCore/wwwroot/App_Data/TEMP/*
+/src/Umbraco.Web.UI.NetCore/App_Data/Logs/*

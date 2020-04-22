@@ -16,12 +16,6 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public string Render()
-        {
-            return string.Empty;
-        }
-
-        /// <inheritdoc/>
         public IDisposable Step(string name)
         {
             _logger.Debug<LogProfiler>("Begin: {ProfileName}", name);

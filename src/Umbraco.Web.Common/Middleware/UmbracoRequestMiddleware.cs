@@ -22,5 +22,4 @@ namespace Umbraco.Web.Common.Middleware
             _umbracoRequestLifetimeManager.EndRequest(context);
         }
     }
-
 }

@@ -3,6 +3,7 @@ using System.Web.Mvc;
 
 namespace Umbraco.Web.Mvc
 {
+    /// Migrated already to .Net Core
     public class ActionExecutedEventArgs : EventArgs
     {
         public Controller Controller { get; set; }

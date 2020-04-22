@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Web;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
@@ -19,7 +15,6 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd, IUmbracoContext
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IGlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
@@ -32,7 +27,7 @@ namespace Umbraco.Web
         // internal for unit tests
         // otherwise it's used by EnsureContext above
         // warn: does *not* manage setting any IUmbracoContextAccessor
-        internal UmbracoContext(IHttpContextAccessor httpContextAccessor,
+        internal UmbracoContext(
             IPublishedSnapshotService publishedSnapshotService,
             IWebSecurity webSecurity,
             IGlobalSettings globalSettings,
@@ -42,25 +37,13 @@ namespace Umbraco.Web
             ICookieManager cookieManager,
             IRequestAccessor requestAccessor)
         {
-            if (httpContextAccessor == null) throw new ArgumentNullException(nameof(httpContextAccessor));
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
             if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
             VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
-            _httpContextAccessor = httpContextAccessor;
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
             _requestAccessor = requestAccessor;
-
-            // ensure that this instance is disposed when the request terminates, though we *also* ensure
-            // this happens in the Umbraco module since the UmbracoCOntext is added to the HttpContext items.
-            //
-            // also, it *can* be returned by the container with a PerRequest lifetime, meaning that the
-            // container *could* also try to dispose it.
-            //
-            // all in all, this context may be disposed more than once, but DisposableObject ensures that
-            // it is ok and it will be actually disposed only once.
-            httpContextAccessor.HttpContext?.DisposeOnPipelineCompleted(this);
 
             ObjectCreated = DateTime.Now;
             UmbracoRequestId = Guid.NewGuid();
@@ -76,7 +59,7 @@ namespace Umbraco.Web
             // the current domain during application startup.
             // see: http://issues.umbraco.org/issue/U4-1890
             //
-            OriginalRequestUrl = new Uri(GetRequestFromContext()?.GetDisplayUrl() ?? "http://localhost");
+            OriginalRequestUrl = _requestAccessor.GetRequestUrl() ?? new Uri("http://localhost");
             CleanedUmbracoUrl = uriUtility.UriToUmbraco(OriginalRequestUrl);
         }
 
@@ -183,9 +166,9 @@ namespace Umbraco.Web
 
         private void DetectPreviewMode()
         {
-            var request = GetRequestFromContext();
-            if (request?.GetDisplayUrl() != null
-                && new Uri(request.GetEncodedUrl()).IsBackOfficeRequest(_globalSettings, _hostingEnvironment) == false
+            var requestUrl = _requestAccessor.GetRequestUrl();
+            if (requestUrl != null
+                && requestUrl.IsBackOfficeRequest(_globalSettings, _hostingEnvironment) == false
                 && Security.CurrentUser != null)
             {
                 var previewToken = _cookieManager.GetCookieValue(Constants.Web.PreviewCookieName); // may be null or empty
@@ -202,18 +185,6 @@ namespace Umbraco.Web
         {
             InPreviewMode = preview;
             return PublishedSnapshot.ForcedPreview(preview, orig => InPreviewMode = orig);
-        }
-
-        private HttpRequest GetRequestFromContext()
-        {
-            try
-            {
-                return _httpContextAccessor.HttpContext?.Request;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
         }
 
         protected override void DisposeResources()

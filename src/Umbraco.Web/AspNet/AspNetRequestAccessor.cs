@@ -38,5 +38,6 @@ namespace Umbraco.Web.AspNet
         }
         public event EventHandler<UmbracoRequestEventArgs> EndRequest;
         public event EventHandler<RoutableAttemptEventArgs> RouteAttempt;
+        public Uri GetRequestUrl() => _httpContextAccessor.HttpContext?.Request.Url;
     }
 }

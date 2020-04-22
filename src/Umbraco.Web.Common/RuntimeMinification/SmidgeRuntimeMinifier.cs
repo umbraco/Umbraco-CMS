@@ -112,7 +112,7 @@ namespace Umbraco.Web.Common.RuntimeMinification
         public void Reset()
         {
             var version = DateTime.UtcNow.Ticks.ToString();
-            _configManipulator.SaveConfigValue(Constants.Configuration.ConfigRuntimeMinificationVersion, version.ToString());
+            _configManipulator.SaveConfigValue(Core.Constants.Configuration.ConfigRuntimeMinificationVersion, version.ToString());
         }
 
 

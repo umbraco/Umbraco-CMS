@@ -324,6 +324,8 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IHostingEnvironment GetHostingEnvironment() => _testHelperInternal.GetHostingEnvironment();
 
+        public static ILoggingConfiguration GetLoggingConfiguration(IHostingEnvironment hostingEnv) => _testHelperInternal.GetLoggingConfiguration(hostingEnv);
+
         public static IApplicationShutdownRegistry GetHostingEnvironmentLifetime() => _testHelperInternal.GetHostingEnvironmentLifetime();
 
         public static IIpResolver GetIpResolver() => _testHelperInternal.GetIpResolver();

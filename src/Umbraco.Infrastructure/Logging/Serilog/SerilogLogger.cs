@@ -1,72 +1,56 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
-using System.Threading;
 using Serilog;
 using Serilog.Events;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Net;
 
 namespace Umbraco.Core.Logging.Serilog
 {
+
     ///<summary>
     /// Implements <see cref="ILogger"/> on top of Serilog.
     ///</summary>
     public class SerilogLogger : ILogger, IDisposable
     {
-        private readonly ICoreDebugSettings _coreDebugSettings;
-        private readonly IIOHelper _ioHelper;
-        private readonly IMarchal _marchal;
+        public global::Serilog.ILogger SerilogLog { get; }
 
         /// <summary>
         /// Initialize a new instance of the <see cref="SerilogLogger"/> class with a configuration file.
         /// </summary>
         /// <param name="logConfigFile"></param>
-        public SerilogLogger(ICoreDebugSettings coreDebugSettings, IIOHelper ioHelper, IMarchal marchal, FileInfo logConfigFile)
+        public SerilogLogger(FileInfo logConfigFile)
         {
-            _coreDebugSettings = coreDebugSettings;
-            _ioHelper = ioHelper;
-            _marchal = marchal;
-
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.AppSettings(filePath: AppDomain.CurrentDomain.BaseDirectory + logConfigFile)
+            SerilogLog = new LoggerConfiguration()
+                .ReadFrom.AppSettings(filePath: logConfigFile.FullName)
                 .CreateLogger();
         }
 
-        public SerilogLogger(ICoreDebugSettings coreDebugSettings, IIOHelper ioHelper, IMarchal marchal, LoggerConfiguration logConfig)
+        public SerilogLogger(LoggerConfiguration logConfig)
         {
-            _coreDebugSettings = coreDebugSettings;
-            _ioHelper = ioHelper;
-            _marchal = marchal;
-
             //Configure Serilog static global logger with config passed in
-            Log.Logger = logConfig.CreateLogger();
+            SerilogLog = logConfig.CreateLogger();
         }
 
         /// <summary>
         /// Creates a logger with some pre-defined configuration and remainder from config file
         /// </summary>
         /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
-        public static SerilogLogger CreateWithDefaultConfiguration(IHostingEnvironment hostingEnvironment, ISessionIdResolver sessionIdResolver, Func<IRequestCache> requestCacheGetter, ICoreDebugSettings coreDebugSettings, IIOHelper ioHelper, IMarchal marchal)
+        public static SerilogLogger CreateWithDefaultConfiguration(IHostingEnvironment hostingEnvironment, ILoggingConfiguration loggingConfiguration)
         {
             var loggerConfig = new LoggerConfiguration();
             loggerConfig
-                .MinimalConfiguration(hostingEnvironment, sessionIdResolver, requestCacheGetter)
-                .ReadFromConfigFile()
-                .ReadFromUserConfigFile();
+                .MinimalConfiguration(hostingEnvironment, loggingConfiguration)
+                .ReadFromConfigFile(loggingConfiguration)
+                .ReadFromUserConfigFile(loggingConfiguration);
 
-            return new SerilogLogger(coreDebugSettings, ioHelper, marchal, loggerConfig);
+            return new SerilogLogger(loggerConfig);
         }
 
         /// <summary>
         /// Gets a contextualized logger.
         /// </summary>
         private global::Serilog.ILogger LoggerFor(Type reporting)
-            => Log.Logger.ForContext(reporting);
+            => SerilogLog.ForContext(reporting);
 
         /// <summary>
         /// Maps Umbraco's log level to Serilog's.
@@ -99,8 +83,7 @@ namespace Umbraco.Core.Logging.Serilog
         /// <inheritdoc/>
         public void Fatal(Type reporting, Exception exception, string message)
         {
-            var logger = LoggerFor(reporting);
-            DumpThreadAborts(logger, LogEventLevel.Fatal, exception, ref message);
+            var logger = LoggerFor(reporting);            
             logger.Fatal(exception, message);
         }
 
@@ -108,8 +91,7 @@ namespace Umbraco.Core.Logging.Serilog
         public void Fatal(Type reporting, Exception exception)
         {
             var logger = LoggerFor(reporting);
-            var message = "Exception.";
-            DumpThreadAborts(logger, LogEventLevel.Fatal, exception, ref message);
+            var message = "Exception.";            
             logger.Fatal(exception, message);
         }
 
@@ -128,16 +110,14 @@ namespace Umbraco.Core.Logging.Serilog
         /// <inheritdoc/>
         public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
-            var logger = LoggerFor(reporting);
-            DumpThreadAborts(logger, LogEventLevel.Fatal, exception, ref messageTemplate);
+            var logger = LoggerFor(reporting);            
             logger.Fatal(exception, messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
         public void Error(Type reporting, Exception exception, string message)
         {
-            var logger = LoggerFor(reporting);
-            DumpThreadAborts(logger, LogEventLevel.Error, exception, ref message);
+            var logger = LoggerFor(reporting);            
             logger.Error(exception, message);
         }
 
@@ -146,7 +126,6 @@ namespace Umbraco.Core.Logging.Serilog
         {
             var logger = LoggerFor(reporting);
             var message = "Exception";
-            DumpThreadAborts(logger, LogEventLevel.Error, exception, ref message);
             logger.Error(exception, message);
         }
 
@@ -166,65 +145,7 @@ namespace Umbraco.Core.Logging.Serilog
         public void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
             var logger = LoggerFor(reporting);
-            DumpThreadAborts(logger, LogEventLevel.Error, exception, ref messageTemplate);
             logger.Error(exception, messageTemplate, propertyValues);
-        }
-
-        private void DumpThreadAborts(global::Serilog.ILogger logger, LogEventLevel level, Exception exception, ref string messageTemplate)
-        {
-            var dump = false;
-
-            if (IsTimeoutThreadAbortException(exception))
-            {
-                messageTemplate += "\r\nThe thread has been aborted, because the request has timed out.";
-
-                // dump if configured, or if stacktrace contains Monitor.ReliableEnter
-                dump = _coreDebugSettings.DumpOnTimeoutThreadAbort || IsMonitorEnterThreadAbortException(exception);
-
-                // dump if it is ok to dump (might have a cap on number of dump...)
-                dump &= MiniDump.OkToDump(_ioHelper);
-            }
-
-            if (dump)
-            {
-                try
-                {
-                    var dumped = MiniDump.Dump(_marchal, _ioHelper, withException: true);
-                    messageTemplate += dumped
-                        ? "\r\nA minidump was created in App_Data/MiniDump"
-                        : "\r\nFailed to create a minidump";
-                }
-                catch (Exception ex)
-                {
-                    messageTemplate += "\r\nFailed to create a minidump";
-
-                    //Log a new entry (as opposed to appending to same log entry)
-                    logger.Write(level, ex, "Failed to create a minidump ({ExType}: {ExMessage})",
-                        new object[]{ ex.GetType().FullName, ex.Message });
-                }
-            }
-        }
-
-        private static bool IsMonitorEnterThreadAbortException(Exception exception)
-        {
-            if (!(exception is ThreadAbortException abort)) return false;
-
-            var stacktrace = abort.StackTrace;
-            return stacktrace.Contains("System.Threading.Monitor.ReliableEnter");
-        }
-
-        private static bool IsTimeoutThreadAbortException(Exception exception)
-        {
-            if (!(exception is ThreadAbortException abort)) return false;
-            if (abort.ExceptionState == null) return false;
-
-            var stateType = abort.ExceptionState.GetType();
-            if (stateType.FullName != "System.Web.HttpApplication+CancelModuleException") return false;
-
-            var timeoutField = stateType.GetField("_timeout", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (timeoutField == null) return false;
-
-            return (bool) timeoutField.GetValue(abort.ExceptionState);
         }
 
         /// <inheritdoc/>
@@ -289,7 +210,7 @@ namespace Umbraco.Core.Logging.Serilog
 
         public void Dispose()
         {
-            Log.CloseAndFlush();
+            SerilogLog.DisposeIfDisposable();
         }
     }
 }

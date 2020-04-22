@@ -64,6 +64,7 @@ namespace Umbraco.Core.Migrations.Upgrade
         {
             get
             {
+
                 // no state in database yet - assume we have something in web.config that makes some sense
                 if (!SemVersion.TryParse(_globalSettings.ConfigurationStatus, out var currentVersion))
                     throw new InvalidOperationException($"Could not get current version from web.config {Constants.AppSettings.ConfigurationStatus} appSetting.");

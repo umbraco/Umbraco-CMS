@@ -9,5 +9,6 @@ namespace Umbraco.Web
         string GetQueryStringValue(string name);
         event EventHandler<UmbracoRequestEventArgs> EndRequest;
         event EventHandler<RoutableAttemptEventArgs> RouteAttempt;
+        Uri GetRequestUrl();
     }
 }

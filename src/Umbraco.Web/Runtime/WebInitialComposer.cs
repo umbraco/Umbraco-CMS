@@ -25,6 +25,9 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Net;
 using Umbraco.Web.AspNet;
+using Umbraco.Core.Diagnostics;
+using Umbraco.Core.Logging;
+using Umbraco.Web.Logging;
 
 namespace Umbraco.Web.Runtime
 {
@@ -50,7 +53,8 @@ namespace Umbraco.Web.Runtime
 
 
 
-
+            composition.RegisterUnique<IMarchal, FrameworkMarchal>();
+            composition.RegisterUnique<IProfilerHtml, WebProfiler>();
 
             composition.ComposeWebMappingProfiles();
 
