@@ -6,11 +6,6 @@ namespace Umbraco.Core.Logging
     {
         private readonly VoidDisposable _disposable = new VoidDisposable();
 
-        public string Render()
-        {
-            return string.Empty;
-        }
-
         public IDisposable Step(string name)
         {
             return _disposable;

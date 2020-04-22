@@ -5,13 +5,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Common.AspNetCore
 {
     public class AspNetCoreHostingEnvironment : Umbraco.Core.Hosting.IHostingEnvironment
     {
-
-
         private readonly IHostingSettings _hostingSettings;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
@@ -28,6 +27,7 @@ namespace Umbraco.Web.Common.AspNetCore
 
             ApplicationVirtualPath = "/"; //TODO how to find this, This is a server thing, not application thing.
             IISVersion = new Version(0, 0); // TODO not necessary IIS
+
         }
 
         public bool IsHosted { get; } = true;

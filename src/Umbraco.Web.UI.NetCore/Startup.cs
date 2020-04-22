@@ -54,6 +54,7 @@ namespace Umbraco.Web.UI.BackOffice
             });
 
             //Finally initialize Current
+            // TODO: This should be moved to the UmbracoServiceProviderFactory when the container is cross-wired and then don't use the overload above to `out var factory`
             Current.Initialize(
                 factory.GetInstance<ILogger> (),
                 factory.GetInstance<Configs>(),
@@ -75,7 +76,9 @@ namespace Umbraco.Web.UI.BackOffice
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseStatusCodePages();
             app.UseUmbracoCore();
+            app.UseUmbracoRequestLogging();
             app.UseUmbracoWebsite();
             app.UseUmbracoBackOffice();
             app.UseRouting();
@@ -89,7 +92,8 @@ namespace Umbraco.Web.UI.BackOffice
                 });
                 endpoints.MapGet("/", async context =>
                 {
-                    await context.Response.WriteAsync($"<html><body>Hello World!{Current.Profiler.Render()}</body></html>");
+                    var profilerHtml = app.ApplicationServices.GetRequiredService<IProfilerHtml>();
+                    await context.Response.WriteAsync($"<html><body>Hello World!{profilerHtml.Render()}</body></html>");
                 });
             });
         }

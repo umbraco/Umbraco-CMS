@@ -30,7 +30,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static IHtmlString RenderProfiler(this HtmlHelper helper)
         {
-            return new HtmlString(Current.Profiler.Render());
+            return new HtmlString(Current.ProfilerHtml.Render());
         }
 
         /// <summary>

@@ -6,6 +6,7 @@ namespace Umbraco.Core
 {
     public static class ContentExtensions
     {
+
   #region XML methods
 
         /// <summary>

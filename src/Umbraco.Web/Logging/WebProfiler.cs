@@ -14,7 +14,7 @@ namespace Umbraco.Web.Logging
     /// <remarks>
     /// Profiling only runs when the app is in debug mode, see WebRuntime for how this gets created
     /// </remarks>
-    internal class WebProfiler : IProfiler
+    internal class WebProfiler : IProfiler, IProfilerHtml
     {
         private const string BootRequestItemKey = "Umbraco.Core.Logging.WebProfiler__isBootRequest";
         private readonly WebProfilerProvider _provider;

@@ -12,6 +12,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services.Changes;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services.Implement
 {
@@ -27,6 +28,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
         private readonly ILanguageRepository _languageRepository;
         private readonly Lazy<IPropertyValidationService> _propertyValidationService;
+        private readonly IShortStringHelper _shortStringHelper;
         private IQuery<IContent> _queryNotTrashed;
 
         #region Constructors
@@ -35,7 +37,7 @@ namespace Umbraco.Core.Services.Implement
             IEventMessagesFactory eventMessagesFactory,
             IDocumentRepository documentRepository, IEntityRepository entityRepository, IAuditRepository auditRepository,
             IContentTypeRepository contentTypeRepository, IDocumentBlueprintRepository documentBlueprintRepository, ILanguageRepository languageRepository,
-            Lazy<IPropertyValidationService> propertyValidationService)
+            Lazy<IPropertyValidationService> propertyValidationService, IShortStringHelper shortStringHelper)
             : base(provider, logger, eventMessagesFactory)
         {
             _documentRepository = documentRepository;
@@ -45,6 +47,7 @@ namespace Umbraco.Core.Services.Implement
             _documentBlueprintRepository = documentBlueprintRepository;
             _languageRepository = languageRepository;
             _propertyValidationService = propertyValidationService;
+            _shortStringHelper = shortStringHelper;
         }
 
         #endregion
@@ -600,22 +603,26 @@ namespace Umbraco.Core.Services.Implement
                         totalChildren = 0;
                         return Enumerable.Empty<IContent>();
                     }
-                    return GetPagedDescendantsLocked(contentPath[0].Path, pageIndex, pageSize, out totalChildren, filter, ordering);
+                    return GetPagedLocked(GetPagedDescendantQuery(contentPath[0].Path), pageIndex, pageSize, out totalChildren, filter, ordering);
                 }
-                return GetPagedDescendantsLocked(null, pageIndex, pageSize, out totalChildren, filter, ordering);
+                return GetPagedLocked(null, pageIndex, pageSize, out totalChildren, filter, ordering);
             }
         }
 
-        private IEnumerable<IContent> GetPagedDescendantsLocked(string contentPath, long pageIndex, int pageSize, out long totalChildren,
+        private IQuery<IContent> GetPagedDescendantQuery(string contentPath)
+        {
+            var query = Query<IContent>();
+            if (!contentPath.IsNullOrWhiteSpace())
+                query.Where(x => x.Path.SqlStartsWith($"{contentPath},", TextColumnType.NVarchar));
+            return query;
+        }
+
+        private IEnumerable<IContent> GetPagedLocked(IQuery<IContent> query, long pageIndex, int pageSize, out long totalChildren,
             IQuery<IContent> filter, Ordering ordering)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
             if (ordering == null) throw new ArgumentNullException(nameof(ordering));
-
-            var query = Query<IContent>();
-            if (!contentPath.IsNullOrWhiteSpace())
-                query.Where(x => x.Path.SqlStartsWith($"{contentPath},", TextColumnType.NVarchar));
 
             return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
         }
@@ -1865,7 +1872,7 @@ namespace Umbraco.Core.Services.Implement
         public OperationResult MoveToRecycleBin(IContent content, int userId)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            var moves = new List<Tuple<IContent, string>>();
+            var moves = new List<(IContent, string)>();
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1924,7 +1931,7 @@ namespace Umbraco.Core.Services.Implement
                 return;
             }
 
-            var moves = new List<Tuple<IContent, string>>();
+            var moves = new List<(IContent, string)>();
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1977,7 +1984,7 @@ namespace Umbraco.Core.Services.Implement
         // MUST be called from within WriteLock
         // trash indicates whether we are trashing, un-trashing, or not changing anything
         private void PerformMoveLocked(IContent content, int parentId, IContent parent, int userId,
-            ICollection<Tuple<IContent, string>> moves,
+            ICollection<(IContent, string)> moves,
             bool? trash)
         {
             content.WriterId = userId;
@@ -1989,7 +1996,7 @@ namespace Umbraco.Core.Services.Implement
 
             var paths = new Dictionary<int, string>();
 
-            moves.Add(Tuple.Create(content, content.Path)); // capture original path
+            moves.Add((content, content.Path)); // capture original path
 
             //need to store the original path to lookup descendants based on it below
             var originalPath = content.Path;
@@ -2006,20 +2013,24 @@ namespace Umbraco.Core.Services.Implement
             paths[content.Id] = (parent == null ? (parentId == Constants.System.RecycleBinContent ? "-1,-20" : Constants.System.RootString) : parent.Path) + "," + content.Id;
 
             const int pageSize = 500;
-            var total = long.MaxValue;
-            while (total > 0)
+            var query = GetPagedDescendantQuery(originalPath);
+            long total;
+            do
             {
-                var descendants = GetPagedDescendantsLocked(originalPath, 0, pageSize, out total, null, Ordering.By("Path", Direction.Ascending));
+                // We always page a page 0 because for each page, we are moving the result so the resulting total will be reduced
+                var descendants = GetPagedLocked(query, 0, pageSize, out total, null, Ordering.By("Path", Direction.Ascending));
+
                 foreach (var descendant in descendants)
                 {
-                    moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path
+                    moves.Add((descendant, descendant.Path)); // capture original path
 
                     // update path and level since we do not update parentId
                     descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
                     descendant.Level += levelDelta;
                     PerformMoveContentLocked(descendant, userId, trash);
                 }
-            }
+
+            } while (total > pageSize);
 
         }
 
@@ -2365,6 +2376,25 @@ namespace Umbraco.Core.Services.Implement
 
             Audit(AuditType.Sort, userId, 0, "Sorting content performed by user");
             return OperationResult.Succeed(evtMsgs);
+        }
+
+        public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.WriteLock(Constants.Locks.ContentTree);
+
+                var report = _documentRepository.CheckDataIntegrity(options);
+
+                if (report.FixedIssues.Count > 0)
+                {
+                    //The event args needs a content item so we'll make a fake one with enough properties to not cause a null ref
+                    var root = new Content("root", -1, new ContentType(_shortStringHelper, -1)) {Id = -1, Key = Guid.Empty};
+                    scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>.EventArgs(new TreeChange<IContent>(root, TreeChangeTypes.RefreshAll)));
+                }
+
+                return report;
+            }
         }
 
         #endregion
@@ -2804,7 +2834,7 @@ namespace Umbraco.Core.Services.Implement
             // which we need for many things like keeping caches in sync, but we can surely do this MUCH better.
 
             var changes = new List<TreeChange<IContent>>();
-            var moves = new List<Tuple<IContent, string>>();
+            var moves = new List<(IContent, string)>();
             var contentTypeIdsA = contentTypeIds.ToArray();
 
             // using an immediate uow here because we keep making changes with

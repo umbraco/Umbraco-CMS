@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Common.AspNetCore;
 
 namespace Umbraco.Tests.Integration.Implementations

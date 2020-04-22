@@ -29,6 +29,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Examine;
 using Umbraco.Infrastructure.Media;
+using Umbraco.Net;
 using Umbraco.Web;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
@@ -351,10 +352,6 @@ namespace Umbraco.Core.Runtime
 
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
-
-
-
-
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog.Context;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Threading;
@@ -12,6 +13,8 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
+using Umbraco.Core.Logging.Serilog.Enrichers;
+using Umbraco.Net;
 using Umbraco.Web.AspNet;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Logging;
@@ -34,12 +37,16 @@ namespace Umbraco.Web
                 var configFactory = new ConfigsFactory();
 
                 var hostingSettings = configFactory.HostingSettings;
-                var coreDebug = configFactory.CoreDebugSettings;
                 var globalSettings = configFactory.GlobalSettings;
 
                 var hostingEnvironment = new AspNetHostingEnvironment(hostingSettings);
+                var loggingConfiguration = new LoggingConfiguration(
+                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data\\Logs"),
+                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.config"),
+                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.user.config"));
                 var ioHelper = new IOHelper(hostingEnvironment, globalSettings);
-                var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,  new AspNetSessionManager(), () => _factory?.GetInstance<IRequestCache>(), coreDebug, ioHelper, new FrameworkMarchal());
+                var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration);
+
                 var configs = configFactory.Create();
 
                 var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, logger, configFactory.WebRoutingSettings);
@@ -167,6 +174,11 @@ namespace Umbraco.Web
                 Umbraco.Composing.Current.HostingEnvironment,
                 Umbraco.Composing.Current.BackOfficeInfo);
             _factory = Current.Factory = _runtime.Configure(register);
+
+            // now we can add our request based logging enrichers (globally, which is what we were doing in netframework before)
+            LogContext.Push(new HttpSessionIdEnricher(_factory.GetInstance<ISessionIdResolver>()));
+            LogContext.Push(new HttpRequestNumberEnricher(_factory.GetInstance<IRequestCache>()));
+            LogContext.Push(new HttpRequestIdEnricher(_factory.GetInstance<IRequestCache>()));
 
             _runtime.Start();
         }
