@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridPrevalueEditorController",
-        function ($scope, gridService, editorService) {
+        function ($scope, gridService, editorService, localizationService, overlayService) {
 
             var emptyModel = {
                 styles: [
@@ -83,9 +83,7 @@ angular.module("umbraco")
                 if (template === undefined) {
                     template = {
                         name: "",
-                        sections: [
-
-                        ]
+                        sections: []
                     };
                 }
 
@@ -128,9 +126,7 @@ angular.module("umbraco")
                 if (layout === undefined) {
                     layout = {
                         name: "",
-                        areas: [
-
-                        ]
+                        areas: []
                     };
                 }
 
@@ -157,27 +153,30 @@ angular.module("umbraco")
 
             };
 
-            //var rowDeletesPending = false;
-            $scope.deleteLayout = function (index) {
+            $scope.deleteLayout = function (layout, index, event) {
 
-                var rowDeleteOverlay = {
-                    dialogData: {
-                        rowName: $scope.model.value.layouts[index].name
-                    },
-                    view: "views/propertyEditors/grid/dialogs/rowdeleteconfirm.html",
-                    size: "small",
+                const dialog = {
+                    view: "views/propertyEditors/grid/overlays/rowdeleteconfirm.html",
+                    layout: layout,
+                    submitButtonLabelKey: "contentTypeEditor_yesDelete",
+                    submitButtonStyle: "danger",
                     submit: function (model) {
                         $scope.model.value.layouts.splice(index, 1);
-                        editorService.close();
+                        overlayService.close();
                     },
-                    close: function (model) {
-                        editorService.close();
+                    close: function () {
+                        overlayService.close();
                     }
                 };
 
-                editorService.open(rowDeleteOverlay);
-            };
+                localizationService.localize("general_delete").then(value => {
+                    dialog.title = value;
+                    overlayService.open(dialog);
+                });
 
+                event.preventDefault();
+                event.stopPropagation();
+            };
 
             /****************
                 utillities
