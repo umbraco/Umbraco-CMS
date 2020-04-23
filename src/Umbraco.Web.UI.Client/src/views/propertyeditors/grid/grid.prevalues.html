@@ -84,7 +84,7 @@
 
                         <div>
                             {{layout.label || layout.name}}<br />
-                            <button type="button" class="btn btn-small btn-link" ng-click="deleteLayout($index)">
+                            <button type="button" class="btn btn-small btn-link" ng-click="deleteLayout(layout, $index, $event)">
                                 <i class="icon-delete red" aria-hidden="true"></i>
                                 <localize key="general_delete">Delete</localize>
                             </button>

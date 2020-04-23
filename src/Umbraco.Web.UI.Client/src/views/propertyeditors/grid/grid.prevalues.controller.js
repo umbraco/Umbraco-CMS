@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridPrevalueEditorController",
-    function ($scope, gridService, editorService) {
+    function ($scope, gridService, editorService, localizationService, overlayService) {
 
         var emptyModel = {
             styles:[
@@ -154,30 +154,53 @@ angular.module("umbraco")
            };
 
            editorService.open(rowConfigOverlay);
-           
         };
 
-        //var rowDeletesPending = false;
-        $scope.deleteLayout = function(index) {
-            
-            var rowDeleteOverlay = {
-                dialogData: {
-                  rowName: $scope.model.value.layouts[index].name
+        $scope.deleteLayout = function(layout, index, event) {
+
+            const dialog = {
+                view: "views/propertyEditors/grid/overlays/rowdeleteconfirm.html",
+                layout: layout,
+                submitButtonLabelKey: "contentTypeEditor_yesDelete",
+                submitButtonStyle: "danger",
+                submit: function (model) {
+                    //performDelete(model.language);
+                    overlayService.close();
                 },
-                view: "views/propertyEditors/grid/dialogs/rowdeleteconfirm.html",
-                size: "small",
-                submit: function(model) {
-                    $scope.model.value.layouts.splice(index, 1);
-                    editorService.close();
-                },
-                close: function(model) {
-                    editorService.close();
+                close: function () {
+                    overlayService.close();
                 }
             };
 
-            editorService.open(rowDeleteOverlay);
+            localizationService.localize("general_delete").then(value => {
+                dialog.title = value;
+                overlayService.open(dialog);
+            });
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            //var rowDeleteOverlay = {
+            //    dialogData: {
+            //      rowName: $scope.model.value.layouts[index].name
+            //    },
+            //    view: "views/propertyEditors/grid/dialogs/rowdeleteconfirm.html",
+            //    size: "small",
+            //    submit: function(model) {
+            //        $scope.model.value.layouts.splice(index, 1);
+            //        editorService.close();
+            //    },
+            //    close: function(model) {
+            //        editorService.close();
+            //    }
+            //};
+
+            //editorService.open(rowDeleteOverlay);
         };
 
+        function performDelete() {
+            
+        }
 
         /****************
             utillities
