@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Core;
 
-namespace Umbraco.Tests.Misc
+namespace Umbraco.Tests.UnitTests.Umbraco.Core
 {
     [TestFixture]
     public class DateTimeExtensionsTests

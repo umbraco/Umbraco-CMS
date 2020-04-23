@@ -179,7 +179,6 @@
     <Compile Include="Published\ModelTypeTests.cs" />
     <Compile Include="Published\NestedContentTests.cs" />
     <Compile Include="Published\PropertyCacheLevelTests.cs" />
-    <Compile Include="Misc\DateTimeExtensionsTests.cs" />
     <Compile Include="Misc\HashGeneratorTests.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="Issues\U9560.cs" />
