@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.PropertyEditors.GridPrevalueEditorController" class="usky-grid usky-grid-configuration">
+<div ng-controller="Umbraco.PropertyEditors.GridPrevalueEditorController as vm" class="usky-grid usky-grid-configuration">
     <div class="grid-layout">
         <div class="control-group uSky-templates">
 
@@ -17,7 +17,7 @@
 
                 <li ng-repeat="template in model.value.templates" class="clearfix">
 
-                    <div ng-click="configureTemplate(template)"
+                    <div ng-click="vm.configureTemplate(template)"
                          class="preview-rows layout">
 
                         <div class="preview-row">
@@ -32,7 +32,7 @@
 
                     <div>
                         {{template.name}} <br />
-                        <button type="button" class="btn btn-small btn-link" ng-click="deleteTemplate($index)">
+                        <button type="button" class="btn btn-small btn-link" ng-click="vm.deleteTemplate($index)">
                             <i class="icon-delete red" aria-hidden="true"></i>
                             <localize key="general_delete">Delete</localize>
                         </button>
@@ -41,7 +41,7 @@
                 </li>
             </ul>
 
-            <button type="button" class="btn btn-small btn-info" ng-click="configureTemplate()">
+            <button type="button" class="btn btn-small btn-info" ng-click="vm.configureTemplate()">
                 <i class="icon-add" aria-hidden="true"></i>
                 <localize key="grid_addGridLayout" />
             </button>
@@ -65,7 +65,7 @@
 
                     <li ng-repeat="layout in model.value.layouts" class="clearfix">
 
-                        <div ng-click="configureLayout(layout)"
+                        <div ng-click="vm.configureLayout(layout)"
                              class="preview-rows columns">
 
                             <div class="preview-row">
@@ -83,7 +83,7 @@
 
                         <div>
                             {{layout.label || layout.name}}<br />
-                            <button type="button" class="btn btn-small btn-link" ng-click="deleteLayout(layout, $index, $event)">
+                            <button type="button" class="btn btn-small btn-link" ng-click="vm.deleteLayout(layout, $index, $event)">
                                 <i class="icon-delete red" aria-hidden="true"></i>
                                 <localize key="general_delete">Delete</localize>
                             </button>
@@ -92,7 +92,7 @@
                     </li>
                 </ul>
 
-                <button type="button" class="btn btn-small btn-info" ng-click="configureLayout()">
+                <button type="button" class="btn btn-small btn-info" ng-click="vm.configureLayout()">
                     <i class="icon-add" aria-hidden="true"></i>
                     <localize key="grid_addRowConfiguration">Add row configuration</localize>
                 </button>
@@ -120,7 +120,7 @@
                 <li ng-repeat="configValue in model.value.config">
                     <i class="icon icon-navigation handle" aria-hidden="true"></i>
 
-                    <button type="button" class="btn-link" ng-click="removeConfigValue(model.value.config, $index)">
+                    <button type="button" class="btn-link" ng-click="vm.removeConfigValue(model.value.config, $index)">
                         <i class="icon icon-delete red" aria-hidden="true"></i>
                         {{configValue.label}}
                     </button>
@@ -129,7 +129,7 @@
 
             <ul class="unstyled list-icons">
                 <li>                    
-                    <button type="button" ng-click="editConfig()" class="btn-link">
+                    <button type="button" ng-click="vm.editConfig()" class="btn-link">
                         <i class="icon icon-settings-alt-2 turquoise" aria-hidden="true"></i>
                         <localize key="general_edit">Edit</localize>
                     </button>
@@ -148,7 +148,7 @@
                 <li ng-repeat="style in model.value.styles">
                     <i class="icon icon-navigation handle" aria-hidden="true"></i>
 
-                    <button type="button" class="btn-link" ng-click="removeConfigValue(model.value.styles, $index)">
+                    <button type="button" class="btn-link" ng-click="vm.removeConfigValue(model.value.styles, $index)">
                         <i class="icon icon-delete red" aria-hidden="true"></i>
                         {{style.label}}
                     </button>
@@ -158,7 +158,7 @@
 
             <ul class="unstyled list-icons">
                 <li>                    
-                    <button type="button" ng-click="editStyles()" class="btn-link">
+                    <button type="button" ng-click="vm.editStyles()" class="btn-link">
                         <i class="icon icon-settings-alt-2 turquoise" aria-hidden="true"></i>
                         <localize key="general_edit">Edit</localize>
                     </button>
