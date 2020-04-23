@@ -206,11 +206,11 @@ function umbSessionStorage($window) {
     return {
 
         get: function (key) {
-            return angular.fromJson(storage["umb_" + key]);
+            return JSON.parse(storage["umb_" + key]);
         },
 
         set: function (key, value) {
-            storage["umb_" + key] = angular.toJson(value);
+            storage["umb_" + key] = Utilities.toJson(value);
         }
 
     };

@@ -7,7 +7,7 @@ angular.module("umbraco")
 
             vm.submit = submit;
             vm.close = close;
-            
+
             vm.toggle = toggle;
             vm.upload = upload;
             vm.dragLeave = dragLeave;
@@ -26,7 +26,7 @@ angular.module("umbraco")
             vm.shouldShowUrl = shouldShowUrl;
 
             var dialogOptions = $scope.model;
-            
+
             $scope.disableFolderSelect = (dialogOptions.disableFolderSelect && dialogOptions.disableFolderSelect !== "0") ? true : false;
             $scope.disableFocalPoint = (dialogOptions.disableFocalPoint && dialogOptions.disableFocalPoint !== "0") ? true : false;
             $scope.onlyImages = (dialogOptions.onlyImages && dialogOptions.onlyImages !== "0") ? true : false;
@@ -133,21 +133,21 @@ angular.module("umbraco")
                     // media object so we need to look it up
                     var id = $scope.target.udi ? $scope.target.udi : $scope.target.id;
                     var altText = $scope.target.altText;
-                    
+
                     // ID of a UDI or legacy int ID still could be null/undefinied here
                     // As user may dragged in an image that has not been saved to media section yet
                     if (id) {
                         entityResource.getById(id, "Media")
-                        .then(function (node) {
-                            $scope.target = node;
-                            if (ensureWithinStartNode(node)) {
-                                selectMedia(node);
-                                $scope.target.url = mediaHelper.resolveFileFromEntity(node);
-                                $scope.target.thumbnail = mediaHelper.resolveFileFromEntity(node, true);
-                                $scope.target.altText = altText;
-                                openDetailsDialog();
-                            }
-                        }, gotoStartNode);
+                            .then(function (node) {
+                                $scope.target = node;
+                                if (ensureWithinStartNode(node)) {
+                                    selectMedia(node);
+                                    $scope.target.url = mediaHelper.resolveFileFromEntity(node);
+                                    $scope.target.thumbnail = mediaHelper.resolveFileFromEntity(node, true);
+                                    $scope.target.altText = altText;
+                                    openDetailsDialog();
+                                }
+                            }, gotoStartNode);
                     } else {
                         // No ID set - then this is going to be a tmpimg that has not been uploaded
                         // User editing this will want to be changing the ALT text
@@ -157,7 +157,7 @@ angular.module("umbraco")
             }
 
             function upload(v) {
-                var fileSelect = angular.element(".umb-file-dropzone .file-select");
+                var fileSelect = $(".umb-file-dropzone .file-select");
                 if (fileSelect.length === 0){
                     localizationService.localize('media_uploadNotAllowed').then(function (message) { notificationsService.warning(message); });
                 }
@@ -166,11 +166,11 @@ angular.module("umbraco")
                 }
             }
 
-            function dragLeave(el, event) {
+            function dragLeave() {
                 $scope.activeDrag = false;
             }
 
-            function dragEnter(el, event) {
+            function dragEnter() {
                 $scope.activeDrag = true;
             }
 
@@ -242,16 +242,16 @@ angular.module("umbraco")
                     }
                 } else {
                     if ($scope.showDetails) {
-                        
+
                         $scope.target = media;
-                        
+
                         // handle both entity and full media object
                         if (media.image) {
                             $scope.target.url = media.image;
                         } else {
                             $scope.target.url = mediaHelper.resolveFile(media);
                         }
-                        
+
                         openDetailsDialog();
                     } else {
                         selectMedia(media);
@@ -303,7 +303,7 @@ angular.module("umbraco")
                     $timeout(function () {
                         if ($scope.multiPicker) {
                             var images = _.rest($scope.images, $scope.images.length - files.length);
-                            _.each(images, function(image) {
+                            _.each(images, function (image) {
                                 selectMedia(image);
                             });
                         } else {
@@ -343,7 +343,7 @@ angular.module("umbraco")
                 return false;
             }
 
-            function gotoStartNode(err) {
+            function gotoStartNode() {
                 gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
             }
 
@@ -375,7 +375,7 @@ angular.module("umbraco")
                     if (vm.searchOptions.filter) {
                         searchMedia();
                     } else {
-                        
+
                         // reset pagination
                         vm.searchOptions = {
                             pageNumber: 1,
@@ -385,7 +385,7 @@ angular.module("umbraco")
                             filter: '',
                             dataTypeKey: dataTypeKey
                         };
-                        
+
                         getChildren($scope.currentFolder.id);
                     }
                 });
@@ -413,9 +413,9 @@ angular.module("umbraco")
                 entityResource.getPagedDescendants($scope.filterOptions.excludeSubFolders ? $scope.currentFolder.id : $scope.startNodeId, "Media", vm.searchOptions)
                     .then(function (data) {
                         // update image data to work with image grid
-                        angular.forEach(data.items, function (mediaItem) {
-                            setMediaMetaData(mediaItem);
-                        });
+                        if (data.items) {
+                            data.items.forEach(mediaItem => setMediaMetaData(mediaItem));
+                        }
 
                         // update images
                         $scope.images = data.items ? data.items : [];
@@ -499,7 +499,7 @@ angular.module("umbraco")
                     var folderImage = $scope.images[folderIndex];
                     var imageIsSelected = false;
 
-                    if ($scope.model && angular.isArray($scope.model.selection)) {
+                    if ($scope.model && Utilities.isArray($scope.model.selection)) {
                         for (var selectedIndex = 0;
                             selectedIndex < $scope.model.selection.length;
                             selectedIndex++) {

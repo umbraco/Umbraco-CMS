@@ -6,13 +6,15 @@
                 <a href="#/{{section.alias}}"
                    ng-dblclick="sectionDblClick(section)"
                    ng-click="sectionClick($event, section)"
-                   prevent-default>
+                   prevent-default
+                   ng-attr-aria-current="{{section.alias == currentSection ? 'page' : undefined}}"
+                   aria-label="{{section.name + (section.alias == currentSection ? ' (active)' : '')}}">
                     <span class="section__name">{{section.name}}</span>
                 </a>
             </li>
 
             <li data-element="section-expand" class="expand" ng-class="{ 'open': showTray === true, current: currentSectionInOverflow() }" ng-show="visibleSections < sections.length">
-                <a href="#" ng-click="trayClick()" prevent-default>
+                <a href="#" ng-click="trayClick()" prevent-default aria-label="More sections">
                     <span class="section__name">&bull;&bull;&bull;</span>
                 </a>
 
@@ -21,7 +23,9 @@
                         <a href="#/{{section.alias}}"
                             ng-dblclick="sectionDblClick(section)"
                             ng-click="sectionClick($event, section)"
-                            prevent-default>
+                            prevent-default
+                            ng-attr-aria-current="{{section.alias == currentSection ? 'page' : undefined}}"
+                            aria-label="{{section.name + (section.alias == currentSection ? ' (active)' : '')}}">
                             <span class="section__name">{{section.name}}</span>
                         </a>
                     </li>

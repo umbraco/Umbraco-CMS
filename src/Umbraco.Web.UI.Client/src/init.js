@@ -34,7 +34,7 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
                         else {
 
                             const introTourShown = localStorageService.get("introTourShown");
-                            if(!introTourShown){
+                            if (!introTourShown) {
                                 // Go & show email marketing tour (ONLY when intro tour is completed or been dismissed)
                                 tourService.getTourByAlias("umbEmailMarketing").then(function (emailMarketingTour) {
                                     // Only show the email marketing tour one time - dismissing it or saying no will make sure it never appears again
@@ -45,7 +45,7 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
                                         // Only show the email tour once per logged in session
                                         // The localstorage key is removed on logout or user session timeout
                                         const emailMarketingTourShown = localStorageService.get("emailMarketingTourShown");
-                                        if(!emailMarketingTourShown){
+                                        if (!emailMarketingTourShown) {
                                             tourService.startTour(emailMarketingTour);
                                             localStorageService.set("emailMarketingTourShown", true);
                                         }
@@ -89,7 +89,7 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
                 currentRouteParams = toRetain;
             }
             else {
-                currentRouteParams = angular.copy(current.params); 
+                currentRouteParams = Utilities.copy(current.params);
             }
 
 
@@ -183,7 +183,7 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
                         currentRouteParams = toRetain;
                     }
                     else {
-                        currentRouteParams = angular.copy(next.params);
+                        currentRouteParams = Utilities.copy(next.params);
                     }
 
                     //always clear the 'sr' query string (soft redirect) if it exists
@@ -191,7 +191,7 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
                         currentRouteParams.sr = null;
                         $route.updateParams(currentRouteParams);
                     }
-                    
+
                 }
             }
         });
