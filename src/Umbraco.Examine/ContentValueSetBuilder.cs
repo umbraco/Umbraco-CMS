@@ -53,9 +53,9 @@ namespace Umbraco.Examine
             // processing below instead of one by one.
             using (var scope = _scopeProvider.CreateScope())
             {
-                creatorIds = content.Select(x => x.CreatorId).Distinct().Select(x => _userService.GetProfileById(x))
+                creatorIds = _userService.GetProfilesById(content.Select(x => x.CreatorId).ToArray())
                     .ToDictionary(x => x.Id, x => x);
-                writerIds = content.Select(x => x.WriterId).Distinct().Select(x => _userService.GetProfileById(x))
+                writerIds = _userService.GetProfilesById(content.Select(x => x.WriterId).ToArray())
                     .ToDictionary(x => x.Id, x => x);
                 scope.Complete();
             }
