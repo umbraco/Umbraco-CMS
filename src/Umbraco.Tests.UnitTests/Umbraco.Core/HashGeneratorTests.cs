@@ -4,7 +4,7 @@ using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core;
 
-namespace Umbraco.Tests.Misc
+namespace Umbraco.Tests.UnitTests.Umbraco.Core
 {
     [TestFixture]
     public class HashGeneratorTests
@@ -20,6 +20,7 @@ namespace Umbraco.Tests.Misc
                     else
                         generator.AddCaseInsensitiveString(str);
                 }
+
                 return generator.GenerateHash();
             }
         }
@@ -27,7 +28,6 @@ namespace Umbraco.Tests.Misc
         [Test]
         public void Generate_Hash_Multiple_Strings_Case_Sensitive()
         {
-
             var hash1 = Generate(true, "hello", "world");
             var hash2 = Generate(true, "hello", "world");
             var hashFalse1 = Generate(true, "hello", "worlD");
@@ -54,11 +54,13 @@ namespace Umbraco.Tests.Misc
         private DirectoryInfo PrepareFolder()
         {
             var assDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
-            var dir = Directory.CreateDirectory(Path.Combine(assDir.FullName, "HashCombiner", Guid.NewGuid().ToString("N")));
+            var dir = Directory.CreateDirectory(Path.Combine(assDir.FullName, "HashCombiner",
+                Guid.NewGuid().ToString("N")));
             foreach (var f in dir.GetFiles())
             {
                 f.Delete();
             }
+
             return dir;
         }
 
@@ -74,7 +76,6 @@ namespace Umbraco.Tests.Misc
                 combiner2.AddCaseInsensitiveString("world");
                 Assert.AreNotEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
             }
-
         }
 
         [Test]
@@ -120,6 +121,7 @@ namespace Umbraco.Tests.Misc
                 {
                     file1.WriteLine("hello");
                 }
+
                 var file2Path = Path.Combine(dir.FullName, "hastest2.txt");
                 File.Delete(file2Path);
                 using (var file2 = File.CreateText(Path.Combine(dir.FullName, "hastest2.txt")))
