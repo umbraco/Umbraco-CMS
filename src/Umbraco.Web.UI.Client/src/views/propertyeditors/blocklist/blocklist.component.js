@@ -200,17 +200,17 @@
         function editBlock(blockModel, hideContent) {
 
             // make a clone to avoid editing model directly.
-            var blockContentModelClone = angular.copy(blockModel.content);
+            var blockContentClone = angular.copy(blockModel.content);
             var blockSettingsModelClone = null;
 
             if (blockModel.config.settingsElementTypeAlias) {
-                blockSettingsModelClone = angular.copy(blockModel.settings);
+                blockSettingsClone = angular.copy(blockModel.settings);
             }
             
             var blockEditorModel = {
-                content: blockContentModelClone,
+                content: blockContentClone,
                 hideContent: hideContent,
-                settings: blockSettingsModelClone,
+                settings: blockSettingsClone,
                 title: blockModel.label,
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
                 size: blockModel.config.editorSize || "medium",

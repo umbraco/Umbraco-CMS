@@ -9,7 +9,7 @@
          * Simple mapping from property model content entry to editing model,
          * needs to stay simple to avoid deep watching.
          */
-        function mapToElementModel(elementModel, contentModel) {
+        function mapToElementModel(elementModel, dataModel) {
 
             var variant = elementModel.variants[0];
             
@@ -18,8 +18,8 @@
 
                 for (var p = 0; p < tab.properties.length; p++) {
                     var prop = tab.properties[p];
-                    if (contentModel[prop.alias]) {
-                        prop.value = contentModel[prop.alias];
+                    if (dataModel[prop.alias]) {
+                        prop.value = dataModel[prop.alias];
                     }
                 }
             }
@@ -29,7 +29,7 @@
          * Simple mapping from elementModel to property model content entry,
          * needs to stay simple to avoid deep watching.
          */
-        function mapToPropertyModel(elementModel, contentModel) {
+        function mapToPropertyModel(elementModel, dataModel) {
             
             var variant = elementModel.variants[0];
             
@@ -39,14 +39,14 @@
                 for (var p = 0; p < tab.properties.length; p++) {
                     var prop = tab.properties[p];
                     if (prop.value) {
-                        contentModel[prop.alias] = prop.value;
+                        dataModel[prop.alias] = prop.value;
                     }
                 }
             }
         }
 
-        function mapValueToPropertyModel(value, alias, contentModel) {
-            contentModel[alias] = value;
+        function mapValueToPropertyModel(value, alias, dataModel) {
+            dataModel[alias] = value;
         }
 
         /**
@@ -88,8 +88,8 @@
 
         function getBlockLabel(blockModel) {
             if(blockModel.labelInterpolator) {
-                // We are just using the contentModel, since its a key/value object that is live synced. (if we need to add additional vars, we could make a shallow copy and apply those.)
-                return blockModel.labelInterpolator(blockModel.contentModel);
+                // We are just using the data model, since its a key/value object that is live synced. (if we need to add additional vars, we could make a shallow copy and apply those.)
+                return blockModel.labelInterpolator(blockModel.data);
             }
             return blockModel.content.contentTypeName;
         }
@@ -105,7 +105,7 @@
             // Start watching each property value.
             var variant = model.variants[0];
             var field = forSettings ? "settings" : "content";
-            var watcherCreator = forSettings ? createSettingsModelPropWatcher : createContentModelPropWatcher;
+            var watcherCreator = forSettings ? createSettingsModelPropWatcher : createDataModelPropWatcher;
             for (var t = 0; t < variant.tabs.length; t++) {
                 var tab = variant.tabs[t];
                 for (var p = 0; p < tab.properties.length; p++) {
@@ -123,10 +123,10 @@
         /**
          * Used to create a scoped watcher for a content property on a blockModel.
          */
-        function createContentModelPropWatcher(blockModel, prop)  {
+        function createDataModelPropWatcher(blockModel, prop)  {
             return function() {
                 // sync data:
-                blockModel.contentModel[prop.alias] = prop.value;
+                blockModel.data[prop.alias] = prop.value;
 
                 // regenerate label.
                 // TODO: could use a debounce.
@@ -140,7 +140,7 @@
         function createSettingsModelPropWatcher(blockModel, prop)  {
             return function() {
                 // sync data:
-                blockModel.layoutModel.settings[prop.alias] = prop.value;
+                blockModel.layout.settings[prop.alias] = prop.value;
             }
         }
 
@@ -265,14 +265,14 @@
 
                 var udi = layoutEntry.udi;
 
-                var contentModel = this._getDataByUdi(udi);
+                var dataModel = this._getDataByUdi(udi);
 
-                if (contentModel === null) {
+                if (dataModel === null) {
                     console.error("Couldnt find content model of "+udi)
                     return null;
                 }
 
-                var blockConfiguration = this.getBlockConfiguration(contentModel.contentTypeAlias);
+                var blockConfiguration = this.getBlockConfiguration(dataModel.contentTypeAlias);
 
                 if (blockConfiguration === null) {
                     console.error("The block entry of "+udi+" is not begin initialized cause its contentTypeAlias is not allowed for this PropertyEditor")
@@ -296,10 +296,10 @@
                 blockModel.content = angular.copy(contentScaffold);
                 blockModel.content.udi = udi;
 
-                mapToElementModel(blockModel.content, contentModel);
+                mapToElementModel(blockModel.content, dataModel);
 
-                blockModel.contentModel = contentModel;
-                blockModel.layoutModel = layoutEntry;
+                blockModel.data = dataModel;
+                blockModel.layout = layoutEntry;
                 blockModel.watchers = [];
 
                 if (blockConfiguration.settingsElementTypeAlias) {
@@ -353,10 +353,10 @@
 
                 var udi = blockModel.content.key;
 
-                mapToPropertyModel(blockModel.content, blockModel.contentModel);
+                mapToPropertyModel(blockModel.content, blockModel.data);
 
                 // TODO: implement settings, sync settings to layout entry.
-                // mapToPropertyModel(blockModel.settings, blockModel.layoutModel.settings)
+                // mapToPropertyModel(blockModel.settings, blockModel.layout.settings)
 
             },
 
@@ -398,23 +398,23 @@
              * Insert data from ElementType Model
              * @return {Object} Layout entry object, to be inserted at a decired location in the layout object.
              */
-            createFromElementType: function(elementTypeContentModel) {
+            createFromElementType: function(elementTypeDataModel) {
 
-                elementTypeContentModel = angular.copy(elementTypeContentModel);
+                elementTypeDataModel = angular.copy(elementTypeDataModel);
 
-                var contentTypeAlias = elementTypeContentModel.contentTypeAlias;
+                var contentTypeAlias = elementTypeDataModel.contentTypeAlias;
 
                 var layoutEntry = this.create(contentTypeAlias);
                 if(layoutEntry === null) {
                     return null;
                 }
 
-                var contentModel = this._getDataByUdi(layoutEntry.udi);
-                if(contentModel === null) {
+                var dataModel = this._getDataByUdi(layoutEntry.udi);
+                if(dataModel === null) {
                     return null;
                 }
 
-                mapToPropertyModel(elementTypeContentModel, contentModel);
+                mapToPropertyModel(elementTypeDataModel, dataModel);
 
                 return layoutEntry;
 

@@ -110,7 +110,7 @@
                 var blockModel = modelObject.getBlockModel(layout[0]);
 
                 expect(blockModel).not.toBeUndefined();
-                expect(blockModel.contentModel.udi).toBe(propertyModelMock.data[0].udi);
+                expect(blockModel.data.udi).toBe(propertyModelMock.data[0].udi);
                 expect(blockModel.content.variants[0].tabs[0].properties[0].value).toBe(propertyModelMock.data[0].testproperty);
 
                 done();
@@ -135,8 +135,8 @@
 
                 $rootScope.$digest();// invoke angularJS Store.
 
-                expect(blockModel.contentModel).toBe(propertyModel.data[0]);
-                expect(blockModel.contentModel.testproperty).toBe("anotherTestValue");
+                expect(blockModel.data).toBe(propertyModel.data[0]);
+                expect(blockModel.data.testproperty).toBe("anotherTestValue");
                 expect(propertyModel.data[0].testproperty).toBe("anotherTestValue");
 
                 //
