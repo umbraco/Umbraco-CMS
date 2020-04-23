@@ -1,7 +1,6 @@
 ﻿using System.Xml;
-using Umbraco.Tests.Common.Builders;
 
-namespace Umbraco.Tests.Common
+namespace Umbraco.Tests.Common.Builders
 {
     public class XmlDocumentBuilder : BuilderBase<XmlDocument>
     {

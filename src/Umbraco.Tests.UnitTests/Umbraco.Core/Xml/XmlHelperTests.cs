@@ -5,7 +5,7 @@ using System.Xml.XPath;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Xml;
-using Umbraco.Tests.Common;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Xml
 {
