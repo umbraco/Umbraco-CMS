@@ -17,8 +17,7 @@
 
                 <li ng-repeat="template in model.value.templates" class="clearfix">
 
-                    <div ng-click="configureTemplate(template)"
-                         class="preview-rows layout">
+                    <div ng-click="configureTemplate(template)" class="preview-rows layout">
 
                         <div class="preview-row">
                             <div class="preview-col"
@@ -41,8 +40,7 @@
                 </li>
             </ul>
 
-            <button type="button" class="btn btn-small btn-info"
-                    ng-click="configureTemplate()">
+            <button type="button" class="btn btn-small btn-info" ng-click="configureTemplate()">
                 <i class="icon-add" aria-hidden="true"></i>
                 <localize key="grid_addGridLayout" />
             </button>
@@ -66,8 +64,7 @@
 
                     <li ng-repeat="layout in model.value.layouts" class="clearfix">
 
-                        <div ng-click="configureLayout(layout)"
-                             class="preview-rows columns">
+                        <div ng-click="configureLayout(layout)" class="preview-rows columns">
 
                             <div class="preview-row">
                                 <div class="preview-col"
@@ -93,7 +90,7 @@
                     </li>
                 </ul>
 
-                <button type="button" class="btn btn-small" ng-click="configureLayout()">
+                <button type="button" class="btn btn-small btn-info" ng-click="configureLayout()">
                     <i class="icon-add" aria-hidden="true"></i>
                     <localize key="grid_addRowConfiguration">Add row configuration</localize>
                 </button>
