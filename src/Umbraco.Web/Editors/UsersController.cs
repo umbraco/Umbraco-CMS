@@ -499,7 +499,7 @@ namespace Umbraco.Web.Editors
                 UmbracoUserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
 
-            // TODO: SB: EmailService.SendAsync
+            // TODO: Port email service to ASP.NET Core
             /*await UserManager.EmailService.SendAsync(
                 //send the special UmbracoEmailMessage which configures it's own sender
                 //to allow for events to handle sending the message if no smtp is configured

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -327,7 +327,7 @@ namespace Umbraco.Web.Editors
                         UmbracoUserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings),
                         new[] { identityUser.UserName, callbackUrl });
 
-                    // TODO: SB: SendEmailAsync
+                    // TODO: Port email service to ASP.NET Core
                     /*await UserManager.SendEmailAsync(identityUser.Id,
                         Services.TextService.Localize("login/resetPasswordEmailCopySubject",
                             // Ensure the culture of the found user is used for the email!
@@ -451,8 +451,6 @@ namespace Umbraco.Web.Editors
                 // if user was only invited, then they have not been approved
                 // but a successful forgot password flow (e.g. if their token had expired and they did a forgot password instead of request new invite)
                 // means we have verified their email
-
-                // TODO: SB: ConfirmEmailAsync
                 if (!await UserManager.IsEmailConfirmedAsync(identityUser))
                 {
                     await UserManager.ConfirmEmailAsync(identityUser, model.ResetCode);
