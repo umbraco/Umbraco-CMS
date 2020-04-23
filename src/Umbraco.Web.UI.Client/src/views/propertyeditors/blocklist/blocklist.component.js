@@ -26,7 +26,7 @@
             }
         });
 
-    function BlockListController($scope, $interpolate, editorService, clipboardService, localizationService, overlayService, blockEditorService) {
+    function BlockListController($scope, editorService, clipboardService, localizationService, overlayService, blockEditorService) {
         
         var unsubscribe = [];
         var modelObject;
@@ -201,7 +201,7 @@
 
             // make a clone to avoid editing model directly.
             var blockContentClone = angular.copy(blockModel.content);
-            var blockSettingsModelClone = null;
+            var blockSettingsClone = null;
 
             if (blockModel.config.settingsElementTypeAlias) {
                 blockSettingsClone = angular.copy(blockModel.settings);
