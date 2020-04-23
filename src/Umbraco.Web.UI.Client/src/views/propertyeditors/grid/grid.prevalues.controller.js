@@ -192,7 +192,7 @@ angular.module("umbraco")
             }
 
             /****************
-                Utillities
+                Utilities
             *****************/
             function toggleCollection(collection, toggle) {
                 if (toggle) {
@@ -250,14 +250,14 @@ angular.module("umbraco")
             }
 
             /****************
-                editors
+                Editors
             *****************/
             gridService.getGridEditors().then(function (response) {
                 $scope.editors = response.data;
             });
 
 
-            /* init grid data */
+            /* Init grid data */
             if (!$scope.model.value || $scope.model.value === "" || !$scope.model.value.templates) {
                 $scope.model.value = emptyModel;
             } else {
