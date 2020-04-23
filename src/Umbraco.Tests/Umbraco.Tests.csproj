@@ -386,7 +386,6 @@
     <Compile Include="PublishedContent\PublishedContentTestBase.cs" />
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
-    <Compile Include="Misc\HashCodeCombinerTests.cs" />
     <Compile Include="Web\Mvc\HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="IO\IoHelperTests.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueConverterTests.cs" />
