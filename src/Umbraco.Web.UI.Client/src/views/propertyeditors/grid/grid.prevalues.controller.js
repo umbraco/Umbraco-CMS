@@ -164,7 +164,7 @@ angular.module("umbraco")
                 submitButtonLabelKey: "contentTypeEditor_yesDelete",
                 submitButtonStyle: "danger",
                 submit: function (model) {
-                    //performDelete(model.language);
+                    performDelete(index);
                     overlayService.close();
                 },
                 close: function () {
@@ -198,8 +198,8 @@ angular.module("umbraco")
             //editorService.open(rowDeleteOverlay);
         };
 
-        function performDelete() {
-            
+        function performDelete(index) {
+            $scope.model.value.layouts.splice(index, 1);
         }
 
         /****************
