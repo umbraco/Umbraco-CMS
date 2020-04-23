@@ -2,6 +2,22 @@ angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridPrevalueEditorController",
         function ($scope, gridService, editorService, localizationService, overlayService) {
 
+            var vm = this;
+
+            vm.configureTemplate = configureTemplate;
+            vm.deleteTemplate = deleteTemplate;
+
+            vm.configureLayout = configureLayout;
+            vm.deleteLayout = deleteLayout;
+
+            vm.toggleCollection = toggleCollection;
+            vm.percentage = percentage;
+            vm.zeroWidthFilter = zeroWidthFilter;
+
+            vm.removeConfigValue = removeConfigValue;
+            vm.editConfig = editConfig;
+            vm.editStyles = editStyles;
+
             var emptyModel = {
                 styles: [
                     {
@@ -73,10 +89,10 @@ angular.module("umbraco")
             };
 
             /****************
-                template
+                Template
             *****************/
 
-            $scope.configureTemplate = function (template) {
+            function configureTemplate(template) {
 
                 var index = $scope.model.value.templates.indexOf(template);
 
@@ -107,19 +123,17 @@ angular.module("umbraco")
                 };
 
                 editorService.open(layoutConfigOverlay);
+            }
 
-            };
-
-            $scope.deleteTemplate = function (index) {
+            function deleteTemplate(index) {
                 $scope.model.value.templates.splice(index, 1);
-            };
-
+            }
 
             /****************
                 Row
             *****************/
 
-            $scope.configureLayout = function (layout) {
+            function configureLayout(layout) {
 
                 var index = $scope.model.value.layouts.indexOf(layout);
 
@@ -150,10 +164,9 @@ angular.module("umbraco")
                 };
 
                 editorService.open(rowConfigOverlay);
+            }
 
-            };
-
-            $scope.deleteLayout = function (layout, index, event) {
+            function deleteLayout(layout, index, event) {
 
                 const dialog = {
                     view: "views/propertyEditors/grid/overlays/rowdeleteconfirm.html",
@@ -176,12 +189,12 @@ angular.module("umbraco")
 
                 event.preventDefault();
                 event.stopPropagation();
-            };
+            }
 
             /****************
-                utillities
+                Utillities
             *****************/
-            $scope.toggleCollection = function (collection, toggle) {
+            function toggleCollection(collection, toggle) {
                 if (toggle) {
                     collection = [];
                 } else {
@@ -189,21 +202,21 @@ angular.module("umbraco")
                 }
             };
 
-            $scope.percentage = function (spans) {
+            function percentage(spans) {
                 return ((spans / $scope.model.value.columns) * 100).toFixed(8);
-            };
+            }
 
-            $scope.zeroWidthFilter = function (cell) {
+            function zeroWidthFilter(cell) {
                 return cell.grid > 0;
-            };
+            }
 
             /****************
                 Config
             *****************/
 
-            $scope.removeConfigValue = function (collection, index) {
+            function removeConfigValue(collection, index) {
                 collection.splice(index, 1);
-            };
+            }
 
             var editConfigCollection = function (configValues, title, callback) {
 
@@ -224,17 +237,17 @@ angular.module("umbraco")
                 editorService.open(editConfigCollectionOverlay);
             };
 
-            $scope.editConfig = function () {
+            function editConfig() {
                 editConfigCollection($scope.model.value.config, "Settings", function (data) {
                     $scope.model.value.config = data;
                 });
-            };
+            }
 
-            $scope.editStyles = function () {
+            function editStyles() {
                 editConfigCollection($scope.model.value.styles, "Styling", function (data) {
                     $scope.model.value.styles = data;
                 });
-            };
+            }
 
             /****************
                 editors
