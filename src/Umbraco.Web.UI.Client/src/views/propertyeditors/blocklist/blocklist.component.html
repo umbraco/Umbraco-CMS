@@ -19,9 +19,9 @@
 
                 <div class="umb-block-list__block" ng-class="{'--open':block.isOpen}">
 
-                    <umb-block-list-scoped-block-content ng-if="block.config.stylesheet" class="umb-block-list__block--content blockelement__draggable-element" view="{{::block.view}}" stylesheet="/{{::block.config.stylesheet}}" api="vm.blockEditorApi" block="block">
+                    <umb-block-list-scoped-block-content ng-if="block.config.stylesheet" class="umb-block-list__block--content blockelement__draggable-element" view="{{::block.view}}" stylesheet="/{{::block.config.stylesheet}}" api="vm.blockEditorApi" block="block" index="$index">
                     </umb-block-list-scoped-block-content>
-                    <umb-block-list-block-content ng-if="!block.config.stylesheet" class="umb-block-list__block--content" view="{{::block.view}}" api="vm.blockEditorApi" block="block">
+                    <umb-block-list-block-content ng-if="!block.config.stylesheet" class="umb-block-list__block--content" view="{{::block.view}}" api="vm.blockEditorApi" block="block" index="$index">
                     </umb-block-list-block-content>
 
                     <div class="umb-block-list__block--actions">

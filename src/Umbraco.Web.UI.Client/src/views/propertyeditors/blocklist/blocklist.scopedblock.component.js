@@ -14,12 +14,13 @@
         .module("umbraco")
         .component("umbBlockListScopedBlockContent", {
             controller: BlockListScopedBlockContentController,
-            controllerAs: "vm",
+            controllerAs: "model",
             bindings: {
                 stylesheet: "@",
                 view: "@",
                 block: "=",
-                api: "="
+                api: "=",
+                index: "<"
             }
         }
     );

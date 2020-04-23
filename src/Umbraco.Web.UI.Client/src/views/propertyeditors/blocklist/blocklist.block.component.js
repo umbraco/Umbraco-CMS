@@ -15,11 +15,12 @@
         .component("umbBlockListBlockContent", {
             template: '<div ng-include="vm.view"></div>',
             controller: BlockListBlockContentController,
-            controllerAs: "vm",
+            controllerAs: "model",
             bindings: {
                 view: "@",
                 block: "=",
-                api: "="
+                api: "=",
+                index: "<"
             }
         }
     );
