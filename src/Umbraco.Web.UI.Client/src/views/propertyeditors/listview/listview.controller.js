@@ -382,7 +382,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         return serial(selected, fn, getStatusMsg, 0).then(function (result) {
             // executes once the whole selection has been processed
             // in case of an error (caught by serial), result will be the error
-            if (!(result.data && angular.isArray(result.data.notifications)))
+            if (!(result.data && Utilities.isArray(result.data.notifications)))
                 showNotificationsAndReset(result, true, getSuccessMsg(selected.length));
         });
     }
@@ -709,7 +709,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     }
 
     function isDate(val) {
-        if (angular.isString(val)) {
+        if (Utilities.isString(val)) {
             return val.match(/^(\d{4})\-(\d{2})\-(\d{2})\ (\d{2})\:(\d{2})\:(\d{2})$/);
         }
         return false;

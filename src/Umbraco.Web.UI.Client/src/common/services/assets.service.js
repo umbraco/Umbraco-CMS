@@ -256,7 +256,7 @@ angular.module('umbraco.services')
             load: function (pathArray, scope, defaultAssetType) {
                 var promise;
 
-                if (!angular.isArray(pathArray)) {
+                if (!Utilities.isArray(pathArray)) {
                     throw "pathArray must be an array";
                 }
 

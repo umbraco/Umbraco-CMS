@@ -66,6 +66,34 @@
      */
     const isObject = val => val !== null && typeof val === 'object';
 
+    const isWindow = obj => obj && obj.window === obj;
+
+    const isScope = obj => obj && obj.$evalAsync && obj.$watch;
+
+    const toJsonReplacer = (key, value) => {
+        var val = value;      
+        if (typeof key === 'string' && key.charAt(0) === '$' && key.charAt(1) === '$') {
+          val = undefined;
+        } else if (isWindow(value)) {
+          val = '$WINDOW';
+        } else if (value &&  window.document === value) {
+          val = '$DOCUMENT';
+        } else if (isScope(value)) {
+          val = '$SCOPE';
+        }      
+        return val;
+      }
+    /**
+     * Equivalent to angular.toJson
+     */
+    const toJson = (obj, pretty) => {
+        if (isUndefined(obj)) return undefined;
+        if (!isNumber(pretty)) {
+          pretty = pretty ? 2 : null;
+        }
+        return JSON.stringify(obj, toJsonReplacer, pretty);
+    }
+
     let _utilities = {
         noop: noop,
         copy: copy,
@@ -77,7 +105,8 @@
         isDefined: isDefined,
         isString: isString,
         isNumber: isNumber,
-        isObject: isObject
+        isObject: isObject,
+        toJson: toJson
     };
 
     if (typeof (window.Utilities) === 'undefined') {

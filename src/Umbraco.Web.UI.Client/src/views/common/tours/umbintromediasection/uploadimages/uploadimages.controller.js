@@ -2,12 +2,11 @@
     "use strict";
 
     function UploadImagesController($scope, editorState, mediaResource) {
-        
+
         var vm = this;
-        var element = angular.element($scope.model.currentStep.element);
 
         vm.error = false;
-        
+
         vm.initNextStep = initNextStep;
 
         function initNextStep() {
@@ -23,7 +22,7 @@
 
                     var children = data;
 
-                    if(children.items && children.items.length > 0) {
+                    if (children.items && children.items.length > 0) {
                         $scope.model.nextStep();
                     } else {
                         vm.error = true;
