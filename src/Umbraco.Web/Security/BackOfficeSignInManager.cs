@@ -139,7 +139,7 @@ namespace Umbraco.Web.Security
                             $"Login attempt failed for username {userName} from IP address {_request.RemoteIpAddress}, no content and/or media start nodes could be found for any of the user's groups", null, null);
 
                         // We will say its a sucessful login which it is, but they have no node access
-                        return SignInStatus.Success;
+                        return SignInResult.Success;
                     }
                 }
 
