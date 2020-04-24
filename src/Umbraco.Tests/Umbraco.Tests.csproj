@@ -471,7 +471,6 @@
     <Compile Include="UmbracoExamine\ExamineDemoDataMediaService.cs" />
     <Compile Include="UmbracoExamine\ExamineDemoDataContentService.cs" />
     <Compile Include="CoreThings\UriExtensionsTests.cs" />
-    <Compile Include="Misc\UriUtilityTests.cs" />
     <Compile Include="Composing\PackageActionCollectionTests.cs" />
     <Compile Include="Composing\TypeLoaderExtensions.cs" />
     <Compile Include="Composing\TypeLoaderTests.cs" />

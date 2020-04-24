@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using Umbraco.Tests.Common;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
 {
