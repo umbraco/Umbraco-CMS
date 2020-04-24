@@ -10,11 +10,13 @@ namespace Umbraco.Tests.Security
         [TestCase(null)]
         [TestCase("")]
         [TestCase(" ")]
-        public void NormalizeName_When_Name_Null_Or_Whitespace_Expect_ArgumentNullException(string name)
+        public void NormalizeName_When_Name_Null_Or_Whitespace_Expect_Same_Returned(string name)
         {
             var sut = new NopLookupNormalizer();
 
-            Assert.Throws<ArgumentNullException>(() => sut.NormalizeName(name));
+            var normalizedName = sut.NormalizeName(name);
+
+            Assert.AreEqual(name, normalizedName);
         }
 
         [Test]
@@ -31,22 +33,24 @@ namespace Umbraco.Tests.Security
         [TestCase(null)]
         [TestCase("")]
         [TestCase(" ")]
-        public void NormalizeEmail_When_Name_Null_Or_Whitespace_Expect_ArgumentNullException(string email)
+        public void NormalizeEmail_When_Name_Null_Or_Whitespace_Expect_Same_Returned(string email)
         {
             var sut = new NopLookupNormalizer();
 
-            Assert.Throws<ArgumentNullException>(() => sut.NormalizeEmail(email));
+            var normalizedEmail = sut.NormalizeEmail(email);
+
+            Assert.AreEqual(email, normalizedEmail);
         }
 
         [Test]
         public void NormalizeEmail_Expect_Input_Returned()
         {
-            var name = $"{Guid.NewGuid()}@umbraco";
+            var email = $"{Guid.NewGuid()}@umbraco";
             var sut = new NopLookupNormalizer();
 
-            var normalizedName = sut.NormalizeEmail(name);
+            var normalizedEmail = sut.NormalizeEmail(email);
 
-            Assert.AreEqual(name, normalizedName);
+            Assert.AreEqual(email, normalizedEmail);
         }
     }
 }
