@@ -84,7 +84,6 @@ namespace Umbraco.Web.Common.Extensions
 
             IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
             services.AddSingleton<IHttpContextAccessor>(httpContextAccessor);
-
             var requestCache = new GenericDictionaryRequestAppCache(() => httpContextAccessor.HttpContext.Items);
 
             services.AddUmbracoCore(webHostEnvironment,
