@@ -14,7 +14,7 @@ namespace Umbraco.Core.Logging.Viewer
         private readonly global::Serilog.ILogger _serilogLog;
 
         protected SerilogLogViewerSourceBase(ILogViewerConfig logViewerConfig, global::Serilog.ILogger serilogLog)
-        {            
+        {
             _logViewerConfig = logViewerConfig;
             _serilogLog = serilogLog;
         }
@@ -50,7 +50,7 @@ namespace Umbraco.Core.Logging.Viewer
         /// <returns></returns>
         public string GetLogLevel()
         {
-            var logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>().Where(_serilogLog.IsEnabled)?.Min() ?? null;
+            var logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>().Where(_serilogLog.IsEnabled).DefaultIfEmpty(LogEventLevel.Information)?.Min() ?? null;
             return logLevel?.ToString() ?? "";
         }
 
@@ -131,6 +131,6 @@ namespace Umbraco.Core.Logging.Viewer
             };
         }
 
-        
+
     }
 }

@@ -925,6 +925,24 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Get_By_Profile_Id_Must_return_null_if_user_not_exists()
+        {
+            var profile = ServiceContext.UserService.GetProfileById(42);
+
+            // Assert
+            Assert.IsNull(profile);
+        }
+
+        [Test]
+        public void GetProfilesById_Must_empty_if_users_not_exists()
+        {
+            var profiles = ServiceContext.UserService.GetProfilesById(42);
+
+            // Assert
+            CollectionAssert.IsEmpty(profiles);
+        }
+
+        [Test]
         public void Get_User_By_Username()
         {
             // Arrange
