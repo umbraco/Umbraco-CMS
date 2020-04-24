@@ -73,7 +73,7 @@ namespace Umbraco.Web
         }
 
         protected UmbracoApplicationBase(ILogger logger, Configs configs, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
-        {            
+        {
             if (!Umbraco.Composing.Current.IsInitialized)
             {
                 Logger = logger;

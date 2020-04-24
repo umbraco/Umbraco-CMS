@@ -70,7 +70,8 @@ namespace Umbraco.Web.Scheduling
                 //    but then what should be its "scope"? could we attach it to scopes?
                 // - and we should definitively *not* have to flush it here (should be auto)
                 //
-                using (var contextReference = _umbracoContextFactory.EnsureUmbracoContext())
+                using (
+                var contextReference = _umbracoContextFactory.EnsureUmbracoContext())
                 {
                     try
                     {

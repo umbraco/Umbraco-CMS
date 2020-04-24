@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models.Membership;
 
@@ -68,5 +69,17 @@ namespace Umbraco.Core.Services
             userService.ReplaceUserGroupPermissions(groupId, new char[] { });
         }
 
+
+        public static IEnumerable<IProfile> GetProfilesById(this IUserService userService, params int[] ids)
+        {
+            var fullUsers = userService.GetUsersById(ids);
+
+            return fullUsers.Select(user =>
+            {
+                var asProfile = user as IProfile;
+                return asProfile ?? new UserProfile(user.Id, user.Name);
+            });
+
+        }
     }
 }
