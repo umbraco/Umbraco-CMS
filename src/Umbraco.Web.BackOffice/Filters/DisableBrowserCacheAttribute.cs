@@ -8,16 +8,16 @@ namespace Umbraco.Web.BackOffice.Filters
     /// </summary>
     public class DisableBrowserCacheAttribute : ActionFilterAttribute
     {
-        public override async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
+        public override void OnResultExecuting(ResultExecutingContext context)
         {
-            if (context.HttpContext?.Response?.StatusCode == 200)
+            if (context.HttpContext?.Response?.StatusCode != 200)
             {
-                context.HttpContext.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
-                context.HttpContext.Response.Headers["Expires"] = "-1";
-                context.HttpContext.Response.Headers["Pragma"] = "no-cache";
+                return;
             }
 
-            await next();
+            context.HttpContext.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            context.HttpContext.Response.Headers["Expires"] = "-1";
+            context.HttpContext.Response.Headers["Pragma"] = "no-cache";
         }
     }
 }
