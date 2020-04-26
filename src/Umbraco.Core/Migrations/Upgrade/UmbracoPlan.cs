@@ -7,6 +7,7 @@ using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_1;
 using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_6_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_7_0;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -193,6 +194,14 @@ namespace Umbraco.Core.Migrations.Upgrade
 
 
             To<MissingDictionaryIndex>("{a78e3369-8ea3-40ec-ad3f-5f76929d2b20}");
+
+            // to 8.7.0...
+            To<NestedContentUpgrade>("{C697CE68-FE7B-4E05-AD0A-E189E5AB980B}");
+            To<ColorPickerPreValueMigrator>("{24D8C07C-08A5-4088-A4DC-2B19BF1F0EB6}");
+            To<MultiNodeTreePickerPreValueMigrator>("{AF424C79-1869-4FE6-9101-F20ACFEC313F}");
+            To<SliderPreValueMigrator>("{2E2FAD22-0D63-4360-88AC-1D581D7989EE}");
+            To<GridPreValueMigrator>("{42A51FED-627A-46D1-87D6-668E96563739}");
+            To<MultipleTextstringPreValueMigrator>("{A93768A9-EAAD-44F5-8341-3CF61B676D65}");
 
             //FINAL
         }

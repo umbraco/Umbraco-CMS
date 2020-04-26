@@ -131,6 +131,12 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\ContentTypeDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyDataDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyTypeDto80.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_7_0\ColorPickerPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_7_0\GridPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_7_0\MultiNodeTreePickerPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_7_0\NestedContentUpgrade.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_7_0\MultipleTextstringPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_7_0\SliderPreValueMigrator.cs" />
     <Compile Include="Models\InstallLog.cs" />
     <Compile Include="Persistence\Repositories\IInstallationRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\InstallationRepository.cs" />
