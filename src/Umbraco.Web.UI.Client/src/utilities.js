@@ -94,6 +94,16 @@
         return JSON.stringify(obj, toJsonReplacer, pretty);
     }
 
+    /**
+     * Equivalent to angular.fromJson
+     */
+    const fromJson = (val) => {
+        if (!isString(val)) {
+            return val;
+        }
+        return JSON.parse(val);
+    }
+
     let _utilities = {
         noop: noop,
         copy: copy,
@@ -106,6 +116,7 @@
         isString: isString,
         isNumber: isNumber,
         isObject: isObject,
+        fromJson: fromJson,
         toJson: toJson
     };
 
