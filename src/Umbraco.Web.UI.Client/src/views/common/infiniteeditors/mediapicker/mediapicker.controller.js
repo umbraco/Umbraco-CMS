@@ -347,23 +347,11 @@ angular.module("umbraco")
 
             function openDetailsDialog() {
                 localizationService.localize("defaultdialogs_editSelectedMedia").then(function (data) {
+                    $scope.model.selection.push($scope.target);
                     vm.mediaPickerDetailsOverlay = {
                         show: true,
                         title: data,
-                        disableFocalPoint: $scope.disableFocalPoint,
-                        submit: function (model) {
-                            $scope.model.selection.push($scope.target);
-                            $scope.model.submit($scope.model);
-
-                            vm.mediaPickerDetailsOverlay.show = false;
-                            vm.mediaPickerDetailsOverlay = null;
-                        },
-                        close: function (oldModel) {
-                            vm.mediaPickerDetailsOverlay.show = false;
-                            vm.mediaPickerDetailsOverlay = null;
-
-                            close();
-                        }
+                        disableFocalPoint: $scope.disableFocalPoint
                     };
                 });
             };
