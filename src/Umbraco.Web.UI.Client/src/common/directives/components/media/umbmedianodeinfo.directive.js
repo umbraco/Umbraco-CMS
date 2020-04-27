@@ -37,7 +37,7 @@
                     });
                 });
 
-                // get document type details
+                // get media type details
                 scope.mediaType = scope.node.contentType;
 
                 // set the media link initially
