@@ -23,12 +23,14 @@ angular.module("umbraco")
             
             if($scope.model.hideContent) {
                 apps.splice(apps.indexOf(contentApp), 1);
+            } else if ($scope.model.openSettings !== true) {
+                contentApp.active = true;
             }
 
             // remove info app:
             var infoAppIndex = apps.findIndex(entry => entry.alias === "umbInfo");
             apps.splice(infoAppIndex, 1);
-            
+
         }
 
         if (vm.settings && vm.settings.variants) {
@@ -41,13 +43,11 @@ angular.module("umbraco")
                         "view": "views/common/infiniteeditors/elementeditor/elementeditor.settings.html"
                     };
                     vm.tabs.push(settingsTab);
+                    if ($scope.model.openSettings) {
+                        settingsTab.active = true;
+                    }
                 }
             );
-        }
-
-        // activate first app:
-        if (vm.tabs.length > 0) {
-            vm.tabs[0].active = true;
         }
 
         vm.submitAndClose = function () {
