@@ -162,7 +162,7 @@
                             <img ng-src="{{target.thumbnail}}" alt="{{target.name}}" />
                         </div>
 
-                        <div ng-if="!vm.mediaPickerDetailsOverlay.disableFocalPoint">
+                        <div ng-if="!vm.mediaPickerDetailsOverlay.disableFocalPoint && cropSize">
 
                             <h5>
                                 <localize key="@general_cropSection">Crop section</localize>
