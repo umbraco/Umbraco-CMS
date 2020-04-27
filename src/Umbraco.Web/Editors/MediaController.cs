@@ -126,15 +126,15 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForMedia("id")]
         public MediaItemDisplay GetById(int id)
         {
-            var foundContent = GetObjectFromRequest(() => Services.MediaService.GetById(id));
+            var foundMedia = GetObjectFromRequest(() => Services.MediaService.GetById(id));
 
-            if (foundContent == null)
+            if (foundMedia == null)
             {
                 HandleContentNotFound(id);
                 //HandleContentNotFound will throw an exception
                 return null;
             }
-            return Mapper.Map<MediaItemDisplay>(foundContent);
+            return Mapper.Map<MediaItemDisplay>(foundMedia);
         }
 
         /// <summary>
@@ -146,15 +146,15 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForMedia("id")]
         public MediaItemDisplay GetById(Guid id)
         {
-            var foundContent = GetObjectFromRequest(() => Services.MediaService.GetById(id));
+            var foundMedia = GetObjectFromRequest(() => Services.MediaService.GetById(id));
 
-            if (foundContent == null)
+            if (foundMedia == null)
             {
                 HandleContentNotFound(id);
                 //HandleContentNotFound will throw an exception
                 return null;
             }
-            return Mapper.Map<MediaItemDisplay>(foundContent);
+            return Mapper.Map<MediaItemDisplay>(foundMedia);
         }
 
         /// <summary>
