@@ -2253,6 +2253,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="create">Create</key>
     <key alias="edit">Edit</key>
     <key alias="name">Name</key>
+    <key alias="addNewRow">Add new row</key>
+    <key alias="tabExpand">View more options</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>

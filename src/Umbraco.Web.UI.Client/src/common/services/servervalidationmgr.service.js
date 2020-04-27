@@ -26,7 +26,7 @@ function serverValidationManager($timeout) {
     }
 
     function getFieldErrors(self, fieldName) {
-        if (!angular.isString(fieldName)) {
+        if (!Utilities.isString(fieldName)) {
             throw "fieldName must be a string";
         }
 
@@ -36,11 +36,12 @@ function serverValidationManager($timeout) {
         });
     }
     
+
     function getPropertyErrors(self, propertyAlias, culture, segment, fieldName) {
-        if (!angular.isString(propertyAlias)) {
+        if (!Utilities.isString(propertyAlias)) {
             throw "propertyAlias must be a string";
         }
-        if (fieldName && !angular.isString(fieldName)) {
+        if (fieldName && !Utilities.isString(fieldName)) {
             throw "fieldName must be a string";
         }
         

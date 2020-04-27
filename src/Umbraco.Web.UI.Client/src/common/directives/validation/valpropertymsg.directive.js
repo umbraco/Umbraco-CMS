@@ -102,7 +102,7 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                             var errCount = 0;
 
                             for (var e in formCtrl.$error) {
-                                if (angular.isArray(formCtrl.$error[e])) {
+                                if (Utilities.isArray(formCtrl.$error[e])) {
                                     errCount++;
                                 }
                             }         
@@ -112,8 +112,8 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                             // is the only one, then we'll clear.
 
                             if (errCount === 0 
-                                || (errCount === 1 && angular.isArray(formCtrl.$error.valPropertyMsg)) 
-                                || (formCtrl.$invalid && angular.isArray(formCtrl.$error.valServer))) {
+                                || (errCount === 1 && Utilities.isArray(formCtrl.$error.valPropertyMsg)) 
+                                || (formCtrl.$invalid && Utilities.isArray(formCtrl.$error.valServer))) {
                                 scope.errorMsg = "";
                                 formCtrl.$setValidity('valPropertyMsg', true);
                             } else if (showValidation && scope.errorMsg === "") {

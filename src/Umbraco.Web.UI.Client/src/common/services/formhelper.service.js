@@ -83,7 +83,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             if (!args || !args.notifications) {
                 return false;
             }
-            if (angular.isArray(args.notifications)) {
+            if (Utilities.isArray(args.notifications)) {
                 for (var i = 0; i < args.notifications.length; i++) {
                     notificationsService.showNotification(args.notifications[i]);
                 }

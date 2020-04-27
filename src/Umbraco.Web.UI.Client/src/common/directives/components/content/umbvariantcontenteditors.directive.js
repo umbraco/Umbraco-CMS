@@ -42,7 +42,7 @@
 
         /** Called when the component initializes */
         function onInit() {
-            prevContentDateUpdated = angular.copy(vm.content.updateDate);
+            prevContentDateUpdated = Utilities.copy(vm.content.updateDate);
             setActiveVariant();
         }
 
@@ -69,7 +69,7 @@
         function doCheck() {
             if (!angular.equals(vm.content.updateDate, prevContentDateUpdated)) {
                 setActiveVariant();
-                prevContentDateUpdated = angular.copy(vm.content.updateDate);
+                prevContentDateUpdated = Utilities.copy(vm.content.updateDate);
             }
         }
 

@@ -38,7 +38,7 @@
 
             //watch for changes to isNew, set the page.isNew accordingly and load the breadcrumb if we can
             $scope.$watch('isNew', function (newVal, oldVal) {
-                
+
                 $scope.page.isNew = Object.toBoolean(newVal);
 
                 //We fetch all ancestors of the node to generate the footer breadcrumb navigation
@@ -180,32 +180,32 @@
                 }
             }));
 
-            evts.push(eventsService.on("editors.content.reload", function (name, args) {                
+            evts.push(eventsService.on("editors.content.reload", function (name, args) {
                 if (args && args.node && $scope.content.id === args.node.id) {
                     reload();
                     loadBreadcrumb();
                     syncTreeNode($scope.content, $scope.content.path);
                 }
             }));
-            
-            evts.push(eventsService.on("rte.file.uploading", function(){
+
+            evts.push(eventsService.on("rte.file.uploading", function () {
                 $scope.page.saveButtonState = "busy";
                 $scope.page.buttonGroupState = "busy";
 
             }));
 
-            evts.push(eventsService.on("rte.file.uploaded", function(){
+            evts.push(eventsService.on("rte.file.uploaded", function () {
                 $scope.page.saveButtonState = "success";
                 $scope.page.buttonGroupState = "success";
             }));
 
-            evts.push(eventsService.on("rte.shortcut.save", function(){
+            evts.push(eventsService.on("rte.shortcut.save", function () {
                 if ($scope.page.showSaveButton) {
                     $scope.save();
                 }
             }));
 
-            evts.push(eventsService.on("content.saved", function(){
+            evts.push(eventsService.on("content.saved", function () {
                 // Clear out localstorage keys that start with tinymce__
                 // When we save/perist a content node
                 // NOTE: clearAll supports a RegEx pattern of items to remove
@@ -321,7 +321,7 @@
                     .then(function (syncArgs) {
                         $scope.page.menu.currentNode = syncArgs.node;
                         if (reloadChildren && syncArgs.node.expanded) {
-                            treeService.loadNodeChildren({node: syncArgs.node});
+                            treeService.loadNodeChildren({ node: syncArgs.node });
                         }
                     }, function () {
                         //handle the rejection
@@ -782,7 +782,7 @@
                 var dialog = {
                     parentScope: $scope,
                     view: "views/content/overlays/schedule.html",
-                    variants:  angular.copy($scope.content.variants), //set a model property for the dialog
+                    variants: Utilities.copy($scope.content.variants), //set a model property for the dialog
                     skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                     submitButtonLabelKey: "buttons_schedulePublish",
                     submit: function (model) {
@@ -816,7 +816,7 @@
                             }
                             model.submitButtonState = "error";
                             //re-map the dialog model since we've re-bound the properties
-                            dialog.variants = angular.copy($scope.content.variants);
+                            dialog.variants = Utilities.copy($scope.content.variants);
                             //don't reject, we've handled the error
                             return $q.when(err);
                         });
