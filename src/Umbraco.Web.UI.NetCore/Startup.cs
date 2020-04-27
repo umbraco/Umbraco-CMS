@@ -1,6 +1,7 @@
 using System;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -48,9 +49,6 @@ namespace Umbraco.Web.UI.BackOffice
         {
             services.AddUmbracoConfiguration(_config);
             services.AddUmbracoRuntimeMinifier(_config);
-
-            // need to manually register this factory
-            DbProviderFactories.RegisterFactory(Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
 
             services.AddUmbracoCore(_env, out var factory);
             services.AddUmbracoWebsite();

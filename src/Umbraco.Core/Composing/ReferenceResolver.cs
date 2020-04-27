@@ -51,7 +51,7 @@ namespace Umbraco.Core.Composing
             // Load in each assembly in the directory of the entry assembly to be included in the search
             // for Umbraco dependencies/transitive dependencies
             foreach(var dir in assemblyLocations)
-            {   
+            {
                 foreach(var dll in Directory.EnumerateFiles(dir, "*.dll"))
                 {
                     var assemblyName = AssemblyName.GetAssemblyName(dll);
@@ -65,14 +65,15 @@ namespace Umbraco.Core.Composing
                     if (assemblyName.FullName.StartsWith("Umbraco."))
                         continue;
 
-                    var assembly = Assembly.Load(assemblyName);
+                    var assembly = Assembly.LoadFrom(dll);
                     assemblies.Add(assembly);
                 }
             }
 
+            var assemblyNameToAssembly = assemblies.ToDictionary(x => x.GetName());
             foreach (var item in assemblies)
             {
-                var classification = Resolve(item);
+                var classification = Resolve(item, assemblyNameToAssembly);
                 if (classification == Classification.ReferencesUmbraco || classification == Classification.IsUmbraco)
                 {
                     applicationParts.Add(item);
@@ -100,7 +101,7 @@ namespace Umbraco.Core.Composing
             return assembly.Location;
         }
 
-        private Classification Resolve(Assembly assembly)
+        private Classification Resolve(Assembly assembly, IDictionary<AssemblyName, Assembly> assemblyNameToAssembly)
         {
             if (_classifications.TryGetValue(assembly, out var classification))
             {
@@ -110,12 +111,12 @@ namespace Umbraco.Core.Composing
             // Initialize the dictionary with a value to short-circuit recursive references.
             classification = Classification.Unknown;
             _classifications[assembly] = classification;
-            
+
             if (TypeFinder.KnownAssemblyExclusionFilter.Any(f => assembly.FullName.StartsWith(f, StringComparison.InvariantCultureIgnoreCase)))
             {
                 // if its part of the filter it doesn't reference umbraco
                 classification = Classification.DoesNotReferenceUmbraco;
-            }                
+            }
             else if (_umbracoAssemblies.Contains(assembly.GetName().Name))
             {
                 classification = Classification.IsUmbraco;
@@ -123,10 +124,10 @@ namespace Umbraco.Core.Composing
             else
             {
                 classification = Classification.DoesNotReferenceUmbraco;
-                foreach (var reference in GetReferences(assembly))
+                foreach (var reference in GetReferences(assembly, assemblyNameToAssembly))
                 {
                     // recurse
-                    var referenceClassification = Resolve(reference);
+                    var referenceClassification = Resolve(reference, assemblyNameToAssembly);
 
                     if (referenceClassification == Classification.IsUmbraco || referenceClassification == Classification.ReferencesUmbraco)
                     {
@@ -141,22 +142,37 @@ namespace Umbraco.Core.Composing
             return classification;
         }
 
-        protected virtual IEnumerable<Assembly> GetReferences(Assembly assembly)
-        {            
-            foreach (var referenceName in assembly.GetReferencedAssemblies())
+        protected virtual IEnumerable<Assembly> GetReferences(Assembly assembly, IDictionary<AssemblyName, Assembly> assemblyNameToAssembly)
+        {
+            var referencedAssemblies = assembly.GetReferencedAssemblies();
+
+            foreach (var referenceName in referencedAssemblies)
             {
                 // don't include if this is excluded
                 if (TypeFinder.KnownAssemblyExclusionFilter.Any(f => referenceName.FullName.StartsWith(f, StringComparison.InvariantCultureIgnoreCase)))
                     continue;
 
-                var reference = Assembly.Load(referenceName);
+                Assembly reference ;
+                try
+                {
+                    reference = Assembly.Load(referenceName);
+                }
+                catch (Exception)
+                {
+                    if (!assemblyNameToAssembly.TryGetValue(referenceName, out var item))
+                    {
+                        continue;
+                    }
+
+                    reference = Assembly.LoadFrom(item.Location);
+                }
 
                 if (!_lookup.Contains(reference))
                 {
                     // A dependency references an item that isn't referenced by this project.
                     // We'll add this reference so that we can calculate the classification.
 
-                    _lookup.Add(reference);                    
+                    _lookup.Add(reference);
                 }
                 yield return reference;
             }

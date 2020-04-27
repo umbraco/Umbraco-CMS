@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
@@ -134,7 +135,9 @@ namespace Umbraco.Web.Common.Extensions
 
             var globalSettings = configs.Global();
             var umbracoVersion = new UmbracoVersion(globalSettings);
+            var typeFinder = CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly, configs.TypeFinder());
 
+            RegisterDatabaseTypes(typeFinder);
             var coreRuntime = GetCoreRuntime(
                 configs,
                 umbracoVersion,
@@ -143,7 +146,7 @@ namespace Umbraco.Web.Common.Extensions
                 profiler,
                 hostingEnvironment,
                 backOfficeInfo,
-                CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly),
+                typeFinder,
                 requestCache);
 
             factory = coreRuntime.Configure(container);
@@ -151,14 +154,22 @@ namespace Umbraco.Web.Common.Extensions
             return services;
         }
 
-        private static ITypeFinder CreateTypeFinder(Core.Logging.ILogger logger, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly)
+        private static void RegisterDatabaseTypes(ITypeFinder typeFinder)
         {
-            // TODO: Currently we are not passing in any TypeFinderConfig (with ITypeFinderSettings) which we should do, however
-            // this is not critical right now and would require loading in some config before boot time so just leaving this as-is for now.
+            // need to manually register this factory
+            DbProviderFactories.RegisterFactory(Core.Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
+            var sqlCe = typeFinder.GetTypeByName("System.Data.SqlServerCe.SqlCeProviderFactory");
+            if (!(sqlCe is null))
+            {
+                DbProviderFactories.RegisterFactory(Core.Constants.DbProviderNames.SqlCe, sqlCe );
+            }
+        }
+        private static ITypeFinder CreateTypeFinder(Core.Logging.ILogger logger, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, ITypeFinderSettings typeFinderSettings)
+        {
             var runtimeHashPaths = new RuntimeHashPaths();
             runtimeHashPaths.AddFolder(new DirectoryInfo(Path.Combine(webHostEnvironment.ContentRootPath, "bin")));
             var runtimeHash = new RuntimeHash(new ProfilingLogger(logger, profiler), runtimeHashPaths);
-            return new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(entryAssembly), runtimeHash);
+            return new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(entryAssembly), runtimeHash, new TypeFinderConfig(typeFinderSettings));
         }
 
         private static IRuntime GetCoreRuntime(

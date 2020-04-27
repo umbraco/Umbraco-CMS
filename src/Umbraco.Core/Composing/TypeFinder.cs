@@ -31,7 +31,7 @@ namespace Umbraco.Core.Composing
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _assemblyProvider = assemblyProvider;
             _runtimeHash = runtimeHash;
-            _assembliesAcceptingLoadExceptions = typeFinderConfig?.AssembliesAcceptingLoadExceptions.Where(x => !x.IsNullOrWhiteSpace()).ToArray() ?? Array.Empty<string>();           
+            _assembliesAcceptingLoadExceptions = typeFinderConfig?.AssembliesAcceptingLoadExceptions.Where(x => !x.IsNullOrWhiteSpace()).ToArray() ?? Array.Empty<string>();
         }
 
         private bool AcceptsLoadExceptions(Assembly a)
@@ -142,7 +142,10 @@ namespace Umbraco.Core.Composing
             "ServiceStack.",
             "SqlCE4Umbraco,",
             "Superpower,", // used by Serilog
-            "System.",
+           // "System.",
+            "System.Data.SqlClient,",
+            "System.Runtime,",
+            "System.Runtime.",
             "TidyNet,",
             "TidyNet.",
             "WebDriver,",
@@ -192,7 +195,7 @@ namespace Umbraco.Core.Composing
 
             return GetClassesWithBaseType(assignTypeFrom, assemblyList, onlyConcreteClasses);
         }
-        
+
         /// <summary>
         /// Finds any classes with the attribute.
         /// </summary>
@@ -234,7 +237,7 @@ namespace Umbraco.Core.Composing
 
             // It didn't parse, so try loading from each already loaded assembly and cache it
             return TypeNamesCache.GetOrAdd(name, s =>
-                AppDomain.CurrentDomain.GetAssemblies()
+                GetAllAssemblies()
                     .Select(x => x.GetType(s))
                     .FirstOrDefault(x => x != null));
         }

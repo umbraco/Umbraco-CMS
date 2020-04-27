@@ -14,6 +14,7 @@ using Umbraco.Core.Macros;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Web.Common.Macros;
 
 namespace Umbraco.Web.Macros
 {
@@ -348,9 +349,8 @@ namespace Umbraco.Web.Macros
         /// <returns>The text output of the macro execution.</returns>
         private MacroContent ExecutePartialView(MacroModel macro, IPublishedContent content)
         {
-            throw new NotImplementedException();
-            // var engine = new PartialViewMacroEngine(_umbracoContextAccessor, _httpContextAccessor, _ioHelper);
-            // return engine.Execute(macro, content);
+            var engine = new PartialViewMacroEngine(_umbracoContextAccessor, _httpContextAccessor, _ioHelper);
+            return engine.Execute(macro, content);
         }
 
         #endregion

@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.WebAssets;
+using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Install;
 using Umbraco.Web.Security;
 
@@ -42,7 +43,7 @@ namespace Umbraco.Web.Common.Install
         }
 
         [HttpGet]
-       // [StatusCodeResult(System.Net.HttpStatusCode.ServiceUnavailable)] //TODO reintroduce
+        [StatusCodeResult(System.Net.HttpStatusCode.ServiceUnavailable)]
         public ActionResult Index()
         {
             if (_runtime.Level == RuntimeLevel.Run)

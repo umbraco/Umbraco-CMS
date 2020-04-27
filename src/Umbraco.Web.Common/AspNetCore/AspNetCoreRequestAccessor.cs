@@ -28,7 +28,7 @@ namespace Umbraco.Web.Common.AspNetCore
 
         private void RequestStart(object sender, HttpContext e)
         {
-            var reason = EnsureRoutableOutcome.IsRoutable;
+            var reason = EnsureRoutableOutcome.IsRoutable; //TODO get the correct value here like in UmbracoInjectedModule
             RouteAttempt?.Invoke(sender, new RoutableAttemptEventArgs(reason, _umbracoContextAccessor.UmbracoContext));
         }
 
@@ -41,7 +41,6 @@ namespace Umbraco.Web.Common.AspNetCore
 
         public event EventHandler<UmbracoRequestEventArgs> EndRequest;
 
-        //TODO implement
         public event EventHandler<RoutableAttemptEventArgs> RouteAttempt;
         public Uri GetRequestUrl() => _httpContextAccessor.HttpContext != null ? new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl()) : null;
     }
