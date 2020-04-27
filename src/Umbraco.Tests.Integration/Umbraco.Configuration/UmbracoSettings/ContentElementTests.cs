@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Macros;
 
-namespace Umbraco.Tests.Configurations.UmbracoSettings
+namespace Umbraco.Tests.Integration.Umbraco.Configuration.UmbracoSettings
 {
     [TestFixture]
     public class ContentElementTests : UmbracoSettingsTests
@@ -96,25 +94,23 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [TestCase("png", true)]
         [TestCase("jpg", true)]
         [TestCase("gif", true)]
-        // TODO: Why does it flip to TestingDefaults=true for these two tests on AppVeyor. WHY?
-        //[TestCase("bmp", false)]
-        //[TestCase("php", false)]
+        [TestCase("bmp", false)]
+        [TestCase("php", false)]
         [TestCase("ashx", false)]
         [TestCase("config", false)]
-        public void IsFileAllowedForUpload_WithWhitelist(string extension, bool expected)
+        [TestCase("test", false)]
+        public virtual void IsFileAllowedForUpload_WithWhitelist(string extension, bool expected)
         {
-            // Make really sure that defaults are NOT used
-            TestingDefaults = false;
+            Console.WriteLine("Extension being tested: {0}", extension);
+            Console.WriteLine("Expected IsAllowed?: {0}", expected);
+            Console.WriteLine("AllowedUploadFiles: {0}", ContentSettings.AllowedUploadFiles);
+            Console.WriteLine("DisallowedUploadFiles: {0}", ContentSettings.DisallowedUploadFiles);
 
-            Debug.WriteLine("Extension being tested", extension);
-            Debug.WriteLine("AllowedUploadFiles: {0}", ContentSettings.AllowedUploadFiles);
-            Debug.WriteLine("DisallowedUploadFiles: {0}", ContentSettings.DisallowedUploadFiles);
+            bool allowedContainsExtension = ContentSettings.AllowedUploadFiles.Any(x => x.InvariantEquals(extension));
+            bool disallowedContainsExtension = ContentSettings.DisallowedUploadFiles.Any(x => x.InvariantEquals(extension));
 
-            var allowedContainsExtension = ContentSettings.AllowedUploadFiles.Any(x => x.InvariantEquals(extension));
-            var disallowedContainsExtension = ContentSettings.DisallowedUploadFiles.Any(x => x.InvariantEquals(extension));
-
-            Debug.WriteLine("AllowedContainsExtension: {0}", allowedContainsExtension);
-            Debug.WriteLine("DisallowedContainsExtension: {0}", disallowedContainsExtension);
+            Console.WriteLine("AllowedContainsExtension: {0}", allowedContainsExtension);
+            Console.WriteLine("DisallowedContainsExtension: {0}", disallowedContainsExtension);
 
             Assert.AreEqual(expected, ContentSettings.IsFileAllowedForUpload(extension));
         }

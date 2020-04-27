@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace Umbraco.Tests.Configurations.UmbracoSettings
+namespace Umbraco.Tests.Integration.Umbraco.Configuration.UmbracoSettings
 {
     [TestFixture]
     public class WebRoutingElementTests : UmbracoSettingsTests
