@@ -13,7 +13,7 @@
     angular
         .module("umbraco")
         .component("umbBlockListBlockContent", {
-            template: '<div ng-include="vm.view"></div>',
+            template: '<div ng-include="model.view"></div>',
             controller: BlockListBlockContentController,
             controllerAs: "model",
             bindings: {
@@ -26,10 +26,10 @@
     );
 
     function BlockListBlockContentController($scope) {
-        var vm = this;
-        vm.$onInit = function() {
-            $scope.block = vm.block;
-            $scope.api = vm.api;
+        var model = this;
+        model.$onInit = function() {
+            $scope.block = model.block;
+            $scope.api = model.api;
         };
     }
         

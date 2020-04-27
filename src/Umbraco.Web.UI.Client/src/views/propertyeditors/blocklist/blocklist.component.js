@@ -35,6 +35,7 @@
         var copyAllBlocksAction;
         var deleteAllBlocksAction;
 
+        var inlineEditing = false;
 
         var vm = this;
 
@@ -57,6 +58,8 @@
 
 
         vm.$onInit = function() {
+
+            inlineEditing = vm.model.config.useInlineEditingAsDefault;
 
             vm.validationLimit = vm.model.config.validationLimit;
 
@@ -136,7 +139,7 @@
             if (block === null) return null;
 
             // Lets apply fallback views, and make the view available directly on the blockModel.
-            block.view = (block.config.view ? "/" + block.config.view : (vm.model.config.useInlineEditingAsDefault ? "views/blockelements/inlineblock/inlineblock.editor.html" : "views/blockelements/labelblock/labelblock.editor.html"));
+            block.view = (block.config.view ? "/" + block.config.view : (inlineEditing ? "views/blockelements/inlineblock/inlineblock.editor.html" : "views/blockelements/labelblock/labelblock.editor.html"));
 
             block.showSettings = block.config.settingsElementTypeAlias != null;
 
@@ -197,7 +200,7 @@
             vm.blocks.forEach(deleteBlock);
         }
 
-        function editBlock(blockModel, hideContent) {
+        function editBlock(blockModel, openSettings) {
 
             // make a clone to avoid editing model directly.
             var blockContentClone = angular.copy(blockModel.content);
@@ -206,10 +209,13 @@
             if (blockModel.config.settingsElementTypeAlias) {
                 blockSettingsClone = angular.copy(blockModel.settings);
             }
+
+            var hideContent = (openSettings === true && inlineEditing === true);
             
             var blockEditorModel = {
                 content: blockContentClone,
                 hideContent: hideContent,
+                openSettings: openSettings === true,
                 settings: blockSettingsClone,
                 title: blockModel.label,
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",

@@ -33,6 +33,7 @@
 }
 .umb-block-list__block--actions {
     position: absolute;
+    z-index:999999999;// We always want to be on top of custom view, but we need to make sure we still are behind relevant Umbraco CMS UI. ToDo: Needs further testing.
     top: 10px;
     right: 10px;
     font-size: 0;

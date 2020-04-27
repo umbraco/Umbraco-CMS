@@ -30,6 +30,7 @@
                 <div class="umb-block-card-grid">
 
                     <umb-block-card
+                        class="umb-outline"
                         ng-repeat="block in vm.model.availableItems | filter:searchTerm"
                         block-config-model="block.blockConfigModel"
                         element-type-model="block.elementTypeModel"
