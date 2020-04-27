@@ -36,6 +36,7 @@ angular.module("umbraco")
                    
                     $scope.control.value = {
                         focalPoint: selectedImage.focalPoint,
+                        coordinates: selectedImage.coordinates,
                         id: selectedImage.id,
                         udi: selectedImage.udi,
                         image: selectedImage.image,
@@ -66,13 +67,26 @@ angular.module("umbraco")
                 var url = $scope.control.value.image;
 
                 if($scope.control.editor.config && $scope.control.editor.config.size){
-                    url += "?width=" + $scope.control.editor.config.size.width;
-                    url += "&height=" + $scope.control.editor.config.size.height;
-                    url += "&animationprocessmode=first";
-
-                    if($scope.control.value.focalPoint){
-                        url += "&center=" + $scope.control.value.focalPoint.top +"," + $scope.control.value.focalPoint.left;
-                        url += "&mode=crop";
+                    if ($scope.control.value.coordinates) {
+                        // New way, crop by percent must come before width/height.
+                        var coords = $scope.control.value.coordinates;
+                        url += "?crop=" + coords.x1 + "," + coords.y1 + "," + coords.x2 + "," + coords.y2 + "&cropmode=percentage";
+                        url += "&width=" + $scope.control.editor.config.size.width;
+                        url += "&height=" + $scope.control.editor.config.size.height;
+                        url += "&animationprocessmode=first";
+                    } else {
+                        // Here in order not to break existing content where focalPoint were used.
+                        // For some reason width/height have to come first when mode=crop.
+                        url += "?width=" + $scope.control.editor.config.size.width;
+                        url += "&height=" + $scope.control.editor.config.size.height;
+                        url += "&animationprocessmode=first";
+                        if ($scope.control.value.focalPoint) {
+                            url += "&center=" + $scope.control.value.focalPoint.top + "," + $scope.control.value.focalPoint.left;
+                            url += "&mode=crop";
+                        } else {
+                            // Prevent black padding and no crop when focal point not set / changed from default
+                            url += "&center=0.5,0.5&mode=crop";
+                        }
                     }
                 }
 

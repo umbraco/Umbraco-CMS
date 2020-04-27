@@ -163,14 +163,26 @@
                     </div>
 
                     <div ng-if="!vm.mediaPickerDetailsOverlay.disableFocalPoint">
+                        <div>
+                            <umb-image-crop height="{{cropSize.height}}"
+                                            width="{{cropSize.width}}"
+                                            crop="target.coordinates"
+                                            center="target.focalPoint"
+                                            max-size="450"
+                                            src="target.url">
+                            </umb-image-crop>
+                        </div>
+
+                        <!-- THIS WILL BE REMOVED BEFORE PR IS DONE -->
+
                         <h5>
                             <localize key="@general_focalPoint">Focal point</localize>
                         </h5>
 
                         <div ng-if="target.url">
                             <umb-image-gravity src="target.url"
-                            center="target.focalPoint"
-							on-value-changed="vm.focalPointChanged(left, top)">
+                                               center="target.focalPoint"
+                                               on-value-changed="vm.focalPointChanged(left, top)">
                             </umb-image-gravity>
                         </div>
 
