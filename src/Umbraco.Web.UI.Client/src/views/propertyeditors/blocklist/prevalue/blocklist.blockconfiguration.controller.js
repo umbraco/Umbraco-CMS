@@ -92,32 +92,36 @@
 
             var availableItems = vm.getAvailableElementTypes()
 
-            var elemTypeSelectorOverlay = {
-                view: "itempicker",
-                title: "no title jet",
-                availableItems: availableItems,
-                selectedItems: selectedItems,
-                createNewItem: {
-                    action: function() {
-                        overlayService.close();
-                        vm.createElementTypeAndAdd(vm.addBlockFromElementTypeAlias);
+            localizationService.localizeMany(["blockEditor_headlineCreateBlock", "blockEditor_labelcreateNewElementType"]).then(function(localized) {
+                
+                var elemTypeSelectorOverlay = {
+                    view: "itempicker",
+                    title: localizedlocalized[0],
+                    availableItems: availableItems,
+                    selectedItems: selectedItems,
+                    createNewItem: {
+                        action: function() {
+                            overlayService.close();
+                            vm.createElementTypeAndAdd(vm.addBlockFromElementTypeAlias);
+                        },
+                        icon: "icon-add",
+                        name: localizedlocalized[1]
                     },
-                    icon: "icon-add",
-                    name: "Create new"
-                },
-                position: "target",
-                event: $event,
-                size: availableItems.length < 7 ? "small" : "medium",
-                submit: function (overlay) {
-                    vm.addBlockFromElementTypeAlias(overlay.selectedItem.alias);
-                    overlayService.close();
-                },
-                close: function () {
-                    overlayService.close();
-                }
-            };
+                    position: "target",
+                    event: $event,
+                    size: availableItems.length < 7 ? "small" : "medium",
+                    submit: function (overlay) {
+                        vm.addBlockFromElementTypeAlias(overlay.selectedItem.alias);
+                        overlayService.close();
+                    },
+                    close: function () {
+                        overlayService.close();
+                    }
+                };
 
-            overlayService.open(elemTypeSelectorOverlay);
+                overlayService.open(elemTypeSelectorOverlay);
+                
+            });
         };
 
         vm.createElementTypeAndAdd = function(callback) {

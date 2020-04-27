@@ -46,33 +46,37 @@
 
         vm.addSettingsForBlock = function ($event, block) {
 
-            var elemTypeSelectorOverlay = {
-                view: "itempicker",
-                title: "Pick settings (missing translation)",
-                availableItems: vm.elementTypes,
-                position: "target",
-                event: $event,
-                size: vm.elementTypes.length < 7 ? "small" : "medium",
-                createNewItem: {
-                    action: function() {
-                        overlayService.close();
-                        vm.createElementTypeAndAdd((alias) => {
-                            vm.applySettingsToBlock(block, alias);
-                        });
-                    },
-                    icon: "icon-add",
-                    name: "Create new"
-                },
-                submit: function (overlay) {
-                    vm.applySettingsToBlock(block, overlay.selectedItem.alias);
-                    overlayService.close();
-                },
-                close: function () {
-                    overlayService.close();
-                }
-            };
+            localizationService.localizeMany(["blockEditor_headlineAddSettingsElementType", "blockEditor_labelcreateNewElementType"]).then(function(localized) {
 
-            overlayService.open(elemTypeSelectorOverlay);
+                var elemTypeSelectorOverlay = {
+                    view: "itempicker",
+                    title: localized[0],
+                    availableItems: vm.elementTypes,
+                    position: "target",
+                    event: $event,
+                    size: vm.elementTypes.length < 7 ? "small" : "medium",
+                    createNewItem: {
+                        action: function() {
+                            overlayService.close();
+                            vm.createElementTypeAndAdd((alias) => {
+                                vm.applySettingsToBlock(block, alias);
+                            });
+                        },
+                        icon: "icon-add",
+                        name: localized[1]
+                    },
+                    submit: function (overlay) {
+                        vm.applySettingsToBlock(block, overlay.selectedItem.alias);
+                        overlayService.close();
+                    },
+                    close: function () {
+                        overlayService.close();
+                    }
+                };
+
+                overlayService.open(elemTypeSelectorOverlay);
+
+            });
         };
         vm.applySettingsToBlock = function(block, alias) {
             block.settingsElementTypeAlias = alias;
@@ -102,23 +106,27 @@
 
 
         vm.addViewForBlock = function(block) {
-            const filePicker = {
-                title: "Select view (TODO need translation)",
-                section: "settings",
-                treeAlias: "files",
-                entityType: "file",
-                isDialog: true,
-                select: function (node) {
-                    console.log(node)
-                    const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
-                    block.view = filepath;
-                    editorService.close();
-                },
-                close: function () {
-                    editorService.close();
-                }
-            };
-            editorService.treePicker(filePicker);
+            localizationService.localize("blockEditor_headlineSelectView").then(function(localizedTitle) {
+
+                const filePicker = {
+                    title: localizedTitle,
+                    section: "settings",
+                    treeAlias: "files",
+                    entityType: "file",
+                    isDialog: true,
+                    select: function (node) {
+                        console.log(node)
+                        const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
+                        block.view = filepath;
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
+                };
+                editorService.treePicker(filePicker);
+            
+            });
         }
         vm.requestRemoveViewForBlock = function(block) {
             localizationService.localizeMany(["general_remove", "defaultdialogs_confirmremoveusageof"]).then(function (data) {
@@ -142,22 +150,26 @@
 
         
         vm.addStylesheetForBlock = function(block) {
-            const filePicker = {
-                title: "Select Stylesheet (TODO need translation)",
-                section: "settings",
-                treeAlias: "files",
-                entityType: "file",
-                isDialog: true,
-                select: function (node) {
-                    const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
-                    block.stylesheet = filepath;
-                    editorService.close();
-                },
-                close: function () {
-                    editorService.close();
-                }
-            };
-            editorService.treePicker(filePicker);
+            localizationService.localize("blockEditor_headlineAddCustomStylesheet").then(function(localizedTitle) {
+                    
+                const filePicker = {
+                    title: localizedTitle,
+                    section: "settings",
+                    treeAlias: "files",
+                    entityType: "file",
+                    isDialog: true,
+                    select: function (node) {
+                        const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
+                        block.stylesheet = filepath;
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
+                };
+                editorService.treePicker(filePicker);
+
+            });
         }
         vm.requestRemoveStylesheetForBlock = function(block) {
             localizationService.localizeMany(["general_remove", "defaultdialogs_confirmremoveusageof"]).then(function (data) {
@@ -181,24 +193,29 @@
 
 
         vm.addThumbnailForBlock = function(block) {
-            const thumbnailPicker = {
-                title: "Select thumbnail (TODO need translation)",
-                section: "settings",
-                treeAlias: "files",
-                entityType: "file",
-                isDialog: true,
-                filter: function (i) {
-                    return !(i.name.indexOf(".jpg") !== -1 || i.name.indexOf(".jpeg") !== -1 || i.name.indexOf(".png") !== -1 || i.name.indexOf(".svg") !== -1 || i.name.indexOf(".webp") !== -1 || i.name.indexOf(".gif") !== -1);
-                },
-                select: function (file) {
-                    block.thumbnail = file.name;
-                    editorService.close();
-                },
-                close: function () {
-                    editorService.close();
-                }
-            };
-            editorService.treePicker(thumbnailPicker);
+
+            localizationService.localize("blockEditor_headlineAddThumbnail").then(function(localizedTitle) {
+
+                const thumbnailPicker = {
+                    title: localizedTitle,
+                    section: "settings",
+                    treeAlias: "files",
+                    entityType: "file",
+                    isDialog: true,
+                    filter: function (i) {
+                        return !(i.name.indexOf(".jpg") !== -1 || i.name.indexOf(".jpeg") !== -1 || i.name.indexOf(".png") !== -1 || i.name.indexOf(".svg") !== -1 || i.name.indexOf(".webp") !== -1 || i.name.indexOf(".gif") !== -1);
+                    },
+                    select: function (file) {
+                        block.thumbnail = file.name;
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
+                };
+                editorService.treePicker(thumbnailPicker);
+
+            });
         }
         vm.removeThumbnailForBlock = function(entry) {
             entry.thumbnail = null;
