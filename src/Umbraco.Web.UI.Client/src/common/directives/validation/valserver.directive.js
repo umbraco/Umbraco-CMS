@@ -76,7 +76,7 @@ function valServer(serverValidationManager) {
                         if (modelCtrl.$invalid) {
                             modelCtrl.$setValidity('valServer', true);
                             //clear the server validation entry
-                            serverValidationManager.removePropertyError(currentProperty.alias, currentCulture, currentSegment, fieldName);
+                            serverValidationManager.removePropertyError(currentProperty.alias, currentCulture, fieldName, currentSegment);
                             stopWatch();
                         }
                     }, true);

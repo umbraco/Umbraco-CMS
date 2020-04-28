@@ -369,7 +369,7 @@ function serverValidationManager($timeout) {
          * @description
          * Adds an error message for the content property
          */
-        addPropertyError: function (propertyAlias, culture, segment, fieldName, errorMsg) {
+        addPropertyError: function (propertyAlias, culture, fieldName, errorMsg, segment) {
             if (!propertyAlias) {
                 return;
             }
@@ -420,7 +420,7 @@ function serverValidationManager($timeout) {
          * @description
          * Removes an error message for the content property
          */
-        removePropertyError: function (propertyAlias, culture, segment, fieldName) {
+        removePropertyError: function (propertyAlias, culture, fieldName, segment) {
 
             if (!propertyAlias) {
                 return;
