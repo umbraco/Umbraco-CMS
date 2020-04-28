@@ -256,7 +256,7 @@ function serverValidationManager($timeout) {
          * This will always return any callbacks registered for just the property (i.e. field name is empty) and for ones with an 
          * explicit field name set.
          */
-        getPropertyCallbacks: function (propertyAlias, culture, segment, fieldName) {
+        getPropertyCallbacks: function (propertyAlias, culture, fieldName, segment) {
 
             //normalize culture to "invariant"
             if (!culture) {
@@ -397,7 +397,7 @@ function serverValidationManager($timeout) {
             //find all errors for this item
             var errorsForCallback = getPropertyErrors(this, propertyAlias, culture, segment, fieldName);
             //we should now call all of the call backs registered for this error
-            var cbs = this.getPropertyCallbacks(propertyAlias, culture, segment, fieldName);
+            var cbs = this.getPropertyCallbacks(propertyAlias, culture, fieldName, segment);
             //call each callback for this error
             for (var cb in cbs) {
                 executeCallback(this, errorsForCallback, cbs[cb].callback, culture, segment);
