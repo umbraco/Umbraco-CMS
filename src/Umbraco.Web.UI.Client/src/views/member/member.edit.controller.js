@@ -132,7 +132,7 @@ function MemberEditController($scope, $routeParams, $location, $http, $q, appSta
 
         evts.push(eventsService.on("editors.memberType.saved", function (name, args) {
             // if this member item uses the updated member type we need to reload the member item
-            if (args && args.memberType && args.memberType.key === $scope.content.contentType.key.replace("-", "")) {
+            if (args && args.memberType && args.memberType.key.replace(/-/g, '') === $scope.content.contentType.key) {
                 $scope.page.loading = true;
                 loadMember().then(function () {
                     $scope.page.loading = false;
