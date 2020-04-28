@@ -17,8 +17,8 @@
         var evts = [];
         var vm = this;
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
-        var memberTypeId = infiniteMode ? $scope.model.id : $routeParams.id;
-        var create = infiniteMode ? $scope.model.create : $routeParams.create;
+        var memberTypeId = $routeParams.id;
+        var create = $routeParams.create;
 
         vm.save = save;
         vm.close = close;
