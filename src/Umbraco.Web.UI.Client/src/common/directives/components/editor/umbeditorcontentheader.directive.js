@@ -77,11 +77,11 @@
                         scope.vm.hasCulture = true;
                     }
                     if (variant.segment !== null) {
-                        scope.vm.hasSegment = true;
+                        scope.vm.hasSegments = true;
                     }
                 });
 
-                scope.vm.hasVariants = (scope.vm.hasCulture || scope.vm.hasSegment);
+                scope.vm.hasVariants = (scope.vm.hasCulture || scope.vm.hasSegments);
                 
                 checkErrorsOnOtherVariants();
 

@@ -49,7 +49,7 @@
                         <span ng-bind="editor.content.displayName"></span>
                     </span>
 
-                    <umb-dropdown ng-if="vm.dropdownOpen" class="umb-variant-switcher" ng-class="{'--has-sub-variants': vm.hasSegment === true}" on-close="vm.dropdownOpen = false" umb-keyboard-list>
+                    <umb-dropdown ng-if="vm.dropdownOpen" class="umb-variant-switcher" ng-class="{'--has-sub-variants': vm.hasSegments === true}" on-close="vm.dropdownOpen = false" umb-keyboard-list>
                         <umb-dropdown-item
                             ng-repeat-start="entry in vm.variantMenu track by $index"
                             class="umb-variant-switcher__item"
