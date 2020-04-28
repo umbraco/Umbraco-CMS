@@ -122,7 +122,8 @@
             this.content = $scope.content;
             if($scope.variantNodeModel) {
                 $scope.defaultVariant = _.find($scope.variantNodeModel.variants, variant => {
-                    return variant.language && variant.language.isDefault;
+                    // defaultVariant will never have segment. Wether it has a language or not depends on the setup.
+                    return !variant.segment && ((variant.language && variant.language.isDefault) || (!variant.language));
                 });
             }
             
