@@ -305,10 +305,7 @@ namespace Umbraco.Web.Security
         /// </remarks>
         public async Task<IdentityResult> ChangePasswordWithResetAsync(int userId, string token, string newPassword)
         {
-            var userIdAsString = userId.TryConvertTo<string>();
-            if (!userIdAsString.Success) throw new InvalidOperationException("Unable to convert userId to int");
-
-            var user = await base.FindByIdAsync(userIdAsString.Result);
+            var user = await base.FindByIdAsync(userId.ToString());
             var result = await base.ResetPasswordAsync(user, token, newPassword);
             if (result.Succeeded) RaisePasswordChangedEvent(userId);
             return result;

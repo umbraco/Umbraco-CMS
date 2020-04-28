@@ -349,13 +349,13 @@ namespace Umbraco.Web.Editors
         public async Task<IEnumerable<string>> Get2FAProviders()
         {
             var userId = await SignInManager.GetVerifiedUserIdAsync();
-            if (userId == int.MinValue)
+            if (string.IsNullOrWhiteSpace(userId))
             {
                 Logger.Warn<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var user = await UserManager.FindByIdAsync(userId.ToString());
+            var user = await UserManager.FindByIdAsync(userId);
             var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(user);
 
             return userFactors;
@@ -368,7 +368,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
             var userId = await SignInManager.GetVerifiedUserIdAsync();
-            if (userId == int.MinValue)
+            if (string.IsNullOrWhiteSpace(userId))
             {
                 Logger.Warn<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
                 throw new HttpResponseException(HttpStatusCode.NotFound);

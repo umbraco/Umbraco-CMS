@@ -14,9 +14,6 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.Identity;
-using Constants = Umbraco.Core.Constants;
-using IUser = Umbraco.Core.Models.Membership.IUser;
-using UserLoginInfo = Microsoft.AspNetCore.Identity.UserLoginInfo;
 
 namespace Umbraco.Web.Security
 {
@@ -70,7 +67,7 @@ namespace Umbraco.Web.Security
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException(nameof(user));
             
-            return Task.FromResult(UserIdToString(user.Id));
+            return Task.FromResult(user.Id.ToString());
         }
 
         public Task<string> GetUserNameAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken)
@@ -895,16 +892,8 @@ namespace Umbraco.Web.Security
 
             return Task.FromResult(false);
         }
-
-        private string UserIdToString(int userId)
-        {
-            var attempt = userId.TryConvertTo<string>();
-            if (attempt.Success) return attempt.Result;
-
-            throw new InvalidOperationException("Unable to convert user ID to string", attempt.Exception);
-        }
-
-        private int UserIdToInt(string userId)
+        
+        private static int UserIdToInt(string userId)
         {
             var attempt = userId.TryConvertTo<int>();
             if (attempt.Success) return attempt.Result;

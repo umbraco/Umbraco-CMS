@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Globalization;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -219,7 +218,7 @@ namespace Umbraco.Web.Security
 
             if (rememberBrowser)
             {
-                var rememberBrowserIdentity = _authenticationManager.CreateTwoFactorRememberBrowserIdentity(ConvertIdToString(user.Id));
+                var rememberBrowserIdentity = _authenticationManager.CreateTwoFactorRememberBrowserIdentity(user.Id.ToString());
                 _authenticationManager.SignIn(new AuthenticationProperties()
                 {
                     IsPersistent = isPersistent,
@@ -263,14 +262,14 @@ namespace Umbraco.Web.Security
         /// <remarks>
         /// Replaces the underlying call which is not flexible and doesn't support a custom cookie
         /// </remarks>
-        public async Task<int> GetVerifiedUserIdAsync()
+        public async Task<string> GetVerifiedUserIdAsync()
         {
             var result = await _authenticationManager.AuthenticateAsync(Constants.Security.BackOfficeTwoFactorAuthenticationType);
             if (result != null && result.Identity != null && string.IsNullOrEmpty(result.Identity.GetUserId()) == false)
             {
-                return ConvertIdFromString(result.Identity.GetUserId());
+                return result.Identity.GetUserId();
             }
-            return int.MinValue;
+            return null;
         }
 
         /// <summary>
@@ -304,11 +303,11 @@ namespace Umbraco.Web.Security
         public async Task<SignInResult> TwoFactorSignInAsync(string provider, string code, bool isPersistent, bool rememberBrowser)
         {
             var userId = await GetVerifiedUserIdAsync();
-            if (userId == int.MinValue)
+            if (string.IsNullOrWhiteSpace(userId))
             {
                 return SignInResult.Failed;
             }
-            var user = await _userManager.FindByIdAsync(ConvertIdToString(userId));
+            var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null)
             {
                 return SignInResult.Failed;
@@ -339,29 +338,9 @@ namespace Umbraco.Web.Security
         /// the default(int) value returned by the base class is always a valid user (i.e. the admin) so we just have to duplicate
         /// all of this code to check for int.MinVale instead.
         /// </remarks>
-        public async Task<bool> SendTwoFactorCodeAsync(string provider)
+        public Task<bool> SendTwoFactorCodeAsync(string provider)
         {
             throw new NotImplementedException();
-
-            /*var userId = await GetVerifiedUserIdAsync();
-            if (userId == int.MinValue)
-                return false;
-
-            var token = await _userManager.GenerateTwoFactorTokenAsync(userId, provider);
-
-
-            var identityResult = await _userManager.NotifyTwoFactorTokenAsync(userId, provider, token);
-            return identityResult.Succeeded;*/
-        }
-
-        private string ConvertIdToString(int id)
-        {
-            return Convert.ToString(id, CultureInfo.InvariantCulture);
-        }
-
-        private int ConvertIdFromString(string id)
-        {
-            return id == null ? default(int) : (int) Convert.ChangeType(id, typeof(int), CultureInfo.InvariantCulture);
         }
 
         public void Dispose()
