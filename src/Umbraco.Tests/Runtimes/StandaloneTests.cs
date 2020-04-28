@@ -115,7 +115,7 @@ namespace Umbraco.Tests.Runtimes
             composition.RegisterUnique<IDistributedCacheBinder, DistributedCacheBinder>();
             composition.RegisterUnique<IExamineManager, ExamineManager>();
             composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
-            //composition.RegisterUnique<IMacroRenderer, MacroRenderer>(); // TODO new reference?
+            composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
             composition.RegisterUnique<MediaUrlProviderCollection>(_ => new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()));
 
             // initialize some components only/individually

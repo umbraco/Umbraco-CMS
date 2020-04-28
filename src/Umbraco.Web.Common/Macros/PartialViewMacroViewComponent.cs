@@ -4,13 +4,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Macros
 {
     /// <summary>
     /// Controller to render macro content for Partial View Macros
     /// </summary>
-   // [MergeParentContextViewData] // TODO is this important now it is a view Component
+    //[MergeParentContextViewData] // TODO is this requeired now it is a ViewComponent?
     [HideFromTypeFinder] // explicitly used: do *not* find and register it!
     internal class PartialViewMacroViewComponent : ViewComponent
     {

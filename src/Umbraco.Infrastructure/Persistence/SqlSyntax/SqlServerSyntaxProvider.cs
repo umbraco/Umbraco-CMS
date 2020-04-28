@@ -16,6 +16,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// </summary>
     public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerSyntaxProvider>
     {
+        public override string ProviderName => Constants.DatabaseProviders.SqlServer;
+
         public ServerVersionInfo ServerVersion { get; private set; }
 
         public enum VersionName

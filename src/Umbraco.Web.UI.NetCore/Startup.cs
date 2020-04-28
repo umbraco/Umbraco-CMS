@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Reflection;
@@ -15,6 +16,10 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.Install;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Persistance.SqlCe;
 using Umbraco.Web.BackOffice.AspNetCore;
 using Umbraco.Web.Common.Extensions;
 using Umbraco.Web.Common.Filters;
@@ -47,6 +52,25 @@ namespace Umbraco.Web.UI.BackOffice
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<ISqlSyntaxProvider, SqlServerSyntaxProvider>();
+            services.AddSingleton<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
+
+            services.AddSingleton<IBulkSqlInsertProvider, SqlServerBulkSqlInsertProvider>();
+            services.AddSingleton<IBulkSqlInsertProvider, SqlCeBulkSqlInsertProvider>();
+
+            services.AddSingleton<IEmbeddedDatabaseCreator, NoopEmbeddedDatabaseCreator>();
+            services.AddSingleton<IEmbeddedDatabaseCreator, SqlCeEmbeddedDatabaseCreator>();
+
+            services.AddSingleton<IDbProviderFactoryCreator>(x => new DbProviderFactoryCreator(
+                x.GetService<Configs>().ConnectionStrings()[Core.Constants.System.UmbracoConnectionName]?.ProviderName,
+                DbProviderFactories.GetFactory,
+                x.GetServices<ISqlSyntaxProvider>(),
+                x.GetServices<IBulkSqlInsertProvider>(),
+                x.GetServices<IEmbeddedDatabaseCreator>()
+            ));
+
+
+
             services.AddUmbracoConfiguration(_config);
             services.AddUmbracoRuntimeMinifier(_config);
 

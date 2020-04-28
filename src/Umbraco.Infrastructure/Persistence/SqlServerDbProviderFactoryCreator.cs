@@ -47,7 +47,7 @@ namespace Umbraco.Core.Persistence
             }
         }
 
-        public void CreateDatabase()
+        public void CreateDatabase(string providerName)
         {
             throw new NotSupportedException("Embedded databases are not supported");
         }

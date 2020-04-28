@@ -9,6 +9,8 @@ namespace Umbraco.Core.Persistence
 {
     public class SqlCeBulkSqlInsertProvider : IBulkSqlInsertProvider
     {
+        public string ProviderName => Constants.DatabaseProviders.SqlCe;
+
         public int BulkInsertRecords<T>(IUmbracoDatabase database, IEnumerable<T> records)
         {
             var recordsA = records.ToArray();

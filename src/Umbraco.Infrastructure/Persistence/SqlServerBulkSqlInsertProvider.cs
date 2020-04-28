@@ -8,12 +8,13 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
 {
-
     /// <summary>
     /// A bulk sql insert provider for Sql Server
     /// </summary>
     public class SqlServerBulkSqlInsertProvider : IBulkSqlInsertProvider
     {
+        public string ProviderName => Constants.DatabaseProviders.SqlServer;
+
         public int BulkInsertRecords<T>(IUmbracoDatabase database, IEnumerable<T> records)
         {
             var recordsA = records.ToArray();

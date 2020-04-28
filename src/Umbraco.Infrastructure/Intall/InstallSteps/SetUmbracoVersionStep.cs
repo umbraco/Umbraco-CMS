@@ -25,30 +25,30 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
-            var security = _umbracoContextAccessor.GetRequiredUmbracoContext().Security;
-            if (security.IsAuthenticated() == false && _globalSettings.ConfigurationStatus.IsNullOrWhiteSpace())
-            {
-                security.PerformLogin(-1);
-            }
-
-            if (security.IsAuthenticated())
-            {
-                // when a user is already logged in, we need to check whether it's user 'zero'
-                // which is the legacy super user from v7 - and then we need to actually log the
-                // true super user in - but before that we need to log off, else audit events
-                // will try to reference user zero and fail
-                var userIdAttempt = security.GetUserId();
-                if (userIdAttempt && userIdAttempt.Result == 0)
-                {
-                    security.ClearCurrentLogin();
-                    security.PerformLogin(Constants.Security.SuperUserId);
-                }
-            }
-            else if (_globalSettings.ConfigurationStatus.IsNullOrWhiteSpace())
-            {
-                // for installs, we need to log the super user in
-                security.PerformLogin(Constants.Security.SuperUserId);
-            }
+            // var security = _umbracoContextAccessor.GetRequiredUmbracoContext().Security;
+            // if (security.IsAuthenticated() == false && _globalSettings.ConfigurationStatus.IsNullOrWhiteSpace())
+            // {
+            //     security.PerformLogin(-1);
+            // }
+            //
+            // if (security.IsAuthenticated())
+            // {
+            //     // when a user is already logged in, we need to check whether it's user 'zero'
+            //     // which is the legacy super user from v7 - and then we need to actually log the
+            //     // true super user in - but before that we need to log off, else audit events
+            //     // will try to reference user zero and fail
+            //     var userIdAttempt = security.GetUserId();
+            //     if (userIdAttempt && userIdAttempt.Result == 0)
+            //     {
+            //         security.ClearCurrentLogin();
+            //         security.PerformLogin(Constants.Security.SuperUserId);
+            //     }
+            // }
+            // else if (_globalSettings.ConfigurationStatus.IsNullOrWhiteSpace())
+            // {
+            //     // for installs, we need to log the super user in
+            //     security.PerformLogin(Constants.Security.SuperUserId);
+            // }
 
             // Update configurationStatus
             _globalSettings.ConfigurationStatus = _umbracoVersion.SemanticVersion.ToSemanticString();

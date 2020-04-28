@@ -138,6 +138,8 @@ namespace Umbraco.Web.Common.Extensions
             var typeFinder = CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly, configs.TypeFinder());
 
             RegisterDatabaseTypes(typeFinder);
+            var dbProviderFactoryCreator = serviceProvider.GetRequiredService<IDbProviderFactoryCreator>();
+
             var coreRuntime = GetCoreRuntime(
                 configs,
                 umbracoVersion,
@@ -147,7 +149,8 @@ namespace Umbraco.Web.Common.Extensions
                 hostingEnvironment,
                 backOfficeInfo,
                 typeFinder,
-                requestCache);
+                requestCache,
+                dbProviderFactoryCreator);
 
             factory = coreRuntime.Configure(container);
 
@@ -175,12 +178,8 @@ namespace Umbraco.Web.Common.Extensions
         private static IRuntime GetCoreRuntime(
             Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, Core.Logging.ILogger logger,
             IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
-            ITypeFinder typeFinder, IRequestCache requestCache)
+            ITypeFinder typeFinder, IRequestCache requestCache, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
-            var connectionStringConfig = configs.ConnectionStrings()[Core.Constants.System.UmbracoConnectionName];
-            var dbProviderFactoryCreator = new SqlServerDbProviderFactoryCreator(
-                connectionStringConfig?.ProviderName,
-                DbProviderFactories.GetFactory);
 
             // Determine if we should use the sql main dom or the default
             var globalSettings = configs.Global();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
@@ -9,21 +10,21 @@ namespace Umbraco.Core.Persistence
     {
         private readonly string _defaultProviderName;
         private readonly Func<string, DbProviderFactory> _getFactory;
+        private readonly IDictionary<string, IEmbeddedDatabaseCreator> _embeddedDatabaseCreators;
         private readonly IDictionary<string, ISqlSyntaxProvider> _syntaxProviders;
         private readonly IDictionary<string, IBulkSqlInsertProvider> _bulkSqlInsertProviders;
-        private readonly Action _createDatabaseAction;
 
         public DbProviderFactoryCreator(string defaultProviderName,
             Func<string, DbProviderFactory> getFactory,
-            IDictionary<string, ISqlSyntaxProvider> syntaxProviders,
-            IDictionary<string,IBulkSqlInsertProvider> bulkSqlInsertProviders,
-            Action createDatabaseAction)
+            IEnumerable<ISqlSyntaxProvider> syntaxProviders,
+            IEnumerable<IBulkSqlInsertProvider> bulkSqlInsertProviders,
+            IEnumerable<IEmbeddedDatabaseCreator> embeddedDatabaseCreators)
         {
             _defaultProviderName = defaultProviderName;
             _getFactory = getFactory;
-            _syntaxProviders = syntaxProviders;
-            _bulkSqlInsertProviders = bulkSqlInsertProviders;
-            _createDatabaseAction = createDatabaseAction;
+            _embeddedDatabaseCreators = embeddedDatabaseCreators.ToDictionary(x=>x.ProviderName);
+            _syntaxProviders = syntaxProviders.ToDictionary(x=>x.ProviderName);
+            _bulkSqlInsertProviders = bulkSqlInsertProviders.ToDictionary(x=>x.ProviderName);
         }
 
         public DbProviderFactory CreateFactory() => CreateFactory(_defaultProviderName);
@@ -57,9 +58,12 @@ namespace Umbraco.Core.Persistence
             return result;
         }
 
-        public void CreateDatabase()
+        public void CreateDatabase(string providerName)
         {
-            _createDatabaseAction();
+            if(_embeddedDatabaseCreators.TryGetValue(providerName, out var creator))
+            {
+                creator.Create();
+            }
         }
     }
 }

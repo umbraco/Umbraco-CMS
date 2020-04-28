@@ -56,7 +56,7 @@ namespace Umbraco.Web
             }
         }
 
-        public void CreateDatabase()
+        public void CreateDatabase(string providerName)
         {
             var engine = new SqlCeEngine(DatabaseBuilder.EmbeddedDatabaseConnectionString);
             engine.CreateDatabase();

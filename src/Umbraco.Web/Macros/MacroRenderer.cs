@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -14,11 +13,10 @@ using Umbraco.Core.Macros;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Web.Common.Macros;
 
 namespace Umbraco.Web.Macros
 {
-    public class MacroRenderer : IMacroRenderer
+    internal class MacroRenderer : IMacroRenderer
     {
         private readonly IProfilingLogger _plogger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;

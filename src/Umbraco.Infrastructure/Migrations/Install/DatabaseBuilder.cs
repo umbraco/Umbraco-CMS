@@ -155,7 +155,7 @@ namespace Umbraco.Core.Migrations.Install
                 // this should probably be in a "using (new SqlCeEngine)" clause but not sure
                 // of the side effects and it's been like this for quite some time now
 
-                _dbProviderFactoryCreator.CreateDatabase();
+                _dbProviderFactoryCreator.CreateDatabase(Constants.DbProviderNames.SqlCe);
             }
 
             factory.Configure(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);

@@ -75,7 +75,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
 
             composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
-            //composition.RegisterUnique<IMacroRenderer, MacroRenderer>(); //TODO...
+            composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
 
             composition.RegisterUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 

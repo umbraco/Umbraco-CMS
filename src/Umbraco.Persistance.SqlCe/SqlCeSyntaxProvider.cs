@@ -14,6 +14,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// </summary>
     public class SqlCeSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlCeSyntaxProvider>
     {
+        public override string ProviderName => Constants.DatabaseProviders.SqlCe;
+
         public override Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top)
         {
             return new Sql<ISqlContext>(sql.SqlContext, sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
