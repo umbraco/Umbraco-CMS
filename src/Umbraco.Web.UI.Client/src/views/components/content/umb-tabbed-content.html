@@ -12,7 +12,7 @@
                     ng-repeat="property in group.properties track by property.alias"
                     property="property"
                     show-inherit="propertyEditorDisabled(property)"
-                    inherits-from="defaultVariant.language.name">
+                    inherits-from="defaultVariant.displayName">
 
                     <div ng-class="{'o-40 cursor-not-allowed': propertyEditorDisabled(property) }">
                         <umb-property-editor
