@@ -258,7 +258,6 @@ function mediaEditController($scope, $routeParams, $location, $http, $q, appStat
                 $scope.page.loading = false;
 
                 $q.resolve($scope.content);
-
             });
 
     }
