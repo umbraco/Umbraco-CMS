@@ -293,6 +293,23 @@ function serverValidationManager($timeout) {
         
         /**
          * @ngdoc function
+         * @name getCultureCallbacks
+         * @methodOf umbraco.services.serverValidationManager
+         * @function
+         *
+         * @description
+         * Gets all callbacks that has been registered using the subscribe method for the culture. Not including segments.
+         */
+        getCultureCallbacks: function (culture) {
+            var found = _.filter(callbacks, function (item) {
+                //returns any callback that have been registered directly/ONLY against the culture
+                return (item.culture === culture && item.segment === null && item.propertyAlias === null && item.fieldName === null);
+            });
+            return found;
+        },
+
+        /**
+         * @ngdoc function
          * @name getVariantCallbacks
          * @methodOf umbraco.services.serverValidationManager
          * @function
@@ -302,7 +319,7 @@ function serverValidationManager($timeout) {
          */
         getVariantCallbacks: function (culture, segment) {
             var found = _.filter(callbacks, function (item) {
-                //returns any callback that have been registered directly/ONLY against the culture
+                //returns any callback that have been registered directly against the given culture and given segment.
                 return (item.culture === culture && item.segment === segment && item.propertyAlias === null && item.fieldName === null);
             });
             return found;
@@ -544,6 +561,27 @@ function serverValidationManager($timeout) {
             return err ? true : false;
         },
         
+        /**
+         * @ngdoc function
+         * @name hasCultureError
+         * @methodOf umbraco.services.serverValidationManager
+         * @function
+         *
+         * @description
+         * Checks if the given culture has an error
+         */
+        hasCultureError: function (culture) {
+
+            //normalize culture to "invariant"
+            if (!culture) {
+                culture = "invariant";
+            }
+
+            var err = _.find(this.items, function (item) {
+                return (item.culture === culture && item.segment === null);
+            });
+            return err ? true : false;
+        },
         
         /**
          * @ngdoc function
@@ -556,7 +594,7 @@ function serverValidationManager($timeout) {
          */
         hasVariantError: function (culture, segment) {
             
-            //normalize culture to null
+            //normalize culture to "invariant"
             if (!culture) {
                 culture = "invariant";
             }
