@@ -9,9 +9,9 @@
 (function () {
     "use strict";
 
-    function MemberTypesEditController($scope, $rootScope, $routeParams, $log, $filter,
-        memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper,
-        navigationService, contentEditingHelper, notificationsService, $q, localizationService,
+    function MemberTypesEditController($scope, $routeParams, $q,
+        memberTypeResource, dataTypeResource, editorState, iconHelper,
+        navigationService, contentEditingHelper, notificationsService, localizationService,
         overlayHelper, contentTypeHelper, angularHelper, eventsService) {
 
         var evts = [];

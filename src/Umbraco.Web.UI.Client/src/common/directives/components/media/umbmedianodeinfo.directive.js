@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function MediaNodeInfoDirective($timeout, $location, eventsService, userService, dateHelper, editorService, mediaHelper, mediaResource, $q) {
+    function MediaNodeInfoDirective($timeout, $location, $q, eventsService, userService, dateHelper, editorService, mediaHelper, mediaResource) {
 
         function link(scope, element, attrs, ctrl) {
 
