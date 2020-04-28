@@ -35,6 +35,7 @@
             });
             scope.vm = {};
             scope.vm.hasVariants = false;
+            scope.vm.hasSubVariants = false;
             scope.vm.hasCulture = false;
             scope.vm.hasSegments = false;
             scope.vm.dropdownOpen = false;
@@ -82,6 +83,7 @@
                 });
 
                 scope.vm.hasVariants = (scope.vm.hasCulture || scope.vm.hasSegments);
+                scope.vm.hasSubVariants = (scope.vm.hasCulture && scope.vm.hasSegments);
                 
                 checkErrorsOnOtherVariants();
 
@@ -90,6 +92,7 @@
                     angular.forEach(scope.content.variants, (v) => {
                         if (v.language !== null && v.segment === null) {
                             var variantMenuEntry = {
+                                key: String.CreateGuid(),
                                 open: v.language && v.language.culture === scope.editor.culture,
                                 variant: v,
                                 subVariants: scope.content.variants.filter( (subVariant) => subVariant.language.culture === v.language.culture && subVariant.segment !== null)
@@ -100,6 +103,7 @@
                 } else {
                     angular.forEach(scope.content.variants, (v) => {
                         scope.vm.variantMenu.push({
+                            key: String.CreateGuid(),
                             variant: v
                         });
                     });
