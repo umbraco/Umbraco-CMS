@@ -256,8 +256,12 @@ function MemberEditController($scope, $routeParams, $location, $http, $q, appSta
 
         if (id && id.length < 9) {
 
-            return entityResource.getById(id, "Member").then(function (entity) {
+            entityResource.getById(id, "Member").then(function (entity) {
                 $location.path("/member/member/edit/" + entity.key);
+
+                deferred.resolve($scope.content);
+            }, function () {
+                deferred.reject();
             });
         }
         else {
