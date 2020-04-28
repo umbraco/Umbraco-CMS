@@ -201,7 +201,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                     }
 
                     // add a generic error for the property
-                    serverValidationManager.addPropertyError(propertyAlias, culture, segment, htmlFieldReference, modelState[e][0]);
+                    serverValidationManager.addPropertyError(propertyAlias, culture, htmlFieldReference, modelState[e][0], segment);
 
                 } else {
 
