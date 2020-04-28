@@ -76,27 +76,21 @@
             // on first init, we dont have any apps. but if we are re-initializing, we do, but ...
             if ($scope.activeApp) {
 
-                // lets check if it still exists as part of our apps array. (if not we have made a change to our docType, even just a re-save of the docType it will turn into new Apps.)
                 _.forEach(content.apps, function (app) {
                     if (app.alias === $scope.activeApp.alias) {
                         isAppPresent = true;
+                        $scope.appChanged(app);
                     }
                 });
 
-                // if we did reload our DocType, but still have the same app we will try to find it by the alias.
                 if (isAppPresent === false) {
-                    _.forEach(content.apps, function (app) {
-                        if (app.alias === $scope.activeApp.alias) {
-                            isAppPresent = true;
-                            $scope.appChanged(app);
-                        }
-                    });
+                    // active app does not exist anymore.
+                    $scope.activeApp = null;
                 }
-
             }
 
             // if we still dont have a app, lets show the first one:
-            if (isAppPresent === false && content.apps.length) {
+            if ($scope.activeApp === null && content.apps.length) {
                 $scope.appChanged(content.apps[0]);
             }
             // otherwise make sure the save options are up to date with the current content state
