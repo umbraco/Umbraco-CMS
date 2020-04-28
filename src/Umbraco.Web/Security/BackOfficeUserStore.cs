@@ -408,7 +408,6 @@ namespace Umbraco.Web.Security
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException(nameof(user));
 
-            // TODO: SCOTT: Consider adding display name to IIdentityUserLogin
             var userLogin = user.Logins.SingleOrDefault(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey);
             if (userLogin != null) user.Logins.Remove(userLogin);
 
