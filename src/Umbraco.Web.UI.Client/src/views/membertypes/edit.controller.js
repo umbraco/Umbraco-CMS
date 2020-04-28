@@ -34,6 +34,7 @@
         vm.page.saveButtonState = "init";
         vm.labels = {};
         vm.saveButtonKey = "buttons_save";
+        vm.generateModelsKey = "buttons_saveAndGenerateModels";
 
         onInit();
 
@@ -43,6 +44,7 @@
                 memberTypeId = $scope.model.id;
                 create = $scope.model.create;
                 vm.saveButtonKey = "buttons_saveAndClose";
+                vm.generateModelsKey = "buttons_generateModelsAndClose";
             }
         }
 
