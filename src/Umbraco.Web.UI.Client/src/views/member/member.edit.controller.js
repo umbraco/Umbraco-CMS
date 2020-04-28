@@ -219,7 +219,8 @@ function MemberEditController($scope, $routeParams, $location, $http, $q, appSta
 
                         var path = buildTreePath(data);
 
-                        syncTreeNode($scope.content, path);
+                        navigationService.syncTree({ tree: "member", path: path.split(",") });
+                        //syncTreeNode($scope.content, data.path);
 
                         $scope.page.saveButtonState = "success";
 
@@ -277,7 +278,8 @@ function MemberEditController($scope, $routeParams, $location, $http, $q, appSta
                     if (!infiniteMode) {
                         var path = buildTreePath(data);
 
-                        syncTreeNode($scope.content, path, true);
+                        navigationService.syncTree({ tree: "member", path: path.split(","), forceReload: true });
+                        //syncTreeNode($scope.content, data.path, true);
                     }
 
                     //it's the initial load of the editor, we need to get the tree node
