@@ -71,7 +71,7 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                 //this can be null if no property was assigned
                 if (scope.currentProperty) {
                     //first try to get the error msg from the server collection
-                    var err = serverValidationManager.getPropertyError(scope.currentProperty.alias, null, null, "");
+                    var err = serverValidationManager.getPropertyError(scope.currentProperty.alias, null, "", null);
                     //if there's an error message use it
                     if (err && err.errorMsg) {
                         return err.errorMsg;
