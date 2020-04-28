@@ -91,24 +91,26 @@ function valServer(serverValidationManager) {
             }
             
             //subscribe to the server validation changes
+            function serverValidationManagerCallback(isValid, propertyErrors, allErrors) {
+                if (!isValid) {
+                    modelCtrl.$setValidity('valServer', false);
+                    //assign an error msg property to the current validator
+                    modelCtrl.errorMsg = propertyErrors[0].errorMsg;
+                    startWatch();
+                }
+                else {
+                    modelCtrl.$setValidity('valServer', true);
+                    //reset the error message
+                    modelCtrl.errorMsg = "";
+                    stopWatch();
+                }
+            }
             unsubscribe.push(serverValidationManager.subscribe(currentProperty.alias,
                 currentCulture,
-                currentSegment,
                 fieldName,
-                function(isValid, propertyErrors, allErrors) {
-                    if (!isValid) {
-                        modelCtrl.$setValidity('valServer', false);
-                        //assign an error msg property to the current validator
-                        modelCtrl.errorMsg = propertyErrors[0].errorMsg;
-                        startWatch();
-                    }
-                    else {
-                        modelCtrl.$setValidity('valServer', true);
-                        //reset the error message
-                        modelCtrl.errorMsg = "";
-                        stopWatch();
-                    }
-                }));
+                serverValidationManagerCallback,
+                currentSegment)
+            );
 
             scope.$on('$destroy', function () {
                 stopWatch();

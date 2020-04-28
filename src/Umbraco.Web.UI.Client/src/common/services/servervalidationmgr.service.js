@@ -158,7 +158,7 @@ function serverValidationManager($timeout) {
          *  field alias to listen for.
          *  If propertyAlias is null, then this subscription is for a field property (not a user defined property).
          */
-        subscribe: function (propertyAlias, culture, segment, fieldName, callback) {
+        subscribe: function (propertyAlias, culture, fieldName, callback, segment) {
             if (!callback) {
                 return;
             }

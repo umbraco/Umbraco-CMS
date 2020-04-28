@@ -117,10 +117,10 @@
                 });
                 
                 angular.forEach(scope.content.variants, function (variant) {
-                    unsubscribe.push(serverValidationManager.subscribe(null, variant.language !== null ? variant.language.culture : null, variant.segment, null, onVariantValidation));
+                    unsubscribe.push(serverValidationManager.subscribe(null, variant.language !== null ? variant.language.culture : null, null, onVariantValidation, variant.segment));
                 });
                 
-                unsubscribe.push(serverValidationManager.subscribe(null, null, null, null, onVariantValidation));
+                unsubscribe.push(serverValidationManager.subscribe(null, null, null, onVariantValidation, null));
                 
                 
                 
