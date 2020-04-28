@@ -11,6 +11,7 @@ namespace Umbraco.Web.Mvc
     /// to the current page but the current page is actually a rewritten URL normally done with something like
     /// Server.Transfer. It is also handy if you want to persist the query strings.
     /// </remarks>
+    /// Migrated already to .Net Core
     public class RedirectToUmbracoUrlResult : ActionResult
     {
         private readonly IUmbracoContext _umbracoContext;

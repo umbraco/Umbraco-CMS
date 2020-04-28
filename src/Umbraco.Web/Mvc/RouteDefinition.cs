@@ -7,6 +7,7 @@ namespace Umbraco.Web.Mvc
     /// <summary>
     /// Represents the data required to route to a specific controller/action during an Umbraco request
     /// </summary>
+    /// Migrated already to .Net Core
     public class RouteDefinition
     {
         public string ControllerName { get; set; }
