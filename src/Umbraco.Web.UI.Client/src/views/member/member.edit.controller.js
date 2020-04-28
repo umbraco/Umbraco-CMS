@@ -273,8 +273,6 @@ function MemberEditController($scope, $routeParams, $location, $http, $q, appSta
 
                     $scope.content = data;
 
-                    console.log("member data", data);
-
                     if (!infiniteMode) {
                         var path = buildTreePath(data);
 
