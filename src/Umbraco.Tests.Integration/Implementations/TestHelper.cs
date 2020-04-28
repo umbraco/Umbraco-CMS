@@ -17,8 +17,6 @@ using Umbraco.Net;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
 using Umbraco.Tests.Common;
-using Umbraco.Web.BackOffice;
-using Umbraco.Web.BackOffice.AspNetCore;
 using Umbraco.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
@@ -43,7 +41,8 @@ namespace Umbraco.Tests.Integration.Implementations
 
             var hostEnvironment = new Mock<IWebHostEnvironment>();
             hostEnvironment.Setup(x => x.ApplicationName).Returns("UmbracoIntegrationTests");
-            hostEnvironment.Setup(x => x.ContentRootPath).Returns(() => Assembly.GetExecutingAssembly().GetRootDirectorySafe());
+            hostEnvironment.Setup(x => x.ContentRootPath)
+                .Returns(() => Assembly.GetExecutingAssembly().GetRootDirectorySafe());
             hostEnvironment.Setup(x => x.WebRootPath).Returns(() => WorkingDirectory);
             _hostEnvironment = hostEnvironment.Object;
 
@@ -79,9 +78,11 @@ namespace Umbraco.Tests.Integration.Implementations
             }
         }
 
-        public IUmbracoBootPermissionChecker UmbracoBootPermissionChecker { get; } = new TestUmbracoBootPermissionChecker();
+        public IUmbracoBootPermissionChecker UmbracoBootPermissionChecker { get; } =
+            new TestUmbracoBootPermissionChecker();
 
-        public AppCaches AppCaches { get; } = new AppCaches(NoAppCache.Instance, NoAppCache.Instance, new IsolatedCaches(type => NoAppCache.Instance));
+        public AppCaches AppCaches { get; } = new AppCaches(NoAppCache.Instance, NoAppCache.Instance,
+            new IsolatedCaches(type => NoAppCache.Instance));
 
         public IProfilingLogger Logger { get; private set; }
 
@@ -91,7 +92,8 @@ namespace Umbraco.Tests.Integration.Implementations
 
         public IWebHostEnvironment GetWebHostEnvironment() => _hostEnvironment;
 
-        public override IDbProviderFactoryCreator DbProviderFactoryCreator => new SqlServerDbProviderFactoryCreator(Constants.DbProviderNames.SqlServer, DbProviderFactories.GetFactory);
+        public override IDbProviderFactoryCreator DbProviderFactoryCreator =>
+            new SqlServerDbProviderFactoryCreator(Constants.DbProviderNames.SqlServer, DbProviderFactories.GetFactory);
 
         public override IBulkSqlInsertProvider BulkSqlInsertProvider => new SqlServerBulkSqlInsertProvider();
 
@@ -100,7 +102,8 @@ namespace Umbraco.Tests.Integration.Implementations
         public override IBackOfficeInfo GetBackOfficeInfo()
         {
             if (_backOfficeInfo == null)
-                _backOfficeInfo = new AspNetCoreBackOfficeInfo(SettingsForTests.GetDefaultGlobalSettings(GetUmbracoVersion()));
+                _backOfficeInfo =
+                    new AspNetCoreBackOfficeInfo(SettingsForTests.GetDefaultGlobalSettings(GetUmbracoVersion()));
             return _backOfficeInfo;
         }
 
@@ -113,5 +116,22 @@ namespace Umbraco.Tests.Integration.Implementations
 
         public override IIpResolver GetIpResolver() => _ipResolver;
 
+        /// <summary>
+        /// Some test files are copied to the /bin (/bin/debug) on build, this is a utility to return their physical path based on a virtual path name
+        /// </summary>
+        /// <param name="relativePath"></param>
+        /// <returns></returns>
+        public override string MapPathForTestFiles(string relativePath)
+        {
+            if (!relativePath.StartsWith("~/"))
+                throw new ArgumentException("relativePath must start with '~/'", nameof(relativePath));
+
+            var codeBase = typeof(TestHelperBase).Assembly.CodeBase;
+            var uri = new Uri(codeBase);
+            var path = uri.LocalPath;
+            var bin = Path.GetDirectoryName(path);
+
+            return relativePath.Replace("~/", bin + "/");
+        }
     }
 }

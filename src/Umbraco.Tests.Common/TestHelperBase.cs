@@ -116,7 +116,7 @@ namespace Umbraco.Tests.Common
         /// </summary>
         /// <param name="relativePath"></param>
         /// <returns></returns>
-        public string MapPathForTestFiles(string relativePath)
+        public virtual string MapPathForTestFiles(string relativePath)
         {
             if (!relativePath.StartsWith("~/"))
                 throw new ArgumentException("relativePath must start with '~/'", nameof(relativePath));
