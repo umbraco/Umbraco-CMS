@@ -73,23 +73,5 @@ namespace Umbraco.Core.Configuration
         /// <para>It is the full version of Umbraco, including comments.</para>
         /// </remarks>
         public SemVersion SemanticVersion { get; }
-
-        /// <summary>
-        /// Gets the "local" version of the site.
-        /// </summary>
-        /// <remarks>
-        /// <para>Three things have a version, really: the executing code, the database model,
-        /// and the site/files. The database model version is entirely managed via migrations,
-        /// and changes during an upgrade. The executing code version changes when new code is
-        /// deployed. The site/files version changes during an upgrade.</para>
-        /// </remarks>
-        public SemVersion LocalVersion
-        {
-            get
-            {
-                var value = _globalSettings.ConfigurationStatus;
-                return value.IsNullOrWhiteSpace() ? null : SemVersion.TryParse(value, out var semver) ? semver : null;
-            }
-        }
     }
 }

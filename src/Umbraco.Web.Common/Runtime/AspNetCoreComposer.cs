@@ -59,6 +59,9 @@ namespace Umbraco.Web.Common.Runtime
 
             composition.RegisterUnique<AngularJsonMediaTypeFormatter>();
 
+            // register the umbraco context factory
+            composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
+
             //register the install components
             //NOTE: i tried to not have these registered if we weren't installing or upgrading but post install when the site restarts
             //it still needs to use the install controller so we can't do that

@@ -97,36 +97,36 @@ namespace Umbraco.Core
         /// </summary>
         public void DetermineRuntimeLevel(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
-            var localVersion = _umbracoVersion.LocalVersion; // the local, files, version
-            var codeVersion = SemanticVersion; // the executing code version
-            var connect = false;
-
-            if (localVersion == null)
-            {
-                // there is no local version, we are not installed
-                logger.Debug<RuntimeState>("No local version, need to install Umbraco.");
-                Level = RuntimeLevel.Install;
-                Reason = RuntimeLevelReason.InstallNoVersion;
-                return;
-            }
-
-            if (localVersion < codeVersion)
-            {
-                // there *is* a local version, but it does not match the code version
-                // need to upgrade
-                logger.Debug<RuntimeState>("Local version '{LocalVersion}' < code version '{CodeVersion}', need to upgrade Umbraco.", localVersion, codeVersion);
-                Level = RuntimeLevel.Upgrade;
-                Reason = RuntimeLevelReason.UpgradeOldVersion;
-            }
-            else if (localVersion > codeVersion)
-            {
-                logger.Warn<RuntimeState>("Local version '{LocalVersion}' > code version '{CodeVersion}', downgrading is not supported.", localVersion, codeVersion);
-
-                // in fact, this is bad enough that we want to throw
-                Reason = RuntimeLevelReason.BootFailedCannotDowngrade;
-                throw new BootFailedException($"Local version \"{localVersion}\" > code version \"{codeVersion}\", downgrading is not supported.");
-            }
-            else if (databaseFactory.Configured == false)
+            // var localVersion = _umbracoVersion.LocalVersion; // the local, files, version
+            // var codeVersion = SemanticVersion; // the executing code version
+             var connect = false;
+            //
+            // if (localVersion == null)
+            // {
+            //     // there is no local version, we are not installed
+            //     logger.Debug<RuntimeState>("No local version, need to install Umbraco.");
+            //     Level = RuntimeLevel.Install;
+            //     Reason = RuntimeLevelReason.InstallNoVersion;
+            //     return;
+            // }
+            //
+            // if (localVersion < codeVersion)
+            // {
+            //     // there *is* a local version, but it does not match the code version
+            //     // need to upgrade
+            //     logger.Debug<RuntimeState>("Local version '{LocalVersion}' < code version '{CodeVersion}', need to upgrade Umbraco.", localVersion, codeVersion);
+            //     Level = RuntimeLevel.Upgrade;
+            //     Reason = RuntimeLevelReason.UpgradeOldVersion;
+            // }
+            // else if (localVersion > codeVersion)
+            // {
+            //     logger.Warn<RuntimeState>("Local version '{LocalVersion}' > code version '{CodeVersion}', downgrading is not supported.", localVersion, codeVersion);
+            //
+            //     // in fact, this is bad enough that we want to throw
+            //     Reason = RuntimeLevelReason.BootFailedCannotDowngrade;
+            //     throw new BootFailedException($"Local version \"{localVersion}\" > code version \"{codeVersion}\", downgrading is not supported.");
+            // }
+            if (databaseFactory.Configured == false)
             {
                 // local version *does* match code version, but the database is not configured
                 // install - may happen with Deploy/Cloud/etc

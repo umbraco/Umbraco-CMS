@@ -28,13 +28,7 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             get
             {
-                // TODO: if UmbracoVersion.Local is null?
-                // it means that there is a database but the web.config version is cleared
-                // that was a "normal" way to force the upgrader to execute, and we would detect the current
-                // version via the DB like DatabaseSchemaResult.DetermineInstalledVersion - magic, do we really
-                // need this now?
-                var currentVersion = (_umbracoVersion.LocalVersion ?? new Semver.SemVersion(0)).ToString();
-
+                //TODO this will always compare the same version now
                 var newVersion = _umbracoVersion.SemanticVersion.ToString();
 
                 string FormatGuidState(string value)
@@ -48,6 +42,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
                 var currentState = FormatGuidState(_runtimeState.CurrentMigrationState);
                 var newState = FormatGuidState(_runtimeState.FinalMigrationState);
+                var currentVersion = _umbracoVersion.Current;
 
                 var reportUrl = $"https://our.umbraco.com/contribute/releases/compare?from={currentVersion}&to={newVersion}&notes=1";
 

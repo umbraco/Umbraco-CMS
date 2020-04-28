@@ -49,10 +49,7 @@ namespace Umbraco.Web.Install.InstallSteps
             //     // for installs, we need to log the super user in
             //     security.PerformLogin(Constants.Security.SuperUserId);
             // }
-
-            // Update configurationStatus
-            _globalSettings.ConfigurationStatus = _umbracoVersion.SemanticVersion.ToSemanticString();
-
+            
             //reports the ended install
             _installHelper.InstallStatus(true, "");
 

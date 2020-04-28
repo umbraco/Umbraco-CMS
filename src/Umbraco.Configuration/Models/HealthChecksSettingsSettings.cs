@@ -55,7 +55,7 @@ namespace Umbraco.Configuration.Models
             public IReadOnlyDictionary<string, INotificationMethod> NotificationMethods => _configurationSection
                 .GetSection("NotificationMethods")
                 .GetChildren()
-                .ToDictionary(x => x.Key, x => (INotificationMethod) new NotificationMethod(x.Key, x));
+                .ToDictionary(x => x.Key, x => (INotificationMethod) new NotificationMethod(x.Key, x), StringComparer.InvariantCultureIgnoreCase);
 
             public IEnumerable<IDisabledHealthCheck> DisabledChecks => _configurationSection
                 .GetSection("DisabledChecks").GetChildren().Select(
@@ -87,7 +87,7 @@ namespace Umbraco.Configuration.Models
 
             public IReadOnlyDictionary<string, INotificationMethodSettings> Settings => _configurationSection
                 .GetSection("Settings").GetChildren().ToDictionary(x => x.Key,
-                    x => (INotificationMethodSettings) new NotificationMethodSettings(x.Key, x.Value));
+                    x => (INotificationMethodSettings) new NotificationMethodSettings(x.Key, x.Value), StringComparer.InvariantCultureIgnoreCase);
         }
 
         private class NotificationMethodSettings : INotificationMethodSettings
