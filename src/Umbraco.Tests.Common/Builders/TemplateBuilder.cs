@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Common.Builders
             var alias = _alias ?? name.ToCamelCase();
             var createDate = _createDate ?? DateTime.Now;
             var updateDate = _updateDate ?? DateTime.Now;
-            var path = _path ?? string.Empty;
+            var path = _path ?? $"-1,{id}";
             var content = _content;
             var isMasterTemplate = _isMasterTemplate ?? false;
             var masterTemplateAlias = _masterTemplateAlias ?? string.Empty;

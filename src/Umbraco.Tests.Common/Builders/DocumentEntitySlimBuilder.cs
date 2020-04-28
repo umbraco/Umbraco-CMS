@@ -81,7 +81,7 @@ namespace Umbraco.Tests.Common.Builders
             var name = _name ?? Guid.NewGuid().ToString();
             var creatorId = _creatorId ?? 1;
             var level = _level ?? 1;
-            var path = _path ?? "-1";
+            var path = _path ?? $"-1,{id}";
             var sortOrder = _sortOrder ?? 0;
             var parentId = _parentId ?? -1;
             var icon = _contentTypeIcon ?? string.Empty;

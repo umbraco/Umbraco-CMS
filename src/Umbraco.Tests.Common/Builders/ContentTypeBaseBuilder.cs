@@ -66,15 +66,15 @@ namespace Umbraco.Tests.Common.Builders
 
         protected int GetLevel() => _level ?? 0;
 
-        protected string GetPath() => _path ?? string.Empty;
+        protected string GetPath() => _path ?? _path ?? $"-1,{GetId()}";
 
         protected int GetSortOrder() => _sortOrder ?? 0;
 
         protected string GetDescription() => _description ?? string.Empty;
 
-        protected string GetIcon() => _icon ?? string.Empty;
+        protected string GetIcon() => _icon ?? "icon-document";
 
-        protected string GetThumbnail() => _thumbnail ?? string.Empty;
+        protected string GetThumbnail() => _thumbnail ?? "folder.png";
 
         protected int GetCreatorId() => _creatorId ?? 0;
 

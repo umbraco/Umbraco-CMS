@@ -154,8 +154,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
 
             var propertyTypeBuilder = new PropertyTypeBuilder();
             var additionalPropertyType = propertyTypeBuilder
-                .WithPropertyEditorAlias("test")
-                .WithValueStorageType(ValueStorageType.Nvarchar)
                 .WithAlias("blah")
                 .Build();
 

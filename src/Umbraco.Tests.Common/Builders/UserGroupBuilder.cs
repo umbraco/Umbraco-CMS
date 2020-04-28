@@ -98,7 +98,7 @@ namespace Umbraco.Tests.Common.Builders
             var userCount = _userCount ?? 0;
             var startContentId = _startContentId ?? -1;
             var startMediaId = _startMediaId ?? -1;
-            var icon = _icon ?? string.Empty;
+            var icon = _icon ?? "icon-group";
 
             var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 

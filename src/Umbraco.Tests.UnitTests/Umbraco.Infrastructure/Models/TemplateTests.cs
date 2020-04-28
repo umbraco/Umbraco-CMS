@@ -74,7 +74,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
                 .WithCreateDate(DateTime.Now)
                 .WithUpdateDate(DateTime.Now)
                 .WithKey(Guid.NewGuid())
-                .WithPath("-1,3")
                 .WithContent("blah")
                 .AsMasterTemplate("master", 88)
                 .Build();

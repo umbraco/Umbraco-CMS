@@ -65,7 +65,7 @@ namespace Umbraco.Tests.Common.Builders
                     .WithValueStorageType(ValueStorageType.Nvarchar)
                     .WithAlias(Constants.Conventions.Media.Extension)
                     .WithName("File Extension")
-                    .WithSortOrder(4)
+                    .WithSortOrder(5)
                     .WithDataTypeId(Constants.System.DefaultLabelDataTypeId)
                     .Done();
             _propertyGroupBuilders.Add(builder);

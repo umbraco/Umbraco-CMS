@@ -26,7 +26,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
                 .WithName("Test")
                 .WithParentId(5)
                 .WithSortOrder(6)
-                .WithPath("-1,23")
                 .WithLevel(7)
                 .WithContentTypeAlias("test1")
                 .WithContentTypeIcon("icon")

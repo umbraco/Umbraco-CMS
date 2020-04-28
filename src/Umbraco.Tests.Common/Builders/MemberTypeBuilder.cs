@@ -30,7 +30,6 @@ namespace Umbraco.Tests.Common.Builders
             var builder = new PropertyGroupBuilder<MemberTypeBuilder>(this)
                 .WithId(99)
                 .WithName(Constants.Conventions.Member.StandardPropertiesGroupName)
-                .WithSortOrder(1)
                 .AddPropertyType()
                     .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextArea)
                     .WithValueStorageType(ValueStorageType.Ntext)

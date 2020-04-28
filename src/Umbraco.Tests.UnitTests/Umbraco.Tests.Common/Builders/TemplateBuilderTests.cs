@@ -13,44 +13,44 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
         public void Is_Built_Correctly()
         {
             // Arrange
-            const int id = 3;
-            const string alias = "test";
-            const string name = "Test";
-            var key = Guid.NewGuid();
-            var createDate = DateTime.Now.AddHours(-1);
-            var updateDate = DateTime.Now;
-            const string path = "-1,3";
-            const string content = "blah";
-            const string masterTemplateAlias = "master";
-            const int masterTemplateId = 88;
+            const int testId = 3;
+            const string testAlias = "test";
+            const string testName = "Test";
+            var testKey = Guid.NewGuid();
+            var testCreateDate = DateTime.Now.AddHours(-1);
+            var testUpdateDate = DateTime.Now;
+            const string testPath = "-1,3";
+            const string testContent = "blah";
+            const string testMasterTemplateAlias = "master";
+            const int testMasterTemplateId = 88;
 
             var builder = new TemplateBuilder();
 
             // Act
             var template = builder
                 .WithId(3)
-                .WithAlias(alias)
-                .WithName(name)
-                .WithCreateDate(createDate)
-                .WithUpdateDate(updateDate)
-                .WithKey(key)
-                .WithPath(path)
-                .WithContent(content)
-                .AsMasterTemplate(masterTemplateAlias, masterTemplateId)
+                .WithAlias(testAlias)
+                .WithName(testName)
+                .WithCreateDate(testCreateDate)
+                .WithUpdateDate(testUpdateDate)
+                .WithKey(testKey)
+                .WithPath(testPath)
+                .WithContent(testContent)
+                .AsMasterTemplate(testMasterTemplateAlias, testMasterTemplateId)
                 .Build();
 
             // Assert
-            Assert.AreEqual(id, template.Id);
-            Assert.AreEqual(alias, template.Alias);
-            Assert.AreEqual(name, template.Name);
-            Assert.AreEqual(createDate, template.CreateDate);
-            Assert.AreEqual(updateDate, template.UpdateDate);
-            Assert.AreEqual(key, template.Key);
-            Assert.AreEqual(path, template.Path);
-            Assert.AreEqual(content, template.Content);
+            Assert.AreEqual(testId, template.Id);
+            Assert.AreEqual(testAlias, template.Alias);
+            Assert.AreEqual(testName, template.Name);
+            Assert.AreEqual(testCreateDate, template.CreateDate);
+            Assert.AreEqual(testUpdateDate, template.UpdateDate);
+            Assert.AreEqual(testKey, template.Key);
+            Assert.AreEqual(testPath, template.Path);
+            Assert.AreEqual(testContent, template.Content);
             Assert.IsTrue(template.IsMasterTemplate);
-            Assert.AreEqual(masterTemplateAlias, template.MasterTemplateAlias);
-            Assert.AreEqual(masterTemplateId, ((Template)template).MasterTemplateId.Value);
+            Assert.AreEqual(testMasterTemplateAlias, template.MasterTemplateAlias);
+            Assert.AreEqual(testMasterTemplateId, ((Template)template).MasterTemplateId.Value);
         }
     }
 }
