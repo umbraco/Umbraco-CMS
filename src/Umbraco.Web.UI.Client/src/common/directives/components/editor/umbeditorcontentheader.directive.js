@@ -112,7 +112,7 @@
                 
                 scope.editor.variantApps.forEach( (app) => {
                     if (app.alias === "umbContent") {
-                        app.anchors = scope.content.tabs;
+                        app.anchors = scope.editor.content.tabs;
                     }
                 });
                 
