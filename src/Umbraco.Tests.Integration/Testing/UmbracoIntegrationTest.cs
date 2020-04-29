@@ -103,6 +103,7 @@ namespace Umbraco.Tests.Integration.Testing
                 .UseUmbraco(serviceProviderFactory)
                 .ConfigureServices((hostContext, services) =>
                 {
+                    services.AddSingleton(testHelper.DbProviderFactoryCreator);
                     var webHostEnvironment = testHelper.GetWebHostEnvironment();
                     services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
 

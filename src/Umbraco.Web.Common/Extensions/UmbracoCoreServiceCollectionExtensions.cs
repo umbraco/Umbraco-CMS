@@ -125,7 +125,7 @@ namespace Umbraco.Web.Common.Extensions
 
             var serviceProvider = services.BuildServiceProvider();
             var configs = serviceProvider.GetService<Configs>();
-
+            var dbProviderFactoryCreator = serviceProvider.GetRequiredService<IDbProviderFactoryCreator>();
 
             CreateCompositionRoot(services,
                 configs,
@@ -138,7 +138,6 @@ namespace Umbraco.Web.Common.Extensions
             var typeFinder = CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly, configs.TypeFinder());
 
             RegisterDatabaseTypes(typeFinder);
-            var dbProviderFactoryCreator = serviceProvider.GetRequiredService<IDbProviderFactoryCreator>();
 
             var coreRuntime = GetCoreRuntime(
                 configs,

@@ -97,6 +97,7 @@ namespace Umbraco.Tests.Integration
                 .ConfigureServices((hostContext, services) =>
                 {
                     var webHostEnvironment = testHelper.GetWebHostEnvironment();
+                    services.AddSingleton(testHelper.DbProviderFactoryCreator);
                     services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
 
                     // Add it!
@@ -136,6 +137,7 @@ namespace Umbraco.Tests.Integration
                 .ConfigureServices((hostContext, services) =>
                 {
                     var webHostEnvironment = testHelper.GetWebHostEnvironment();
+                    services.AddSingleton(testHelper.DbProviderFactoryCreator);
                     services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
 
                     // Add it!
