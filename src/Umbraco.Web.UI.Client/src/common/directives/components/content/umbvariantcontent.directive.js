@@ -43,7 +43,7 @@
         function onInit() {
             
             // Make copy of apps, so we can have a variant specific model for the App. (needed for validation etc.)
-            vm.editor.variantApps = angular.copy(vm.content.apps);
+            vm.editor.variantApps = Utilities.copy(vm.content.apps);
 
             var activeApp = vm.content.apps.find((app) => app.active);
 
