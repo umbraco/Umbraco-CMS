@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.Overlays.PublishDescendantsController as vm" class="umb-variant-selector-overlay">
 
-    <div ng-if="vm.variants.length === 1">
+    <div ng-if="vm.displayVariants.length === 1">
         <div class="mb3">
             <p><localize key="{{vm.labels.help.key}}" tokens="vm.labels.help.tokens"></localize></p>
         </div>
@@ -16,7 +16,7 @@
 
     </div>
 
-    <div ng-if="vm.variants.length > 1">
+    <div ng-if="vm.displayVariants.length > 1">
 
         <div class="mb3">
             <p><localize key="content_publishDescendantsWithVariantsHelp"></localize></p>
@@ -33,7 +33,7 @@
 
         <div class="umb-list umb-list--condensed">
 
-            <div class="umb-list-item umb-list--condensed" ng-repeat="variant in vm.variants">
+            <div class="umb-list-item umb-list--condensed" ng-repeat="variant in vm.displayVariants track by variant.compositeId">
                 <ng-form name="publishVariantSelectorForm">
                     <div class="umb-variant-selector-entry" ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid}">
 

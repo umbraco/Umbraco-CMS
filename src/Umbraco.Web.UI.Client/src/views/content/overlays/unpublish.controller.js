@@ -7,11 +7,11 @@
         var autoSelectedVariants = [];
 
         vm.changeSelection = changeSelection;
-        vm.publishedVariantFilter = publishedVariantFilter;
 
         function onInit() {
 
             vm.variants = $scope.model.variants;
+            vm.unpublishableVariants = vm.variants.filter(publishedVariantFilter)
 
             // set dialog title
             if (!$scope.model.title) {
@@ -21,16 +21,13 @@
             }
 
             _.each(vm.variants, function (variant) {
-                variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
-                variant.htmlId = "_content_variant_" + variant.compositeId;
-
                 variant.isMandatory = isMandatoryFilter(variant);
             });
 
             // node has variants
             if (vm.variants.length !== 1) {
                 
-                vm.variants = vm.variants.sort(function (a, b) {
+                vm.unpublishableVariants.sort(function (a, b) {
                     if (a.language && b.language) {
                         if (a.language.name > b.language.name) {
                             return -1;

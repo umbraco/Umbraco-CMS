@@ -10,7 +10,7 @@
 
     <div class="umb-list umb-list--condensed" ng-if="!vm.loading">
 
-        <div class="umb-list-item" ng-repeat="variant in vm.availableVariants">
+        <div class="umb-list-item" ng-repeat="variant in vm.availableVariants track by variant.compositeId">
             <ng-form name="publishVariantSelectorForm">
                 <div class="umb-variant-selector-entry" ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid}">
 

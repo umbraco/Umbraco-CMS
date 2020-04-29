@@ -112,8 +112,6 @@
             });
 
             _.each(vm.variants, (variant) => {
-                variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
-                variant.htmlId = "_content_variant_" + variant.compositeId;
                 
                 // if this is a new node and we have data on this variant.
                 if(vm.isNew === true && hasAnyDataFilter(variant)) {
@@ -133,7 +131,7 @@
             });
 
             if (vm.availableVariants.length !== 0) {
-                vm.availableVariants = vm.availableVariants.sort(function (a, b) {
+                vm.availableVariants.sort(function (a, b) {
                     if (a.language && b.language) {
                         if (a.language.name > b.language.name) {
                             return -1;

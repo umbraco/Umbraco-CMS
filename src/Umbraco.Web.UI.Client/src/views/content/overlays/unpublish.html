@@ -13,7 +13,7 @@
 
         <div class="umb-list umb-list--condensed">
 
-            <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.publishedVariantFilter">
+            <div class="umb-list-item" ng-repeat="variant in vm.unpublishableVariants track by variant.compositeId">
                 <ng-form name="unpublishVariantSelectorForm">
                     <div class="umb-variant-selector-entry" ng-class="{'umb-list-item--error': unpublishVariantSelectorForm.unpublishVariantSelector.$invalid}">
 

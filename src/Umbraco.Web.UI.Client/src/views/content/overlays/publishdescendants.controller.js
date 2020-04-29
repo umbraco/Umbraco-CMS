@@ -14,6 +14,7 @@
         function onInit() {
 
             vm.variants = $scope.model.variants;
+            vm.displayVariants = vm.variants.slice(0);// shallow copy, we dont want to share the array-object(because we will be performing a sort method) but each entry should be shared (because we need validation and notifications).
             vm.labels = {};
 
             if (!$scope.model.title) {
@@ -23,15 +24,12 @@
             }
 
             _.each(vm.variants, function (variant) {
-                variant.compositeId = (variant.language ? variant.language.culture : "inv") + "_" + (variant.segment ? variant.segment : "");
-                variant.htmlId = "_content_variant_" + variant.compositeId;
-                
                 variant.isMandatory = isMandatoryFilter(variant);
             });
 
             if (vm.variants.length > 1) {
 
-                vm.variants = vm.variants.sort(function (a, b) {
+                vm.displayVariants.sort(function (a, b) {
                     if (a.language && b.language) {
                         if (a.language.name > b.language.name) {
                             return -1;

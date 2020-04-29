@@ -1,6 +1,6 @@
 ﻿<div class="umb-split-views">
     <div class="umb-split-view"
-         ng-repeat="editor in vm.editors track by editor.culture+'.'+editor.segment">
+         ng-repeat="editor in vm.editors track by editor.compositeId">
 
         <umb-variant-content
             page="vm.page"

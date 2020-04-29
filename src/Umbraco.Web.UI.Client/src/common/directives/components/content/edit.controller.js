@@ -143,8 +143,8 @@
         }
 
         /** Returns true if the content item varies by culture */
-        function isContentCultureVariant() {
-            return $scope.content.variants.length > 1;
+        function hasVariants(content) {
+            return content.variants.length > 1;
         }
 
         function reload() {
@@ -215,6 +215,11 @@
             //we are editing so get the content item from the server
             return $scope.getMethod()($scope.contentId)
                 .then(function (data) {
+
+                    data.variants.forEach((variant) => {
+                        variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
+                        variant.htmlId = "_content_variant_" + variant.compositeId;
+                    });
 
                     $scope.content = data;
 
@@ -581,7 +586,7 @@
 
         $scope.sendToPublish = function () {
             clearNotifications($scope.content);
-            if (isContentCultureVariant()) {
+            if (hasVariants($scope.content)) {
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
 
@@ -641,7 +646,7 @@
 
         $scope.saveAndPublish = function () {
             clearNotifications($scope.content);
-            if (isContentCultureVariant()) {
+            if (hasVariants($scope.content)) {
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
                     var dialog = {
@@ -703,7 +708,7 @@
         $scope.save = function () {
             clearNotifications($scope.content);
             // TODO: Add "..." to save button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
-            if (isContentCultureVariant()) {
+            if (hasVariants($scope.content)) {
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "openSaveDialog" })) {
 
@@ -768,7 +773,7 @@
             clearNotifications($scope.content);
             //before we launch the dialog we want to execute all client side validations first
             if (formHelper.submitForm({ scope: $scope, action: "schedule" })) {
-                if (!isContentCultureVariant()) {
+                if (!hasVariants($scope.content)) {
                     //ensure the flags are set
                     $scope.content.variants[0].save = true;
                 }
@@ -805,7 +810,7 @@
                         }, function (err) {
                             clearDirtyState($scope.content.variants);
                             //if this is invariant, show the notification errors, else they'll be shown inline with the variant
-                            if (!isContentCultureVariant()) {
+                            if (!hasVariants($scope.content)) {
                                 formHelper.showNotifications(err.data);
                             }
                             model.submitButtonState = "error";
@@ -832,7 +837,7 @@
             //before we launch the dialog we want to execute all client side validations first
             if (formHelper.submitForm({ scope: $scope, action: "publishDescendants" })) {
 
-                if (!isContentCultureVariant()) {
+                if (!hasVariants($scope.content)) {
                     //ensure the flags are set
                     $scope.content.variants[0].save = true;
                     $scope.content.variants[0].publish = true;
@@ -865,7 +870,7 @@
                         }, function (err) {
                             clearDirtyState($scope.content.variants);
                             //if this is invariant, show the notification errors, else they'll be shown inline with the variant
-                            if (!isContentCultureVariant()) {
+                            if (!hasVariants($scope.content)) {
                                 formHelper.showNotifications(err.data);
                             }
                             model.submitButtonState = "error";

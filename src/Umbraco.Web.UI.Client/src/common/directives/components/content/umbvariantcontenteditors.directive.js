@@ -20,7 +20,7 @@
         controller: umbVariantContentEditorsController
     };
 
-    function umbVariantContentEditorsController($scope, $location) {
+    function umbVariantContentEditorsController($scope, $location, contentEditingHelper) {
 
         var prevContentDateUpdated = null;
 
@@ -59,8 +59,7 @@
 
             if (changes.culture && !changes.culture.isFirstChange() && changes.culture.currentValue !== changes.culture.previousValue) {
                 setActiveVariant();
-            }
-            if (changes.segment && !changes.segment.isFirstChange() && changes.segment.currentValue !== changes.segment.previousValue) {
+            } else if (changes.segment && !changes.segment.isFirstChange() && changes.segment.currentValue !== changes.segment.previousValue) {
                 setActiveVariant();
             }
         }
@@ -86,7 +85,7 @@
             // set the active variant
             var activeVariant = null;
             _.each(vm.content.variants, function (v) {
-                if ((!v.language || v.language.culture === vm.culture) && v.segment === vm.segment) {
+                if ((vm.culture === "invariant" || v.language && v.language.culture === vm.culture) && v.segment === vm.segment) {
                     activeVariant = v;
                 }
             });
@@ -119,6 +118,10 @@
         function insertVariantEditor(index, variant) {
 
             if (vm.editors[index]) {
+                if (vm.editors[index].content === variant) {
+                    console.error("This editor is already in this place.");
+                    return;
+                }
                 vm.editors[index].content.active = false;
             }
             variant.active = true;
@@ -126,28 +129,27 @@
             var variantCulture = variant.language ? variant.language.culture : "invariant";
             var variantSegment = variant.segment;
 
-            //check if the culture at the index is the same, if it's null an editor will be added
-            var currentCulture = vm.editors.length === 0 || vm.editors.length <= index ? null : vm.editors[index].culture;
-            //check if the segment at the index is the same, if it's null an editor will be added
-            var currentSegment = vm.editors.length === 0 || vm.editors.length <= index ? null : vm.editors[index].segment;
-
+            var currentCulture = index < vm.editors.length ? vm.editors[index].culture : null;
+            var currentSegment = index < vm.editors.length ? vm.editors[index].segment : null;
             
-            if (currentCulture !== variantCulture || currentSegment !== variantSegment) {
+            // if index not already exists or if the culture or segment isnt identical then we do a replacement.
+            if (index >= vm.editors.length || currentCulture !== variantCulture || currentSegment !== variantSegment) {
 
-                //Not the current culture which means we need to modify the array.
+                //Not the current culture or segment which means we need to modify the array.
                 //NOTE: It is not good enough to just replace the `content` object at a given index in the array
                 // since that would mean that directives are not re-initialized.
                 vm.editors.splice(index, 1, {
+                    compositeId: variant.compositeId,
                     content: variant,
-                    //used for "track-by" ng-repeat
                     culture: variantCulture,
                     segment: variantSegment
                 });
             }
             else {
-                //replace the editor for the same culture
+                //replace the content of the editor, since the cultura and segment is the same.
                 vm.editors[index].content = variant;
             }
+            
         }
         
         /**

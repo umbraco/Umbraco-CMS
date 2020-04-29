@@ -20,9 +20,6 @@
             }
 
             _.each(vm.variants, function (variant) {
-                variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
-                variant.htmlId = "_content_variant_" + variant.compositeId;
-                
                 variant.isMandatory = isMandatoryFilter(variant);
             });
             

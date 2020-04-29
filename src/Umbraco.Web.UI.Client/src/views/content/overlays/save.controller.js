@@ -9,7 +9,6 @@
         vm.isNew = true;
 
         vm.changeSelection = changeSelection;
-        vm.dirtyVariantFilter = dirtyVariantFilter;
 
         function changeSelection(variant) {
             var firstSelected = _.find(vm.variants, function (v) {
@@ -18,7 +17,7 @@
             $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
         }
 
-        function dirtyVariantFilter(variant) {
+        function saveableVariantFilter(variant) {
             //determine a variant is 'dirty' (meaning it will show up as save-able) if it's
             // * the active one
             // * it's editor is in a $dirty state
@@ -58,6 +57,7 @@
 
         function onInit() {
             vm.variants = $scope.model.variants;
+            vm.availableVariants = vm.variants.filter(saveableVariantFilter);
 
             if(!$scope.model.title) {
                 localizationService.localize("content_readyToSave").then(function(value){
@@ -81,17 +81,21 @@
 
             _.each(vm.variants,
                 function (variant) {
-                    variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
-                    variant.htmlId = "_content_variant_" + variant.compositeId;
-
                     if(vm.isNew && hasAnyData(variant)){
                         variant.save = true;
                     }
                 });
 
             if (vm.variants.length !== 0) {
-                
-                vm.variants = vm.variants.sort(function (a, b) {
+
+                _.find(vm.variants, function (v) {
+                    if(v.active) {
+                        //ensure that the current one is selected
+                        v.save = true;
+                    }
+                });
+
+                vm.availableVariants.sort(function (a, b) {
                     if (a.language && b.language) {
                         if (a.language.name > b.language.name) {
                             return -1;
@@ -109,13 +113,6 @@
                         }
                     }
                     return 0;
-                });
-
-                _.find(vm.variants, function (v) {
-                    if(v.active) {
-                        //ensure that the current one is selected
-                        v.save = true;
-                    }
                 });
 
             } else {

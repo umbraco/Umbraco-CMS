@@ -84,7 +84,7 @@
 
         <div class="umb-list umb-list--condensed">
 
-            <div class="umb-list-item" ng-repeat="variant in vm.variants">
+            <div class="umb-list-item" ng-repeat="variant in vm.displayVariants track by variant.compositeId">
                 <ng-form name="scheduleSelectorForm" style="width:100%;">
                     <div class="umb-variant-selector-entry" ng-class="{'umb-list-item--error': scheduleSelectorForm.saveVariantReleaseDate.$invalid}">
 
