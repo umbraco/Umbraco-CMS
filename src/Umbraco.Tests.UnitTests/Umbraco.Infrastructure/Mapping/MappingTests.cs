@@ -7,7 +7,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Tests.Mapping
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Mapping
 {
     [TestFixture]
     public class MappingTests
@@ -138,7 +138,6 @@ namespace Umbraco.Tests.Mapping
             {
                 // keep failing at mapping - and looping through the maps
                 for (var i = 0; i < 10; i++)
-                {
                     try
                     {
                         mapper.Map<Thing2>(thing4);
@@ -148,7 +147,6 @@ namespace Umbraco.Tests.Mapping
                         caught = e;
                         Console.WriteLine($"{e.GetType().Name} {e.Message}");
                     }
-                }
 
                 Console.WriteLine("done");
             }
@@ -185,7 +183,7 @@ namespace Umbraco.Tests.Mapping
             {
                 Fruit1 = Thing5Enum.Apple,
                 Fruit2 = Thing5Enum.Banana,
-                Fruit3= Thing5Enum.Cherry
+                Fruit3 = Thing5Enum.Cherry
             };
 
             var thing6 = mapper.Map<Thing5, Thing6>(thing5);

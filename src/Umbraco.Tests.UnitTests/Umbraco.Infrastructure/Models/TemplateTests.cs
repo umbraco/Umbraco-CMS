@@ -37,7 +37,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
             Assert.AreEqual(clone.Id, template.Id);
             Assert.AreEqual(clone.Key, template.Key);
             Assert.AreEqual(clone.MasterTemplateAlias, template.MasterTemplateAlias);
-            Assert.AreEqual(clone.MasterTemplateId.Value, template.MasterTemplateId.Value);
+            Assert.AreEqual(clone.MasterTemplateId.Value, ((Template)template).MasterTemplateId.Value);
             Assert.AreEqual(clone.Name, template.Name);
             Assert.AreEqual(clone.UpdateDate, template.UpdateDate);
 
@@ -65,7 +65,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
             Debug.Print(json);
         }
 
-        private Template BuildTemplate()
+        private ITemplate BuildTemplate()
         {
             return _builder
                 .WithId(3)
@@ -74,7 +74,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
                 .WithCreateDate(DateTime.Now)
                 .WithUpdateDate(DateTime.Now)
                 .WithKey(Guid.NewGuid())
-                .WithPath("-1,3")
                 .WithContent("blah")
                 .AsMasterTemplate("master", 88)
                 .Build();

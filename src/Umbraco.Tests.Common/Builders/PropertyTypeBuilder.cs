@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Common.Builders.Extensions;
@@ -91,14 +92,14 @@ namespace Umbraco.Tests.Common.Builders
         {
             var id = _id ?? 0;
             var key = _key ?? Guid.NewGuid();
-            var propertyEditorAlias = _propertyEditorAlias ?? Guid.NewGuid().ToString().ToCamelCase();
-            var valueStorageType = _valueStorageType ?? ValueStorageType.Ntext;
+            var propertyEditorAlias = _propertyEditorAlias ?? Constants.PropertyEditors.Aliases.TextBox;
+            var valueStorageType = _valueStorageType ?? ValueStorageType.Nvarchar;
             var name = _name ?? Guid.NewGuid().ToString();
             var alias = _alias ?? name.ToCamelCase();
             var createDate = _createDate ?? DateTime.Now;
             var updateDate = _updateDate ?? DateTime.Now;
             var sortOrder = _sortOrder ?? 0;
-            var dataTypeId = _dataTypeId ?? 0;
+            var dataTypeId = _dataTypeId ?? -88;
             var description = _description ?? string.Empty;
             var propertyGroupId = _propertyGroupId ?? null;
             var mandatory = _mandatory ?? false;

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Tests.Common.Builders
@@ -20,15 +21,16 @@ namespace Umbraco.Tests.Common.Builders
             IWithAliasBuilder,
             IWithNameBuilder
     {
-        private int? _startContentId;
-        private int? _startMediaId;
+        private int? _id;
         private string _alias;
         private string _icon;
         private string _name;
         private IEnumerable<string> _permissions = Enumerable.Empty<string>();
         private IEnumerable<string> _sectionCollection = Enumerable.Empty<string>();
         private string _suffix;
-        private int? _id;
+        private int? _startContentId;
+        private int? _startMediaId;
+        private int? _userCount;
 
         public UserGroupBuilder(TParent parentBuilder) : base(parentBuilder)
         {
@@ -42,6 +44,36 @@ namespace Umbraco.Tests.Common.Builders
         public UserGroupBuilder<TParent> WithSuffix(string suffix)
         {
             _suffix = suffix;
+            return this;
+        }
+
+        public UserGroupBuilder<TParent> WithUserCount(int userCount)
+        {
+            _userCount = userCount;
+            return this;
+        }
+
+        public UserGroupBuilder<TParent> WithPermissions(string permissions)
+        {
+            _permissions = permissions.Split();
+            return this;
+        }
+
+        public UserGroupBuilder<TParent> WithPermissions(IList<string> permissions)
+        {
+            _permissions = permissions;
+            return this;
+        }
+
+        public UserGroupBuilder<TParent> WithStartContentId(int startContentId)
+        {
+            _startContentId = startContentId;
+            return this;
+        }
+
+        public UserGroupBuilder<TParent> WithStartMediaId(int startMediaId)
+        {
+            _startMediaId = startMediaId;
             return this;
         }
 
@@ -60,14 +92,26 @@ namespace Umbraco.Tests.Common.Builders
 
         public override IUserGroup Build()
         {
-            var userGroup = Mock.Of<IUserGroup>(x =>
-                x.StartContentId == _startContentId &&
-                x.StartMediaId == _startMediaId &&
-                x.Name == (_name ?? ("TestUserGroup" + _suffix)) &&
-                x.Alias == (_alias ?? ("testUserGroup" + _suffix)) &&
-                x.Icon == _icon &&
-                x.Permissions == _permissions &&
-                x.AllowedSections == _sectionCollection);
+            var id = _id ?? 1;
+            var name = _name ?? ("TestUserGroup" + _suffix);
+            var alias = _alias ?? ("testUserGroup" + _suffix);
+            var userCount = _userCount ?? 0;
+            var startContentId = _startContentId ?? -1;
+            var startMediaId = _startMediaId ?? -1;
+            var icon = _icon ?? "icon-group";
+
+            var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+
+            var userGroup = new UserGroup(shortStringHelper, userCount, alias, name, _permissions, icon);
+            userGroup.Id = id;
+            userGroup.StartContentId = startContentId;
+            userGroup.StartMediaId = startMediaId;
+
+            foreach (var item in _sectionCollection)
+            {
+                userGroup.AddAllowedSection(item);
+            }
+
             return userGroup;
         }
 
@@ -76,7 +120,6 @@ namespace Umbraco.Tests.Common.Builders
             get => _id;
             set => _id = value;
         }
-
 
         string IWithIconBuilder.Icon
         {

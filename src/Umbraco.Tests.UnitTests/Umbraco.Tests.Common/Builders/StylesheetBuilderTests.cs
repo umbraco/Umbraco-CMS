@@ -10,20 +10,20 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
         public void Is_Built_Correctly()
         {
             // Arrange
-            const string path = "/css/styles.css";
-            const string content = @"body { color:#000; } .bold {font-weight:bold;}";
+            const string testPath = "/css/styles.css";
+            const string testContent = @"body { color:#000; } .bold {font-weight:bold;}";
 
             var builder = new StylesheetBuilder();
 
             // Act
             var stylesheet = builder
-                .WithPath(path)
-                .WithContent(content)
+                .WithPath(testPath)
+                .WithContent(testContent)
                 .Build();
 
             // Assert
             Assert.AreEqual("\\css\\styles.css", stylesheet.Path);
-            Assert.AreEqual(content, stylesheet.Content);
+            Assert.AreEqual(testContent, stylesheet.Content);
         }
     }
 }
