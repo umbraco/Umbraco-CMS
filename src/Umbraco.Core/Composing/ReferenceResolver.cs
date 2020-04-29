@@ -70,10 +70,9 @@ namespace Umbraco.Core.Composing
                 }
             }
 
-            var assemblyNameToAssembly = assemblies.ToDictionary(x => x.GetName());
             foreach (var item in assemblies)
             {
-                var classification = Resolve(item, assemblyNameToAssembly);
+                var classification = Resolve(item);
                 if (classification == Classification.ReferencesUmbraco || classification == Classification.IsUmbraco)
                 {
                     applicationParts.Add(item);
@@ -101,7 +100,7 @@ namespace Umbraco.Core.Composing
             return assembly.Location;
         }
 
-        private Classification Resolve(Assembly assembly, IDictionary<AssemblyName, Assembly> assemblyNameToAssembly)
+        private Classification Resolve(Assembly assembly)
         {
             if (_classifications.TryGetValue(assembly, out var classification))
             {
@@ -124,10 +123,10 @@ namespace Umbraco.Core.Composing
             else
             {
                 classification = Classification.DoesNotReferenceUmbraco;
-                foreach (var reference in GetReferences(assembly, assemblyNameToAssembly))
+                foreach (var reference in GetReferences(assembly))
                 {
                     // recurse
-                    var referenceClassification = Resolve(reference, assemblyNameToAssembly);
+                    var referenceClassification = Resolve(reference);
 
                     if (referenceClassification == Classification.IsUmbraco || referenceClassification == Classification.ReferencesUmbraco)
                     {
@@ -142,7 +141,7 @@ namespace Umbraco.Core.Composing
             return classification;
         }
 
-        protected virtual IEnumerable<Assembly> GetReferences(Assembly assembly, IDictionary<AssemblyName, Assembly> assemblyNameToAssembly)
+        protected virtual IEnumerable<Assembly> GetReferences(Assembly assembly)
         {
             var referencedAssemblies = assembly.GetReferencedAssemblies();
 
@@ -152,20 +151,7 @@ namespace Umbraco.Core.Composing
                 if (TypeFinder.KnownAssemblyExclusionFilter.Any(f => referenceName.FullName.StartsWith(f, StringComparison.InvariantCultureIgnoreCase)))
                     continue;
 
-                Assembly reference ;
-                try
-                {
-                    reference = Assembly.Load(referenceName);
-                }
-                catch (Exception)
-                {
-                    if (!assemblyNameToAssembly.TryGetValue(referenceName, out var item))
-                    {
-                        continue;
-                    }
-
-                    reference = Assembly.LoadFrom(item.Location);
-                }
+                var reference = Assembly.Load(referenceName);
 
                 if (!_lookup.Contains(reference))
                 {

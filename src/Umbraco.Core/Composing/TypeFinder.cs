@@ -142,8 +142,10 @@ namespace Umbraco.Core.Composing
             "ServiceStack.",
             "SqlCE4Umbraco,",
             "Superpower,", // used by Serilog
-           // "System.",
             "System.Data.SqlClient,",
+            "System.Data.Odbc,",
+            "System.Data.OleDb,",
+            "System.Data.Entity,",
             "System.Runtime,",
             "System.Runtime.",
             "TidyNet,",

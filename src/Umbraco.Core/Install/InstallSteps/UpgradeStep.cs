@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Install.Models;
@@ -28,9 +29,6 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             get
             {
-                //TODO this will always compare the same version now
-                var newVersion = _umbracoVersion.SemanticVersion.ToString();
-
                 string FormatGuidState(string value)
                 {
                     if (string.IsNullOrWhiteSpace(value)) value = "unknown";
@@ -39,14 +37,14 @@ namespace Umbraco.Web.Install.InstallSteps
                     return value;
                 }
 
-
                 var currentState = FormatGuidState(_runtimeState.CurrentMigrationState);
                 var newState = FormatGuidState(_runtimeState.FinalMigrationState);
-                var currentVersion = _umbracoVersion.Current;
+                var newVersion = _umbracoVersion.SemanticVersion.ToString();
+                var oldVersion = new SemVersion(_umbracoVersion.SemanticVersion.Major, 0, 0).ToString(); //TODO can we find the old version somehow? e.g. from current state
 
-                var reportUrl = $"https://our.umbraco.com/contribute/releases/compare?from={currentVersion}&to={newVersion}&notes=1";
+                var reportUrl = $"https://our.umbraco.com/contribute/releases/compare?from={oldVersion}&to={newVersion}&notes=1";
 
-                return new { currentVersion, newVersion, currentState, newState, reportUrl };
+                return new { oldVersion, newVersion, currentState, newState, reportUrl };
             }
         }
     }

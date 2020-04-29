@@ -10,6 +10,7 @@ using Umbraco.Core;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
+using Umbraco.Net;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Install;
 using Umbraco.Web.Install.Models;
@@ -23,17 +24,20 @@ namespace Umbraco.Web.Common.Install
     {
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly InstallStatusTracker _installStatusTracker;
+        private readonly IRuntimeState _runtimeState;
         private readonly InstallStepCollection _installSteps;
         private readonly ILogger _logger;
         private readonly IProfilingLogger _proflog;
 
         public InstallApiController(DatabaseBuilder databaseBuilder, IProfilingLogger proflog,
-            InstallHelper installHelper, InstallStepCollection installSteps, InstallStatusTracker installStatusTracker)
+            InstallHelper installHelper, InstallStepCollection installSteps, InstallStatusTracker installStatusTracker,
+            IRuntimeState runtimeState)
         {
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
             _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _installSteps = installSteps;
             _installStatusTracker = installStatusTracker;
+            _runtimeState = runtimeState;
             InstallHelper = installHelper;
             _logger = _proflog;
         }
