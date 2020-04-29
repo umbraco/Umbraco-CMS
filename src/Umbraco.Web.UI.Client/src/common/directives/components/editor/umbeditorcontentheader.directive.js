@@ -45,7 +45,7 @@
             
             function checkErrorsOnOtherVariants() {
                 var check = false;
-                angular.forEach(scope.content.variants, function (variant) {
+                scope.content.variants.forEach( function (variant) {
                     if (variant.active !== true && scope.variantHasError(variant)) {
                         check = true;
                     }
@@ -70,7 +70,7 @@
             function onInit() {
                 
                 // find default + check if we have variants.
-                angular.forEach(scope.content.variants, function (variant) {
+                scope.content.variants.forEach(, function (variant) {
                     if (variant.language !== null && variant.language.isDefault) {
                         scope.vm.defaultVariant = variant;
                     }
@@ -89,7 +89,7 @@
 
                 scope.vm.variantMenu = [];
                 if (scope.vm.hasCulture) {
-                    angular.forEach(scope.content.variants, (v) => {
+                    scope.content.variants.forEach( (v) => {
                         if (v.language !== null && v.segment === null) {
                             var variantMenuEntry = {
                                 key: String.CreateGuid(),
@@ -101,7 +101,7 @@
                         }
                     });
                 } else {
-                    angular.forEach(scope.content.variants, (v) => {
+                    scope.content.variants.forEach( (v) => {
                         scope.vm.variantMenu.push({
                             key: String.CreateGuid(),
                             variant: v
@@ -110,13 +110,13 @@
                 }
 
                 
-                angular.forEach(scope.editor.variantApps, (app) => {
+                scope.editor.variantApps.forEach( (app) => {
                     if (app.alias === "umbContent") {
                         app.anchors = scope.content.tabs;
                     }
                 });
                 
-                angular.forEach(scope.content.variants, function (variant) {
+                scope.content.variants.forEach( function (variant) {
                     unsubscribe.push(serverValidationManager.subscribe(null, variant.language !== null ? variant.language.culture : null, null, onVariantValidation, variant.segment));
                 });
                 

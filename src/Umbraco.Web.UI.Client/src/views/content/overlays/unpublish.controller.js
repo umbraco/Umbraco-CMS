@@ -68,7 +68,7 @@
             // and disable selection for the others
             if(selectedVariant.save && selectedVariant.segment == null && selectedVariant.language && selectedVariant.language.isMandatory) {
 
-                angular.forEach(vm.variants, function(variant){
+                vm.variants.forEach(function(variant) {
                     if(!variant.save) {
                         // keep track of the variants we automaically select
                         // so we can remove the selection again
@@ -88,7 +88,7 @@
             // We also want to enable all checkboxes again
             if(!selectedVariant.save && selectedVariant.segment == null && selectedVariant.language && selectedVariant.language.isMandatory) {
                 
-                angular.forEach(vm.variants, function(variant){
+                vm.variants.forEach( function(variant){
 
                     // check if variant was auto selected, then deselect
                     if(_.contains(autoSelectedVariants, variant)) {
