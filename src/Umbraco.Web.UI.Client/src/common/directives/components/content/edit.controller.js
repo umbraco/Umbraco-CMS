@@ -223,8 +223,6 @@
             return $scope.getMethod()($scope.contentId)
                 .then(function (data) {
 
-                    console.log("loadContent", data)
-
                     $scope.content = data;
 
                     appendRuntimeData();
@@ -252,8 +250,6 @@
                 .then(function (data) {
 
                     $scope.content = data;
-
-                    console.log("got scaffold: ", data)
 
                     appendRuntimeData();
                     init();
