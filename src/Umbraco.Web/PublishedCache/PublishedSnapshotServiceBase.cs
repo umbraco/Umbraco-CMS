@@ -6,16 +6,6 @@ using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.PublishedCache
 {
-    internal class NotifiedEventArgs<T> : EventArgs
-    {
-        public NotifiedEventArgs(T[] payloads)
-        {
-            Payloads = payloads;
-        }
-
-        public T[] Payloads { get; }
-    }
-
     internal abstract class PublishedSnapshotServiceBase : IPublishedSnapshotService
     {
         protected PublishedSnapshotServiceBase(IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor)
