@@ -3,7 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 
-namespace Umbraco.Tests.Models
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
 {
     [TestFixture]
     public class ContentScheduleTests

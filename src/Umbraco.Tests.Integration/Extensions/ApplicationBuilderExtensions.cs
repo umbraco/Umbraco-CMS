@@ -5,9 +5,7 @@ using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
-using Umbraco.Configuration.Models;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
@@ -63,7 +61,7 @@ namespace Umbraco.Tests.Integration.Extensions
                     var dbFactory = app.ApplicationServices.GetRequiredService<IUmbracoDatabaseFactory>();
                     if (!dbFactory.Configured)
                     {
-                        dbFactory.Configure(db.ConnectionString, Umbraco.Core.Constants.DatabaseProviders.SqlServer);
+                        dbFactory.Configure(db.ConnectionString, Constants.DatabaseProviders.SqlServer);
                     }
 
                     // In the case that we've initialized the schema, it means that we are installed so we'll want to ensure that
