@@ -207,6 +207,13 @@
             }));
         }
 
+        function appendRuntimeData() {
+            $scope.content.variants.forEach((variant) => {
+                variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
+                variant.htmlId = "_content_variant_" + variant.compositeId;
+            });
+        }
+
         /**
          *  This does the content loading and initializes everything, called on first load
          */
@@ -216,13 +223,11 @@
             return $scope.getMethod()($scope.contentId)
                 .then(function (data) {
 
-                    data.variants.forEach((variant) => {
-                        variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
-                        variant.htmlId = "_content_variant_" + variant.compositeId;
-                    });
+                    console.log("loadContent", data)
 
                     $scope.content = data;
 
+                    appendRuntimeData();
                     init();
 
                     syncTreeNode($scope.content, $scope.content.path, true);
@@ -248,6 +253,9 @@
 
                     $scope.content = data;
 
+                    console.log("got scaffold: ", data)
+
+                    appendRuntimeData();
                     init();
                     startWatches($scope.content);
 
