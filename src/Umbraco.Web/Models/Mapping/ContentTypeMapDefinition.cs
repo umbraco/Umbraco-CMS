@@ -403,6 +403,7 @@ namespace Umbraco.Web.Models.Mapping
             if (!(target is IMemberType))
             {
                 target.SetVariesBy(ContentVariation.Culture, source.AllowCultureVariant);
+                target.SetVariesBy(ContentVariation.Segment, source.AllowSegmentVariant);
             }
 
             // handle property groups and property types
