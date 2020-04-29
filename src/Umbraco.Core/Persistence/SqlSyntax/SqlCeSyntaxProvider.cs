@@ -231,5 +231,11 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
 
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
 
+        public override string GetSpecialDbType(SpecialDbTypes dbTypes)
+        {
+            if (dbTypes == SpecialDbTypes.NVARCHARMAX) // SqlCE does not have nvarchar(max) for now
+                return "NTEXT";
+            return base.GetSpecialDbType(dbTypes);
+        }
     }
 }
