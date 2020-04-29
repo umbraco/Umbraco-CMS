@@ -70,7 +70,7 @@
             function onInit() {
                 
                 // find default + check if we have variants.
-                scope.content.variants.forEach(, function (variant) {
+                scope.content.variants.forEach( function (variant) {
                     if (variant.language !== null && variant.language.isDefault) {
                         scope.vm.defaultVariant = variant;
                     }
