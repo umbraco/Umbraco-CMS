@@ -54,7 +54,7 @@ namespace Umbraco.Web.Security
                         // Refresh the identity if the stamp matches, otherwise reject
                         if (user != null && manager.SupportsUserSecurityStamp)
                         {
-                            var securityStamp = context.Identity.FindFirst(Constants.Web.SecurityStampClaimType)?.Value;
+                            var securityStamp = context.Identity.FindFirstValue(Constants.Web.SecurityStampClaimType);
                             var newSecurityStamp = await manager.GetSecurityStampAsync(user);
 
                             if (securityStamp == newSecurityStamp)

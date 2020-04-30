@@ -13,8 +13,8 @@ namespace Umbraco.Web
             string userId = null;
             if (identity is ClaimsIdentity claimsIdentity)
             {
-                userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                         ?? claimsIdentity.FindFirst("sub")?.Value;
+                userId = claimsIdentity.FindFirstValue(ClaimTypes.NameIdentifier)
+                         ?? claimsIdentity.FindFirstValue("sub");
             }
 
             return userId;
@@ -27,11 +27,18 @@ namespace Umbraco.Web
             string username = null;
             if (identity is ClaimsIdentity claimsIdentity)
             {
-                username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value
-                           ?? claimsIdentity.FindFirst("preferred_username")?.Value;
+                username = claimsIdentity.FindFirstValue(ClaimTypes.Name)
+                           ?? claimsIdentity.FindFirstValue("preferred_username");
             }
 
             return username;
+        }
+
+        public static string FindFirstValue(this ClaimsIdentity identity, string claimType)
+        {
+            if (identity == null) throw new ArgumentNullException(nameof(identity));
+
+            return identity.FindFirst(claimType)?.Value;
         }
     }
 }

@@ -124,6 +124,7 @@
     <Compile Include="Configurations\GlobalSettingsTests.cs" />
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
+    <Compile Include="CoreThings\ClaimsIdentityExtensionsTests.cs" />
     <Compile Include="CoreThings\EnumExtensionsTests.cs" />
     <Compile Include="CoreThings\GuidUtilsTests.cs" />
     <Compile Include="CoreThings\HexEncoderTests.cs" />

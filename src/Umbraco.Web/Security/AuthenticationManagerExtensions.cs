@@ -28,7 +28,7 @@ namespace Umbraco.Web.Security
                 name = name.Replace(" ", "");
             }
 
-            var email = result.Identity.FindFirst(ClaimTypes.Email)?.Value;
+            var email = result.Identity.FindFirstValue(ClaimTypes.Email);
             return new ExternalLoginInfo
             {
                 ExternalIdentity = result.Identity,

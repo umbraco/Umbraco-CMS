@@ -57,7 +57,7 @@ namespace Umbraco.Web.Security
             if (context?.OwinContext?.Authentication?.User?.Identity != null)
             {
                 var claimsIdentity = context.OwinContext.Authentication.User.Identity as ClaimsIdentity;
-                var sessionId = claimsIdentity.FindFirst(Core.Constants.Security.SessionIdClaimType)?.Value;
+                var sessionId = claimsIdentity.FindFirstValue(Constants.Security.SessionIdClaimType);
                 if (sessionId.IsNullOrWhiteSpace() == false && Guid.TryParse(sessionId, out var guidSession))
                 {
                     _userService.ClearLoginSession(guidSession);

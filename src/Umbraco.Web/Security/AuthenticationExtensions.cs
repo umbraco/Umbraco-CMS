@@ -230,7 +230,7 @@ namespace Umbraco.Web.Security
                 var claimsIdentity = http.User.Identity as ClaimsIdentity;
                 if (claimsIdentity != null)
                 {
-                    var sessionId = claimsIdentity.FindFirst(Constants.Security.SessionIdClaimType)?.Value;
+                    var sessionId = claimsIdentity.FindFirstValue(Constants.Security.SessionIdClaimType);
                     Guid guidSession;
                     if (sessionId.IsNullOrWhiteSpace() == false && Guid.TryParse(sessionId, out guidSession))
                     {

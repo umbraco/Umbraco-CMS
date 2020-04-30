@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using Umbraco.Web;
 
 namespace Umbraco.Core.Security
 {
@@ -203,17 +204,17 @@ namespace Umbraco.Core.Security
         private string[] _allowedApplications;
         public string[] AllowedApplications => _allowedApplications ?? (_allowedApplications = FindAll(x => x.Type == Constants.Security.AllowedApplicationsClaimType).Select(app => app.Value).ToArray());
 
-        public int Id => int.Parse(this.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+        public int Id => int.Parse(this.FindFirstValue(ClaimTypes.NameIdentifier));
 
-        public string RealName => this.FindFirst(ClaimTypes.GivenName)?.Value;
+        public string RealName => this.FindFirstValue(ClaimTypes.GivenName);
 
-        public string Username => this.FindFirst(ClaimTypes.Name)?.Value;
+        public string Username => this.FindFirstValue(ClaimTypes.Name);
 
-        public string Culture => this.FindFirst(ClaimTypes.Locality)?.Value;
+        public string Culture => this.FindFirstValue(ClaimTypes.Locality);
 
         public string SessionId
         {
-            get => this.FindFirst(Constants.Security.SessionIdClaimType)?.Value;
+            get => this.FindFirstValue(Constants.Security.SessionIdClaimType);
             set
             {
                 var existing = FindFirst(Constants.Security.SessionIdClaimType);
@@ -223,7 +224,7 @@ namespace Umbraco.Core.Security
             }
         }
 
-        public string SecurityStamp => this.FindFirst(Constants.Web.SecurityStampClaimType)?.Value;
+        public string SecurityStamp => this.FindFirstValue(Constants.Web.SecurityStampClaimType);
 
         public string[] Roles => this.FindAll(x => x.Type == DefaultRoleClaimType).Select(role => role.Value).ToArray();
 
