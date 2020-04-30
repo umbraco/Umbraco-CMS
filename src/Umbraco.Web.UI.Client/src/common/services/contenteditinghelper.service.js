@@ -330,7 +330,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
          * Returns a id for the variant that is unique between all variants on the content
          */
         buildCompositeVariantId: function (variant) {
-            return (variant.language ? variant.language.culture : "invariant") + "." + (variant.segment ? variant.segment : "");
+            return (variant.language ? variant.language.culture : "invariant") + "_" + (variant.segment ? variant.segment : "");
         },
 
 
