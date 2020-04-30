@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using System.Security.Principal;
 
-namespace Umbraco.Web
+namespace Umbraco.Core
 {
     public static class ClaimsIdentityExtensions
     {
