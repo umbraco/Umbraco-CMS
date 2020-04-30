@@ -1,41 +1,30 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Tests.Models
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
 {
     [TestFixture]
     public class DictionaryTranslationTests
     {
-        private IGlobalSettings GlobalSettings { get; } = SettingsForTests.GenerateMockGlobalSettings();
+        private DictionaryTranslationBuilder _builder = new DictionaryTranslationBuilder();
+
+        [SetUp]
+        public void SetUp()
+        {
+            _builder = new DictionaryTranslationBuilder();
+        }
 
         [Test]
         public void Can_Deep_Clone()
         {
-            var item = new DictionaryTranslation(new Language(GlobalSettings, "en-AU")
-            {
-                CreateDate = DateTime.Now,
-                CultureName = "en",
-                Id = 11,
-                IsoCode = "AU",
-                Key = Guid.NewGuid(),
-                UpdateDate = DateTime.Now
-            }, "colour")
-            {
-                CreateDate = DateTime.Now,
-                Id = 88,
-                Key = Guid.NewGuid(),
-                UpdateDate = DateTime.Now
-            };
+            var item = BuildDictionaryTranslation();
 
-            var clone = (DictionaryTranslation) item.DeepClone();
+            var clone = (DictionaryTranslation)item.DeepClone();
 
             Assert.AreNotSame(clone, item);
             Assert.AreEqual(clone, item);
@@ -53,32 +42,26 @@ namespace Umbraco.Tests.Models
             //This double verifies by reflection
             var allProps = clone.GetType().GetProperties();
             foreach (var propertyInfo in allProps.Where(x => x.Name != "Language"))
-            {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(item, null));
-            }
         }
 
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var item = new DictionaryTranslation(new Language(GlobalSettings, "en-AU")
-            {
-                CreateDate = DateTime.Now,
-                CultureName = "en",
-                Id = 11,
-                IsoCode = "AU",
-                Key = Guid.NewGuid(),
-                UpdateDate = DateTime.Now
-            }, "colour")
-            {
-                CreateDate = DateTime.Now,
-                Id = 88,
-                Key = Guid.NewGuid(),
-                UpdateDate = DateTime.Now
-            };
+            var item = BuildDictionaryTranslation();
 
             var json = JsonConvert.SerializeObject(item);
             Debug.Print(json);
+        }
+
+        private IDictionaryTranslation BuildDictionaryTranslation()
+        {
+            return _builder
+                .AddLanguage()
+                    .WithCultureInfo("en-AU")
+                    .Done()
+                .WithValue("colour")
+                .Build();            
         }
     }
 }

@@ -20,6 +20,11 @@ namespace Umbraco.Tests.Common.Builders
         private DateTime? _updateDate;
         private string _value;
 
+        public DictionaryTranslationBuilder() : base(null)
+        {
+            _languageBuilder = new LanguageBuilder<DictionaryTranslationBuilder>(this);
+        }
+
         public DictionaryTranslationBuilder(DictionaryItemBuilder parentBuilder) : base(parentBuilder)
         {
             _languageBuilder = new LanguageBuilder<DictionaryTranslationBuilder>(this);

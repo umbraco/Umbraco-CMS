@@ -5,7 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 
-namespace Umbraco.Tests.Models
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
 {
     [TestFixture]
     public class DeepCloneHelperTests
@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Models
 
             Assert.AreNotSame(test1, clone);
             Assert.AreEqual(test1.MyTest1.Length, clone.MyTest1.Length);
-            for (int i = 0; i < test1.MyTest1.Length; i++)
+            for (var i = 0; i < test1.MyTest1.Length; i++)
             {
                 Assert.IsNotNull(clone.MyTest1.ElementAt(i));
                 Assert.AreNotSame(clone.MyTest1.ElementAt(i), test1.MyTest1.ElementAt(i));
@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Models
 
             Assert.AreNotSame(test1, clone);
             Assert.AreEqual(test1.MyTest1.Length, clone.MyTest1.Length);
-            for (int i = 0; i < test1.MyTest1.Length; i++)
+            for (var i = 0; i < test1.MyTest1.Length; i++)
             {
                 Assert.IsNotNull(clone.MyTest1.ElementAt(i));
                 Assert.AreNotSame(clone.MyTest1.ElementAt(i), test1.MyTest1.ElementAt(i));
@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Models
             Assert.AreNotSame(test1, clone);
 
             Assert.AreEqual(test1.MyTest1.Cast<object>().Count(), clone.MyTest1.Cast<object>().Count());
-            for (int i = 0; i < test1.MyTest1.Cast<object>().Count(); i++)
+            for (var i = 0; i < test1.MyTest1.Cast<object>().Count(); i++)
             {
                 Assert.IsNotNull(clone.MyTest1.Cast<object>().ElementAt(i));
                 Assert.AreNotSame(clone.MyTest1.Cast<object>().ElementAt(i), test1.MyTest1.Cast<object>().ElementAt(i));
@@ -96,7 +96,7 @@ namespace Umbraco.Tests.Models
 
             Assert.AreNotSame(test1, clone);
             Assert.AreEqual(test1.MyTest1.Count(), clone.MyTest1.Count());
-            for (int i = 0; i < test1.MyTest1.Count(); i++)
+            for (var i = 0; i < test1.MyTest1.Count(); i++)
             {
                 Assert.IsNotNull(clone.MyTest1.ElementAt(i));
                 Assert.AreNotSame(clone.MyTest1.ElementAt(i), test1.MyTest1.ElementAt(i));
@@ -115,7 +115,7 @@ namespace Umbraco.Tests.Models
 
             Assert.AreNotSame(test1, clone);
             Assert.AreEqual(test1.MyTest1.Count(), clone.MyTest1.Count());
-            for (int i = 0; i < test1.MyTest1.Count(); i++)
+            for (var i = 0; i < test1.MyTest1.Count(); i++)
             {
                 Assert.IsNotNull(clone.MyTest1.ElementAt(i));
                 Assert.AreNotSame(clone.MyTest1.ElementAt(i), test1.MyTest1.ElementAt(i));
@@ -134,7 +134,7 @@ namespace Umbraco.Tests.Models
 
             Assert.AreNotSame(test1, clone);
             Assert.AreEqual(test1.MyTest1.Count(), clone.MyTest1.Count());
-            for (int i = 0; i < test1.MyTest1.Count(); i++)
+            for (var i = 0; i < test1.MyTest1.Count(); i++)
             {
                 Assert.IsNotNull(clone.MyTest1.ElementAt(i));
                 Assert.AreNotSame(clone.MyTest1.ElementAt(i), test1.MyTest1.ElementAt(i));

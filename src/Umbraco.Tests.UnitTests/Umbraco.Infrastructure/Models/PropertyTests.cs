@@ -51,7 +51,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
                 .AddPropertyType()
                     .WithId(3)
                     .WithPropertyEditorAlias("TestPropertyEditor")
-                    .WithValueStorageType(ValueStorageType.Nvarchar)
                     .WithAlias("test")
                     .WithName("Test")
                     .WithSortOrder(9)

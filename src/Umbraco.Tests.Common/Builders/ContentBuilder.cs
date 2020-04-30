@@ -4,83 +4,89 @@ using Umbraco.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Tests.Common.Builders
 {
-    public class DataTypeBuilder
-        : BuilderBase<DataType>,
+    public class ContentBuilder
+        : BuilderBase<Content>,
+            IBuildContentTypes,
             IWithIdBuilder,
             IWithKeyBuilder,
+            IWithParentIdBuilder,
             IWithCreatorIdBuilder,
             IWithCreateDateBuilder,
             IWithUpdateDateBuilder,
-            IWithDeleteDateBuilder,
             IWithNameBuilder,
-            IWithParentIdBuilder,
             IWithTrashedBuilder,
             IWithLevelBuilder,
             IWithPathBuilder,
             IWithSortOrderBuilder
     {
-        private DataEditorBuilder<DataTypeBuilder> _dataEditorBuilder;
+        private ContentTypeBuilder _contentTypeBuilder;
+        private GenericDictionaryBuilder<ContentBuilder, string, object> _propertyDataBuilder;
+
         private int? _id;
-        private int? _parentId;
         private Guid? _key;
         private DateTime? _createDate;
         private DateTime? _updateDate;
-        private DateTime? _deleteDate;
+        private int? _parentId;
         private string _name;
-        private bool? _trashed;
+        private int? _creatorId;
         private int? _level;
         private string _path;
-        private int? _creatorId;
-        private ValueStorageType? _databaseType;
         private int? _sortOrder;
+        private bool? _trashed;
 
-        public DataTypeBuilder()
+        public ContentTypeBuilder AddContentType()
         {
-            _dataEditorBuilder = new DataEditorBuilder<DataTypeBuilder>(this);
+            var builder = new ContentTypeBuilder(this);
+            _contentTypeBuilder = builder;
+            return builder;
         }
 
-        public DataTypeBuilder WithDatabaseType(ValueStorageType databaseType)
+        public override Content Build()
         {
-            _databaseType = databaseType;
-            return this;
-        }
-
-        public DataEditorBuilder<DataTypeBuilder> AddEditor()
-        {
-            return _dataEditorBuilder;
-        }
-
-        public override DataType Build()
-        {
-            var editor = _dataEditorBuilder.Build();
-            var parentId = _parentId ?? -1;
             var id = _id ?? 1;
             var key = _key ?? Guid.NewGuid();
+            var parentId = _parentId ?? -1;
             var createDate = _createDate ?? DateTime.Now;
             var updateDate = _updateDate ?? DateTime.Now;
-            var deleteDate = _deleteDate ?? null;
             var name = _name ?? Guid.NewGuid().ToString();
-            var level = _level ?? 0;
-            var path = _path ?? $"-1,{id}";
             var creatorId = _creatorId ?? 1;
-            var databaseType = _databaseType ?? ValueStorageType.Ntext;
+            var level = _level ?? 1;
+            var path = _path ?? $"-1,{id}";
             var sortOrder = _sortOrder ?? 0;
+            var trashed = _trashed ?? false;
 
-            return new DataType(editor, parentId)
+            if (_contentTypeBuilder == null)
+            {
+                throw new InvalidOperationException("A member cannot be constructed without providing a member type. Use AddContentType().");
+            }
+
+            var memberType = _contentTypeBuilder.Build();
+
+            var member = new Content(name, parentId, memberType)
             {
                 Id = id,
                 Key = key,
                 CreateDate = createDate,
                 UpdateDate = updateDate,
-                DeleteDate = deleteDate,
-                Name = name,
-                Trashed = _trashed ?? false,
+                CreatorId = creatorId,
                 Level = level,
                 Path = path,
-                CreatorId = creatorId,
-                DatabaseType = databaseType,
                 SortOrder = sortOrder,
+                Trashed = trashed,
             };
+
+            if (_propertyDataBuilder != null)
+            {
+                var propertyData = _propertyDataBuilder.Build();
+                foreach (var kvp in propertyData)
+                {
+                    member.SetValue(kvp.Key, kvp.Value);
+                }
+
+                member.ResetDirtyProperties(false);
+            }
+
+            return member;
         }
 
         int? IWithIdBuilder.Id
@@ -113,22 +119,10 @@ namespace Umbraco.Tests.Common.Builders
             set => _updateDate = value;
         }
 
-        DateTime? IWithDeleteDateBuilder.DeleteDate
-        {
-            get => _deleteDate;
-            set => _deleteDate = value;
-        }
-
         string IWithNameBuilder.Name
         {
             get => _name;
             set => _name = value;
-        }
-
-        int? IWithParentIdBuilder.ParentId
-        {
-            get => _parentId;
-            set => _parentId = value;
         }
 
         bool? IWithTrashedBuilder.Trashed
@@ -153,6 +147,11 @@ namespace Umbraco.Tests.Common.Builders
         {
             get => _sortOrder;
             set => _sortOrder = value;
+        }
+        int? IWithParentIdBuilder.ParentId
+        {
+            get => _parentId;
+            set => _parentId = value;
         }
     }
 }
