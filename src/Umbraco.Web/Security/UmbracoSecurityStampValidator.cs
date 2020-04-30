@@ -24,11 +24,7 @@ namespace Umbraco.Web.Security
 
             return async context =>
             {
-                var currentUtc = DateTimeOffset.UtcNow;
-                if (context.Options != null && context.Options.SystemClock != null)
-                {
-                    currentUtc = context.Options.SystemClock.UtcNow;
-                }
+                 var currentUtc = context.Options?.SystemClock?.UtcNow ?? DateTimeOffset.UtcNow;
 
                 var issuedUtc = context.Properties.IssuedUtc;
 

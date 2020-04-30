@@ -430,7 +430,7 @@ namespace Umbraco.Web.Security
         {
             if (app == null)
             {
-                throw new ArgumentNullException("app");
+                throw new ArgumentNullException(nameof(app));
             }
             return app.CreatePerOwinContext(createCallback, (options, instance) => instance.Dispose());
         }

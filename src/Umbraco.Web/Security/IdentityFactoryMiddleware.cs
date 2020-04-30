@@ -22,7 +22,7 @@ namespace Umbraco.Web.Security
         {
             if (options == null)
             {
-                throw new ArgumentNullException("options");
+                throw new ArgumentNullException(nameof(options));
             }
             if (options.Provider == null)
             {
