@@ -154,7 +154,7 @@ namespace Umbraco.Web.Security
                 // change a password or add an external login to your account.
                 OnValidateIdentity = UmbracoSecurityStampValidator
                     .OnValidateIdentity<BackOfficeSignInManager, BackOfficeUserManager, BackOfficeIdentityUser>(
-                        TimeSpan.FromMinutes(3),
+                        TimeSpan.FromMinutes(30),
                         (signInManager, manager, user) => signInManager.CreateUserIdentityAsync(user),
                         identity => identity.GetUserId()),
 
