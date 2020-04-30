@@ -206,7 +206,11 @@ function umbSessionStorage($window) {
     return {
 
         get: function (key) {
-            return JSON.parse(storage["umb_" + key]);
+            if (storage["umb_" + key]) {
+                return JSON.parse(storage["umb_" + key]);
+            } else {
+                return null;
+            }
         },
 
         set: function (key, value) {
