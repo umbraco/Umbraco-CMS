@@ -148,6 +148,8 @@ namespace Umbraco.Core.Composing
             "System.Data.Entity,",
             "System.Runtime,",
             "System.Runtime.",
+            "System.Numerics.",
+            "System.Buffers,",
             "TidyNet,",
             "TidyNet.",
             "WebDriver,",
