@@ -26,7 +26,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Returns a new MainDom
         /// </summary>
-        public static IMainDom GetMainDom(ILogger logger)
+        protected IMainDom GetMainDom(ILogger logger)
         {
             // Determine if we should use the sql main dom or the default
             var appSettingMainDomLock = ConfigurationManager.AppSettings[Constants.AppSettings.MainDomLock];
