@@ -329,6 +329,7 @@ namespace Umbraco.Web.Editors
             }
 
             var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            if (user == null) throw new InvalidOperationException("Could not find user");
 
             var result = await UserManager.AddLoginAsync(user,
                 new UserLoginInfo(loginInfo.Login.LoginProvider, loginInfo.Login.ProviderKey, loginInfo.Login.LoginProvider));

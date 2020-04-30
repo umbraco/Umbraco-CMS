@@ -12,22 +12,14 @@ namespace Umbraco.Web.Security
         where TResult : class, IDisposable
         where TOptions : IdentityFactoryOptions<TResult>
     {
-        /// <summary>
-        ///     Constructor
-        /// </summary>
         /// <param name="next">The next middleware in the OWIN pipeline to invoke</param>
         /// <param name="options">Configuration options for the middleware</param>
         public IdentityFactoryMiddleware(OwinMiddleware next, TOptions options)
             : base(next)
         {
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-            if (options.Provider == null)
-            {
-                throw new ArgumentNullException("options.Provider");
-            }
+            if (options == null) throw new ArgumentNullException(nameof(options));
+            if (options.Provider == null) throw new ArgumentException("options.Provider");
+
             Options = options;
         }
 
@@ -74,9 +66,6 @@ namespace Umbraco.Web.Security
 
     public class IdentityFactoryProvider<T> where T : class, IDisposable
     {
-        /// <summary>
-        ///     Constructor
-        /// </summary>
         public IdentityFactoryProvider()
         {
             OnDispose = (options, instance) => { };

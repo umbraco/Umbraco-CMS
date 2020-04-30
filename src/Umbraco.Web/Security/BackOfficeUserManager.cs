@@ -306,6 +306,8 @@ namespace Umbraco.Web.Security
         public async Task<IdentityResult> ChangePasswordWithResetAsync(int userId, string token, string newPassword)
         {
             var user = await base.FindByIdAsync(userId.ToString());
+            if (user == null) throw new InvalidOperationException("Could not find user");
+
             var result = await base.ResetPasswordAsync(user, token, newPassword);
             if (result.Succeeded) RaisePasswordChangedEvent(userId);
             return result;
@@ -317,24 +319,7 @@ namespace Umbraco.Web.Security
             if (result.Succeeded) RaisePasswordChangedEvent(user.Id);
             return result;
         }
-
-        /// <summary>
-        /// Override to determine how to hash the password
-        /// </summary>
-        /// <param name="store"></param>
-        /// <param name="user"></param>
-        /// <param name="password"></param>
-        /// <returns></returns>
-        protected override async Task<PasswordVerificationResult> VerifyPasswordAsync(IUserPasswordStore<T> store, T user, string password)
-        {
-            var userAwarePasswordHasher = PasswordHasher;
-            if (userAwarePasswordHasher == null)
-                return await base.VerifyPasswordAsync(store, user, password);
-
-            var hash = await store.GetPasswordHashAsync(user, CancellationToken.None);
-            return userAwarePasswordHasher.VerifyHashedPassword(user, hash, password);
-        }
-
+        
         /// <summary>
         /// Override to determine how to hash the password
         /// </summary>

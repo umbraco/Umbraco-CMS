@@ -131,6 +131,7 @@ namespace Umbraco.Web.Editors
         public async Task<HttpResponseMessage> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)
         {
             var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            if (user == null) throw new InvalidOperationException("Could not find user");
 
             var result = await UserManager.RemoveLoginAsync(
                 user,

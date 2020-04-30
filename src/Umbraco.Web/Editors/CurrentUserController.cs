@@ -159,6 +159,8 @@ namespace Umbraco.Web.Editors
         public async Task<UserDetail> PostSetInvitedUserPassword([FromBody]string newPassword)
         {
             var user = await UserManager.FindByIdAsync(Security.GetUserId().ResultOr(0).ToString());
+            if (user == null) throw new InvalidOperationException("Could not find user");
+
             var result = await UserManager.AddPasswordAsync(user, newPassword);
 
             if (result.Succeeded == false)
