@@ -45,7 +45,6 @@ namespace Umbraco.Web.Install.InstallSteps
 
             if (result.RequiresUpgrade == false)
             {
-                HandleConnectionStrings(_logger, _ioHelper, _connectionStrings, _configManipulator);
                 return Task.FromResult<InstallSetupResult>(null);
             }
 
@@ -54,27 +53,6 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 {"upgrade", true}
             }));
-        }
-
-        internal static void HandleConnectionStrings(ILogger logger, IIOHelper ioHelper, IConnectionStrings connectionStrings, IConfigManipulator configManipulator)
-        {
-
-
-            var databaseSettings = connectionStrings[Constants.System.UmbracoConnectionName];
-
-
-
-            // Remove legacy umbracoDbDsn configuration setting if it exists and connectionstring also exists
-            if (databaseSettings != null)
-            {
-                configManipulator.RemoveConnectionString();
-            }
-            else
-            {
-                var ex = new ArgumentNullException(string.Format("ConfigurationManager.ConnectionStrings[{0}]", Constants.System.UmbracoConnectionName), "Install / upgrade did not complete successfully, umbracoDbDSN was not set in the connectionStrings section");
-                logger.Error<DatabaseInstallStep>(ex, "Install / upgrade did not complete successfully, umbracoDbDSN was not set in the connectionStrings section");
-                throw ex;
-            }
         }
 
         public override bool RequiresExecution(object model)
