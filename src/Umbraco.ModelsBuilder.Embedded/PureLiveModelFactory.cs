@@ -21,7 +21,7 @@ using File = System.IO.File;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
-    internal class PureLiveModelFactory : ILivePublishedModelFactory, IRegisteredObject
+    internal class PureLiveModelFactory : ILivePublishedModelFactory2, IRegisteredObject
     {
         private Assembly _modelsAssembly;
         private Infos _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
@@ -132,6 +132,16 @@ namespace Umbraco.ModelsBuilder.Embedded
             var listType = typeof(List<>).MakeGenericType(modelInfo.ModelType);
             ctor = modelInfo.ListCtor = ReflectionUtilities.EmitConstructor<Func<IList>>(declaring: listType);
             return ctor();
+        }
+
+        /// <inheritdoc />
+        public bool Enabled => _config.Enable;
+
+        /// <inheritdoc />
+        public void Reset()
+        {
+            if (_config.Enable)
+                ResetModels();
         }
 
         #endregion
