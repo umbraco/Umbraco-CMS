@@ -272,10 +272,43 @@
             serverValidationManager.addPropertyError("myProperty", "fr-FR", "value2", "Another value 3", null);
 
             //assert
+            expect(serverValidationManager.hasCultureError(null)).toBe(true);
+            expect(serverValidationManager.hasCultureError("en-US")).toBe(true);
+            expect(serverValidationManager.hasCultureError("fr-FR")).toBe(true);
+            expect(serverValidationManager.hasCultureError("es-ES")).toBe(false);
+
+        });
+
+    });
+
+    describe('managing variant validation errors', function () {
+
+        it('can retrieve variant validation errors', function () {
+
+            //arrange
+            serverValidationManager.addPropertyError("myProperty", null, "value1", "Some value 1", null);
+            serverValidationManager.addPropertyError("myProperty", "en-US", "value1", "Some value 2", null);
+            serverValidationManager.addPropertyError("myProperty", null, "value2", "Another value 2", null);
+            serverValidationManager.addPropertyError("myProperty", "fr-FR", "value2", "Another value 3", null);
+
+            serverValidationManager.addPropertyError("myProperty", null, "value1", "Some value 1", "MySegment");
+            serverValidationManager.addPropertyError("myProperty", "en-US", "value1", "Some value 2", "MySegment");
+            serverValidationManager.addPropertyError("myProperty", null, "value2", "Another value 2", "MySegment");
+            serverValidationManager.addPropertyError("myProperty", "fr-FR", "value2", "Another value 3", "MySegment");
+
+            //assert
             expect(serverValidationManager.hasVariantError(null, null)).toBe(true);
             expect(serverValidationManager.hasVariantError("en-US", null)).toBe(true);
             expect(serverValidationManager.hasVariantError("fr-FR", null)).toBe(true);
+
+            expect(serverValidationManager.hasVariantError(null, "MySegment")).toBe(true);
+            expect(serverValidationManager.hasVariantError("en-US", "MySegment")).toBe(true);
+            expect(serverValidationManager.hasVariantError("fr-FR", "MySegment")).toBe(true);
+
             expect(serverValidationManager.hasVariantError("es-ES", null)).toBe(false);
+            expect(serverValidationManager.hasVariantError("es-ES", "MySegment")).toBe(false);
+            expect(serverValidationManager.hasVariantError("fr-FR", "MySegmentNotRight")).toBe(false);
+            expect(serverValidationManager.hasVariantError(null, "MySegmentNotRight")).toBe(false);
 
         });
 
