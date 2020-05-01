@@ -541,13 +541,6 @@ angular.module("umbraco")
                 }
             }
 
-            function setUpdatedMediaNodes(item) {
-                // add udi to list of updated media items so we easily can update them in other editors
-                if ($scope.model.updatedMediaNodes.indexOf(item.udi) === -1) {
-                    $scope.model.updatedMediaNodes.push(item.udi);
-                }
-            }
-
             function submit() {
                 if ($scope.model && $scope.model.submit) {
                     $scope.model.submit($scope.model);
