@@ -8,8 +8,8 @@
         // (i.e. variant.apps[contentApp].viewModel = variant)
         //so instead since we already have access to the content, we can just get the variant directly by the index.
         
-        var unbindLanguageWatcher;
-        var unbindSegmentWatcher;
+        var unbindLanguageWatcher = function() {};
+        var unbindSegmentWatcher = function() {};
         var timeout = null;
 
         var vm = this;
@@ -32,8 +32,6 @@
                             requestUpdate();
                         }
                     });
-                } else {
-                    unbindLanguageWatcher = function() {}
                 }
 
                 unbindSegmentWatcher = $scope.$watch(function () {
