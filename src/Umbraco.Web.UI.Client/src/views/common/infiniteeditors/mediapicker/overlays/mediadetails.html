@@ -1,0 +1,56 @@
+﻿<div ng-controller="Umbraco.Editors.MediaPickerDetailsController as vm">
+
+    <div class="umb-control-group" ng-if="vm.shouldShowUrl()">
+        <h5>
+            <localize key="@general_url"></localize>
+        </h5>
+        <input type="text" localize="placeholder" placeholder="@general_url" class="umb-property-editor umb-textstring" ng-model="model.target.url" />
+    </div>
+
+    <div class="umb-control-group" ng-if="model.target">
+        <h5>
+            <localize key="@content_altTextOptional"></localize>
+        </h5>
+        <input type="text" class="umb-property-editor umb-textstring" ng-model="model.target.altText" />
+    </div>
+
+    <div class="umb-control-group" ng-if="model.target">
+
+        <div ng-if="model.disableFocalPoint && model.target.thumbnail">
+            <h5>
+                <localize key="general_preview">Preview</localize>
+            </h5>
+
+            <img ng-src="{{model.target.thumbnail}}" alt="{{model.target.name}}" />
+        </div>
+
+        <div ng-if="!model.disableFocalPoint">
+            <h5>
+                <localize key="@general_focalPoint">Focal point</localize>
+            </h5>
+
+            <div ng-if="model.target.url">
+                <umb-image-gravity src="model.target.url"
+                                   center="model.target.focalPoint"
+                                   on-value-changed="vm.focalPointChanged(left, top)">
+                </umb-image-gravity>
+            </div>
+
+            <div ng-if="model.cropSize">
+
+                <h5>
+                    <localize key="general_preview">Preview</localize>
+                </h5>
+
+                <umb-image-thumbnail center="target.focalPoint"
+                                     src="target.url"
+                                     height="{{model.cropSize.height}}"
+                                     width="{{model.cropSize.width}}"
+                                     max-size="400">
+                </umb-image-thumbnail>
+
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage) {
+        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, overlayService, umbSessionStorage) {
 
             var vm = this;
 
@@ -17,13 +17,11 @@ angular.module("umbraco")
             vm.changeSearch = changeSearch;
             vm.submitFolder = submitFolder;
             vm.enterSubmitFolder = enterSubmitFolder;
-            vm.focalPointChanged = focalPointChanged;
             vm.changePagination = changePagination;
 
             vm.clickHandler = clickHandler;
             vm.clickItemName = clickItemName;
             vm.gotoFolder = gotoFolder;
-            vm.shouldShowUrl = shouldShowUrl;
 
             var dialogOptions = $scope.model;
 
@@ -346,26 +344,54 @@ angular.module("umbraco")
             }
 
             function openDetailsDialog() {
-                localizationService.localize("defaultdialogs_editSelectedMedia").then(function (data) {
-                    vm.mediaPickerDetailsOverlay = {
-                        show: true,
-                        title: data,
-                        disableFocalPoint: $scope.disableFocalPoint,
-                        submit: function (model) {
+                
+                const dialog = {
+                    view: "views/common/infiniteeditors/mediapicker/overlays/mediadetails.html",
+                    position: "right",
+                    cropSize: $scope.cropSize,
+                    target: $scope.target,
+                    disableFocalPoint: $scope.disableFocalPoint,
+                    submit: function (model) {
+                        console.log("model", model);
+                        //if (model.selectedItem) {
                             $scope.model.selection.push($scope.target);
                             $scope.model.submit($scope.model);
+                        //}
 
-                            vm.mediaPickerDetailsOverlay.show = false;
-                            vm.mediaPickerDetailsOverlay = null;
-                        },
-                        close: function (oldModel) {
-                            vm.mediaPickerDetailsOverlay.show = false;
-                            vm.mediaPickerDetailsOverlay = null;
+                        overlayService.close();
+                    },
+                    close: function () {
+                        overlayService.close();
 
-                            close();
-                        }
-                    };
+                        close();
+                    }
+                };
+
+                localizationService.localize("defaultdialogs_editSelectedMedia").then(value => {
+                    dialog.title = value;
+                    overlayService.open(dialog);
                 });
+
+                //localizationService.localize("defaultdialogs_editSelectedMedia").then(function (data) {
+                //    vm.mediaPickerDetailsOverlay = {
+                //        show: true,
+                //        title: data,
+                //        disableFocalPoint: $scope.disableFocalPoint,
+                //        submit: function (model) {
+                //            $scope.model.selection.push($scope.target);
+                //            $scope.model.submit($scope.model);
+
+                //            vm.mediaPickerDetailsOverlay.show = false;
+                //            vm.mediaPickerDetailsOverlay = null;
+                //        },
+                //        close: function (oldModel) {
+                //            vm.mediaPickerDetailsOverlay.show = false;
+                //            vm.mediaPickerDetailsOverlay = null;
+
+                //            close();
+                //        }
+                //    };
+                //});
             };
 
             var debounceSearchMedia = _.debounce(function () {
@@ -515,38 +541,11 @@ angular.module("umbraco")
                 }
             }
 
-
-            /**
-             * Called when the umbImageGravity component updates the focal point value
-             * @param {any} left
-             * @param {any} top
-             */
-            function focalPointChanged(left, top) {
-                // update the model focalpoint value
-                $scope.target.focalPoint = {
-                    left: left,
-                    top: top
-                };
-            }
-
             function setUpdatedMediaNodes(item) {
                 // add udi to list of updated media items so we easily can update them in other editors
                 if ($scope.model.updatedMediaNodes.indexOf(item.udi) === -1) {
                     $scope.model.updatedMediaNodes.push(item.udi);
                 }
-            }
-
-            function shouldShowUrl() {
-                if (!$scope.target) {
-                    return false;
-                }
-                if ($scope.target.id) {
-                    return false;
-                }
-                if ($scope.target.url && $scope.target.url.toLower().indexOf("blob:") === 0) {
-                    return false;
-                }
-                return true;
             }
 
             function submit() {
