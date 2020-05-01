@@ -33,7 +33,7 @@ function angularHelper($q) {
             //this is sequential promise chaining, it's not pretty but we need to do it this way.
             //$q.all doesn't execute promises in sequence but that's what we want to do here.
 
-            if (!angular.isArray(promises)) {
+            if (!Utilities.isArray(promises)) {
                 throw "promises must be an array";
             }
 

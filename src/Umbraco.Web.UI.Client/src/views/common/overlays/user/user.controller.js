@@ -102,6 +102,10 @@ angular.module("umbraco")
             });
         }
 
+        $scope.linkProvider = function (e) {
+            e.target.submit();
+        }
+
         $scope.unlink = function (e, loginProvider, providerKey) {
             var result = confirm("Are you sure you want to unlink this account?");
             if (!result) {
