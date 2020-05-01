@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, overlayService, umbSessionStorage) {
+        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage) {
 
             var vm = this;
 
@@ -347,21 +347,20 @@ angular.module("umbraco")
                 
                 const dialog = {
                     view: "views/common/infiniteeditors/mediapicker/overlays/mediadetails.html",
-                    position: "right",
+                    size: "small",
                     cropSize: $scope.cropSize,
                     target: $scope.target,
                     disableFocalPoint: $scope.disableFocalPoint,
                     submit: function (model) {
                         console.log("model", model);
-                        //if (model.selectedItem) {
-                            $scope.model.selection.push($scope.target);
-                            $scope.model.submit($scope.model);
-                        //}
 
-                        overlayService.close();
+                        $scope.model.selection.push($scope.target);
+                        $scope.model.submit($scope.model);
+
+                        editorService.close();
                     },
                     close: function () {
-                        overlayService.close();
+                        editorService.close();
 
                         //close();
                     }
@@ -369,7 +368,7 @@ angular.module("umbraco")
 
                 localizationService.localize("defaultdialogs_editSelectedMedia").then(value => {
                     dialog.title = value;
-                    overlayService.open(dialog);
+                    editorService.open(dialog);
                 });
 
                 //localizationService.localize("defaultdialogs_editSelectedMedia").then(function (data) {

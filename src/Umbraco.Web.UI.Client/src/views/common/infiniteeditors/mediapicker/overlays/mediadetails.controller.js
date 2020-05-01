@@ -4,6 +4,9 @@
 
             var vm = this;
 
+            vm.submit = submit;
+            vm.close = close;
+
             vm.shouldShowUrl = shouldShowUrl;
             vm.focalPointChanged = focalPointChanged;
 
@@ -34,6 +37,18 @@
                     left: left,
                     top: top
                 };
+            }
+
+            function submit() {
+                if ($scope.model && $scope.model.submit) {
+                    $scope.model.submit($scope.model);
+                }
+            }
+
+            function close() {
+                if ($scope.model && $scope.model.close) {
+                    $scope.model.close($scope.model);
+                }
             }
 
         });
