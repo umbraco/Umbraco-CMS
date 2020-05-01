@@ -146,7 +146,7 @@
                 });
             }
             else {
-                //replace the content of the editor, since the cultura and segment is the same.
+                //replace the content of the editor, since the culture and segment is the same.
                 vm.editors[index].content = variant;
             }
             
