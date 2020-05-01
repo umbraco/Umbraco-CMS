@@ -165,9 +165,8 @@
             controller: controller,
             link: link,
             scope: {
-                content: "=",
-                //contentNodeModel is the content model for the node, 
-                contentNodeModel: "=?"
+                content: "=", // in this context the content is the variant model.
+                contentNodeModel: "=?" //contentNodeModel is the content model for the node, 
             }
         };
 
