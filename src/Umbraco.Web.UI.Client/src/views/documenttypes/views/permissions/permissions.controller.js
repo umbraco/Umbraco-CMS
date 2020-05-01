@@ -14,12 +14,9 @@
         /* ----------- SCOPE VARIABLES ----------- */
 
         var vm = this;
-        var childNodeSelectorOverlayTitle = "";
 
         vm.contentTypes = [];
         vm.selectedChildren = [];
-
-        vm.overlayTitle = "";
 
         vm.addChild = addChild;
         vm.removeChild = removeChild;
@@ -34,10 +31,6 @@
         init();
 
         function init() {
-
-            localizationService.localize("contentTypeEditor_chooseChildNode").then(function(value){
-                childNodeSelectorOverlayTitle = value;
-            });
 
             contentTypeResource.getAll().then(function(contentTypes){
                 vm.contentTypes = _.where(contentTypes, {isElement: false});
@@ -63,16 +56,18 @@
         }
 
         function addChild($event) {
-            var childNodeSelectorOverlay = {
+            
+            const dialog = {
                 view: "itempicker",
-                title: childNodeSelectorOverlayTitle,
                 availableItems: vm.contentTypes,
                 selectedItems: vm.selectedChildren,
                 position: "target",
                 event: $event,
-                submit: function(model) {
-                    vm.selectedChildren.push(model.selectedItem);
-                    $scope.model.allowedContentTypes.push(model.selectedItem.id);
+                submit: function (model) {
+                    if (model.selectedItem) {
+                        vm.selectedChildren.push(model.selectedItem);
+                        $scope.model.allowedContentTypes.push(model.selectedItem.id);
+                    }
                     overlayService.close();
                 },
                 close: function() {
@@ -80,8 +75,10 @@
                 }
             };
 
-            overlayService.open(childNodeSelectorOverlay);
-
+            localizationService.localize("contentTypeEditor_chooseChildNode").then(value => {
+                dialog.title = value;
+                overlayService.open(dialog);
+            });
         }
 
         function removeChild(selectedChild, index) {
