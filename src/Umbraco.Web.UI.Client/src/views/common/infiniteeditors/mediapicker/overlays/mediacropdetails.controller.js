@@ -1,5 +1,5 @@
 ﻿angular.module("umbraco")
-    .controller("Umbraco.Editors.MediaPickerDetailsController",
+    .controller("Umbraco.Editors.MediaCropDetailsController",
         function ($scope) {
 
             var vm = this;

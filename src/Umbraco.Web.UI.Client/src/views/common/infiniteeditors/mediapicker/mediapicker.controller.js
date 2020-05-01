@@ -346,7 +346,7 @@ angular.module("umbraco")
             function openDetailsDialog() {
                 
                 const dialog = {
-                    view: "views/common/infiniteeditors/mediapicker/overlays/mediadetails.html",
+                    view: "views/common/infiniteeditors/mediapicker/overlays/mediacropdetails.html",
                     size: "small",
                     cropSize: $scope.cropSize,
                     target: $scope.target,
