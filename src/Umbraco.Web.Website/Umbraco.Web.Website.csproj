@@ -15,6 +15,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="SixLabors.ImageSharp.Web" Version="1.0.0-beta0009" />
+        <PackageReference Include="SixLabors.ImageSharp.Web" Version="1.0.0-rc0001" />
     </ItemGroup>
 </Project>
