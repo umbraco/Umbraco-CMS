@@ -21,14 +21,6 @@ Use this directive to render a ui component for selecting child items to a paren
                 on-remove="vm.removeChild">
         </umb-child-selector>
 
-        <!-- use overlay to select children from -->
-        <umb-overlay
-           ng-if="vm.overlay.show"
-           model="vm.overlay"
-           position="target"
-           view="vm.overlay.view">
-        </umb-overlay>
-
 	</div>
 </pre>
 
