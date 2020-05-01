@@ -363,7 +363,7 @@ angular.module("umbraco")
                     close: function () {
                         overlayService.close();
 
-                        close();
+                        //close();
                     }
                 };
 
