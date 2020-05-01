@@ -24,18 +24,22 @@ namespace Umbraco.Core
         private readonly ConcurrentHashSet<string> _applicationUrls = new ConcurrentHashSet<string>();
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IBackOfficeInfo _backOfficeInfo;
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private Uri _applicationUrl;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
         /// </summary>
         public RuntimeState(ILogger logger, IGlobalSettings globalSettings,
             IUmbracoVersion umbracoVersion,
-            IBackOfficeInfo backOfficeInfo)
+            IBackOfficeInfo backOfficeInfo,
+            IHostingEnvironment hostingEnvironment)
         {
             _logger = logger;
             _globalSettings = globalSettings;
             _umbracoVersion = umbracoVersion;
             _backOfficeInfo = backOfficeInfo;
+            _hostingEnvironment = hostingEnvironment;
         }
 
 
@@ -49,7 +53,11 @@ namespace Umbraco.Core
         public SemVersion SemanticVersion => _umbracoVersion.SemanticVersion;
 
         /// <inheritdoc />
-        public Uri ApplicationUrl { get; private set; }
+        public Uri ApplicationUrl
+        {
+            get => _applicationUrl ??= new Uri(_hostingEnvironment.ApplicationServerAddress);
+            private set => _applicationUrl = value;
+        }
 
         /// <inheritdoc />
         public string CurrentMigrationState { get; private set; }

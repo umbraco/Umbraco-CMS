@@ -237,7 +237,7 @@ angular.module("umbraco.install").factory('installerService', function ($rootSco
 			service.status.feedback = getDescriptionForStepAtIndex(service.status.steps, 0);
 			service.status.progress = 0;
 
-			function processInstallStep() {
+			function processInstallStep(retry) {
 
                 $http.post(Umbraco.Sys.ServerVariables.installApiBaseUrl + "PostPerformInstall", _installerModel)
                     .then(function (response) {
@@ -275,7 +275,9 @@ angular.module("umbraco.install").factory('installerService', function ($rootSco
                         // not as json. If this happens we can't actually load in external views since they will YSOD as well!
                         // so we need to display this in our own internal way
 
-                        if (status >= 500 && status < 600) {
+                        if(status === 502 && retry !== true){
+                            processInstallStep(true);
+                        }else if (status >= 500 && status < 600) {
                             service.status.current = { view: "ysod", model: null };
                             var ysod = data;
                             //we need to manually write the html to the iframe - the html contains full html markup

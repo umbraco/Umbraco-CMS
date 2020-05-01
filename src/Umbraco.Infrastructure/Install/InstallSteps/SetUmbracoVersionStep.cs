@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Net;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -14,13 +15,16 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly InstallHelper _installHelper;
         private readonly IGlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
 
-        public SetUmbracoVersionStep(IUmbracoContextAccessor umbracoContextAccessor, InstallHelper installHelper, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion)
+        public SetUmbracoVersionStep(IUmbracoContextAccessor umbracoContextAccessor, InstallHelper installHelper,
+            IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _installHelper = installHelper;
             _globalSettings = globalSettings;
             _umbracoVersion = umbracoVersion;
+            _umbracoApplicationLifetime = umbracoApplicationLifetime;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
@@ -49,9 +53,11 @@ namespace Umbraco.Web.Install.InstallSteps
             //     // for installs, we need to log the super user in
             //     security.PerformLogin(Constants.Security.SuperUserId);
             // }
-            
+
             //reports the ended install
             _installHelper.InstallStatus(true, "");
+
+            _umbracoApplicationLifetime.Restart();
 
             return Task.FromResult<InstallSetupResult>(null);
         }

@@ -24,22 +24,17 @@ namespace Umbraco.Web.Common.Install
     {
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly InstallStatusTracker _installStatusTracker;
-        private readonly IRuntimeState _runtimeState;
-        private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
         private readonly InstallStepCollection _installSteps;
         private readonly ILogger _logger;
         private readonly IProfilingLogger _proflog;
 
         public InstallApiController(DatabaseBuilder databaseBuilder, IProfilingLogger proflog,
-            InstallHelper installHelper, InstallStepCollection installSteps, InstallStatusTracker installStatusTracker,
-            IRuntimeState runtimeState, IUmbracoApplicationLifetime umbracoApplicationLifetime)
+            InstallHelper installHelper, InstallStepCollection installSteps, InstallStatusTracker installStatusTracker)
         {
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
             _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _installSteps = installSteps;
             _installStatusTracker = installStatusTracker;
-            _runtimeState = runtimeState;
-            _umbracoApplicationLifetime = umbracoApplicationLifetime;
             InstallHelper = installHelper;
             _logger = _proflog;
         }
@@ -175,7 +170,6 @@ namespace Umbraco.Web.Common.Install
             }
 
             _installStatusTracker.Reset();
-            _umbracoApplicationLifetime.Restart();
             return new InstallProgressResultModel(true, "", "");
         }
 

@@ -26,6 +26,7 @@ namespace Umbraco.Web.Common.AspNetCore
             ApplicationPhysicalPath = webHostEnvironment.ContentRootPath;
 
             ApplicationVirtualPath = "/"; //TODO how to find this, This is a server thing, not application thing.
+            ApplicationServerAddress = "https://localhost:44354"; // TODO how to find this?
             IISVersion = new Version(0, 0); // TODO not necessary IIS
 
         }
@@ -34,6 +35,7 @@ namespace Umbraco.Web.Common.AspNetCore
         public string SiteName { get; }
         public string ApplicationId { get; }
         public string ApplicationPhysicalPath { get; }
+        public string ApplicationServerAddress { get; }
 
         public string ApplicationVirtualPath { get; }
         public bool IsDebugMode => _hostingSettings.DebugMode;

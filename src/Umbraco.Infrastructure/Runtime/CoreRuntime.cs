@@ -65,7 +65,7 @@ namespace Umbraco.Core.Runtime
             // runtime state
             // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
             // as the second one captures the current value (null) and therefore fails
-           _state = new RuntimeState(Logger, Configs.Global(), UmbracoVersion, BackOfficeInfo)
+           _state = new RuntimeState(Logger, Configs.Global(), UmbracoVersion, BackOfficeInfo, HostingEnvironment)
             {
                 Level = RuntimeLevel.Boot
             };

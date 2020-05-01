@@ -10,9 +10,10 @@ namespace Umbraco.Web.Hosting
 {
     public class AspNetHostingEnvironment : IHostingEnvironment
     {
-        
+
         private readonly IHostingSettings _hostingSettings;
         private string _localTempPath;
+        private string _applicationServerAddress;
 
         public AspNetHostingEnvironment(IHostingSettings hostingSettings)
         {
@@ -25,6 +26,8 @@ namespace Umbraco.Web.Hosting
                                      ?? HostingEnvironment.ApplicationVirtualPath?.EnsureStartsWith("/")
                                      ?? "/";
             IISVersion = HttpRuntime.IISVersion;
+
+            ApplicationServerAddress = "https://localhost:44354"; // TODO how to find this?
         }
 
         public string SiteName { get; }
@@ -32,6 +35,9 @@ namespace Umbraco.Web.Hosting
         public string ApplicationPhysicalPath { get; }
 
         public string ApplicationVirtualPath { get; }
+
+        public string ApplicationServerAddress { get; }
+
         public bool IsDebugMode => HttpContext.Current?.IsDebuggingEnabled ?? _hostingSettings.DebugMode;
         /// <inheritdoc/>
         public bool IsHosted => (HttpContext.Current != null || HostingEnvironment.IsHosted);
@@ -48,7 +54,7 @@ namespace Umbraco.Web.Hosting
         }
 
         public string ToAbsolute(string virtualPath) => VirtualPathUtility.ToAbsolute(virtualPath, ApplicationVirtualPath);
-        
+
 
         public string LocalTempPath
         {
@@ -87,7 +93,7 @@ namespace Umbraco.Web.Hosting
                 }
             }
         }
-       
+
     }
 
 

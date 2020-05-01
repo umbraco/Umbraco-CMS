@@ -41,7 +41,7 @@ namespace Umbraco.Web.Install
                     // otherwise we need to ensure that a user is logged in
                     return runtimeState.Level == RuntimeLevel.Install
                            || runtimeState.Level == RuntimeLevel.Upgrade
-                           || umbracoContext.Security.ValidateCurrentUser();
+                           || (umbracoContext?.Security?.ValidateCurrentUser() ?? false);
                 }
                 catch (Exception ex)
                 {

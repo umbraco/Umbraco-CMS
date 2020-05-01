@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Common
 
         protected TestHelperBase(Assembly entryAssembly)
         {
-            SettingsForTests = new SettingsForTests();            
+            SettingsForTests = new SettingsForTests();
             MainDom = new SimpleMainDom();
             _typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(entryAssembly), new VaryingRuntimeHash());
         }
@@ -54,7 +54,8 @@ namespace Umbraco.Tests.Common
                 Mock.Of<ILogger>(),
                 Mock.Of<IGlobalSettings>(),
                 GetUmbracoVersion(),
-                GetBackOfficeInfo());
+                GetBackOfficeInfo(),
+                GetHostingEnvironment());
         }
 
         public abstract IBackOfficeInfo GetBackOfficeInfo();
