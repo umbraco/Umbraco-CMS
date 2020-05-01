@@ -221,6 +221,10 @@ Opens an overlay to show a custom YSOD. </br>
 
                 $timeout(function () {
 
+                    if (!scope.name) {
+                        scope.name = 'overlay';
+                    }
+
                     if (scope.position === "target" && scope.model.event) {
                         setTargetPosition();
 
@@ -530,6 +534,7 @@ Opens an overlay to show a custom YSOD. </br>
                 view: "=",
                 position: "@",
                 size: "=?",
+                name: "=?",
                 parentScope: "=?"
             },
             link: link
