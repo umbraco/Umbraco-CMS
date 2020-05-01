@@ -370,27 +370,6 @@ angular.module("umbraco")
                     dialog.title = value;
                     editorService.open(dialog);
                 });
-
-                //localizationService.localize("defaultdialogs_editSelectedMedia").then(function (data) {
-                //    vm.mediaPickerDetailsOverlay = {
-                //        show: true,
-                //        title: data,
-                //        disableFocalPoint: $scope.disableFocalPoint,
-                //        submit: function (model) {
-                //            $scope.model.selection.push($scope.target);
-                //            $scope.model.submit($scope.model);
-
-                //            vm.mediaPickerDetailsOverlay.show = false;
-                //            vm.mediaPickerDetailsOverlay = null;
-                //        },
-                //        close: function (oldModel) {
-                //            vm.mediaPickerDetailsOverlay.show = false;
-                //            vm.mediaPickerDetailsOverlay = null;
-
-                //            close();
-                //        }
-                //    };
-                //});
             };
 
             var debounceSearchMedia = _.debounce(function () {
