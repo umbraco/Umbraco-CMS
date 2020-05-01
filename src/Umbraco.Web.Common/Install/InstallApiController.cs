@@ -24,17 +24,20 @@ namespace Umbraco.Web.Common.Install
     {
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly InstallStatusTracker _installStatusTracker;
+        private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
         private readonly InstallStepCollection _installSteps;
         private readonly ILogger _logger;
         private readonly IProfilingLogger _proflog;
 
         public InstallApiController(DatabaseBuilder databaseBuilder, IProfilingLogger proflog,
-            InstallHelper installHelper, InstallStepCollection installSteps, InstallStatusTracker installStatusTracker)
+            InstallHelper installHelper, InstallStepCollection installSteps, InstallStatusTracker installStatusTracker,
+            IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
             _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _installSteps = installSteps;
             _installStatusTracker = installStatusTracker;
+            _umbracoApplicationLifetime = umbracoApplicationLifetime;
             InstallHelper = installHelper;
             _logger = _proflog;
         }
@@ -74,6 +77,14 @@ namespace Umbraco.Web.Common.Install
         {
             var starterKits = InstallHelper.GetStarterKits();
             return starterKits;
+        }
+
+
+        [HttpPost]
+        public ActionResult CompleteInstall()
+        {
+            _umbracoApplicationLifetime.Restart();
+            return NoContent();
         }
 
         /// <summary>
