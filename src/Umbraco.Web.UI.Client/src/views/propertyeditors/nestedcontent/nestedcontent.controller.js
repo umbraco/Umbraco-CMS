@@ -138,13 +138,23 @@
                 return;
             }
 
+            var availableItems = [];
+            _.each(vm.scaffolds, function (scaffold) {
+                availableItems.push({
+                    alias: scaffold.contentTypeAlias,
+                    name: scaffold.contentTypeName,
+                    icon: iconHelper.convertFromLegacyIcon(scaffold.icon)
+                });
+            });
+
             const dialog = {
                 view: "itempicker",
                 orderBy: "$index",
                 view: "itempicker",
                 event: $event,
-                filter: vm.scaffolds.length > 12,
-                availableItems: vm.scaffolds,
+                filter: availableItems.length > 12,
+                size: availableItems.length > 6 ? "medium" : "small",
+                availableItems: availableItems,
                 clickPasteItem: function (item) {
                     if (item.type === "elementTypeArray") {
                         _.each(item.data, function (entry) {
@@ -168,22 +178,9 @@
                 }
             };
 
-            var availableItems = [];
-            _.each(vm.scaffolds, function (scaffold) {
-                availableItems.push({
-                    alias: scaffold.contentTypeAlias,
-                    name: scaffold.contentTypeName,
-                    icon: iconHelper.convertFromLegacyIcon(scaffold.icon)
-                });
-            });
-
-            dialog.availableItems = availableItems;
-
             if (dialog.availableItems.length === 0) {
                 return;
             }
-
-            dialog.size = dialog.availableItems.length > 6 ? "medium" : "small";
 
             dialog.pasteItems = [];
 
