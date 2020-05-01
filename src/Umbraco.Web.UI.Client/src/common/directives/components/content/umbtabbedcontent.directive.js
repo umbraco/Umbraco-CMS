@@ -117,11 +117,11 @@
 
         function controller($scope) {
             
-            
             //expose the property/methods for other directives to use
             this.content = $scope.content;
-            if($scope.variantNodeModel) {
-                $scope.defaultVariant = _.find($scope.variantNodeModel.variants, variant => {
+            
+            if($scope.contentNodeModel) {
+                $scope.defaultVariant = _.find($scope.contentNodeModel.variants, variant => {
                     // defaultVariant will never have segment. Wether it has a language or not depends on the setup.
                     return !variant.segment && ((variant.language && variant.language.isDefault) || (!variant.language));
                 });
@@ -166,7 +166,8 @@
             link: link,
             scope: {
                 content: "=",
-                variantNodeModel: "=?"
+                //contentNodeModel is the content model for the node, 
+                contentNodeModel: "=?"
             }
         };
 
