@@ -75,7 +75,6 @@
                 const dialog = {
                     view: "user",
                     position: "right",
-                    size: "medium",
                     name: "overlay-user",
                     close: function () {
                         overlayService.close();
