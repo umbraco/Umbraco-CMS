@@ -1,9 +1,8 @@
 ﻿using System;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Collections;
 
-namespace Umbraco.Tests.Collections
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Collections
 {
     [TestFixture]
     public class OrderedHashSetTests
@@ -12,7 +11,7 @@ namespace Umbraco.Tests.Collections
         public void Keeps_Last()
         {
             var list = new OrderedHashSet<MyClass>(keepOldest: false);
-            var items = new[] { new MyClass("test"), new MyClass("test"), new MyClass("test") };
+            var items = new[] {new MyClass("test"), new MyClass("test"), new MyClass("test")};
             foreach (var item in items)
             {
                 list.Add(item);
@@ -27,7 +26,7 @@ namespace Umbraco.Tests.Collections
         public void Keeps_First()
         {
             var list = new OrderedHashSet<MyClass>(keepOldest: true);
-            var items = new[] { new MyClass("test"), new MyClass("test"), new MyClass("test") };
+            var items = new[] {new MyClass("test"), new MyClass("test"), new MyClass("test")};
             foreach (var item in items)
             {
                 list.Add(item);
@@ -60,7 +59,7 @@ namespace Umbraco.Tests.Collections
                 if (ReferenceEquals(null, obj)) return false;
                 if (ReferenceEquals(this, obj)) return true;
                 if (obj.GetType() != this.GetType()) return false;
-                return Equals((MyClass)obj);
+                return Equals((MyClass) obj);
             }
 
             public override int GetHashCode()
