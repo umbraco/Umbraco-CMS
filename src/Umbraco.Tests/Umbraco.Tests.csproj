@@ -302,7 +302,6 @@
     <Compile Include="Web\Controllers\FilterAllowedOutgoingContentAttributeTests.cs" />
     <Compile Include="Web\Controllers\MediaControllerUnitTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
-    <Compile Include="Clr\ReflectionTests.cs" />
     <Compile Include="Macros\MacroParserTests.cs" />
     <Compile Include="Models\ContentExtensionsTests.cs" />
     <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
