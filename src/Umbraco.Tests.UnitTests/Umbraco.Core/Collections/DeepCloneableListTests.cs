@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Models;
 
-namespace Umbraco.Tests.Collections
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Collections
 {
     [TestFixture]
     public class DeepCloneableListTests
@@ -85,7 +82,7 @@ namespace Umbraco.Tests.Collections
             list.Add(new TestClone());
             list.Add(new TestClone());
 
-            var cloned = (DeepCloneableList<TestClone>)list.DeepClone();
+            var cloned = (DeepCloneableList<TestClone>) list.DeepClone();
 
             //Test that each item in the sequence is equal - based on the equality comparer of TestClone (i.e. it's ID)
             Assert.IsTrue(list.SequenceEqual(cloned));
@@ -111,8 +108,8 @@ namespace Umbraco.Tests.Collections
                 Id = Guid.NewGuid();
             }
 
-            public Guid Id { get; private set; }
-            public bool IsClone { get; private set; }
+            public Guid Id { get; }
+            public bool IsClone { get; }
 
             public object DeepClone()
             {
@@ -145,7 +142,7 @@ namespace Umbraco.Tests.Collections
                 if (ReferenceEquals(null, obj)) return false;
                 if (ReferenceEquals(this, obj)) return true;
                 if (obj.GetType() != this.GetType()) return false;
-                return Equals((TestClone)obj);
+                return Equals((TestClone) obj);
             }
 
             /// <summary>
