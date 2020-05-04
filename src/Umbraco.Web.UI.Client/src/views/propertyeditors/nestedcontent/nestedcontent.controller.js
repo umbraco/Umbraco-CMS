@@ -14,7 +14,7 @@
         });
 
     function NestedContentController($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService, $routeParams, editorState) {
-        
+
         var vm = this;
         var model = $scope.$parent.$parent.model;
 
@@ -58,9 +58,9 @@
             updateModel();
             vm.currentNode = node;
         }
-        
-        var copyAllEntries = function() {
-            
+
+        var copyAllEntries = function () {
+
             syncCurrentNode();
 
             // list aliases
@@ -68,14 +68,14 @@
 
             // remove dublicates
             aliases = aliases.filter((item, index) => aliases.indexOf(item) === index);
-            
+
             var nodeName = "";
 
-            if(vm.umbVariantContent) {
+            if (vm.umbVariantContent) {
                 nodeName = vm.umbVariantContent.editor.content.name;
             }
 
-            localizationService.localize("clipboard_labelForArrayOfItemsFrom", [model.label, nodeName]).then(function(data) {
+            localizationService.localize("clipboard_labelForArrayOfItemsFrom", [model.label, nodeName]).then(function (data) {
                 clipboardService.copyArray("elementTypeArray", aliases, vm.nodes, data, "icon-thumbnail-list", model.id);
             });
         }
@@ -146,7 +146,7 @@
                 orderBy: "$index",
                 view: "itempicker",
                 event: $event,
-                clickPasteItem: function(item) {
+                clickPasteItem: function (item) {
                     if (item.type === "elementTypeArray") {
                         _.each(item.data, function (entry) {
                             pasteFromClipboard(entry);
@@ -183,9 +183,9 @@
             if (vm.overlayMenu.availableItems.length === 0) {
                 return;
             }
-            
+
             vm.overlayMenu.size = vm.overlayMenu.availableItems.length > 6 ? "medium" : "small";
-            
+
             vm.overlayMenu.pasteItems = [];
 
             var singleEntriesForPaste = clipboardService.retriveEntriesOfType("elementType", contentTypeAliases);
@@ -197,7 +197,7 @@
                     icon: entry.icon
                 });
             });
-            
+
             var arrayEntriesForPaste = clipboardService.retriveEntriesOfType("elementTypeArray", contentTypeAliases);
             _.each(arrayEntriesForPaste, function (entry) {
                 vm.overlayMenu.pasteItems.push({
@@ -393,10 +393,10 @@
             clipboardService.copy("elementType", node.contentTypeAlias, node);
             $event.stopPropagation();
         }
-        
-        
+
+
         function pasteFromClipboard(newNode) {
-            
+
             if (newNode === undefined) {
                 return;
             }
@@ -407,7 +407,7 @@
             vm.nodes.push(newNode);
             setDirty();
             //updateModel();// done by setting current node...
-            
+
             setCurrentNode(newNode);
         }
 
@@ -515,7 +515,7 @@
         }
 
         function createNode(scaffold, fromNcEntry) {
-            var node = angular.copy(scaffold);
+            var node = Utilities.copy(scaffold);
 
             node.key = fromNcEntry && fromNcEntry.key ? fromNcEntry.key : String.CreateGuid();
 
@@ -596,12 +596,12 @@
         }
 
 
-        
+
         var propertyActions = [
             copyAllEntriesAction,
             removeAllEntriesAction
         ];
-        
+
         this.$onInit = function () {
             if (this.umbProperty) {
                 this.umbProperty.setPropertyActions(propertyActions);

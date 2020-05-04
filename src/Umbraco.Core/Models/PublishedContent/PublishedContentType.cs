@@ -107,10 +107,10 @@ namespace Umbraco.Core.Models.PublishedContent
             { nameof(IMember.Comments), Constants.DataTypes.Textbox },
             { nameof(IMember.IsApproved), Constants.DataTypes.Boolean },
             { nameof(IMember.IsLockedOut), Constants.DataTypes.Boolean },
-            { nameof(IMember.LastLockoutDate), Constants.DataTypes.DateTime },
-            { nameof(IMember.CreateDate), Constants.DataTypes.DateTime },
-            { nameof(IMember.LastLoginDate), Constants.DataTypes.DateTime },
-            { nameof(IMember.LastPasswordChangeDate), Constants.DataTypes.DateTime },
+            { nameof(IMember.LastLockoutDate), Constants.DataTypes.LabelDateTime },
+            { nameof(IMember.CreateDate), Constants.DataTypes.LabelDateTime },
+            { nameof(IMember.LastLoginDate), Constants.DataTypes.LabelDateTime },
+            { nameof(IMember.LastPasswordChangeDate), Constants.DataTypes.LabelDateTime },
         };
 
         #region Content type

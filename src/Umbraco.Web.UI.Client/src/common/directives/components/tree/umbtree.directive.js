@@ -87,7 +87,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
 
             /** Helper function to emit tree events */
             function emitEvent(eventName, args) {
-                if (registeredCallbacks[eventName] && angular.isArray(registeredCallbacks[eventName])) {
+                if (registeredCallbacks[eventName] && Utilities.isArray(registeredCallbacks[eventName])) {
                     _.each(registeredCallbacks[eventName], function (c) {
                         c(args);//call it
                     });
@@ -100,7 +100,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
              * @param {any} args either a string representing the 'section' or an object containing: 'section', 'treeAlias', 'customTreeParams', 'cacheKey'
              */
             function load(args) {
-                if (angular.isString(args)) {
+                if (Utilities.isString(args)) {
                     $scope.section = args;
                 }
                 else if (args) {
@@ -147,7 +147,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                     throw "args.path cannot be null";
                 }
 
-                if (angular.isString(args.path)) {
+                if (Utilities.isString(args.path)) {
                     args.path = args.path.replace('"', '').split(',');
                 }
 
