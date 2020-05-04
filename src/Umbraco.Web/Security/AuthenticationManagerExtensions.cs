@@ -78,17 +78,14 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public static async Task<ExternalLoginInfo> GetExternalLoginInfoAsync(this IAuthenticationManager manager, string authenticationType)
         {
-            if (manager == null)
-            {
-                throw new ArgumentNullException("manager");
-            }
+            if (manager == null) throw new ArgumentNullException(nameof(manager));
             return GetExternalLoginInfo(await manager.AuthenticateAsync(authenticationType));
         }
         
         public static IEnumerable<AuthenticationDescription> GetExternalAuthenticationTypes(this IAuthenticationManager manager)
         {
             if (manager == null) throw new ArgumentNullException(nameof(manager));
-            return manager.GetAuthenticationTypes(d => d.Properties != null && d.Properties.ContainsKey("Caption"));
+            return manager.GetAuthenticationTypes(d => d.Properties != null && d.Caption != null);
         }
 
         public static ClaimsIdentity CreateTwoFactorRememberBrowserIdentity(this IAuthenticationManager manager, string userId)

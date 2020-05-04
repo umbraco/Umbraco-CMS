@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.Net.Http;
 using System.Text;
@@ -65,6 +65,9 @@ namespace Umbraco.Web.Install.InstallSteps
 
             //To change the password here we actually need to reset it since we don't have an old one to use to change
             var resetToken = await userManager.GeneratePasswordResetTokenAsync(membershipUser);
+            if (string.IsNullOrWhiteSpace(resetToken))
+                throw new InvalidOperationException("Could not reset password: unable to generate internal reset token");
+
             var resetResult = await userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
             if (!resetResult.Succeeded)
             {
