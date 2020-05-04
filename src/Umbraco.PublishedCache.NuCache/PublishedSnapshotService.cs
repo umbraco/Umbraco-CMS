@@ -900,23 +900,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // we ran this on a background thread then those cache refreshers are going to not get 'live' data when they query the content cache which
                 // they require.
 
-                // These can be run side by side in parallel.
-
-                Parallel.Invoke(
-                    () =>
-                    {
-                        using (_contentStore.GetScopedWriteLock(_scopeProvider))
-                        {
-                            NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _, out _);
-                        }
-                    },
-                    () =>
-                    {
-                        using (_mediaStore.GetScopedWriteLock(_scopeProvider))
-                        {
-                            NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _);
-                        }
-                    });
+                // These cannot currently be run side by side in parallel, due to the monitors need to be exits my the same thread that enter them.
+                using (_contentStore.GetScopedWriteLock(_scopeProvider))
+                {
+                    NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _, out _);
+                }
+                using (_mediaStore.GetScopedWriteLock(_scopeProvider))
+                {
+                    NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _);
+                }
             }
 
             ((PublishedSnapshot)CurrentPublishedSnapshot)?.Resync();
