@@ -4,7 +4,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFifteenFour
 {
-    [Migration("7.15.4", 1, Constants.System.UmbracoMigrationName)]
+    [Migration("7.15.5", 1, Constants.System.UmbracoMigrationName)]
     public class PopulateMissingSecurityStamps : MigrationBase
     {
         public PopulateMissingSecurityStamps(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
