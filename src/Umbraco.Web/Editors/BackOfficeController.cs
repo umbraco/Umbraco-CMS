@@ -85,7 +85,7 @@ namespace Umbraco.Web.Editors
                     Core.Constants.Security.BackOfficeAuthenticationType,
                     Core.Constants.Security.BackOfficeExternalAuthenticationType);
             }
-            
+
             if (invite == null)
             {
                 Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: NULL");
@@ -143,10 +143,10 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// This Action is used by the installer when an upgrade is detected but the admin user is not logged in. We need to 
+        /// This Action is used by the installer when an upgrade is detected but the admin user is not logged in. We need to
         /// ensure the user is authenticated before the install takes place so we redirect here to show the standard login screen.
         /// </summary>
-        /// <returns></returns>      
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult> AuthorizeUpgrade()
         {
@@ -177,7 +177,6 @@ namespace Umbraco.Web.Editors
                 //the dictionary returned is fine but the delimiter between an 'area' and a 'value' is a '/' but the javascript
                 // in the back office requres the delimiter to be a '_' so we'll just replace it
                 .ToDictionary(key => key.Key.Replace("/", "_"), val => val.Value);
-            var formatting = GlobalSettings.DebugMode ? Formatting.Indented : Formatting.None;
             return new JsonNetResult { Data = textForCulture, Formatting = Formatting.Indented };
         }
 
@@ -230,7 +229,6 @@ namespace Umbraco.Web.Editors
                     typeof(BackOfficeController) + "GetManifestAssetList",
                     () => getResult(),
                     new TimeSpan(0, 10, 0));
-            var formatting = GlobalSettings.DebugMode ? Formatting.Indented : Formatting.None;
             return new JsonNetResult { Data = result, Formatting = Formatting.Indented };
         }
 
@@ -244,11 +242,10 @@ namespace Umbraco.Web.Editors
                 new DirectoryInfo(Server.MapPath(SystemDirectories.AppPlugins)),
                 new DirectoryInfo(Server.MapPath(SystemDirectories.Config)),
                 HttpContext.IsDebuggingEnabled);
-            var formatting = GlobalSettings.DebugMode ? Formatting.Indented : Formatting.None;
             return new JsonNetResult { Data = gridConfig.EditorsConfig.Editors, Formatting = Formatting.Indented };
         }
 
-        
+
 
         /// <summary>
         /// Returns the JavaScript object representing the static server variables javascript object
@@ -271,7 +268,7 @@ namespace Umbraco.Web.Editors
             return JavaScript(result);
         }
 
-        
+
 
         [HttpPost]
         public ActionResult ExternalLogin(string provider, string redirectUrl = null)
@@ -341,10 +338,10 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Used by Default and AuthorizeUpgrade to render as per normal if there's no external login info, 
+        /// Used by Default and AuthorizeUpgrade to render as per normal if there's no external login info,
         /// otherwise process the external login info.
         /// </summary>
-        /// <returns></returns>       
+        /// <returns></returns>
         private async Task<ActionResult> RenderDefaultOrProcessExternalLoginAsync(
             Func<ActionResult> defaultResponse,
             Func<ActionResult> externalSignInResponse)
@@ -384,9 +381,9 @@ namespace Umbraco.Web.Editors
             ExternalSignInAutoLinkOptions autoLinkOptions = null;
 
             //Here we can check if the provider associated with the request has been configured to allow
-            // new users (auto-linked external accounts). This would never be used with public providers such as 
+            // new users (auto-linked external accounts). This would never be used with public providers such as
             // Google, unless you for some reason wanted anybody to be able to access the backend if they have a Google account
-            // .... not likely! 
+            // .... not likely!
             var authType = OwinContext.Authentication.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == loginInfo.Login.LoginProvider);
             if (authType == null)
             {
@@ -401,10 +398,10 @@ namespace Umbraco.Web.Editors
             var user = await UserManager.FindAsync(loginInfo.Login);
             if (user != null)
             {
-                //TODO: It might be worth keeping some of the claims associated with the ExternalLoginInfo, in which case we 
-                // wouldn't necessarily sign the user in here with the standard login, instead we'd update the 
+                //TODO: It might be worth keeping some of the claims associated with the ExternalLoginInfo, in which case we
+                // wouldn't necessarily sign the user in here with the standard login, instead we'd update the
                 // UseUmbracoBackOfficeExternalCookieAuthentication extension method to have the correct provider and claims factory,
-                // ticket format, etc.. to create our back office user including the claims assigned and in this method we'd just ensure 
+                // ticket format, etc.. to create our back office user including the claims assigned and in this method we'd just ensure
                 // that the ticket is created and stored and that the user is logged in.
 
                 var shouldSignIn = true;
@@ -477,7 +474,7 @@ namespace Umbraco.Web.Editors
                     {
                         autoLinkUser.AddRole(userGroup.Alias);
                     }
-                            
+
                     //call the callback if one is assigned
                     if (autoLinkOptions.OnAutoLinking != null)
                     {

@@ -16,12 +16,6 @@ namespace Umbraco.Core.Serialization
         {
             _settings = new JsonSerializerSettings();
 
-            //var customResolver = new CustomIgnoreResolver
-            //    {
-            //        DefaultMembersSearchFlags = BindingFlags.Instance | BindingFlags.Public
-            //    };
-            //_settings.ContractResolver = customResolver;
-
             var javaScriptDateTimeConverter = new JavaScriptDateTimeConverter();
 
             _settings.Converters.Add(javaScriptDateTimeConverter);
@@ -61,7 +55,6 @@ namespace Umbraco.Core.Serialization
         /// <returns></returns>
         public IStreamedResult ToStream(object input)
         {
-            var formatting = GlobalSettings.DebugMode ? Formatting.Indented : Formatting.None;
             string s = JsonConvert.SerializeObject(input, Formatting.Indented, _settings);
             byte[] bytes = Encoding.UTF8.GetBytes(s);
             MemoryStream ms = new MemoryStream(bytes);
