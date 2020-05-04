@@ -178,8 +178,6 @@
     <Compile Include="Published\ModelTypeTests.cs" />
     <Compile Include="Published\NestedContentTests.cs" />
     <Compile Include="Published\PropertyCacheLevelTests.cs" />
-    <Compile Include="Misc\DateTimeExtensionsTests.cs" />
-    <Compile Include="Misc\HashGeneratorTests.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="Issues\U9560.cs" />
     <Compile Include="Integration\ContentEventsTests.cs" />
@@ -370,7 +368,6 @@
     <Compile Include="PublishedContent\PublishedContentTestBase.cs" />
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
-    <Compile Include="Misc\HashCodeCombinerTests.cs" />
     <Compile Include="Web\Mvc\HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="IO\IoHelperTests.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueConverterTests.cs" />
@@ -456,7 +453,6 @@
     <Compile Include="UmbracoExamine\ExamineDemoDataMediaService.cs" />
     <Compile Include="UmbracoExamine\ExamineDemoDataContentService.cs" />
     <Compile Include="CoreThings\UriExtensionsTests.cs" />
-    <Compile Include="Misc\UriUtilityTests.cs" />
     <Compile Include="Composing\PackageActionCollectionTests.cs" />
     <Compile Include="Composing\TypeLoaderExtensions.cs" />
     <Compile Include="Composing\TypeLoaderTests.cs" />
@@ -475,7 +471,6 @@
     <Compile Include="Web\UrlHelperExtensionTests.cs" />
     <Compile Include="Web\WebExtensionMethodTests.cs" />
     <Compile Include="CoreThings\XmlExtensionsTests.cs" />
-    <Compile Include="Misc\XmlHelperTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\DictionaryPublishedContent.cs" />
     <Compile Include="LegacyXmlPublishedCache\DomainCache.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewContent.cs" />
