@@ -3,6 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -130,10 +131,12 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Returns the keyvalue table key for the current server/app
         /// </summary>
-        private string MainDomKey { get; } = MainDomKeyPrefix + "-"
-                                                + (NetworkHelper.MachineName    // eg DOMAIN\SERVER
-                                                + HttpRuntime.AppDomainAppId)   // eg /LM/S3SVC/11/ROOT
-                                            .GenerateHash(); 
+        /// <remarks>
+        /// The key is the the normal MainDomId which takes into account the AppDomainAppId and the physical file path of the app and this is
+        /// combined with the current machine name. The machine name is required because the default semaphore lock is machine wide so it implicitly
+        /// takes into account machine name whereas this needs to be explicitly per machine.
+        /// </remarks>
+        private string MainDomKey { get; } = MainDomKeyPrefix + "-" + (NetworkHelper.MachineName + MainDom.GetMainDomId()).GenerateHash<SHA1>();
 
         private void ListeningLoop()
         {
