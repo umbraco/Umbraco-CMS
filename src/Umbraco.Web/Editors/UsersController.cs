@@ -701,38 +701,29 @@ namespace Umbraco.Web.Editors
         [AdminUsersAuthorize("userIds")]
         public async Task<HttpResponseMessage> PostUnlockUsers([FromUri]int[] userIds)
         {
-            if (userIds.Length <= 0)
-                return Request.CreateResponse(HttpStatusCode.OK);
-
-            var user = await UserManager.FindByIdAsync(userIds[0].ToString());
-
-            if (userIds.Length == 1)
-            {
-                
-
-                var unlockResult = await UserManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now);
-                if (unlockResult.Succeeded == false)
-                {
-                    return Request.CreateValidationErrorResponse(
-                        string.Format("Could not unlock for user {0} - error {1}", userIds[0], unlockResult.Errors.First()));
-                }
-
-                return Request.CreateNotificationSuccessResponse(
-                    Services.TextService.Localize("speechBubbles/unlockUserSuccess", new[] { user.Name }));
-            }
+            if (userIds.Length <= 0) return Request.CreateResponse(HttpStatusCode.OK);
 
             foreach (var u in userIds)
             {
+                var user = await UserManager.FindByIdAsync(u.ToString());
+                if (user == null) throw new InvalidOperationException();
+
                 var unlockResult = await UserManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now);
                 if (unlockResult.Succeeded == false)
                 {
                     return Request.CreateValidationErrorResponse(
-                        string.Format("Could not unlock for user {0} - error {1}", u, unlockResult.Errors.First()));
+                        string.Format("Could not unlock for user {0} - error {1}", u, unlockResult.Errors.First().Description));
+                }
+
+                if (userIds.Length == 1)
+                {
+                    return Request.CreateNotificationSuccessResponse(
+                        Services.TextService.Localize("speechBubbles/unlockUserSuccess", new[] {user.Name}));
                 }
             }
 
             return Request.CreateNotificationSuccessResponse(
-                Services.TextService.Localize("speechBubbles/unlockUsersSuccess", new[] { userIds.Length.ToString() }));
+                Services.TextService.Localize("speechBubbles/unlockUsersSuccess", new[] {userIds.Length.ToString()}));
         }
 
         [AdminUsersAuthorize("userIds")]
