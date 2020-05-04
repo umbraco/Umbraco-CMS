@@ -108,7 +108,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = hostingEnvironment.MapPath(Constants.SystemDirectories.TempFileUploads);
+            var root = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);

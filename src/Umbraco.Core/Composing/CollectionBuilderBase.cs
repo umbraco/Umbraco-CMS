@@ -117,7 +117,7 @@ namespace Umbraco.Core.Composing
         /// <remarks>Creates a new collection each time it is invoked.</remarks>
         public virtual TCollection CreateCollection(IFactory factory)
         {
-            return factory.CreateInstance<TCollection>(CreateItems(factory));
+            return factory.CreateInstance<TCollection>(  CreateItems(factory));
         }
 
         protected Type EnsureType(Type type, string action)

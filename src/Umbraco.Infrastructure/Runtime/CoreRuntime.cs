@@ -141,7 +141,7 @@ namespace Umbraco.Core.Runtime
                     NetworkHelper.MachineName);
                 Logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
 
-                AppDomain.CurrentDomain.SetData("DataDirectory", IOHelper.MapPath(Constants.SystemDirectories.Data));
+                AppDomain.CurrentDomain.SetData("DataDirectory", HostingEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
 
                 // application environment
                 ConfigureUnhandledException();

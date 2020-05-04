@@ -44,7 +44,7 @@ namespace Umbraco.Web.Hosting
 
         public Version IISVersion { get; }
 
-        public string MapPath(string path)
+        public string MapPathWebRoot(string path)
         {
             if (HostingEnvironment.IsHosted)
                 return HostingEnvironment.MapPath(path);
@@ -52,6 +52,8 @@ namespace Umbraco.Web.Hosting
             // this will be the case in unit tests, we'll manually map the path
             return ApplicationPhysicalPath + path.TrimStart("~").EnsureStartsWith("/");
         }
+
+        public string MapPathContentRoot(string path) => MapPathWebRoot(path);
 
         public string ToAbsolute(string virtualPath) => VirtualPathUtility.ToAbsolute(virtualPath, ApplicationVirtualPath);
 
@@ -89,7 +91,7 @@ namespace Umbraco.Web.Hosting
                     //case LocalTempStorage.Default:
                     //case LocalTempStorage.Unknown:
                     default:
-                        return _localTempPath = MapPath("~/App_Data/TEMP");
+                        return _localTempPath = MapPathContentRoot("~/App_Data/TEMP");
                 }
             }
         }
