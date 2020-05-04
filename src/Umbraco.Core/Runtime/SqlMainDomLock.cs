@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -16,7 +17,7 @@ namespace Umbraco.Core.Runtime
     internal class SqlMainDomLock : IMainDomLock
     {
         private string _lockId;
-        private const string MainDomKey = "Umbraco.Core.Runtime.SqlMainDom";
+        private const string MainDomKeyPrefix = "Umbraco.Core.Runtime.SqlMainDom";
         private const string UpdatedSuffix = "_updated";
         private readonly ILogger _logger;
         private IUmbracoDatabase _db;
@@ -125,6 +126,14 @@ namespace Umbraco.Core.Runtime
             return Task.Factory.StartNew(ListeningLoop, _cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
         }
+
+        /// <summary>
+        /// Returns the keyvalue table key for the current server/app
+        /// </summary>
+        private string MainDomKey { get; } = MainDomKeyPrefix + "-"
+                                                + (NetworkHelper.MachineName    // eg DOMAIN\SERVER
+                                                + HttpRuntime.AppDomainAppId)   // eg /LM/S3SVC/11/ROOT
+                                            .GenerateHash(); 
 
         private void ListeningLoop()
         {
