@@ -159,7 +159,7 @@ namespace Umbraco.Web.Editors
 
             if (result.Succeeded == false)
             {
-                Logger.Warn<BackOfficeController>("Could not verify email, Error: {Errors}, Token: {Invite}", string.Join(",", result.Errors), invite);
+                Logger.Warn<BackOfficeController>("Could not verify email, Error: {Errors}, Token: {Invite}", result.Errors.ToErrorMessage(), invite);
                 return new RedirectResult(Url.Action("Default") + "#/login/false?invite=3");
             }
 

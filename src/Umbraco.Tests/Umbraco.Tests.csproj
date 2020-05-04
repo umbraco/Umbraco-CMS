@@ -146,6 +146,7 @@
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />
+    <Compile Include="Security\AuthenticationExtensionsTests.cs" />
     <Compile Include="Security\BackOfficeClaimsPrincipalFactoryTests.cs" />
     <Compile Include="Persistence\Repositories\KeyValueRepositoryTests.cs" />
     <Compile Include="Security\BackOfficeUserManagerTests.cs" />

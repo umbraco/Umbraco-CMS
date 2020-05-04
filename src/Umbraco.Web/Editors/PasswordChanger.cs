@@ -73,7 +73,7 @@ namespace Umbraco.Web.Editors
 
                 if (resetResult.Succeeded == false)
                 {
-                    var errors = string.Join(". ", resetResult.Errors);
+                    var errors = resetResult.Errors.ToErrorMessage();
                     _logger.Warn<PasswordChanger>("Could not reset user password {PasswordErrors}", errors);
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult(errors, new[] { "value" }) });
                 }
@@ -93,7 +93,7 @@ namespace Umbraco.Web.Editors
             if (changeResult.Succeeded == false)
             {
                 //no, fail with error messages for "password"
-                var errors = string.Join(". ", changeResult.Errors);
+                var errors = changeResult.Errors.ToErrorMessage();
                 _logger.Warn<PasswordChanger>("Could not change user password {PasswordErrors}", errors);
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult(errors, new[] { "password" }) });
             }

@@ -167,9 +167,7 @@ namespace Umbraco.Web.Editors
             {
                 //it wasn't successful, so add the change error to the model state, we've name the property alias _umb_password on the form
                 // so that is why it is being used here.
-                ModelState.AddModelError(
-                    "value",
-                    string.Join(", ", result.Errors));
+                ModelState.AddModelError("value", result.Errors.ToErrorMessage());
 
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }

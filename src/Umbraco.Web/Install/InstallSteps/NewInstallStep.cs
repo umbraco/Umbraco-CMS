@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -70,9 +72,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             var resetResult = await userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
             if (!resetResult.Succeeded)
-            {
-                throw new InvalidOperationException("Could not reset password: " + string.Join(", ", resetResult.Errors));
-            }
+                throw new InvalidOperationException("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));
 
             admin.Email = user.Email.Trim();
             admin.Name = user.Name.Trim();

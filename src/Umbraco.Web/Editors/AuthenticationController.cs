@@ -112,7 +112,7 @@ namespace Umbraco.Web.Editors
 
             if (result.Succeeded == false)
             {
-                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(string.Join(", ", result.Errors)));
+                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(result.Errors.ToErrorMessage()));
             }
 
             Request.TryGetOwinContext().Result.Authentication.SignOut(
@@ -438,13 +438,13 @@ namespace Umbraco.Web.Editors
                     var unlockResult = await UserManager.SetLockoutEndDateAsync(identityUser, DateTimeOffset.Now);
                     if (unlockResult.Succeeded == false)
                     {
-                        Logger.Warn<AuthenticationController>("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First());
+                        Logger.Warn<AuthenticationController>("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
                     }
 
                     var resetAccessFailedCountResult = await UserManager.ResetAccessFailedCountAsync(identityUser);
                     if (resetAccessFailedCountResult.Succeeded == false)
                     {
-                        Logger.Warn<AuthenticationController>("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First());
+                        Logger.Warn<AuthenticationController>("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
                     }
                 }
 

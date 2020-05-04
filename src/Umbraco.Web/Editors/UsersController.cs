@@ -36,6 +36,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Media;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Editors
 {
@@ -320,7 +321,7 @@ namespace Umbraco.Web.Editors
             if (created.Succeeded == false)
             {
                 throw new HttpResponseException(
-                    Request.CreateNotificationValidationErrorResponse(string.Join(", ", created.Errors)));
+                    Request.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage()));
             }
 
             string resetPassword;
@@ -330,7 +331,7 @@ namespace Umbraco.Web.Editors
             if (result.Succeeded == false)
             {
                 throw new HttpResponseException(
-                    Request.CreateNotificationValidationErrorResponse(string.Join(", ", created.Errors)));
+                    Request.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage()));
             }
 
             resetPassword = password;
@@ -409,7 +410,7 @@ namespace Umbraco.Web.Editors
                 if (created.Succeeded == false)
                 {
                     throw new HttpResponseException(
-                        Request.CreateNotificationValidationErrorResponse(string.Join(", ", created.Errors)));
+                        Request.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage()));
                 }
 
                 //now re-look the user back up
@@ -712,7 +713,7 @@ namespace Umbraco.Web.Editors
                 if (unlockResult.Succeeded == false)
                 {
                     return Request.CreateValidationErrorResponse(
-                        string.Format("Could not unlock for user {0} - error {1}", u, unlockResult.Errors.First().Description));
+                        string.Format("Could not unlock for user {0} - error {1}", u, unlockResult.Errors.ToErrorMessage()));
                 }
 
                 if (userIds.Length == 1)
