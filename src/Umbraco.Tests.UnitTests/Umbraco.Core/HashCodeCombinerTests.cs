@@ -4,20 +4,21 @@ using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core;
 
-namespace Umbraco.Tests.Misc
+namespace Umbraco.Tests.UnitTests.Umbraco.Core
 {
     [TestFixture]
     public class HashCodeCombinerTests
     {
-
         private DirectoryInfo PrepareFolder()
         {
             var assDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
-            var dir = Directory.CreateDirectory(Path.Combine(assDir.FullName, "HashCombiner", Guid.NewGuid().ToString("N")));
+            var dir = Directory.CreateDirectory(Path.Combine(assDir.FullName, "HashCombiner",
+                Guid.NewGuid().ToString("N")));
             foreach (var f in dir.GetFiles())
             {
                 f.Delete();
             }
+
             return dir;
         }
 
@@ -80,6 +81,7 @@ namespace Umbraco.Tests.Misc
             {
                 file1.WriteLine("hello");
             }
+
             var file2Path = Path.Combine(dir.FullName, "hastest2.txt");
             File.Delete(file2Path);
             using (var file2 = File.CreateText(Path.Combine(dir.FullName, "hastest2.txt")))
@@ -140,6 +142,5 @@ namespace Umbraco.Tests.Misc
 
             Assert.AreNotEqual(combiner1.GetCombinedHashCode(), combiner3.GetCombinedHashCode());
         }
-
     }
 }

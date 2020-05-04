@@ -145,6 +145,16 @@ namespace Umbraco.ModelsBuilder.Embedded
             return ctor();
         }
 
+        /// <inheritdoc />
+        public bool Enabled => _config.Enable;
+
+        /// <inheritdoc />
+        public void Reset()
+        {
+            if (_config.Enable)
+                ResetModels();
+        }
+
         #endregion
 
         #region Compilation

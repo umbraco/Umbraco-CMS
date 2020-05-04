@@ -485,7 +485,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                                     //now we need to check if this custom config key is defined in our baseline, if it is we don't want to
                                     //overwrite the baseline config item if it is an array, we want to concat the items in the array, otherwise
                                     //if it's an object it will overwrite the baseline
-                                    if (angular.isArray(config[i]) && angular.isArray(tinyMceConfig.customConfig[i])) {
+                                    if (Utilities.isArray(config[i]) && Utilities.isArray(tinyMceConfig.customConfig[i])) {
                                         //concat it and below this concat'd array will overwrite the baseline in angular.extend
                                         tinyMceConfig.customConfig[i] = config[i].concat(tinyMceConfig.customConfig[i]);
                                     }

@@ -61,11 +61,7 @@
                 <section id="contentwrapper">
 
                     <div id="contentcolumn">
-
                         <div class="umb-editor" ng-view></div>
-                        <div class="umb-editor__overlay" ng-if="infiniteMode"></div>
-
-                        <umb-editors></umb-editors>
                     </div>
 
                 </section>
@@ -87,7 +83,7 @@
 
     </div>
 
-    <umb-backdrop ng-if="backdrop.show"
+    <umb-backdrop ng-if="backdrop.show || infiniteMode"
                   backdrop-opacity="backdrop.opacity"
                   highlight-element="backdrop.element"
                   highlight-prevent-click="backdrop.elementPreventClick"
@@ -100,6 +96,8 @@
                  view="overlay.view"
                  parent-scope="overlay.parentScope">
     </umb-overlay>
+
+    <umb-editors ng-show="infiniteMode"></umb-editors>
 
     <umb-login ng-if="login.show"
                on-login="hideLoginScreen()">

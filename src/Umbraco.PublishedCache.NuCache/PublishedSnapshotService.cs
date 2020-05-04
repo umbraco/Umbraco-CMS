@@ -878,7 +878,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             Notify<IContentType>(_contentStore, payloads, RefreshContentTypesLocked);
             Notify<IMediaType>(_mediaStore, payloads, RefreshMediaTypesLocked);
 
-            if (_publishedModelFactory.IsLiveFactory())
+            if (_publishedModelFactory.IsLiveFactoryEnabled())
             {
                 //In the case of Pure Live - we actually need to refresh all of the content and the media
                 //see https://github.com/umbraco/Umbraco-CMS/issues/5671
@@ -900,23 +900,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // we ran this on a background thread then those cache refreshers are going to not get 'live' data when they query the content cache which
                 // they require.
 
-                // These can be run side by side in parallel.
-
-                Parallel.Invoke(
-                    () =>
-                    {
-                        using (_contentStore.GetScopedWriteLock(_scopeProvider))
-                        {
-                            NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _, out _);
-                        }
-                    },
-                    () =>
-                    {
-                        using (_mediaStore.GetScopedWriteLock(_scopeProvider))
-                        {
-                            NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _);
-                        }
-                    });
+                // These cannot currently be run side by side in parallel, due to the monitors need to be exits my the same thread that enter them.
+                using (_contentStore.GetScopedWriteLock(_scopeProvider))
+                {
+                    NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _, out _);
+                }
+                using (_mediaStore.GetScopedWriteLock(_scopeProvider))
+                {
+                    NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _);
+                }
             }
 
             ((PublishedSnapshot)CurrentPublishedSnapshot)?.Resync();
