@@ -158,15 +158,16 @@ namespace Umbraco.Web.Editors
         [OverrideAuthorization]
         public async Task<UserDetail> PostSetInvitedUserPassword([FromBody]string newPassword)
         {
-            var result = await UserManager.AddPasswordAsync(Security.GetUserId().ResultOr(0), newPassword);
+            var user = await UserManager.FindByIdAsync(Security.GetUserId().ResultOr(0).ToString());
+            if (user == null) throw new InvalidOperationException("Could not find user");
+
+            var result = await UserManager.AddPasswordAsync(user, newPassword);
 
             if (result.Succeeded == false)
             {
                 //it wasn't successful, so add the change error to the model state, we've name the property alias _umb_password on the form
                 // so that is why it is being used here.
-                ModelState.AddModelError(
-                    "value",
-                    string.Join(", ", result.Errors));
+                ModelState.AddModelError("value", result.Errors.ToErrorMessage());
 
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }

@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Owin.Security;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Security
 {
@@ -26,11 +27,12 @@ namespace Umbraco.Web.Security
             {
                 name = name.Replace(" ", "");
             }
+
             var email = result.Identity.FindFirstValue(ClaimTypes.Email);
             return new ExternalLoginInfo
             {
                 ExternalIdentity = result.Identity,
-                Login = new UserLoginInfo(idClaim.Issuer, idClaim.Value),
+                Login = new UserLoginInfo(idClaim.Issuer, idClaim.Value, idClaim.Issuer),
                 DefaultUserName = name,
                 Email = email
             };
@@ -76,11 +78,39 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public static async Task<ExternalLoginInfo> GetExternalLoginInfoAsync(this IAuthenticationManager manager, string authenticationType)
         {
-            if (manager == null)
-            {
-                throw new ArgumentNullException("manager");
-            }
+            if (manager == null) throw new ArgumentNullException(nameof(manager));
             return GetExternalLoginInfo(await manager.AuthenticateAsync(authenticationType));
         }
+        
+        public static IEnumerable<AuthenticationDescription> GetExternalAuthenticationTypes(this IAuthenticationManager manager)
+        {
+            if (manager == null) throw new ArgumentNullException(nameof(manager));
+            return manager.GetAuthenticationTypes(d => d.Properties != null && d.Caption != null);
+        }
+
+        public static ClaimsIdentity CreateTwoFactorRememberBrowserIdentity(this IAuthenticationManager manager, string userId)
+        {
+            if (manager == null) throw new ArgumentNullException(nameof(manager));
+
+            var rememberBrowserIdentity = new ClaimsIdentity(Constants.Web.TwoFactorRememberBrowserCookie);
+            rememberBrowserIdentity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId));
+
+            return rememberBrowserIdentity;
+        }
+    }
+
+    public class ExternalLoginInfo
+    {
+        /// <summary>Associated login data</summary>
+        public UserLoginInfo Login { get; set; }
+
+        /// <summary>Suggested user name for a user</summary>
+        public string DefaultUserName { get; set; }
+
+        /// <summary>Email claim from the external identity</summary>
+        public string Email { get; set; }
+
+        /// <summary>The external identity</summary>
+        public ClaimsIdentity ExternalIdentity { get; set; }
     }
 }

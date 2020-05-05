@@ -1,218 +1,187 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Owin.Security.DataProtection;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Net;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Net;
 using Umbraco.Web.Models.Identity;
-using IPasswordHasher = Microsoft.AspNet.Identity.IPasswordHasher;
 
 namespace Umbraco.Web.Security
 {
-    /// <summary>
-    /// Default back office user manager
-    /// </summary>
     public class BackOfficeUserManager : BackOfficeUserManager<BackOfficeIdentityUser>
     {
         public const string OwinMarkerKey = "Umbraco.Web.Security.Identity.BackOfficeUserManagerMarker";
 
         public BackOfficeUserManager(
-            IUserStore<BackOfficeIdentityUser, int> store,
-            IdentityFactoryOptions<BackOfficeUserManager> options,
-            IContentSettings contentSettingsConfig,
             IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
-            IGlobalSettings globalSettings)
-            : base(store, passwordConfiguration, ipResolver)
+            IUserStore<BackOfficeIdentityUser> store,
+            IOptions<IdentityOptions> optionsAccessor,
+            IEnumerable<IUserValidator<BackOfficeIdentityUser>> userValidators,
+            IEnumerable<IPasswordValidator<BackOfficeIdentityUser>> passwordValidators,
+            ILookupNormalizer keyNormalizer,
+            IdentityErrorDescriber errors,
+            IDataProtectionProvider dataProtectionProvider,
+            ILogger<UserManager<BackOfficeIdentityUser>> logger)
+            : base(passwordConfiguration, ipResolver, store, optionsAccessor, userValidators, passwordValidators, keyNormalizer, errors, null, logger)
         {
-            if (options == null) throw new ArgumentNullException("options");
-            InitUserManager(this, passwordConfiguration, options.DataProtectionProvider, contentSettingsConfig, globalSettings);
+            InitUserManager(this, dataProtectionProvider);
         }
-
+        
         #region Static Create methods
-
+        
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager
         /// </summary>
-        /// <param name="options"></param>
-        /// <param name="userService"></param>
-        /// <param name="entityService"></param>
-        /// <param name="externalLoginService"></param>
-        /// <param name="passwordConfiguration"></param>
-        /// <param name="contentSettingsConfig"></param>
-        /// <param name="globalSettings"></param>
-        /// <returns></returns>
         public static BackOfficeUserManager Create(
-            IdentityFactoryOptions<BackOfficeUserManager> options,
             IUserService userService,
             IEntityService entityService,
             IExternalLoginService externalLoginService,
-            UmbracoMapper mapper,
-            IContentSettings contentSettingsConfig,
             IGlobalSettings globalSettings,
+            UmbracoMapper mapper,
             IPasswordConfiguration passwordConfiguration,
-            IIpResolver ipResolver)
+            IIpResolver ipResolver,
+            IdentityErrorDescriber errors,
+            IDataProtectionProvider dataProtectionProvider,
+            ILogger<UserManager<BackOfficeIdentityUser>> logger)
         {
-            if (options == null) throw new ArgumentNullException("options");
-            if (userService == null) throw new ArgumentNullException("userService");
-            if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
-
             var store = new BackOfficeUserStore(userService, entityService, externalLoginService, globalSettings, mapper);
-            var manager = new BackOfficeUserManager(store, options, contentSettingsConfig, passwordConfiguration, ipResolver, globalSettings);
-            return manager;
+            
+            return Create(
+                passwordConfiguration,
+                ipResolver,
+                store,
+                errors,
+                dataProtectionProvider,
+                logger);
         }
 
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and a custom BackOfficeUserManager instance
         /// </summary>
-        /// <param name="options"></param>
-        /// <param name="customUserStore"></param>
-        /// <param name="passwordConfiguration"></param>
-        /// <param name="contentSettingsConfig"></param>
-        /// <returns></returns>
         public static BackOfficeUserManager Create(
-            IdentityFactoryOptions<BackOfficeUserManager> options,
-            BackOfficeUserStore customUserStore,
-            IContentSettings contentSettingsConfig,
             IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
-            IGlobalSettings globalSettings)
+            IUserStore<BackOfficeIdentityUser> customUserStore,
+            IdentityErrorDescriber errors,
+            IDataProtectionProvider dataProtectionProvider,
+            ILogger<UserManager<BackOfficeIdentityUser>> logger)
         {
-            var manager = new BackOfficeUserManager(customUserStore, options, contentSettingsConfig, passwordConfiguration, ipResolver, globalSettings);
-            return manager;
+            var options = new IdentityOptions();
+
+            // Configure validation logic for usernames
+            var userValidators = new List<UserValidator<BackOfficeIdentityUser>> { new BackOfficeUserValidator<BackOfficeIdentityUser>() };
+            options.User.RequireUniqueEmail = true;
+
+            // Configure validation logic for passwords
+            var passwordValidators = new List<IPasswordValidator<BackOfficeIdentityUser>> { new PasswordValidator<BackOfficeIdentityUser>() };
+            options.Password.RequiredLength = passwordConfiguration.RequiredLength;
+            options.Password.RequireNonAlphanumeric = passwordConfiguration.RequireNonLetterOrDigit;
+            options.Password.RequireDigit = passwordConfiguration.RequireDigit;
+            options.Password.RequireLowercase = passwordConfiguration.RequireLowercase;
+            options.Password.RequireUppercase = passwordConfiguration.RequireUppercase;
+            
+            // Ensure Umbraco security stamp claim type is used
+            options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
+            options.ClaimsIdentity.UserNameClaimType = ClaimTypes.Name;
+            options.ClaimsIdentity.RoleClaimType = ClaimTypes.Role;
+            options.ClaimsIdentity.SecurityStampClaimType = Constants.Web.SecurityStampClaimType;
+
+            options.Lockout.AllowedForNewUsers = true;
+            options.Lockout.MaxFailedAccessAttempts = passwordConfiguration.MaxFailedAccessAttemptsBeforeLockout;
+            //NOTE: This just needs to be in the future, we currently don't support a lockout timespan, it's either they are locked
+            // or they are not locked, but this determines what is set on the account lockout date which corresponds to whether they are
+            // locked out or not.
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(30);
+
+            return new BackOfficeUserManager(
+                passwordConfiguration,
+                ipResolver,
+                customUserStore,
+                new OptionsWrapper<IdentityOptions>(options),
+                userValidators,
+                passwordValidators,
+                new NopLookupNormalizer(), 
+                errors,
+                dataProtectionProvider,
+                logger);
         }
+
         #endregion
-
-
     }
 
-    /// <summary>
-    /// Generic Back office user manager
-    /// </summary>
-    public class BackOfficeUserManager<T> : UserManager<T, int>
+    public class BackOfficeUserManager<T> : UserManager<T>
         where T : BackOfficeIdentityUser
     {
         private PasswordGenerator _passwordGenerator;
 
-        public BackOfficeUserManager(IUserStore<T, int> store,
+        public BackOfficeUserManager(
             IPasswordConfiguration passwordConfiguration,
-            IIpResolver ipResolver)
-            : base(store)
+            IIpResolver ipResolver,
+            IUserStore<T> store,
+            IOptions<IdentityOptions> optionsAccessor,
+            IEnumerable<IUserValidator<T>> userValidators,
+            IEnumerable<IPasswordValidator<T>> passwordValidators,
+            ILookupNormalizer keyNormalizer,
+            IdentityErrorDescriber errors,
+            IServiceProvider services,
+            ILogger<UserManager<T>> logger)
+            : base(store, optionsAccessor, null, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
         {
-            PasswordConfiguration = passwordConfiguration;
-            IpResolver = ipResolver;
+            PasswordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            IpResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));
         }
 
-        #region What we support do not currently
-
+        #region What we do not currently support
         // TODO: We could support this - but a user claims will mostly just be what is in the auth cookie
-        public override bool SupportsUserClaim
-        {
-            get { return false; }
-        }
-
+        public override bool SupportsUserClaim => false;
+        
         // TODO: Support this
-        public override bool SupportsQueryableUsers
-        {
-            get { return false; }
-        }
+        public override bool SupportsQueryableUsers => false;
 
         /// <summary>
         /// Developers will need to override this to support custom 2 factor auth
         /// </summary>
-        public override bool SupportsUserTwoFactor
-        {
-            get { return false; }
-        }
+        public override bool SupportsUserTwoFactor => false;
 
         // TODO: Support this
-        public override bool SupportsUserPhoneNumber
-        {
-            get { return false; }
-        }
+        public override bool SupportsUserPhoneNumber => false;
         #endregion
-
-        public virtual async Task<ClaimsIdentity> GenerateUserIdentityAsync(T user)
-        {
-            // NOTE the authenticationType must match the umbraco one
-            // defined in CookieAuthenticationOptions.AuthenticationType
-            var userIdentity = await CreateIdentityAsync(user, Core.Constants.Security.BackOfficeAuthenticationType);
-            return userIdentity;
-        }
 
         /// <summary>
         /// Initializes the user manager with the correct options
         /// </summary>
-        /// <param name="manager"></param>
-        /// <param name="passwordConfig"></param>
-        /// <param name="dataProtectionProvider"></param>
-        /// <param name="contentSettingsConfig"></param>
-        /// <returns></returns>
         protected void InitUserManager(
             BackOfficeUserManager<T> manager,
-            IPasswordConfiguration passwordConfig,
-            IDataProtectionProvider dataProtectionProvider,
-            IContentSettings contentSettingsConfig,
-            IGlobalSettings globalSettings)
+            IDataProtectionProvider dataProtectionProvider)
         {
-            // Configure validation logic for usernames
-            manager.UserValidator = new BackOfficeUserValidator<T>(manager)
-            {
-                AllowOnlyAlphanumericUserNames = false,
-                RequireUniqueEmail = true
-            };
+            // use a custom hasher based on our membership provider
+            PasswordHasher = GetDefaultPasswordHasher(PasswordConfiguration);
 
-            // Configure validation logic for passwords
-            manager.PasswordValidator = new ConfiguredPasswordValidator(passwordConfig);
-
-            //use a custom hasher based on our membership provider
-            manager.PasswordHasher = GetDefaultPasswordHasher(passwordConfig);
-
+            // set OWIN data protection token provider as default
             if (dataProtectionProvider != null)
             {
-                manager.UserTokenProvider = new DataProtectorTokenProvider<T, int>(dataProtectionProvider.Create("ASP.NET Identity"))
-                {
-                    TokenLifespan = TimeSpan.FromDays(3)
-                };
+                manager.RegisterTokenProvider(
+                    TokenOptions.DefaultProvider,
+                    new OwinDataProtectorTokenProvider<T>(dataProtectionProvider.Create("ASP.NET Identity"))
+                    {
+                        TokenLifespan = TimeSpan.FromDays(3)
+                    });
             }
 
-            manager.UserLockoutEnabledByDefault = true;
-            manager.MaxFailedAccessAttemptsBeforeLockout = passwordConfig.MaxFailedAccessAttemptsBeforeLockout;
-            //NOTE: This just needs to be in the future, we currently don't support a lockout timespan, it's either they are locked
-            // or they are not locked, but this determines what is set on the account lockout date which corresponds to whether they are
-            // locked out or not.
-            manager.DefaultAccountLockoutTimeSpan = TimeSpan.FromDays(30);
-
-            //custom identity factory for creating the identity object for which we auth against in the back office
-            manager.ClaimsIdentityFactory = new BackOfficeClaimsIdentityFactory<T>();
-
-            manager.EmailService = new EmailService(
-                contentSettingsConfig.NotificationEmailAddress,
-                new EmailSender(globalSettings));
-
-            //NOTE: Not implementing these, if people need custom 2 factor auth, they'll need to implement their own UserStore to support it
-
-            //// Register two factor authentication providers. This application uses Phone and Emails as a step of receiving a code for verifying the user
-            //// You can write your own provider and plug in here.
-            //manager.RegisterTwoFactorProvider("PhoneCode", new PhoneNumberTokenProvider<ApplicationUser>
-            //{
-            //    MessageFormat = "Your security code is: {0}"
-            //});
-            //manager.RegisterTwoFactorProvider("EmailCode", new EmailTokenProvider<ApplicationUser>
-            //{
-            //    Subject = "Security Code",
-            //    BodyFormat = "Your security code is: {0}"
-            //});
-
-            //manager.SmsService = new SmsService();
+            // register ASP.NET Core Identity token providers
+            manager.RegisterTokenProvider(TokenOptions.DefaultEmailProvider, new EmailTokenProvider<T>());
+            manager.RegisterTokenProvider(TokenOptions.DefaultPhoneProvider, new PhoneNumberTokenProvider<T>());
+            manager.RegisterTokenProvider(TokenOptions.DefaultAuthenticatorProvider, new AuthenticatorTokenProvider<T>());
         }
 
         /// <summary>
@@ -221,12 +190,11 @@ namespace Umbraco.Web.Security
         /// <param name="userId"></param>
         /// <param name="sessionId"></param>
         /// <returns></returns>
-        public virtual async Task<bool> ValidateSessionIdAsync(int userId, string sessionId)
+        public virtual async Task<bool> ValidateSessionIdAsync(string userId, string sessionId)
         {
-            var userSessionStore = Store as IUserSessionStore<BackOfficeIdentityUser, int>;
+            var userSessionStore = Store as IUserSessionStore<T>;
             //if this is not set, for backwards compat (which would be super rare), we'll just approve it
-            if (userSessionStore == null)
-                return true;
+            if (userSessionStore == null)  return true;
 
             return await userSessionStore.ValidateSessionIdAsync(userId, sessionId);
         }
@@ -235,12 +203,12 @@ namespace Umbraco.Web.Security
         /// This will determine which password hasher to use based on what is defined in config
         /// </summary>
         /// <returns></returns>
-        protected virtual IPasswordHasher GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration)
+        protected virtual IPasswordHasher<T> GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration)
         {
             //we can use the user aware password hasher (which will be the default and preferred way)
-            return new UserAwarePasswordHasher(new PasswordSecurity(passwordConfiguration));
+            return new UserAwarePasswordHasher<T>(new PasswordSecurity(passwordConfiguration));
         }
-
+        
         /// <summary>
         /// Gets/sets the default back office user password checker
         /// </summary>
@@ -262,20 +230,18 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Override to check the user approval value as well as the user lock out date, by default this only checks the user's locked out date
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="user"></param>
         /// <returns></returns>
         /// <remarks>
         /// In the ASP.NET Identity world, there is only one value for being locked out, in Umbraco we have 2 so when checking this for Umbraco we need to check both values
         /// </remarks>
-        public override async Task<bool> IsLockedOutAsync(int userId)
+        public override async Task<bool> IsLockedOutAsync(T user)
         {
-            var user = await FindByIdAsync(userId);
-            if (user == null)
-                throw new InvalidOperationException("No user found by id " + userId);
-            if (user.IsApproved == false)
-                return true;
+            if (user == null) throw new ArgumentNullException(nameof(user));
 
-            return await base.IsLockedOutAsync(userId);
+            if (user.IsApproved == false)  return true;
+
+            return await base.IsLockedOutAsync(user);
         }
 
         #region Overrides for password logic
@@ -325,13 +291,7 @@ namespace Umbraco.Web.Security
             //use the default behavior
             return await base.CheckPasswordAsync(user, password);
         }
-
-        public override Task<IdentityResult> ResetPasswordAsync(int userId, string token, string newPassword)
-        {
-            var result = base.ResetPasswordAsync(userId, token, newPassword);
-            return result;
-        }
-
+        
         /// <summary>
         /// This is a special method that will reset the password but will raise the Password Changed event instead of the reset event
         /// </summary>
@@ -343,65 +303,53 @@ namespace Umbraco.Web.Security
         /// We use this because in the back office the only way an admin can change another user's password without first knowing their password
         /// is to generate a token and reset it, however, when we do this we want to track a password change, not a password reset
         /// </remarks>
-        public Task<IdentityResult> ChangePasswordWithResetAsync(int userId, string token, string newPassword)
+        public async Task<IdentityResult> ChangePasswordWithResetAsync(int userId, string token, string newPassword)
         {
-            var result = base.ResetPasswordAsync(userId, token, newPassword);
-            if (result.Result.Succeeded)
-                RaisePasswordChangedEvent(userId);
+            var user = await base.FindByIdAsync(userId.ToString());
+            if (user == null) throw new InvalidOperationException("Could not find user");
+
+            var result = await base.ResetPasswordAsync(user, token, newPassword);
+            if (result.Succeeded) RaisePasswordChangedEvent(userId);
             return result;
         }
 
-        public override Task<IdentityResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+        public override async Task<IdentityResult> ChangePasswordAsync(T user, string currentPassword, string newPassword)
         {
-            var result = base.ChangePasswordAsync(userId, currentPassword, newPassword);
-            if (result.Result.Succeeded)
-                RaisePasswordChangedEvent(userId);
+            var result = await base.ChangePasswordAsync(user, currentPassword, newPassword);
+            if (result.Succeeded) RaisePasswordChangedEvent(user.Id);
             return result;
         }
-
+        
         /// <summary>
         /// Override to determine how to hash the password
         /// </summary>
-        /// <param name="store"></param>
-        /// <param name="user"></param>
-        /// <param name="password"></param>
-        /// <returns></returns>
-        protected override async Task<bool> VerifyPasswordAsync(IUserPasswordStore<T, int> store, T user, string password)
-        {
-            var userAwarePasswordHasher = PasswordHasher as IUserAwarePasswordHasher<BackOfficeIdentityUser, int>;
-            if (userAwarePasswordHasher == null)
-                return await base.VerifyPasswordAsync(store, user, password);
-
-            var hash = await store.GetPasswordHashAsync(user);
-            return userAwarePasswordHasher.VerifyHashedPassword(user, hash, password) != PasswordVerificationResult.Failed;
-        }
-
-        /// <summary>
-        /// Override to determine how to hash the password
-        /// </summary>
-        /// <param name="passwordStore"></param>
         /// <param name="user"></param>
         /// <param name="newPassword"></param>
+        /// <param name="validatePassword"></param>
         /// <returns></returns>
         /// <remarks>
         /// This method is called anytime the password needs to be hashed for storage (i.e. including when reset password is used)
         /// </remarks>
-        protected override async Task<IdentityResult> UpdatePassword(IUserPasswordStore<T, int> passwordStore, T user, string newPassword)
+        protected override async Task<IdentityResult> UpdatePasswordHash(T user, string newPassword, bool validatePassword)
         {
             user.LastPasswordChangeDateUtc = DateTime.UtcNow;
-            var userAwarePasswordHasher = PasswordHasher as IUserAwarePasswordHasher<BackOfficeIdentityUser, int>;
-            if (userAwarePasswordHasher == null)
-                return await base.UpdatePassword(passwordStore, user, newPassword);
 
-            var result = await PasswordValidator.ValidateAsync(newPassword);
-            if (result.Succeeded == false)
-                return result;
+            if (validatePassword)
+            {
+                var validate = await ValidatePasswordAsync(user, newPassword);
+                if (!validate.Succeeded)
+                {
+                    return validate;
+                }
+            }
 
-            await passwordStore.SetPasswordHashAsync(user, userAwarePasswordHasher.HashPassword(user, newPassword));
+            var passwordStore = Store as IUserPasswordStore<T>;
+            if (passwordStore == null) throw new NotSupportedException("The current user store does not implement " + typeof(IUserPasswordStore<>));
+
+            var hash = newPassword != null ? PasswordHasher.HashPassword(user, newPassword) : null;
+            await passwordStore.SetPasswordHashAsync(user, hash, CancellationToken);
             await UpdateSecurityStampInternal(user);
             return IdentityResult.Success;
-
-
         }
 
         /// <summary>
@@ -409,22 +357,20 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        private async Task UpdateSecurityStampInternal(BackOfficeIdentityUser user)
+        private async Task UpdateSecurityStampInternal(T user)
         {
-            if (SupportsUserSecurityStamp == false)
-                return;
-            await GetSecurityStore().SetSecurityStampAsync(user, NewSecurityStamp());
+            if (SupportsUserSecurityStamp == false) return;
+            await GetSecurityStore().SetSecurityStampAsync(user, NewSecurityStamp(), CancellationToken.None);
         }
 
         /// <summary>
         /// This is copied from the underlying .NET base class since they decided to not expose it
         /// </summary>
         /// <returns></returns>
-        private IUserSecurityStampStore<BackOfficeIdentityUser, int> GetSecurityStore()
+        private IUserSecurityStampStore<T> GetSecurityStore()
         {
-            var store = Store as IUserSecurityStampStore<BackOfficeIdentityUser, int>;
-            if (store == null)
-                throw new NotSupportedException("The current user store does not implement " + typeof(IUserSecurityStampStore<>));
+            var store = Store as IUserSecurityStampStore<T>;
+            if (store == null) throw new NotSupportedException("The current user store does not implement " + typeof(IUserSecurityStampStore<>));
             return store;
         }
 
@@ -439,68 +385,66 @@ namespace Umbraco.Web.Security
 
         #endregion
 
-        public override async Task<IdentityResult> SetLockoutEndDateAsync(int userId, DateTimeOffset lockoutEnd)
+        public override async Task<IdentityResult> SetLockoutEndDateAsync(T user, DateTimeOffset? lockoutEnd)
         {
-            var result = await base.SetLockoutEndDateAsync(userId, lockoutEnd);
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
+            var result = await base.SetLockoutEndDateAsync(user, lockoutEnd);
 
             // The way we unlock is by setting the lockoutEnd date to the current datetime
             if (result.Succeeded && lockoutEnd >= DateTimeOffset.UtcNow)
             {
-                RaiseAccountLockedEvent(userId);
+                RaiseAccountLockedEvent(user.Id);
             }
             else
             {
-                RaiseAccountUnlockedEvent(userId);
+                RaiseAccountUnlockedEvent(user.Id);
                 //Resets the login attempt fails back to 0 when unlock is clicked
-                await ResetAccessFailedCountAsync(userId);
-
+                await ResetAccessFailedCountAsync(user);
             }
 
             return result;
         }
 
-        public override async Task<IdentityResult> ResetAccessFailedCountAsync(int userId)
+        public override async Task<IdentityResult> ResetAccessFailedCountAsync(T user)
         {
-            var lockoutStore = (IUserLockoutStore<BackOfficeIdentityUser, int>)Store;
-            var user = await FindByIdAsync(userId);
-            if (user == null)
-                throw new InvalidOperationException("No user found by user id " + userId);
+            if (user == null) throw new ArgumentNullException(nameof(user));
 
-            var accessFailedCount = await GetAccessFailedCountAsync(user.Id);
+            var lockoutStore = (IUserLockoutStore<T>)Store;
+            var accessFailedCount = await GetAccessFailedCountAsync(user);
 
             if (accessFailedCount == 0)
                 return IdentityResult.Success;
 
-            await lockoutStore.ResetAccessFailedCountAsync(user);
+            await lockoutStore.ResetAccessFailedCountAsync(user, CancellationToken.None);
             //raise the event now that it's reset
-            RaiseResetAccessFailedCountEvent(userId);
+            RaiseResetAccessFailedCountEvent(user.Id);
             return await UpdateAsync(user);
         }
-
-
 
         /// <summary>
         /// Overrides the Microsoft ASP.NET user management method
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="user"></param>
         /// <returns>
-        /// returns a Async Task<IdentityResult>
+        /// returns a Async Task<IdentityResult />
         /// </returns>
         /// <remarks>
         /// Doesn't set fail attempts back to 0
         /// </remarks>
-        public override async Task<IdentityResult> AccessFailedAsync(int userId)
+        public override async Task<IdentityResult> AccessFailedAsync(T user)
         {
-            var lockoutStore = (IUserLockoutStore<BackOfficeIdentityUser, int>)Store;
-            var user = await FindByIdAsync(userId);
-            if (user == null)
-                throw new InvalidOperationException("No user found by user id " + userId);
+            if (user == null) throw new ArgumentNullException(nameof(user));
 
-            var count = await lockoutStore.IncrementAccessFailedCountAsync(user);
+            var lockoutStore = Store as IUserLockoutStore<T>;
+            if (lockoutStore == null) throw new NotSupportedException("The current user store does not implement " + typeof(IUserLockoutStore<>));
 
-            if (count >= MaxFailedAccessAttemptsBeforeLockout)
+            var count = await lockoutStore.IncrementAccessFailedCountAsync(user, CancellationToken.None);
+
+            if (count >= Options.Lockout.MaxFailedAccessAttempts)
             {
-                await lockoutStore.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.Add(DefaultAccountLockoutTimeSpan));
+                await lockoutStore.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.Add(Options.Lockout.DefaultLockoutTimeSpan),
+                    CancellationToken.None);
                 //NOTE: in normal aspnet identity this would do set the number of failed attempts back to 0
                 //here we are persisting the value for the back office
             }
@@ -508,8 +452,7 @@ namespace Umbraco.Web.Security
             var result = await UpdateAsync(user);
 
             //Slightly confusing: this will return a Success if we successfully update the AccessFailed count
-            if (result.Succeeded)
-                RaiseLoginFailedEvent(userId);
+            if (result.Succeeded) RaiseLoginFailedEvent(user.Id);
 
             return result;
         }
@@ -635,7 +578,5 @@ namespace Umbraco.Web.Security
         {
             if (ResetAccessFailedCount != null) ResetAccessFailedCount(this, e);
         }
-
     }
-
 }
