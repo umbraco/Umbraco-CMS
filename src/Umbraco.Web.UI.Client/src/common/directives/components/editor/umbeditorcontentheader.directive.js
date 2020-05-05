@@ -47,10 +47,18 @@
             scope.vm.defaultVariant = null;
             scope.vm.errorsOnOtherVariants = false;// indicating wether to show that other variants, than the current, have errors.
             
+            function updateVaraintErrors() {
+                scope.content.variants.forEach( function (variant) {
+                    variant.hasError = scope.variantHasError(variant);
+                    
+                });
+                checkErrorsOnOtherVariants();
+            }
+
             function checkErrorsOnOtherVariants() {
                 var check = false;
                 scope.content.variants.forEach( function (variant) {
-                    if (variant.active !== true && scope.variantHasError(variant)) {
+                    if (variant.active !== true && variant.hasError) {
                         check = true;
                     }
                 });
@@ -58,6 +66,19 @@
             }
             
             function onVariantValidation(valid, errors, allErrors, culture, segment) {
+
+                // only want to react to property errors:
+            if(errors.findIndex(error => {console.log("reject this", error, error.propertyAlias !== null); return error.propertyAlias !== null;}) === -1) {
+                    console.log("rejected", errors)
+                    // we dont have any errors for properties, meaning we will back out.
+                    return;
+                }
+
+                // If error coming back is invariant, we will assign the error to the default variant by picking the defaultVariant language.
+                if(culture === "invariant") {
+                    culture = scope.vm.defaultVariant.language.culture;
+                }
+
                 var index = scope.vm.variantsWithError.findIndex((item) => item.culture === culture && item.segment === segment)
                 if(valid === true) {
                     if (index !== -1) {
@@ -68,7 +89,7 @@
                         scope.vm.variantsWithError.push({"culture": culture, "segment": segment});
                     }
                 }
-                checkErrorsOnOtherVariants();
+                scope.$evalAsync(updateVaraintErrors);
             }
             
             function onInit() {
@@ -88,8 +109,8 @@
 
                 scope.vm.hasVariants = (scope.vm.hasCulture || scope.vm.hasSegments);
                 scope.vm.hasSubVariants = (scope.vm.hasCulture && scope.vm.hasSegments);
-                
-                checkErrorsOnOtherVariants();
+
+                updateVaraintErrors();
 
                 scope.vm.variantMenu = [];
                 if (scope.vm.hasCulture) {
@@ -112,21 +133,21 @@
                         });
                     });
                 }
-
-                
+ 
                 scope.editor.variantApps.forEach( (app) => {
                     if (app.alias === "umbContent") {
                         app.anchors = scope.editor.content.tabs;
                     }
                 });
-                
+
                 scope.content.variants.forEach( function (variant) {
+                    
+                    // if we are looking for the variant with default language then we also want to check for invariant variant.
+                    if (variant.language && variant.language.culture === scope.vm.defaultVariant.language.culture && variant.segment === null) {
+                        unsubscribe.push(serverValidationManager.subscribe(null, "invariant", null, onVariantValidation, null));
+                    }
                     unsubscribe.push(serverValidationManager.subscribe(null, variant.language !== null ? variant.language.culture : null, null, onVariantValidation, variant.segment));
                 });
-                
-                unsubscribe.push(serverValidationManager.subscribe(null, null, null, onVariantValidation, null));
-                
-                
                 
             }
 
@@ -174,14 +195,6 @@
              * @param {any} culture
              */
             scope.variantHasError = function(variant) {
-                if(variant.language) {
-                    // if we are looking for the variant with default language then we also want to check for invariant variant.
-                    if (variant.language.culture === scope.vm.defaultVariant.language.culture && variant.segment === null) {
-                        if(scope.vm.variantsWithError.find((item) => item.culture === "invariant" && item.segment === null) !== undefined) {
-                            return true;
-                        }
-                    }
-                }
                 if(scope.vm.variantsWithError.find((item) => (!variant.language || item.culture === variant.language.culture) && item.segment === variant.segment) !== undefined) {
                     return true;
                 }
