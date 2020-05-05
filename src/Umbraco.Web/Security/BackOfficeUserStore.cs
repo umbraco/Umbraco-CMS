@@ -66,7 +66,7 @@ namespace Umbraco.Web.Security
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException(nameof(user));
-            
+
             return Task.FromResult(user.Id.ToString());
         }
 
@@ -152,7 +152,7 @@ namespace Umbraco.Web.Security
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException(nameof(user));
-            
+
             var found = _userService.GetUserById(user.Id);
             if (found != null)
             {
@@ -184,7 +184,7 @@ namespace Umbraco.Web.Security
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException(nameof(user));
-            
+
             var found = _userService.GetUserById(user.Id);
             if (found != null)
             {
@@ -293,7 +293,7 @@ namespace Umbraco.Web.Security
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException(nameof(user));
-            // if (email.IsNullOrWhiteSpace()) throw new ArgumentNullException("email");
+            if (email.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(email));
 
             user.Email = email;
 
@@ -540,9 +540,24 @@ namespace Umbraco.Web.Security
             return Task.FromResult(user.Roles.Select(x => x.RoleId).InvariantContains(normalizedRoleName));
         }
 
-        public Task<IList<BackOfficeIdentityUser>> GetUsersInRoleAsync(string normalizedRoleName, CancellationToken cancellationToken)
+        /// <summary>
+        /// Lists all users of a given role.
+        /// </summary>
+        /// <remarks>
+        ///     Identity Role names are equal to Umbraco UserGroup alias.
+        /// </remarks>
+        public Task<IList<BackOfficeIdentityUser>> GetUsersInRoleAsync(string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
         {
-            throw new NotImplementedException();
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+            if (normalizedRoleName == null) throw new ArgumentNullException(nameof(normalizedRoleName));
+
+            var userGroup =  _userService.GetUserGroupByAlias(normalizedRoleName);
+
+            var users = _userService.GetAllInGroup(userGroup.Id);
+            IList<BackOfficeIdentityUser> backOfficeIdentityUsers = users.Select(x => _mapper.Map<BackOfficeIdentityUser>(x)).ToList();
+
+            return Task.FromResult(backOfficeIdentityUsers);
         }
 
         /// <summary>
@@ -875,7 +890,7 @@ namespace Umbraco.Web.Security
 
             return anythingChanged;
         }
-        
+
         private void ThrowIfDisposed()
         {
             if (_disposed) throw new ObjectDisposedException(GetType().Name);
@@ -891,7 +906,7 @@ namespace Umbraco.Web.Security
 
             return Task.FromResult(false);
         }
-        
+
         private static int UserIdToInt(string userId)
         {
             var attempt = userId.TryConvertTo<int>();

@@ -56,6 +56,11 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 throw new InvalidOperationException("Could not find the super user!");
             }
+            admin.Email = user.Email.Trim();
+            admin.Name = user.Name.Trim();
+            admin.Username = user.Email.Trim();
+
+            _userService.Save(admin);
 
             var userManager = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().GetBackOfficeUserManager();
             var membershipUser = await userManager.FindByIdAsync(Constants.Security.SuperUserId.ToString());
@@ -74,11 +79,7 @@ namespace Umbraco.Web.Install.InstallSteps
             if (!resetResult.Succeeded)
                 throw new InvalidOperationException("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));
 
-            admin.Email = user.Email.Trim();
-            admin.Name = user.Name.Trim();
-            admin.Username = user.Email.Trim();
 
-            _userService.Save(admin);
 
             if (user.SubscribeToNewsLetter)
             {
