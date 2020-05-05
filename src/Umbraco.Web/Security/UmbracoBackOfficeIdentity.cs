@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using Microsoft.AspNet.Identity;
+using Umbraco.Web;
 
 namespace Umbraco.Core.Security
 {
@@ -117,7 +117,7 @@ namespace Umbraco.Core.Security
             Constants.Security.StartMediaNodeIdClaimType,
             ClaimTypes.Locality,
             Constants.Security.SessionIdClaimType,
-            Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType
+            Constants.Web.SecurityStampClaimType
         };
 
         /// <summary>
@@ -161,8 +161,8 @@ namespace Umbraco.Core.Security
 
             //The security stamp claim is also required... this is because this claim type is hard coded
             // by the SecurityStampValidator, see: https://katanaproject.codeplex.com/workitem/444
-            if (HasClaim(x => x.Type == Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType) == false)
-                AddClaim(new Claim(Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType, securityStamp, ClaimValueTypes.String, Issuer, Issuer, this));
+            if (HasClaim(x => x.Type == Constants.Web.SecurityStampClaimType) == false)
+                AddClaim(new Claim(Constants.Web.SecurityStampClaimType, securityStamp, ClaimValueTypes.String, Issuer, Issuer, this));
 
             //Add each app as a separate claim
             if (HasClaim(x => x.Type == Constants.Security.AllowedApplicationsClaimType) == false && allowedApps != null)
@@ -208,7 +208,7 @@ namespace Umbraco.Core.Security
 
         public string RealName => this.FindFirstValue(ClaimTypes.GivenName);
 
-        public string Username => this.GetUserName();
+        public string Username => this.FindFirstValue(ClaimTypes.Name);
 
         public string Culture => this.FindFirstValue(ClaimTypes.Locality);
 
@@ -224,7 +224,7 @@ namespace Umbraco.Core.Security
             }
         }
 
-        public string SecurityStamp => this.FindFirstValue(Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType);
+        public string SecurityStamp => this.FindFirstValue(Constants.Web.SecurityStampClaimType);
 
         public string[] Roles => this.FindAll(x => x.Type == DefaultRoleClaimType).Select(role => role.Value).ToArray();
 

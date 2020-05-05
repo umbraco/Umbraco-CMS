@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.AspNet.Identity;
 using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Web.Models.Identity
@@ -13,7 +12,7 @@ namespace Umbraco.Web.Models.Identity
     /// This class normally exists inside of the EntityFramework library, not sure why MS chose to explicitly put it there but we don't want
     /// references to that so we will create our own here
     /// </remarks>
-    public class IdentityUser<TKey, TLogin, TRole, TClaim> : IUser<TKey>
+    public class IdentityUser<TKey, TLogin, TRole, TClaim>
         where TLogin : IIdentityUserLogin
         //NOTE: Making our role id a string
         where TRole : IdentityUserRole<string>

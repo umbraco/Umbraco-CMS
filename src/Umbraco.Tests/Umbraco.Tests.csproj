@@ -124,6 +124,7 @@
     <Compile Include="Configurations\GlobalSettingsTests.cs" />
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
+    <Compile Include="CoreThings\ClaimsIdentityExtensionsTests.cs" />
     <Compile Include="CoreThings\EnumExtensionsTests.cs" />
     <Compile Include="CoreThings\GuidUtilsTests.cs" />
     <Compile Include="CoreThings\HexEncoderTests.cs" />
@@ -145,7 +146,13 @@
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />
+    <Compile Include="Security\AuthenticationExtensionsTests.cs" />
+    <Compile Include="Security\BackOfficeClaimsPrincipalFactoryTests.cs" />
     <Compile Include="Persistence\Repositories\KeyValueRepositoryTests.cs" />
+    <Compile Include="Security\BackOfficeUserManagerTests.cs" />
+    <Compile Include="Security\NopLookupNormalizerTests.cs" />
+    <Compile Include="Security\OwinDataProtectorTokenProviderTests.cs" />
+    <Compile Include="Security\UmbracoSecurityStampValidatorTests.cs" />
     <Compile Include="Services\KeyValueServiceTests.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="UmbracoExamine\ExamineExtensions.cs" />

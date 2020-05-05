@@ -21,6 +21,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.WebAssets;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Editors
 {
