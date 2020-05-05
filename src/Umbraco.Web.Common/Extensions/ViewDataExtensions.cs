@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Semver;
 
 
 namespace Umbraco.Web
@@ -9,6 +10,7 @@ namespace Umbraco.Web
         public const string TokenUmbracoPath = "UmbracoPath";
         public const string TokenInstallApiBaseUrl = "InstallApiBaseUrl";
         public const string TokenUmbracoBaseFolder = "UmbracoBaseFolder";
+        public const string TokenUmbracoVersion = "UmbracoVersion";
         public const string TokenExternalSignInError = "ExternalSignInError";
         public const string TokenPasswordResetCode = "PasswordResetCode";
 
@@ -47,6 +49,15 @@ namespace Umbraco.Web
         public static void SetUmbracoBaseFolder(this ViewDataDictionary viewData, string value)
         {
             viewData[TokenUmbracoBaseFolder] = value;
+        }
+        public static void SetUmbracoVersion(this ViewDataDictionary viewData, SemVersion version)
+        {
+            viewData[TokenUmbracoVersion] = version;
+        }
+
+        public static SemVersion GetUmbracoVersion(this ViewDataDictionary viewData)
+        {
+            return (SemVersion) viewData[TokenUmbracoVersion];
         }
 
         public static IEnumerable<string> GetExternalSignInError(this ViewDataDictionary viewData)

@@ -237,7 +237,7 @@ angular.module("umbraco.install").factory('installerService', function ($rootSco
 			service.status.feedback = getDescriptionForStepAtIndex(service.status.steps, 0);
 			service.status.progress = 0;
 
-			function processInstallStep(retry) {
+			function processInstallStep() {
 
                 $http.post(Umbraco.Sys.ServerVariables.installApiBaseUrl + "PostPerformInstall", _installerModel)
                     .then(function (response) {

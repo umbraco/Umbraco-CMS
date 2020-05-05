@@ -24,6 +24,7 @@ namespace Umbraco.Web.Common.Install
         private readonly IRuntimeState _runtime;
         private readonly IGlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IUmbracoVersion _umbracoVersion;
         private readonly IRuntimeMinifier _runtimeMinifier;
 
         public InstallController(
@@ -32,7 +33,8 @@ namespace Umbraco.Web.Common.Install
             IRuntimeState runtime,
             IGlobalSettings globalSettings,
             IRuntimeMinifier runtimeMinifier,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            IUmbracoVersion umbracoVersion)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _installHelper = installHelper;
@@ -40,6 +42,7 @@ namespace Umbraco.Web.Common.Install
             _globalSettings = globalSettings;
             _runtimeMinifier = runtimeMinifier;
             _hostingEnvironment = hostingEnvironment;
+            _umbracoVersion = umbracoVersion;
         }
 
         [HttpGet]
@@ -64,11 +67,13 @@ namespace Umbraco.Web.Common.Install
                 }
             }
 
-            // gen the install base url
+            // gen the install base urlAddUmbracoCore
             ViewData.SetInstallApiBaseUrl(Url.GetUmbracoApiService("GetSetup", "InstallApi", "UmbracoInstall").TrimEnd("GetSetup"));
 
             // get the base umbraco folder
             ViewData.SetUmbracoBaseFolder(_hostingEnvironment.ToAbsolute(_globalSettings.UmbracoPath));
+
+            ViewData.SetUmbracoVersion(_umbracoVersion.SemanticVersion);
 
             _installHelper.InstallStatus(false, "");
 

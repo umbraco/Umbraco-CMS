@@ -5,7 +5,7 @@
  *
  * @description
  * The controller for the doc type creation dialog
- */
+ */Umbraco.Sys.ServerVariables
 function DocumentTypesCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState, notificationsService, localizationService, iconHelper) {
 
     $scope.model = {

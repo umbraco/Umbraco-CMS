@@ -27,6 +27,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
+            //TODO: This needs to be reintroduced, when users are compatible with ASP.NET Core Identity.
             // var security = _umbracoContextAccessor.GetRequiredUmbracoContext().Security;
             // if (security.IsAuthenticated() == false && _globalSettings.ConfigurationStatus.IsNullOrWhiteSpace())
             // {

@@ -1,4 +1,5 @@
 ﻿@using Umbraco.Web
+@using Umbraco.Composing
 @{
     Layout = null;
 }
@@ -67,7 +68,10 @@
         Umbraco.Sys = {};
         Umbraco.Sys.ServerVariables = {
             "installApiBaseUrl": "@ViewData.GetInstallApiBaseUrl()",
-            "umbracoBaseUrl": "@ViewData.GetUmbracoBaseFolder()"
+            "umbracoBaseUrl": "@ViewData.GetUmbracoBaseFolder()",
+            "application": {
+               version: "@ViewData.GetUmbracoVersion().Major"
+           }
         };
     </script>
     <script src="lib/lazyload-js/lazyload.min.js"></script>

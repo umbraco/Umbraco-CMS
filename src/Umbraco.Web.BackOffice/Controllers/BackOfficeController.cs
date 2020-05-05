@@ -28,7 +28,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         // GET
         public IActionResult Index()
         {
-            _umbracoApplicationLifetime.Restart(); //TODO remove
             return View();
         }
 

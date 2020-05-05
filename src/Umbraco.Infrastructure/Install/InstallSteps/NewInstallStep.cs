@@ -59,7 +59,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             _userService.Save(admin);
 
-            //TODO: This needs to be reintroduced, when members are compatible with ASP.NET Core Identity.
+            //TODO: This needs to be reintroduced, when users are compatible with ASP.NET Core Identity.
             // var userManager = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().GetBackOfficeUserManager();
             // var membershipUser = await userManager.FindByIdAsync(Constants.Security.SuperUserId.ToString());
             // if (membershipUser == null)

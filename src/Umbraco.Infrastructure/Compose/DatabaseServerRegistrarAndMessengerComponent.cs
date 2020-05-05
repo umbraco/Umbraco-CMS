@@ -164,7 +164,7 @@ namespace Umbraco.Web.Compose
             // only perform this one time ever
             LazyInitializer.EnsureInitialized(ref _tasks, ref _started, ref _locker, () =>
             {
-                var serverAddress = _runtime.ApplicationUrl?.ToString();
+                var serverAddress = _runtime.ApplicationUrl.ToString();
 
                 return new[]
                 {
