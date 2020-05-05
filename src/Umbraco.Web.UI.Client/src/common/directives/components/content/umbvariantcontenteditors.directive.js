@@ -119,7 +119,7 @@
 
             if (vm.editors[index]) {
                 if (vm.editors[index].content === variant) {
-                    console.error("This editor is already in this place.");
+                    // This variant is already the content of the editor in this index.
                     return;
                 }
                 vm.editors[index].content.active = false;
