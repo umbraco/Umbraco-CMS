@@ -356,7 +356,7 @@ function serverValidationManager($timeout) {
             var cbs = this.getFieldCallbacks(fieldName);
             //call each callback for this error
             for (var cb in cbs) {
-                executeCallback(this, errorsForCallback, cbs[cb].callback, null);
+                executeCallback(this, errorsForCallback, cbs[cb].callback, null, null);
             }
         },
 
@@ -456,7 +456,10 @@ function serverValidationManager($timeout) {
                 callbacks[cb].callback.apply(this, [
                         true,       //pass in a value indicating it is VALID
                         [],         //pass in empty collection
-                        []]);       //pass in empty collection
+                        [],
+                        null,
+                        null]
+                    );
             }
         },
         

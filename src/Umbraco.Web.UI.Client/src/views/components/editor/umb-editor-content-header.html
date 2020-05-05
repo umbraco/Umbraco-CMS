@@ -53,7 +53,7 @@
                         <umb-dropdown-item
                             ng-repeat-start="entry in vm.variantMenu track by entry.key"
                             class="umb-variant-switcher__item"
-                            ng-class="{'--current': entry.variant === editor.content, '--active': entry.variant.active && vm.dropdownOpen, '--error': variantHasError(entry.variant), '--state-notCreated':entry.variant.state==='NotCreated' && entry.variant.name == null, '--state-draft':entry.variant.state==='Draft' || (entry.variant.state==='NotCreated' && entry.variant.name != null)}"
+                            ng-class="{'--current': entry.variant === editor.content, '--active': entry.variant.active && vm.dropdownOpen, '--error': entry.variant.active !== true && entry.variant.hasError, '--state-notCreated':entry.variant.state==='NotCreated' && entry.variant.name == null, '--state-draft':entry.variant.state==='Draft' || (entry.variant.state==='NotCreated' && entry.variant.name != null)}"
                         >
                             <button type="button" ng-if="entry.subVariants && entry.subVariants.length > 0" class="umb-variant-switcher__item-expand-button umb-outline" ng-click="entry.open = !entry.open">
                                 <i class="icon icon-navigation-down" ng-if="entry.open"></i>
@@ -73,7 +73,7 @@
                             <umb-dropdown-item
                                 ng-repeat="subVariant in entry.subVariants track by $index"
                                 class="umb-variant-switcher__item"
-                                ng-class="{'--current': subVariant === editor.content, '--active': subVariant.active && vm.dropdownOpen, '--error': variantHasError(subVariant), '--state-notCreated':subVariant.state==='NotCreated', '--state-draft':subVariant.state==='Draft'}"
+                                ng-class="{'--current': subVariant === editor.content, '--active': subVariant.active && vm.dropdownOpen, '--error': subVariant.active !== true && subVariant.hasError, '--state-notCreated':subVariant.state==='NotCreated', '--state-draft':subVariant.state==='Draft'}"
                             >
                                 <button type="button" class="umb-variant-switcher__name-wrapper umb-outline" ng-click="selectVariant($event, subVariant)" prevent-default>
                                     <span class="umb-variant-switcher__name" ng-bind="subVariant.segment"></span>
