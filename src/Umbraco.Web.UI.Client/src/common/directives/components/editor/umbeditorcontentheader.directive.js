@@ -68,8 +68,7 @@
             function onVariantValidation(valid, errors, allErrors, culture, segment) {
 
                 // only want to react to property errors:
-            if(errors.findIndex(error => {console.log("reject this", error, error.propertyAlias !== null); return error.propertyAlias !== null;}) === -1) {
-                    console.log("rejected", errors)
+            if(errors.findIndex(error => {return error.propertyAlias !== null;}) === -1) {
                     // we dont have any errors for properties, meaning we will back out.
                     return;
                 }
