@@ -38,7 +38,8 @@ function valPropertyMsg(serverValidationManager, localizationService) {
             var currentProperty = umbPropCtrl.property;
             scope.currentProperty = currentProperty;
 
-            var currentCulture = currentProperty.culture;         
+            var currentCulture = currentProperty.culture;
+            var currentSegment = currentProperty.segment;     
             
             // validation object won't exist when editor loads outside the content form (ie in settings section when modifying a content type)
             var isMandatory = currentProperty.validation ? currentProperty.validation.mandatory : undefined;
@@ -54,7 +55,7 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                 var currentVariant = umbVariantCtrl.editor.content;
 
                 // Lets check if we have variants and we are on the default language then ...
-                if (umbVariantCtrl.content.variants.length > 1 && !currentVariant.language.isDefault && !currentCulture && !currentProperty.unlockInvariantValue) {
+                if (umbVariantCtrl.content.variants.length > 1 && (!currentVariant.language || !currentVariant.language.isDefault) && !currentCulture && !currentSegment && !currentProperty.unlockInvariantValue) {
                     //This property is locked cause its a invariant property shown on a non-default language.
                     //Therefor do not validate this field.
                     return;
@@ -70,7 +71,7 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                 //this can be null if no property was assigned
                 if (scope.currentProperty) {
                     //first try to get the error msg from the server collection
-                    var err = serverValidationManager.getPropertyError(scope.currentProperty.alias, null, "");
+                    var err = serverValidationManager.getPropertyError(scope.currentProperty.alias, null, "", null);
                     //if there's an error message use it
                     if (err && err.errorMsg) {
                         return err.errorMsg;
@@ -221,25 +222,31 @@ function valPropertyMsg(serverValidationManager, localizationService) {
             // the correct field validation in their property editors.
 
             if (scope.currentProperty) { //this can be null if no property was assigned
+
+                function serverValidationManagerCallback(isValid, propertyErrors, allErrors) {
+                    hasError = !isValid;
+                    if (hasError) {
+                        //set the error message to the server message
+                        scope.errorMsg = propertyErrors[0].errorMsg;
+                        //flag that the current validator is invalid
+                        formCtrl.$setValidity('valPropertyMsg', false);
+                        startWatch();
+                    }
+                    else {
+                        scope.errorMsg = "";
+                        //flag that the current validator is valid
+                        formCtrl.$setValidity('valPropertyMsg', true);
+                        stopWatch();
+                    }
+                }
+
                 unsubscribe.push(serverValidationManager.subscribe(scope.currentProperty.alias,
                     currentCulture,
                     "",
-                    function(isValid, propertyErrors, allErrors) {
-                        hasError = !isValid;
-                        if (hasError) {
-                            //set the error message to the server message
-                            scope.errorMsg = propertyErrors[0].errorMsg;
-                            //flag that the current validator is invalid
-                            formCtrl.$setValidity('valPropertyMsg', false);
-                            startWatch();
-                        }
-                        else {
-                            scope.errorMsg = "";
-                            //flag that the current validator is valid
-                            formCtrl.$setValidity('valPropertyMsg', true);
-                            stopWatch();
-                        }
-                    }));
+                    serverValidationManagerCallback,
+                    currentSegment
+                    )
+                );
 
             }
 

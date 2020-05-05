@@ -159,8 +159,15 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                 //the alias in model state can be in dot notation which indicates
                 // * the first part is the content property alias
                 // * the second part is the field to which the valiation msg is associated with
-                //There will always be at least 3 parts for content properties since all model errors for properties are prefixed with "_Properties"
+                //There will always be at least 4 parts for content properties since all model errors for properties are prefixed with "_Properties"
                 //If it is not prefixed with "_Properties" that means the error is for a field of the object directly.
+
+                // Example: "_Properties.headerImage.en-US.mySegment.myField"
+                // * it's for a property since it has a _Properties prefix
+                // * it's for the headerImage property type
+                // * it's for the en-US culture
+                // * it's for the mySegment segment
+                // * it's for the myField html field (optional)
 
                 var parts = e.split(".");
 
@@ -179,15 +186,22 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                         }
                     }
 
-                    //if it contains 3 '.' then we will wire it up to a property's html field
+                    var segment = null;
                     if (parts.length > 3) {
-                        //add an error with a reference to the field for which the validation belongs too
-                        serverValidationManager.addPropertyError(propertyAlias, culture, parts[3], modelState[e][0]);
+                        segment = parts[3];
+                        //special check in case the string is formatted this way
+                        if (segment === "null") {
+                            segment = null;
+                        }
                     }
-                    else {
-                        //add a generic error for the property, no reference to a specific html field
-                        serverValidationManager.addPropertyError(propertyAlias, culture, "", modelState[e][0]);
+
+                    var htmlFieldReference = "";
+                    if (parts.length > 4) {
+                        htmlFieldReference = parts[4] || "";
                     }
+
+                    // add a generic error for the property
+                    serverValidationManager.addPropertyError(propertyAlias, culture, htmlFieldReference, modelState[e][0], segment);
 
                 } else {
 

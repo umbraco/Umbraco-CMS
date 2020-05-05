@@ -37,7 +37,7 @@
         <localize key="contentTypeEditor_noGroups"></localize>
     </div>
 
-    <a ng-if="!sortingMode" hotkey="alt+shift+p" ng-click="addPropertyToActiveGroup()"></a>    
+    <a ng-if="!sortingMode" hotkey="alt+shift+p" ng-click="addPropertyToActiveGroup()"></a>
 
     <ul class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
 
@@ -215,7 +215,12 @@
 
                                     <div class="umb-group-builder__property-tag -white" ng-if="property.allowCultureVariant">
                                         <i class="icon-shuffle umb-group-builder__property-tag-icon"></i>
-                                        <localize key="contentTypeEditor_variantsHeading"></localize>
+                                        <localize key="contentTypeEditor_cultureVariantLabel"></localize>
+                                    </div>
+
+                                    <div class="umb-group-builder__property-tag -white" ng-if="property.allowSegmentVariant">
+                                        <i class="icon-shuffle umb-group-builder__property-tag-icon"></i>
+                                        <localize key="contentTypeEditor_segmentVariantLabel"></localize>
                                     </div>
 
                                 </div>
