@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Web
 
             //even though there are 2 errors, they are both for en-US since that is the default language and one of the errors is for an invariant property
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("en-US", result[0]);
+            Assert.AreEqual("en-US", result[0].culture);
 
             ms = new ModelStateDictionary();
             ms.AddVariantValidationError("en-US", null, "generic culture error");
