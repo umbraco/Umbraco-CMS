@@ -9,6 +9,7 @@
     <key alias="auditTrail">Audit Trail</key>
     <key alias="browse">Browse Node</key>
     <key alias="changeDocType">Change Document Type</key>
+    <key alias="changeDataType">Change Data Type</key>
     <key alias="copy">Copy</key>
     <key alias="create">Create</key>
     <key alias="export">Export</key>
@@ -503,6 +504,7 @@
     <key alias="unLinkYour">Un-link your</key>
     <key alias="account">account</key>
     <key alias="selectEditor">Select editor</key>
+    <key alias="selectEditorConfiguration">Select configuration</key>
     <key alias="selectSnippet">Select snippet</key>
     <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language, you should unpublish the node in that language instead.</key>
   </area>
@@ -1642,6 +1644,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="availableEditors">Create new</key>
     <key alias="reuse">Use existing</key>
     <key alias="editorSettings">Editor settings</key>
+    <key alias="searchResultSettings">Available configurations</key>
+    <key alias="searchResultEditors">Create a new configuration</key>
     <key alias="configuration">Configuration</key>
     <key alias="yesDelete">Yes, delete</key>
     <key alias="movedUnderneath">was moved underneath</key>

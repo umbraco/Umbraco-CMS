@@ -8,7 +8,8 @@
     <key alias="assignDomain">Tilføj domæne</key>
     <key alias="auditTrail">Revisionsspor</key>
     <key alias="browse">Gennemse elementer</key>
-    <key alias="changeDocType">Skift dokumenttype</key>
+    <key alias="changeDocType">Skift Dokument Type</key>
+    <key alias="changeDataType">Skift Input Type</key>
     <key alias="copy">Kopier</key>
     <key alias="create">Opret</key>
     <key alias="export">Eksportér</key>
@@ -479,6 +480,7 @@
     <key alias="unLinkYour">Fjern link fra dit</key>
     <key alias="account">konto</key>
     <key alias="selectEditor">Vælg editor</key>
+    <key alias="selectEditorConfiguration">Vælg konfiguration</key>
     <key alias="selectSnippet">Vælg snippet</key>
     <key alias="variantdeletewarning">Dette vil slette noden og alle dets sprog. Hvis du kun vil slette et sprog, så afpublicér det i stedet.</key>
   </area>
@@ -1379,9 +1381,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="compositionInUse">Indholdstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som komposition</key>
     <key alias="noAvailableCompositions">Der er ingen indholdstyper tilgængelige at bruge som komposition</key>
     <key alias="compositionRemoveWarning">Når du fjerner en komposition vil alle associerede indholdsdata blive slettet. Når først dokumenttypen er gemt, er der ingen vej tilbage.</key>
-    <key alias="availableEditors">Tilgængelige editors</key>
+    <key alias="availableEditors">Opret ny indstilling</key>
     <key alias="reuse">Genbrug</key>
-    <key alias="editorSettings">Editor indstillinger</key>
+    <key alias="editorSettings">Input indstillinger</key>
+    <key alias="searchResultSettings">Tilgængelige indstillinger</key>
+    <key alias="searchResultEditors">Opret ny indstilling</key>
     <key alias="configuration">Konfiguration</key>
     <key alias="yesDelete">Ja, slet</key>
     <key alias="movedUnderneath">blev flyttet til</key>
