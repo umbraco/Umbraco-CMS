@@ -9,6 +9,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Migrations

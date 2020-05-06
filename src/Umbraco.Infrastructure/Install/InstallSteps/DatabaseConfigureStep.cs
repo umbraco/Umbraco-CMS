@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -64,7 +65,36 @@ namespace Umbraco.Web.Install.InstallSteps
             }
         }
 
+        public override object ViewModel
+        {
+            get
+            {
+                var databases = new List<object>()
+                {
+                    new { name = "Microsoft SQL Server", id = 1 },
+                    new { name = "Microsoft SQL Azure", id = 3 },
+                    new { name = "Custom connection string", id = -1 },
+                };
+
+                if (IsSqlCeAvailable())
+                {
+                    databases.Insert(0,  new { name = "Microsoft SQL Server Compact (SQL CE)", id = 0 });
+                }
+
+                return new
+                {
+                    databases = databases
+                };
+            }
+        }
+
+        public static bool IsSqlCeAvailable()
+        {
+            return !(Type.GetType("Umbraco.Persistance.SqlCe.SqlCeSyntaxProvider, Umbraco.Persistance.SqlCe") is null);
+        }
+
         public override string View => ShouldDisplayView() ? base.View : "";
+
 
         public override bool RequiresExecution(DatabaseModel model)
         {

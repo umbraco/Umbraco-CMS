@@ -142,14 +142,7 @@ namespace Umbraco.Core.Composing
             "ServiceStack.",
             "SqlCE4Umbraco,",
             "Superpower,", // used by Serilog
-            "System.Data.SqlClient,",
-            "System.Data.Odbc,",
-            "System.Data.OleDb,",
-            "System.Data.Entity,",
-            "System.Runtime,",
-            "System.Runtime.",
-            "System.Numerics.",
-            "System.Buffers,",
+            "System.",
             "TidyNet,",
             "TidyNet.",
             "WebDriver,",
@@ -241,7 +234,7 @@ namespace Umbraco.Core.Composing
 
             // It didn't parse, so try loading from each already loaded assembly and cache it
             return TypeNamesCache.GetOrAdd(name, s =>
-                GetAllAssemblies()
+                AppDomain.CurrentDomain.GetAssemblies()
                     .Select(x => x.GetType(s))
                     .FirstOrDefault(x => x != null));
         }

@@ -108,7 +108,8 @@ namespace Umbraco.Web.Install.InstallSteps
                 return new
                 {
                     minCharLength = _passwordConfiguration.RequiredLength,
-                    minNonAlphaNumericLength = _passwordConfiguration.RequireNonLetterOrDigit ? 1 : 0
+                    minNonAlphaNumericLength = _passwordConfiguration.RequireNonLetterOrDigit ? 1 : 0,
+                    quickInstallAvailable = DatabaseConfigureStep.IsSqlCeAvailable()
                 };
             }
         }

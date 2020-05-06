@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.Migrations.Stubs;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;

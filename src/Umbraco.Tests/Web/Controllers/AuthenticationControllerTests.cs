@@ -35,6 +35,7 @@ using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
+using Umbraco.Persistance.SqlCe;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Web.Controllers

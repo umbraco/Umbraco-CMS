@@ -45,6 +45,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Media;
 using Umbraco.Net;
+using Umbraco.Persistance.SqlCe;
 using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Security;
 

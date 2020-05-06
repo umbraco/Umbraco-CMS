@@ -10,6 +10,7 @@ using NPoco;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.Persistence.NPocoTests;
 
 namespace Umbraco.Tests.Benchmarks

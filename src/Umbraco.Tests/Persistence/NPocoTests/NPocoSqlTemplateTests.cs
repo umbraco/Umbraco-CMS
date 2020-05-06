@@ -6,6 +6,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core;
+using Umbraco.Persistance.SqlCe;
 
 namespace Umbraco.Tests.Persistence.NPocoTests
 {

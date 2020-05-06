@@ -10,7 +10,7 @@
             //dealing with requests:
             'request': function (config) {
 
-                if (!Umbraco.Sys.ServerVariablesUmbraco.Sys.ServerVariables.umbracoSettings.umbracoPath) {
+                if (!Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath) {
                     // no settings available, we're probably on the login screen
                     return config;
                 }

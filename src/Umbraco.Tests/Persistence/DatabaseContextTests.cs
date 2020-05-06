@@ -14,6 +14,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
+using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Security;
 

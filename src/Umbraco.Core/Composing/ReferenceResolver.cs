@@ -65,7 +65,7 @@ namespace Umbraco.Core.Composing
                     if (assemblyName.FullName.StartsWith("Umbraco."))
                         continue;
 
-                    var assembly = Assembly.LoadFrom(dll);
+                    var assembly = Assembly.Load(assemblyName);
                     assemblies.Add(assembly);
                 }
             }
@@ -143,9 +143,7 @@ namespace Umbraco.Core.Composing
 
         protected virtual IEnumerable<Assembly> GetReferences(Assembly assembly)
         {
-            var referencedAssemblies = assembly.GetReferencedAssemblies();
-
-            foreach (var referenceName in referencedAssemblies)
+            foreach (var referenceName in assembly.GetReferencedAssemblies())
             {
                 // don't include if this is excluded
                 if (TypeFinder.KnownAssemblyExclusionFilter.Any(f => referenceName.FullName.StartsWith(f, StringComparison.InvariantCultureIgnoreCase)))

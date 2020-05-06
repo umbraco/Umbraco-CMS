@@ -360,7 +360,6 @@
     <Compile Include="Editors\RelationController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
     <Compile Include="Editors\TemplateQueryController.cs" />
-    <Compile Include="Install\UmbracoInstallArea.cs" />
     <Compile Include="Mvc\ActionExecutedEventArgs.cs" />
     <Compile Include="Mvc\AdminTokenAuthorizeAttribute.cs" />
     <Compile Include="Mvc\NotFoundHandler.cs" />

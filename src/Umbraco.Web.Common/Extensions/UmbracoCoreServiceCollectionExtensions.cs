@@ -25,6 +25,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Runtime.Profiler;
@@ -33,6 +34,56 @@ namespace Umbraco.Web.Common.Extensions
 {
     public static class UmbracoCoreServiceCollectionExtensions
     {
+        public static IServiceCollection AddUmbracoSqlCeSupport(this IServiceCollection services)
+        {
+            try
+            {
+                var binFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                if (binFolder != null)
+                {
+                    var dllPath = Path.Combine(binFolder, "Umbraco.Persistance.SqlCe.dll");
+                    Assembly.LoadFrom(dllPath);
+
+
+                    var sqlCeSyntaxProviderType = Type.GetType("Umbraco.Persistance.SqlCe.SqlCeSyntaxProvider, Umbraco.Persistance.SqlCe");
+                    var sqlCeBulkSqlInsertProviderType = Type.GetType("Umbraco.Persistance.SqlCe.SqlCeBulkSqlInsertProvider, Umbraco.Persistance.SqlCe");
+                    var sqlCeEmbeddedDatabaseCreatorType = Type.GetType("Umbraco.Persistance.SqlCe.SqlCeEmbeddedDatabaseCreator, Umbraco.Persistance.SqlCe");
+
+                    if (!(sqlCeSyntaxProviderType is null || sqlCeBulkSqlInsertProviderType is null || sqlCeEmbeddedDatabaseCreatorType is null))
+                    {
+                        services.AddSingleton(typeof(ISqlSyntaxProvider), sqlCeSyntaxProviderType);
+                        services.AddSingleton(typeof(IBulkSqlInsertProvider), sqlCeBulkSqlInsertProviderType);
+                        services.AddSingleton(typeof(IEmbeddedDatabaseCreator), sqlCeEmbeddedDatabaseCreatorType);
+                    }
+
+                    Assembly.LoadFrom(Path.Combine(binFolder, "System.Data.SqlServerCe.dll"));
+
+                    var sqlCe = Type.GetType("System.Data.SqlServerCe.SqlCeProviderFactory, System.Data.SqlServerCe");
+                    if (!(sqlCe is null))
+                    {
+                        DbProviderFactories.RegisterFactory(Core.Constants.DbProviderNames.SqlCe, sqlCe );
+                    }
+                }
+            }
+            catch
+            {
+                // Ignore if SqlCE is not available
+            }
+
+            return services;
+        }
+
+        public static IServiceCollection AddUmbracoSqlServerSupport(this IServiceCollection services)
+        {
+            DbProviderFactories.RegisterFactory(Core.Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
+
+            services.AddSingleton<ISqlSyntaxProvider, SqlServerSyntaxProvider>();
+            services.AddSingleton<IBulkSqlInsertProvider, SqlServerBulkSqlInsertProvider>();
+            services.AddSingleton<IEmbeddedDatabaseCreator, NoopEmbeddedDatabaseCreator>();
+
+            return services;
+        }
+
         /// <summary>
         /// Adds the Umbraco Configuration requirements
         /// </summary>
@@ -123,9 +174,18 @@ namespace Umbraco.Web.Common.Extensions
             if (container is null) throw new ArgumentNullException(nameof(container));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
 
+            services.AddSingleton<IDbProviderFactoryCreator>(x => new DbProviderFactoryCreator(
+                x.GetService<Configs>().ConnectionStrings()[Core.Constants.System.UmbracoConnectionName]?.ProviderName,
+                DbProviderFactories.GetFactory,
+                x.GetServices<ISqlSyntaxProvider>(),
+                x.GetServices<IBulkSqlInsertProvider>(),
+                x.GetServices<IEmbeddedDatabaseCreator>()
+            ));
+
             var serviceProvider = services.BuildServiceProvider();
             var configs = serviceProvider.GetService<Configs>();
             var dbProviderFactoryCreator = serviceProvider.GetRequiredService<IDbProviderFactoryCreator>();
+
 
             CreateCompositionRoot(services,
                 configs,
@@ -136,8 +196,6 @@ namespace Umbraco.Web.Common.Extensions
             var globalSettings = configs.Global();
             var umbracoVersion = new UmbracoVersion(globalSettings);
             var typeFinder = CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly, configs.TypeFinder());
-
-            RegisterDatabaseTypes(typeFinder);
 
             var coreRuntime = GetCoreRuntime(
                 configs,
@@ -156,16 +214,7 @@ namespace Umbraco.Web.Common.Extensions
             return services;
         }
 
-        private static void RegisterDatabaseTypes(ITypeFinder typeFinder)
-        {
-            // need to manually register this factory
-            DbProviderFactories.RegisterFactory(Core.Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
-            var sqlCe = typeFinder.GetTypeByName("System.Data.SqlServerCe.SqlCeProviderFactory");
-            if (!(sqlCe is null))
-            {
-                DbProviderFactories.RegisterFactory(Core.Constants.DbProviderNames.SqlCe, sqlCe );
-            }
-        }
+
         private static ITypeFinder CreateTypeFinder(Core.Logging.ILogger logger, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, ITypeFinderSettings typeFinderSettings)
         {
             var runtimeHashPaths = new RuntimeHashPaths();
