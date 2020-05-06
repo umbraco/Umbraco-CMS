@@ -44,9 +44,13 @@
         <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__group-sortable': sortingMode}" data-element="group-{{tab.name}}">
 
             <!-- TAB INIT STATE -->
-            <button type="button" class="umb-group-builder__group -placeholder" hotkey="alt+shift+g" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode" data-element="group-add">
+            <a href="" class="umb-group-builder__group -placeholder"
+                ng-if="tab.tabState=='init' && !sortingMode"
+                data-element="group-add"
+                hotkey="alt+shift+g"
+                ng-click="addGroup(tab)">
                 <localize key="contentTypeEditor_addGroup"></localize>
-            </button>
+            </a>
 
             <!-- TAB ACTIVE OR INACTIVE STATE -->
             <div class="umb-group-builder__group" ng-if="tab.tabState !== 'init'" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited, 'umb-group-builder__group-handle -sortable': sortingMode && !tab.inherited}" tabindex="0" ng-focus="activateGroup(tab)">
@@ -117,15 +121,14 @@
                     <li data-element="property-{{property.alias}}" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}" ng-repeat="property in tab.properties">
 
                         <!-- Add new property -->
-                        <button type="button"
-                            data-element="property-add"
-                            class="umb-group-builder__group-add-property"
+                        <a href="" class="umb-group-builder__group-add-property"
                             ng-if="property.propertyState=='init' && !sortingMode"
+                            data-element="property-add"
                             ng-click="addProperty(property, tab)"
                             ng-focus="activateGroup(tab)"
                             focus-when="{{property.focus}}">
                             <localize key="contentTypeEditor_addProperty"></localize>
-                        </button>
+                        </a>
 
                         <div class="umb-group-builder__property" ng-if="property.propertyState!=='init'" ng-class="{'-active': property.dialogIsOpen, '-active': property.propertyState=='active', '-inherited': property.inherited, '-locked': property.locked, 'umb-group-builder__property-handle -sortable': sortingMode && !property.inherited, '-sortable-locked': sortingMode && property.inherited}">
 
