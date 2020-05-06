@@ -49,7 +49,7 @@
                                     placeholder="@placeholders_enterDescription"
                                     ng-keypress="vm.submitOnEnter($event)"
                                     umb-auto-resize>
-                        </textarea>
+                            </textarea>
                         </div>
                     
                         <div class="editor-wrapper umb-control-group control-group" ng-model="model.property.editor" val-require-component ng-if="!model.property.locked">
@@ -139,8 +139,7 @@
                              
                                     <umb-toggle data-element="permissions-allow-culture-variant"
                                                 checked="model.property.allowCultureVariant"
-                                                on-click="vm.toggleAllowCultureVariants()"
-                                    >
+                                                on-click="vm.toggleAllowCultureVariants()">
                                     </umb-toggle>
 
                         </div>
@@ -177,8 +176,7 @@
                             <umb-toggle ng-if="vm.showSensitiveData" data-element="settings_is_sensitive_data"
                                         checked="model.property.isSensitiveData"
                                         on-click="vm.toggleIsSensitiveData()">
-                            </umb-toggle>
-                                                      
+                            </umb-toggle>            
 
                         </div>
                     </div>
