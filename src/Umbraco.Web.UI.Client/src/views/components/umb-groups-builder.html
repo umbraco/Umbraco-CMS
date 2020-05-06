@@ -55,7 +55,7 @@
 
                     <ng-form name="groupNameForm" data-element="group-name">
                         <div class="umb-group-builder__group-title control-group -no-margin" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited}">
-                            <i class="umb-group-builder__group-title-icon icon-navigation" ng-if="sortingMode && !tab.inherited"></i>
+                            <i class="umb-group-builder__group-title-icon icon-navigation" aria-hidden="true" ng-if="sortingMode && !tab.inherited"></i>
                             <input data-element="group-name-field"
                                    class="umb-group-builder__group-title-input"
                                    type="text"
@@ -80,7 +80,7 @@
                     </ng-form>
 
                     <div class="umb-group-builder__group-inherited-label" ng-if="tab.inherited">
-                        <i class="icon icon-merge"></i>
+                        <i class="icon icon-merge" aria-hidden="true"></i>
                         <localize key="contentTypeEditor_inheritedFrom"></localize>: {{ tab.inheritedFromName }}
                         <span ng-repeat="contentTypeName in tab.parentTabContentTypeNames">
                             <button type="button" class="btn-link btn-small p0" ng-click="openDocumentType(tab.parentTabContentTypes[$index])">{{ contentTypeName }}</button>
@@ -101,7 +101,7 @@
                     </ng-form>
 
                     <div class="umb-group-builder__group-remove" ng-if="!sortingMode && canRemoveGroup(tab)">
-                        <i class="icon-trash" ng-click="togglePrompt(tab)"></i>
+                        <i class="icon-trash" aria-hidden="true" ng-click="togglePrompt(tab)"></i>
                         <umb-confirm-action
                             ng-if="tab.deletePrompt"
                             direction="left"
@@ -175,7 +175,7 @@
                                 </ng-form>
 
                                 <div ng-if="sortingMode" class="flex items-center">
-                                    <i class="icon icon-navigation" ng-if="!property.inherited" style="margin-right: 10px;"></i>
+                                    <i class="icon icon-navigation" aria-hidden="true" ng-if="!property.inherited" style="margin-right: 10px;"></i>
                                     <span class="umb-group-builder__property-meta-label">{{ property.label }}</span>
                                     <span class="umb-group-builder__property-meta-alias" style="margin-bottom: 0; margin-left: 5px; margin-top: 1px;">({{ property.alias }})</span>
                                     <input name="propertySortOrder" type="number" class="umb-group-builder__group-sort-value umb-property-editor-tiny" ng-model="property.sortOrder" ng-disabled="property.inherited" />
@@ -223,13 +223,13 @@
                                 <div class="umb-group-builder__property-tags -right">
 
                                     <div class="umb-group-builder__property-tag" ng-if="property.inherited">
-                                        <i class="icon icon-merge"></i>
+                                        <i class="icon icon-merge" aria-hidden="true"></i>
                                         <span style="margin-right: 3px"><localize key="contentTypeEditor_inheritedFrom"></localize></span>
                                         {{property.contentTypeName}}
                                     </div>
 
                                     <div class="umb-group-builder__property-tag" ng-if="property.locked">
-                                        <i class="icon icon-lock"></i>
+                                        <i class="icon icon-lock" aria-hidden="true"></i>
                                         <localize key="general_locked"></localize>
                                     </div>
 
