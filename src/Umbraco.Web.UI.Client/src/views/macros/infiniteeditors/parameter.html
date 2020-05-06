@@ -41,19 +41,23 @@
                             </div>
                         </div>
 
-                        <button type="button" data-element="editor-add" ng-if="!model.parameter.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openMacroParameterPicker(model.parameter)">
+                        <button type="button" class="btn btn-link editor-placeholder" data-element="editor-add" ng-if="!model.parameter.editor" hotkey="alt+shift+e" ng-click="vm.openMacroParameterPicker(model.parameter)">
                             <localize key="shortcuts_addEditor"></localize>
                         </button>
 
                         <div class="editor clearfix" ng-if="model.parameter.editor">
 
-                            <button type="button" class="editor-icon-wrapper" ng-click="vm.openMacroParameterPicker(model.parameter)">
+                            <button type="button" class="btn btn-link editor-icon-wrapper" ng-click="vm.openMacroParameterPicker(model.parameter)">
                                 <i class="icon {{model.parameter.dataTypeIcon}}" ng-class="{'icon-autofill': model.parameter.dataTypeIcon == null}" aria-hidden="true"></i>
                             </button>
 
                             <div class="editor-details">
-                                <button type="button" class="editor-name" ng-click="vm.openMacroParameterPicker(model.parameter)">{{model.parameter.dataTypeName}}</button>
-                                <button type="button" class="editor-editor" ng-click="vm.openMacroParameterPicker(model.parameter)">{{model.parameter.editor}}</button>
+                                <button type="button" class="btn btn-link" ng-click="vm.openMacroParameterPicker(model.parameter)">
+                                    <span class="flex flex-column">
+                                        <span class="editor-name">{{ model.parameter.dataTypeName }}</span>
+                                        <span class="editor-editor">{{ model.parameter.editor }}</span>
+                                    </span>
+                                </button>
                             </div>
 
                         </div>
