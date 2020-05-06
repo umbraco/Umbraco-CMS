@@ -54,27 +54,29 @@
                     
                         <div class="editor-wrapper umb-control-group control-group" ng-model="model.property.editor" val-require-component ng-if="!model.property.locked">
                     
-                            <a data-element="editor-add" href="" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openDataTypePicker(model.property)">
+                            <button type="button" data-element="editor-add" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openDataTypePicker(model.property)">
                                 <localize key="shortcuts_addEditor"></localize>
-                            </a>
+                            </button>
                     
                             <div class="editor clearfix" ng-if="model.property.editor">
                     
-                                <a href="" class="editor-icon-wrapper" ng-click="vm.openDataTypePicker(model.property)">
-                                    <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}"></i>
-                                </a>
+                                <button type="button" class="editor-icon-wrapper" ng-click="vm.openDataTypePicker(model.property)">
+                                    <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}" aria-hidden="true"></i>
+                                </button>
                     
                                 <div class="editor-details">
-                                    <a href="" class="editor-name" ng-click="vm.openDataTypePicker(model.property)">{{ model.property.dataTypeName }}</a>
-                                    <a href="" class="editor-editor" ng-click="vm.openDataTypePicker(model.property)">{{ model.property.editor }}</a>
+                                    <button type="button" ng-click="vm.openDataTypePicker(model.property)">
+                                        <span class="editor-name">{{ model.property.dataTypeName }}</span>
+                                        <span class="editor-editor">{{ model.property.editor }}</span>
+                                    </button>
                                 </div>
                     
-                                <a href class="editor-settings-icon pull-right"
-                                ng-click="vm.openDataTypeSettings(model.property)"
-                                hotkey="alt+shift+d"
-                                ng-if="model.property.editor">
-                                    <i class="icon icon-settings"></i>
-                                </a>
+                                <button type="button" class="editor-settings-icon pull-right"
+                                        ng-click="vm.openDataTypeSettings(model.property)"
+                                        hotkey="alt+shift+d"
+                                        ng-if="model.property.editor">
+                                    <i class="icon icon-settings" aria-hidden="true"></i>
+                                </button>
                     
                             </div>
                     
