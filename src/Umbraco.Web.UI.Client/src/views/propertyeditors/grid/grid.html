@@ -95,7 +95,7 @@
                                    </div>
 
                                     <div class="cell-tools-remove row-tool">
-                                        <button class="icon-trash btn-reset" ng-click="togglePrompt(row)" type="button"></button>
+                                        <button type="button" class="umb-control-tool-icon icon-trash btn-reset" ng-click="togglePrompt(row)"></button>
                                         <umb-confirm-action
                                             ng-if="row.deletePrompt"
                                             direction="left"
@@ -200,7 +200,7 @@
                                                                           </div>
 
                                                                           <div class="umb-control-tool">
-                                                                              <button class="umb-control-tool-icon icon-trash btn-reset" ng-click="togglePrompt(control)" type="button"></button>
+                                                                              <button type="button" class="umb-control-tool-icon icon-trash btn-reset" ng-click="togglePrompt(control)"></button>
                                                                               <umb-confirm-action ng-if="control.deletePrompt"
                                                                                                   direction="left"
                                                                                                   on-confirm="removeControl(area, $index)"

@@ -101,7 +101,7 @@
                     </ng-form>
 
                     <div class="umb-group-builder__group-remove" ng-if="!sortingMode && canRemoveGroup(tab)">
-                        <i class="icon-trash" aria-hidden="true" ng-click="togglePrompt(tab)"></i>
+                        <button type="button" class="umb-control-tool-icon icon-trash btn-reset" ng-click="togglePrompt(tab)"></button>
                         <umb-confirm-action
                             ng-if="tab.deletePrompt"
                             direction="left"
