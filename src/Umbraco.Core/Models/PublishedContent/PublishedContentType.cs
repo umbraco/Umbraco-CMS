@@ -105,13 +105,13 @@ namespace Umbraco.Core.Models.PublishedContent
             { "Email", Constants.DataTypes.Textbox },
             { "Username", Constants.DataTypes.Textbox },
             { "PasswordQuestion", Constants.DataTypes.Textbox },
-            { "Comments", Constants.DataTypes.Textbox },
+            { "Comments", Constants.DataTypes.Textarea },
             { "IsApproved", Constants.DataTypes.Boolean },
             { "IsLockedOut", Constants.DataTypes.Boolean },
-            { "LastLockoutDate", Constants.DataTypes.DateTime },
-            { "CreateDate", Constants.DataTypes.DateTime },
-            { "LastLoginDate", Constants.DataTypes.DateTime },
-            { "LastPasswordChangeDate", Constants.DataTypes.DateTime },
+            { "LastLockoutDate", Constants.DataTypes.LabelDateTime },
+            { "CreateDate", Constants.DataTypes.LabelDateTime },
+            { "LastLoginDate", Constants.DataTypes.LabelDateTime },
+            { "LastPasswordChangeDate", Constants.DataTypes.LabelDateTime }
         };
 
         #region Content type

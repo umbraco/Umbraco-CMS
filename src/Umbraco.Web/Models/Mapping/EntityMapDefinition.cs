@@ -177,6 +177,12 @@ namespace Umbraco.Web.Models.Mapping
 
             target.Name = source.Values.ContainsKey("nodeName") ? source.Values["nodeName"] : "[no name]";
 
+            var culture = context.GetCulture();
+            if(culture.IsNullOrWhiteSpace() == false)
+            {
+                target.Name = source.Values.ContainsKey($"nodeName_{culture}") ? source.Values[$"nodeName_{culture}"] : target.Name;
+            }
+
             if (source.Values.TryGetValue(UmbracoExamineIndex.UmbracoFileFieldName, out var umbracoFile))
             {
                 if (umbracoFile != null)
@@ -234,11 +240,11 @@ namespace Umbraco.Web.Models.Mapping
         {
             switch (entity)
             {
-                case ContentEntitySlim contentEntity:
-                    // NOTE: this case covers both content and media entities
-                    return contentEntity.ContentTypeIcon;
-                case MemberEntitySlim memberEntity:
+                case IMemberEntitySlim memberEntity:
                     return memberEntity.ContentTypeIcon.IfNullOrWhiteSpace(Constants.Icons.Member);
+                case IContentEntitySlim contentEntity:
+                    // NOTE: this case covers both content and media entities
+                    return contentEntity.ContentTypeIcon;                
             }
 
             return null;

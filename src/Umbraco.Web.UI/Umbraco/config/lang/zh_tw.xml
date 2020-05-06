@@ -87,7 +87,7 @@
     <key alias="saveAndPublish">保存並發佈</key>
     <key alias="saveToPublish">保存並提交審核</key>
     <key alias="saveListView">保存清單檢視</key>
-    <key alias="showPage">預覽</key>
+    <key alias="saveAndPreview">預覽</key>
     <key alias="showPageDisabled">因未設置範本無法預覽</key>
     <key alias="styleChoose">選擇樣式</key>
     <key alias="styleShow">顯示樣式</key>

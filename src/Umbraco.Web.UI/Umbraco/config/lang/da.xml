@@ -36,7 +36,9 @@
     <key alias="SetPermissionsForThePage">Sæt rettigheder for siden %0%</key>
     <key alias="chooseWhereToCopy">Vælg hvor du vil kopiere</key>
     <key alias="chooseWhereToMove">Vælg hvortil du vil flytte</key>
+    <key alias="infiniteEditorChooseWhereToMove">Vælg hvor du vil flytte de valgte elementer hen</key>
     <key alias="toInTheTreeStructureBelow">til i træstrukturen nedenfor</key>
+    <key alias="infiniteEditorChooseWhereToCopy">Vælg hvor du vil kopiere de valgte elementer til</key>
     <key alias="wasMovedTo">blev flyttet til</key>
     <key alias="wasCopiedTo">blev kopieret til</key>
     <key alias="wasDeleted">blev slettet</key>
@@ -138,7 +140,7 @@
     <key alias="saveToPublish">Gem og send til udgivelse</key>
     <key alias="saveListView">Gem listevisning</key>
     <key alias="schedulePublish">Planlæg</key>
-    <key alias="showPage">Forhåndsvisning</key>
+    <key alias="saveAndPreview">Forhåndsvisning</key>
     <key alias="showPageDisabled">Forhåndsvisning er deaktiveret fordi der ikke er nogen skabelon tildelt</key>
     <key alias="styleChoose">Vælg formattering</key>
     <key alias="styleShow">Vis koder</key>
@@ -447,6 +449,7 @@
     <key alias="viewCacheItem">Se cache element</key>
     <key alias="relateToOriginalLabel">Relatér til original</key>
     <key alias="includeDescendants">Inkludér undersider</key>
+    <key alias="theFriendliestCommunity">Det venligste community</key>
     <key alias="linkToPage">Link til side</key>
     <key alias="openInNewWindow">Åben linket i et nyt vindue eller fane</key>
     <key alias="linkToMedia">Link til medie</key>
@@ -541,9 +544,6 @@
     <key alias="anchor">#value eller ?key=value</key>
     <key alias="enterAlias">Indtast alias...</key>
     <key alias="generatingAlias">Genererer alias...</key>
-    <key alias="a11yCreateItem">Opret element</key>
-    <key alias="a11yEdit">Rediger</key>
-    <key alias="a11yName">Navn</key>
   </area>
   <area alias="editcontenttype">
     <key alias="createListView" version="7.2">Opret brugerdefineret listevisning</key>
@@ -663,7 +663,7 @@
     <key alias="icon">Ikon</key>
     <key alias="id">Id</key>
     <key alias="import">Importer</key>
-    <key alias="includeFromsubFolders">Inkludér undermapper i søgning</key>
+    <key alias="excludeFromSubFolders">Søg kun i denne mappe</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Indre margen</key>
     <key alias="insert">Indsæt</key>
@@ -753,6 +753,9 @@
     <key alias="current">nuværende</key>
     <key alias="embed">Indlejring</key>
     <key alias="selected">valgt</key>
+    <key alias="other">Andet</key>
+    <key alias="articles">Artikler</key>
+    <key alias="videos">Videoer</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blå</key>
@@ -779,6 +782,7 @@
     <key alias="generalHeader">Generelt</key>
     <key alias="editorHeader">Editor</key>
     <key alias="toggleAllowCultureVariants">Skift tillad sprogvarianter</key>
+    <key alias="toggleAllowSegmentVariants">Skift tillad segmentering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Baggrundsfarve</key>
@@ -1085,6 +1089,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="addCrop">Tilføj ny beskæring</key>
     <key alias="updateEditCrop">Acceptér</key>
     <key alias="undoEditCrop">Fortryd</key>
+    <key alias="customCrop">Brugerdefineret</key>
   </area>
   <area alias="rollback">
     <key alias="headline">Vælg en version at sammenligne med den nuværende version</key>
@@ -1117,7 +1122,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="forms">Formularer</key>
   </area>
   <area alias="help">
+    <key alias="tours">Tours</key>
     <key alias="theBestUmbracoVideoTutorials">De bedste Umbraco video tutorials</key>
+    <key alias="umbracoForum">Besøg our.umbraco.com</key>
+    <key alias="umbracoTv">Besøg umbraco.tv</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Standardskabelon</key>
@@ -1403,9 +1411,16 @@ Mange hilsner fra Umbraco robotten
     <key alias="tabHasNoSortOrder">fane har ingen sorteringsrækkefølge</key>
     <key alias="compositionUsageHeading">Hvor er denne komposition brugt?</key>
     <key alias="compositionUsageSpecification">Denne komposition brugt i kompositionen af de følgende indholdstyper:</key>
-    <key alias="variantsHeading">Tillad sprogvariation</key>
+    <key alias="variantsHeading">Tillad variationer</key>
+    <key alias="cultureVariantHeading">Tillad sprogvariation</key>
+    <key alias="segmentVariantHeading">Tillad segmentering</key>
+    <key alias="cultureVariantLabel">Tillader sprogvariationer</key>
+    <key alias="segmentVariantLabel">Tillader segmentering</key>
     <key alias="variantsDescription">Tillad at redaktører kan oprette indhold af denne type på flere sprog.</key>
+    <key alias="cultureVariantDescription">Tillad at redaktører kan oprette dette indhold på flere sprog.</key>
+    <key alias="segmentVariantDescription">Tillad at redaktører kan oprette flere udgaver af denne type indhold.</key>
     <key alias="allowVaryByCulture">Tillad sprogvariation</key>
+    <key alias="allowVaryBySegment">Tillad segmentering</key>
     <key alias="elementType">Element-type</key>
     <key alias="elementHeading">Er en Element-type</key>
     <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet.</key>
@@ -1737,6 +1752,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="currentLanguage">Aktivt sprog</key>
     <key alias="switchLanguage">Skift sprog til</key>
     <key alias="createNewFolder">Opret ny mappe</key>
+    <key alias="createItem">Opret element</key>
+    <key alias="edit">Rediger</key>
+    <key alias="name">Navn</key>
   </area>
   <area alias="references">
     <key alias="tabName">Referencer</key>

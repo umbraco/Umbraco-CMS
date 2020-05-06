@@ -50,3 +50,5 @@
 *.dbproj text=auto merge=union
 *.sln text=auto eol=crlf merge=union
 *.gitattributes text=auto merge=union
+
+*.gitattributes text=auto

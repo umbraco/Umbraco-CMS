@@ -14,7 +14,7 @@
         });
 
     function NestedContentController($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService, $routeParams, editorState) {
-        
+
         var vm = this;
         var model = $scope.$parent.$parent.model;
 
@@ -41,7 +41,7 @@
         if (vm.maxItems === 0)
             vm.maxItems = 1000;
 
-        vm.singleMode = vm.minItems === 1 && vm.maxItems === 1;
+        vm.singleMode = vm.minItems === 1 && vm.maxItems === 1 && model.config.contentTypes.length === 1;;
         vm.showIcons = Object.toBoolean(model.config.showIcons);
         vm.wideMode = Object.toBoolean(model.config.hideLabel);
         vm.hasContentTypes = model.config.contentTypes.length > 0;
@@ -58,9 +58,9 @@
             updateModel();
             vm.currentNode = node;
         }
-        
-        var copyAllEntries = function() {
-            
+
+        var copyAllEntries = function () {
+
             syncCurrentNode();
 
             // list aliases
@@ -68,14 +68,14 @@
 
             // remove dublicates
             aliases = aliases.filter((item, index) => aliases.indexOf(item) === index);
-            
+
             var nodeName = "";
 
-            if(vm.umbVariantContent) {
+            if (vm.umbVariantContent) {
                 nodeName = vm.umbVariantContent.editor.content.name;
             }
 
-            localizationService.localize("clipboard_labelForArrayOfItemsFrom", [model.label, nodeName]).then(function(data) {
+            localizationService.localize("clipboard_labelForArrayOfItemsFrom", [model.label, nodeName]).then(function (data) {
                 clipboardService.copyArray("elementTypeArray", aliases, vm.nodes, data, "icon-thumbnail-list", model.id);
             });
         }
@@ -131,6 +131,7 @@
 
             setCurrentNode(newNode);
             setDirty();
+            validate();
         };
 
         vm.openNodeTypePicker = function ($event) {
@@ -145,7 +146,7 @@
                 orderBy: "$index",
                 view: "itempicker",
                 event: $event,
-                clickPasteItem: function(item) {
+                clickPasteItem: function (item) {
                     if (item.type === "elementTypeArray") {
                         _.each(item.data, function (entry) {
                             pasteFromClipboard(entry);
@@ -182,9 +183,9 @@
             if (vm.overlayMenu.availableItems.length === 0) {
                 return;
             }
-            
+
             vm.overlayMenu.size = vm.overlayMenu.availableItems.length > 6 ? "medium" : "small";
-            
+
             vm.overlayMenu.pasteItems = [];
 
             var singleEntriesForPaste = clipboardService.retriveEntriesOfType("elementType", contentTypeAliases);
@@ -196,7 +197,7 @@
                     icon: entry.icon
                 });
             });
-            
+
             var arrayEntriesForPaste = clipboardService.retriveEntriesOfType("elementTypeArray", contentTypeAliases);
             _.each(arrayEntriesForPaste, function (entry) {
                 vm.overlayMenu.pasteItems.push({
@@ -222,6 +223,7 @@
             if (vm.overlayMenu.availableItems.length === 1 && vm.overlayMenu.pasteItems.length === 0) {
                 // only one scaffold type - no need to display the picker
                 addNode(vm.scaffolds[0].contentTypeAlias);
+                vm.overlayMenu = null;
                 return;
             }
 
@@ -236,12 +238,22 @@
             }
         };
 
+        vm.canDeleteNode = function (idx) {
+            return (vm.nodes.length > vm.minItems)
+                ? true
+                : model.config.contentTypes.length > 1;
+        }
+
         function deleteNode(idx) {
             vm.nodes.splice(idx, 1);
             setDirty();
             updateModel();
+            validate();
         };
         vm.requestDeleteNode = function (idx) {
+            if (!vm.canDeleteNode(idx)) {
+                return;
+            }
             if (model.config.confirmDeletes === true) {
                 localizationService.localizeMany(["content_nestedContentDeleteItem", "general_delete", "general_cancel", "contentTypeEditor_yesDelete"]).then(function (data) {
                     const overlay = {
@@ -267,6 +279,9 @@
         };
 
         vm.getName = function (idx) {
+            if (!model.value || !model.value.length) {
+                return "";
+            }
 
             var name = "";
 
@@ -316,6 +331,10 @@
         };
 
         vm.getIcon = function (idx) {
+            if (!model.value || !model.value.length) {
+                return "";
+            }
+
             var scaffold = getScaffold(model.value[idx].ncContentTypeAlias);
             return scaffold && scaffold.icon ? iconHelper.convertFromLegacyIcon(scaffold.icon) : "icon-folder";
         }
@@ -376,10 +395,10 @@
             clipboardService.copy("elementType", node.contentTypeAlias, node);
             $event.stopPropagation();
         }
-        
-        
+
+
         function pasteFromClipboard(newNode) {
-            
+
             if (newNode === undefined) {
                 return;
             }
@@ -390,7 +409,7 @@
             vm.nodes.push(newNode);
             setDirty();
             //updateModel();// done by setting current node...
-            
+
             setCurrentNode(newNode);
         }
 
@@ -470,11 +489,13 @@
                     }
                 }
 
-                // Auto-fill with elementTypes, but only if we have one type to choose from, and if this property is empty.
-                if (vm.singleMode === true && vm.nodes.length === 0 && model.config.minItems > 0) {
+                // Enforce min items if we only have one scaffold type
+                var modelWasChanged = false;
+                if (vm.nodes.length < vm.minItems && vm.scaffolds.length === 1) {
                     for (var i = vm.nodes.length; i < model.config.minItems; i++) {
                         addNode(vm.scaffolds[0].contentTypeAlias);
                     }
+                    modelWasChanged = true;
                 }
 
                 // If there is only one item, set it as current node
@@ -482,7 +503,13 @@
                     setCurrentNode(vm.nodes[0]);
                 }
 
+                validate();
+
                 vm.inited = true;
+
+                if (modelWasChanged) {
+                    updateModel();
+                }
 
                 updatePropertyActionStates();
                 checkAbilityToPasteContent();
@@ -490,7 +517,7 @@
         }
 
         function createNode(scaffold, fromNcEntry) {
-            var node = angular.copy(scaffold);
+            var node = Utilities.copy(scaffold);
 
             node.key = fromNcEntry && fromNcEntry.key ? fromNcEntry.key : String.CreateGuid();
 
@@ -566,17 +593,17 @@
         }
 
         function updatePropertyActionStates() {
-            copyAllEntriesAction.isDisabled = !model.value || model.value.length === 0;
-            removeAllEntriesAction.isDisabled = !model.value || model.value.length === 0;
+            copyAllEntriesAction.isDisabled = !model.value || !model.value.length;
+            removeAllEntriesAction.isDisabled = copyAllEntriesAction.isDisabled;
         }
 
 
-        
+
         var propertyActions = [
             copyAllEntriesAction,
             removeAllEntriesAction
         ];
-        
+
         this.$onInit = function () {
             if (this.umbProperty) {
                 this.umbProperty.setPropertyActions(propertyActions);
@@ -587,25 +614,28 @@
             updateModel();
         });
 
+        var validate = function () {
+            if (vm.nodes.length < vm.minItems) {
+                $scope.nestedContentForm.minCount.$setValidity("minCount", false);
+            }
+            else {
+                $scope.nestedContentForm.minCount.$setValidity("minCount", true);
+            }
+
+            if (vm.nodes.length > vm.maxItems) {
+                $scope.nestedContentForm.maxCount.$setValidity("maxCount", false);
+            }
+            else {
+                $scope.nestedContentForm.maxCount.$setValidity("maxCount", true);
+            }
+        }
+
         var watcher = $scope.$watch(
             function () {
                 return vm.nodes.length;
             },
             function () {
-                //Validate!
-                if (vm.nodes.length < vm.minItems) {
-                    $scope.nestedContentForm.minCount.$setValidity("minCount", false);
-                }
-                else {
-                    $scope.nestedContentForm.minCount.$setValidity("minCount", true);
-                }
-
-                if (vm.nodes.length > vm.maxItems) {
-                    $scope.nestedContentForm.maxCount.$setValidity("maxCount", false);
-                }
-                else {
-                    $scope.nestedContentForm.maxCount.$setValidity("maxCount", true);
-                }
+                validate();
             }
         );
 

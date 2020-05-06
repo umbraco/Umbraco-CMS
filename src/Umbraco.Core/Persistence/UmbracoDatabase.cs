@@ -44,6 +44,8 @@ namespace Umbraco.Core.Persistence
             _commandRetryPolicy = commandRetryPolicy;
 
             EnableSqlTrace = EnableSqlTraceDefault;
+
+            NPocoDatabaseExtensions.ConfigureNPocoBulkExtensions();
         }
 
         /// <summary>
@@ -57,6 +59,8 @@ namespace Umbraco.Core.Persistence
             _logger = logger;
 
             EnableSqlTrace = EnableSqlTraceDefault;
+
+            NPocoDatabaseExtensions.ConfigureNPocoBulkExtensions();
         }
 
         #endregion

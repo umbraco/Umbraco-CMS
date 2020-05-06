@@ -103,14 +103,21 @@
 
 
 
-
+.umb-toggle.umb-toggle--disabled.umb-toggle--checked,
 .umb-toggle.umb-toggle--disabled {
     .umb-toggle__toggle {
         cursor: not-allowed;
-        border-color: @gray-5;
+        background-color: @gray-9;
+        border-color: @gray-9;
+    }
+    .umb-toggle__icon--left {
+        color: @gray-6;
+    }
+    .umb-toggle__icon--right {
+        color: @gray-6;
     }
     .umb-toggle__handler {
-        background-color: @gray-5;
+        background-color: @gray-10;
     }
 }
 

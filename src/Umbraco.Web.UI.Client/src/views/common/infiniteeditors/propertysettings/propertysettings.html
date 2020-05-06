@@ -83,7 +83,6 @@
                                 >
                                     <i class="icon icon-wrong"></i>
                                 </button>
-
                             </div>
 
                         </div>
@@ -92,14 +91,15 @@
 
                             <h5><localize key="validation_validation"></localize></h5>
 
-                            <label>
-                                <localize key="validation_fieldIsMandatory"></localize>
-                            </label>
-
                             <umb-toggle data-element="validation_mandatory"
                                         checked="model.property.validation.mandatory"
-                                        on-click="vm.toggleValidation()">
+                                        on-click="vm.toggleValidation()"
+                                        label-on="{{vm.labels.fieldIsMandatory}}"
+                                        label-off="{{vm.labels.fieldIsMandatory}}"
+                                        show-labels="true"
+                                        label-position="right"
                                         focus-when="{{vm.focusOnMandatoryField}}"
+                                        class="mb1">
                             </umb-toggle>
 
                             <input type="text"
@@ -141,13 +141,23 @@
                         </div>
                         <div class="umb-control-group clearfix -no-border" ng-if="model.contentType === 'documentType' && model.contentTypeAllowCultureVariant">
 
-                                    <h5><localize key="contentTypeEditor_variantsHeading" /></h5>
+                            <h5><localize key="contentTypeEditor_variantsHeading" /></h5>
+                            <umb-toggle data-element="permissions-allow-culture-variant"
+                                        checked="model.property.allowCultureVariant"
+                                        on-click="vm.toggleAllowCultureVariants()"
+                            >
+                            </umb-toggle>
 
-                                    <umb-toggle data-element="permissions-allow-culture-variant"
-                                                checked="model.property.allowCultureVariant"
-                                                on-click="vm.toggleAllowCultureVariants()"
-                                    >
-                                    </umb-toggle>
+                        </div>
+                        <div class="umb-control-group clearfix" ng-if="model.contentType === 'documentType' && model.contentTypeAllowSegmentVariant">
+
+                            <h5><localize key="contentTypeEditor_segmentVariantHeading" /></h5>
+
+                            <umb-toggle data-element="permissions-allow-segment-variant"
+                                        checked="model.property.allowSegmentVariant"
+                                        on-click="vm.toggleAllowSegmentVariants()"
+                            >
+                            </umb-toggle>
 
                         </div>
 
