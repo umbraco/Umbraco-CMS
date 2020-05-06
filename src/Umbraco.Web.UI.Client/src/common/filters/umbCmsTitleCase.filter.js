@@ -12,7 +12,7 @@
 angular.module("umbraco.filters").filter('umbCmsTitleCase', function() {
     return function (str) {
         return str.replace(
-            \w\S*/g,
+            /\w\S*/g,
             txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
         );
     }
