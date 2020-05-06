@@ -117,7 +117,7 @@
                     <li data-element="property-{{property.alias}}" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}" ng-repeat="property in tab.properties">
 
                         <!-- Add new property -->
-                        <a href=""
+                        <button type="button"
                             data-element="property-add"
                             class="umb-group-builder__group-add-property"
                             ng-if="property.propertyState=='init' && !sortingMode"
@@ -125,7 +125,7 @@
                             ng-focus="activateGroup(tab)"
                             focus-when="{{property.focus}}">
                             <localize key="contentTypeEditor_addProperty"></localize>
-                        </a>
+                        </button>
 
                         <div class="umb-group-builder__property" ng-if="property.propertyState!=='init'" ng-class="{'-active': property.dialogIsOpen, '-active': property.propertyState=='active', '-inherited': property.inherited, '-locked': property.locked, 'umb-group-builder__property-handle -sortable': sortingMode && !property.inherited, '-sortable-locked': sortingMode && property.inherited}">
 
