@@ -511,7 +511,11 @@ input.umb-group-builder__group-sort-value {
             line-height: 58px;
             border-radius: 5px;
             float: left;
-            margin-right: 20px;
+            margin-right: 5px;
+
+            &:hover, &:focus {
+                border-color: @gray-6;
+            }
 
             .icon {
                 font-size: 26px;
@@ -520,7 +524,7 @@ input.umb-group-builder__group-sort-value {
 
         .editor-details {
             float: left;
-            margin-top: 10px;
+            margin-top: 0;
 
             .editor-name {
                 display: block;
@@ -536,6 +540,7 @@ input.umb-group-builder__group-sort-value {
         .editor-settings-icon {
             font-size: 18px;
             margin-top: 8px;
+            margin-left: 5px;
         }
     }
 

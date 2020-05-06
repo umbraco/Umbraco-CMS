@@ -60,20 +60,20 @@
                     
                             <div class="editor flex clearfix" ng-if="model.property.editor">
                     
-                                <button type="button" class="flex-none editor-icon-wrapper" ng-click="vm.openDataTypePicker(model.property)">
+                                <button type="button" class="btn-reset flex-none editor-icon-wrapper" ng-click="vm.openDataTypePicker(model.property)">
                                     <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}" aria-hidden="true"></i>
                                 </button>
                     
                                 <div class="editor-details flex-auto">
                                     <button type="button" class="btn btn-link" ng-click="vm.openDataTypePicker(model.property)">
-                                        <span class="flex flex-column">
+                                        <span class="flex flex-column text-left">
                                             <span class="editor-name">{{ model.property.dataTypeName }}</span>
                                             <span class="editor-editor">{{ model.property.editor }}</span>
                                         </span>
                                     </button>
                                 </div>
                     
-                                <button type="button" class="btn btn-link editor-settings-icon pull-right"
+                                <button type="button" class="btn-reset editor-settings-icon self-start"
                                         ng-click="vm.openDataTypeSettings(model.property)"
                                         hotkey="alt+shift+d"
                                         ng-if="model.property.editor">
