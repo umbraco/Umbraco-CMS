@@ -41,19 +41,19 @@
                             </div>
                         </div>
 
-                        <a data-element="editor-add" href="" ng-if="!model.parameter.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openMacroParameterPicker(model.parameter)">
+                        <button type="button" data-element="editor-add" ng-if="!model.parameter.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openMacroParameterPicker(model.parameter)">
                             <localize key="shortcuts_addEditor"></localize>
-                        </a>
+                        </button>
 
                         <div class="editor clearfix" ng-if="model.parameter.editor">
 
-                            <a href="" class="editor-icon-wrapper" ng-click="vm.openMacroParameterPicker(model.parameter)">
-                                <i class="icon {{model.parameter.dataTypeIcon}}" ng-class="{'icon-autofill': model.parameter.dataTypeIcon == null}"></i>
-                            </a>
+                            <button type="button" class="editor-icon-wrapper" ng-click="vm.openMacroParameterPicker(model.parameter)">
+                                <i class="icon {{model.parameter.dataTypeIcon}}" ng-class="{'icon-autofill': model.parameter.dataTypeIcon == null}" aria-hidden="true"></i>
+                            </button>
 
                             <div class="editor-details">
-                                <a href="" class="editor-name" ng-click="vm.openMacroParameterPicker(model.parameter)">{{model.parameter.dataTypeName}}</a>
-                                <a href="" class="editor-editor" ng-click="vm.openMacroParameterPicker(model.parameter)">{{model.parameter.editor}}</a>
+                                <button type="button" class="editor-name" ng-click="vm.openMacroParameterPicker(model.parameter)">{{model.parameter.dataTypeName}}</button>
+                                <button type="button" class="editor-editor" ng-click="vm.openMacroParameterPicker(model.parameter)">{{model.parameter.editor}}</button>
                             </div>
 
                         </div>
