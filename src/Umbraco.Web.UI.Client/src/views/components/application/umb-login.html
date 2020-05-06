@@ -8,7 +8,7 @@
             <img src="assets/img/application/umbraco_logo_white.svg">
         </div>
 
-        <div ng-show="vm.invitedUser != null" class="umb-login-container">
+        <div ng-if="!vm.denyLocalLogin" ng-show="vm.invitedUser != null" class="umb-login-container">
 
             <form name="inviteUserPasswordForm" novalidate="" ng-submit="vm.inviteSavePassword()" val-form-manager>
                 <div class="form" ng-if="vm.inviteStep === 1">
@@ -104,7 +104,7 @@
             </div>
 
         </div>
-        <div ng-show="vm.invitedUser == null && vm.inviteStep === 3" ng-if="vm.inviteStep === 3" class="umb-login-container">
+        <div ng-if="!vm.denyLocalLogin" ng-show="vm.invitedUser == null && vm.inviteStep === 3" ng-if="vm.inviteStep === 3" class="umb-login-container">
             <div class="form">
                 <h1 style="margin-bottom: 10px; text-align: left;">Hi there</h1>
                 <p style="line-height: 1.6; margin-bottom: 25px;">
@@ -146,7 +146,7 @@
 
                     </div>
 
-                    <form method="POST" name="vm.loginForm" ng-submit="vm.loginSubmit()">
+                    <form ng-if="!vm.denyLocalLogin" method="POST" name="vm.loginForm" ng-submit="vm.loginSubmit()">
 
                         <div ng-messages="vm.loginForm.$error" class="control-group" aria-live="assertive">
                             <p ng-message="auth" class="text-error" role="alert">{{vm.errorMsg}}</p>
@@ -182,7 +182,7 @@
                     </form>
                 </div>
 
-                <div ng-show="vm.view == 'request-password-reset'">
+                <div ng-if="!vm.denyLocalLogin" ng-show="vm.view == 'request-password-reset'">
                     <p tabindex="0">
                         <localize key="login_forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</localize>
                     </p>
@@ -213,7 +213,7 @@
                     </form>
                 </div>
 
-                <div ng-show="vm.view == 'set-password'">
+                <div ng-if="!vm.denyLocalLogin" ng-show="vm.view == 'set-password'">
 
                     <p ng-hide="vm.resetComplete">
                         <localize key="login_setPasswordInstruction">Please provide a new password.</localize>
@@ -249,7 +249,7 @@
                     </form>
                 </div>
 
-                <div ng-show="vm.view == 'password-reset-code-expired'">
+                <div ng-if="!vm.denyLocalLogin" ng-show="vm.view == 'password-reset-code-expired'">
                     <div class="text-error" ng-repeat="error in vm.resetPasswordCodeInfo.errors">
                         <span>{{error}}</span>
                     </div>
@@ -259,7 +259,7 @@
                     </div>
                 </div>
 
-                <div ng-show="vm.view == '2fa-login'">
+                <div ng-if="!vm.denyLocalLogin" ng-show="vm.view == '2fa-login'">
                     <div ng-include='vm.twoFactor.view'></div>
                 </div>
 

@@ -13,7 +13,10 @@
             }
         });
 
-    function UmbLoginController($scope, $location, currentUserResource, formHelper, mediaHelper, umbRequestHelper, Upload, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, $q, $route) {
+    function UmbLoginController($scope, $location, currentUserResource, formHelper,
+        mediaHelper, umbRequestHelper, Upload, localizationService,
+        userService, externalLoginInfo, externalLoginInfoService,
+        resetPasswordCodeInfo, $timeout, authResource, $q, $route) {
 
         const vm = this;
 
@@ -44,6 +47,7 @@
         vm.errorMsg = "";
         vm.externalLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl;
         vm.externalLoginProviders = externalLoginInfo.providers;
+        vm.denyLocalLogin = externalLoginInfoService.hasDenyLocalLogin();
         vm.externalLoginInfo = externalLoginInfo;
         vm.resetPasswordCodeInfo = resetPasswordCodeInfo;
         vm.backgroundImage = Umbraco.Sys.ServerVariables.umbracoSettings.loginBackgroundImage;

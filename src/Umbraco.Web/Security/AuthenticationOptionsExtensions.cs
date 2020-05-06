@@ -59,6 +59,11 @@ namespace Umbraco.Web.Security
             return options;
         }
 
+        public static void DenyLocalLogin(this AuthenticationOptions options)
+        {
+            options.Description.Properties["UmbracoBackOffice_DenyLocalLogin"] = true;
+        }
+
         /// <summary>
         /// Configures the properties of the authentication description instance for use with Umbraco back office
         /// </summary>

@@ -1,4 +1,4 @@
-﻿<div class="umb-user-details-details">
+﻿<div ng-controller="Umbraco.Editors.Users.DetailsController as vm" class="umb-user-details-details">
 
     <div class="umb-user-details-details__main-content">
 
@@ -252,7 +252,7 @@
                                     size="s">
                         </umb-button>
                     </div>
-                    <div>
+                    <div ng-if="!vm.denyLocalLogin">
 
                         <umb-button type="button" ng-if="model.user.userDisplayState.key !== 'Invited'"
                                     button-style="[action,block]"
@@ -274,7 +274,7 @@
                         </umb-button>
                     </div>
 
-                    <div ng-if="model.user.resetPasswordValue">
+                    <div ng-if="!vm.denyLocalLogin && model.user.resetPasswordValue">
                         <p><br />Password reset to value: <strong>{{model.user.resetPasswordValue}}</strong></p>
                     </div>
 
