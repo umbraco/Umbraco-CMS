@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Umbraco.Web.Common.Extensions
+namespace Umbraco.Extensions
 {
     public static class ControllerExtensions
     {

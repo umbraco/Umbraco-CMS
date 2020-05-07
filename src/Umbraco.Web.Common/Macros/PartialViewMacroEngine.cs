@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Common.Extensions;
+using Umbraco.Extensions;
 using Umbraco.Web.Macros;
 
 namespace Umbraco.Web.Common.Macros

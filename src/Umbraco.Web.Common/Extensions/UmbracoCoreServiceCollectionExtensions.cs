@@ -30,7 +30,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Runtime.Profiler;
 
-namespace Umbraco.Web.Common.Extensions
+namespace Umbraco.Extensions
 {
     public static class UmbracoCoreServiceCollectionExtensions
     {

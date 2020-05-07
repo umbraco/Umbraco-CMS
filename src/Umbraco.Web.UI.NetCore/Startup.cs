@@ -20,7 +20,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Web.BackOffice.AspNetCore;
-using Umbraco.Web.Common.Extensions;
+using Umbraco.Extensions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Website.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;

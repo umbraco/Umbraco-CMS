@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using StackExchange.Profiling;
 using Umbraco.Web.Common.Middleware;
 
-namespace Umbraco.Web.Common.Extensions
+namespace Umbraco.Extensions
 {
     public static class UmbracoRequestApplicationBuilderExtensions
     {

@@ -1,7 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Http;
 
-namespace Umbraco.Web.Common.Extensions
+namespace Umbraco.Extensions
 {
     public static class HttpContextAccessorExtensions
     {

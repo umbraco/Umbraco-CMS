@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Web.Common.Extensions;
+using Umbraco.Extensions;
 using Umbraco.Web.Common.Lifetime;
 using Umbraco.Web.Routing;
 

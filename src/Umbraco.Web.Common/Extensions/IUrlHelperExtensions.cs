@@ -4,10 +4,10 @@ using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.Extensions;
+using Umbraco.Extensions;
 using Umbraco.Web.WebApi;
 
-namespace Umbraco.Web
+namespace Umbraco.Extensions
 {
     public static class HttpUrlHelperExtensions
     {

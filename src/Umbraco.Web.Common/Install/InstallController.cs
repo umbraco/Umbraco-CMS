@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.WebAssets;
+using Umbraco.Extensions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Install;
 using Umbraco.Web.Security;
