@@ -26,6 +26,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Composing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
+using Umbraco.Web.Editors.Filters;
 
 namespace Umbraco.Web.Editors
 {
@@ -75,6 +76,7 @@ namespace Umbraco.Web.Editors
         /// This will also update the security stamp for the user so it can only be used once
         /// </remarks>
         [ValidateAngularAntiForgeryToken]
+        [DenyLocalLoginAuthorization]
         public async Task<UserDisplay> PostVerifyInvite([FromUri]int id, [FromUri]string token)
         {
             if (string.IsNullOrWhiteSpace(token))
@@ -110,6 +112,8 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public async Task<HttpResponseMessage> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)
         {
+            // TODO: If DenyLocalLogin is enabled for this provider we cannot unlink
+
             var result = await UserManager.RemoveLoginAsync(
                 User.Identity.GetUserId<int>(),
                 new UserLoginInfo(unlinkLoginModel.LoginProvider, unlinkLoginModel.ProviderKey));
@@ -178,6 +182,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [WebApi.UmbracoAuthorize(requireApproval: false)]
         [SetAngularAntiForgeryTokens]
+        [DenyLocalLoginAuthorization]
         public UserDetail GetCurrentInvitedUser()
         {
             var user = UmbracoContext.Security.CurrentUser;
@@ -213,6 +218,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
+        [DenyLocalLoginAuthorization]
         public async Task<HttpResponseMessage> PostLogin(LoginModel loginModel)
         {
             var http = EnsureHttpContext();
@@ -286,6 +292,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
+        [DenyLocalLoginAuthorization]
         public async Task<HttpResponseMessage> PostRequestPasswordReset(RequestPasswordResetModel model)
         {
             // If this feature is switched off in configuration the UI will be amended to not make the request to reset password available.
