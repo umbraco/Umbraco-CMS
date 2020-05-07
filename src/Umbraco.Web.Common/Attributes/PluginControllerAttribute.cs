@@ -4,7 +4,7 @@ using System.Linq;
 namespace Umbraco.Web.Common.Attributes
 {
     /// <summary>
-    /// Indicates that a controller is a plugin tree controller and should be routed to its own area.
+    /// Indicates that a controller is a plugin controller and should be routed to its own area.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class PluginControllerAttribute : Attribute
