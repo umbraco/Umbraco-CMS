@@ -16,19 +16,23 @@ namespace Umbraco.Web.Common.Attributes
     /// </summary>
     public class AngularJsonOnlyConfigurationAttribute : ActionFilterAttribute
     {
+        private readonly IOptions<MvcNewtonsoftJsonOptions> _mvcNewtonsoftJsonOptions;
+        private readonly ArrayPool<char> _arrayPool;
+        private readonly IOptions<MvcOptions> _options;
+
+        public AngularJsonOnlyConfigurationAttribute(IOptions<MvcNewtonsoftJsonOptions> mvcNewtonsoftJsonOptions, ArrayPool<char> arrayPool, IOptions<MvcOptions> options)
+        {
+            _mvcNewtonsoftJsonOptions = mvcNewtonsoftJsonOptions;
+            _arrayPool = arrayPool;
+            _options = options;
+        }
 
         public override void OnResultExecuting(ResultExecutingContext context)
         {
-
-            var mvcNewtonsoftJsonOptions = context.HttpContext.RequestServices.GetService<IOptions<MvcNewtonsoftJsonOptions>>();
-            var arrayPool = context.HttpContext.RequestServices.GetService<ArrayPool<char>>();
-            var mvcOptions = context.HttpContext.RequestServices.GetService<IOptions<MvcOptions>>();
-
-
             if (context.Result is ObjectResult objectResult)
             {
                 objectResult.Formatters.Clear();
-                objectResult.Formatters.Add(new AngularJsonMediaTypeFormatter(mvcNewtonsoftJsonOptions.Value.SerializerSettings, arrayPool, mvcOptions.Value));
+                objectResult.Formatters.Add(new AngularJsonMediaTypeFormatter(_mvcNewtonsoftJsonOptions.Value.SerializerSettings, _arrayPool, _options.Value));
             }
 
             base.OnResultExecuting(context);

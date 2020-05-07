@@ -17,7 +17,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Common.Install
 {
-    [AngularJsonOnlyConfiguration]
+    [TypeFilter(typeof(AngularJsonOnlyConfigurationAttribute))]
     [HttpInstallAuthorize]
     [Area("Install")]
     public class InstallApiController : Controller
