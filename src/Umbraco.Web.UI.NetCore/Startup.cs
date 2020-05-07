@@ -63,6 +63,7 @@ namespace Umbraco.Web.UI.BackOffice
             services.AddMvc(options =>
             {
                 options.Filters.Add<HttpResponseExceptionFilter>();
+
             }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddNewtonsoftJson(options =>
                 {
@@ -114,14 +115,15 @@ namespace Umbraco.Web.UI.BackOffice
                     Action = "Default"
                 });
 
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
 
                 endpoints.MapControllerRoute("Install", "/install/{controller}/{Action}", defaults:new { Area = "Install"});
 
                 //TODO register routing correct: Name must be like this
                 endpoints.MapControllerRoute("umbraco-api-UmbracoInstall-InstallApi", "/install/api/{Action}", defaults:new { Area = "Install", Controller = "InstallApi"});
+
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller}/{action=Index}/{id?}");
 
                 endpoints.MapGet("/", async context =>
                 {
