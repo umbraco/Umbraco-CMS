@@ -90,6 +90,7 @@ namespace Umbraco.Web.Common.Install
         /// <summary>
         ///     Installs.
         /// </summary>
+        [HttpPost]
         public async Task<InstallProgressResultModel> PostPerformInstall([FromBody] InstallInstructions installModel)
         {
             if (installModel == null) throw new ArgumentNullException(nameof(installModel));
