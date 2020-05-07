@@ -27,6 +27,7 @@ namespace Umbraco.Web.Common.Attributes
 
             if (context.Result is ObjectResult objectResult)
             {
+                objectResult.Formatters.Clear();
                 objectResult.Formatters.Add(new AngularJsonMediaTypeFormatter(mvcNewtonsoftJsonOptions.Value.SerializerSettings, arrayPool, mvcOptions.Value));
             }
 
