@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Core.Exceptions;
+using Umbraco.Web.Common.Exceptions;
 
 namespace Umbraco.Web.Common.Filters
 {

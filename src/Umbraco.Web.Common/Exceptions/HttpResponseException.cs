@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Exceptions
+namespace Umbraco.Web.Common.Exceptions
 {
     [Serializable]
     public class HttpResponseException : Exception
@@ -38,6 +38,17 @@ namespace Umbraco.Core.Exceptions
             info.AddValue(nameof(AdditionalHeaders), AdditionalHeaders);
 
             base.GetObjectData(info, context);
+        }
+
+        public static HttpResponseException CreateValidationErrorResponse(object model)
+        {
+            return new HttpResponseException(HttpStatusCode.BadRequest, model)
+            {
+                AdditionalHeaders =
+                {
+                    ["X-Status-Reason"] = "Validation failed"
+                }
+            };
         }
     }
 }

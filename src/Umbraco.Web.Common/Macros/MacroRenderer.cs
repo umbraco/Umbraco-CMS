@@ -85,7 +85,7 @@ namespace Umbraco.Web.Macros
             {
                 object key = 0;
 
-                if (_umbracoContextAccessor.UmbracoContext.Security.IsAuthenticated())
+                if (_umbracoContextAccessor.GetRequiredUmbracoContext().Security.IsAuthenticated())
                 {
                     key = _memberUserKeyProvider.GetMemberProviderUserKey() ?? 0;
                 }

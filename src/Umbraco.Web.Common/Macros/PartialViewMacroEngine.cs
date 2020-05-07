@@ -74,8 +74,6 @@ namespace Umbraco.Web.Common.Macros
 
             //lets render this controller as a child action
             var viewContext = new ViewContext();
-            //try and extract the current view context from the route values, this would be set in the UmbracoViewPage or in
-            // the UmbracoPageResult if POSTing to an MVC controller but rendering in Webforms
 
             routeVals.DataTokens.Add("ParentActionViewContext", viewContext);
 

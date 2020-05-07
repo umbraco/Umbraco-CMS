@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Net;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Install;
 using Umbraco.Web.Install.Models;
 
@@ -152,32 +151,20 @@ namespace Umbraco.Web.Common.Install
                     var installException = ex as InstallException;
                     if (installException != null)
                     {
-                        throw new HttpResponseException(HttpStatusCode.BadRequest, new
+                        throw HttpResponseException.CreateValidationErrorResponse(new
                         {
                             view = installException.View,
                             model = installException.ViewModel,
                             message = installException.Message
-                        })
-                        {
-                         AdditionalHeaders   =
-                         {
-                             ["X-Status-Reason"] =  "Validation failed"
-                         }
-                        };
+                        });
                     }
 
-                    throw new HttpResponseException(HttpStatusCode.BadRequest,new
+                    throw HttpResponseException.CreateValidationErrorResponse(new
                     {
                         step = step.Name,
                         view = "error",
                         message = ex.Message
-                    })
-                    {
-                        AdditionalHeaders   =
-                        {
-                            ["X-Status-Reason"] =  "Validation failed"
-                        }
-                    };
+                    });
                 }
             }
 
