@@ -271,6 +271,7 @@ For extra details about options and events take a look here: https://refreshless
                             var lastOffset = 1000 - 10 * poolPositions[poolIndex][last];
                             offset = (textIsRtl && !isVertical ? 100 : 0) + (offset / handlesInPool) - lastOffset;
 
+                            // Filter to unique values
                             var tooltipValues = poolValues[poolIndex].filter((v, i, a) => a.indexOf(v) === i); 
 
                             // Center this tooltip over the affected handles
