@@ -10,5 +10,7 @@ namespace Umbraco.Web
         event EventHandler<UmbracoRequestEventArgs> EndRequest;
         event EventHandler<RoutableAttemptEventArgs> RouteAttempt;
         Uri GetRequestUrl();
+
+        Uri GetApplicationUrl();
     }
 }

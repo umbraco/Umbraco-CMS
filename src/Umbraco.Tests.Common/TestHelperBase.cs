@@ -51,11 +51,8 @@ namespace Umbraco.Tests.Common
         public IRuntimeState GetRuntimeState()
         {
             return new RuntimeState(
-                Mock.Of<ILogger>(),
                 Mock.Of<IGlobalSettings>(),
-                GetUmbracoVersion(),
-                GetBackOfficeInfo(),
-                GetHostingEnvironment());
+                GetUmbracoVersion());
         }
 
         public abstract IBackOfficeInfo GetBackOfficeInfo();

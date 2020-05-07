@@ -15,12 +15,12 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     public class ExcessiveHeadersCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
-        private readonly IRuntimeState _runtime;
+        private readonly IRequestAccessor _requestAccessor;
 
-        public ExcessiveHeadersCheck(ILocalizedTextService textService, IRuntimeState runtime)
+        public ExcessiveHeadersCheck(ILocalizedTextService textService, IRequestAccessor requestAccessor)
         {
             _textService = textService;
-            _runtime = runtime;
+            _requestAccessor = requestAccessor;
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         {
             var message = string.Empty;
             var success = false;
-            var url = _runtime.ApplicationUrl;
+            var url = _requestAccessor.GetApplicationUrl();
 
             // Access the site home page and check for the headers
             var request = WebRequest.Create(url);

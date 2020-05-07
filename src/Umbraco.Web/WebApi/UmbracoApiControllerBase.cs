@@ -114,11 +114,6 @@ namespace Umbraco.Web.WebApi
         internal IRuntimeState RuntimeState { get; }
 
         /// <summary>
-        /// Gets the application url.
-        /// </summary>
-        protected Uri ApplicationUrl => RuntimeState.ApplicationUrl;
-
-        /// <summary>
         /// Gets the mapper.
         /// </summary>
         public UmbracoMapper Mapper { get; }

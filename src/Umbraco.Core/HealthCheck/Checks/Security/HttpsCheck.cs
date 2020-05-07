@@ -19,20 +19,20 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     public class HttpsCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
-        private readonly IRuntimeState _runtime;
         private readonly IGlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
         private readonly ILogger _logger;
+        private readonly IRequestAccessor _requestAccessor;
 
         private const string FixHttpsSettingAction = "fixHttpsSetting";
 
-        public HttpsCheck(ILocalizedTextService textService, IRuntimeState runtime, IGlobalSettings globalSettings, IIOHelper ioHelper, ILogger logger)
+        public HttpsCheck(ILocalizedTextService textService, IGlobalSettings globalSettings, IIOHelper ioHelper, ILogger logger, IRequestAccessor requestAccessor)
         {
             _textService = textService;
-            _runtime = runtime;
             _globalSettings = globalSettings;
             _ioHelper = ioHelper;
             _logger = logger;
+            _requestAccessor = requestAccessor;
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
             // Attempt to access the site over HTTPS to see if it HTTPS is supported
             // and a valid certificate has been configured
-            var url = _runtime.ApplicationUrl.ToString().Replace("http:", "https:");
+            var url = _requestAccessor.GetApplicationUrl().ToString().Replace("http:", "https:");
             var request = (HttpWebRequest) WebRequest.Create(url);
             request.Method = "HEAD";
 
@@ -136,7 +136,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
         private HealthCheckStatus CheckIfCurrentSchemeIsHttps()
         {
-            var uri = _runtime.ApplicationUrl;
+            var uri =  _requestAccessor.GetApplicationUrl();
             var success = uri.Scheme == "https";
 
             var actions = new List<HealthCheckAction>();
@@ -152,7 +152,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         private HealthCheckStatus CheckHttpsConfigurationSetting()
         {
             var httpsSettingEnabled = _globalSettings.UseHttps;
-            var uri = _runtime.ApplicationUrl;
+            var uri =  _requestAccessor.GetApplicationUrl();
             var actions = new List<HealthCheckAction>();
 
             string resultMessage;

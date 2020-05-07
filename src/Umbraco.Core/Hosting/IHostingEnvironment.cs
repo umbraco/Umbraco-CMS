@@ -23,8 +23,6 @@ namespace Umbraco.Core.Hosting
         /// </remarks>
         string ApplicationVirtualPath { get; }
 
-        string ApplicationServerAddress { get; }
-
         bool IsDebugMode { get; }
 
         /// <summary>

@@ -3,14 +3,11 @@ using System.Threading;
 using Semver;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Sync;
 
 namespace Umbraco.Core
 {
@@ -19,27 +16,16 @@ namespace Umbraco.Core
     /// </summary>
     public class RuntimeState : IRuntimeState
     {
-        private readonly ILogger _logger;
         private readonly IGlobalSettings _globalSettings;
-        private readonly ConcurrentHashSet<string> _applicationUrls = new ConcurrentHashSet<string>();
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IBackOfficeInfo _backOfficeInfo;
-        private readonly IHostingEnvironment _hostingEnvironment;
-        private Uri _applicationUrl;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
         /// </summary>
-        public RuntimeState(ILogger logger, IGlobalSettings globalSettings,
-            IUmbracoVersion umbracoVersion,
-            IBackOfficeInfo backOfficeInfo,
-            IHostingEnvironment hostingEnvironment)
+        public RuntimeState(IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion)
         {
-            _logger = logger;
             _globalSettings = globalSettings;
             _umbracoVersion = umbracoVersion;
-            _backOfficeInfo = backOfficeInfo;
-            _hostingEnvironment = hostingEnvironment;
         }
 
 
@@ -53,13 +39,6 @@ namespace Umbraco.Core
         public SemVersion SemanticVersion => _umbracoVersion.SemanticVersion;
 
         /// <inheritdoc />
-        public Uri ApplicationUrl
-        {
-            get => _applicationUrl ??= new Uri(_hostingEnvironment.ApplicationServerAddress);
-            private set => _applicationUrl = value;
-        }
-
-        /// <inheritdoc />
         public string CurrentMigrationState { get; private set; }
 
         /// <inheritdoc />
@@ -70,32 +49,6 @@ namespace Umbraco.Core
 
         /// <inheritdoc />
         public RuntimeLevelReason Reason { get; internal set; } = RuntimeLevelReason.Unknown;
-
-
-        /// <summary>
-        /// Ensures that the <see cref="ApplicationUrl"/> property has a value.
-        /// </summary>
-        public void EnsureApplicationUrl()
-        {
-            //Fixme: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
-            // it changes the URL to `localhost:80` which actually doesn't work for pinging itself, it only works internally in Azure. The ironic part
-            // about this is that this is here specifically for the slot swap scenario https://issues.umbraco.org/issue/U4-10626
-
-
-            // see U4-10626 - in some cases we want to reset the application url
-            // (this is a simplified version of what was in 7.x)
-            // note: should this be optional? is it expensive?
-            var url = _backOfficeInfo.GetAbsoluteUrl;
-
-            var change = url != null && !_applicationUrls.Contains(url);
-
-            if (change)
-            {
-                _logger.Info<RuntimeState>("New url {Url} detected, re-discovering application url.", url);
-                _applicationUrls.Add(url);
-                ApplicationUrl = new Uri(url);
-            }
-        }
 
         /// <inheritdoc />
         public BootFailedException BootFailedException { get; internal set; }

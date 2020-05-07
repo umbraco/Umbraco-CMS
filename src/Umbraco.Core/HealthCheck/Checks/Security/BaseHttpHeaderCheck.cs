@@ -14,7 +14,6 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 {
     public abstract class BaseHttpHeaderCheck : HealthCheck
     {
-        protected IRuntimeState Runtime { get; }
         protected ILocalizedTextService TextService { get; }
 
         private const string SetHeaderInConfigAction = "setHeaderInConfig";
@@ -23,15 +22,16 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         private readonly string _value;
         private readonly string _localizedTextPrefix;
         private readonly bool _metaTagOptionAvailable;
+        private readonly IRequestAccessor _requestAccessor;
         private readonly IIOHelper _ioHelper;
 
         protected BaseHttpHeaderCheck(
-            IRuntimeState runtime,
+            IRequestAccessor requestAccessor,
             ILocalizedTextService textService,
             string header, string value, string localizedTextPrefix, bool metaTagOptionAvailable, IIOHelper ioHelper)
         {
-            Runtime = runtime;
             TextService = textService ?? throw new ArgumentNullException(nameof(textService));
+            _requestAccessor = requestAccessor;
             _ioHelper = ioHelper;
             _header = header;
             _value = value;
@@ -72,7 +72,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var success = false;
 
             // Access the site home page and check for the click-jack protection header or meta tag
-            var url = Runtime.ApplicationUrl;
+            var url =  _requestAccessor.GetApplicationUrl();
             var request = WebRequest.Create(url);
             request.Method = "GET";
             try

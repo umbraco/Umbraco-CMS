@@ -11,8 +11,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         Group = "Security")]
     public class NoSniffCheck : BaseHttpHeaderCheck
     {
-        public NoSniffCheck(IRuntimeState runtime, ILocalizedTextService textService, IIOHelper ioHelper)
-            : base(runtime, textService, "X-Content-Type-Options", "nosniff", "noSniff", false, ioHelper)
+        public NoSniffCheck(IRequestAccessor requestAccessor, ILocalizedTextService textService, IIOHelper ioHelper)
+            : base(requestAccessor, textService, "X-Content-Type-Options", "nosniff", "noSniff", false, ioHelper)
         {
         }
     }

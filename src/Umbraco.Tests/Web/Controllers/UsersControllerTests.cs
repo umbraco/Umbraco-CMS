@@ -104,7 +104,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IHostingEnvironment>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
                     Factory.GetInstance<IPublishedUrlProvider>(),
-                    Factory.GetInstance<ISecuritySettings>()
+                    Factory.GetInstance<ISecuritySettings>(),
+                    Factory.GetInstance<IRequestAccessor>()
 
                 );
                 return usersController;
@@ -177,7 +178,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IHostingEnvironment>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
                     Factory.GetInstance<IPublishedUrlProvider>(),
-                    Factory.GetInstance<ISecuritySettings>()
+                    Factory.GetInstance<ISecuritySettings>(),
+                    Factory.GetInstance<IRequestAccessor>()
                 );
                 return usersController;
             }
@@ -220,7 +222,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IHostingEnvironment>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
                     Factory.GetInstance<IPublishedUrlProvider>(),
-                    Factory.GetInstance<ISecuritySettings>()
+                    Factory.GetInstance<ISecuritySettings>(),
+                    Factory.GetInstance<IRequestAccessor>()
                 );
                 return usersController;
             }
@@ -298,7 +301,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IHostingEnvironment>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
                     Factory.GetInstance<IPublishedUrlProvider>(),
-                    Factory.GetInstance<ISecuritySettings>()
+                    Factory.GetInstance<ISecuritySettings>(),
+                    Factory.GetInstance<IRequestAccessor>()
                 );
                 return usersController;
             }
@@ -488,7 +492,8 @@ namespace Umbraco.Tests.Web.Controllers
                 Factory.GetInstance<IHostingEnvironment>(),
                 Factory.GetInstance<IImageUrlGenerator>(),
                 Factory.GetInstance<IPublishedUrlProvider>(),
-                Factory.GetInstance<ISecuritySettings>());
+                Factory.GetInstance<ISecuritySettings>(),
+                Factory.GetInstance<IRequestAccessor>());
 
             var mockOwinContext = new Mock<IOwinContext>();
             var mockUserManagerMarker = new Mock<IBackOfficeUserManagerMarker>();

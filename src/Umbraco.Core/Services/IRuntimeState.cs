@@ -26,12 +26,6 @@ namespace Umbraco.Core
         SemVersion SemanticVersion { get; }
 
         /// <summary>
-        /// Gets the Umbraco application url.
-        /// </summary>
-        /// <remarks>This is eg "http://www.example.com".</remarks>
-        Uri ApplicationUrl { get; }
-
-        /// <summary>
         /// Gets the runtime level of execution.
         /// </summary>
         RuntimeLevel Level { get; }
