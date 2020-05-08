@@ -183,10 +183,16 @@ namespace Umbraco.Extensions
                 x.GetServices<IEmbeddedDatabaseCreator>()
             ));
 
+            // TODO: We want to avoid pre-resolving a container as much as possible we should not
+            // be doing this any more than we are now. The ugly part about this is that the service
+            // instances resolved here won't be the same instances resolved from the container
+            // later once the true container is built. However! ... in the case of IDbProviderFactoryCreator
+            // it will be the same instance resolved later because we are re-registering this instance back
+            // into the container. This is not true for `Configs` but we should do that too, see comments in
+            // `RegisterEssentials`.
             var serviceProvider = services.BuildServiceProvider();
             var configs = serviceProvider.GetService<Configs>();
             var dbProviderFactoryCreator = serviceProvider.GetRequiredService<IDbProviderFactoryCreator>();
-
 
             CreateCompositionRoot(services,
                 configs,
