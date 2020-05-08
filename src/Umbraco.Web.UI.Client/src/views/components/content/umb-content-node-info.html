@@ -5,7 +5,7 @@
         <umb-box ng-if="currentUrls" data-element="node-info-urls">
             <umb-box-header title-key="general_links"></umb-box-header>
             <umb-box-content class="block-form">
-                <ul class="nav nav-stacked" style="margin-bottom: 0;">
+                <ul class="nav nav-stacked mb0">
                     <li ng-repeat="url in currentUrls">
                         <a href="{{url.text}}" target="_blank" ng-if="url.isUrl">
                             <span ng-if="currentUrlsHaveMultipleCultures && url.culture" style="font-size: 13px; color: #cccccc; width: 50px;display: inline-block">{{url.culture}}</span>
