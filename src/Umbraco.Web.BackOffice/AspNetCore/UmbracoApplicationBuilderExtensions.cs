@@ -6,6 +6,7 @@ using Smidge;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
+using Umbraco.Extensions;
 using Umbraco.Infrastructure.Logging.Serilog.Enrichers;
 using Umbraco.Web.Common.Middleware;
 
@@ -17,9 +18,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
 
-            var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
-            // can't continue if boot failed
-            if (runtime.State.Level <= RuntimeLevel.BootFailed) return app;
+            if (!app.UmbracoCanBoot()) return app;
 
             // TODO: start the back office
 
@@ -35,10 +34,10 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
 
-            var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
-
-            if (runtime.State.Level > RuntimeLevel.BootFailed)
+            if (app.UmbracoCanBoot())
             {
+                var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
+
                 // Register a listener for application shutdown in order to terminate the runtime
                 var hostLifetime = app.ApplicationServices.GetRequiredService<IApplicationShutdownRegistry>();
                 var runtimeShutdown = new CoreRuntimeShutdown(runtime, hostLifetime);
@@ -53,7 +52,8 @@ namespace Umbraco.Web.BackOffice.AspNetCore
             }
             else
             {
-                // TODO: Register simple middleware to show the error like we used to in UmbracoModule?
+                // TODO: Register simple middleware to show the error like we used to in UmbracoModule? Or maybe that's part of a UseUmbracoWebsite/backoffice type thing .. probably :)
+
             }
 
             return app;
@@ -90,9 +90,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
 
-            var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
-            // can't continue if boot failed
-            if (runtime.State.Level <= RuntimeLevel.BootFailed) return app;
+            if (!app.UmbracoCanBoot()) return app;
 
             app.UseMiddleware<UmbracoRequestLoggingMiddleware>();
 
@@ -103,9 +101,7 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
 
-            var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
-            // can't continue if boot failed
-            if (runtime.State.Level <= RuntimeLevel.BootFailed) return app;
+            if (!app.UmbracoCanBoot()) return app;
 
             app.UseSmidge();
 
