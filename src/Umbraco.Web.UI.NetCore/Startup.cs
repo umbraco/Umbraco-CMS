@@ -50,9 +50,7 @@ namespace Umbraco.Web.UI.BackOffice
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddUmbracoSqlCeSupport();
-            services.AddUmbracoSqlServerSupport();
+        {   
             services.AddUmbracoConfiguration(_config);            
             services.AddUmbracoCore(_env, out var factory);
             services.AddUmbracoWebsite();
@@ -92,8 +90,8 @@ namespace Umbraco.Web.UI.BackOffice
         public void Configure(IApplicationBuilder app)
         {
 
-        //    app.UseMiniProfiler();
-            app.UseUmbracoRequest();
+            //app.UseMiniProfiler();
+            app.UseUmbracoRequestLifetime();
             if (_env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -121,13 +119,7 @@ namespace Umbraco.Web.UI.BackOffice
 
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
-
-                endpoints.MapGet("/", async context =>
-                {
-                    var profilerHtml = app.ApplicationServices.GetRequiredService<IProfilerHtml>();
-                    await context.Response.WriteAsync($"<html><body>Hello World!{profilerHtml.Render()}</body></html>");
-                });
+                    pattern: "{controller}/{action=Index}/{id?}");               
             });
         }
     }

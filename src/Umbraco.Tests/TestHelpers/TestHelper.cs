@@ -49,7 +49,7 @@ namespace Umbraco.Tests.TestHelpers
 
             }
 
-            public override IDbProviderFactoryCreator DbProviderFactoryCreator { get; } = new UmbracoDbProviderFactoryCreator(Constants.DbProviderNames.SqlCe);
+            public override IDbProviderFactoryCreator DbProviderFactoryCreator { get; } = new UmbracoDbProviderFactoryCreator();
 
             public override IBulkSqlInsertProvider BulkSqlInsertProvider { get; } = new SqlCeBulkSqlInsertProvider();
 

@@ -241,6 +241,9 @@ namespace Umbraco.Core.Runtime
 
         public void Start()
         {
+            if (_state.Level <= RuntimeLevel.BootFailed)
+                throw new InvalidOperationException($"Cannot start the runtime if the runtime level is less than or equal to {RuntimeLevel.BootFailed}");
+
             // throws if not full-trust
             _umbracoBootPermissionChecker.ThrowIfNotPermissions();
 

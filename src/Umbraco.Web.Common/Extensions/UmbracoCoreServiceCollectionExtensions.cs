@@ -173,9 +173,10 @@ namespace Umbraco.Extensions
             if (container is null) throw new ArgumentNullException(nameof(container));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
 
-            
+            services.AddUmbracoSqlCeSupport();
+            services.AddUmbracoSqlServerSupport();
+
             services.AddSingleton<IDbProviderFactoryCreator>(x => new DbProviderFactoryCreator(
-                x.GetService<Configs>().ConnectionStrings()[Core.Constants.System.UmbracoConnectionName]?.ProviderName,
                 DbProviderFactories.GetFactory,
                 x.GetServices<ISqlSyntaxProvider>(),
                 x.GetServices<IBulkSqlInsertProvider>(),

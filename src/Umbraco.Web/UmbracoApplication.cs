@@ -24,7 +24,7 @@ namespace Umbraco.Web
 
             var connectionStringConfig = configs.ConnectionStrings()[Constants.System.UmbracoConnectionName];
 
-            var dbProviderFactoryCreator = new UmbracoDbProviderFactoryCreator(connectionStringConfig?.ProviderName);
+            var dbProviderFactoryCreator = new UmbracoDbProviderFactoryCreator();
 
             var globalSettings = configs.Global();
             var connectionStrings = configs.ConnectionStrings();

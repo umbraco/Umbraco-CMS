@@ -8,26 +8,22 @@ namespace Umbraco.Core.Persistence
 {
     public class DbProviderFactoryCreator : IDbProviderFactoryCreator
     {
-        private readonly string _defaultProviderName;
         private readonly Func<string, DbProviderFactory> _getFactory;
         private readonly IDictionary<string, IEmbeddedDatabaseCreator> _embeddedDatabaseCreators;
         private readonly IDictionary<string, ISqlSyntaxProvider> _syntaxProviders;
         private readonly IDictionary<string, IBulkSqlInsertProvider> _bulkSqlInsertProviders;
 
-        public DbProviderFactoryCreator(string defaultProviderName,
+        public DbProviderFactoryCreator(
             Func<string, DbProviderFactory> getFactory,
             IEnumerable<ISqlSyntaxProvider> syntaxProviders,
             IEnumerable<IBulkSqlInsertProvider> bulkSqlInsertProviders,
             IEnumerable<IEmbeddedDatabaseCreator> embeddedDatabaseCreators)
         {
-            _defaultProviderName = defaultProviderName;
             _getFactory = getFactory;
             _embeddedDatabaseCreators = embeddedDatabaseCreators.ToDictionary(x=>x.ProviderName);
             _syntaxProviders = syntaxProviders.ToDictionary(x=>x.ProviderName);
             _bulkSqlInsertProviders = bulkSqlInsertProviders.ToDictionary(x=>x.ProviderName);
         }
-
-        public DbProviderFactory CreateFactory() => CreateFactory(_defaultProviderName);
 
         public DbProviderFactory CreateFactory(string providerName)
         {

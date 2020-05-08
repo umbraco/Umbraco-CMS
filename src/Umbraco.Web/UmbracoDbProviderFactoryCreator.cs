@@ -11,18 +11,11 @@ namespace Umbraco.Web
 {
     public class UmbracoDbProviderFactoryCreator : IDbProviderFactoryCreator
     {
-        private readonly string _defaultProviderName;
-
-        public UmbracoDbProviderFactoryCreator(string defaultProviderName)
+        public UmbracoDbProviderFactoryCreator()
         {
-            _defaultProviderName = defaultProviderName;
         }
 
-        public DbProviderFactory CreateFactory()
-        {
-            return CreateFactory(_defaultProviderName);
-        }
-
+        
         public DbProviderFactory CreateFactory(string providerName)
         {
             if (string.IsNullOrEmpty(providerName)) return null;

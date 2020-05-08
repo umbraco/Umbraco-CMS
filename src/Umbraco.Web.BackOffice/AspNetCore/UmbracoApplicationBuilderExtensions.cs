@@ -17,6 +17,12 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
 
+            var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
+            // can't continue if boot failed
+            if (runtime.State.Level <= RuntimeLevel.BootFailed) return app;
+
+            // TODO: start the back office
+
             return app;
         }
 
@@ -29,18 +35,26 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
 
-            // Register a listener for application shutdown in order to terminate the runtime
-            var hostLifetime = app.ApplicationServices.GetRequiredService<IApplicationShutdownRegistry>();
             var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
-            var runtimeShutdown = new CoreRuntimeShutdown(runtime, hostLifetime);
-            hostLifetime.RegisterObject(runtimeShutdown);
 
-            // Register our global threadabort enricher for logging
-            var threadAbortEnricher = app.ApplicationServices.GetRequiredService<ThreadAbortExceptionEnricher>();
-            LogContext.Push(threadAbortEnricher); // NOTE: We are not in a using clause because we are not removing it, it is on the global context
+            if (runtime.State.Level > RuntimeLevel.BootFailed)
+            {
+                // Register a listener for application shutdown in order to terminate the runtime
+                var hostLifetime = app.ApplicationServices.GetRequiredService<IApplicationShutdownRegistry>();
+                var runtimeShutdown = new CoreRuntimeShutdown(runtime, hostLifetime);
+                hostLifetime.RegisterObject(runtimeShutdown);
 
-            // Start the runtime!
-            runtime.Start();
+                // Register our global threadabort enricher for logging
+                var threadAbortEnricher = app.ApplicationServices.GetRequiredService<ThreadAbortExceptionEnricher>();
+                LogContext.Push(threadAbortEnricher); // NOTE: We are not in a using clause because we are not removing it, it is on the global context
+
+                // Start the runtime!
+                runtime.Start();
+            }
+            else
+            {
+                // TODO: Register simple middleware to show the error like we used to in UmbracoModule?
+            }
 
             return app;
         }
@@ -76,6 +90,10 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
 
+            var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
+            // can't continue if boot failed
+            if (runtime.State.Level <= RuntimeLevel.BootFailed) return app;
+
             app.UseMiddleware<UmbracoRequestLoggingMiddleware>();
 
             return app;
@@ -84,6 +102,10 @@ namespace Umbraco.Web.BackOffice.AspNetCore
         public static IApplicationBuilder UseUmbracoRuntimeMinification(this IApplicationBuilder app)
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
+
+            var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
+            // can't continue if boot failed
+            if (runtime.State.Level <= RuntimeLevel.BootFailed) return app;
 
             app.UseSmidge();
 
