@@ -30,7 +30,10 @@
                         <p><localize key="redirectUrls_panelInformation" class="ng-isolate-scope ng-scope">The following URLs redirect to this content item:</localize></p>
                         <ul class="nav nav-stacked" style="margin-bottom: 0;">
                             <li ng-repeat="redirectUrl in redirectUrls">
-                                <a href="{{redirectUrl.originalUrl}}" target="_blank"><i ng-class="value.icon" class="icon-out"></i> {{redirectUrl.originalUrl}}</a>
+                                <a href="{{redirectUrl.originalUrl}}" target="_blank">
+                                    <i ng-class="value.icon" class="icon-out" aria-hidden="true"></i>
+                                    {{redirectUrl.originalUrl}}
+                                </a>
                             </li>
                         </ul>
                     </div>
