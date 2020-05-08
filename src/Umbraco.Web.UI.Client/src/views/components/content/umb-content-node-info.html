@@ -9,14 +9,12 @@
                     <li ng-repeat="url in currentUrls">
                         <a href="{{url.text}}" target="_blank" ng-if="url.isUrl">
                             <span ng-if="currentUrlsHaveMultipleCultures && url.culture" style="font-size: 13px; color: #cccccc; width: 50px;display: inline-block">{{url.culture}}</span>
-                            <i class="icon icon-out"></i>
+                            <i class="icon icon-out" aria-hidden="true"></i>
                             <span>{{url.text}}</span>
                         </a>
                         <div ng-if="!url.isUrl" style="margin-top: 4px;">
-
                             <span ng-if="currentUrlsHaveMultipleCultures && url.culture" style="font-size: 13px; color: #cccccc; width: 50px;display: inline-block">{{url.culture}}</span>
                             <em>{{url.text}}</em>
-
                         </div>
                     </li>
                 </ul>
@@ -42,9 +40,7 @@
 
         <umb-box data-element="node-info-history">
 
-            <umb-box-header
-                title="{{historyLabel}}">
-                
+            <umb-box-header title="{{historyLabel}}"> 
                 <umb-button
                     ng-hide="node.trashed"
                     type="button"
@@ -104,8 +100,6 @@
                                 <span>
                                     <localize key="auditTrails_{{ item.logType | lowercase }}" tokens="[item.parameters]">{{ item.comment }}</localize>
                                 </span>
-
-                                
                             </div>
 
                         </div>
