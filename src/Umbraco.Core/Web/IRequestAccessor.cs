@@ -11,6 +11,7 @@ namespace Umbraco.Web
         event EventHandler<RoutableAttemptEventArgs> RouteAttempt;
         Uri GetRequestUrl();
 
+        // TODO: Not sure this belongs here but we can leave it for now
         Uri GetApplicationUrl();
     }
 }

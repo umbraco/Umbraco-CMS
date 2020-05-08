@@ -53,12 +53,10 @@ namespace Umbraco.Web.UI.BackOffice
         {
             services.AddUmbracoSqlCeSupport();
             services.AddUmbracoSqlServerSupport();
-
-            services.AddUmbracoConfiguration(_config);
-            services.AddUmbracoRuntimeMinifier(_config);
-
+            services.AddUmbracoConfiguration(_config);            
             services.AddUmbracoCore(_env, out var factory);
             services.AddUmbracoWebsite();
+            services.AddUmbracoRuntimeMinifier(_config);
 
             services.AddMvc(options =>
             {

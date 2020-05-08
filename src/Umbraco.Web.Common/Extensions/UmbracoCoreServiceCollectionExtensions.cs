@@ -42,12 +42,11 @@ namespace Umbraco.Extensions
                 if (binFolder != null)
                 {
                     var dllPath = Path.Combine(binFolder, "Umbraco.Persistance.SqlCe.dll");
-                    Assembly.LoadFrom(dllPath);
+                    var umbSqlCeAssembly = Assembly.LoadFrom(dllPath);
 
-
-                    var sqlCeSyntaxProviderType = Type.GetType("Umbraco.Persistance.SqlCe.SqlCeSyntaxProvider, Umbraco.Persistance.SqlCe");
-                    var sqlCeBulkSqlInsertProviderType = Type.GetType("Umbraco.Persistance.SqlCe.SqlCeBulkSqlInsertProvider, Umbraco.Persistance.SqlCe");
-                    var sqlCeEmbeddedDatabaseCreatorType = Type.GetType("Umbraco.Persistance.SqlCe.SqlCeEmbeddedDatabaseCreator, Umbraco.Persistance.SqlCe");
+                    var sqlCeSyntaxProviderType = umbSqlCeAssembly.GetType("Umbraco.Persistance.SqlCe.SqlCeSyntaxProvider");
+                    var sqlCeBulkSqlInsertProviderType = umbSqlCeAssembly.GetType("Umbraco.Persistance.SqlCe.SqlCeBulkSqlInsertProvider");
+                    var sqlCeEmbeddedDatabaseCreatorType = umbSqlCeAssembly.GetType("Umbraco.Persistance.SqlCe.SqlCeEmbeddedDatabaseCreator");
 
                     if (!(sqlCeSyntaxProviderType is null || sqlCeBulkSqlInsertProviderType is null || sqlCeEmbeddedDatabaseCreatorType is null))
                     {
@@ -56,9 +55,9 @@ namespace Umbraco.Extensions
                         services.AddSingleton(typeof(IEmbeddedDatabaseCreator), sqlCeEmbeddedDatabaseCreatorType);
                     }
 
-                    Assembly.LoadFrom(Path.Combine(binFolder, "System.Data.SqlServerCe.dll"));
+                    var sqlCeAssembly = Assembly.LoadFrom(Path.Combine(binFolder, "System.Data.SqlServerCe.dll"));
 
-                    var sqlCe = Type.GetType("System.Data.SqlServerCe.SqlCeProviderFactory, System.Data.SqlServerCe");
+                    var sqlCe = sqlCeAssembly.GetType("System.Data.SqlServerCe.SqlCeProviderFactory");
                     if (!(sqlCe is null))
                     {
                         DbProviderFactories.RegisterFactory(Core.Constants.DbProviderNames.SqlCe, sqlCe );
@@ -174,6 +173,7 @@ namespace Umbraco.Extensions
             if (container is null) throw new ArgumentNullException(nameof(container));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
 
+            
             services.AddSingleton<IDbProviderFactoryCreator>(x => new DbProviderFactoryCreator(
                 x.GetService<Configs>().ConnectionStrings()[Core.Constants.System.UmbracoConnectionName]?.ProviderName,
                 DbProviderFactories.GetFactory,

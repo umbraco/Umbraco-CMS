@@ -12,19 +12,13 @@ namespace Umbraco.Web.Common.Runtime
     {
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly IUmbracoApplicationLifetimeManager _umbracoApplicationLifetimeManager;
-        private readonly IUmbracoRequestLifetime _umbracoRequestLifetime;
-        private readonly IRuntimeState _runtimeState;
-
+        
         public AspNetCoreComponent(
             IHostApplicationLifetime hostApplicationLifetime,
-            IUmbracoApplicationLifetimeManager umbracoApplicationLifetimeManager,
-            IUmbracoRequestLifetime umbracoRequestLifetime,
-            IRuntimeState runtimeState)
+            IUmbracoApplicationLifetimeManager umbracoApplicationLifetimeManager)
         {
             _hostApplicationLifetime = hostApplicationLifetime;
             _umbracoApplicationLifetimeManager = umbracoApplicationLifetimeManager;
-            _umbracoRequestLifetime = umbracoRequestLifetime;
-            _runtimeState = runtimeState;
         }
 
         public void Initialize()

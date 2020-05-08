@@ -90,6 +90,9 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public static bool IsSqlCeAvailable()
         {
+            // NOTE: Type.GetType will only return types that are currently loaded into the appdomain. In this case
+            // that is ok because we know if this is availalbe we will have manually loaded it into the appdomain.
+            // Else we'd have to use Assembly.LoadFrom and need to know the DLL location here which we don't need to do.
             return !(Type.GetType("Umbraco.Persistance.SqlCe.SqlCeSyntaxProvider, Umbraco.Persistance.SqlCe") is null);
         }
 
