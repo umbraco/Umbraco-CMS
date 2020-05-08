@@ -1,13 +1,15 @@
 ﻿using System;
-using System.Configuration;
 using System.Net;
 using System.Text.RegularExpressions;
-using System.Web.Mvc;
-using Umbraco.Core.Configuration;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.Common.ModelBinders;
 
-namespace Umbraco.Web.Mvc
+namespace Umbraco.Web.Common.Filters
 {
     /// <summary>
     ///     An exception filter checking if we get a <see cref="ModelBindingException" /> or <see cref="InvalidCastException" /> with the same model.
@@ -16,23 +18,30 @@ namespace Umbraco.Web.Mvc
     /// <remarks>
     /// This is only enabled when running PureLive
     /// </remarks>
-    /// Migrated to .NET Core
-    internal class ModelBindingExceptionFilter : FilterAttribute, IExceptionFilter
+    internal class ModelBindingExceptionFilter : ActionFilterAttribute, IExceptionFilter
     {
-        private static readonly Regex GetPublishedModelsTypesRegex = new Regex("Umbraco.Web.PublishedModels.(\\w+)", RegexOptions.Compiled);
+        private static readonly Regex _getPublishedModelsTypesRegex = new Regex("Umbraco.Web.PublishedModels.(\\w+)", RegexOptions.Compiled);
+
+        private readonly IExceptionFilterSettings _exceptionFilterSettings;
+        private readonly IPublishedModelFactory _publishedModelFactory;
+
+        public ModelBindingExceptionFilter(IExceptionFilterSettings exceptionFilterSettings, IPublishedModelFactory publishedModelFactory)
+        {
+            _exceptionFilterSettings = exceptionFilterSettings;
+            _publishedModelFactory = publishedModelFactory ?? throw new ArgumentNullException(nameof(publishedModelFactory));
+        }
 
         public void OnException(ExceptionContext filterContext)
         {
-            var settings = Current.Factory.GetInstance<IExceptionFilterSettings>();
-            var disabled = settings?.Disabled ?? false;
-            if (Current.PublishedModelFactory.IsLiveFactory()
+            var disabled = _exceptionFilterSettings?.Disabled ?? false;
+            if (_publishedModelFactory.IsLiveFactory()
                 && !disabled
                 && !filterContext.ExceptionHandled
                 && ((filterContext.Exception is ModelBindingException || filterContext.Exception is InvalidCastException)
                     && IsMessageAboutTheSameModelType(filterContext.Exception.Message)))
             {
                 filterContext.HttpContext.Response.Headers.Add(HttpResponseHeader.RetryAfter.ToString(), "1");
-                filterContext.Result = new RedirectResult(filterContext.HttpContext.Request.RawUrl, false);
+                filterContext.Result = new RedirectResult(filterContext.HttpContext.Request.GetDisplayUrl(), false);
 
                 filterContext.ExceptionHandled = true;
             }
@@ -54,7 +63,7 @@ namespace Umbraco.Web.Mvc
         /// </remarks>
         private bool IsMessageAboutTheSameModelType(string exceptionMessage)
         {
-            var matches = GetPublishedModelsTypesRegex.Matches(exceptionMessage);
+            var matches = _getPublishedModelsTypesRegex.Matches(exceptionMessage);
 
             if (matches.Count >= 2)
             {

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
@@ -14,6 +12,7 @@ namespace Umbraco.Web.Mvc
     /// <summary>
     /// Maps view models, supporting mapping to and from any IPublishedContent or IContentModel.
     /// </summary>
+    /// Migrated to .NET Core
     public class ContentModelBinder : DefaultModelBinder, IModelBinderProvider
     {
         // use Instance
