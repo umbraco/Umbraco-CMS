@@ -64,13 +64,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         public JsonNetResult LocalizedText(string culture = null)
         {
-            //var securityHelper = _umbracoContextAccessor.GetRequiredUmbracoContext().Security;
-            //securityHelper.IsAuthenticated()
-            var isAuth = false;
+            var securityHelper = _umbracoContextAccessor.GetRequiredUmbracoContext().Security;
+            var isAuthenticated = securityHelper.IsAuthenticated();
 
             var cultureInfo = string.IsNullOrWhiteSpace(culture)
                 //if the user is logged in, get their culture, otherwise default to 'en'
-                ? isAuth
+                ? isAuthenticated
                     //current culture is set at the very beginning of each request
                     ? Thread.CurrentThread.CurrentCulture
                     : CultureInfo.GetCultureInfo(_globalSettings.DefaultUILanguage)
