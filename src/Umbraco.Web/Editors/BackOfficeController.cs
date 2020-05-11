@@ -194,6 +194,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="culture"></param>
         /// <returns></returns>
+        /// <remarks>Migrated already to .Net Core</remarks>
         [HttpGet]
         public JsonNetResult LocalizedText(string culture = null)
         {
@@ -239,7 +240,8 @@ namespace Umbraco.Web.Editors
 
             return JavaScript(result);
         }
-
+        
+        /// Migrated already to .Net Core
         [UmbracoAuthorize(Order = 0)]
         [HttpGet]
         public JsonNetResult GetGridConfig()
