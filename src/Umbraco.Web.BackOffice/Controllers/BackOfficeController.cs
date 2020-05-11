@@ -1,10 +1,18 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Globalization;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Runtime;
+using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
+using Umbraco.Web.BackOffice.ActionResults;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.WebAssets;
@@ -16,12 +24,18 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IGlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly ILocalizedTextService _textService;
+        private readonly IGridConfig _gridConfig;
 
-        public BackOfficeController(IRuntimeMinifier runtimeMinifier, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        public BackOfficeController(IRuntimeMinifier runtimeMinifier, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService, IGridConfig gridConfig)
         {
             _runtimeMinifier = runtimeMinifier;
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _textService = textService;
+            _gridConfig = gridConfig ?? throw new ArgumentNullException(nameof(gridConfig));
         }
 
         // GET
@@ -40,6 +54,55 @@ namespace Umbraco.Web.BackOffice.Controllers
             var result = await _runtimeMinifier.GetScriptForLoadingBackOfficeAsync(_globalSettings, _hostingEnvironment);
 
             return new JavaScriptResult(result);
+        }
+
+        /// <summary>
+        /// Get the json localized text for a given culture or the culture for the current user
+        /// </summary>
+        /// <param name="culture"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public JsonNetResult LocalizedText(string culture = null)
+        {
+            //var securityHelper = _umbracoContextAccessor.GetRequiredUmbracoContext().Security;
+            //securityHelper.IsAuthenticated()
+            var isAuth = false;
+
+            var cultureInfo = string.IsNullOrWhiteSpace(culture)
+                //if the user is logged in, get their culture, otherwise default to 'en'
+                ? isAuth
+                    //current culture is set at the very beginning of each request
+                    ? Thread.CurrentThread.CurrentCulture
+                    : CultureInfo.GetCultureInfo(_globalSettings.DefaultUILanguage)
+                : CultureInfo.GetCultureInfo(culture);
+
+            var allValues = _textService.GetAllStoredValues(cultureInfo);
+            var pathedValues = allValues.Select(kv =>
+            {
+                var slashIndex = kv.Key.IndexOf('/');
+                var areaAlias = kv.Key.Substring(0, slashIndex);
+                var valueAlias = kv.Key.Substring(slashIndex + 1);
+                return new
+                {
+                    areaAlias,
+                    valueAlias,
+                    value = kv.Value
+                };
+            });
+
+            var nestedDictionary = pathedValues
+                .GroupBy(pv => pv.areaAlias)
+                .ToDictionary(pv => pv.Key, pv =>
+                    pv.ToDictionary(pve => pve.valueAlias, pve => pve.value));
+
+            return new JsonNetResult { Data = nestedDictionary, Formatting = Formatting.None };
+        }
+
+        //[UmbracoAuthorize(Order = 0)] TODO: Re-implement UmbracoAuthorizeAttribute
+        [HttpGet]
+        public JsonNetResult GetGridConfig()
+        {
+            return new JsonNetResult { Data = _gridConfig.EditorsConfig.Editors, Formatting = Formatting.None };
         }
     }
 }
