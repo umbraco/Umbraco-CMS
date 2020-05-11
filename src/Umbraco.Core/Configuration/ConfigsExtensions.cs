@@ -28,6 +28,9 @@ namespace Umbraco.Core
         public static ISecuritySettings Security(this Configs configs)
             => configs.GetConfig<ISecuritySettings>();
 
+        public static ITypeFinderSettings TypeFinder(this Configs configs)
+            => configs.GetConfig<ITypeFinderSettings>();
+
 
         public static IUserPasswordConfiguration UserPasswordConfiguration(this Configs configs)
             => configs.GetConfig<IUserPasswordConfiguration>();

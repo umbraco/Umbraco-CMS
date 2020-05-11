@@ -20,6 +20,10 @@ namespace Umbraco.Core
         /// These services are all either created by the runtime or used to construct the runtime
         /// </remarks>
         public static void RegisterEssentials(this Composition composition,
+            // TODO: Configs should be here too, the reason is that we only register them before the Core Runtime in aspnetcore
+            // then we pre-resolve them which means that the instance re-resolved later is different... BUT if we register that
+            // pre-resolved instance here again, then it will be the same instance re-resolved later, just like we are doing with
+            // IDbProviderFactoryCreator.
             ILogger logger, IProfiler profiler, IProfilingLogger profilingLogger,
             IMainDom mainDom,
             AppCaches appCaches,

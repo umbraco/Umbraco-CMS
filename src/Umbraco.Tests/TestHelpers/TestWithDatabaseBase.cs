@@ -29,6 +29,7 @@ using Umbraco.Tests.Testing;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Web.WebApi;
 using Umbraco.Tests.Common;
@@ -132,10 +133,6 @@ namespace Umbraco.Tests.TestHelpers
             {
                 CreateSqlCeDatabase(); // TODO: faster!
             }
-
-            // ensure the configuration matches the current version for tests
-            var globalSettingsMock = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettingsMock.Setup(x => x.ConfigurationStatus).Returns(UmbracoVersion.Current.ToString(3));
 
             using (ProfilingLogger.TraceDuration<TestWithDatabaseBase>("Initialize database."))
             {

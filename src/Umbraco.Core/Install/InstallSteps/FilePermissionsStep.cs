@@ -11,7 +11,7 @@ namespace Umbraco.Web.Install.InstallSteps
     [InstallSetupStep(InstallationType.NewInstall | InstallationType.Upgrade,
         "Permissions", 0, "",
         PerformsAppRestart = true)]
-    internal class FilePermissionsStep : InstallSetupStep<object>
+    public class FilePermissionsStep : InstallSetupStep<object>
     {
         private readonly IFilePermissionHelper _filePermissionHelper;
         public FilePermissionsStep(IFilePermissionHelper filePermissionHelper)

@@ -50,7 +50,7 @@ namespace Umbraco.Web.Runtime
 
             composition.Register<IUmbracoApplicationLifetime, AspNetUmbracoApplicationLifetime>(Lifetime.Singleton);
             composition.Register<IPasswordHasher, AspNetPasswordHasher>();
-            composition.Register<IFilePermissionHelper, FilePermissionHelper>(Lifetime.Singleton);
+
 
 
             composition.RegisterUnique<IMarchal, FrameworkMarchal>();

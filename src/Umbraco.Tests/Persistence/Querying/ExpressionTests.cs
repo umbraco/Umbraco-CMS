@@ -16,6 +16,7 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Persistance.SqlCe;
 
 namespace Umbraco.Tests.Persistence.Querying
 {

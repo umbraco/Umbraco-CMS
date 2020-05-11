@@ -130,6 +130,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             DbTypeMap.Set<byte[]>(DbType.Binary, BlobColumnDefinition);
         }
 
+        public abstract string ProviderName { get; }
+
         public virtual string EscapeString(string val)
         {
             return NPocoDatabaseExtensions.EscapeAtSymbols(val.Replace("'", "''"));

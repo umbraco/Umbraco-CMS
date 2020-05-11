@@ -1,6 +1,5 @@
 ﻿@using Umbraco.Core.Configuration
 @using Umbraco.Web
-@using Umbraco.Web.Install.Controllers
 @{
     Layout = null;
 }
@@ -31,7 +30,7 @@
          ng-cloak
          ng-animate="'fade'"
          ng-show="installer.configuring">
-        
+
         <div ng-if="installer.current" ng-switch on="installer.current.view">
             <div ng-switch-when="ysod">
                 <h1>A server error occurred</h1>
@@ -40,7 +39,7 @@
             </div>
             <div ng-switch-default>
                 <div ng-include="installer.current.view"></div>
-            </div>    
+            </div>
         </div>
     </div>
 
@@ -49,11 +48,11 @@
         <h2>Did you know</h2>
         <p ng-bind-html="installer.fact"></p>
     </div>
-    
-    <h3 ng-cloak ng-animate="'fade'" id="feedback" ng-show="installer.feedback">{{installer.feedback}}</h3> 
-   
+
+    <h3 ng-cloak ng-animate="'fade'" id="feedback" ng-show="installer.feedback">{{installer.feedback}}</h3>
+
     <div id="missinglazyload" style="display: none;">
-        <h3>There has been a problem with the build.</h3> 
+        <h3>There has been a problem with the build.</h3>
         <p>This might be because you could be offline or on a slow connection. Please try the following steps</p>
         <ol>
             <li>Make sure you have <a href="https://nodejs.org" target="_blank">Node.js</a> installed.</li>

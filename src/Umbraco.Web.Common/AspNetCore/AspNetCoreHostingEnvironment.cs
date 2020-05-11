@@ -1,11 +1,8 @@
 using System;
-using System.Globalization;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Common.AspNetCore
 {
@@ -34,6 +31,7 @@ namespace Umbraco.Web.Common.AspNetCore
         public string SiteName { get; }
         public string ApplicationId { get; }
         public string ApplicationPhysicalPath { get; }
+        public string ApplicationServerAddress { get; }
 
         public string ApplicationVirtualPath { get; }
         public bool IsDebugMode => _hostingSettings.DebugMode;
@@ -75,15 +73,21 @@ namespace Umbraco.Web.Common.AspNetCore
                     //case LocalTempStorage.Default:
                     //case LocalTempStorage.Unknown:
                     default:
-                        return _localTempPath = MapPath("~/App_Data/TEMP");
+                        return _localTempPath = MapPathContentRoot("~/App_Data/TEMP");
                 }
             }
         }
 
-        public string MapPath(string path)
+        public string MapPathWebRoot(string path)
         {
             var newPath = path.TrimStart('~', '/').Replace('/', Path.DirectorySeparatorChar);
             return Path.Combine(_webHostEnvironment.WebRootPath, newPath);
+        }
+
+        public string MapPathContentRoot(string path)
+        {
+            var newPath = path.TrimStart('~', '/').Replace('/', Path.DirectorySeparatorChar);
+            return Path.Combine(_webHostEnvironment.ContentRootPath, newPath);
         }
 
         public string ToAbsolute(string virtualPath)

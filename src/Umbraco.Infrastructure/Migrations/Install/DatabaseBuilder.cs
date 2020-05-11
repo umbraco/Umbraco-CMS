@@ -149,13 +149,13 @@ namespace Umbraco.Core.Migrations.Install
         {
             _configManipulator.SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
 
-            var path = Path.Combine(_hostingEnvironment.ApplicationPhysicalPath, "App_Data", "Umbraco.sdf");
+            var path = _hostingEnvironment.MapPathContentRoot("App_Data\\Umbraco.sdf");
             if (File.Exists(path) == false)
             {
                 // this should probably be in a "using (new SqlCeEngine)" clause but not sure
                 // of the side effects and it's been like this for quite some time now
 
-                _dbProviderFactoryCreator.CreateDatabase();
+                _dbProviderFactoryCreator.CreateDatabase(Constants.DbProviderNames.SqlCe);
             }
 
             factory.Configure(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
@@ -363,8 +363,7 @@ namespace Umbraco.Core.Migrations.Install
                 //var installedSchemaVersion = schemaResult.DetermineInstalledVersion();
                 //var hasInstalledVersion = !installedSchemaVersion.Equals(new Version(0, 0, 0));
 
-                //If Configuration Status is empty and the determined version is "empty" its a new install - otherwise upgrade the existing
-                if (string.IsNullOrEmpty(_globalSettings.ConfigurationStatus) && !hasInstalledVersion)
+                if (!hasInstalledVersion)
                 {
                     if (_runtime.Level == RuntimeLevel.Run)
                         throw new Exception("Umbraco is already configured!");

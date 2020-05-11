@@ -51,7 +51,7 @@ namespace Umbraco.Core.Composing
             // Load in each assembly in the directory of the entry assembly to be included in the search
             // for Umbraco dependencies/transitive dependencies
             foreach(var dir in assemblyLocations)
-            {   
+            {
                 foreach(var dll in Directory.EnumerateFiles(dir, "*.dll"))
                 {
                     var assemblyName = AssemblyName.GetAssemblyName(dll);
@@ -110,12 +110,12 @@ namespace Umbraco.Core.Composing
             // Initialize the dictionary with a value to short-circuit recursive references.
             classification = Classification.Unknown;
             _classifications[assembly] = classification;
-            
+
             if (TypeFinder.KnownAssemblyExclusionFilter.Any(f => assembly.FullName.StartsWith(f, StringComparison.InvariantCultureIgnoreCase)))
             {
                 // if its part of the filter it doesn't reference umbraco
                 classification = Classification.DoesNotReferenceUmbraco;
-            }                
+            }
             else if (_umbracoAssemblies.Contains(assembly.GetName().Name))
             {
                 classification = Classification.IsUmbraco;
@@ -142,7 +142,7 @@ namespace Umbraco.Core.Composing
         }
 
         protected virtual IEnumerable<Assembly> GetReferences(Assembly assembly)
-        {            
+        {
             foreach (var referenceName in assembly.GetReferencedAssemblies())
             {
                 // don't include if this is excluded
@@ -156,7 +156,7 @@ namespace Umbraco.Core.Composing
                     // A dependency references an item that isn't referenced by this project.
                     // We'll add this reference so that we can calculate the classification.
 
-                    _lookup.Add(reference);                    
+                    _lookup.Add(reference);
                 }
                 yield return reference;
             }

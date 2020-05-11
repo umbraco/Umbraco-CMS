@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Runtimes
             var mainDom = new SimpleMainDom();
             var umbracoVersion = TestHelper.GetUmbracoVersion();
             var backOfficeInfo = TestHelper.GetBackOfficeInfo();
-            var runtimeState = new RuntimeState(logger, null, umbracoVersion, backOfficeInfo);
+            var runtimeState = new RuntimeState(null, umbracoVersion);
             var configs = TestHelper.GetConfigs();
             var variationContextAccessor = TestHelper.VariationContextAccessor;
 

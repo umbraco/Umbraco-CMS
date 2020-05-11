@@ -64,16 +64,11 @@ namespace Umbraco.Core.Migrations.Upgrade
         {
             get
             {
-                // no state in database yet - assume we have something in web.config that makes some sense
-                if (!SemVersion.TryParse(_globalSettings.ConfigurationStatus, out var currentVersion))
-                    throw new InvalidOperationException($"Could not get current version from web.config {Constants.AppSettings.ConfigurationStatus} appSetting.");
 
-                // cannot go back in time
-                if (currentVersion > _umbracoVersion.SemanticVersion)
-                    throw new InvalidOperationException($"Version {currentVersion} cannot be downgraded to {_umbracoVersion.SemanticVersion}.");
+                var currentVersion = _umbracoVersion.SemanticVersion;
 
-                // only from 7.14.0 and above
-                var minVersion = new SemVersion(7, 14);
+                // only from 8.0.0 and above
+                var minVersion = new SemVersion(8, 0);
                 if (currentVersion < minVersion)
                     throw new InvalidOperationException($"Version {currentVersion} cannot be migrated to {_umbracoVersion.SemanticVersion}."
                                                         + $" Please upgrade first to at least {minVersion}.");

@@ -25,6 +25,7 @@ namespace Umbraco.Core.Composing
                 "Umbraco.Web.Common",
                 "Umbraco.Web.BackOffice",
                 "Umbraco.Web.Website",
+                "Umbraco.Web.NetCore"
             };
 
         public DefaultUmbracoAssemblyProvider(Assembly entryPointAssembly)

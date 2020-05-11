@@ -47,6 +47,7 @@ namespace Umbraco.Web.Editors
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeState _runtimeState;
         private readonly ISecuritySettings _securitySettings;
+        private readonly IRequestAccessor _requestAccessor;
 
         public AuthenticationController(
             IUserPasswordConfiguration passwordConfiguration,
@@ -60,13 +61,15 @@ namespace Umbraco.Web.Editors
             IRuntimeState runtimeState,
             UmbracoMapper umbracoMapper,
             ISecuritySettings securitySettings,
-            IPublishedUrlProvider publishedUrlProvider)
+            IPublishedUrlProvider publishedUrlProvider,
+            IRequestAccessor requestAccessor)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
             _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
             _securitySettings = securitySettings ?? throw new ArgumentNullException(nameof(securitySettings));
+            _requestAccessor = requestAccessor ?? throw new ArgumentNullException(nameof(securitySettings));
         }
 
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager
@@ -545,7 +548,7 @@ namespace Umbraco.Web.Editors
                 });
 
             // Construct full URL using configured application URL (which will fall back to request)
-            var applicationUri = _runtimeState.ApplicationUrl;
+            var applicationUri = _requestAccessor.GetApplicationUrl();
             var callbackUri = new Uri(applicationUri, action);
             return callbackUri.ToString();
         }

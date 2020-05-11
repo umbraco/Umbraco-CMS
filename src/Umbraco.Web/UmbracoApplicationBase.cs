@@ -96,11 +96,11 @@ namespace Umbraco.Web
             // this is not critical right now and would require loading in some config before boot time so just leaving this as-is for now.
             var runtimeHashPaths = new RuntimeHashPaths();
             // the bin folder and everything in it
-            runtimeHashPaths.AddFolder(new DirectoryInfo(hostingEnvironment.MapPath("~/bin")));
+            runtimeHashPaths.AddFolder(new DirectoryInfo(hostingEnvironment.MapPathContentRoot("~/bin")));
             // the app code folder and everything in it
-            runtimeHashPaths.AddFile(new FileInfo(hostingEnvironment.MapPath("~/App_Code")));
+            runtimeHashPaths.AddFile(new FileInfo(hostingEnvironment.MapPathContentRoot("~/App_Code")));
             // global.asax (the app domain also monitors this, if it changes will do a full restart)
-            runtimeHashPaths.AddFile(new FileInfo(hostingEnvironment.MapPath("~/global.asax")));
+            runtimeHashPaths.AddFile(new FileInfo(hostingEnvironment.MapPathContentRoot("~/global.asax")));
             var runtimeHash = new RuntimeHash(new ProfilingLogger(logger, profiler), runtimeHashPaths);
             return new TypeFinder(Logger, new DefaultUmbracoAssemblyProvider(
                 // GetEntryAssembly was actually an exposed API by request of the aspnetcore team which works in aspnet core because a website

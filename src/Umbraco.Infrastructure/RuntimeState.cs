@@ -3,14 +3,11 @@ using System.Threading;
 using Semver;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Sync;
 
 namespace Umbraco.Core
 {
@@ -19,23 +16,16 @@ namespace Umbraco.Core
     /// </summary>
     public class RuntimeState : IRuntimeState
     {
-        private readonly ILogger _logger;
         private readonly IGlobalSettings _globalSettings;
-        private readonly ConcurrentHashSet<string> _applicationUrls = new ConcurrentHashSet<string>();
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IBackOfficeInfo _backOfficeInfo;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
         /// </summary>
-        public RuntimeState(ILogger logger, IGlobalSettings globalSettings,
-            IUmbracoVersion umbracoVersion,
-            IBackOfficeInfo backOfficeInfo)
+        public RuntimeState(IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion)
         {
-            _logger = logger;
             _globalSettings = globalSettings;
             _umbracoVersion = umbracoVersion;
-            _backOfficeInfo = backOfficeInfo;
         }
 
 
@@ -49,9 +39,6 @@ namespace Umbraco.Core
         public SemVersion SemanticVersion => _umbracoVersion.SemanticVersion;
 
         /// <inheritdoc />
-        public Uri ApplicationUrl { get; private set; }
-
-        /// <inheritdoc />
         public string CurrentMigrationState { get; private set; }
 
         /// <inheritdoc />
@@ -63,32 +50,6 @@ namespace Umbraco.Core
         /// <inheritdoc />
         public RuntimeLevelReason Reason { get; internal set; } = RuntimeLevelReason.Unknown;
 
-
-        /// <summary>
-        /// Ensures that the <see cref="ApplicationUrl"/> property has a value.
-        /// </summary>
-        public void EnsureApplicationUrl()
-        {
-            //Fixme: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
-            // it changes the URL to `localhost:80` which actually doesn't work for pinging itself, it only works internally in Azure. The ironic part
-            // about this is that this is here specifically for the slot swap scenario https://issues.umbraco.org/issue/U4-10626
-
-
-            // see U4-10626 - in some cases we want to reset the application url
-            // (this is a simplified version of what was in 7.x)
-            // note: should this be optional? is it expensive?
-            var url = _backOfficeInfo.GetAbsoluteUrl;
-
-            var change = url != null && !_applicationUrls.Contains(url);
-
-            if (change)
-            {
-                _logger.Info<RuntimeState>("New url {Url} detected, re-discovering application url.", url);
-                _applicationUrls.Add(url);
-                ApplicationUrl = new Uri(url);
-            }
-        }
-
         /// <inheritdoc />
         public BootFailedException BootFailedException { get; internal set; }
 
@@ -97,36 +58,7 @@ namespace Umbraco.Core
         /// </summary>
         public void DetermineRuntimeLevel(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
-            var localVersion = _umbracoVersion.LocalVersion; // the local, files, version
-            var codeVersion = SemanticVersion; // the executing code version
-            var connect = false;
-
-            if (localVersion == null)
-            {
-                // there is no local version, we are not installed
-                logger.Debug<RuntimeState>("No local version, need to install Umbraco.");
-                Level = RuntimeLevel.Install;
-                Reason = RuntimeLevelReason.InstallNoVersion;
-                return;
-            }
-
-            if (localVersion < codeVersion)
-            {
-                // there *is* a local version, but it does not match the code version
-                // need to upgrade
-                logger.Debug<RuntimeState>("Local version '{LocalVersion}' < code version '{CodeVersion}', need to upgrade Umbraco.", localVersion, codeVersion);
-                Level = RuntimeLevel.Upgrade;
-                Reason = RuntimeLevelReason.UpgradeOldVersion;
-            }
-            else if (localVersion > codeVersion)
-            {
-                logger.Warn<RuntimeState>("Local version '{LocalVersion}' > code version '{CodeVersion}', downgrading is not supported.", localVersion, codeVersion);
-
-                // in fact, this is bad enough that we want to throw
-                Reason = RuntimeLevelReason.BootFailedCannotDowngrade;
-                throw new BootFailedException($"Local version \"{localVersion}\" > code version \"{codeVersion}\", downgrading is not supported.");
-            }
-            else if (databaseFactory.Configured == false)
+            if (databaseFactory.Configured == false)
             {
                 // local version *does* match code version, but the database is not configured
                 // install - may happen with Deploy/Cloud/etc
@@ -139,6 +71,7 @@ namespace Umbraco.Core
             // else, keep going,
             // anything other than install wants a database - see if we can connect
             // (since this is an already existing database, assume localdb is ready)
+            var connect = false;
             var tries = _globalSettings.InstallMissingDatabase ? 2 : 5;
             for (var i = 0;;)
             {

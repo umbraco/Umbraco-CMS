@@ -22,7 +22,6 @@ namespace Umbraco.Tests.Common
 
             var config = Mock.Of<IGlobalSettings>(
                 settings =>
-                    settings.ConfigurationStatus == semanticVersion.ToSemanticString()  &&
                     settings.UseHttps == false &&
                     settings.HideTopLevelNodeFromPath == false &&
                     settings.TimeOutInMinutes == 20 &&

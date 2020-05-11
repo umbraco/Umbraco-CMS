@@ -78,8 +78,8 @@ namespace Umbraco.Core.IO
             if (_hostingEnvironment.IsHosted)
             {
                 var result = (!string.IsNullOrEmpty(path) && (path.StartsWith("~") || path.StartsWith(_hostingEnvironment.ApplicationVirtualPath)))
-                    ? _hostingEnvironment.MapPath(path)
-                    : _hostingEnvironment.MapPath("~/" + path.TrimStart('/'));
+                    ? _hostingEnvironment.MapPathWebRoot(path)
+                    : _hostingEnvironment.MapPathWebRoot("~/" + path.TrimStart('/'));
 
                 if (result != null) return result;
             }

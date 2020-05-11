@@ -6,16 +6,12 @@ namespace Umbraco.Core.Persistence
 {
     public class SqlServerDbProviderFactoryCreator : IDbProviderFactoryCreator
     {
-        private readonly string _defaultProviderName;
         private readonly Func<string, DbProviderFactory> _getFactory;
 
-        public SqlServerDbProviderFactoryCreator(string defaultProviderName, Func<string, DbProviderFactory> getFactory)
+        public SqlServerDbProviderFactoryCreator(Func<string, DbProviderFactory> getFactory)
         {
-            _defaultProviderName = defaultProviderName;
             _getFactory = getFactory;
         }
-
-        public DbProviderFactory CreateFactory() => CreateFactory(_defaultProviderName);
 
         public DbProviderFactory CreateFactory(string providerName)
         {
@@ -47,7 +43,7 @@ namespace Umbraco.Core.Persistence
             }
         }
 
-        public void CreateDatabase()
+        public void CreateDatabase(string providerName)
         {
             throw new NotSupportedException("Embedded databases are not supported");
         }

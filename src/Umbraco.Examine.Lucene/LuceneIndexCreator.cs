@@ -41,13 +41,13 @@ namespace Umbraco.Examine
         public virtual Lucene.Net.Store.Directory CreateFileSystemLuceneDirectory(string folderName)
         {
 
-            var dirInfo = new DirectoryInfo(Path.Combine(_hostingEnvironment.MapPath(Constants.SystemDirectories.TempData), "ExamineIndexes", folderName));
+            var dirInfo = new DirectoryInfo(Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData), "ExamineIndexes", folderName));
             if (!dirInfo.Exists)
                 System.IO.Directory.CreateDirectory(dirInfo.FullName);
 
             //check if there's a configured directory factory, if so create it and use that to create the lucene dir
             var configuredDirectoryFactory = _settings.LuceneDirectoryFactory;
-                
+
             if (!configuredDirectoryFactory.IsNullOrWhiteSpace())
             {
                 //this should be a fully qualified type

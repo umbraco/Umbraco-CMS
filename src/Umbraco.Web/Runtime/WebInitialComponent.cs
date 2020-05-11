@@ -131,7 +131,7 @@ namespace Umbraco.Web.Runtime
             RouteNoContentController(umbracoPath);
 
             // register install routes
-            RouteTable.Routes.RegisterArea<UmbracoInstallArea>();
+           // RouteTable.Routes.RegisterArea<UmbracoInstallArea>();
 
             // register all back office routes
             RouteTable.Routes.RegisterArea(new BackOfficeArea(globalSettings, hostingEnvironment));

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using Moq;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Persistance.SqlCe;
 
 namespace Umbraco.Tests.Persistence.Mappers
 {

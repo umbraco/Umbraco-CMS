@@ -1,5 +1,6 @@
 angular.module("umbraco.install").controller("Umbraco.Install.UserController", function($scope, installerService) {
     
+    $scope.majorVersion = Umbraco.Sys.ServerVariables.application.version;
     $scope.passwordPattern = /.*/;
     $scope.installer.current.model.subscribeToNewsLetter = false;
     

@@ -83,7 +83,6 @@ namespace Umbraco.Web.Compose
         private object _locker = new object();
         private readonly DatabaseServerRegistrar _registrar;
         private readonly IBatchedDatabaseServerMessenger _messenger;
-        private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
         private readonly IServerRegistrationService _registrationService;
         private readonly BackgroundTaskRunner<IBackgroundTask> _touchTaskRunner;
@@ -93,7 +92,6 @@ namespace Umbraco.Web.Compose
         private readonly IRequestAccessor _requestAccessor;
 
         public DatabaseServerRegistrarAndMessengerComponent(
-            IRuntimeState runtime,
             IServerRegistrar serverRegistrar,
             IServerMessenger serverMessenger,
             IServerRegistrationService registrationService,
@@ -101,7 +99,6 @@ namespace Umbraco.Web.Compose
             IApplicationShutdownRegistry hostingEnvironment,
             IRequestAccessor requestAccessor)
         {
-            _runtime = runtime;
             _logger = logger;
             _registrationService = registrationService;
             _requestAccessor = requestAccessor;
@@ -164,7 +161,7 @@ namespace Umbraco.Web.Compose
             // only perform this one time ever
             LazyInitializer.EnsureInitialized(ref _tasks, ref _started, ref _locker, () =>
             {
-                var serverAddress = _runtime.ApplicationUrl.ToString();
+                var serverAddress = _requestAccessor.GetApplicationUrl().ToString();
 
                 return new[]
                 {

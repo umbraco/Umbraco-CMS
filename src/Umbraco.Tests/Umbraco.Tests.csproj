@@ -350,7 +350,6 @@
     <Compile Include="Strings\CmsHelperCasingTests.cs" />
     <Compile Include="Strings\DefaultShortStringHelperTests.cs" />
     <Compile Include="Strings\MockShortStringHelper.cs" />
-    <Compile Include="Macros\MacroTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
     <Compile Include="Migrations\SqlScripts\SqlResources.Designer.cs">
       <AutoGen>True</AutoGen>

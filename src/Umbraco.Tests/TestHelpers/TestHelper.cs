@@ -27,6 +27,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.Common;
 using Umbraco.Web;
 using Umbraco.Web.Hosting;
@@ -48,7 +49,7 @@ namespace Umbraco.Tests.TestHelpers
 
             }
 
-            public override IDbProviderFactoryCreator DbProviderFactoryCreator { get; } = new UmbracoDbProviderFactoryCreator(Constants.DbProviderNames.SqlCe);
+            public override IDbProviderFactoryCreator DbProviderFactoryCreator { get; } = new UmbracoDbProviderFactoryCreator();
 
             public override IBulkSqlInsertProvider BulkSqlInsertProvider { get; } = new SqlCeBulkSqlInsertProvider();
 

@@ -31,7 +31,7 @@ namespace Umbraco.Core.Composing
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _assemblyProvider = assemblyProvider;
             _runtimeHash = runtimeHash;
-            _assembliesAcceptingLoadExceptions = typeFinderConfig?.AssembliesAcceptingLoadExceptions.Where(x => !x.IsNullOrWhiteSpace()).ToArray() ?? Array.Empty<string>();           
+            _assembliesAcceptingLoadExceptions = typeFinderConfig?.AssembliesAcceptingLoadExceptions.Where(x => !x.IsNullOrWhiteSpace()).ToArray() ?? Array.Empty<string>();
         }
 
         private bool AcceptsLoadExceptions(Assembly a)
@@ -192,7 +192,7 @@ namespace Umbraco.Core.Composing
 
             return GetClassesWithBaseType(assignTypeFrom, assemblyList, onlyConcreteClasses);
         }
-        
+
         /// <summary>
         /// Finds any classes with the attribute.
         /// </summary>

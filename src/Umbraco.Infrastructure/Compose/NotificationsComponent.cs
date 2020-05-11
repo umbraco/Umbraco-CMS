@@ -149,7 +149,7 @@ namespace Umbraco.Web.Compose
         public sealed class Notifier
         {
             private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-            private readonly IRuntimeState _runtimeState;
+            private readonly IRequestAccessor _requestAccessor;
             private readonly INotificationService _notificationService;
             private readonly IUserService _userService;
             private readonly ILocalizedTextService _textService;
@@ -166,10 +166,10 @@ namespace Umbraco.Web.Compose
             /// <param name="globalSettings"></param>
             /// <param name="contentConfig"></param>
             /// <param name="logger"></param>
-            public Notifier(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtimeState, INotificationService notificationService, IUserService userService, ILocalizedTextService textService, IGlobalSettings globalSettings, ILogger logger)
+            public Notifier(IUmbracoContextAccessor umbracoContextAccessor, IRequestAccessor requestAccessor, INotificationService notificationService, IUserService userService, ILocalizedTextService textService, IGlobalSettings globalSettings, ILogger logger)
             {
                 _umbracoContextAccessor = umbracoContextAccessor;
-                _runtimeState = runtimeState;
+                _requestAccessor = requestAccessor;
                 _notificationService = notificationService;
                 _userService = userService;
                 _textService = textService;
@@ -193,7 +193,7 @@ namespace Umbraco.Web.Compose
                     }
                 }
 
-                SendNotification(user, entities, action, _runtimeState.ApplicationUrl);
+                SendNotification(user, entities, action, _requestAccessor.GetApplicationUrl());
             }
 
             private void SendNotification(IUser sender, IEnumerable<IContent> entities, IAction action, Uri siteUri)
