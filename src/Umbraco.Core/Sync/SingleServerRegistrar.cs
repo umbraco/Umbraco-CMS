@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Web;
 
 namespace Umbraco.Core.Sync
 {
@@ -13,15 +14,15 @@ namespace Umbraco.Core.Sync
     /// </remarks>
     public class SingleServerRegistrar : IServerRegistrar
     {
-        private readonly IRuntimeState _runtime;
+        private readonly IRequestAccessor _requestAccessor;
         private readonly Lazy<IServerAddress[]> _registrations;
 
         public IEnumerable<IServerAddress> Registrations => _registrations.Value;
 
-        public SingleServerRegistrar(IRuntimeState runtime)
+        public SingleServerRegistrar(IRequestAccessor requestAccessor)
         {
-            _runtime = runtime;
-            _registrations = new Lazy<IServerAddress[]>(() => new IServerAddress[] { new ServerAddressImpl(_runtime.ApplicationUrl.ToString()) });
+            _requestAccessor = requestAccessor;
+            _registrations = new Lazy<IServerAddress[]>(() => new IServerAddress[] { new ServerAddressImpl(_requestAccessor.GetApplicationUrl().ToString()) });
         }
 
         public ServerRole GetCurrentServerRole()

@@ -14,6 +14,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// </summary>
     public interface ISqlSyntaxProvider
     {
+        string ProviderName { get; }
+
         string EscapeString(string val);
 
         string GetWildcardPlaceholder();

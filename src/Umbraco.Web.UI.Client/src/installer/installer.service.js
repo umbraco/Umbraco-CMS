@@ -266,32 +266,7 @@ angular.module("umbraco.install").factory('installerService', function ($rootSco
                         else {
                             service.complete();
                         }
-                    }, function (response) {
-
-                        var data = response.data;
-                        var status = response.status;
-                        //need to handle 500's separately, this will happen if something goes wrong outside
-                        // of the installer (like app startup events or something) and these will get returned as text/html
-                        // not as json. If this happens we can't actually load in external views since they will YSOD as well!
-                        // so we need to display this in our own internal way
-
-                        if (status >= 500 && status < 600) {
-                            service.status.current = { view: "ysod", model: null };
-                            var ysod = data;
-                            //we need to manually write the html to the iframe - the html contains full html markup
-                            $timeout(function () {
-                                document.getElementById('ysod').contentDocument.write(ysod);
-                            }, 500);
-                        }
-                        else {
-                            //this is where we handle installer error
-                            var v = data.view ? resolveView(data.view) : resolveView("error");
-                            var model = data.model ? data.model : data;
-                            service.status.current = { view: v, model: model };
-                        }
-
-                        service.switchToConfiguration();
-                    });
+                    }, handleErrorResponse);
 			}
 			processInstallStep();
 		},
@@ -329,20 +304,52 @@ angular.module("umbraco.install").factory('installerService', function ($rootSco
 
 		complete : function(){
 
-			service.status.progress = "100%";	
-			service.status.done = true;
-			service.status.feedback = "Redirecting you to Umbraco, please wait";
-			service.status.loading = false;
+            $http.post(Umbraco.Sys.ServerVariables.installApiBaseUrl + "CompleteInstall", _installerModel)
+                .then(function () {
+                    service.status.progress = "100%";
+                    service.status.done = true;
+                    service.status.feedback = "Restarting and redirecting you to Umbraco, please wait";
+                    service.status.loading = false;
 
-			if (factTimer) {
-			    clearInterval(factTimer);
-			}
+                    if (factTimer) {
+                        clearInterval(factTimer);
+                    }
 
-			$timeout(function(){
-				window.location.href = Umbraco.Sys.ServerVariables.umbracoBaseUrl;
-			}, 1500);
+                    $timeout(function(){
+                        window.location.href = Umbraco.Sys.ServerVariables.umbracoBaseUrl;
+                    }, 5000);
+                }, handleErrorResponse);
+            
+           
 		}
 	};
 
+	var handleErrorResponse = function (response) {
+
+        var data = response.data;
+        var status = response.status;
+        //need to handle 500's separately, this will happen if something goes wrong outside
+        // of the installer (like app startup events or something) and these will get returned as text/html
+        // not as json. If this happens we can't actually load in external views since they will YSOD as well!
+        // so we need to display this in our own internal way
+
+        if (status >= 500 && status < 600) {
+            service.status.current = { view: "ysod", model: null };
+            var ysod = data;
+            //we need to manually write the html to the iframe - the html contains full html markup
+            $timeout(function () {
+                document.getElementById('ysod').contentDocument.write(ysod);
+            }, 500);
+        }
+        else {
+            //this is where we handle installer error
+            var v = data.view ? resolveView(data.view) : resolveView("error");
+            var model = data.model ? data.model : data;
+            service.status.current = { view: v, model: model };
+        }
+
+        service.switchToConfiguration();
+    }
+	
 	return service;
 });

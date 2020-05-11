@@ -10,9 +10,10 @@ namespace Umbraco.Web.Hosting
 {
     public class AspNetHostingEnvironment : IHostingEnvironment
     {
-        
+
         private readonly IHostingSettings _hostingSettings;
         private string _localTempPath;
+
 
         public AspNetHostingEnvironment(IHostingSettings hostingSettings)
         {
@@ -32,13 +33,14 @@ namespace Umbraco.Web.Hosting
         public string ApplicationPhysicalPath { get; }
 
         public string ApplicationVirtualPath { get; }
+
         public bool IsDebugMode => HttpContext.Current?.IsDebuggingEnabled ?? _hostingSettings.DebugMode;
         /// <inheritdoc/>
         public bool IsHosted => (HttpContext.Current != null || HostingEnvironment.IsHosted);
 
         public Version IISVersion { get; }
 
-        public string MapPath(string path)
+        public string MapPathWebRoot(string path)
         {
             if (HostingEnvironment.IsHosted)
                 return HostingEnvironment.MapPath(path);
@@ -47,8 +49,10 @@ namespace Umbraco.Web.Hosting
             return ApplicationPhysicalPath + path.TrimStart("~").EnsureStartsWith("/");
         }
 
+        public string MapPathContentRoot(string path) => MapPathWebRoot(path);
+
         public string ToAbsolute(string virtualPath) => VirtualPathUtility.ToAbsolute(virtualPath, ApplicationVirtualPath);
-        
+
 
         public string LocalTempPath
         {
@@ -83,11 +87,11 @@ namespace Umbraco.Web.Hosting
                     //case LocalTempStorage.Default:
                     //case LocalTempStorage.Unknown:
                     default:
-                        return _localTempPath = MapPath("~/App_Data/TEMP");
+                        return _localTempPath = MapPathContentRoot("~/App_Data/TEMP");
                 }
             }
         }
-       
+
     }
 
 

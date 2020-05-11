@@ -20,7 +20,7 @@ namespace Umbraco.Web.Common.AspNetCore
 
             var cookieValue = httpContext.Request.Cookies[cookieName];
 
-            httpContext.Response.Cookies.Append(cookieName, cookieValue, new CookieOptions()
+            httpContext.Response.Cookies.Append(cookieName, cookieValue ?? string.Empty, new CookieOptions()
             {
                 Expires = DateTime.Now.AddYears(-1)
             });

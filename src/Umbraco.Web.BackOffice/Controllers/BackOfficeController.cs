@@ -2,9 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Runtime;
 using Umbraco.Core.WebAssets;
+using Umbraco.Net;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.WebAssets;
@@ -16,12 +15,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IGlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
 
-        public BackOfficeController(IRuntimeMinifier runtimeMinifier, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        public BackOfficeController(IRuntimeMinifier runtimeMinifier, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
             _runtimeMinifier = runtimeMinifier;
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
+            _umbracoApplicationLifetime = umbracoApplicationLifetime;
         }
 
         // GET

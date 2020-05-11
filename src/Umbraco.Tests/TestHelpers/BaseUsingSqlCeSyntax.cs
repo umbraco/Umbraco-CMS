@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence;
+using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.Components;
 using Current = Umbraco.Web.Composing.Current;
 

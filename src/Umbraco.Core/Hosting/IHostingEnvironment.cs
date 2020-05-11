@@ -32,8 +32,6 @@ namespace Umbraco.Core.Hosting
 
         Version IISVersion { get; }
 
-        // TODO: Should we change this name to MapPathWebRoot ? and also have a new MapPathContentRoot ?
-
         /// <summary>
         /// Maps a virtual path to a physical path to the application's web root
         /// </summary>
@@ -43,7 +41,18 @@ namespace Umbraco.Core.Hosting
         /// Depending on the runtime 'web root', this result can vary. For example in Net Framework the web root and the content root are the same, however
         /// in netcore the web root is /www therefore this will Map to a physical path within www.
         /// </remarks>
-        string MapPath(string path);
+        string MapPathWebRoot(string path);
+
+        /// <summary>
+        /// Maps a virtual path to a physical path to the application's root (not always equal to the web root)
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Depending on the runtime 'web root', this result can vary. For example in Net Framework the web root and the content root are the same, however
+        /// in netcore the web root is /www therefore this will Map to a physical path within www.
+        /// </remarks>
+        string MapPathContentRoot(string path);
 
         /// <summary>
         /// Converts a virtual path to an absolute URL path based on the application's web root

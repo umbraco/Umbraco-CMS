@@ -1,6 +1,10 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using System;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Net;
+using Umbraco.Web.Common.Lifetime;
 
 namespace Umbraco.Web.Common.Runtime
 {
@@ -8,8 +12,10 @@ namespace Umbraco.Web.Common.Runtime
     {
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly IUmbracoApplicationLifetimeManager _umbracoApplicationLifetimeManager;
-
-        public AspNetCoreComponent(IHostApplicationLifetime hostApplicationLifetime, IUmbracoApplicationLifetimeManager umbracoApplicationLifetimeManager)
+        
+        public AspNetCoreComponent(
+            IHostApplicationLifetime hostApplicationLifetime,
+            IUmbracoApplicationLifetimeManager umbracoApplicationLifetimeManager)
         {
             _hostApplicationLifetime = hostApplicationLifetime;
             _umbracoApplicationLifetimeManager = umbracoApplicationLifetimeManager;
@@ -21,6 +27,8 @@ namespace Umbraco.Web.Common.Runtime
                 _umbracoApplicationLifetimeManager.InvokeApplicationInit();
             });
         }
+
+
 
         public void Terminate()
         {

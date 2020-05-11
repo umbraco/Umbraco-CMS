@@ -18,7 +18,7 @@ using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Web.BackOffice.AspNetCore;
-using Umbraco.Web.Common.Extensions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -103,6 +103,7 @@ namespace Umbraco.Tests.Integration.Testing
                 .UseUmbraco(serviceProviderFactory)
                 .ConfigureServices((hostContext, services) =>
                 {
+                    services.AddSingleton(testHelper.DbProviderFactoryCreator);
                     var webHostEnvironment = testHelper.GetWebHostEnvironment();
                     services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
 

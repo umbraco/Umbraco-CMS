@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Install.Models;
@@ -10,7 +11,7 @@ namespace Umbraco.Web.Install.InstallSteps
     /// This step is purely here to show the button to commence the upgrade
     /// </summary>
     [InstallSetupStep(InstallationType.Upgrade, "Upgrade", "upgrade", 1, "Upgrading Umbraco to the latest and greatest version.")]
-    internal class UpgradeStep : InstallSetupStep<object>
+    public class UpgradeStep : InstallSetupStep<object>
     {
         public override bool RequiresExecution(object model) => true;
         private readonly IUmbracoVersion _umbracoVersion;
@@ -28,15 +29,6 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             get
             {
-                // TODO: if UmbracoVersion.Local is null?
-                // it means that there is a database but the web.config version is cleared
-                // that was a "normal" way to force the upgrader to execute, and we would detect the current
-                // version via the DB like DatabaseSchemaResult.DetermineInstalledVersion - magic, do we really
-                // need this now?
-                var currentVersion = (_umbracoVersion.LocalVersion ?? new Semver.SemVersion(0)).ToString();
-
-                var newVersion = _umbracoVersion.SemanticVersion.ToString();
-
                 string FormatGuidState(string value)
                 {
                     if (string.IsNullOrWhiteSpace(value)) value = "unknown";
@@ -45,13 +37,14 @@ namespace Umbraco.Web.Install.InstallSteps
                     return value;
                 }
 
-
                 var currentState = FormatGuidState(_runtimeState.CurrentMigrationState);
                 var newState = FormatGuidState(_runtimeState.FinalMigrationState);
+                var newVersion = _umbracoVersion.SemanticVersion.ToString();
+                var oldVersion = new SemVersion(_umbracoVersion.SemanticVersion.Major, 0, 0).ToString(); //TODO can we find the old version somehow? e.g. from current state
 
-                var reportUrl = $"https://our.umbraco.com/contribute/releases/compare?from={currentVersion}&to={newVersion}&notes=1";
+                var reportUrl = $"https://our.umbraco.com/contribute/releases/compare?from={oldVersion}&to={newVersion}&notes=1";
 
-                return new { currentVersion, newVersion, currentState, newState, reportUrl };
+                return new { oldVersion, newVersion, currentState, newState, reportUrl };
             }
         }
     }

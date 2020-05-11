@@ -15,8 +15,6 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoContextFactory : IUmbracoContextFactory
     {
-        private static readonly NullWriter NullWriterInstance = new NullWriter();
-
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IVariationContextAccessor _variationContextAccessor;
@@ -86,12 +84,6 @@ namespace Umbraco.Web
             _umbracoContextAccessor.UmbracoContext = umbracoContext;
 
             return new UmbracoContextReference(umbracoContext, true, _umbracoContextAccessor);
-        }
-
-        // dummy TextWriter that does not write
-        private class NullWriter : TextWriter
-        {
-            public override Encoding Encoding => Encoding.UTF8;
         }
     }
 }

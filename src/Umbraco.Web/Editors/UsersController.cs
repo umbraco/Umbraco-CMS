@@ -52,6 +52,7 @@ namespace Umbraco.Web.Editors
         private readonly ISqlContext _sqlContext;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly ISecuritySettings _securitySettings;
+        private readonly IRequestAccessor _requestAccessor;
 
         public UsersController(
             IGlobalSettings globalSettings,
@@ -68,7 +69,8 @@ namespace Umbraco.Web.Editors
             IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
             IPublishedUrlProvider publishedUrlProvider,
-            ISecuritySettings securitySettings)
+            ISecuritySettings securitySettings,
+            IRequestAccessor requestAccessor)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _mediaFileSystem = mediaFileSystem;
@@ -77,6 +79,7 @@ namespace Umbraco.Web.Editors
             _sqlContext = sqlContext;
             _imageUrlGenerator = imageUrlGenerator;
             _securitySettings = securitySettings;
+            _requestAccessor = requestAccessor;
         }
 
         /// <summary>
@@ -107,7 +110,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = hostingEnvironment.MapPath(Constants.SystemDirectories.TempFileUploads);
+            var root = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -489,7 +492,7 @@ namespace Umbraco.Web.Editors
                 });
 
             // Construct full URL using configured application URL (which will fall back to request)
-            var applicationUri = RuntimeState.ApplicationUrl;
+            var applicationUri = _requestAccessor.GetApplicationUrl();
             var inviteUri = new Uri(applicationUri, action);
 
             var emailSubject = Services.TextService.Localize("user/inviteEmailCopySubject",

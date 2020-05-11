@@ -65,7 +65,7 @@ namespace Umbraco.Core.Runtime
             // runtime state
             // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
             // as the second one captures the current value (null) and therefore fails
-           _state = new RuntimeState(Logger, Configs.Global(), UmbracoVersion, BackOfficeInfo)
+           _state = new RuntimeState(Configs.Global(), UmbracoVersion)
             {
                 Level = RuntimeLevel.Boot
             };
@@ -140,6 +140,8 @@ namespace Umbraco.Core.Runtime
                     HostingEnvironment?.ApplicationPhysicalPath,
                     NetworkHelper.MachineName);
                 Logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
+
+                AppDomain.CurrentDomain.SetData("DataDirectory", HostingEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
 
                 // application environment
                 ConfigureUnhandledException();
@@ -239,6 +241,9 @@ namespace Umbraco.Core.Runtime
 
         public void Start()
         {
+            if (_state.Level <= RuntimeLevel.BootFailed)
+                throw new InvalidOperationException($"Cannot start the runtime if the runtime level is less than or equal to {RuntimeLevel.BootFailed}");
+
             // throws if not full-trust
             _umbracoBootPermissionChecker.ThrowIfNotPermissions();
 

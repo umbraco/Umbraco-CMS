@@ -4,11 +4,15 @@ using System.Data;
 using System.Data.SqlServerCe;
 using System.Linq;
 using NPoco;
+using Umbraco.Core;
+using Umbraco.Core.Persistence;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Persistance.SqlCe
 {
     public class SqlCeBulkSqlInsertProvider : IBulkSqlInsertProvider
     {
+        public string ProviderName => Constants.DatabaseProviders.SqlCe;
+
         public int BulkInsertRecords<T>(IUmbracoDatabase database, IEnumerable<T> records)
         {
             var recordsA = records.ToArray();

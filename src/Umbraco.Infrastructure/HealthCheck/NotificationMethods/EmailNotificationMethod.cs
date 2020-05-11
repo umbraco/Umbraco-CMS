@@ -15,12 +15,12 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
     public class EmailNotificationMethod : NotificationMethodBase
     {
         private readonly ILocalizedTextService _textService;
-        private readonly IRuntimeState _runtimeState;
-        private readonly ILogger _logger;
+        private readonly IRequestAccessor _requestAccessor;
+
         private readonly IGlobalSettings _globalSettings;
         private readonly IContentSettings _contentSettings;
 
-        public EmailNotificationMethod(ILocalizedTextService textService, IRuntimeState runtimeState, ILogger logger, IGlobalSettings globalSettings, IHealthChecksSettings healthChecksSettings, IContentSettings contentSettings) : base(healthChecksSettings)
+        public EmailNotificationMethod(ILocalizedTextService textService, IRequestAccessor requestAccessor, IGlobalSettings globalSettings, IHealthChecksSettings healthChecksSettings, IContentSettings contentSettings) : base(healthChecksSettings)
         {
             var recipientEmail = Settings?["recipientEmail"]?.Value;
             if (string.IsNullOrWhiteSpace(recipientEmail))
@@ -32,8 +32,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             RecipientEmail = recipientEmail;
 
             _textService = textService ?? throw new ArgumentNullException(nameof(textService));
-            _runtimeState = runtimeState;
-            _logger = logger;
+            _requestAccessor = requestAccessor;
             _globalSettings = globalSettings;
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
         }
@@ -61,7 +60,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
             // Include the umbraco Application URL host in the message subject so that
             // you can identify the site that these results are for.
-            var host = _runtimeState.ApplicationUrl;
+            var host = _requestAccessor.GetApplicationUrl();
 
             var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject", new[] { host.ToString() });
 

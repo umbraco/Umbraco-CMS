@@ -11,6 +11,7 @@ using NPoco.DatabaseTypes;
 using NPoco.Linq;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Persistance.SqlCe;
 
 namespace Umbraco.Tests.Testing
 {

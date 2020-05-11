@@ -13,7 +13,7 @@ namespace Umbraco.Core.Composing
     public class UmbracoServiceProviderFactory : IServiceProviderFactory<IServiceContainer>
     {
         public UmbracoServiceProviderFactory(ServiceContainer container)
-        {            
+        {
             _container = new LightInjectContainer(container);
         }
 
@@ -21,7 +21,11 @@ namespace Umbraco.Core.Composing
         /// Creates an ASP.NET Core compatible service container
         /// </summary>
         /// <returns></returns>
-        public static ServiceContainer CreateServiceContainer() => new ServiceContainer(ContainerOptions.Default.Clone().WithMicrosoftSettings().WithAspNetCoreSettings());
+        public static ServiceContainer CreateServiceContainer() => new ServiceContainer(
+            ContainerOptions.Default.Clone()
+                .WithMicrosoftSettings()
+                //.WithAspNetCoreSettings() //TODO WithAspNetCoreSettings changes behavior that we need to discuss
+            );
 
         /// <summary>
         /// Default ctor for use in Host Builder configuration
@@ -59,7 +63,7 @@ namespace Umbraco.Core.Composing
         /// <returns></returns>
         public IServiceContainer CreateBuilder(IServiceCollection services)
         {
-            _services = services;            
+            _services = services;
             return _container.Container;
         }
 

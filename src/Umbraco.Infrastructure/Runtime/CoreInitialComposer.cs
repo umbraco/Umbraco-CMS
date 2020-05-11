@@ -10,6 +10,7 @@ using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Install;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Media;
@@ -127,7 +128,7 @@ namespace Umbraco.Core.Runtime
                 // even on 1 single server we can have 2 concurrent app domains
                 var singleServer = globalSettings.DisableElectionForSingleServer;
                 return singleServer
-                    ? (IServerRegistrar) new SingleServerRegistrar(f.GetInstance<IRuntimeState>())
+                    ? (IServerRegistrar) new SingleServerRegistrar(f.GetInstance<IRequestAccessor>())
                     : new DatabaseServerRegistrar(
                         new Lazy<IServerRegistrationService>(f.GetInstance<IServerRegistrationService>),
                         new DatabaseServerRegistrarOptions());
@@ -352,6 +353,10 @@ namespace Umbraco.Core.Runtime
 
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
+
+            composition.Register<IFilePermissionHelper, FilePermissionHelper>(Lifetime.Singleton);
+
+
         }
     }
 }

@@ -22,6 +22,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
+using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Current = Umbraco.Web.Composing.Current;
 

@@ -8,6 +8,8 @@ namespace Umbraco.Core.Persistence
     /// </summary>
     public class BasicBulkSqlInsertProvider : IBulkSqlInsertProvider
     {
+        public string ProviderName => Constants.DatabaseProviders.SqlServer;
+
         public int BulkInsertRecords<T>(IUmbracoDatabase database, IEnumerable<T> records)
         {
             var recordsA = records.ToArray();

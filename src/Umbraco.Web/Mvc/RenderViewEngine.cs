@@ -48,7 +48,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         private void EnsureFoldersAndFiles()
         {
-            var viewFolder = _hostingEnvironment.MapPath(Constants.ViewLocation);
+            var viewFolder = _hostingEnvironment.MapPathContentRoot(Constants.ViewLocation);
 
             // ensure the web.config file is in the ~/Views folder
             Directory.CreateDirectory(viewFolder);

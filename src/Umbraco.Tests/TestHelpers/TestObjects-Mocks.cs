@@ -14,6 +14,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
+using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.Common;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;

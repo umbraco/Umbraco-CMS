@@ -21,6 +21,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
+using HttpResponseException = System.Web.Http.HttpResponseException;
 
 namespace Umbraco.Web.Editors
 {

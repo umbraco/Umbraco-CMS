@@ -1,19 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlServerCe;
 using System.Linq;
 using NPoco;
+using Umbraco.Core;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.SqlSyntax;
+using ColumnInfo = Umbraco.Core.Persistence.SqlSyntax.ColumnInfo;
 
-namespace Umbraco.Core.Persistence.SqlSyntax
+namespace Umbraco.Persistance.SqlCe
 {
     /// <summary>
     /// Represents an SqlSyntaxProvider for Sql Ce
     /// </summary>
     public class SqlCeSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlCeSyntaxProvider>
     {
+        public override string ProviderName => Constants.DatabaseProviders.SqlCe;
+
         public override Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top)
         {
             return new Sql<ISqlContext>(sql.SqlContext, sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
