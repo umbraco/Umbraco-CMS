@@ -19,9 +19,9 @@
         function registerAllTours() {
             tours = [];
             return tourResource.getTours().then(function (tourFiles) {
-                tourFiles.forEach(tourFile => {
+                Utilities.forEach(tourFiles, tourFile => {
 
-                    tourFile.tours.forEach(newTour => {
+                    Utilities.forEach(tourFile.tours, newTour => {
                         validateTour(newTour);
                         validateTourRegistration(newTour);
                         tours.push(newTour);
@@ -134,7 +134,7 @@
             var tours = getTours();
             setTourStatuses(tours).then(function () {
                 var groupedTours = [];
-                tours.forEach(function (item) {
+                Utilities.forEach(tours, function (item) {
 
                     if (item.contentType === null || item.contentType === '') {
                         var groupExists = false;
@@ -143,7 +143,7 @@
                             "tours": []
                         };
 
-                        groupedTours.forEach(function (group) {
+                        Utilities.forEach(groupedTours, function (group) {
                             // extend existing group if it is already added
                             if (group.group === item.group) {
                                 if (item.groupOrder) {
@@ -251,7 +251,7 @@
          */
         function validateTourRegistration(tour) {
             // check for existing tours with the same alias
-            tours.forEach(existingTour => {
+            Utilities.forEach(tours, existingTour => {
                 if (existingTour.alias === tour.alias) {
                     throw "A tour with the alias " + tour.alias + " is already registered";
                 }
@@ -267,17 +267,17 @@
             var deferred = $q.defer();
             currentUserResource.getTours().then(function (storedTours) {
 
-                storedTours.forEach(storedTour => {
+                Utilities.forEach(storedTours, storedTour => {
 
                     if (storedTour.completed === true) {
-                        tours.forEach(tour => {
+                        Utilities.forEach(tours, tour => {
                             if (storedTour.alias === tour.alias) {
                                 tour.completed = true;
                             }
                         });
                     }
                     if (storedTour.disabled === true) {
-                        tours.forEach(tour => {
+                        Utilities.forEach(tours, tour => {
                             if (storedTour.alias === tour.alias) {
                                 tour.disabled = true;
                             }

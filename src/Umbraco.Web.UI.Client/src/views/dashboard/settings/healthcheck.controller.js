@@ -33,7 +33,7 @@
             var totalInfo = 0;
 
             // count total number of statusses
-            group.checks.forEach(check => {
+            Utilities.forEach(group.checks, check => {
 
                 if (check.status) {
                     check.status.forEach(status => {
@@ -95,22 +95,24 @@
             group.checkCounter = 0;
             group.loading = true;
 
-            checks.forEach(check => {
-                check.loading = true;
+            if (checks) {
+                checks.forEach(check => {
+                    check.loading = true;
 
-                healthCheckResource.getStatus(check.id)
-                    .then(function (response) {
-                        check.status = response;
-                        group.checkCounter = group.checkCounter + 1;
-                        check.loading = false;
+                    healthCheckResource.getStatus(check.id)
+                        .then(function (response) {
+                            check.status = response;
+                            group.checkCounter = group.checkCounter + 1;
+                            check.loading = false;
 
-                        // when all checks are done, set global group result
-                        if (group.checkCounter === checks.length) {
-                            setGroupGlobalResultType(group);
-                            group.loading = false;
-                        }
-                    });
-            });
+                            // when all checks are done, set global group result
+                            if (group.checkCounter === checks.length) {
+                                setGroupGlobalResultType(group);
+                                group.loading = false;
+                            }
+                        });
+                });
+            }
         }
 
         function openGroup(group) {
