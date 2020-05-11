@@ -31,14 +31,16 @@ namespace Umbraco.Web.PropertyEditors
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
         private readonly IContentTypeService _contentTypeService;
+        private readonly ILocalizedTextService _textService;
         internal const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
 
-        public NestedContentPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService)
+        public NestedContentPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService)
             : base (logger)
         {
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
             _contentTypeService = contentTypeService;
+            _textService = textService;
         }
 
         // has to be lazy else circular dep in ctor
@@ -52,21 +54,23 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService);
+        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _textService);
 
         internal class NestedContentPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private readonly PropertyEditorCollection _propertyEditors;
             private readonly IDataTypeService _dataTypeService;
             private readonly NestedContentValues _nestedContentValues;
-            
-            public NestedContentPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService)
+            private readonly ILocalizedTextService _textService;
+
+            public NestedContentPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService)
                 : base(attribute)
             {
                 _propertyEditors = propertyEditors;
                 _dataTypeService = dataTypeService;
                 _nestedContentValues = new NestedContentValues(contentTypeService);
-                Validators.Add(new NestedContentValidator(propertyEditors, dataTypeService, _nestedContentValues));
+                _textService = textService;
+                Validators.Add(new NestedContentValidator(propertyEditors, dataTypeService, _nestedContentValues, _textService));
             }
 
             /// <inheritdoc />
@@ -260,12 +264,14 @@ namespace Umbraco.Web.PropertyEditors
             private readonly PropertyEditorCollection _propertyEditors;
             private readonly IDataTypeService _dataTypeService;
             private readonly NestedContentValues _nestedContentValues;
+            private readonly ILocalizedTextService _textService;
 
-            public NestedContentValidator(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, NestedContentValues nestedContentValues)
+            public NestedContentValidator(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, NestedContentValues nestedContentValues, ILocalizedTextService textService)
             {
                 _propertyEditors = propertyEditors;
                 _dataTypeService = dataTypeService;
                 _nestedContentValues = nestedContentValues;
+                _textService = textService;
             }
 
             public IEnumerable<ValidationResult> Validate(object rawValue, string valueType, object dataTypeConfiguration)
@@ -302,7 +308,7 @@ namespace Umbraco.Web.PropertyEditors
                         else if (row.JsonRowValue[row.PropKey].ToString().IsNullOrWhiteSpace() || (row.JsonRowValue[row.PropKey].Type == JTokenType.Array && !row.JsonRowValue[row.PropKey].HasValues))
                         {
                             var message = string.IsNullOrWhiteSpace(row.PropType.MandatoryMessage)
-                                                      ? $"'{row.PropType.Name}' cannot be empty"
+                                                      ? $"'{_textService.UmbracoDictionaryTranslate(row.PropType.Name)}' cannot be empty"
                                                       : row.PropType.MandatoryMessage;
                             validationResults.Add(new ValidationResult($"Item {(row.RowIndex + 1)}: {message}", new[] { row.PropKey }));
                         }   
