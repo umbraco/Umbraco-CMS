@@ -1,5 +1,6 @@
 ﻿namespace Umbraco.Core.Models.PublishedContent
 {
+
     /// <summary>
     /// Provides a live published model creation service.
     /// </summary>
@@ -18,5 +19,15 @@
         /// <para>This is called prior to refreshing the cache.</para>
         /// </remarks>
         void Refresh();
+
+        /// <summary>
+        /// Tells the factory that it should build a new generation of models
+        /// </summary>
+        void Reset();
+
+        /// <summary>
+        /// If the live model factory
+        /// </summary>
+        bool Enabled { get; }
     }
 }

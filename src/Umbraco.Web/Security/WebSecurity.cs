@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Security;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models.Membership;
-using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
@@ -85,7 +83,7 @@ namespace Umbraco.Web.Security
             //ensure it's done for owin too
             owinCtx.Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
 
-            var user = UserManager.FindByIdAsync(userId).Result;
+            var user = UserManager.FindByIdAsync(userId.ToString()).Result;
 
             SignInManager.SignInAsync(user, isPersistent: true, rememberBrowser: false).Wait();
 

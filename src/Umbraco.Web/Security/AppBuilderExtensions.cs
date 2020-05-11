@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Owin;
 using Microsoft.Owin.Extensions;
 using Microsoft.Owin.Logging;
@@ -15,11 +15,8 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Net;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Identity;
@@ -35,18 +32,10 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Configure Default Identity User Manager for Umbraco
         /// </summary>
-        /// <param name="app"></param>
-        /// <param name="services"></param>
-        /// <param name="mapper"></param>
-        /// <param name="contentSettings"></param>
-        /// <param name="globalSettings"></param>
-        /// <param name="passwordConfiguration"></param>
-        /// <param name="ipResolver"></param>
         public static void ConfigureUserManagerForUmbracoBackOffice(this IAppBuilder app,
             ServiceContext services,
-            UmbracoMapper mapper,
-            IContentSettings contentSettings,
             IGlobalSettings globalSettings,
+            UmbracoMapper mapper,
             // TODO: This could probably be optional?
             IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver)
@@ -56,35 +45,28 @@ namespace Umbraco.Web.Security
             //Configure Umbraco user manager to be created per request
             app.CreatePerOwinContext<BackOfficeUserManager>(
                 (options, owinContext) => BackOfficeUserManager.Create(
-                    options,
                     services.UserService,
                     services.EntityService,
                     services.ExternalLoginService,
-                    mapper,
-                    contentSettings,
                     globalSettings,
+                    mapper,
                     passwordConfiguration,
-                    ipResolver));
+                    ipResolver,
+                    new IdentityErrorDescriber(),
+                    app.GetDataProtectionProvider(),
+                    new NullLogger<BackOfficeUserManager<BackOfficeIdentityUser>>()));
 
             app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
 
             //Create a sign in manager per request
-            app.CreatePerOwinContext<BackOfficeSignInManager>((options, context) => BackOfficeSignInManager.Create(options, context, globalSettings, app.CreateLogger<BackOfficeSignInManager>()));
+            app.CreatePerOwinContext<BackOfficeSignInManager>((options, context) => BackOfficeSignInManager.Create(context, globalSettings, app.CreateLogger<BackOfficeSignInManager>()));
         }
 
         /// <summary>
         /// Configure a custom UserStore with the Identity User Manager for Umbraco
         /// </summary>
-        /// <param name="app"></param>
-        /// <param name="runtimeState"></param>
-        /// <param name="globalSettings"></param>
-        /// <param name="customUserStore"></param>
-        /// <param name="contentSettings"></param>
-        /// <param name="passwordConfiguration"></param>
-        /// <param name="ipResolver"></param>
         public static void ConfigureUserManagerForUmbracoBackOffice(this IAppBuilder app,
             IRuntimeState runtimeState,
-            IContentSettings contentSettings,
             IGlobalSettings globalSettings,
             BackOfficeUserStore customUserStore,
             // TODO: This could probably be optional?
@@ -97,44 +79,17 @@ namespace Umbraco.Web.Security
             //Configure Umbraco user manager to be created per request
             app.CreatePerOwinContext<BackOfficeUserManager>(
                 (options, owinContext) => BackOfficeUserManager.Create(
-                    options,
-                    customUserStore,
-                    contentSettings,
                     passwordConfiguration,
                     ipResolver,
-                    globalSettings));
+                    customUserStore,
+                    new IdentityErrorDescriber(),
+                    app.GetDataProtectionProvider(),
+                    new NullLogger<BackOfficeUserManager<BackOfficeIdentityUser>>()));
 
             app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
 
             //Create a sign in manager per request
-            app.CreatePerOwinContext<BackOfficeSignInManager>((options, context) => BackOfficeSignInManager.Create(options, context, globalSettings, app.CreateLogger(typeof(BackOfficeSignInManager).FullName)));
-        }
-
-        /// <summary>
-        /// Configure a custom BackOfficeUserManager for Umbraco
-        /// </summary>
-        /// <param name="app"></param>
-        /// <param name="runtimeState"></param>
-        /// <param name="globalSettings"></param>
-        /// <param name="userManager"></param>
-        public static void ConfigureUserManagerForUmbracoBackOffice<TManager, TUser>(this IAppBuilder app,
-            IRuntimeState runtimeState,
-            IGlobalSettings globalSettings,
-            Func<IdentityFactoryOptions<TManager>, IOwinContext, TManager> userManager)
-            where TManager : BackOfficeUserManager<TUser>
-            where TUser : BackOfficeIdentityUser
-        {
-            if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));
-            if (userManager == null) throw new ArgumentNullException(nameof(userManager));
-
-            //Configure Umbraco user manager to be created per request
-            app.CreatePerOwinContext<TManager>(userManager);
-
-            app.SetBackOfficeUserManagerType<TManager, TUser>();
-
-            //Create a sign in manager per request
-            app.CreatePerOwinContext<BackOfficeSignInManager>(
-                (options, context) => BackOfficeSignInManager.Create(options, context, globalSettings, app.CreateLogger(typeof(BackOfficeSignInManager).FullName)));
+            app.CreatePerOwinContext<BackOfficeSignInManager>((options, context) => BackOfficeSignInManager.Create(context, globalSettings, app.CreateLogger(typeof(BackOfficeSignInManager).FullName)));
         }
 
         /// <summary>
@@ -197,11 +152,11 @@ namespace Umbraco.Web.Security
                 // Enables the application to validate the security stamp when the user
                 // logs in. This is a security feature which is used when you
                 // change a password or add an external login to your account.
-                OnValidateIdentity = SecurityStampValidator
-                    .OnValidateIdentity<BackOfficeUserManager, BackOfficeIdentityUser, int>(
+                OnValidateIdentity = UmbracoSecurityStampValidator
+                    .OnValidateIdentity<BackOfficeSignInManager, BackOfficeUserManager, BackOfficeIdentityUser>(
                         TimeSpan.FromMinutes(30),
-                        (manager, user) => manager.GenerateUserIdentityAsync(user),
-                        identity => identity.GetUserId<int>()),
+                        (signInManager, manager, user) => signInManager.CreateUserIdentityAsync(user),
+                        identity => identity.GetUserId()),
 
             };
 
@@ -463,6 +418,42 @@ namespace Umbraco.Web.Security
                 requestCache);
 
             return authOptions;
+        }
+        public static IAppBuilder CreatePerOwinContext<T>(this IAppBuilder app, Func<T> createCallback)
+            where T : class, IDisposable
+        {
+            return CreatePerOwinContext<T>(app, (options, context) => createCallback());
+        }
+
+        public static IAppBuilder CreatePerOwinContext<T>(this IAppBuilder app,
+            Func<IdentityFactoryOptions<T>, IOwinContext, T> createCallback) where T : class, IDisposable
+        {
+            if (app == null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
+            return app.CreatePerOwinContext(createCallback, (options, instance) => instance.Dispose());
+        }
+
+        public static IAppBuilder CreatePerOwinContext<T>(this IAppBuilder app,
+            Func<IdentityFactoryOptions<T>, IOwinContext, T> createCallback,
+            Action<IdentityFactoryOptions<T>, T> disposeCallback) where T : class, IDisposable
+        {
+            if (app == null) throw new ArgumentNullException(nameof(app));
+            if (createCallback == null) throw new ArgumentNullException(nameof(createCallback));
+            if (disposeCallback == null) throw new ArgumentNullException(nameof(disposeCallback));
+
+            app.Use(typeof(IdentityFactoryMiddleware<T, IdentityFactoryOptions<T>>),
+                new IdentityFactoryOptions<T>
+                {
+                    DataProtectionProvider = app.GetDataProtectionProvider(),
+                    Provider = new IdentityFactoryProvider<T>
+                    {
+                        OnCreate = createCallback,
+                        OnDispose = disposeCallback
+                    }
+                });
+            return app;
         }
     }
 }

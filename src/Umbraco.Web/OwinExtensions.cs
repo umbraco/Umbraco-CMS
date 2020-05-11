@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Web;
-using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Security;
 using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Security;
 
@@ -54,7 +51,7 @@ namespace Umbraco.Web
             var ctx = owinContext.Get<HttpContextBase>(typeof(HttpContextBase).FullName);
             return ctx == null ? Attempt<HttpContextBase>.Fail() : Attempt.Succeed(ctx);
         }
-
+        
         /// <summary>
         /// Gets the back office sign in manager out of OWIN
         /// </summary>
@@ -83,6 +80,25 @@ namespace Umbraco.Web
             return marker.GetManager(owinContext)
                 ?? throw new NullReferenceException($"Could not resolve an instance of {typeof (BackOfficeUserManager<BackOfficeIdentityUser>)} from the {typeof (IOwinContext)}.");
         }
-    }
 
+        /// <summary>
+        /// Adapted from Microsoft.AspNet.Identity.Owin.OwinContextExtensions
+        /// </summary>
+        public static T Get<T>(this IOwinContext context)
+        {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            return context.Get<T>(GetKey(typeof(T)));
+        }
+
+        public static IOwinContext Set<T>(this IOwinContext context, T value)
+        {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            return context.Set(GetKey(typeof(T)), value);
+        }
+
+        private static string GetKey(Type t)
+        {
+            return "AspNet.Identity.Owin:" + t.AssemblyQualifiedName;
+        }
+    }
 }

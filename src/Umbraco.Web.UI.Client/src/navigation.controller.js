@@ -68,7 +68,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             args.event.stopPropagation();
             args.event.preventDefault();
 
-            if (n.metaData && n.metaData["jsClickCallback"] && angular.isString(n.metaData["jsClickCallback"]) && n.metaData["jsClickCallback"] !== "") {
+            if (n.metaData && n.metaData["jsClickCallback"] && Utilities.isString(n.metaData["jsClickCallback"]) && n.metaData["jsClickCallback"] !== "") {
                 //this is a legacy tree node!
                 var jsPrefix = "javascript:";
                 var js;
@@ -142,7 +142,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
     var isInit = false;
     var evts = [];
-    
+
     //Listen for global state changes
     evts.push(eventsService.on("appState.globalState.changed", function (e, args) {
         if (args.key === "showNavigation") {
@@ -200,7 +200,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 $scope.treeApi.load({ section: $scope.currentSection, customTreeParams: $scope.customTreeParams, cacheKey: $scope.treeCacheKey });
             });
         }
-        
+
         //show/hide search results
         if (args.key === "showSearchResults") {
             $scope.showSearchResults = args.value;
@@ -222,7 +222,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 } else {
                     $location.search("mculture", null);
                 }
-                
+
                 var currentEditorState = editorState.getCurrent();
                 if (currentEditorState && currentEditorState.path) {
                     $scope.treeApi.syncTree({ path: currentEditorState.path, activate: true });
@@ -233,13 +233,13 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
     //Emitted when a language is created or an existing one saved/edited
     evts.push(eventsService.on("editors.languages.languageSaved", function (e, args) {
-        if(args.isNew){
+        if (args.isNew) {
             //A new language has been created - reload languages for tree
             loadLanguages().then(function (languages) {
                 $scope.languages = languages;
             });
         }
-        else if(args.language.isDefault){
+        else if (args.language.isDefault) {
             //A language was saved and was set to be the new default (refresh the tree, so its at the top)
             loadLanguages().then(function (languages) {
                 $scope.languages = languages;
@@ -282,7 +282,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
     /**
      * For multi language sites, this ensures that mculture is set to either the last selected language or the default one
-     */ 
+     */
     function ensureMainCulture() {
         if ($location.search().mculture) {
             return;
@@ -295,7 +295,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         $timeout(function () {
             $scope.selectLanguage(language);
         });
-    }    
+    }
 
     /**
      * Based on the current state of the application, this configures the scope variables that control the main tree and language drop down
@@ -432,7 +432,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
                     //the nav is ready, let the app know
                     eventsService.emit("app.navigationReady", { treeApi: $scope.treeApi });
-                    
+
                 }
             });
         });
@@ -469,7 +469,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         // add the selected culture to a cookie so the user will log back into the same culture later on (cookie lifetime = one year)
         var expireDate = new Date();
         expireDate.setDate(expireDate.getDate() + 365);
-        $cookies.put("UMB_MCULTURE", language.culture, {path: "/", expires: expireDate});
+        $cookies.put("UMB_MCULTURE", language.culture, { path: "/", expires: expireDate });
 
         // close the language selector
         $scope.page.languageSelectorIsOpen = false;
@@ -495,9 +495,10 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             //execute them sequentially
 
             // set selected language to active
-            angular.forEach($scope.languages, function(language){
+            Utilities.forEach($scope.languages, language => {
                 language.active = false;
             });
+
             language.active = true;
 
             angularHelper.executeSequentialPromises(promises);
@@ -538,7 +539,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         closeTree();
     };
 
-    $scope.onOutsideClick = function() {
+    $scope.onOutsideClick = function () {
         closeTree();
     };
 

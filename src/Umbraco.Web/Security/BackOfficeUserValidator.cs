@@ -1,26 +1,18 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
 using Umbraco.Web.Models.Identity;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Web.Security
 {
-    /// <summary>
-    /// Custom validator to not validate a user's username or email if they haven't changed
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    internal class BackOfficeUserValidator<T> : UserValidator<T, int>
+    public class BackOfficeUserValidator<T> : UserValidator<T>
         where T : BackOfficeIdentityUser
     {
-        public BackOfficeUserValidator(UserManager<T, int> manager) : base(manager)
+        public override async Task<IdentityResult> ValidateAsync(UserManager<T> manager, T user)
         {
-        }
-
-        public override async Task<IdentityResult> ValidateAsync(T item)
-        {
-            //Don't validate if the user's email or username hasn't changed otherwise it's just wasting SQL queries.
-            if (item.IsPropertyDirty("Email") || item.IsPropertyDirty("UserName"))
+            // Don't validate if the user's email or username hasn't changed otherwise it's just wasting SQL queries.
+            if (user.IsPropertyDirty("Email") || user.IsPropertyDirty("UserName"))
             {
-                return await base.ValidateAsync(item);
+                return await base.ValidateAsync(manager, user);
             }
             return IdentityResult.Success;
         }

@@ -21,6 +21,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.WebAssets;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Editors
 {
@@ -370,6 +371,7 @@ namespace Umbraco.Web.Editors
                         {"loginBackgroundImage", _contentSettings.LoginBackgroundImage},
                         {"showUserInvite", EmailSender.CanSendRequiredEmail(globalSettings)},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail(globalSettings)},
+                        {"showAllowSegmentationForDocumentTypes", false},
                     }
                 },
                 {

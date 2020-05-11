@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -54,9 +56,14 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 throw new InvalidOperationException("Could not find the super user!");
             }
+            admin.Email = user.Email.Trim();
+            admin.Name = user.Name.Trim();
+            admin.Username = user.Email.Trim();
+
+            _userService.Save(admin);
 
             var userManager = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().GetBackOfficeUserManager();
-            var membershipUser = await userManager.FindByIdAsync(Constants.Security.SuperUserId);
+            var membershipUser = await userManager.FindByIdAsync(Constants.Security.SuperUserId.ToString());
             if (membershipUser == null)
             {
                 throw new InvalidOperationException(
@@ -64,19 +71,15 @@ namespace Umbraco.Web.Install.InstallSteps
             }
 
             //To change the password here we actually need to reset it since we don't have an old one to use to change
-            var resetToken = await userManager.GeneratePasswordResetTokenAsync(membershipUser.Id);
-            var resetResult =
-                await userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
+            var resetToken = await userManager.GeneratePasswordResetTokenAsync(membershipUser);
+            if (string.IsNullOrWhiteSpace(resetToken))
+                throw new InvalidOperationException("Could not reset password: unable to generate internal reset token");
+
+            var resetResult = await userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
             if (!resetResult.Succeeded)
-            {
-                throw new InvalidOperationException("Could not reset password: " + string.Join(", ", resetResult.Errors));
-            }
+                throw new InvalidOperationException("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));
 
-            admin.Email = user.Email.Trim();
-            admin.Name = user.Name.Trim();
-            admin.Username = user.Email.Trim();
 
-            _userService.Save(admin);
 
             if (user.SubscribeToNewsLetter)
             {

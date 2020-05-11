@@ -6,6 +6,7 @@ namespace Umbraco.Tests.Common.Builders
 {
     public class MemberBuilder
         : BuilderBase<Member>,
+            IBuildContentTypes,
             IWithIdBuilder,
             IWithKeyBuilder,
             IWithCreatorIdBuilder,
@@ -87,7 +88,7 @@ namespace Umbraco.Tests.Common.Builders
             var name = _name ?? Guid.NewGuid().ToString();
             var creatorId = _creatorId ?? 1;
             var level = _level ?? 1;
-            var path = _path ?? "-1";
+            var path = _path ?? $"-1,{id}";
             var sortOrder = _sortOrder ?? 0;
             var trashed = _trashed ?? false;
             var username = _username ?? string.Empty;

@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
 using Umbraco.Core;
@@ -148,25 +147,19 @@ namespace Umbraco.Web.Editors
             }
 
             var id = parts[0];
-            int intId;
-            if (int.TryParse(id, out intId) == false)
-            {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
-                return RedirectToAction("Default");
-            }
 
-            var identityUser = await UserManager.FindByIdAsync(intId);
+            var identityUser = await UserManager.FindByIdAsync(id);
             if (identityUser == null)
             {
                 Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with non existing user: {UserId}", id);
                 return RedirectToAction("Default");
             }
 
-            var result = await UserManager.ConfirmEmailAsync(intId, decoded);
+            var result = await UserManager.ConfirmEmailAsync(identityUser, decoded);
 
             if (result.Succeeded == false)
             {
-                Logger.Warn<BackOfficeController>("Could not verify email, Error: {Errors}, Token: {Invite}", string.Join(",", result.Errors), invite);
+                Logger.Warn<BackOfficeController>("Could not verify email, Error: {Errors}, Token: {Invite}", result.Errors.ToErrorMessage(), invite);
                 return new RedirectResult(Url.Action("Default") + "#/login/false?invite=3");
             }
 
@@ -304,10 +297,10 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public async Task<ActionResult> ValidatePasswordResetCode([Bind(Prefix = "u")]int userId, [Bind(Prefix = "r")]string resetCode)
         {
-            var user = UserManager.FindById(userId);
+            var user = await UserManager.FindByIdAsync(userId.ToString());
             if (user != null)
             {
-                var result = await UserManager.UserTokenProvider.ValidateAsync("ResetPassword", resetCode, UserManager, user);
+                var result = await UserManager.VerifyUserTokenAsync(user, "ResetPassword", "ResetPassword", resetCode);
                 if (result)
                 {
                     //Add a flag and redirect for it to be displayed
@@ -335,7 +328,11 @@ namespace Umbraco.Web.Editors
                 return RedirectToLocal(Url.Action("Default", "BackOffice"));
             }
 
-            var result = await UserManager.AddLoginAsync(User.Identity.GetUserId<int>(), loginInfo.Login);
+            var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            if (user == null) throw new InvalidOperationException("Could not find user");
+
+            var result = await UserManager.AddLoginAsync(user,
+                new UserLoginInfo(loginInfo.Login.LoginProvider, loginInfo.Login.ProviderKey, loginInfo.Login.LoginProvider));
             if (result.Succeeded)
             {
                 return RedirectToLocal(Url.Action("Default", "BackOffice"));
@@ -399,7 +396,7 @@ namespace Umbraco.Web.Editors
             }
 
             // Sign in the user with this external login provider if the user already has a login
-            var user = await UserManager.FindAsync(loginInfo.Login);
+            var user = await UserManager.FindByLoginAsync(loginInfo.Login.LoginProvider, loginInfo.Login.ProviderKey);
             if (user != null)
             {
                 // TODO: It might be worth keeping some of the claims associated with the ExternalLoginInfo, in which case we
@@ -490,21 +487,22 @@ namespace Umbraco.Web.Editors
 
                     if (userCreationResult.Succeeded == false)
                     {
-                        ViewData.SetExternalSignInError(userCreationResult.Errors);
+                        ViewData.SetExternalSignInError(userCreationResult.Errors.Select(x => x.Description).ToList());
                     }
                     else
                     {
-                        var linkResult = await UserManager.AddLoginAsync(autoLinkUser.Id, loginInfo.Login);
+                        var linkResult = await UserManager.AddLoginAsync(autoLinkUser,
+                            new UserLoginInfo(loginInfo.Login.LoginProvider, loginInfo.Login.ProviderKey, loginInfo.Login.LoginProvider));
                         if (linkResult.Succeeded == false)
                         {
-                            ViewData.SetExternalSignInError(linkResult.Errors);
+                            ViewData.SetExternalSignInError(linkResult.Errors.Select(x => x.Description).ToList());
 
                             //If this fails, we should really delete the user since it will be in an inconsistent state!
                             var deleteResult = await UserManager.DeleteAsync(autoLinkUser);
                             if (deleteResult.Succeeded == false)
                             {
                                 //DOH! ... this isn't good, combine all errors to be shown
-                                ViewData.SetExternalSignInError(linkResult.Errors.Concat(deleteResult.Errors));
+                                ViewData.SetExternalSignInError(linkResult.Errors.Concat(deleteResult.Errors).Select(x => x.Description).ToList());
                             }
                         }
                         else
