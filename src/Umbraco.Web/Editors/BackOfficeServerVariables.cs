@@ -371,6 +371,7 @@ namespace Umbraco.Web.Editors
                         {"loginBackgroundImage", _contentSettings.LoginBackgroundImage},
                         {"showUserInvite", EmailSender.CanSendRequiredEmail(globalSettings)},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail(globalSettings)},
+                        {"showAllowSegmentationForDocumentTypes", false},
                     }
                 },
                 {

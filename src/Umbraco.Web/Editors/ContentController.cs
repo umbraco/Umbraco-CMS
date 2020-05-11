@@ -911,7 +911,13 @@ namespace Umbraco.Web.Editors
                 if (variantCount > 1)
                 {
                     var cultureErrors = ModelState.GetCulturesWithErrors(Services.LocalizationService, cultureForInvariantErrors);
-                    foreach (var c in contentItem.Variants.Where(x => x.Save && !cultureErrors.Contains(x.Culture)).Select(x => x.Culture).ToArray())
+
+                    var savedWithoutErrors = contentItem.Variants
+                        .Where(x => x.Save && !cultureErrors.Contains(x.Culture) && x.Culture != null)
+                        .Select(x => x.Culture)
+                        .ToArray();
+
+                    foreach (var c in savedWithoutErrors)
                     {
                         AddSuccessNotification(notifications, c,
                             Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
@@ -1889,7 +1895,8 @@ namespace Umbraco.Web.Editors
                     ? variant.PropertyCollectionDto
                     : new ContentPropertyCollectionDto
                     {
-                        Properties = variant.PropertyCollectionDto.Properties.Where(x => !x.Culture.IsNullOrWhiteSpace())
+                        Properties = variant.PropertyCollectionDto.Properties.Where(
+                            x => !x.Culture.IsNullOrWhiteSpace() || !x.Segment.IsNullOrWhiteSpace())
                     };
 
                 //for each variant, map the property values
