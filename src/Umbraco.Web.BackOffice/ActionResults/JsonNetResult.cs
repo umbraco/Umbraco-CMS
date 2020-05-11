@@ -42,11 +42,8 @@ namespace Umbraco.Web.BackOffice.ActionResults
             {
                 using var bodyWriter = new StreamWriter(response.Body);
                 using var writer = new JsonTextWriter(bodyWriter) { Formatting = Formatting };
-
                 var serializer = JsonSerializer.Create(SerializerSettings);
                 serializer.Serialize(writer, Data);
-
-                writer.Flush();
             }
 
             return Task.CompletedTask;

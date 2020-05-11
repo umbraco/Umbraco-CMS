@@ -1,21 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Composing;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Website.ActionResults
 {
+    /// <summary>
+    /// Redirects to an Umbraco page by Id or Entity
+    /// </summary>
     public class RedirectToUmbracoPageResult : IActionResult
     {
         private IPublishedContent _publishedContent;
@@ -55,7 +55,7 @@ namespace Umbraco.Web.Website.ActionResults
                 if (!(_publishedContent is null)) return _publishedContent;
 
                 //need to get the URL for the page
-                _publishedContent = _umbracoContextAccessor.UmbracoContext.Content.GetById(_pageId);
+                _publishedContent = _umbracoContextAccessor.GetRequiredUmbracoContext().Content.GetById(_pageId);
 
                return _publishedContent;
             }

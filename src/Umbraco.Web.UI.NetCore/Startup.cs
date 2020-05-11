@@ -2,6 +2,7 @@ using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -53,10 +54,16 @@ namespace Umbraco.Web.UI.BackOffice
                 options.ShouldProfile = request => false; // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
             });
 
+            // If using Kestrel: https://stackoverflow.com/a/55196057
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
+
             //Finally initialize Current
             // TODO: This should be moved to the UmbracoServiceProviderFactory when the container is cross-wired and then don't use the overload above to `out var factory`
             Current.Initialize(
-                factory.GetInstance<ILogger> (),
+                factory.GetInstance<ILogger>(),
                 factory.GetInstance<Configs>(),
                 factory.GetInstance<IIOHelper>(),
                 factory.GetInstance<IHostingEnvironment>(),
@@ -70,7 +77,7 @@ namespace Umbraco.Web.UI.BackOffice
         public void Configure(IApplicationBuilder app)
         {
 
-        //    app.UseMiniProfiler();
+            //    app.UseMiniProfiler();
             app.UseUmbracoRequest();
             if (_env.IsDevelopment())
             {
