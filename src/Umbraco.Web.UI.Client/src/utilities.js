@@ -104,6 +104,16 @@
         return JSON.parse(val);
     }
 
+    /**
+     * Not equivalent to angular.forEach. But like the angularJS method this does not fail on null or undefined.
+     */
+    const forEach = (obj, iterator) => {
+        if (obj) {
+            return obj.forEach(iterator);
+        }
+        return obj;
+    }
+
     let _utilities = {
         noop: noop,
         copy: copy,
@@ -117,7 +127,8 @@
         isNumber: isNumber,
         isObject: isObject,
         fromJson: fromJson,
-        toJson: toJson
+        toJson: toJson,
+        forEach: forEach
     };
 
     if (typeof (window.Utilities) === 'undefined') {
