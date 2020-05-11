@@ -134,7 +134,7 @@
             var tours = getTours();
             setTourStatuses(tours).then(function () {
                 var groupedTours = [];
-                Utilities.forEach(tours, function (item) {
+                tours.forEach(function (item) {
 
                     if (item.contentType === null || item.contentType === '') {
                         var groupExists = false;
@@ -143,7 +143,7 @@
                             "tours": []
                         };
 
-                        Utilities.forEach(groupedTours, function (group) {
+                        groupedTours.forEach(function (group) {
                             // extend existing group if it is already added
                             if (group.group === item.group) {
                                 if (item.groupOrder) {
