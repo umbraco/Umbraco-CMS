@@ -54,5 +54,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "allowCultureVariant")]
         public bool AllowCultureVariant { get; set; }
+
+        [DataMember(Name = "allowSegmentVariant")]
+        public bool AllowSegmentVariant { get; set; }
     }
 }
