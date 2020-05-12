@@ -1,12 +1,8 @@
 using System;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
 using SixLabors.ImageSharp.Web.DependencyInjection;
-using Umbraco.Core;
-using Umbraco.Extensions;
-using Umbraco.Web.Common.Middleware;
 
-namespace Umbraco.Web.Website.Extensions
+namespace Umbraco.Extensions
 {
     public static class UmbracoWebsiteApplicationBuilderExtensions
     {

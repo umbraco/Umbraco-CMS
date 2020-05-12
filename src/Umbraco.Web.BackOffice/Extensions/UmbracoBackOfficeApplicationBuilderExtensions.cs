@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.BackOffice.Extensions
+namespace Umbraco.Extensions
 {
     public static class UmbracoBackOfficeApplicationBuilderExtensions
     {
