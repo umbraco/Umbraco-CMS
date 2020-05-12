@@ -433,9 +433,9 @@
     $this.CopyFile("$($this.SolutionRoot)\build\Azure\azuregalleryrelease.ps1", $this.BuildOutput)
   })
 
-  $ubuild.DefineMethod("BuildCSharpDocs",
+  $ubuild.DefineMethod("PrepareCSharpDocs",
   {
-    Write-Host "Building C# Documentation"
+    Write-Host "Prepare C# Documentation"
 
     $src = "$($this.SolutionRoot)\src"
     $tmp = $this.BuildTemp
@@ -453,9 +453,9 @@
     & $this.BuildEnv.Zip a -tzip -r "$out\csharp-docs.zip" $DocFxSiteOutput
   })
 
-  $ubuild.DefineMethod("BuildAngularDocs",
+  $ubuild.DefineMethod("PrepareAngularDocs",
   {
-    Write-Host "Building Angular Documentation"
+    Write-Host "Prepare Angular Documentation"
 
     $src = "$($this.SolutionRoot)\src"
     $out = $this.BuildOutput
