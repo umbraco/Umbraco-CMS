@@ -122,7 +122,8 @@ namespace Umbraco.Web.Website.ActionResults
             // http://issues.umbraco.org/issue/U4-1339
 
             var targetController = controller;
-            var tempData = context.HttpContext.RequestServices.GetRequiredService<ITempDataDictionary>();
+            var tempDataDictionaryFactory = context.HttpContext.RequestServices.GetRequiredService<ITempDataDictionaryFactory>();
+            var tempData = tempDataDictionaryFactory.GetTempData(context.HttpContext);
 
             targetController.TempData = tempData;
             targetController.TempData.Save();
