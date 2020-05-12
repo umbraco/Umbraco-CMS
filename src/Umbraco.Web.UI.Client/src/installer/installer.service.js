@@ -340,6 +340,7 @@ angular.module("umbraco.install").factory('installerService', function ($rootSco
             // TODO: In dotnetcore the resulting YSOD isn't HTML, the error is just a string so it looks ugly
             // So we shouldn't be using an iframe and will need to change this so that we have an unhandled exception filter for the installer (and eventually
             // the rest of the back office) to handle errors and chuck the data into a json format for us to use.
+            // It might turn out that our new Api Convention `UmbracoApiBehaviorApplicationModelProvider` might handle this for us with it's custom error handling.
             $timeout(function () {
                 document.getElementById('ysod').contentDocument.write(ysod);
             }, 500);
