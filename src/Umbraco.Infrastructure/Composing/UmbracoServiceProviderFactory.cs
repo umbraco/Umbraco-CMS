@@ -1,9 +1,11 @@
 ﻿using LightInject;
 using LightInject.Microsoft.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using System;
+using Umbraco.Composing;
 using Umbraco.Core.Composing.LightInject;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Composing
 {
@@ -75,6 +77,16 @@ namespace Umbraco.Core.Composing
         public IServiceProvider CreateServiceProvider(IServiceContainer containerBuilder)
         {
             var provider = containerBuilder.CreateServiceProvider(_services);
+
+            // after cross wiring, configure "Current"
+            Current.Initialize(
+                _container.GetInstance<Umbraco.Core.Logging.ILogger>(),
+                _container.GetInstance<Configs>(),
+                _container.GetInstance<IIOHelper>(),
+                _container.GetInstance<Umbraco.Core.Hosting.IHostingEnvironment>(),
+                _container.GetInstance<IBackOfficeInfo>(),
+                _container.GetInstance<Umbraco.Core.Logging.IProfiler>());
+
             return provider;
         }
 

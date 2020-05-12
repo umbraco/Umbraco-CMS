@@ -20,6 +20,7 @@ using Smidge.Nuglify;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Common.ApplicationModels;
+using Umbraco.Web.Common.Middleware;
 using Umbraco.Web.Common.ModelBinding;
 
 namespace Umbraco.Extensions
@@ -33,6 +34,9 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static IServiceCollection AddUmbracoWebComponents(this IServiceCollection services)
         {
+            services.AddTransient<UmbracoRequestLoggingMiddleware>();
+            services.AddTransient<UmbracoRequestMiddleware>();
+
             services.TryAddSingleton<UmbracoJsonModelBinder>();
             services.ConfigureOptions<UmbracoMvcConfigureOptions>();
             services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoApiBehaviorApplicationModelProvider>());

@@ -8,30 +8,28 @@ using Umbraco.Core.Logging.Serilog.Enrichers;
 
 namespace Umbraco.Web.Common.Middleware
 {
-    public class UmbracoRequestLoggingMiddleware
+    public class UmbracoRequestLoggingMiddleware : IMiddleware
     {
-        readonly RequestDelegate _next;
         private readonly HttpSessionIdEnricher _sessionIdEnricher;
         private readonly HttpRequestNumberEnricher _requestNumberEnricher;
         private readonly HttpRequestIdEnricher _requestIdEnricher;        
 
-        public UmbracoRequestLoggingMiddleware(RequestDelegate next,
+        public UmbracoRequestLoggingMiddleware(
             HttpSessionIdEnricher sessionIdEnricher,
             HttpRequestNumberEnricher requestNumberEnricher,
             HttpRequestIdEnricher requestIdEnricher)
         {
-            _next = next;
             _sessionIdEnricher = sessionIdEnricher;
             _requestNumberEnricher = requestNumberEnricher;
             _requestIdEnricher = requestIdEnricher;
         }
 
-        public async Task Invoke(HttpContext httpContext)
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             // do not process if client-side request
-            if (new Uri(httpContext.Request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsClientSideRequest())
+            if (new Uri(context.Request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsClientSideRequest())
             {
-                await _next(httpContext);
+                await next(context);
                 return;
             }
 
@@ -42,7 +40,7 @@ namespace Umbraco.Web.Common.Middleware
             using (LogContext.Push(_requestNumberEnricher))
             using (LogContext.Push(_requestIdEnricher))
             {
-                await _next(httpContext);
+                await next(context);
             }
         }
     }
