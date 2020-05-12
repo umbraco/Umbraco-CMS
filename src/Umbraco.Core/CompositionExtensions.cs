@@ -4,6 +4,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging.Viewer;
+using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PackageActions;
 using Umbraco.Core.Persistence.Mappers;
@@ -49,6 +50,13 @@ namespace Umbraco.Core
             => composition.WithCollectionBuilder<DataEditorCollectionBuilder>();
 
         /// <summary>
+        /// Gets the data value reference factory collection builder.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        public static DataValueReferenceFactoryCollectionBuilder DataValueReferenceFactories(this Composition composition)
+            => composition.WithCollectionBuilder<DataValueReferenceFactoryCollectionBuilder>();
+
+        /// <summary>
         /// Gets the property value converters collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
@@ -66,8 +74,15 @@ namespace Umbraco.Core
         /// Gets the validators collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
-        internal static ManifestValueValidatorCollectionBuilder Validators(this Composition composition)
+        internal static ManifestValueValidatorCollectionBuilder ManifestValueValidators(this Composition composition)
             => composition.WithCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
+
+        /// <summary>
+        /// Gets the manifest filter collection builder.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        public static ManifestFilterCollectionBuilder ManifestFilters(this Composition composition)
+            => composition.WithCollectionBuilder<ManifestFilterCollectionBuilder>();
 
         /// <summary>
         /// Gets the components collection builder.

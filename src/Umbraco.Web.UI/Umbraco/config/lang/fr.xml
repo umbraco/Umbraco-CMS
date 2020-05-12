@@ -124,7 +124,7 @@
     <key alias="saveAndSchedule">Sauver et planifier</key>
     <key alias="saveToPublish">Sauver et envoyer pour approbation</key>
     <key alias="saveListView">Sauver la mise en page de la liste</key>
-    <key alias="showPage">Prévisualiser</key>
+    <key alias="saveAndPreview">Prévisualiser</key>
     <key alias="showPageDisabled">La prévisualisation est désactivée car aucun modèle n'a été assigné.</key>
     <key alias="styleChoose">Choisir un style</key>
     <key alias="styleShow">Afficher les styles</key>
@@ -324,7 +324,6 @@
     <key alias="linkinternal">Lien interne :</key>
     <key alias="linklocaltip">Si vous utilisez des ancres, insérez # au début du lien</key>
     <key alias="linknewwindow">Ouvrir dans une nouvelle fenêtre?</key>
-    <key alias="macroContainerSettings">Paramètres de macro</key>
     <key alias="macroDoesNotHaveProperties">Cette macro ne contient aucune propriété éditable</key>
     <key alias="paste">Coller</key>
     <key alias="permissionsEdit">Editer les permissions pour</key>
@@ -380,7 +379,7 @@
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
-      Editez les différentes versions de langues pour l'élément de dictionaire '<em>%0%</em>' ci-dessous.<br/>Vous pouvez ajouter d'autres langues depuis le menu ci-dessous "Langues".
+      Editez les différentes versions de langues pour l'élément de dictionaire '<em>%0%</em>' ci-dessous.
    ]]></key>
     <key alias="displayName">Nom de Culture</key>
     <key alias="changeKeyError"><![CDATA[
@@ -1181,7 +1180,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="contentTypePropertyTypeCreated">Type de propriété créé</key>
     <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Nom : %0% <br /> Type de données : %1%]]></key>
     <key alias="contentTypePropertyTypeDeleted">Type de propriété supprimé</key>
-    <key alias="contentTypeSavedHeader">Type de documet sauvegardé</key>
+    <key alias="contentTypeSavedHeader">Type de document sauvegardé</key>
     <key alias="contentTypeTabCreated">Onglet créé</key>
     <key alias="contentTypeTabDeleted">Onglet supprimé</key>
     <key alias="contentTypeTabDeletedText">Onglet avec l'ID : %0% supprimé</key>
@@ -1813,7 +1812,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="noSniffSetHeaderInConfigSuccess">Une configuration a été ajoutée dans votre fichier web.config pour créer un header protégeant contre les vulnérabilités de MIME sniffing.</key>
     <key alias="hSTSCheckHeaderFound"><![CDATA[L'en-tête <strong>Strict-Transport-Security</strong>, aussi connu sous le nom de HSTS-header, a été trouvé.]]></key>
     <key alias="hSTSCheckHeaderNotFound"><![CDATA[L'en-tête <strong>Strict-Transport-Security</strong>, aussi connu sous le nom de HSTS-header, n'a pas été trouvé.]]></key>
-    <key alias="hSTSSetHeaderInConfigDescription">Ajoute l'en-tête 'Strict-Transport-Security' avec la valeur 'max-age=10886400; preload' à la section httpProtocol/customHeaders du fichier web.config. Utilisez cette correction uniquement si vos domaines vont fonctionner en https pour les 18 prochaines semaines (minimum).</key>
+    <key alias="hSTSSetHeaderInConfigDescription">Ajoute l'en-tête 'Strict-Transport-Security' avec la valeur 'max-age=10886400' à la section httpProtocol/customHeaders du fichier web.config. Utilisez cette correction uniquement si vos domaines vont fonctionner en https pour les 18 prochaines semaines (minimum).</key>
     <key alias="hSTSSetHeaderInConfigSuccess">L'en-tête HSTS a été ajouté dans votre fichier web.config.</key>
     <key alias="xssProtectionCheckHeaderFound"><![CDATA[L'en-tête <strong>X-XSS-Protection</strong> a été trouvé.]]></key>
     <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[L'en-tête <strong>X-XSS-Protection</strong> n'a pas été trouvé.]]></key>

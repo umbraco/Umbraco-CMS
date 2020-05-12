@@ -542,7 +542,7 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// Returns the login status model of the currently logged in member, if no member is logged in it returns null;
+        /// Returns the login status model of the currently logged in member.
         /// </summary>
         /// <returns></returns>
         public virtual LoginStatusModel GetCurrentLoginStatus()

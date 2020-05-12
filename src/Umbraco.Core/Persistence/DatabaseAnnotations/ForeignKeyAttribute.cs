@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 
 namespace Umbraco.Core.Persistence.DatabaseAnnotations
 {
@@ -9,11 +10,17 @@ namespace Umbraco.Core.Persistence.DatabaseAnnotations
     public class ForeignKeyAttribute : ReferencesAttribute
     {
         public ForeignKeyAttribute(Type type) : base(type)
-        {
-        }
+        { }
 
-        internal string OnDelete { get; set; }
-        internal string OnUpdate { get; set; }
+        /// <summary>
+        /// Gets or sets the cascade rule for deletions.
+        /// </summary>
+        public Rule OnDelete { get; set; } = Rule.None;
+
+        /// <summary>
+        /// Gets or sets the cascade rule for updates.
+        /// </summary>
+        public Rule OnUpdate { get; set; } = Rule.None;
 
         /// <summary>
         /// Gets or sets the name of the foreign key reference

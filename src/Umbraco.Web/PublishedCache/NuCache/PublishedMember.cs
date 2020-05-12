@@ -20,21 +20,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ContentNode contentNode,
             ContentData contentData,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            IVariationContextAccessor variationContextAccessor,
-            IUmbracoContextAccessor umbracoContextAccessor
-            )
-            : base(contentNode, contentData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor)
+            IVariationContextAccessor variationContextAccessor)
+            : base(contentNode, contentData, publishedSnapshotAccessor, variationContextAccessor)
         {
             _member = member;
         }
 
         public static IPublishedContent Create(
             IMember member,
-            PublishedContentType contentType,
+            IPublishedContentType contentType,
             bool previewing,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            IVariationContextAccessor variationContextAccessor,
-            IUmbracoContextAccessor umbracoContextAccessor)
+            IVariationContextAccessor variationContextAccessor)
         {
             var d = new ContentData
             {
@@ -50,10 +47,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 member.Level, member.Path, member.SortOrder,
                 member.ParentId,
                 member.CreateDate, member.CreatorId);
-            return new PublishedMember(member, n, d, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor).CreateModel();
+            return new PublishedMember(member, n, d, publishedSnapshotAccessor, variationContextAccessor).CreateModel();
         }
 
-        private static Dictionary<string, PropertyData[]> GetPropertyValues(PublishedContentType contentType, IMember member)
+        private static Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)
         {
             // see node in PublishedSnapshotService
             // we do not (want to) support ConvertDbToXml/String
@@ -91,7 +88,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return properties;
         }
 
-        private static void AddIf(PublishedContentType contentType, IDictionary<string, PropertyData[]> properties, string alias, object value)
+        private static void AddIf(IPublishedContentType contentType, IDictionary<string, PropertyData[]> properties, string alias, object value)
         {
             var propertyType = contentType.GetPropertyType(alias);
             if (propertyType == null || propertyType.IsUserProperty) return;

@@ -8,7 +8,7 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public abstract class PropertyValueConverterBase : IPropertyValueConverter
     {
-        public virtual bool IsConverter(PublishedPropertyType propertyType)
+        public virtual bool IsConverter(IPublishedPropertyType propertyType)
             => false;
 
         public virtual bool? IsValue(object value, PropertyValueLevel level)
@@ -30,19 +30,19 @@ namespace Umbraco.Core.PropertyEditors
             return value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false);
         }
 
-        public virtual Type GetPropertyValueType(PublishedPropertyType propertyType)
+        public virtual Type GetPropertyValueType(IPublishedPropertyType propertyType)
             => typeof (object);
 
-        public virtual PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        public virtual PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Snapshot;
 
-        public virtual object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public virtual object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
             => source;
 
-        public virtual object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public virtual object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
             => inter;
 
-        public virtual object ConvertIntermediateToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public virtual object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
             => inter?.ToString() ?? string.Empty;
     }
 }

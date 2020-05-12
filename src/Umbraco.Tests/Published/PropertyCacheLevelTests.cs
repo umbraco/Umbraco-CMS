@@ -35,10 +35,13 @@ namespace Umbraco.Tests.Published
                 new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
 
             var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
-            var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", new[]
+
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
             {
-                publishedContentTypeFactory.CreatePropertyType("prop1", 1),
-            });
+                yield return publishedContentTypeFactory.CreatePropertyType(contentType, "prop1", 1);
+            }
+
+            var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", CreatePropertyTypes);
 
             // PublishedElementPropertyBase.GetCacheLevels:
             //
@@ -113,10 +116,13 @@ namespace Umbraco.Tests.Published
                 new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
 
             var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
-            var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", new[]
+
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
             {
-                publishedContentTypeFactory.CreatePropertyType("prop1", 1),
-            });
+                yield return publishedContentTypeFactory.CreatePropertyType(contentType, "prop1", 1);
+            }
+
+            var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", CreatePropertyTypes);
 
             var elementsCache = new FastDictionaryAppCache();
             var snapshotCache = new FastDictionaryAppCache();
@@ -187,10 +193,13 @@ namespace Umbraco.Tests.Published
                 new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
 
             var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
-            var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", new[]
+
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
             {
-                publishedContentTypeFactory.CreatePropertyType("prop1", 1),
-            });
+                yield return publishedContentTypeFactory.CreatePropertyType(contentType, "prop1", 1);
+            }
+
+            var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", CreatePropertyTypes);
 
             Assert.Throws<Exception>(() =>
             {
@@ -213,28 +222,28 @@ namespace Umbraco.Tests.Published
             public bool? IsValue(object value, PropertyValueLevel level)
                 => value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false);
 
-            public bool IsConverter(PublishedPropertyType propertyType)
+            public bool IsConverter(IPublishedPropertyType propertyType)
                 => propertyType.EditorAlias.InvariantEquals("Umbraco.Void");
 
-            public Type GetPropertyValueType(PublishedPropertyType propertyType)
+            public Type GetPropertyValueType(IPublishedPropertyType propertyType)
                 => typeof(int);
 
-            public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+            public PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
                 => _cacheLevel;
 
-            public object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+            public object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
             {
                 SourceConverts++;
                 return int.TryParse(source as string, out int i) ? i : 0;
             }
 
-            public object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+            public object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
             {
                 InterConverts++;
                 return (int) inter;
             }
 
-            public object ConvertIntermediateToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+            public object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
                 => ((int) inter).ToString();
         }
     }

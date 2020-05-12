@@ -48,7 +48,16 @@ namespace Umbraco.Core.Models
                 var configuration = Configuration;
                 var json = JsonConvert.SerializeObject(configuration);
                 _editor = value;
-                Configuration = _editor.GetConfigurationEditor().FromDatabase(json);
+
+                try
+                {
+                    Configuration = _editor.GetConfigurationEditor().FromDatabase(json);
+                }
+                catch (Exception e)
+                {
+                    throw new InvalidOperationException($"The configuration for data type {Id} : {EditorAlias} is invalid (see inner exception)."
+                                                        + " Please fix the configuration and ensure it is valid. The site may fail to start and / or load data types and run.", e);
+                }
             }
         }
 
@@ -76,7 +85,16 @@ namespace Umbraco.Core.Models
 
                 if (_hasConfiguration) return _configuration;
 
-                _configuration = _editor.GetConfigurationEditor().FromDatabase(_configurationJson);
+                try
+                {
+                    _configuration = _editor.GetConfigurationEditor().FromDatabase(_configurationJson);
+                }
+                catch (Exception e)
+                {
+                    throw new InvalidOperationException($"The configuration for data type {Id} : {EditorAlias} is invalid (see inner exception)."
+                                                        + " Please fix the configuration and ensure it is valid. The site may fail to start and / or load data types and run.", e);
+                }
+
                 _hasConfiguration = true;
                 _configurationJson = null;
 
@@ -158,7 +176,18 @@ namespace Umbraco.Core.Models
                 // else, create a Lazy de-serializer
                 var capturedConfiguration = _configurationJson;
                 var capturedEditor = _editor;
-                return new Lazy<object>(() => capturedEditor.GetConfigurationEditor().FromDatabase(capturedConfiguration));
+                return new Lazy<object>(() =>
+                {
+                    try
+                    {
+                        return capturedEditor.GetConfigurationEditor().FromDatabase(capturedConfiguration);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new InvalidOperationException($"The configuration for data type {Id} : {EditorAlias} is invalid (see inner exception)."
+                                                            + " Please fix the configuration and ensure it is valid. The site may fail to start and / or load data types and run.", e);
+                    }
+                });
             }
         }
     }

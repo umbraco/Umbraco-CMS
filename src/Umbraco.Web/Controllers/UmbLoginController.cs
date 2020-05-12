@@ -22,6 +22,7 @@ namespace Umbraco.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidateUmbracoFormRouteString]
         public ActionResult HandleLogin([Bind(Prefix = "loginModel")]LoginModel model)
         {
             if (ModelState.IsValid == false)
@@ -45,7 +46,7 @@ namespace Umbraco.Web.Controllers
                 // if it's not a local url we'll redirect to the root of the current site
                 return Redirect(Url.IsLocalUrl(model.RedirectUrl)
                     ? model.RedirectUrl
-                    : CurrentPage.AncestorOrSelf(1).Url);
+                    : CurrentPage.AncestorOrSelf(1).Url());
             }
 
             //redirect to current page by default

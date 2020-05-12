@@ -15,6 +15,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
@@ -264,6 +265,7 @@ namespace Umbraco.Web.Trees
             treeNode.Path = entity.Path;
             treeNode.Udi = Udi.Create(ObjectTypes.GetUdiType(entityObjectType), entity.Key);
             treeNode.HasChildren = hasChildren;
+            treeNode.Trashed = entity.Trashed;
             return treeNode;
         }
 
@@ -367,16 +369,6 @@ namespace Umbraco.Web.Trees
         protected bool IsDialog(FormDataCollection queryStrings)
         {
             return queryStrings.GetValue<string>(TreeQueryStringParameters.Use) == "dialog";
-        }
-
-        /// <summary>
-        /// If the request should allows a user to choose nodes that they normally don't have access to
-        /// </summary>
-        /// <param name="queryStrings"></param>
-        /// <returns></returns>
-        protected bool IgnoreUserStartNodes(FormDataCollection queryStrings)
-        {
-            return queryStrings.GetValue<bool>(TreeQueryStringParameters.IgnoreUserStartNodes);
         }
 
         /// <summary>

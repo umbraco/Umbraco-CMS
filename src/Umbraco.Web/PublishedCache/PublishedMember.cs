@@ -17,13 +17,11 @@ namespace Umbraco.Web.PublishedCache
         private readonly IMember _member;
         private readonly IMembershipUser _membershipUser;
         private readonly IPublishedProperty[] _properties;
-        private readonly PublishedContentType _publishedMemberType;
+        private readonly IPublishedContentType _publishedMemberType;
 
         public PublishedMember(
             IMember member,
-            PublishedContentType publishedMemberType,
-            IUmbracoContextAccessor umbracoContextAccessor)
-            :base(umbracoContextAccessor)
+            IPublishedContentType publishedMemberType)
         {
             _member = member ?? throw new ArgumentNullException(nameof(member));
             _membershipUser = member;
@@ -35,16 +33,13 @@ namespace Umbraco.Web.PublishedCache
             //   if they are not part of the member type properties - in which case they are created as
             //   simple raw properties - which are completely invariant
 
-            var _properties = PublishedProperty.MapProperties(_publishedMemberType.PropertyTypes, _member.Properties,
-                (t, v) => new RawValueProperty(t, this, v ?? string.Empty));
-
             var properties = new List<IPublishedProperty>();
             foreach (var propertyType in _publishedMemberType.PropertyTypes)
             {
                 var property = _member.Properties[propertyType.Alias];
                 if (property == null) continue;
 
-                //properties.Add(new FooProperty(propertyType, this, property.Values));
+                properties.Add(new RawValueProperty(propertyType, this, property.GetValue()));
             }
             EnsureMemberProperties(properties);
             _properties = properties.ToArray();
@@ -88,6 +83,8 @@ namespace Umbraco.Web.PublishedCache
 
         public override IEnumerable<IPublishedContent> Children => Enumerable.Empty<IPublishedContent>();
 
+        public override IEnumerable<IPublishedContent> ChildrenForAllCultures => Enumerable.Empty<IPublishedContent>();
+
         public override IEnumerable<IPublishedProperty> Properties => _properties;
 
         public override IPublishedProperty GetProperty(string alias)
@@ -126,7 +123,7 @@ namespace Umbraco.Web.PublishedCache
             properties.Add(property);
         }
 
-        public override PublishedContentType ContentType => _publishedMemberType;
+        public override IPublishedContentType ContentType => _publishedMemberType;
 
         public override int Id => _member.Id;
 
@@ -138,16 +135,16 @@ namespace Umbraco.Web.PublishedCache
 
         public override string Name => _member.Name;
 
-        public override PublishedCultureInfo GetCulture(string culture = null) => throw new NotSupportedException();
-
         public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
 
         public override string UrlSegment => throw new NotSupportedException();
 
         // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
+        [Obsolete("Use WriterName(IUserService) extension instead")]
         public override string WriterName => _member.GetCreatorProfile().Name;
 
         // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
+        [Obsolete("Use CreatorName(IUserService) extension instead")]
         public override string CreatorName => _member.GetCreatorProfile().Name;
 
         public override int WriterId => _member.CreatorId;

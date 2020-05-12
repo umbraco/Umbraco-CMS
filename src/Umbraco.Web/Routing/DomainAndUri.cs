@@ -22,7 +22,7 @@ namespace Umbraco.Web.Routing
         {
             try
             {
-                Uri = DomainHelper.ParseUriFromDomainName(Name, currentUri);
+                Uri = DomainUtilities.ParseUriFromDomainName(Name, currentUri);
             }
             catch (UriFormatException)
             {

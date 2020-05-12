@@ -7,6 +7,7 @@ using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Manifest;
 
 namespace Umbraco.Core
 {
@@ -41,7 +42,12 @@ namespace Umbraco.Core
             configs.Add(() => new CoreDebug());
 
             // GridConfig depends on runtime caches, manifest parsers... and cannot be available during composition
-            configs.Add<IGridConfig>(factory => new GridConfig(factory.GetInstance<ILogger>(), factory.GetInstance<AppCaches>(), configDir, factory.GetInstance<IRuntimeState>().Debug));
+            configs.Add<IGridConfig>(factory => new GridConfig(
+                factory.GetInstance<ILogger>(),
+                factory.GetInstance<AppCaches>(),
+                configDir,
+                factory.GetInstance<ManifestParser>(),
+                factory.GetInstance<IRuntimeState>().Debug));
         }
     }
 }

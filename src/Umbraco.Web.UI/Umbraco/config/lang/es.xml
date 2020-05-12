@@ -124,7 +124,7 @@
     <key alias="saveAndPublish">Guardar y publicar</key>
     <key alias="saveToPublish">Guardar y enviar para aprobación</key>
     <key alias="saveListView">Guardar vista de lista</key>
-    <key alias="showPage">Previsualizar</key>
+    <key alias="saveAndPreview">Previsualizar</key>
     <key alias="showPageDisabled">La previsualización está deshabilitada porque no hay ninguna plantilla asignada</key>
     <key alias="styleChoose">Elegir estilo</key>
     <key alias="styleShow">Mostrar estilos</key>
@@ -311,7 +311,6 @@
     <key alias="linkinternal">Enlace interno</key>
     <key alias="linklocaltip">Al usar enlaces locales, insertar "#" delante del enlace</key>
     <key alias="linknewwindow">¿Abrir en nueva ventana?</key>
-    <key alias="macroContainerSettings">Ajustes para la Macro</key>
     <key alias="macroDoesNotHaveProperties">Esta macro no contiene ninguna propiedad que pueda editar</key>
     <key alias="paste">Pegar</key>
     <key alias="permissionsEdit">Editar permisos para</key>
@@ -366,7 +365,7 @@
     <key alias="selectSnippet">Selecciona snippet</key>
   </area>
   <area alias="dictionaryItem">
-        <key alias="description">Editar las diferentes versiones lingüísticas para la entrada en el diccionario '% 0%' debajo añadir otros idiomas en el menú de 'idiomas' en el menú de la izquierda</key>
+        <key alias="description">Editar las diferentes versiones lingüísticas para la entrada en el diccionario '% 0%' debajo</key>
     <key alias="displayName"><![CDATA[nombre de la cultura
 ]]></key>
     <key alias="changeKeyError"><![CDATA[

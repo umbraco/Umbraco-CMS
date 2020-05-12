@@ -14,7 +14,7 @@
             int pageId;
             if (int.TryParse(frequest.UmbracoContext.HttpContext.Request["umbPageID"], out pageId))
             {
-                var doc = frequest.UmbracoContext.ContentCache.GetById(pageId);
+                var doc = frequest.UmbracoContext.Content.GetById(pageId);
 
                 if (doc != null)
                 {

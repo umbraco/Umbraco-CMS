@@ -14,7 +14,7 @@ namespace Umbraco.Web.Mvc
 
         protected sealed override IPublishedContent FindContent(RequestContext requestContext, UmbracoContext umbracoContext)
         {
-            var byId = umbracoContext.ContentCache.GetById(_realNodeId);
+            var byId = umbracoContext.Content.GetById(_realNodeId);
             return byId == null ? null : FindContent(requestContext, umbracoContext, byId);
         }
 

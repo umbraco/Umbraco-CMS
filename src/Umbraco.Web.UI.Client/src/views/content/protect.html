@@ -18,31 +18,29 @@
                         <localize key="publicAccess_paHowWould" tokens="[currentNode.name]">Choose how to restrict access to this page</localize>
                     </p>
 
-                    <umb-pane>
-                        <div class="pa-select-type">
-                            <input id="protectionTypeMember" type="radio" name="protectionType" value="member" ng-model="vm.type">
+                    <div class="pa-select-type">
+                        <umb-radiobutton input-id="protectionTypeMember" name="protectionType" value="member" model="vm.type" text="" />
 
-                            <label for="protectionTypeMember">
-                                <h5 class="pa-access-header"><localize key="publicAccess_paMembers">Specific members protection</localize></h5>
-                                <p><localize key="publicAccess_paMembersHelp">If you want to grant access to specific members</localize></p>
-                            </label>
-                        </div>
+                        <label for="protectionTypeMember" class="flex flex-column flex-auto">
+                            <strong class="pa-access-header bold"><localize key="publicAccess_paMembers">Specific members protection</localize></strong>
+                            <span class=""><localize key="publicAccess_paMembersHelp">If you want to grant access to specific members</localize></span>
+                        </label>
+                    </div>
 
-                        <div class="pa-select-type">
-                            <input id="protectionTypeGroup" type="radio" name="protectionType" value="group" ng-model="vm.type">
+                    <div class="pa-select-type">
+                        <umb-radiobutton input-id="protectionTypeGroup" name="protectionType" value="group" model="vm.type" />
 
-                            <label for="protectionTypeGroup">
-                                <h5 class="pa-access-header"><localize key="publicAccess_paGroups">Group based protection</localize></h5>
-                                <p><localize key="publicAccess_paGroupsHelp">If you want to grant access to all members of specific member groups</localize></p>
-                            </label>
-                        </div>
-                    </umb-pane>
+                        <label for="protectionTypeGroup" class="flex flex-column flex-auto">
+                            <strong class="pa-access-header bold"><localize key="publicAccess_paGroups">Group based protection</localize></strong>
+                            <span><localize key="publicAccess_paGroupsHelp">If you want to grant access to all members of specific member groups</localize></span>
+                        </label>
+                    </div>
                 </div>
 
                 <div ng-show="vm.step && !vm.loading && !vm.removing">
                     <div ng-if="vm.step === 'member'">
                         <p><localize key="publicAccess_paSelectMembers" tokens="[currentNode.name]">Select the members that should have access to this page</localize></p>
-                        <umb-pane>
+                        <div>
                             <umb-node-preview ng-repeat="member in vm.members | orderBy:'name'"
                                               icon="'icon-user'"
                                               name="member.name"
@@ -52,7 +50,7 @@
                             <a href ng-click="vm.pickMember()" class="umb-node-preview-add" prevent-default>
                                 <localize key="general_add">Add</localize>
                             </a>
-                        </umb-pane>
+                        </div>
                     </div>
 
                     <div ng-show="vm.step === 'group' && !vm.hasGroups">
@@ -61,7 +59,7 @@
 
                     <div ng-show="vm.step === 'group' && vm.hasGroups">
                         <p><localize key="publicAccess_paSelectGroups" tokens="[currentNode.name]">Select the groups that should have access to this page</localize></p>
-                        <umb-pane>
+                        <div>
                             <umb-node-preview ng-repeat="group in vm.groups | orderBy:'name'"
                                               icon="'icon-users'"
                                               name="group.name"
@@ -71,12 +69,12 @@
                             <a href ng-click="vm.pickGroup()" class="umb-node-preview-add" prevent-default>
                                 <localize key="general_add">Add</localize>
                             </a>
-                        </umb-pane>
+                        </div>
                     </div>
 
                     <div ng-show="vm.step === 'member' || vm.hasGroups">
                         <p class="mt4"><localize key="publicAccess_paSelectPages">Select the pages that contain login form and error messages</localize></p>
-                        <umb-pane>
+                        <div>
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
                                     <label>
@@ -111,15 +109,13 @@
                                     </umb-node-preview>
                                 </div>
                             </div>
-                        </umb-pane>
+                        </div>
                     </div>
                 </div>
 
                 <div ng-show="vm.removing">
                     <p><localize key="publicAccess_paRemoveProtectionConfirm" tokens="[currentNode.name]">Are you sure you want to remove the protection from this page?</localize></p>
                 </div>
-
-                <!--<pre>{{vm | json}}</pre>-->
 
             </umb-pane>
 

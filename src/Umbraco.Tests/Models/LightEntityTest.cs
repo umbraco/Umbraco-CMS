@@ -37,9 +37,7 @@ namespace Umbraco.Tests.Models
             };
             item.AdditionalData.Add("test1", 3);
             item.AdditionalData.Add("test2", "valuie");
-            item.AdditionalData.Add("test3", new EntitySlim.PropertySlim("TestPropertyEditor", "test"));
-            item.AdditionalData.Add("test4", new EntitySlim.PropertySlim("TestPropertyEditor2", "test2"));
-
+            
             var result = ss.ToStream(item);
             var json = result.ResultStream.ToJsonString();
             Debug.Print(json); // FIXME: compare with v7

@@ -2,7 +2,9 @@
 {
     public class RenameUmbracoDomainsTable : MigrationBase
     {
-        public RenameUmbracoDomainsTable(IMigrationContext context) : base(context) { }
+        public RenameUmbracoDomainsTable(IMigrationContext context)
+            : base(context)
+        { }
 
         public override void Migrate()
         {

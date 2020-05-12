@@ -26,23 +26,19 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             XmlNode xmlNode,
             bool isPreviewing,
             IAppCache appCache,
-            PublishedContentTypeCache contentTypeCache,
-            IUmbracoContextAccessor umbracoContextAccessor)
-            :base(umbracoContextAccessor)
+            PublishedContentTypeCache contentTypeCache)
         {
             _xmlNode = xmlNode;
             _isPreviewing = isPreviewing;
 
             _appCache = appCache;
             _contentTypeCache = contentTypeCache;
-            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         private readonly XmlNode _xmlNode;
         private readonly bool _isPreviewing;
         private readonly IAppCache _appCache; // at snapshot/request level (see PublishedContentCache)
         private readonly PublishedContentTypeCache _contentTypeCache;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
         private readonly object _initializeLock = new object();
 
@@ -53,7 +49,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private IEnumerable<IPublishedContent> _children = Enumerable.Empty<IPublishedContent>();
         private IPublishedContent _parent;
 
-        private PublishedContentType _contentType;
+        private IPublishedContentType _contentType;
         private Dictionary<string, IPublishedProperty> _properties;
 
         private int _id;
@@ -83,6 +79,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 return _children;
             }
         }
+
+        public override IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
 
         public override IPublishedProperty GetProperty(string alias)
         {
@@ -147,10 +145,15 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             }
         }
 
-        public override PublishedCultureInfo GetCulture(string culture = null) => null;
+        private Dictionary<string, PublishedCultureInfo> _cultures;
 
-        private static readonly Lazy<Dictionary<string, PublishedCultureInfo>> NoCultures = new Lazy<Dictionary<string, PublishedCultureInfo>>(() => new Dictionary<string, PublishedCultureInfo>());
-        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => NoCultures.Value;
+        private Dictionary<string, PublishedCultureInfo> GetCultures()
+        {
+            EnsureNodeInitialized();
+            return new Dictionary<string, PublishedCultureInfo> { { "", new PublishedCultureInfo("", _name, _urlName, _updateDate) } };
+        }
+
+        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _cultures ?? (_cultures = GetCultures());
 
         public override string WriterName
         {
@@ -254,7 +257,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             }
         }
 
-        public override PublishedContentType ContentType
+        public override IPublishedContentType ContentType
         {
             get
             {
@@ -269,7 +272,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             if (parent == null) return;
 
             if (parent.Attributes?.GetNamedItem("isDoc") != null)
-                _parent = Get(parent, _isPreviewing, _appCache, _contentTypeCache, _umbracoContextAccessor);
+                _parent = Get(parent, _isPreviewing, _appCache, _contentTypeCache);
 
             _parentInitialized = true;
         }
@@ -308,8 +311,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             out int id, out Guid key, out int template, out int sortOrder, out string name, out string writerName, out string urlName,
             out string creatorName, out int creatorId, out int writerId, out string docTypeAlias, out int docTypeId, out string path,
             out DateTime createDate, out DateTime updateDate, out int level, out bool isDraft,
-            out PublishedContentType contentType, out Dictionary<string, IPublishedProperty> properties,
-            Func<PublishedItemType, string, PublishedContentType> getPublishedContentType)
+            out IPublishedContentType contentType, out Dictionary<string, IPublishedProperty> properties,
+            Func<PublishedItemType, string, IPublishedContentType> getPublishedContentType)
         {
             //initialize the out params with defaults:
             writerName = null;
@@ -426,7 +429,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             var iterator = nav.Select(expr);
 
             _children = iterator.Cast<XPathNavigator>()
-                .Select(n => Get(((IHasXmlNode) n).GetNode(), _isPreviewing, _appCache, _contentTypeCache, _umbracoContextAccessor))
+                .Select(n => Get(((IHasXmlNode) n).GetNode(), _isPreviewing, _appCache, _contentTypeCache))
                 .OrderBy(x => x.SortOrder)
                 .ToList();
 
@@ -446,7 +449,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         /// sure that we create only one instance of each for the duration of a request. The
         /// returned IPublishedContent is a model, if models are enabled.</remarks>
         public static IPublishedContent Get(XmlNode node, bool isPreviewing, IAppCache appCache,
-            PublishedContentTypeCache contentTypeCache, IUmbracoContextAccessor umbracoContextAccessor)
+            PublishedContentTypeCache contentTypeCache)
         {
             // only 1 per request
 
@@ -454,7 +457,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             var id = attrs?.GetNamedItem("id").Value;
             if (id.IsNullOrWhiteSpace()) throw new InvalidOperationException("Node has no ID attribute.");
             var key = CacheKeyPrefix + id; // dont bother with preview, wont change during request in Xml cache
-            return (IPublishedContent) appCache.Get(key, () => (new XmlPublishedContent(node, isPreviewing, appCache, contentTypeCache, umbracoContextAccessor)).CreateModel());
+            return (IPublishedContent) appCache.Get(key, () => (new XmlPublishedContent(node, isPreviewing, appCache, contentTypeCache)).CreateModel());
         }
 
         public static void ClearRequest()

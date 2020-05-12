@@ -9,6 +9,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
@@ -106,7 +107,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IDataType entity)
         {
-            ((DataType)entity).AddingEntity();
+            entity.AddingEntity();
 
             //ensure a datatype has a unique name before creating it
             entity.Name = EnsureUniqueNodeName(entity.Name);
@@ -174,7 +175,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             //Updates Modified date
-            ((DataType)entity).UpdatingEntity();
+            entity.UpdatingEntity();
 
             //Look up parent to get and set the correct Path if ParentId has changed
             if (entity.IsPropertyDirty("ParentId"))
@@ -278,6 +279,28 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return moveInfo;
         }
 
+        public IReadOnlyDictionary<Udi, IEnumerable<string>> FindUsages(int id)
+        {
+            if (id == default)
+                return new Dictionary<Udi, IEnumerable<string>>();
+
+            var sql = Sql()
+                .Select<ContentTypeDto>(ct => ct.Select(node => node.NodeDto))
+                .AndSelect<PropertyTypeDto>(pt => Alias(pt.Alias, "ptAlias"), pt => Alias(pt.Name, "ptName"))
+                .From<PropertyTypeDto>()
+                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, PropertyTypeDto>(ct => ct.NodeId, pt => pt.ContentTypeId)
+                .InnerJoin<NodeDto>().On<NodeDto, ContentTypeDto>(n => n.NodeId, ct => ct.NodeId)
+                .Where<PropertyTypeDto>(pt => pt.DataTypeId == id)
+                .OrderBy<NodeDto>(node => node.NodeId)
+                .AndBy<PropertyTypeDto>(pt => pt.Alias);
+
+            var dtos = Database.FetchOneToMany<ContentTypeReferenceDto>(ct => ct.PropertyTypes, sql);
+
+            return dtos.ToDictionary(
+                x => (Udi)new GuidUdi(ObjectTypes.GetUdiType(x.NodeDto.NodeObjectType.Value), x.NodeDto.UniqueId).EnsureClosed(),
+                x => (IEnumerable<string>)x.PropertyTypes.Select(p => p.Alias).ToList());
+        }
+
         private string EnsureUniqueNodeName(string nodeName, int id = 0)
         {
             var template = SqlContext.Templates.Get("Umbraco.Core.DataTypeDefinitionRepository.EnsureUniqueNodeName", tsql => tsql
@@ -289,6 +312,25 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var names = Database.Fetch<SimilarNodeName>(sql);
 
             return SimilarNodeName.GetUniqueName(names, id, nodeName);
+        }
+
+        
+        [TableName(Constants.DatabaseSchema.Tables.ContentType)]
+        private class ContentTypeReferenceDto : ContentTypeDto
+        {
+            [ResultColumn]
+            [Reference(ReferenceType.Many)]
+            public List<PropertyTypeReferenceDto> PropertyTypes { get; set; }
+        }
+
+        [TableName(Constants.DatabaseSchema.Tables.PropertyType)]
+        private class PropertyTypeReferenceDto
+        {
+            [Column("ptAlias")]
+            public string Alias { get; set; }
+
+            [Column("ptName")]
+            public string Name { get; set; }
         }
     }
 }

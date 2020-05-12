@@ -14,6 +14,6 @@ namespace Umbraco.Web.Trees
 
         protected override string[] Extensions => ExtensionsStatic;
 
-        protected override string FileIcon => "icon-document";
+        protected override string FileIcon => Constants.Icons.MediaFile;
     }
 }

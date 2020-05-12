@@ -3,7 +3,7 @@
         <div class="umb-group-panel" retrive-dom-element="registerPropertyGroup(element[0], attributes.appAnchor)" data-app-anchor="{{group.id}}" data-element="group-{{group.alias}}" ng-repeat="group in content.tabs track by group.label">
 
             <div class="umb-group-panel__header">
-                <div>{{ group.label }}</div>
+                <div id="group-{{group.id}}">{{ group.label }}</div>
             </div>
 
             <div class="umb-group-panel__content">
@@ -11,13 +11,13 @@
                     data-element="property-{{property.alias}}"
                     ng-repeat="property in group.properties track by property.alias"
                     property="property"
-                    show-inherit="content.variants.length > 1 && !property.culture && !activeVariant.language.isDefault"
-                    inherits-from="defaultVariant.language.name">
+                    show-inherit="propertyEditorDisabled(property)"
+                    inherits-from="defaultVariant.displayName">
 
-                    <div ng-class="{'o-40 cursor-not-allowed': content.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue}">
+                    <div ng-class="{'o-40 cursor-not-allowed': propertyEditorDisabled(property) }">
                         <umb-property-editor
                             model="property"
-                            preview="content.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue">
+                            preview="propertyEditorDisabled(property)">
                         </umb-property-editor>
                     </div>
 

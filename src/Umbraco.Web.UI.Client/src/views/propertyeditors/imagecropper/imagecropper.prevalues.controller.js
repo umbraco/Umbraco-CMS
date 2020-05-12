@@ -47,7 +47,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesControlle
             $scope.setFocus = true;
 
 	        if ($scope.newItem && $scope.newItem.alias &&
-                angular.isNumber($scope.newItem.width) && angular.isNumber($scope.newItem.height) &&
+                Utilities.isNumber($scope.newItem.width) && Utilities.isNumber($scope.newItem.height) &&
                 $scope.newItem.width > 0 && $scope.newItem.height > 0) {
 
                 var exists = _.find($scope.model.value, function (item) { return $scope.newItem.alias === item.alias; });

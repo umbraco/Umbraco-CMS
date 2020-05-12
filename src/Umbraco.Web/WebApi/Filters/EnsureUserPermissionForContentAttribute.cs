@@ -1,17 +1,13 @@
 ﻿using System;
+using System.Net;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using Umbraco.Core.Exceptions;
-using Umbraco.Web.Composing;
-using Umbraco.Web.Editors;
-
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Web.Actions;
 using Umbraco.Core.Security;
-using System.Net;
-using System.Web;
+using Umbraco.Web.Actions;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -47,7 +43,9 @@ namespace Umbraco.Web.WebApi.Filters
 
         public EnsureUserPermissionForContentAttribute(string paramName)
         {
-            if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullOrEmptyException(nameof(paramName));
+            if (paramName == null) throw new ArgumentNullException(nameof(paramName));
+            if (string.IsNullOrEmpty(paramName)) throw new ArgumentException("Value can't be empty.", nameof(paramName));
+
             _paramName = paramName;
             _permissionToCheck = ActionBrowse.ActionLetter;
         }
@@ -67,7 +65,7 @@ namespace Umbraco.Web.WebApi.Filters
                 //not logged in
                 throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
             }
-            
+
             int nodeId;
             if (_nodeId.HasValue == false)
             {
@@ -117,29 +115,24 @@ namespace Umbraco.Web.WebApi.Filters
                 nodeId = _nodeId.Value;
             }
 
-            var queryStringCollection = HttpUtility.ParseQueryString(actionContext.Request.RequestUri.Query);
-            bool.TryParse(queryStringCollection["ignoreUserStartNodes"], out var ignoreUserStartNodes);
-            if (ignoreUserStartNodes == false)
+            var permissionResult = ContentPermissionsHelper.CheckPermissions(nodeId,
+                Current.UmbracoContext.Security.CurrentUser,
+                Current.Services.UserService,
+                Current.Services.ContentService,
+                Current.Services.EntityService,
+                out var contentItem,
+                _permissionToCheck.HasValue ? new[] { _permissionToCheck.Value } : null);
+
+            if (permissionResult == ContentPermissionsHelper.ContentAccess.NotFound)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            if (permissionResult == ContentPermissionsHelper.ContentAccess.Denied)
+                throw new HttpResponseException(actionContext.Request.CreateUserNoAccessResponse());
+
+            if (contentItem != null)
             {
-                var permissionResult = ContentPermissionsHelper.CheckPermissions(nodeId,
-                    Current.UmbracoContext.Security.CurrentUser,
-                    Current.Services.UserService,
-                    Current.Services.ContentService,
-                    Current.Services.EntityService,
-                    out var contentItem,
-                    _permissionToCheck.HasValue ? new[] {_permissionToCheck.Value} : null);
-
-                if (permissionResult == ContentPermissionsHelper.ContentAccess.NotFound)
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
-
-                if (permissionResult == ContentPermissionsHelper.ContentAccess.Denied)
-                    throw new HttpResponseException(actionContext.Request.CreateUserNoAccessResponse());
-
-                if (contentItem != null)
-                {
-                    //store the content item in request cache so it can be resolved in the controller without re-looking it up
-                    actionContext.Request.Properties[typeof(IContent).ToString()] = contentItem;
-                }
+                //store the content item in request cache so it can be resolved in the controller without re-looking it up
+                actionContext.Request.Properties[typeof(IContent).ToString()] = contentItem;
             }
 
             base.OnActionExecuting(actionContext);

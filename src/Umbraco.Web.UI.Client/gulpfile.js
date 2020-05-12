@@ -1,16 +1,36 @@
+
 'use strict';
 
 /*
- * gulpfile.js
- * ===========
- * Rather than manage one giant configuration file responsible
- * for creating multiple tasks, each task has been broken out into
- * its own file in gulp/tasks. Any file in that folder gets automatically
- * required by the loop in ./gulp/index.js (required below).
- *
- * To add a new task, simply add a new task file to gulp/tasks.
- */
+    * gulpfile.js
+    * ===========
+    * This is now using Gulp 4, each child task is now a child function in its own corresponding file.
+    *
+    * To add a new task, simply add a new task file to gulp/tasks folder, add a require statement below to include the one or more methods 
+    * and then add the exports command to add the new item into the task menu.
+    */
 
-global.isProd = true;
+const { src, dest, series, parallel, lastRun } = require('gulp');
 
-require('./gulp');
+const config = require('./gulp/config');
+const { setDevelopmentMode } = require('./gulp/modes');
+const { dependencies } = require('./gulp/tasks/dependencies');
+const { js } = require('./gulp/tasks/js');
+const { less } = require('./gulp/tasks/less');
+const { testE2e, testUnit } = require('./gulp/tasks/test');
+const { views } = require('./gulp/tasks/views');
+const { watchTask } = require('./gulp/tasks/watchTask');
+
+// set default current compile mode:
+config.compile.current = config.compile.build;
+
+// ***********************************************************
+// These Exports are the new way of defining Tasks in Gulp 4.x
+// ***********************************************************
+exports.build = series(parallel(dependencies, js, less, views), testUnit);
+exports.dev = series(setDevelopmentMode, parallel(dependencies, js, less, views), watchTask);
+exports.watch = series(watchTask);
+// 
+exports.runTests = series(js, testUnit);
+exports.testUnit = series(testUnit);
+exports.testE2e = series(testE2e);

@@ -7,7 +7,7 @@
                 </a>
             </li>
 
-            <li ng-repeat="pgn in pagination track by pgn.val"
+            <li ng-repeat="pgn in pagination track by $index"
                 ng-class="{active:pgn.isActive}">
 
                 <a href="#" ng-click="goToPage(pgn.val - 1)" prevent-default

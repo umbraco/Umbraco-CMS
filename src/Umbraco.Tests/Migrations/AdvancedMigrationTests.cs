@@ -217,7 +217,11 @@ namespace Umbraco.Tests.Migrations
                 //Execute.DropKeysAndIndexes("umbracoUser");
 
                 // drops *all* tables keys and indexes
-                Delete.KeysAndIndexes().Do();
+                var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToList();
+                foreach (var table in tables)
+                    Delete.KeysAndIndexes(table, false, true).Do();
+                foreach (var table in tables)
+                    Delete.KeysAndIndexes(table, true, false).Do();
             }
         }
 
@@ -262,7 +266,7 @@ namespace Umbraco.Tests.Migrations
             public override void Migrate()
             {
                 // cannot delete the column without this, of course
-                Delete.KeysAndIndexes().Do();
+                Delete.KeysAndIndexes("umbracoUser").Do();
 
                 Delete.Column("id").FromTable("umbracoUser").Do();
 

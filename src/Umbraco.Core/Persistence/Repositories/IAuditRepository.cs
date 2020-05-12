@@ -33,5 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Direction orderDirection,
             AuditType[] auditTypeFilter,
             IQuery<IAuditItem> customFilter);
+
+        IEnumerable<IAuditItem> Get(AuditType type, IQuery<IAuditItem> query);
     }
 }

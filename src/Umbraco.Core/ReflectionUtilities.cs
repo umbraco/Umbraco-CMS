@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core
 {
@@ -29,10 +28,14 @@ namespace Umbraco.Core
         /// <typeparam name="TDeclaring">The declaring type.</typeparam>
         /// <typeparam name="TValue">The field type.</typeparam>
         /// <param name="fieldName">The name of the field.</param>
-        /// <returns>A field getter function.</returns>
-        /// <exception cref="ArgumentNullOrEmptyException">Occurs when <paramref name="fieldName"/> is null or empty.</exception>
-        /// <exception cref="InvalidOperationException">Occurs when the field does not exist.</exception>
-        /// <exception cref="ArgumentException">Occurs when <typeparamref name="TValue"/> does not match the type of the field.</exception>
+        /// <returns>
+        /// A field getter function.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">fieldName</exception>
+        /// <exception cref="ArgumentException">Value can't be empty or consist only of white-space characters. - <paramref name="fieldName" />
+        /// or
+        /// Value type <typeparamref name="TValue" /> does not match field <typeparamref name="TDeclaring" />.<paramref name="fieldName" /> type.</exception>
+        /// <exception cref="InvalidOperationException">Could not find field <typeparamref name="TDeclaring" />.<paramref name="fieldName" />.</exception>
         public static Func<TDeclaring, TValue> EmitFieldGetter<TDeclaring, TValue>(string fieldName)
         {
             var field = GetField<TDeclaring, TValue>(fieldName);
@@ -45,10 +48,14 @@ namespace Umbraco.Core
         /// <typeparam name="TDeclaring">The declaring type.</typeparam>
         /// <typeparam name="TValue">The field type.</typeparam>
         /// <param name="fieldName">The name of the field.</param>
-        /// <returns>A field setter action.</returns>
-        /// <exception cref="ArgumentNullOrEmptyException">Occurs when <paramref name="fieldName"/> is null or empty.</exception>
-        /// <exception cref="InvalidOperationException">Occurs when the field does not exist.</exception>
-        /// <exception cref="ArgumentException">Occurs when <typeparamref name="TValue"/> does not match the type of the field.</exception>
+        /// <returns>
+        /// A field setter action.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">fieldName</exception>
+        /// <exception cref="ArgumentException">Value can't be empty or consist only of white-space characters. - <paramref name="fieldName" />
+        /// or
+        /// Value type <typeparamref name="TValue" /> does not match field <typeparamref name="TDeclaring" />.<paramref name="fieldName" /> type.</exception>
+        /// <exception cref="InvalidOperationException">Could not find field <typeparamref name="TDeclaring" />.<paramref name="fieldName" />.</exception>
         public static Action<TDeclaring, TValue> EmitFieldSetter<TDeclaring, TValue>(string fieldName)
         {
             var field = GetField<TDeclaring, TValue>(fieldName);
@@ -61,19 +68,36 @@ namespace Umbraco.Core
         /// <typeparam name="TDeclaring">The declaring type.</typeparam>
         /// <typeparam name="TValue">The field type.</typeparam>
         /// <param name="fieldName">The name of the field.</param>
-        /// <returns>A field getter and setter functions.</returns>
-        /// <exception cref="ArgumentNullOrEmptyException">Occurs when <paramref name="fieldName"/> is null or empty.</exception>
-        /// <exception cref="InvalidOperationException">Occurs when the field does not exist.</exception>
-        /// <exception cref="ArgumentException">Occurs when <typeparamref name="TValue"/> does not match the type of the field.</exception>
+        /// <returns>
+        /// A field getter and setter functions.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">fieldName</exception>
+        /// <exception cref="ArgumentException">Value can't be empty or consist only of white-space characters. - <paramref name="fieldName" />
+        /// or
+        /// Value type <typeparamref name="TValue" /> does not match field <typeparamref name="TDeclaring" />.<paramref name="fieldName" /> type.</exception>
+        /// <exception cref="InvalidOperationException">Could not find field <typeparamref name="TDeclaring" />.<paramref name="fieldName" />.</exception>
         public static (Func<TDeclaring, TValue>, Action<TDeclaring, TValue>) EmitFieldGetterAndSetter<TDeclaring, TValue>(string fieldName)
         {
             var field = GetField<TDeclaring, TValue>(fieldName);
             return (EmitFieldGetter<TDeclaring, TValue>(field), EmitFieldSetter<TDeclaring, TValue>(field));
         }
 
+        /// <summary>
+        /// Gets the field.
+        /// </summary>
+        /// <typeparam name="TDeclaring">The type of the declaring.</typeparam>
+        /// <typeparam name="TValue">The type of the value.</typeparam>
+        /// <param name="fieldName">Name of the field.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">fieldName</exception>
+        /// <exception cref="ArgumentException">Value can't be empty or consist only of white-space characters. - <paramref name="fieldName" />
+        /// or
+        /// Value type <typeparamref name="TValue" /> does not match field <typeparamref name="TDeclaring" />.<paramref name="fieldName" /> type.</exception>
+        /// <exception cref="InvalidOperationException">Could not find field <typeparamref name="TDeclaring" />.<paramref name="fieldName" />.</exception>
         private static FieldInfo GetField<TDeclaring, TValue>(string fieldName)
         {
-            if (string.IsNullOrWhiteSpace(fieldName)) throw new ArgumentNullOrEmptyException(nameof(fieldName));
+            if (fieldName == null) throw new ArgumentNullException(nameof(fieldName));
+            if (string.IsNullOrWhiteSpace(fieldName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(fieldName));
 
             // get the field
             var field = typeof(TDeclaring).GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -120,13 +144,18 @@ namespace Umbraco.Core
         /// <typeparam name="TValue">The property type.</typeparam>
         /// <param name="propertyName">The name of the property.</param>
         /// <param name="mustExist">A value indicating whether the property and its getter must exist.</param>
-        /// <returns>A property getter function. If <paramref name="mustExist"/> is <c>false</c>, returns null when the property or its getter does not exist.</returns>
-        /// <exception cref="ArgumentNullOrEmptyException">Occurs when <paramref name="propertyName"/> is null or empty.</exception>
-        /// <exception cref="InvalidOperationException">Occurs when the property or its getter does not exist.</exception>
-        /// <exception cref="ArgumentException">Occurs when <typeparamref name="TValue"/> does not match the type of the property.</exception>
+        /// <returns>
+        /// A property getter function. If <paramref name="mustExist" /> is <c>false</c>, returns null when the property or its getter does not exist.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">propertyName</exception>
+        /// <exception cref="ArgumentException">Value can't be empty or consist only of white-space characters. - <paramref name="propertyName" />
+        /// or
+        /// Value type <typeparamref name="TValue" /> does not match property <typeparamref name="TDeclaring" />.<paramref name="propertyName" /> type.</exception>
+        /// <exception cref="InvalidOperationException">Could not find property getter for <typeparamref name="TDeclaring" />.<paramref name="propertyName" />.</exception>
         public static Func<TDeclaring, TValue> EmitPropertyGetter<TDeclaring, TValue>(string propertyName, bool mustExist = true)
         {
-            if (string.IsNullOrWhiteSpace(propertyName)) throw new ArgumentNullOrEmptyException(nameof(propertyName));
+            if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
+            if (string.IsNullOrWhiteSpace(propertyName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(propertyName));
 
             var property = typeof(TDeclaring).GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
@@ -146,13 +175,18 @@ namespace Umbraco.Core
         /// <typeparam name="TValue">The property type.</typeparam>
         /// <param name="propertyName">The name of the property.</param>
         /// <param name="mustExist">A value indicating whether the property and its setter must exist.</param>
-        /// <returns>A property setter function. If <paramref name="mustExist"/> is <c>false</c>, returns null when the property or its setter does not exist.</returns>
-        /// <exception cref="ArgumentNullOrEmptyException">Occurs when <paramref name="propertyName"/> is null or empty.</exception>
-        /// <exception cref="InvalidOperationException">Occurs when the property or its setter does not exist.</exception>
-        /// <exception cref="ArgumentException">Occurs when <typeparamref name="TValue"/> does not match the type of the property.</exception>
+        /// <returns>
+        /// A property setter function. If <paramref name="mustExist" /> is <c>false</c>, returns null when the property or its setter does not exist.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">propertyName</exception>
+        /// <exception cref="ArgumentException">Value can't be empty or consist only of white-space characters. - <paramref name="propertyName" />
+        /// or
+        /// Value type <typeparamref name="TValue" /> does not match property <typeparamref name="TDeclaring" />.<paramref name="propertyName" /> type.</exception>
+        /// <exception cref="InvalidOperationException">Could not find property setter for <typeparamref name="TDeclaring" />.<paramref name="propertyName" />.</exception>
         public static Action<TDeclaring, TValue> EmitPropertySetter<TDeclaring, TValue>(string propertyName, bool mustExist = true)
         {
-            if (string.IsNullOrWhiteSpace(propertyName)) throw new ArgumentNullOrEmptyException(nameof(propertyName));
+            if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
+            if (string.IsNullOrWhiteSpace(propertyName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(propertyName));
 
             var property = typeof(TDeclaring).GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
@@ -172,13 +206,18 @@ namespace Umbraco.Core
         /// <typeparam name="TValue">The property type.</typeparam>
         /// <param name="propertyName">The name of the property.</param>
         /// <param name="mustExist">A value indicating whether the property and its getter and setter must exist.</param>
-        /// <returns>A property getter and setter functions. If <paramref name="mustExist"/> is <c>false</c>, returns null when the property or its getter or setter does not exist.</returns>
-        /// <exception cref="ArgumentNullOrEmptyException">Occurs when <paramref name="propertyName"/> is null or empty.</exception>
-        /// <exception cref="InvalidOperationException">Occurs when the property or its getter or setter does not exist.</exception>
-        /// <exception cref="ArgumentException">Occurs when <typeparamref name="TValue"/> does not match the type of the property.</exception>
+        /// <returns>
+        /// A property getter and setter functions. If <paramref name="mustExist" /> is <c>false</c>, returns null when the property or its getter or setter does not exist.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">propertyName</exception>
+        /// <exception cref="ArgumentException">Value can't be empty or consist only of white-space characters. - <paramref name="propertyName" />
+        /// or
+        /// Value type <typeparamref name="TValue" /> does not match property <typeparamref name="TDeclaring" />.<paramref name="propertyName" /> type.</exception>
+        /// <exception cref="InvalidOperationException">Could not find property getter and setter for <typeparamref name="TDeclaring" />.<paramref name="propertyName" />.</exception>
         public static (Func<TDeclaring, TValue>, Action<TDeclaring, TValue>) EmitPropertyGetterAndSetter<TDeclaring, TValue>(string propertyName, bool mustExist = true)
         {
-            if (string.IsNullOrWhiteSpace(propertyName)) throw new ArgumentNullOrEmptyException(nameof(propertyName));
+            if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
+            if (string.IsNullOrWhiteSpace(propertyName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(propertyName));
 
             var property = typeof(TDeclaring).GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
@@ -402,13 +441,17 @@ namespace Umbraco.Core
         /// <typeparam name="TLambda">A lambda representing the method.</typeparam>
         /// <param name="methodName">The name of the method.</param>
         /// <param name="mustExist">A value indicating whether the constructor must exist.</param>
-        /// <returns>The method. If <paramref name="mustExist"/> is <c>false</c>, returns null when the method does not exist.</returns>
+        /// <returns>
+        /// The method. If <paramref name="mustExist" /> is <c>false</c>, returns null when the method does not exist.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">methodName</exception>
+        /// <exception cref="ArgumentException">Value can't be empty or consist only of white-space characters. - <paramref name="methodName" />
+        /// or
+        /// Occurs when <typeparamref name="TLambda" /> does not match the method signature..</exception>
+        /// <exception cref="InvalidOperationException">Occurs when no proper method with name <paramref name="methodName" /> could be found.</exception>
         /// <remarks>
-        /// <para>The method arguments are determined by <typeparamref name="TLambda"/> generic arguments.</para>
+        /// The method arguments are determined by <typeparamref name="TLambda" /> generic arguments.
         /// </remarks>
-        /// <exception cref="ArgumentNullOrEmptyException">Occurs when <paramref name="methodName"/> is null or empty.</exception>
-        /// <exception cref="InvalidOperationException">Occurs when no proper method with name <paramref name="methodName"/> could be found.</exception>
-        /// <exception cref="ArgumentException">Occurs when Occurs when <typeparamref name="TLambda"/> does not match the method signature.</exception>
         public static TLambda EmitMethod<TDeclaring, TLambda>(string methodName, bool mustExist = true)
         {
             return EmitMethod<TLambda>(typeof(TDeclaring), methodName, mustExist);
@@ -421,16 +464,21 @@ namespace Umbraco.Core
         /// <param name="declaring">The declaring type.</param>
         /// <param name="methodName">The name of the method.</param>
         /// <param name="mustExist">A value indicating whether the constructor must exist.</param>
-        /// <returns>The method. If <paramref name="mustExist"/> is <c>false</c>, returns null when the method does not exist.</returns>
+        /// <returns>
+        /// The method. If <paramref name="mustExist" /> is <c>false</c>, returns null when the method does not exist.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">methodName</exception>
+        /// <exception cref="ArgumentException">Value can't be empty or consist only of white-space characters. - <paramref name="methodName" />
+        /// or
+        /// Occurs when <typeparamref name="TLambda" /> does not match the method signature..</exception>
+        /// <exception cref="InvalidOperationException">Occurs when no proper method with name <paramref name="methodName" /> could be found.</exception>
         /// <remarks>
-        /// <para>The method arguments are determined by <typeparamref name="TLambda"/> generic arguments.</para>
+        /// The method arguments are determined by <typeparamref name="TLambda" /> generic arguments.
         /// </remarks>
-        /// <exception cref="ArgumentNullOrEmptyException">Occurs when <paramref name="methodName"/> is null or empty.</exception>
-        /// <exception cref="InvalidOperationException">Occurs when no proper method with name <paramref name="methodName"/> could be found.</exception>
-        /// <exception cref="ArgumentException">Occurs when Occurs when <typeparamref name="TLambda"/> does not match the method signature.</exception>
         public static TLambda EmitMethod<TLambda>(Type declaring, string methodName, bool mustExist = true)
         {
-            if (string.IsNullOrWhiteSpace(methodName)) throw new ArgumentNullOrEmptyException(nameof(methodName));
+            if (methodName == null) throw new ArgumentNullException(nameof(methodName));
+            if (string.IsNullOrWhiteSpace(methodName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(methodName));
 
             var (lambdaDeclaring, lambdaParameters, lambdaReturned) = AnalyzeLambda<TLambda>(true, out var isFunction);
 
@@ -510,17 +558,21 @@ namespace Umbraco.Core
         /// <typeparam name="TLambda">A lambda representing the method.</typeparam>
         /// <param name="methodName">The name of the method.</param>
         /// <param name="mustExist">A value indicating whether the constructor must exist.</param>
-        /// <returns>The method. If <paramref name="mustExist"/> is <c>false</c>, returns null when the method does not exist.</returns>
+        /// <returns>
+        /// The method. If <paramref name="mustExist" /> is <c>false</c>, returns null when the method does not exist.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">methodName</exception>
+        /// <exception cref="ArgumentException">Value can't be empty or consist only of white-space characters. - <paramref name="methodName" />
+        /// or
+        /// Occurs when <typeparamref name="TLambda" /> does not match the method signature..</exception>
+        /// <exception cref="InvalidOperationException">Occurs when no proper method with name <paramref name="methodName" /> could be found.</exception>
         /// <remarks>
-        /// <para>The method arguments are determined by <typeparamref name="TLambda"/> generic arguments.</para>
+        /// The method arguments are determined by <typeparamref name="TLambda" /> generic arguments.
         /// </remarks>
-        /// <exception cref="ArgumentNullOrEmptyException">Occurs when <paramref name="methodName"/> is null or empty.</exception>
-        /// <exception cref="InvalidOperationException">Occurs when no proper method with name <paramref name="methodName"/> could be found.</exception>
-        /// <exception cref="ArgumentException">Occurs when Occurs when <typeparamref name="TLambda"/> does not match the method signature.</exception>
         public static TLambda EmitMethod<TLambda>(string methodName, bool mustExist = true)
         {
-            if (string.IsNullOrWhiteSpace(methodName))
-                throw new ArgumentNullOrEmptyException(nameof(methodName));
+            if (methodName == null) throw new ArgumentNullException(nameof(methodName));
+            if (string.IsNullOrWhiteSpace(methodName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(methodName));
 
             // validate lambda type
             var (lambdaDeclaring, lambdaParameters, lambdaReturned) = AnalyzeLambda<TLambda>(false, out var isFunction);

@@ -18,7 +18,7 @@ namespace Umbraco.Web.PublishedCache
     {
         // initializes a new instance of the PublishedElement class
         // within the context of a published snapshot service (eg a published content property value)
-        public PublishedElement(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing,
+        public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing,
             PropertyCacheLevel referenceCacheLevel, IPublishedSnapshotAccessor publishedSnapshotAccessor)
         {
             if (key == Guid.Empty) throw new ArgumentException("Empty guid.");
@@ -46,7 +46,7 @@ namespace Umbraco.Web.PublishedCache
         // + using an initial reference cache level of .None ensures that everything will be
         // cached at .Content level - and that reference cache level will propagate to all
         // properties
-        public PublishedElement(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing)
+        public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing)
             : this(contentType, key, values, previewing, PropertyCacheLevel.None, null)
         { }
 
@@ -60,7 +60,7 @@ namespace Umbraco.Web.PublishedCache
 
         #region ContentType
 
-        public PublishedContentType ContentType { get; }
+        public IPublishedContentType ContentType { get; }
 
         #endregion
 

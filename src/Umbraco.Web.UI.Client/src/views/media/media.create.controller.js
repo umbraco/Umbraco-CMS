@@ -6,13 +6,24 @@
  * @description
  * The controller for the media creation dialog
  */
-function mediaCreateController($scope, $routeParams, $location, mediaTypeResource, iconHelper, navigationService) {
+function mediaCreateController($scope, $location, mediaTypeResource, iconHelper, navigationService, authResource, mediaResource) {
 
     function initialize() {
         $scope.allowedTypes = null;
         mediaTypeResource.getAllowedTypes($scope.currentNode.id).then(function(data) {
             $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
         });
+
+        if ($scope.currentNode.id > -1) {
+            authResource.getCurrentUser().then(function(currentUser) {
+                if (currentUser.allowedSections.indexOf("settings") > -1) {
+                    $scope.hasSettingsAccess = true;
+                    mediaResource.getById($scope.currentNode.id).then(function (data) {
+                        $scope.mediaTypeId = data.contentType.id;
+                    });
+                }
+            });
+        }
     }
 
     $scope.createMediaItem = function(docType) {
@@ -21,6 +32,10 @@ function mediaCreateController($scope, $routeParams, $location, mediaTypeResourc
     };
 
     $scope.close = function() {
+        navigationService.hideMenu();
+    };
+
+    $scope.closeDialog = function () {
         const showMenu = true;
         navigationService.hideDialog(showMenu);
     };

@@ -15,7 +15,7 @@ using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    public class MultiUrlPickerValueEditor : DataValueEditor
+    public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
     {
         private readonly IEntityService _entityService;
         private readonly ILogger _logger;
@@ -81,7 +81,7 @@ namespace Umbraco.Web.PropertyEditors
                             icon = documentEntity.ContentTypeIcon;
                             published = culture == null ? documentEntity.Published : documentEntity.PublishedCultures.Contains(culture);
                             udi = new GuidUdi(Constants.UdiEntityType.Document, documentEntity.Key);
-                            url = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(entity.Key)?.Url ?? "#";
+                            url = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(entity.Key)?.Url() ?? "#";
                             trashed = documentEntity.Trashed;
                         }
                         else if(entity is IContentEntitySlim contentEntity)
@@ -89,7 +89,7 @@ namespace Umbraco.Web.PropertyEditors
                             icon = contentEntity.ContentTypeIcon;
                             published = !contentEntity.Trashed;
                             udi = new GuidUdi(Constants.UdiEntityType.Media, contentEntity.Key);
-                            url = _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(entity.Key)?.Url ?? "#";
+                            url = _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(entity.Key)?.Url() ?? "#";
                             trashed = contentEntity.Trashed;
                         }
                         else
@@ -173,6 +173,23 @@ namespace Umbraco.Web.PropertyEditors
 
             [DataMember(Name = "queryString")]
             public string QueryString { get; set; }
+        }
+
+        public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+        {
+            var asString = value == null ? string.Empty : value is string str ? str : value.ToString();
+
+            if (string.IsNullOrEmpty(asString)) yield break;
+
+            var links = JsonConvert.DeserializeObject<List<LinkDto>>(asString);
+            foreach (var link in links)
+            {
+                if (link.Udi != null) // Links can be absolute links without a Udi
+                {
+                    yield return new UmbracoEntityReference(link.Udi);
+                }
+
+            }
         }
     }
 }

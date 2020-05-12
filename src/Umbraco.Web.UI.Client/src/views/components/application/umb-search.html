@@ -1,24 +1,33 @@
 
-<div class="umb-search" on-outside-click="vm.closeSearch()" ng-keyup="vm.handleKeyUp($event)">
+<div class="umb-search" on-outside-click="vm.closeSearch()" ng-keydown="vm.handleKeyDown($event)">
 
     <div class="flex items-center">
-        <i class="umb-search-input-icon icon-search" ng-click="vm.focusSearch()"></i>
-        <input 
-            class="umb-search-input" 
-            type="text" 
+        <label for="app-search" class="umb-search__label">
+            <i class="umb-search-input-icon icon-search" aria-hidden="true"></i>
+            <span class="sr-only">
+                <localize key="general_search">Search...</localize>
+            </span>
+        </label>
+        <input
+            class="umb-search-input"
+            type="text"
             ng-model="vm.searchQuery"
             ng-model-options="{ debounce: 200 }"
-            ng-change="vm.search(vm.searchQuery)" 
-            placeholder="Search..." 
+            ng-change="vm.search(vm.searchQuery)"
+            localize="placeholder"
+            placeholder="@placeholders_search" 
+            id="app-search"
             focus-when="{{vm.searchHasFocus}}" />
-        <button ng-if="vm.searchQuery.length > 0" tabindex="-1" class="umb-search-input-clear umb-animated" ng-click="vm.clearSearch()">Clear</button>
+        <button ng-show="vm.searchQuery.length > 0" tabindex="-1" class="umb-search-input-clear umb-animated" ng-click="vm.clearSearch()">
+            <localize key="general_clear">Clear</localize>
+        </button>
     </div>
 
     <div class="umb-search-results">
         <div class="umb-search-group" ng-repeat="(key, group) in vm.searchResults">
             <div class="umb-search-group__title">{{key}}</div>
             <ul class="umb-search-items">
-                <li class="umb-search-item" ng-repeat="result in group.results">
+                <li class="umb-search-item" ng-repeat="result in group.results" active-result="{{result === vm.activeResult}}">
                     <a class="umb-search-result__link" ng-href="#/{{result.editorPath}}" ng-click="vm.clickItem(result)">
                         <i class="umb-search-result__icon {{result.icon}}"></i>
                         <span class="umb-search-result__meta">

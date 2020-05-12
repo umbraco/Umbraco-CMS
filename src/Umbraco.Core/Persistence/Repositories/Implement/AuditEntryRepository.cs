@@ -100,7 +100,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <inheritdoc />
         protected override void PersistNewItem(IAuditEntry entity)
         {
-            ((EntityBase) entity).AddingEntity();
+            entity.AddingEntity();
 
             var dto = AuditEntryFactory.BuildDto(entity);
             Database.Insert(dto);

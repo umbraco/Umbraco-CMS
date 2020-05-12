@@ -50,7 +50,7 @@ namespace Umbraco.Web.Routing
                 if (nodeId > 0)
                 {
                     _logger.Debug<ContentFinderByIdPath>("Id={NodeId}", nodeId);
-                    node = frequest.UmbracoContext.ContentCache.GetById(nodeId);
+                    node = frequest.UmbracoContext.Content.GetById(nodeId);
 
                     if (node != null)
                     {

@@ -7,6 +7,7 @@
         var origWidth = 500;
         var origHeight = 300;
 
+        vm.loading = false;
         vm.trustedPreview = null;
 
         $scope.model.embed = {
@@ -17,9 +18,16 @@
             preview: "",
             success: false,
             info: "",
-            supportsDimensions: ""
+            supportsDimensions: false
         };
 
+        if ($scope.model.modify) {
+            angular.extend($scope.model.embed, $scope.model.modify);
+
+            showPreview();
+        }
+
+        vm.toggleConstrain = toggleConstrain;
         vm.showPreview = showPreview;
         vm.changeSize = changeSize;
         vm.submit = submit;
@@ -37,10 +45,10 @@
 
             if ($scope.model.embed.url) {
                 $scope.model.embed.show = true;
-                $scope.model.embed.preview = "<div class=\"umb-loader\" style=\"height: 10px; margin: 10px 0px;\"></div>";
                 $scope.model.embed.info = "";
                 $scope.model.embed.success = false;
 
+                vm.loading = true;
 
                 $http({
                     method: 'GET',
@@ -54,29 +62,41 @@
 
                     $scope.model.embed.preview = "";
 
-
                     switch (response.data.OEmbedStatus) {
                         case 0:
                             //not supported
+                            $scope.model.embed.preview = "";
                             $scope.model.embed.info = "Not supported";
+                            $scope.model.embed.success = false;
+                            $scope.model.embed.supportsDimensions = false;
+                            vm.trustedPreview = null;
                             break;
                         case 1:
                             //error
+                            $scope.model.embed.preview = "";
                             $scope.model.embed.info = "Could not embed media - please ensure the URL is valid";
+                            $scope.model.embed.success = false;
+                            $scope.model.embed.supportsDimensions = false;
+                            vm.trustedPreview = null;
                             break;
                         case 2:
+                            $scope.model.embed.success = true;
+                            $scope.model.embed.supportsDimensions = response.data.SupportsDimensions;
                             $scope.model.embed.preview = response.data.Markup;
                             vm.trustedPreview = $sce.trustAsHtml(response.data.Markup);
-                            $scope.model.embed.supportsDimensions = response.data.SupportsDimensions;
-                            $scope.model.embed.success = true;
                             break;
                     }
+
+                    vm.loading = false;
+
                 }, function() {
+                    $scope.model.embed.success = false;
                     $scope.model.embed.supportsDimensions = false;
                     $scope.model.embed.preview = "";
                     $scope.model.embed.info = "Could not embed media - please ensure the URL is valid";
-                });
 
+                    vm.loading = false;
+                });
             } else {
                 $scope.model.embed.supportsDimensions = false;
                 $scope.model.embed.preview = "";
@@ -103,6 +123,10 @@
                showPreview();
            }
 
+       }
+
+       function toggleConstrain() {
+           $scope.model.embed.constrain = !$scope.model.embed.constrain;
        }
 
        function submit() {

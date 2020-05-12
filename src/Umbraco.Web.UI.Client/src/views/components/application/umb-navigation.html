@@ -1,4 +1,4 @@
-<div id="leftcolumn" ng-controller="Umbraco.NavigationController" ng-mouseleave="leaveTree($event)" ng-mouseenter="enterTree($event)">
+<div id="leftcolumn" ng-controller="Umbraco.NavigationController" ng-mouseleave="leaveTree($event)" ng-mouseenter="enterTree($event)" on-outside-click="onOutsideClick()">
 
     <!-- navigation container -->
     <div id="navigation" ng-show="showNavigation" class="fill umb-modalcolumn" ng-animate="'slide'" nav-resize
@@ -6,13 +6,31 @@
 
         <div class="navigation-inner-container">
 
-            <div class="umb-language-picker" ng-if="currentSection === 'content' && languages.length > 1" on-outside-click="page.languageSelectorIsOpen = false">
-                <div class="umb-language-picker__toggle" ng-click="toggleLanguageSelector()">
-                    <div>{{selectedLanguage.name}}</div>
-                    <ins class="umb-language-picker__expand" ng-class="{'icon-navigation-down': !page.languageSelectorIsOpen, 'icon-navigation-up': page.languageSelectorIsOpen}" class="icon-navigation-right">&nbsp;</ins>
-                </div>
+            <div class="umb-language-picker" ng-if="currentSection === 'content' && languages.length > 1" deep-blur="page.languageSelectorIsOpen = false" on-outside-click="page.languageSelectorIsOpen = false">
+                <button type="button" class="umb-language-picker__toggle" ng-click="toggleLanguageSelector()" aria-haspopup="true" aria-expanded="{{page.languageSelectorIsOpen}}">
+                    <span>
+                        <span class="sr-only">
+                            <localize key="visuallyHiddenTexts_currentLanguage">Current language</localize>
+                            <span>: </span>
+                        </span>
+                        <span>{{selectedLanguage.name}}</span>
+                    </span>
+                    <i class="umb-language-picker__expand" ng-class="{'icon-navigation-down': !page.languageSelectorIsOpen, 'icon-navigation-up': page.languageSelectorIsOpen}" class="icon-navigation-right" aria-hidden="true"></i>
+                </button>
                 <div class="umb-language-picker__dropdown" ng-if="page.languageSelectorIsOpen">
-                    <a class="umb-language-picker__dropdown-item" ng-class="{'umb-language-picker__dropdown-item--current': language.active, 'bold': language.isDefault}" ng-click="selectLanguage(language)" ng-repeat="language in languages" href="">{{language.name}}</a>
+                    <button
+                        type="button"
+                        class="umb-language-picker__dropdown-item"
+                        ng-class="{'umb-language-picker__dropdown-item--current': language.active}"
+                        ng-click="selectLanguage(language)"
+                        ng-repeat="language in languages"
+                    >
+                    <span class="sr-only">
+                        <localize key="visuallyHiddenTexts_switchLanguage">Switch language to</localize>
+                        <span>: </span>
+                    </span>
+                    <span>{{language.name}}</span>
+                    </button>
                 </div>
             </div>
 

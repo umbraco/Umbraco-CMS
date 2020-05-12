@@ -16,27 +16,26 @@
     margin-right: -10px;
 }
 
-.umb-app-header__action a {
+.umb-app-header__button {
     padding-left: 10px;
     padding-right: 10px;
     text-decoration: none;
     display: flex;
     align-items: center;
     height: @appHeaderHeight;
-}
-
-.umb-app-header__action a {
     outline: none;
+    
     &:focus {
         .tabbing-active & {
             .umb-app-header__action-icon::after {
                 content: '';
                 position: absolute;
                 z-index:10000;
-                top: -7px;
-                left: -7px;
+                top: 50%;
+                left: 50%;
                 width: 36px;
                 height: 35px;
+                transform: translate(-50%, -50%);
                 border-radius: 3px;
                 box-shadow: 0 0 2px @pinkLight, inset 0 0 2px 1px @pinkLight;
             }
@@ -51,7 +50,7 @@
     font-size: 22px;
 }
 
-.umb-app-header__action a:hover .umb-app-header__action-icon,
-.umb-app-header__action a:focus .umb-app-header__action-icon {
+.umb-app-header__button:hover .umb-app-header__action-icon,
+.umb-app-header__button:focus .umb-app-header__action-icon {
     opacity: 1;
 }

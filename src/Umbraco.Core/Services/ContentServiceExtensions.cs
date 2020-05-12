@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 
@@ -11,6 +12,42 @@ namespace Umbraco.Core.Services
     /// </summary>
     public static class ContentServiceExtensions
     {
+        #region RTE Anchor values
+
+        private static readonly Regex AnchorRegex = new Regex("<a id=\"(.*?)\">", RegexOptions.Compiled);
+
+        internal static IEnumerable<string> GetAnchorValuesFromRTEs(this IContentService contentService, int id, string culture = "*")
+        {
+            var result = new List<string>();
+            var content = contentService.GetById(id);
+
+            foreach (var contentProperty in content.Properties)
+            {
+                if (contentProperty.PropertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.TinyMce))
+                {
+                    var value = contentProperty.GetValue(culture)?.ToString();
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        result.AddRange(contentService.GetAnchorValuesFromRTEContent(value));
+                    }
+                }
+            }
+            return result;
+        }
+
+
+        internal static IEnumerable<string> GetAnchorValuesFromRTEContent(this IContentService contentService, string rteContent)
+        {
+            var result = new List<string>();
+            var matches = AnchorRegex.Matches(rteContent);
+            foreach (Match match in matches)
+            {
+                result.Add(match.Value.Split('\"')[1]);
+            }
+            return result;
+        }
+        #endregion
+
         public static IEnumerable<IContent> GetByIds(this IContentService contentService, IEnumerable<Udi> ids)
         {
             var guids = new List<GuidUdi>();

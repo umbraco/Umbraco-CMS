@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
@@ -22,25 +21,28 @@ namespace Umbraco.Core.Manifest
         private readonly IAppPolicyCache _cache;
         private readonly ILogger _logger;
         private readonly ManifestValueValidatorCollection _validators;
+        private readonly ManifestFilterCollection _filters;
 
         private string _path;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ILogger logger)
-            : this(appCaches, validators, "~/App_Plugins", logger)
+        public ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, ILogger logger)
+            : this(appCaches, validators, filters, "~/App_Plugins", logger)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, string path, ILogger logger)
+        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string path, ILogger logger)
         {
             if (appCaches == null) throw new ArgumentNullException(nameof(appCaches));
             _cache = appCaches.RuntimeCache;
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));
-            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullOrEmptyException(nameof(path));
+            _filters = filters ?? throw new ArgumentNullException(nameof(filters));
+            if (path == null) throw new ArgumentNullException(nameof(path));
+            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(path));
             Path = path;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -78,6 +80,7 @@ namespace Umbraco.Core.Manifest
                     if (string.IsNullOrWhiteSpace(text))
                         continue;
                     var manifest = ParseManifest(text);
+                    manifest.Source = path;
                     manifests.Add(manifest);
                 }
                 catch (Exception e)
@@ -85,6 +88,8 @@ namespace Umbraco.Core.Manifest
                     _logger.Error<ManifestParser>(e, "Failed to parse manifest at '{Path}', ignoring.", path);
                 }
             }
+
+            _filters.Filter(manifests);
 
             return manifests;
         }
@@ -150,8 +155,8 @@ namespace Umbraco.Core.Manifest
         /// </summary>
         internal PackageManifest ParseManifest(string text)
         {
-            if (string.IsNullOrWhiteSpace(text))
-                throw new ArgumentNullOrEmptyException(nameof(text));
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
 
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
                 new DataEditorConverter(_logger),

@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
@@ -14,6 +15,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// <summary>
     /// Provides an implementation for <see cref="T:Umbraco.Core.PropertyEditors.IPropertyValueConverter" /> for nested content.
     /// </summary>
+    [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
     public class NestedContentManyValueConverter : NestedContentValueConverterBase
     {
         private readonly IProfilingLogger _proflog;
@@ -28,11 +30,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         }
 
         /// <inheritdoc />
-        public override bool IsConverter(PublishedPropertyType propertyType)
+        public override bool IsConverter(IPublishedPropertyType propertyType)
             => IsNestedMany(propertyType);
 
         /// <inheritdoc />
-        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         {
             var contentTypes = propertyType.DataType.ConfigurationAs<NestedContentConfiguration>().ContentTypes;
             return contentTypes.Length == 1
@@ -41,19 +43,19 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         }
 
         /// <inheritdoc />
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
         /// <inheritdoc />
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
             return source?.ToString();
         }
 
         /// <inheritdoc />
-        public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
-            using (_proflog.DebugDuration<PublishedPropertyType>($"ConvertPropertyToNestedContent ({propertyType.DataType.Id})"))
+            using (_proflog.DebugDuration<NestedContentManyValueConverter>($"ConvertPropertyToNestedContent ({propertyType.DataType.Id})"))
             {
                 var configuration = propertyType.DataType.ConfigurationAs<NestedContentConfiguration>();
                 var contentTypes = configuration.ContentTypes;

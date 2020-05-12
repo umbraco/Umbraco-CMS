@@ -2,9 +2,11 @@
     <ng-form name="decimalFieldForm">
         <input name="decimalField"
                type="number"
-               pattern="[0-9]+([,\.][0-9]+)?"
+               pattern="[\-0-9]+([,\.][0-9]+)?"
                class="umb-property-editor umb-number"
                ng-model="model.value"
+               ng-required="model.validation.mandatory"
+               aria-required="{{model.validation.mandatory}}"
                val-server="value"
                fix-number min="{{model.config.min}}" max="{{model.config.max}}" step="{{model.config.step}}" />
 

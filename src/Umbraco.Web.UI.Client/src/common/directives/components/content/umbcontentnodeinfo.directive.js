@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource, overlayService) {
+    function ContentNodeInfoDirective($timeout, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource, overlayService, entityResource) {
 
         function link(scope) {
 
@@ -16,8 +16,12 @@
             scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
             scope.allowChangeDocumentType = false;
             scope.allowChangeTemplate = false;
+            scope.allTemplates = [];
 
             function onInit() {
+                entityResource.getAll("Template").then(function (templates) {
+                    scope.allTemplates = templates;
+                });
 
                 // set currentVariant
                 scope.currentVariant = _.find(scope.node.variants, (v) => v.active);
@@ -126,6 +130,7 @@
                         view: "default",
                         content: labels.doctypeChangeWarning,
                         submitButtonLabelKey: "general_continue",
+                        submitButtonStyle: "warning",
                         closeButtonLabelKey: "general_cancel",
                         submit: function () {
                             openDocTypeEditor(documentType);
@@ -146,8 +151,6 @@
                 const editor = {
                     id: documentType.id,
                     submit: function (model) {
-                        const args = { node: scope.node };
-                        eventsService.emit("editors.content.reload", args);
                         editorService.close();
                     },
                     close: function () {
@@ -158,8 +161,12 @@
             }
 
             scope.openTemplate = function () {
+                var template = _.findWhere(scope.allTemplates, {alias: scope.node.template})
+                if (!template) {
+                    return;
+                }
                 var templateEditor = {
-                    id: scope.node.templateId,
+                    id: template.id,
                     submit: function (model) {
                         editorService.close();
                     },
@@ -301,6 +308,8 @@
                 // get current backoffice user and format dates
                 userService.getCurrentUser().then(function (currentUser) {
                     scope.currentVariant.createDateFormatted = dateHelper.getLocalDate(scope.currentVariant.createDate, currentUser.locale, 'LLL');
+                    scope.currentVariant.releaseDateFormatted = dateHelper.getLocalDate(scope.currentVariant.releaseDate, currentUser.locale, 'LLL');
+                    scope.currentVariant.expireDateFormatted = dateHelper.getLocalDate(scope.currentVariant.expireDate, currentUser.locale, 'LLL');
                 });
             }
 
@@ -314,11 +323,14 @@
                 // find the urls for the currently selected language
                 if (scope.node.variants.length > 1) {
                     // nodes with variants
-                    scope.currentUrls = _.filter(scope.node.urls, (url) => scope.currentVariant.language.culture === url.culture);
+                    scope.currentUrls = _.filter(scope.node.urls, (url) => (scope.currentVariant.language && scope.currentVariant.language.culture === url.culture));
                 } else {
                     // invariant nodes
                     scope.currentUrls = scope.node.urls;
                 }
+
+                // figure out if multiple cultures apply across the content urls
+                scope.currentUrlsHaveMultipleCultures = _.keys(_.groupBy(scope.currentUrls, url => url.culture)).length > 1;
             }
 
             // load audit trail and redirects when on the info tab
@@ -328,6 +340,8 @@
                         isInfoTab = true;
                         loadAuditTrail();
                         loadRedirectUrls();
+                        setNodePublishStatus();
+                        formatDatesToLocal();
                     } else {
                         isInfoTab = false;
                     }
@@ -344,6 +358,7 @@
                     loadAuditTrail(true);
                     loadRedirectUrls();
                     setNodePublishStatus();
+                    formatDatesToLocal();
                 }
                 updateCurrentUrls();
             });

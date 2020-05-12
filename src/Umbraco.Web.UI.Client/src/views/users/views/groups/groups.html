@@ -8,7 +8,7 @@
         <umb-editor-sub-header-content-left ng-if="vm.selection.length === 0">
             <umb-button
                 type="button"
-                button-style="action"
+                button-style="outline"
                 action="vm.createUserGroup()"
                 label="Create Group"
                 label-key="actions_createGroup">
@@ -18,18 +18,10 @@
         <umb-editor-sub-header-content-right ng-if="vm.selection.length === 0">
 
             <umb-editor-sub-header-section>
-            <div class="form-search -no-margin-bottom pull-right">
-                <div class="inner-addon left-addon">
-                    <i class="icon icon-search"></i>
-                    <input class="form-control search-input"
-                        type="text"
-                        localize="placeholder"
-                        placeholder="@placeholders_filter"
-                        ng-model="vm.filter"
-                        prevent-enter-submit
-                        no-dirty-check>
-                </div>
-            </div>
+
+                <umb-mini-search model="vm.filter">
+                </umb-mini-search>
+
             </umb-editor-sub-header-section>
 
         </umb-editor-sub-header-content-right>
@@ -70,7 +62,7 @@
         </div>
     </div>
 
-    <div class="umb-table" ng-if="!vm.loading">
+    <div class="umb-table" ng-if="!vm.loading && vm.filteredUserGroups.length">
 
         <div class="umb-table-head">
             <div class="umb-table-row">
@@ -84,9 +76,9 @@
 
         <div class="umb-table-body">
             <div class="umb-table-row"
-                ng-repeat="group in vm.userGroups | filter:vm.filter track by $index"
+                ng-repeat="group in vm.filteredUserGroups track by $index"
                 ng-click="vm.selectUserGroup(group, $index, $event)"
-                ng-class="{'-selected': group.selected, '-selectable': group.hasAccess && group.alias !== 'admin' && group.alias !== 'translator'}">
+                ng-class="{'-selected': group.selected, '-selectable': group.hasAccess && !group.isSystemUserGroup}">
 
                 <div class="umb-table-cell">
                     <i ng-if="group.icon" class="umb-table-body__icon umb-table-body__fileicon {{ group.icon }}"></i>
@@ -118,5 +110,10 @@
             </div>
         </div>
     </div>
+
+    <!-- Empty states -->
+    <umb-empty-state ng-if="!vm.loading && !vm.filteredUserGroups.length" position="center">
+        <localize key="general_searchNoResult"></localize>
+    </umb-empty-state>
 
 </div>

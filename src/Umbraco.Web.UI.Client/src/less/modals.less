@@ -85,12 +85,16 @@
 	bottom: 0px;
 	position: absolute;
 	padding: 0px;
-  background: #fff;
+  	background: @white;
 }
 
-.umb-dialog .umb-btn-toolbar .umb-control-group{
-	border: none;
-	padding: none;
+.umb-dialog .abstract{
+    margin-bottom:20px;
+}
+
+.umb-dialog .umb-btn-toolbar .umb-control-group {
+    border: none;
+    padding: none;
 }
 
 .umb-dialog-body{
@@ -99,7 +103,7 @@
     top: 0px;
     left: 0px;
     right: 0px;
-    bottom: 52px;
+    bottom: 49px;
 }
 .umb-dialog-body .umb-pane{margin-top: 15px;}
 
@@ -111,8 +115,12 @@
 	left: 0px;
 	right: 0px;
 	bottom: 0px;
-    padding: 20px;
+    padding: 8px;
     margin: 0;
+
+    .btn.umb-outline {
+        position: relative
+    }
 }
 
 /*we will always make sure to wrap iframe dialogs in proper padding*/

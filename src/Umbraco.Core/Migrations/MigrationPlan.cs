@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Type = System.Type;
@@ -25,7 +24,9 @@ namespace Umbraco.Core.Migrations
         /// <param name="name">The name of the plan.</param>
         public MigrationPlan(string name)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
+
             Name = name;
         }
 
@@ -43,7 +44,8 @@ namespace Umbraco.Core.Migrations
         private MigrationPlan Add(string sourceState, string targetState, Type migration)
         {
             if (sourceState == null) throw new ArgumentNullException(nameof(sourceState));
-            if (string.IsNullOrWhiteSpace(targetState)) throw new ArgumentNullOrEmptyException(nameof(targetState));
+            if (targetState == null) throw new ArgumentNullException(nameof(targetState));
+            if (string.IsNullOrWhiteSpace(targetState)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(targetState));
             if (sourceState == targetState) throw new ArgumentException("Source and target state cannot be identical.");
             if (migration == null) throw new ArgumentNullException(nameof(migration));
             if (!migration.Implements<IMigration>()) throw new ArgumentException($"Type {migration.Name} does not implement IMigration.", nameof(migration));
@@ -135,10 +137,12 @@ namespace Umbraco.Core.Migrations
         /// </summary>
         public MigrationPlan ToWithClone(string startState, string endState, string targetState)
         {
-            if (string.IsNullOrWhiteSpace(startState)) throw new ArgumentNullOrEmptyException(nameof(startState));
-            if (string.IsNullOrWhiteSpace(endState)) throw new ArgumentNullOrEmptyException(nameof(endState));
-            if (string.IsNullOrWhiteSpace(targetState)) throw new ArgumentNullOrEmptyException(nameof(targetState));
-
+            if (startState == null) throw new ArgumentNullException(nameof(startState));
+            if (string.IsNullOrWhiteSpace(startState)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(startState));
+            if (endState == null) throw new ArgumentNullException(nameof(endState));
+            if (string.IsNullOrWhiteSpace(endState)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(endState));
+            if (targetState == null) throw new ArgumentNullException(nameof(targetState));
+            if (string.IsNullOrWhiteSpace(targetState)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(targetState));
             if (startState == endState) throw new ArgumentException("Start and end states cannot be identical.");
 
             startState = startState.Trim();
@@ -240,7 +244,8 @@ namespace Umbraco.Core.Migrations
                 if (finalState == null)
                     finalState = kvp.Key;
                 else
-                    throw new Exception("Multiple final states have been detected.");
+                    throw new InvalidOperationException($"Multiple final states have been detected in the plan (\"{finalState}\", \"{kvp.Key}\")."
+                                                            + " Make sure the plan contains only one final state.");
             }
 
             // now check for loops
@@ -254,7 +259,8 @@ namespace Umbraco.Core.Migrations
                 while (nextTransition != null && !verified.Contains(nextTransition.SourceState))
                 {
                     if (visited.Contains(nextTransition.SourceState))
-                        throw new Exception("A loop has been detected.");
+                        throw new InvalidOperationException($"A loop has been detected in the plan around state \"{nextTransition.SourceState}\"."
+                                                                + " Make sure the plan does not contain circular transition paths.");
                     visited.Add(nextTransition.SourceState);
                     nextTransition = _transitions[nextTransition.TargetState];
                 }
@@ -262,6 +268,14 @@ namespace Umbraco.Core.Migrations
             }
 
             _finalState = finalState;
+        }
+
+        /// <summary>
+        /// Throws an exception when the initial state is unknown.
+        /// </summary>
+        protected virtual void ThrowOnUnknownInitialState(string state)
+        {
+            throw new InvalidOperationException($"The migration plan does not support migrating from state \"{state}\".");
         }
 
         /// <summary>
@@ -287,13 +301,15 @@ namespace Umbraco.Core.Migrations
             logger.Info<MigrationPlan>("At {OrigState}", string.IsNullOrWhiteSpace(origState) ? "origin": origState);
 
             if (!_transitions.TryGetValue(origState, out var transition))
-                throw new Exception($"Unknown state \"{origState}\".");
+                ThrowOnUnknownInitialState(origState);
 
             var context = new MigrationContext(scope.Database, logger);
             context.PostMigrations.AddRange(_postMigrationTypes);
 
             while (transition != null)
             {
+                logger.Info<MigrationPlan>("Execute {MigrationType}", transition.MigrationType.Name);
+
                 var migration = migrationBuilder.Build(transition.MigrationType, context);
                 migration.Migrate();
 
@@ -302,8 +318,10 @@ namespace Umbraco.Core.Migrations
 
                 logger.Info<MigrationPlan>("At {OrigState}", origState);
 
+                // throw a raw exception here: this should never happen as the plan has
+                // been validated - this is just a paranoid safety test
                 if (!_transitions.TryGetValue(origState, out transition))
-                    throw new Exception($"Unknown state \"{origState}\".");
+                    throw new InvalidOperationException($"Unknown state \"{origState}\".");
             }
 
             // prepare and de-duplicate post-migrations, only keeping the 1st occurence
@@ -322,9 +340,10 @@ namespace Umbraco.Core.Migrations
 
             logger.Info<MigrationPlan>("Done (pending scope completion).");
 
-            // safety check
+            // safety check - again, this should never happen as the plan has been validated,
+            // and this is just a paranoid safety test
             if (origState != _finalState)
-                throw new Exception($"Internal error, reached state {origState} which is not final state {_finalState}");
+                throw new InvalidOperationException($"Internal error, reached state {origState} which is not final state {_finalState}");
 
             return origState;
         }
@@ -343,7 +362,7 @@ namespace Umbraco.Core.Migrations
             var states = new List<string> { origState };
 
             if (!_transitions.TryGetValue(origState, out var transition))
-                throw new Exception($"Unknown state \"{origState}\".");
+                throw new InvalidOperationException($"Unknown state \"{origState}\".");
 
             while (transition != null)
             {
@@ -358,12 +377,12 @@ namespace Umbraco.Core.Migrations
                 }
 
                 if (!_transitions.TryGetValue(origState, out transition))
-                    throw new Exception($"Unknown state \"{origState}\".");
+                    throw new InvalidOperationException($"Unknown state \"{origState}\".");
             }
 
             // safety check
             if (origState != (toState ?? _finalState))
-                throw new Exception($"Internal error, reached state {origState} which is not state {toState ?? _finalState}");
+                throw new InvalidOperationException($"Internal error, reached state {origState} which is not state {toState ?? _finalState}");
 
             return states;
         }
@@ -402,7 +421,7 @@ namespace Umbraco.Core.Migrations
             public override string ToString()
             {
                 return MigrationType == typeof(NoopMigration)
-                    ? $"{(SourceState == "" ? "<empty>" : SourceState)} --> {TargetState}"
+                    ? $"{(SourceState == string.Empty ? "<empty>" : SourceState)} --> {TargetState}"
                     : $"{SourceState} -- ({MigrationType.FullName}) --> {TargetState}";
             }
         }

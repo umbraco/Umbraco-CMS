@@ -56,7 +56,7 @@ namespace Umbraco.Web.Mvc
                 if (_publishedContent != null) return _publishedContent;
 
                 //need to get the URL for the page
-                _publishedContent = Current.UmbracoContext.ContentCache.GetById(_pageId);
+                _publishedContent = Current.UmbracoContext.Content.GetById(_pageId);
 
                 return _publishedContent;
             }

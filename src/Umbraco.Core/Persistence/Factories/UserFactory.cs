@@ -36,6 +36,13 @@ namespace Umbraco.Core.Persistence.Factories
                 user.InvitedDate = dto.InvitedDate;
                 user.TourData = dto.TourData;
 
+                // we should never get user with ID zero from database, except
+                // when upgrading from v7 - mark that user so that we do not
+                // save it back to database (as that would create a *new* user)
+                // see also: UserRepository.PersistNewItem
+                if (dto.Id == 0)
+                    user.AdditionalData["IS_V7_ZERO"] = true;
+
                 // reset dirty initial properties (U4-1946)
                 user.ResetDirtyProperties(false);
 

@@ -1,6 +1,4 @@
-﻿using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.Dtos;
+﻿using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
@@ -15,24 +13,19 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         public override void Migrate()
         {
-            //first allow NULL-able
+            // first allow NULL-able
             Alter.Table(ContentVersionCultureVariationDto.TableName).AlterColumn("availableUserId").AsInt32().Nullable().Do();
             Alter.Table(ContentVersionDto.TableName).AlterColumn("userId").AsInt32().Nullable().Do();
             Alter.Table(Constants.DatabaseSchema.Tables.Log).AlterColumn("userId").AsInt32().Nullable().Do();
             Alter.Table(NodeDto.TableName).AlterColumn("nodeUser").AsInt32().Nullable().Do();
 
-            //then we can update any non existing users to NULL
+            // then we can update any non existing users to NULL
             Execute.Sql($"UPDATE {ContentVersionCultureVariationDto.TableName} SET availableUserId = NULL WHERE availableUserId NOT IN (SELECT id FROM {UserDto.TableName})").Do();
             Execute.Sql($"UPDATE {ContentVersionDto.TableName} SET userId = NULL WHERE userId NOT IN (SELECT id FROM {UserDto.TableName})").Do();
             Execute.Sql($"UPDATE {Constants.DatabaseSchema.Tables.Log} SET userId = NULL WHERE userId NOT IN (SELECT id FROM {UserDto.TableName})").Do();
             Execute.Sql($"UPDATE {NodeDto.TableName} SET nodeUser = NULL WHERE nodeUser NOT IN (SELECT id FROM {UserDto.TableName})").Do();
 
-            //now NULL-able with FKs
-            Alter.Table(ContentVersionCultureVariationDto.TableName).AlterColumn("availableUserId").AsInt32().Nullable().ForeignKey(UserDto.TableName, "id").Do();
-            Alter.Table(ContentVersionDto.TableName).AlterColumn("userId").AsInt32().Nullable().ForeignKey(UserDto.TableName, "id").Do();
-            Alter.Table(Constants.DatabaseSchema.Tables.Log).AlterColumn("userId").AsInt32().Nullable().ForeignKey(UserDto.TableName, "id").Do();
-            Alter.Table(NodeDto.TableName).AlterColumn("nodeUser").AsInt32().Nullable().ForeignKey(UserDto.TableName, "id").Do();
+            // FKs will be created after migrations
         }
-
     }
 }

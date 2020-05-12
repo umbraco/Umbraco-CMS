@@ -37,11 +37,11 @@ namespace Umbraco.Web.PublishedCache
         public bool HasById(int contentId)
             => HasById(PreviewDefault, contentId);
 
-        public abstract IEnumerable<IPublishedContent> GetAtRoot(bool preview);
+        public abstract IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null);
 
-        public IEnumerable<IPublishedContent> GetAtRoot()
+        public IEnumerable<IPublishedContent> GetAtRoot(string culture = null)
         {
-            return GetAtRoot(PreviewDefault);
+            return GetAtRoot(PreviewDefault, culture);
         }
 
         public abstract IPublishedContent GetSingleByXPath(bool preview, string xpath, XPathVariable[] vars);
@@ -88,11 +88,11 @@ namespace Umbraco.Web.PublishedCache
             return HasContent(PreviewDefault);
         }
 
-        public abstract PublishedContentType GetContentType(int id);
+        public abstract IPublishedContentType GetContentType(int id);
 
-        public abstract PublishedContentType GetContentType(string alias);
+        public abstract IPublishedContentType GetContentType(string alias);
 
-        public virtual IEnumerable<IPublishedContent> GetByContentType(PublishedContentType contentType)
+        public virtual IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
         {
             // this is probably not super-efficient, but works
             // some cache implementation may want to override it, though

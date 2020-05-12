@@ -12,28 +12,43 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter]
     public class MarkdownEditorValueConverter : PropertyValueConverterBase
     {
-        public override bool IsConverter(PublishedPropertyType propertyType)
+        private readonly HtmlLocalLinkParser _localLinkParser;
+        private readonly HtmlUrlParser _urlParser;
+
+        [Obsolete("Use ctor defining all dependencies instead")]
+        public MarkdownEditorValueConverter()
+            : this(Current.Factory.GetInstance<HtmlLocalLinkParser>(), Current.Factory.GetInstance<HtmlUrlParser>())
+        {
+        }
+
+        public MarkdownEditorValueConverter(HtmlLocalLinkParser localLinkParser, HtmlUrlParser urlParser)
+        {
+            _localLinkParser = localLinkParser;
+            _urlParser = urlParser;
+        }
+
+        public override bool IsConverter(IPublishedPropertyType propertyType)
             => Constants.PropertyEditors.Aliases.MarkdownEditor == propertyType.EditorAlias;
 
-        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-            => typeof (IHtmlString);
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
+            => typeof(IHtmlString);
 
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Snapshot;
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
             var sourceString = source.ToString();
 
             // ensures string is parsed for {localLink} and urls are resolved correctly
-            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview, Current.UmbracoContext);
-            sourceString = TemplateUtilities.ResolveUrlsFromTextString(sourceString);
+            sourceString = _localLinkParser.EnsureInternalLinks(sourceString, preview);
+            sourceString = _urlParser.EnsureUrls(sourceString);
 
             return sourceString;
         }
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             // convert markup to HTML for frontend rendering.
             // source should come from ConvertSource and be a string (or null) already

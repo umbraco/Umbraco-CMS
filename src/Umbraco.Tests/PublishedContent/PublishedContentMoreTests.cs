@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models.PublishedContent;
@@ -15,15 +16,16 @@ namespace Umbraco.Tests.PublishedContent
     {
         internal override void PopulateCache(PublishedContentTypeFactory factory, SolidPublishedContentCache cache)
         {
-            var props = new[]
-                {
-                    factory.CreatePropertyType("prop1", 1),
-                };
-            var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), props);
-            var contentType2 = factory.CreateContentType(2, "ContentType2", Enumerable.Empty<string>(), props);
-            var contentType2Sub = factory.CreateContentType(3, "ContentType2Sub", Enumerable.Empty<string>(), props);
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
+            {
+                yield return factory.CreatePropertyType(contentType, "prop1", 1);
+            }
 
-            cache.Add(new SolidPublishedContent(contentType1)
+            var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), CreatePropertyTypes);
+            var contentType2 = factory.CreateContentType(2, "ContentType2", Enumerable.Empty<string>(), CreatePropertyTypes);
+            var contentType2Sub = factory.CreateContentType(3, "ContentType2Sub", Enumerable.Empty<string>(), CreatePropertyTypes);
+
+            var content = new SolidPublishedContent(contentType1)
             {
                 Id = 1,
                 SortOrder = 0,
@@ -35,18 +37,19 @@ namespace Umbraco.Tests.PublishedContent
                 ParentId = -1,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
+                {
+                    new SolidPublishedProperty
                     {
-                        new SolidPublishedProperty
-                        {
-                            Alias = "prop1",
-                            SolidHasValue = true,
-                            SolidValue = 1234,
-                            SolidSourceValue = "1234"
-                        }
+                        Alias = "prop1",
+                        SolidHasValue = true,
+                        SolidValue = 1234,
+                        SolidSourceValue = "1234"
                     }
-            });
+                }
+            };
+            cache.Add(content);
 
-            cache.Add(new SolidPublishedContent(contentType2)
+            content = new SolidPublishedContent(contentType2)
             {
                 Id = 2,
                 SortOrder = 1,
@@ -58,18 +61,19 @@ namespace Umbraco.Tests.PublishedContent
                 ParentId = -1,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
+                {
+                    new SolidPublishedProperty
                     {
-                        new SolidPublishedProperty
-                        {
-                            Alias = "prop1",
-                            SolidHasValue = true,
-                            SolidValue = 1234,
-                            SolidSourceValue = "1234"
-                        }
+                        Alias = "prop1",
+                        SolidHasValue = true,
+                        SolidValue = 1234,
+                        SolidSourceValue = "1234"
                     }
-            });
+                }
+            };
+            cache.Add(content);
 
-            cache.Add(new SolidPublishedContent(contentType2Sub)
+            content = new SolidPublishedContent(contentType2Sub)
             {
                 Id = 3,
                 SortOrder = 2,
@@ -90,20 +94,21 @@ namespace Umbraco.Tests.PublishedContent
                         SolidSourceValue = "1234"
                     }
                 }
-            });
+            };
+            cache.Add(content);
         }
 
         [Test]
         public void First()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot().First();
-            Assert.AreEqual("Content 1", content.Name);
+            var content = Current.UmbracoContext.Content.GetAtRoot().First();
+            Assert.AreEqual("Content 1", content.Name());
         }
 
         [Test]
         public void Distinct()
         {
-            var items = Current.UmbracoContext.ContentCache.GetAtRoot()
+            var items = Current.UmbracoContext.Content.GetAtRoot()
                 .Distinct()
                 .Distinct()
                 .ToIndexedArray();
@@ -127,7 +132,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void OfType1()
         {
-            var items = Current.UmbracoContext.ContentCache.GetAtRoot()
+            var items = Current.UmbracoContext.Content.GetAtRoot()
                 .OfType<ContentType2>()
                 .Distinct()
                 .ToIndexedArray();
@@ -138,7 +143,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void OfType2()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot()
+            var content = Current.UmbracoContext.Content.GetAtRoot()
                 .OfType<ContentType2Sub>()
                 .Distinct()
                 .ToIndexedArray();
@@ -149,7 +154,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void OfType()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot()
+            var content = Current.UmbracoContext.Content.GetAtRoot()
                 .OfType<ContentType2>()
                 .First(x => x.Prop1 == 1234);
             Assert.AreEqual("Content 2", content.Name);
@@ -159,7 +164,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Position()
         {
-            var items = Current.UmbracoContext.ContentCache.GetAtRoot()
+            var items = Current.UmbracoContext.Content.GetAtRoot()
                 .Where(x => x.Value<int>("prop1") == 1234)
                 .ToIndexedArray();
 
@@ -174,7 +179,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Issue()
         {
-            var content = Current.UmbracoContext.ContentCache.GetAtRoot()
+            var content = Current.UmbracoContext.Content.GetAtRoot()
                 .Distinct()
                 .OfType<ContentType2>();
 
@@ -182,12 +187,12 @@ namespace Umbraco.Tests.PublishedContent
             var first = where.First();
             Assert.AreEqual(1234, first.Prop1);
 
-            var content2 = Current.UmbracoContext.ContentCache.GetAtRoot()
+            var content2 = Current.UmbracoContext.Content.GetAtRoot()
                 .OfType<ContentType2>()
                 .First(x => x.Prop1 == 1234);
             Assert.AreEqual(1234, content2.Prop1);
 
-            var content3 = Current.UmbracoContext.ContentCache.GetAtRoot()
+            var content3 = Current.UmbracoContext.Content.GetAtRoot()
                 .OfType<ContentType2>()
                 .First();
             Assert.AreEqual(1234, content3.Prop1);

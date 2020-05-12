@@ -19,13 +19,13 @@
             $scope.hasError = false;
 
             $scope.internal = function ($event) {
+                
                 $scope.currentEditLink = null;
 
                 var contentPicker = {
                     section: "content",
                     treeAlias: "content",
                     multiPicker: false,
-                    ignoreUserStartNodes: Object.toBoolean($scope.model.config.ignoreUserStartNodes),
                     idType: $scope.model.config.idType ? $scope.model.config.idType : "int",
                     submit: function (model) {
                         select(model.selection[0]);
@@ -42,13 +42,13 @@
             };
 
             $scope.selectInternal = function ($event, link) {
+                
                 $scope.currentEditLink = link;
 
                 var contentPicker = {
                     section: "content",
                     treeAlias: "content",
                     multiPicker: false,
-                    ignoreUserStartNodes: Object.toBoolean($scope.model.config.ignoreUserStartNodes),
                     idType: $scope.model.config.idType ? $scope.model.config.idType : "udi",
                     submit: function (model) {
                         select(model.selection[0]);
@@ -80,7 +80,7 @@
             };
 
             $scope.add = function ($event) {
-				if (!angular.isArray($scope.model.value)) {
+				if (!Utilities.isArray($scope.model.value)) {
                   $scope.model.value = [];
 				}
 				

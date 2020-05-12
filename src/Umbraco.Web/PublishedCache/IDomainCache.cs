@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.PublishedCache
@@ -6,20 +8,29 @@ namespace Umbraco.Web.PublishedCache
     public interface IDomainCache
     {
         /// <summary>
-        /// Returns all <see cref="Domain"/> in the current domain cache including any domains that may be referenced by content items that are no longer published
+        /// Gets all <see cref="Domain"/> in the current domain cache, including any domains that may be referenced by documents that are no longer published.
         /// </summary>
         /// <param name="includeWildcards"></param>
         /// <returns></returns>
         IEnumerable<Domain> GetAll(bool includeWildcards);
 
         /// <summary>
-        /// Returns all assigned <see cref="Domain"/> for the content id specified even if the content item is not published
+        /// Gets all assigned <see cref="Domain"/> for specified document, even if it is not published.
         /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="includeWildcards"></param>
-        /// <returns></returns>
-        IEnumerable<Domain> GetAssigned(int contentId, bool includeWildcards);
+        /// <param name="documentId">The document identifier.</param>
+        /// <param name="includeWildcards">A value indicating whether to consider wildcard domains.</param>
+        IEnumerable<Domain> GetAssigned(int documentId, bool includeWildcards = false);
 
+        /// <summary>
+        /// Determines whether a document has domains.
+        /// </summary>
+        /// <param name="documentId">The document identifier.</param>
+        /// <param name="includeWildcards">A value indicating whether to consider wildcard domains.</param>
+        bool HasAssigned(int documentId, bool includeWildcards = false);
+
+        /// <summary>
+        /// Gets the system default culture.
+        /// </summary>
         string DefaultCulture { get; }
     }
 }

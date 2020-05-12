@@ -16,15 +16,17 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentPropertyBasicMapper<TDestination>
         where TDestination : ContentPropertyBasic, new()
     {
+        private readonly IEntityService _entityService;
         private readonly ILogger _logger;
         private readonly PropertyEditorCollection _propertyEditors;
         protected IDataTypeService DataTypeService { get; }
 
-        public ContentPropertyBasicMapper(IDataTypeService dataTypeService, ILogger logger, PropertyEditorCollection propertyEditors)
+        public ContentPropertyBasicMapper(IDataTypeService dataTypeService, IEntityService entityService, ILogger logger, PropertyEditorCollection propertyEditors)
         {
             _logger = logger;
             _propertyEditors = propertyEditors;
             DataTypeService = dataTypeService;
+            _entityService = entityService;
         }
 
         /// <summary>
@@ -48,6 +50,7 @@ namespace Umbraco.Web.Models.Mapping
             dest.Alias = property.Alias;
             dest.PropertyEditor = editor;
             dest.Editor = editor.Alias;
+            dest.DataTypeKey = property.PropertyType.DataTypeKey;
 
             // if there's a set of property aliases specified, we will check if the current property's value should be mapped.
             // if it isn't one of the ones specified in 'includeProperties', we will just return the result without mapping the Value.
@@ -67,8 +70,13 @@ namespace Umbraco.Web.Models.Mapping
 
             dest.Culture = culture;
 
+            // Get the segment, which is always allowed to be null even if the propertyType *can* be varied by segment.
+            // There is therefore no need to perform the null check like with culture above.
+            var segment = !property.PropertyType.VariesBySegment() ? null : context.GetSegment();
+            dest.Segment = segment;
+
             // if no 'IncludeProperties' were specified or this property is set to be included - we will map the value and return.
-            dest.Value = editor.GetValueEditor().ToEditor(property, DataTypeService, culture);
+            dest.Value = editor.GetValueEditor().ToEditor(property, DataTypeService, culture, segment);
         }
     }
 }

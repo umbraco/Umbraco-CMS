@@ -38,6 +38,8 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "updater")]
         public UserProfile Updater { get; set; }
 
+        public int ContentTypeId { get; set; }
+
         [DataMember(Name = "contentTypeAlias", IsRequired = true)]
         [Required(AllowEmptyStrings = false)]
         public string ContentTypeAlias { get; set; }

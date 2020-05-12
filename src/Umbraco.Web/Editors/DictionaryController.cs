@@ -52,6 +52,13 @@ namespace Umbraco.Web.Editors
             if (foundDictionary == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
+            var foundDictionaryDescendants = Services.LocalizationService.GetDictionaryItemDescendants(foundDictionary.Key);
+
+            foreach (var dictionaryItem in foundDictionaryDescendants)
+            {
+                Services.LocalizationService.Delete(dictionaryItem, Security.CurrentUser.Id);
+            }
+
             Services.LocalizationService.Delete(foundDictionary, Security.CurrentUser.Id);
 
             return Request.CreateResponse(HttpStatusCode.OK);

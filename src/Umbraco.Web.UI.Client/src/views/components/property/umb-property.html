@@ -1,24 +1,30 @@
 <div class="umb-property">
     <ng-form name="propertyForm">
-        <div class="control-group umb-control-group" ng-class="{hidelabel:property.hideLabel}">
+        <div class="control-group umb-control-group" ng-class="{hidelabel:property.hideLabel, 'umb-control-group__listview': property.alias === '_umb_containerView'}">
 
             <val-property-msg></val-property-msg>
 
             <div class="umb-el-wrap">
 
-                <label class="control-label" ng-hide="property.hideLabel" for="{{property.alias}}" ng-attr-title="{{propertyAlias}}">
-                    
+                <div class="control-header" ng-hide="property.hideLabel === true">
                     <small ng-if="showInherit" class="db" style="padding-top: 0; margin-bottom: 5px;">
                         <localize key="contentTypeEditor_inheritedFrom"></localize> {{inheritsFrom}}
                     </small>
 
-                    {{property.label}}
+                    <label class="control-label" for="{{property.alias}}" ng-attr-title="{{propertyAlias}}">
 
-                    <span ng-if="property.validation.mandatory">
-                        <strong class="umb-control-required">*</strong>
-                    </span>
-                    <small ng-bind-html="property.description | preserveNewLineInHtml"></small>
-                </label>
+                        {{property.label}}
+
+                        <span ng-if="property.validation.mandatory">
+                            <strong class="umb-control-required">*</strong>
+                        </span>
+
+                    </label>
+
+                    <umb-property-actions actions="propertyActions"></umb-property-actions>
+
+                    <small class="control-description" ng-bind-html="property.description | preserveNewLineInHtml"></small>
+                </div>
 
                 <div class="controls" ng-transclude>
                 </div>

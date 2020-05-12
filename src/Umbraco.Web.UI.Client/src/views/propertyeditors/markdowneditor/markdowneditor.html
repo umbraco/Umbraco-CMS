@@ -1,7 +1,7 @@
 <div class="wmd-panel" ng-controller="Umbraco.PropertyEditors.MarkdownEditorController">
    <div id="wmd-button-bar-{{editorId}}"></div>
 
-   <textarea class="wmd-input" id="wmd-input-{{editorId}}" ng-model="model.value"></textarea>
+   <textarea class="wmd-input" id="wmd-input-{{editorId}}" ng-model="model.value" ng-required="model.validation.mandatory"></textarea>
 
    <div class="wmd-panel wmd-preview" id="wmd-preview-{{editorId}}" ng-show="model.config.preview"></div>
 

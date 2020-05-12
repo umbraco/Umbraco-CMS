@@ -5,6 +5,7 @@ using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
@@ -96,7 +97,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IServerRegistration entity)
         {
-            ((ServerRegistration)entity).AddingEntity();
+            entity.AddingEntity();
 
             var dto = ServerRegistrationFactory.BuildDto(entity);
 
@@ -108,7 +109,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IServerRegistration entity)
         {
-            ((ServerRegistration)entity).UpdatingEntity();
+            entity.UpdatingEntity();
             
             var dto = ServerRegistrationFactory.BuildDto(entity);
 

@@ -67,7 +67,7 @@ namespace Umbraco.Core.Models
 
             if (user.Avatar.IsNullOrWhiteSpace())
             {
-                var gravatarHash = user.Email.ToMd5();
+                var gravatarHash = user.Email.GenerateHash<MD5>();
                 var gravatarUrl = "https://www.gravatar.com/avatar/" + gravatarHash + "?d=404";
 
                 //try Gravatar
@@ -106,13 +106,14 @@ namespace Umbraco.Core.Models
 
             //use the custom avatar
             var avatarUrl = Current.MediaFileSystem.GetUrl(user.Avatar);
+            var urlGenerator = Current.ImageUrlGenerator;
             return new[]
             {
-                avatarUrl  + "?width=30&height=30&mode=crop",
-                avatarUrl  + "?width=60&height=60&mode=crop",
-                avatarUrl  + "?width=90&height=90&mode=crop",
-                avatarUrl  + "?width=150&height=150&mode=crop",
-                avatarUrl  + "?width=300&height=300&mode=crop"
+                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 30, Height = 30 }),
+                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 60, Height = 60 }),
+                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 90, Height = 90 }),
+                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 150, Height = 150 }),
+                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 300, Height = 300 })
             };
 
         }
@@ -191,19 +192,6 @@ namespace Umbraco.Core.Models
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
             return ContentPermissionsHelper.HasPathAccess(entity.Path, user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
-        }
-
-        internal static bool IsInBranchOfStartNode(this IUser user, IUmbracoEntity entity, IEntityService entityService, int recycleBinId, out bool hasPathAccess)
-        {
-            switch (recycleBinId)
-            {
-                case Constants.System.RecycleBinMedia:
-                    return ContentPermissionsHelper.IsInBranchOfStartNode(entity.Path, user.CalculateMediaStartNodeIds(entityService), user.GetMediaStartNodePaths(entityService), out hasPathAccess);
-                case Constants.System.RecycleBinContent:
-                    return ContentPermissionsHelper.IsInBranchOfStartNode(entity.Path, user.CalculateContentStartNodeIds(entityService), user.GetContentStartNodePaths(entityService), out hasPathAccess);
-                default:
-                    throw new NotSupportedException("Path access is only determined on content or media");
-            }
         }
 
         /// <summary>

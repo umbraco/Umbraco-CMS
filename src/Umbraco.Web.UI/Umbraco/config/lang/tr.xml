@@ -85,7 +85,7 @@
     <key alias="save">Kaydet</key>
     <key alias="saveAndPublish">Kaydet ve Yayınla</key>
     <key alias="saveToPublish">Kaydet ve Onay için gönder</key>
-    <key alias="showPage">Önizle</key>
+    <key alias="saveAndPreview">Önizle</key>
     <key alias="showPageDisabled">Önizleme kapalı, Atanmış şablon yok</key>
     <key alias="styleChoose">Stili seçin</key>
     <key alias="styleShow">Stilleri Göster</key>
@@ -203,7 +203,6 @@
     <key alias="linkinternal">İç Bağlantı:</key>
     <key alias="linklocaltip">Yerel bağlantıları kullanırken, bağlantının önündeki "# " insert</key>
     <key alias="linknewwindow">Yeni pencerede aç</key>
-    <key alias="macroContainerSettings">Makro ayarları</key>
     <key alias="macroDoesNotHaveProperties">Düzenleyebileceğiniz Bu makro herhangi bir özellikleri içermiyor</key>
     <key alias="paste">Yapıştır</key>
     <key alias="permissionsEdit">İzinleri düzenle</key>

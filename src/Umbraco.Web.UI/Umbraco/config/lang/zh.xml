@@ -90,7 +90,7 @@
     <key alias="saveAndPublish">保存并发布</key>
     <key alias="saveToPublish">保存并提交审核</key>
     <key alias="saveListView">保存列表视图</key>
-    <key alias="showPage">预览</key>
+    <key alias="saveAndPreview">预览</key>
     <key alias="showPageDisabled">因未设置模板无法预览</key>
     <key alias="styleChoose">选择样式</key>
     <key alias="styleShow">显示样式</key>
@@ -251,7 +251,6 @@
     <key alias="linkinternal">内部链接：</key>
     <key alias="linklocaltip">本地链接请用“#”号开头</key>
     <key alias="linknewwindow">在新窗口中打开？</key>
-    <key alias="macroContainerSettings">宏设置</key>
     <key alias="macroDoesNotHaveProperties"><![CDATA[该宏没有可编辑的属性]]></key>
     <key alias="paste">粘贴</key>
     <key alias="permissionsEdit">编辑权限</key>

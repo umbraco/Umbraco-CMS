@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Logging;
@@ -179,6 +180,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return items.Select(x => x.TABLE_NAME).Cast<string>().ToList();
         }
 
+        public override IsolationLevel DefaultIsolationLevel => IsolationLevel.ReadCommitted;
+
         public override IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db)
         {
             var items = db.Fetch<dynamic>("SELECT TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
@@ -225,6 +228,18 @@ order by T.name, I.name");
 
         }
 
+        /// <inheritdoc />
+        public override bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName)
+        {
+            constraintName = db.Fetch<string>(@"select con.[name] as [constraintName]
+from sys.default_constraints con
+join sys.columns col on con.object_id=col.default_object_id
+join sys.tables tbl on col.object_id=tbl.object_id
+where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
+                       .FirstOrDefault();
+            return !constraintName.IsNullOrWhiteSpace();
+        }
+
         public override bool DoesTableExist(IDatabase db, string tableName)
         {
             var result =
@@ -232,6 +247,46 @@ order by T.name, I.name");
                                        new { TableName = tableName });
 
             return result > 0;
+        }
+
+        public override void WriteLock(IDatabase db, params int[] lockIds)
+        {
+            WriteLock(db, TimeSpan.FromMilliseconds(1800), lockIds);
+        }
+
+        public void WriteLock(IDatabase db, TimeSpan timeout, params int[] lockIds)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
+                throw new InvalidOperationException("A transaction with minimum ReadCommitted isolation level is required.");
+
+
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            foreach (var lockId in lockIds)
+            {
+                db.Execute($"SET LOCK_TIMEOUT {timeout.TotalMilliseconds};");
+                var i = db.Execute(@"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
+                if (i == 0) // ensure we are actually locking!
+                    throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+            }
+        }
+
+
+        public override void ReadLock(IDatabase db, params int[] lockIds)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
+                throw new InvalidOperationException("A transaction with minimum ReadCommitted isolation level is required.");
+
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            foreach (var lockId in lockIds)
+            {
+                var i = db.ExecuteScalar<int?>("SELECT value FROM umbracoLock WITH (REPEATABLEREAD) WHERE id=@id", new { id = lockId });
+                if (i == null) // ensure we are actually locking!
+                    throw new ArgumentException($"LockObject with id={lockId} does not exist.", nameof(lockIds));
+            }
         }
 
         public override string FormatColumnRename(string tableName, string oldName, string newName)
@@ -276,7 +331,7 @@ order by T.name, I.name");
             return null;
         }
 
-        public override string DeleteDefaultConstraint => "ALTER TABLE [{0}] DROP CONSTRAINT [DF_{0}_{1}]";
+        public override string DeleteDefaultConstraint => "ALTER TABLE {0} DROP CONSTRAINT {2}";
 
         public override string DropIndex => "DROP INDEX {0} ON {1}";
 

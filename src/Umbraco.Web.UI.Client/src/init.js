@@ -1,6 +1,6 @@
 /** Executed when the application starts, binds to events and set global state */
-app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache', 'localStorageService', 'tourService', 'dashboardResource',
-    function (userService, $q, $log, $rootScope, $route, $location, urlHelper, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache, localStorageService, tourService, dashboardResource) {
+app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 'appState', 'assetsService', 'eventsService', '$cookies', 'tourService', 'localStorageService',
+    function ($rootScope, $route, $location, urlHelper, navigationService, appState, assetsService, eventsService, $cookies, tourService, localStorageService) {
 
         //This sets the default jquery ajax headers to include our csrf token, we
         // need to user the beforeSend method because our token changes per user/login so
@@ -23,11 +23,35 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
                 appReady(data);
 
                 tourService.registerAllTours().then(function () {
-                    // Auto start intro tour
+
+                    // Start intro tour
                     tourService.getTourByAlias("umbIntroIntroduction").then(function (introTour) {
                         // start intro tour if it hasn't been completed or disabled
                         if (introTour && introTour.disabled !== true && introTour.completed !== true) {
                             tourService.startTour(introTour);
+                            localStorageService.set("introTourShown", true);
+                        }
+                        else {
+
+                            const introTourShown = localStorageService.get("introTourShown");
+                            if (!introTourShown) {
+                                // Go & show email marketing tour (ONLY when intro tour is completed or been dismissed)
+                                tourService.getTourByAlias("umbEmailMarketing").then(function (emailMarketingTour) {
+                                    // Only show the email marketing tour one time - dismissing it or saying no will make sure it never appears again
+                                    // Unless invoked from tourService JS Client code explicitly.
+                                    // Accepted mails = Completed and Declicned mails = Disabled
+                                    if (emailMarketingTour && emailMarketingTour.disabled !== true && emailMarketingTour.completed !== true) {
+
+                                        // Only show the email tour once per logged in session
+                                        // The localstorage key is removed on logout or user session timeout
+                                        const emailMarketingTourShown = localStorageService.get("emailMarketingTourShown");
+                                        if (!emailMarketingTourShown) {
+                                            tourService.startTour(emailMarketingTour);
+                                            localStorageService.set("emailMarketingTourShown", true);
+                                        }
+                                    }
+                                });
+                            }
                         }
                     });
                 });
@@ -43,7 +67,17 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
         }
 
         var currentRouteParams = null;
-        
+
+        var originalTitle = "";
+
+        $rootScope.$on('$changeTitle', function (event, titlePrefix) {
+            if (titlePrefix) {
+                $rootScope.locationTitle = titlePrefix + " - " + originalTitle;
+            } else {
+                $rootScope.locationTitle = originalTitle;
+            }
+        });
+
         /** execute code on each successful route */
         $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
 
@@ -55,7 +89,7 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
                 currentRouteParams = toRetain;
             }
             else {
-                currentRouteParams = angular.copy(current.params); 
+                currentRouteParams = Utilities.copy(current.params);
             }
 
 
@@ -90,14 +124,7 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
 
                 $rootScope.locationTitle = "Umbraco - " + $location.$$host;
             }
-
-            //reset the editorState on each successful route chage
-            editorState.reset();
-
-            //reset the file manager on each route change, the file collection is only relavent
-            // when working in an editor and submitting data to the server.
-            //This ensures that memory remains clear of any files and that the editors don't have to manually clear the files.
-            fileManager.clearFiles();
+            originalTitle = $rootScope.locationTitle;
         });
 
         /** When the route change is rejected - based on checkAuth - we'll prevent the rejected route from executing including
@@ -122,7 +149,7 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
         });
 
         //Bind to $routeUpdate which will execute anytime a location changes but the route is not triggered.
-        //This is the case when a route uses reloadOnSearch: false which is the case for many or our routes so that we are able to maintain
+        //This is the case when a route uses "reloadOnSearch: false" or "reloadOnUrl: false" which is the case for many or our routes so that we are able to maintain
         //global state query strings without force re-loading views.
         //We can then detect if it's a location change that should force a route or not programatically.
         $rootScope.$on('$routeUpdate', function (event, next) {
@@ -135,14 +162,14 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
 
                 var toRetain = navigationService.retainQueryStrings(currentRouteParams, next.params);
 
-                //if toRetain is not null it means that there are missing query strings and we need to update the current params
+                //if toRetain is not null it means that there are missing query strings and we need to update the current params.
                 if (toRetain) {
                     $route.updateParams(toRetain);
                 }
 
                 //check if the location being changed is only due to global/state query strings which means the location change
                 //isn't actually going to cause a route change.
-                if (!toRetain && navigationService.isRouteChangingNavigation(currentRouteParams, next.params)) {
+                if (navigationService.isRouteChangingNavigation(currentRouteParams, next.params)) {
 
                     //The location change will cause a route change, continue the route if the query strings haven't been updated.
                     $route.reload();
@@ -156,9 +183,15 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
                         currentRouteParams = toRetain;
                     }
                     else {
-                        currentRouteParams = angular.copy(next.params); 
+                        currentRouteParams = Utilities.copy(next.params);
                     }
-                    
+
+                    //always clear the 'sr' query string (soft redirect) if it exists
+                    if (currentRouteParams.sr) {
+                        currentRouteParams.sr = null;
+                        $route.updateParams(currentRouteParams);
+                    }
+
                 }
             }
         });

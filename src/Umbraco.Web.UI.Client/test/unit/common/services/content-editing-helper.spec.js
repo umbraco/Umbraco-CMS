@@ -30,7 +30,6 @@ describe('contentEditingHelper tests', function () {
 
             //act
             var handled = contentEditingHelper.handleSaveError({
-                redirectOnFailure: true,
                 err: err,
                 allNewProps: contentEditingHelper.getAllProps(content),
                 allOrigProps: contentEditingHelper.getAllProps(content)
@@ -49,7 +48,6 @@ describe('contentEditingHelper tests', function () {
             
             //act
             var handled = contentEditingHelper.handleSaveError({
-                redirectOnFailure: true,
                 err: err,
                 allNewProps: [],
                 allOrigProps: []
@@ -70,7 +68,6 @@ describe('contentEditingHelper tests', function () {
 
             //act
             var handled = contentEditingHelper.handleSaveError({
-                redirectOnFailure: true,
                 err: err,
                 allNewProps: contentEditingHelper.getAllProps(content),
                 allOrigProps: contentEditingHelper.getAllProps(content)
@@ -124,13 +121,15 @@ describe('contentEditingHelper tests', function () {
 
             //act
             //note the null, that's because culture is null
-            formHelper.handleServerValidation({ "_Properties.bodyText.null.value": ["Required"] });
+            formHelper.handleServerValidation({ "_Properties.bodyText.null.null.value": ["Required"] });
 
             //assert
             expect(serverValidationManager.items.length).toBe(1);
             expect(serverValidationManager.items[0].fieldName).toBe("value");
             expect(serverValidationManager.items[0].errorMsg).toBe("Required");
             expect(serverValidationManager.items[0].propertyAlias).toBe("bodyText");
+            expect(serverValidationManager.items[0].culture).toBe("invariant");
+            expect(serverValidationManager.items[0].segment).toBeNull();
         });
         
         it('adds a multiple property and field level server validation errors when they are invalid', function () {
@@ -145,7 +144,7 @@ describe('contentEditingHelper tests', function () {
                     "Name": ["Required"],
                     "UpdateDate": ["Invalid date"],
                     //note the null, that's because culture is null
-                    "_Properties.bodyText.null.value": ["Required field"],
+                    "_Properties.bodyText.en-US.mySegment.value": ["Required field"],
                     "_Properties.textarea": ["Invalid format"]
                 });
 
@@ -160,6 +159,8 @@ describe('contentEditingHelper tests', function () {
             expect(serverValidationManager.items[2].fieldName).toBe("value");
             expect(serverValidationManager.items[2].errorMsg).toBe("Required field");
             expect(serverValidationManager.items[2].propertyAlias).toBe("bodyText");
+            expect(serverValidationManager.items[2].culture).toBe("en-US");
+            expect(serverValidationManager.items[2].segment).toBe("mySegment");
             expect(serverValidationManager.items[3].fieldName).toBe("");
             expect(serverValidationManager.items[3].errorMsg).toBe("Invalid format");
             expect(serverValidationManager.items[3].propertyAlias).toBe("textarea");

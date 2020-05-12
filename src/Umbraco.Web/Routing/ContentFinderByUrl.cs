@@ -28,7 +28,7 @@ namespace Umbraco.Web.Routing
         {
             string route;
             if (frequest.HasDomain)
-                route = frequest.Domain.ContentId + DomainHelper.PathRelativeToDomain(frequest.Domain.Uri, frequest.Uri.GetAbsolutePathDecoded());
+                route = frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.Uri.GetAbsolutePathDecoded());
             else
                 route = frequest.Uri.GetAbsolutePathDecoded();
 
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Routing
 
             Logger.Debug<ContentFinderByUrl>("Test route {Route}", route);
 
-            var node = docreq.UmbracoContext.ContentCache.GetByRoute(docreq.UmbracoContext.InPreviewMode, route, culture: docreq.Culture?.Name);
+            var node = docreq.UmbracoContext.Content.GetByRoute(docreq.UmbracoContext.InPreviewMode, route, culture: docreq.Culture?.Name);
             if (node != null)
             {
                 docreq.PublishedContent = node;

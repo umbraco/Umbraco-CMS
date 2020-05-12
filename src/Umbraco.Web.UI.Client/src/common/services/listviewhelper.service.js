@@ -332,14 +332,14 @@
 
             selection.length = 0;
 
-            if (angular.isArray(items)) {
+            if (Utilities.isArray(items)) {
                 for (i = 0; items.length > i; i++) {
                     var item = items[i];
                     item.selected = false;
                 }
             }
 
-         if(angular.isArray(folders)) {
+         if(Utilities.isArray(folders)) {
                 for (i = 0; folders.length > i; i++) {
                     var folder = folders[i];
                     folder.selected = false;
@@ -366,7 +366,7 @@
             var checkbox = $event.target;
             var clearSelection = false;
 
-            if (!angular.isArray(items)) {
+            if (!Utilities.isArray(items)) {
                 return;
             }
 
@@ -413,7 +413,7 @@
         
         function selectAllItemsToggle(items, selection) {
             
-            if (!angular.isArray(items)) {
+            if (!Utilities.isArray(items)) {
                 return;
             }
             

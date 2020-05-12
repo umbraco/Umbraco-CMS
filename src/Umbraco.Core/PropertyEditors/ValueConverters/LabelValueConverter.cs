@@ -16,10 +16,10 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter]
     public class LabelValueConverter : PropertyValueConverterBase
     {
-        public override bool IsConverter(PublishedPropertyType propertyType)
+        public override bool IsConverter(IPublishedPropertyType propertyType)
             => Constants.PropertyEditors.Aliases.Label.Equals(propertyType.EditorAlias);
 
-        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         {
             var valueType = ConfigurationEditor.ConfigurationAs<LabelConfiguration>(propertyType.DataType.Configuration);
             switch (valueType.ValueType)
@@ -40,10 +40,10 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             }
         }
 
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
             var valueType = ConfigurationEditor.ConfigurationAs<LabelConfiguration>(propertyType.DataType.Configuration);
             switch (valueType.ValueType)
@@ -65,6 +65,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                     if (source is decimal sourceDecimal) return sourceDecimal;
                     if (source is string sourceDecimalString)
                         return decimal.TryParse(sourceDecimalString, NumberStyles.Any, CultureInfo.InvariantCulture, out var d) ? d : 0;
+					if (source is double sourceDouble)
+						return Convert.ToDecimal(sourceDouble);
                     return (decimal) 0;
                 case ValueTypes.Integer:
                     if (source is int sourceInt) return sourceInt;

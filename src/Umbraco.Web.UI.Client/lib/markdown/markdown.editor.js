@@ -60,6 +60,7 @@
                                                   * its own image insertion dialog, this hook should return true, and the callback should be called with the chosen
                                                   * image url (or null if the user cancelled). If this hook returns false, the default dialog will be used.
                                                   */
+        hooks.addFalse("insertLinkDialog");
 
         this.getConverter = function () { return markdownConverter; }
 
@@ -1239,6 +1240,11 @@
         // Perform the button's action.
         function doClick(button) {
 
+            // don't do anything if the editor input or button bar isn't the currently active element
+            if (document.activeElement !== panels.input && !panels.buttonBar.contains(document.activeElement)) {
+                return;
+            }
+
             inputBox.focus();
 
             if (button.textOp) {
@@ -1631,7 +1637,7 @@
             var that = this;
             // The function to be executed when you enter a link and press OK or Cancel.
             // Marks up the link and adds the ref.
-            var linkEnteredCallback = function (link) {
+            var linkEnteredCallback = function (link, title) {
 
                 if (link !== null) {
                     // (                          $1
@@ -1662,10 +1668,10 @@
 
                     if (!chunk.selection) {
                         if (isImage) {
-                            chunk.selection = "enter image description here";
+                            chunk.selection = title || "enter image description here";
                         }
                         else {
-                            chunk.selection = "enter link description here";
+                            chunk.selection = title || "enter link description here";
                         }
                     }
                 }
@@ -1678,7 +1684,8 @@
                     ui.prompt('Insert Image', imageDialogText, imageDefaultText, linkEnteredCallback);
             }
             else {
-                ui.prompt('Insert Link', linkDialogText, linkDefaultText, linkEnteredCallback);
+                if (!this.hooks.insertLinkDialog(linkEnteredCallback))
+                    ui.prompt('Insert Link', linkDialogText, linkDefaultText, linkEnteredCallback);
             }
             return true;
         }

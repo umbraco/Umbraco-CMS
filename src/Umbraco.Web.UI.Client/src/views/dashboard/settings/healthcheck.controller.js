@@ -1,4 +1,4 @@
-(function() {
+(function () {
     "use strict";
 
     function HealthCheckController($scope, healthCheckResource) {
@@ -22,7 +22,7 @@
 
         // Get a (grouped) list of all health checks
         healthCheckResource.getAllChecks()
-            .then(function(response) {
+            .then(function (response) {
                 vm.groups = response;
             });
 
@@ -33,11 +33,11 @@
             var totalInfo = 0;
 
             // count total number of statusses
-            angular.forEach(group.checks,
-                function(check) {
-                    angular.forEach(check.status,
-                        function(status) {
-                            switch (status.resultType) {
+            Utilities.forEach(group.checks, check => {
+
+                if (check.status) {
+                    check.status.forEach(status => {
+                        switch (status.resultType) {
                             case SUCCESS:
                                 totalSuccess = totalSuccess + 1;
                                 break;
@@ -50,9 +50,10 @@
                             case INFO:
                                 totalInfo = totalInfo + 1;
                                 break;
-                            }
-                        });
-                });
+                        }
+                    });
+                }
+            });
 
             group.totalSuccess = totalSuccess;
             group.totalError = totalError;
@@ -66,7 +67,7 @@
             check.loading = true;
             check.status = null;
             healthCheckResource.getStatus(check.id)
-                .then(function(response) {
+                .then(function (response) {
                     check.loading = false;
                     check.status = response;
                 });
@@ -75,7 +76,7 @@
         function executeAction(check, index, action) {
             check.loading = true;
             healthCheckResource.executeAction(action)
-                .then(function(response) {
+                .then(function (response) {
                     check.status[index] = response;
                     check.loading = false;
                 });
@@ -94,13 +95,12 @@
             group.checkCounter = 0;
             group.loading = true;
 
-            angular.forEach(checks,
-                function(check) {
-
+            if (checks) {
+                checks.forEach(check => {
                     check.loading = true;
 
                     healthCheckResource.getStatus(check.id)
-                        .then(function(response) {
+                        .then(function (response) {
                             check.status = response;
                             group.checkCounter = group.checkCounter + 1;
                             check.loading = false;
@@ -112,6 +112,7 @@
                             }
                         });
                 });
+            }
         }
 
         function openGroup(group) {

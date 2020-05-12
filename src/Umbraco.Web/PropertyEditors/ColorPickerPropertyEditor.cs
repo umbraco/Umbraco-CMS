@@ -4,7 +4,12 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [DataEditor(Constants.PropertyEditors.Aliases.ColorPicker, "Color Picker", "colorpicker", Icon="icon-colorpicker", Group="Pickers")]
+    [DataEditor(
+        Constants.PropertyEditors.Aliases.ColorPicker,
+        "Color Picker",
+        "colorpicker",
+        Icon = "icon-colorpicker",
+        Group = Constants.PropertyEditors.Groups.Pickers)]
     public class ColorPickerPropertyEditor : DataEditor
     {
         public ColorPickerPropertyEditor(ILogger logger)

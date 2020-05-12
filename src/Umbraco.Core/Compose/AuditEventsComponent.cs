@@ -44,21 +44,22 @@ namespace Umbraco.Core.Compose
         public void Terminate()
         { }
 
+        internal static IUser UnknownUser => new User { Id = Constants.Security.UnknownUserId, Name = Constants.Security.UnknownUserName, Email = "" };
+
         private IUser CurrentPerformingUser
         {
             get
             {
                 var identity = Thread.CurrentPrincipal?.GetUmbracoIdentity();
-                return identity == null
-                    ? new User { Id = 0, Name = "SYSTEM", Email = "" }
-                    : _userService.GetUserById(Convert.ToInt32(identity.Id));
+                var user = identity == null ? null : _userService.GetUserById(Convert.ToInt32(identity.Id));
+                return user ?? UnknownUser;
             }
         }
 
         private IUser GetPerformingUser(int userId)
         {
             var found = userId >= 0 ? _userService.GetUserById(userId) : null;
-            return found ?? new User {Id = 0, Name = "SYSTEM", Email = ""};
+            return found ?? UnknownUser;
         }
 
         private string PerformingIp

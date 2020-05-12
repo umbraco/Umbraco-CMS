@@ -89,7 +89,7 @@ namespace Umbraco.Web.Editors
             [FromUri]string[] filterContentTypes,
             [FromUri]string[] filterPropertyTypes)
         {
-            var result = PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MemberType, filterContentTypes, filterPropertyTypes)
+            var result = PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MemberType, filterContentTypes, filterPropertyTypes, false)
                 .Select(x => new
                 {
                     contentType = x.Item1,
@@ -102,7 +102,7 @@ namespace Umbraco.Web.Editors
         public MemberTypeDisplay GetEmpty()
         {
             var ct = new MemberType(-1);
-            ct.Icon = "icon-user";
+            ct.Icon = Constants.Icons.Member;
 
             var dto = Mapper.Map<IMemberType, MemberTypeDisplay>(ct);
             return dto;

@@ -9,18 +9,18 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter]
     public class MultipleTextStringValueConverter : PropertyValueConverterBase
     {
-        public override bool IsConverter(PublishedPropertyType propertyType)
+        public override bool IsConverter(IPublishedPropertyType propertyType)
             => Constants.PropertyEditors.Aliases.MultipleTextstring.Equals(propertyType.EditorAlias);
 
-        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
             => typeof (IEnumerable<string>);
 
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
         private static readonly string[] NewLineDelimiters = { "\r\n", "\r", "\n" };
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
             // data is (both in database and xml):
             // <keyFeatureList>
@@ -58,7 +58,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 : values.ToArray();
         }
 
-        public override object ConvertIntermediateToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             var d = new XmlDocument();
             var e = d.CreateElement("values");

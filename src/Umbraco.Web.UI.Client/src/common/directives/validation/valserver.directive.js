@@ -7,7 +7,7 @@
     **/
 function valServer(serverValidationManager) {
     return {
-        require: ['ngModel', '?^^umbProperty'],
+        require: ['ngModel', '?^^umbProperty', '?^^umbVariantContent'],
         restrict: "A",
         scope: {},
         link: function (scope, element, attr, ctrls) {
@@ -18,9 +18,30 @@ function valServer(serverValidationManager) {
                 //we cannot proceed, this validator will be disabled
                 return;
             }
+            
+            // optional reference to the varaint-content-controller, needed to avoid validation when the field is invariant on non-default languages.
+            var umbVariantCtrl = ctrls.length > 2 ? ctrls[2] : null;
 
             var currentProperty = umbPropCtrl.property;
             var currentCulture = currentProperty.culture;
+            var currentSegment = currentProperty.segment;
+
+            if (umbVariantCtrl) {
+                //if we are inside of an umbVariantContent directive
+
+                var currentVariant = umbVariantCtrl.editor.content;
+
+                // Lets check if we have variants and we are on the default language then ...
+                if (umbVariantCtrl.content.variants.length > 1 && (!currentVariant.language || !currentVariant.language.isDefault) && !currentCulture && !currentSegment && !currentProperty.unlockInvariantValue) {
+                    //This property is locked cause its a invariant property shown on a non-default language.
+                    //Therefor do not validate this field.
+                    return;
+                }
+            }
+                       
+            // if we have reached this part, and there is no culture, then lets fallback to invariant. To get the validation feedback for invariant language.
+            currentCulture = currentCulture || "invariant";
+            
             var watcher = null;
             var unsubscribe = [];
 
@@ -55,7 +76,7 @@ function valServer(serverValidationManager) {
                         if (modelCtrl.$invalid) {
                             modelCtrl.$setValidity('valServer', true);
                             //clear the server validation entry
-                            serverValidationManager.removePropertyError(currentProperty.alias, currentCulture, fieldName);
+                            serverValidationManager.removePropertyError(currentProperty.alias, currentCulture, fieldName, currentSegment);
                             stopWatch();
                         }
                     }, true);
@@ -70,23 +91,26 @@ function valServer(serverValidationManager) {
             }
             
             //subscribe to the server validation changes
+            function serverValidationManagerCallback(isValid, propertyErrors, allErrors) {
+                if (!isValid) {
+                    modelCtrl.$setValidity('valServer', false);
+                    //assign an error msg property to the current validator
+                    modelCtrl.errorMsg = propertyErrors[0].errorMsg;
+                    startWatch();
+                }
+                else {
+                    modelCtrl.$setValidity('valServer', true);
+                    //reset the error message
+                    modelCtrl.errorMsg = "";
+                    stopWatch();
+                }
+            }
             unsubscribe.push(serverValidationManager.subscribe(currentProperty.alias,
                 currentCulture,
                 fieldName,
-                function(isValid, propertyErrors, allErrors) {
-                    if (!isValid) {
-                        modelCtrl.$setValidity('valServer', false);
-                        //assign an error msg property to the current validator
-                        modelCtrl.errorMsg = propertyErrors[0].errorMsg;
-                        startWatch();
-                    }
-                    else {
-                        modelCtrl.$setValidity('valServer', true);
-                        //reset the error message
-                        modelCtrl.errorMsg = "";
-                        stopWatch();
-                    }
-                }));
+                serverValidationManagerCallback,
+                currentSegment)
+            );
 
             scope.$on('$destroy', function () {
                 stopWatch();

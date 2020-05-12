@@ -10,10 +10,12 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Mvc
 {
+
     /// <summary>
     /// Represents the default front-end rendering controller.
     /// </summary>
     [PreRenderViewActionFilter]
+    [ModelBindingExceptionFilter]
     public class RenderMvcController : UmbracoController, IRenderMvcController
     {
         private PublishedRequest _publishedRequest;
