@@ -50,9 +50,9 @@ namespace Umbraco.Extensions
                             var uri = context.Request.GetEncodedUrl();
                             // redirect to install
                             ReportRuntime(logger, runtime.Level, "Umbraco must install or upgrade.");
-                            
+
                             var installUrl = $"{installPath}?redir=true&url={uri}";
-                            context.Response.Redirect(installUrl, true);
+                            context.Response.Redirect(installUrl, false);
                             return Task.CompletedTask;
                         });
 
