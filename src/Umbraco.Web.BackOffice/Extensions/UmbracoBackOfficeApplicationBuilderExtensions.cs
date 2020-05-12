@@ -18,6 +18,10 @@ namespace Umbraco.Web.BackOffice.Extensions
                 // TODO: This is temporary, 'umbraco' cannot be hard coded, needs to use GetUmbracoMvcArea()
                 // but actually we need to route all back office stuff in a back office area like we do in v8
 
+                // TODO: We will also need to detect runtime state here and redirect to the installer,
+                // Potentially switch this to dynamic routing so we can essentially disable/overwrite the back office routes to redirect to install
+                // when required, example https://www.strathweb.com/2019/08/dynamic-controller-routing-in-asp-net-core-3-0/
+
                 endpoints.MapControllerRoute("Backoffice", "/umbraco/{Action}", new
                 {
                     Controller = "BackOffice",

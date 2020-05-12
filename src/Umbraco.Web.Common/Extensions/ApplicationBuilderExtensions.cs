@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog.Context;
@@ -11,6 +12,7 @@ using Umbraco.Web.Common.Middleware;
 
 namespace Umbraco.Extensions
 {
+
     public static class ApplicationBuilderExtensions
     {
         /// <summary>
@@ -25,24 +27,7 @@ namespace Umbraco.Extensions
             return runtime.State.Level > RuntimeLevel.BootFailed;
         }
 
-        /// <summary>
-        /// Enables the Umbraco installer
-        /// </summary>
-        /// <param name="app"></param>
-        /// <returns></returns>
-        public static IApplicationBuilder UseUmbracoInstaller(this IApplicationBuilder app)
-        {
-            app.UseEndpoints(endpoints =>
-            {
-                // TODO: Fix this routing with an area
-                endpoints.MapControllerRoute("Install", "/install/{controller}/{Action}", defaults: new { Area = "Install" });
-
-                //TODO register routing correct: Name must be like this
-                endpoints.MapControllerRoute("umbraco-api-UmbracoInstall-InstallApi", "/install/api/{Action}", defaults: new { Area = "Install", Controller = "InstallApi" });
-            });
-
-            return app;
-        }
+        
 
         /// <summary>
         /// Start Umbraco
