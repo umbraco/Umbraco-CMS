@@ -5,23 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.ModelBinding;
 
 namespace Umbraco.Web.Common.ApplicationModels
 {
-    public class NewtonsoftJsonModelBinderConvention : IActionModelConvention
-    {
-        public void Apply(ActionModel action)
-        {
-            foreach(var p in action.Parameters)
-            {
-                if (p.BindingInfo?.BindingSource == BindingSource.Body)
-                {
-                    p.BindingInfo.BinderType = typeof(UmbracoJsonModelBinder);
-                }
-            }
-        }
-    }
 
     /// <summary>
     /// A custom application model provider for Umbraco controllers
@@ -33,6 +19,10 @@ namespace Umbraco.Web.Common.ApplicationModels
     /// <para>
     /// This is nearly a copy of aspnetcore's ApiBehaviorApplicationModelProvider which supplies a convention for the
     /// [ApiController] attribute, however that convention is too strict for our purposes so we will have our own.
+    /// </para>
+    /// <para>
+    /// See https://shazwazza.com/post/custom-body-model-binding-per-controller-in-asp-net-core/
+    /// and https://github.com/dotnet/aspnetcore/issues/21724
     /// </para>
     /// </remarks>
     public class UmbracoApiBehaviorApplicationModelProvider : IApplicationModelProvider
@@ -50,7 +40,9 @@ namespace Umbraco.Web.Common.ApplicationModels
                 new ConsumesConstraintForFormFileParameterConvention(), // If an controller accepts files, it must accept multipart/form-data.
                 new InferParameterBindingInfoConvention(modelMetadataProvider), // no need for [FromBody] everywhere, A complex type parameter is assigned to FromBody
 
-                new NewtonsoftJsonModelBinderConvention()
+                // This ensures that all parameters of type BindingSource.Body (based on the above InferParameterBindingInfoConvention) are bound
+                // using our own UmbracoJsonModelBinder
+                new UmbracoJsonModelBinderConvention()
             };
 
             // TODO: Need to determine exactly how this affects errors

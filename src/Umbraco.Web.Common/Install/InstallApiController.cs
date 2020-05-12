@@ -34,12 +34,10 @@ namespace Umbraco.Web.Common.Install
         private readonly ILogger _logger;
         private readonly IProfilingLogger _proflog;
 
-        public InstallApiController(UmbracoJsonModelBinderFactory modelBinderFactory, DatabaseBuilder databaseBuilder, IProfilingLogger proflog,
+        public InstallApiController(DatabaseBuilder databaseBuilder, IProfilingLogger proflog,
             InstallHelper installHelper, InstallStepCollection installSteps, InstallStatusTracker installStatusTracker,
             IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
-            ModelBinderFactory = modelBinderFactory;
-
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
             _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _installSteps = installSteps;

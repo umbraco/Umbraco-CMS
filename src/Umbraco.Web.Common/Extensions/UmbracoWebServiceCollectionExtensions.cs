@@ -34,9 +34,7 @@ namespace Umbraco.Extensions
         public static IServiceCollection AddUmbracoWebComponents(this IServiceCollection services)
         {
             services.TryAddSingleton<UmbracoJsonModelBinder>();
-            services.TryAddSingleton<UmbracoJsonModelBinderProvider>();
-            services.TryAddSingleton<UmbracoJsonModelBinderFactory>();
-            //services.ConfigureOptions<UmbracoMvcConfigureOptions>();
+            services.ConfigureOptions<UmbracoMvcConfigureOptions>();
             services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoApiBehaviorApplicationModelProvider>());
 
             // TODO: We need to avoid this, surely there's a way? See ContainerTests.BuildServiceProvider_Before_Host_Is_Configured
@@ -118,7 +116,7 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
-        /// Options for configuring MVC 
+        /// Options for globally configuring MVC for Umbraco
         /// </summary>
         /// <remarks>
         /// We generally don't want to change the global MVC settings since we want to be unobtrusive as possible but some
@@ -126,22 +124,16 @@ namespace Umbraco.Extensions
         /// </remarks>
         private class UmbracoMvcConfigureOptions : IConfigureOptions<MvcOptions>
         {
-            private readonly IHttpRequestStreamReaderFactory _readerFactory;
-            private readonly ILoggerFactory _logger;
-            private readonly ArrayPool<char> _arrayPool;
-            private readonly ObjectPoolProvider _objectPoolProvider;
 
-            public UmbracoMvcConfigureOptions(IHttpRequestStreamReaderFactory readerFactory, ILoggerFactory logger, ArrayPool<char> arrayPool, ObjectPoolProvider objectPoolProvider)
-            {
-                _readerFactory = readerFactory;
-                _logger = logger;
-                _arrayPool = arrayPool;
-                _objectPoolProvider = objectPoolProvider;
+            // TODO: we can inject params with DI here
+            public UmbracoMvcConfigureOptions()
+            {                
             }
 
+            // TODO: we can configure global mvc options here if we need to
             public void Configure(MvcOptions options)
             {                
-                options.ModelBinderProviders.Insert(0, new UmbracoJsonModelBinderProvider(_readerFactory, _logger, _arrayPool, _objectPoolProvider));
+                
             }
         }
 
