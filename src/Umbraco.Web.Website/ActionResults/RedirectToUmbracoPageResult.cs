@@ -161,7 +161,8 @@ namespace Umbraco.Web.Website.ActionResults
                                                        _queryStringValues.AllKeys.Select(x => x + "=" + HttpUtility.UrlEncode(_queryStringValues[x])));
             }
 
-            var tempData = httpContext.RequestServices.GetRequiredService<ITempDataDictionary>();
+            var tempDataDictionaryFactory = context.HttpContext.RequestServices.GetRequiredService<ITempDataDictionaryFactory>();
+            var tempData = tempDataDictionaryFactory.GetTempData(context.HttpContext);
             tempData?.Keep();
 
             httpContext.Response.Redirect(destinationUrl);
