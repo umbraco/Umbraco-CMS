@@ -13,6 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Views\" />
       <Folder Include="wwwroot\Media" />
       <Folder Include="wwwroot\Umbraco\views\install" />
     </ItemGroup>
@@ -40,7 +41,7 @@
         <Content Remove="wwwroot\Umbraco\views\install\continueinstall.html" />
         <Content Remove="wwwroot\Umbraco\views\install\database.html" />
         <Content Remove="wwwroot\Umbraco\views\install\error.html" />
-        <Content Update="Views\Install\Index.cshtml">
+        <Content Update="Areas\UmbracoInstall\Views\Install\Index.cshtml">
           <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
           <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>

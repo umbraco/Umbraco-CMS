@@ -117,7 +117,7 @@ namespace Umbraco.Core
                                     .TrimStart("/");
 
             //check if this is in the umbraco back office
-            return afterAuthority.InvariantStartsWith(hostingEnvironment.ToAbsolute("~/install").TrimStart("/"));
+            return afterAuthority.InvariantStartsWith(hostingEnvironment.ToAbsolute(Constants.SystemDirectories.Install).TrimStart("/"));
         }
 
         /// <summary>

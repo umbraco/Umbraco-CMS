@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Integration
 
             // LightInject / Umbraco
             var container = UmbracoServiceProviderFactory.CreateServiceContainer();
-            var serviceProviderFactory = new UmbracoServiceProviderFactory(container);
+            var serviceProviderFactory = new UmbracoServiceProviderFactory(container, false);
             var umbracoContainer = serviceProviderFactory.GetContainer();
             serviceProviderFactory.CreateBuilder(services); // called during Host Builder, needed to capture services
 
