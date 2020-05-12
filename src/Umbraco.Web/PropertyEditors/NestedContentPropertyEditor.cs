@@ -290,7 +290,7 @@ namespace Umbraco.Web.PropertyEditors
                     {
                         foreach (var result in validator.Validate(row.JsonRowValue[row.PropKey], propertyEditor.GetValueEditor().ValueType, config))
                         {
-                            result.ErrorMessage = "Item " + (row.RowIndex + 1) + " '" + row.PropType.Name + "' " + result.ErrorMessage;
+                            result.ErrorMessage = "Item " + (row.RowIndex + 1) + " '" + _textService.UmbracoDictionaryTranslate(row.PropType.Name) + "' " + result.ErrorMessage;
                             validationResults.Add(result);
                         }
                     }
@@ -301,7 +301,7 @@ namespace Umbraco.Web.PropertyEditors
                         if (row.JsonRowValue[row.PropKey] == null)
                         {
                             var message = string.IsNullOrWhiteSpace(row.PropType.MandatoryMessage)
-                                                      ? $"'{row.PropType.Name}' cannot be null"
+                                                      ? $"'{_textService.UmbracoDictionaryTranslate(row.PropType.Name)}' cannot be null"
                                                       : row.PropType.MandatoryMessage;
                             validationResults.Add(new ValidationResult($"Item {(row.RowIndex + 1)}: {message}", new[] { row.PropKey }));
                         }                            
@@ -322,7 +322,7 @@ namespace Umbraco.Web.PropertyEditors
                         if (!regex.IsMatch(row.JsonRowValue[row.PropKey].ToString()))
                         {
                             var message = string.IsNullOrWhiteSpace(row.PropType.ValidationRegExpMessage)
-                                                      ? $"'{row.PropType.Name}' is invalid, it does not match the correct pattern"
+                                                      ? $"'{_textService.UmbracoDictionaryTranslate(row.PropType.Name)}' is invalid, it does not match the correct pattern"
                                                       : row.PropType.ValidationRegExpMessage;
                            validationResults.Add(new ValidationResult($"Item {(row.RowIndex + 1)}: {message}", new[] { row.PropKey }));
                         }
