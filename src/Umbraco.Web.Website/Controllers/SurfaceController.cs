@@ -48,18 +48,18 @@ namespace Umbraco.Web.Website.Controllers
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(int pageId)
         {
-            return new RedirectToUmbracoPageResult(pageId, _publishedUrlProvider);
+            return new RedirectToUmbracoPageResult(pageId, _publishedUrlProvider, UmbracoContextAccessor);
         }
 
         /// <summary>
-        /// Redirects to the Umbraco page with the given id and passes provided querystring 
+        /// Redirects to the Umbraco page with the given id and passes provided querystring
         /// </summary>
         /// <param name="pageId"></param>
         /// <param name="queryStringValues"></param>
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(int pageId, NameValueCollection queryStringValues)
         {
-            return new RedirectToUmbracoPageResult(pageId, queryStringValues, _publishedUrlProvider);
+            return new RedirectToUmbracoPageResult(pageId, queryStringValues, _publishedUrlProvider, UmbracoContextAccessor);
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Umbraco.Web.Website.Controllers
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(int pageId, string queryString)
         {
-            return new RedirectToUmbracoPageResult(pageId, queryString, _publishedUrlProvider);
+            return new RedirectToUmbracoPageResult(pageId, queryString, _publishedUrlProvider, UmbracoContextAccessor);
         }
 
         /// <summary>

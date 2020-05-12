@@ -66,10 +66,11 @@ namespace Umbraco.Web.Website.ActionResults
         /// </summary>
         /// <param name="pageId"></param>
         /// <param name="publishedUrlProvider"></param>
-        public RedirectToUmbracoPageResult(int pageId, IPublishedUrlProvider publishedUrlProvider)
+        public RedirectToUmbracoPageResult(int pageId, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _pageId = pageId;
             _publishedUrlProvider = publishedUrlProvider;
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         /// <summary>
@@ -78,11 +79,12 @@ namespace Umbraco.Web.Website.ActionResults
         /// <param name="pageId"></param>
         /// <param name="queryStringValues"></param>
         /// <param name="publishedUrlProvider"></param>
-        public RedirectToUmbracoPageResult(int pageId, NameValueCollection queryStringValues, IPublishedUrlProvider publishedUrlProvider)
+        public RedirectToUmbracoPageResult(int pageId, NameValueCollection queryStringValues, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _pageId = pageId;
             _queryStringValues = queryStringValues;
             _publishedUrlProvider = publishedUrlProvider;
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         /// <summary>
@@ -91,11 +93,12 @@ namespace Umbraco.Web.Website.ActionResults
         /// <param name="pageId"></param>
         /// <param name="queryString"></param>
         /// <param name="publishedUrlProvider"></param>
-        public RedirectToUmbracoPageResult(int pageId, string queryString, IPublishedUrlProvider publishedUrlProvider)
+        public RedirectToUmbracoPageResult(int pageId, string queryString, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _pageId = pageId;
             _queryStringValues = ParseQueryString(queryString);
             _publishedUrlProvider = publishedUrlProvider;
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         /// <summary>

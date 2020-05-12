@@ -32,7 +32,8 @@ namespace Umbraco.Web.Website.ActionResults
             if (context is null) throw new ArgumentNullException(nameof(context));
 
             var destinationUrl = _umbracoContext.OriginalRequestUrl.PathAndQuery;
-            var  tempData = context.HttpContext.RequestServices.GetRequiredService<ITempDataDictionary>();
+            var tempDataDictionaryFactory = context.HttpContext.RequestServices.GetRequiredService<ITempDataDictionaryFactory>();
+            var tempData = tempDataDictionaryFactory.GetTempData(context.HttpContext);
             tempData?.Keep();
 
             context.HttpContext.Response.Redirect(destinationUrl);
