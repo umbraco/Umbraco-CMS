@@ -12,8 +12,8 @@ using Umbraco.Web.Common.Macros;
 using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.Macros;
 using Umbraco.Core.Diagnostics;
-using Umbraco.Web.Common.Runtime.Profiler;
 using Umbraco.Core.Logging;
+using Umbraco.Web.Common.Profiler;
 
 namespace Umbraco.Web.Common.Runtime
 {

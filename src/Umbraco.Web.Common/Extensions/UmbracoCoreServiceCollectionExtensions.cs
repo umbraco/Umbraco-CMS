@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
@@ -13,8 +12,6 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Extensions.Hosting;
 using Serilog.Extensions.Logging;
-using Smidge;
-using Smidge.Nuglify;
 using Umbraco.Composing;
 using Umbraco.Configuration;
 using Umbraco.Core;
@@ -28,12 +25,19 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.Common.AspNetCore;
-using Umbraco.Web.Common.Runtime.Profiler;
+using Umbraco.Web.Common.Profiler;
 
 namespace Umbraco.Extensions
 {
+
+
     public static class UmbracoCoreServiceCollectionExtensions
     {
+        /// <summary>
+        /// Adds SqlCe support for Umbraco
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         public static IServiceCollection AddUmbracoSqlCeSupport(this IServiceCollection services)
         {
             try
@@ -60,7 +64,7 @@ namespace Umbraco.Extensions
                     var sqlCe = sqlCeAssembly.GetType("System.Data.SqlServerCe.SqlCeProviderFactory");
                     if (!(sqlCe is null))
                     {
-                        DbProviderFactories.RegisterFactory(Core.Constants.DbProviderNames.SqlCe, sqlCe );
+                        DbProviderFactories.RegisterFactory(Core.Constants.DbProviderNames.SqlCe, sqlCe);
                     }
                 }
             }
@@ -72,6 +76,11 @@ namespace Umbraco.Extensions
             return services;
         }
 
+        /// <summary>
+        /// Adds Sql Server support for Umbraco
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         public static IServiceCollection AddUmbracoSqlServerSupport(this IServiceCollection services)
         {
             DbProviderFactories.RegisterFactory(Core.Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
@@ -102,7 +111,6 @@ namespace Umbraco.Extensions
             return services;
         }
 
-
         /// <summary>
         /// Adds the Umbraco Back Core requirements
         /// </summary>
@@ -111,7 +119,7 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment)
         {
-            return services.AddUmbracoCore(webHostEnvironment,out _);
+            return services.AddUmbracoCore(webHostEnvironment, out _);
         }
 
         /// <summary>
@@ -198,7 +206,7 @@ namespace Umbraco.Extensions
                 configs,
                 webHostEnvironment,
                 loggingConfiguration,
-                out var logger,  out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
+                out var logger, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
 
             var globalSettings = configs.Global();
             var umbracoVersion = new UmbracoVersion(globalSettings);
@@ -219,8 +227,7 @@ namespace Umbraco.Extensions
             factory = coreRuntime.Configure(container);
 
             return services;
-        }
-
+        }        
 
         private static ITypeFinder CreateTypeFinder(Core.Logging.ILogger logger, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, ITypeFinderSettings typeFinderSettings)
         {
@@ -322,15 +329,6 @@ namespace Umbraco.Extensions
             return logger;
         }
 
-        public static IServiceCollection AddUmbracoRuntimeMinifier(this IServiceCollection services,
-            IConfiguration configuration)
-        {
-            services.AddSmidge(configuration.GetSection(Core.Constants.Configuration.ConfigRuntimeMinification));
-            services.AddSmidgeNuglify();
-
-            return services;
-        }
-
         private static IProfiler GetWebProfiler(Umbraco.Core.Hosting.IHostingEnvironment hostingEnvironment)
         {
             // create and start asap to profile boot
@@ -346,6 +344,7 @@ namespace Umbraco.Extensions
 
             return webProfiler;
         }
+
         private class AspNetCoreBootPermissionsChecker : IUmbracoBootPermissionChecker
         {
             public void ThrowIfNotPermissions()
@@ -353,7 +352,6 @@ namespace Umbraco.Extensions
                 // nothing to check
             }
         }
-
 
     }
 

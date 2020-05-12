@@ -336,7 +336,11 @@ angular.module("umbraco.install").factory('installerService', function ($rootSco
         if (status >= 500 && status < 600) {
             service.status.current = { view: "ysod", model: null };
             var ysod = data;
-            //we need to manually write the html to the iframe - the html contains full html markup
+            //we need to manually write the html to the iframe
+            // TODO: In dotnetcore the resulting YSOD isn't HTML, the error is just a string so it looks ugly
+            // So we shouldn't be using an iframe and will need to change this so that we have an unhandled exception filter for the installer (and eventually
+            // the rest of the back office) to handle errors and chuck the data into a json format for us to use.
+            // It might turn out that our new Api Convention `UmbracoApiBehaviorApplicationModelProvider` might handle this for us with it's custom error handling.
             $timeout(function () {
                 document.getElementById('ysod').contentDocument.write(ysod);
             }, 500);

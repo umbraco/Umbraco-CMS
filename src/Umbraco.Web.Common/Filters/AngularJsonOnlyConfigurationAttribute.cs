@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Web.Common.Formatters;
 
-namespace Umbraco.Web.Common.Attributes
+namespace Umbraco.Web.Common.Filters
 {
     /// <summary>
     /// Applying this attribute to any controller will ensure that it only contains one json formatter compatible with the angular json vulnerability prevention.
@@ -38,4 +38,5 @@ namespace Umbraco.Web.Common.Attributes
             base.OnResultExecuting(context);
         }
     }
+
 }

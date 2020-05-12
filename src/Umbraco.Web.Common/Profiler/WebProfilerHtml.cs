@@ -5,8 +5,7 @@ using StackExchange.Profiling;
 using StackExchange.Profiling.Internal;
 using Umbraco.Core.Logging;
 
-// TODO: This namespace is strange, not sure why i has "Runtime" in the name?
-namespace Umbraco.Web.Common.Runtime.Profiler
+namespace Umbraco.Web.Common.Profiler
 {
     public class WebProfilerHtml : IProfilerHtml
     {
