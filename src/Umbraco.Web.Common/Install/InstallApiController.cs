@@ -24,7 +24,7 @@ namespace Umbraco.Web.Common.Install
     [TypeFilter(typeof(HttpResponseExceptionFilter))]
     [TypeFilter(typeof(AngularJsonOnlyConfigurationAttribute))]
     [HttpInstallAuthorize]
-    [Area("Install")]
+    [Area(Umbraco.Core.Constants.Web.Mvc.InstallArea)]
     public class InstallApiController : ControllerBase
     {
         private readonly DatabaseBuilder _databaseBuilder;

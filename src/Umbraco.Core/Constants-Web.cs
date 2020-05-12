@@ -49,6 +49,11 @@
             /// The default authentication type used for remembering that 2FA is not needed on next login
             /// </summary>
             public const string TwoFactorRememberBrowserCookie = "TwoFactorRememberBrowser";
+
+            public static class Mvc
+            {
+                public const string InstallArea = "UmbracoInstall";
+            }
         }
     }
 }

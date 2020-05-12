@@ -27,11 +27,19 @@ namespace Umbraco.Extensions
                     case RuntimeLevel.Install:
                     case RuntimeLevel.Upgrade:
 
-                        // TODO: Fix this routing with an area
-                        endpoints.MapControllerRoute("Install", "/install/{controller}/{Action}", defaults: new { Area = "Install" });
+                        var installPath = uriUtility.ToAbsolute(Constants.SystemDirectories.Install).EnsureEndsWith('/');
 
-                        // TODO register routing correct: Name must be like this
-                        endpoints.MapControllerRoute("umbraco-api-UmbracoInstall-InstallApi", "/install/api/{Action}", defaults: new { Area = "Install", Controller = "InstallApi" });
+                        endpoints.MapAreaControllerRoute(
+                            "umbraco-install-api",
+                            Umbraco.Core.Constants.Web.Mvc.InstallArea,
+                            $"{installPath}api/{{Action}}",
+                            new { controller = "InstallApi" });
+
+                        endpoints.MapAreaControllerRoute(
+                            "umbraco-install",
+                            Umbraco.Core.Constants.Web.Mvc.InstallArea,
+                            $"{installPath}{{controller}}/{{Action}}",
+                            new { controller = "Install", action = "Index" });
 
                         // TODO: Potentially switch this to dynamic routing so we can essentially disable/overwrite the back office routes to redirect to install,
                         // example https://www.strathweb.com/2019/08/dynamic-controller-routing-in-asp-net-core-3-0/
@@ -42,8 +50,8 @@ namespace Umbraco.Extensions
                             var uri = context.Request.GetEncodedUrl();
                             // redirect to install
                             ReportRuntime(logger, runtime.Level, "Umbraco must install or upgrade.");
-                            var installPath = uriUtility.ToAbsolute(Constants.SystemDirectories.Install);
-                            var installUrl = $"{installPath}/?redir=true&url={uri}";
+                            
+                            var installUrl = $"{installPath}?redir=true&url={uri}";
                             context.Response.Redirect(installUrl, true);
                             return Task.CompletedTask;
                         });

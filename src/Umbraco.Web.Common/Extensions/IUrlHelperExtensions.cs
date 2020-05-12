@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Extensions;
 using Umbraco.Web.WebApi;
+using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace Umbraco.Extensions
 {
@@ -101,30 +102,26 @@ namespace Umbraco.Extensions
             if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
             if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
 
-            string routeName;
             if (area.IsNullOrWhiteSpace())
             {
-                routeName = string.Format("umbraco-{0}-{1}", "api", controllerName);
                 if (id == null)
                 {
-
-                    return url.RouteUrl(routeName, new { controller = controllerName, action = actionName, httproute = "" });
+                    return url.Action(actionName, controllerName);
                 }
                 else
                 {
-                    return url.RouteUrl(routeName, new { controller = controllerName, action = actionName, id = id, httproute = "" });
+                    return url.Action(actionName, controllerName, new { id = id });
                 }
             }
             else
             {
-                routeName = string.Format("umbraco-{0}-{1}-{2}", "api", area, controllerName);
                 if (id == null)
                 {
-                    return url.RouteUrl(routeName, new { controller = controllerName, action = actionName, httproute = "" });
+                    return url.Action(actionName, controllerName, new { area = area });
                 }
                 else
                 {
-                    return url.RouteUrl(routeName, new { controller = controllerName, action = actionName, id = id, httproute = "" });
+                    return url.Action(actionName, controllerName, new { area = area, id = id });
                 }
             }
         }
