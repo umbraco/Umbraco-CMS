@@ -1,21 +1,42 @@
+﻿using System.Buffers;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
+using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp.Memory;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
-
+using Smidge;
+using Smidge.Nuglify;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Web.Common.ApplicationModels;
+using Umbraco.Web.Common.ModelBinding;
 
-namespace Umbraco.Web.Website.AspNetCore
+namespace Umbraco.Extensions
 {
-    public static class UmbracoBackOfficeServiceCollectionExtensions
+    public static class UmbracoWebServiceCollectionExtensions
     {
-        public static IServiceCollection AddUmbracoWebsite(this IServiceCollection services)
+        /// <summary>
+        /// Registers the web components needed for Umbraco
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddUmbracoWebComponents(this IServiceCollection services)
         {
+            services.TryAddSingleton<UmbracoJsonModelBinder>();
+            services.ConfigureOptions<UmbracoMvcConfigureOptions>();
+            services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoApiBehaviorApplicationModelProvider>());
+
             // TODO: We need to avoid this, surely there's a way? See ContainerTests.BuildServiceProvider_Before_Host_Is_Configured
             var serviceProvider = services.BuildServiceProvider();
             var configs = serviceProvider.GetService<Configs>();
@@ -25,10 +46,14 @@ namespace Umbraco.Web.Website.AspNetCore
             return services;
         }
 
+        /// <summary>
+        /// Adds Image Sharp with Umbraco settings
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="imagingSettings"></param>
+        /// <returns></returns>
         public static IServiceCollection AddUmbracoImageSharp(this IServiceCollection services, IImagingSettings imagingSettings)
         {
-
-
             services.AddImageSharpCore(
                     options =>
                     {
@@ -61,6 +86,21 @@ namespace Umbraco.Web.Website.AspNetCore
             return services;
         }
 
+        /// <summary>
+        /// Adds the Umbraco runtime minifier
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddUmbracoRuntimeMinifier(this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            services.AddSmidge(configuration.GetSection(Core.Constants.Configuration.ConfigRuntimeMinification));
+            services.AddSmidgeNuglify();
+
+            return services;
+        }
+
         private static void RemoveIntParamenterIfValueGreatherThen(IDictionary<string, string> commands, string parameter, int maxValue)
         {
             if (commands.TryGetValue(parameter, out var command))
@@ -74,6 +114,30 @@ namespace Umbraco.Web.Website.AspNetCore
                 }
             }
         }
+
+        /// <summary>
+        /// Options for globally configuring MVC for Umbraco
+        /// </summary>
+        /// <remarks>
+        /// We generally don't want to change the global MVC settings since we want to be unobtrusive as possible but some
+        /// global mods are needed - so long as they don't interfere with normal user usages of MVC.
+        /// </remarks>
+        private class UmbracoMvcConfigureOptions : IConfigureOptions<MvcOptions>
+        {
+
+            // TODO: we can inject params with DI here
+            public UmbracoMvcConfigureOptions()
+            {                
+            }
+
+            // TODO: we can configure global mvc options here if we need to
+            public void Configure(MvcOptions options)
+            {                
+                
+            }
+        }
+
+
     }
 
 }

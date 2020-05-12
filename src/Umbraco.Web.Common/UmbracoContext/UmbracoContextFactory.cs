@@ -6,6 +6,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Umbraco.Web.Common.Security;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security;
 
@@ -16,8 +17,6 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoContextFactory : IUmbracoContextFactory
     {
-        private static readonly NullWriter NullWriterInstance = new NullWriter();
-
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IVariationContextAccessor _variationContextAccessor;
@@ -73,7 +72,7 @@ namespace Umbraco.Web
                 _variationContextAccessor.VariationContext = new VariationContext(_defaultCultureAccessor.DefaultCulture);
             }
 
-            IWebSecurity webSecurity = null; // TODO, we need to when users are migrated
+            IWebSecurity webSecurity = new WebSecurity();
 
             return new UmbracoContext(
                 _publishedSnapshotService,

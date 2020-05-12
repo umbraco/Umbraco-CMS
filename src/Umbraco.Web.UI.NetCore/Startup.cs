@@ -54,20 +54,10 @@ namespace Umbraco.Web.UI.BackOffice
         {   
             services.AddUmbracoConfiguration(_config);            
             services.AddUmbracoCore(_env, out var factory);
-            services.AddUmbracoWebsite();
+            services.AddUmbracoWebComponents();
             services.AddUmbracoRuntimeMinifier(_config);
 
-            services.AddMvc(options =>
-            {
-                options.Filters.Add<HttpResponseExceptionFilter>();
-
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
-                .AddNewtonsoftJson(options =>
-                {
-                    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-
-                })
-            ;
+            services.AddMvc();
 
             services.AddMiniProfiler(options =>
             {
@@ -97,19 +87,24 @@ namespace Umbraco.Web.UI.BackOffice
         public void Configure(IApplicationBuilder app)
         {
 
-            //app.UseMiniProfiler();
-            app.UseUmbracoRequestLifetime();
+            //app.UseMiniProfiler();            
             if (_env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
             app.UseStatusCodePages();
+            app.UseRouting();
+
+
+            app.UseUmbracoRouting();
             app.UseUmbracoCore();
             app.UseUmbracoRequestLogging();
             app.UseUmbracoWebsite();
-            app.UseUmbracoBackOffice();
-            app.UseRouting();
+            app.UseUmbracoBackOffice();            
             app.UseUmbracoRuntimeMinification();
+
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute("Backoffice", "/umbraco/{Action}", new
@@ -118,7 +113,7 @@ namespace Umbraco.Web.UI.BackOffice
                     Action = "Default"
                 });
 
-
+                // TODO: Fix this routing with an area
                 endpoints.MapControllerRoute("Install", "/install/{controller}/{Action}", defaults:new { Area = "Install"});
 
                 //TODO register routing correct: Name must be like this

@@ -7,8 +7,13 @@ using Umbraco.Web.Common.Middleware;
 
 namespace Umbraco.Extensions
 {
-    public static class UmbracoCommonApplicationBuilderExtensions
+    public static class ApplicationBuilderExtensions
     {
+        /// <summary>
+        /// Returns true if Umbraco <see cref="IRuntimeState"/> is greater than <see cref="RuntimeLevel.BootFailed"/>
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns></returns>
         public static bool UmbracoCanBoot(this IApplicationBuilder app)
         {
             var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
@@ -16,8 +21,13 @@ namespace Umbraco.Extensions
             return runtime.State.Level > RuntimeLevel.BootFailed;
         }
 
+        /// <summary>
+        /// Enables middlewares required to run Umbraco
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns></returns>
         // TODO: Could be internal or part of another call - this is a required system so should't be 'opt-in'
-        public static IApplicationBuilder UseUmbracoRequestLifetime(this IApplicationBuilder app)
+        public static IApplicationBuilder UseUmbracoRouting(this IApplicationBuilder app)
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
 

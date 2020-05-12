@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -11,15 +12,20 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Net;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
+using Umbraco.Web.Common.Filters;
+using Umbraco.Web.Common.ModelBinding;
 using Umbraco.Web.Install;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Common.Install
 {
+
+    [UmbracoApiController]
+    [TypeFilter(typeof(HttpResponseExceptionFilter))]
     [TypeFilter(typeof(AngularJsonOnlyConfigurationAttribute))]
     [HttpInstallAuthorize]
     [Area("Install")]
-    public class InstallApiController : Controller
+    public class InstallApiController : ControllerBase
     {
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly InstallStatusTracker _installStatusTracker;
@@ -40,6 +46,7 @@ namespace Umbraco.Web.Common.Install
             InstallHelper = installHelper;
             _logger = _proflog;
         }
+
 
         internal InstallHelper InstallHelper { get; }
 
@@ -88,9 +95,8 @@ namespace Umbraco.Web.Common.Install
 
         /// <summary>
         ///     Installs.
-        /// </summary>
-        [HttpPost]
-        public async Task<InstallProgressResultModel> PostPerformInstall([FromBody] InstallInstructions installModel)
+        /// </summary>        
+        public async Task<InstallProgressResultModel> PostPerformInstall(InstallInstructions installModel)
         {
             if (installModel == null) throw new ArgumentNullException(nameof(installModel));
 

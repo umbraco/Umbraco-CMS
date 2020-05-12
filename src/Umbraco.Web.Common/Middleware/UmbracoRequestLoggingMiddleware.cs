@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Serilog.Context;
-using Umbraco.Core.Cache;
+using Umbraco.Core;
 using Umbraco.Core.Logging.Serilog.Enrichers;
-using Umbraco.Net;
 
 namespace Umbraco.Web.Common.Middleware
 {
@@ -27,6 +28,13 @@ namespace Umbraco.Web.Common.Middleware
 
         public async Task Invoke(HttpContext httpContext)
         {
+            // do not process if client-side request
+            if (new Uri(httpContext.Request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsClientSideRequest())
+            {
+                await _next(httpContext);
+                return;
+            }
+
             // TODO: Need to decide if we want this stuff still, there's new request logging in serilog:
             // https://github.com/serilog/serilog-aspnetcore#request-logging which i think would suffice and replace all of this?
 

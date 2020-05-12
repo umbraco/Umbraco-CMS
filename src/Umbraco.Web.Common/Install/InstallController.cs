@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
@@ -11,6 +12,7 @@ using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Common.Install
 {
+
     /// <summary>
     /// The MVC Installation controller
     /// </summary>
@@ -49,7 +51,7 @@ namespace Umbraco.Web.Common.Install
         [HttpGet]
         [StatusCodeResult(System.Net.HttpStatusCode.ServiceUnavailable)]
         [TypeFilter(typeof(StatusCodeResultAttribute), Arguments = new object []{System.Net.HttpStatusCode.ServiceUnavailable})]
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             if (_runtime.Level == RuntimeLevel.Run)
                 return Redirect(_globalSettings.UmbracoPath.EnsureEndsWith('/'));
@@ -77,7 +79,7 @@ namespace Umbraco.Web.Common.Install
 
             ViewData.SetUmbracoVersion(_umbracoVersion.SemanticVersion);
 
-            _installHelper.InstallStatus(false, "");
+            await _installHelper.InstallStatus(false, "");
 
             // always ensure full path (see NOTE in the class remarks)
             return View();

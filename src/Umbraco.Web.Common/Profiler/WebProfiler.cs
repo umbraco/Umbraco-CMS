@@ -7,8 +7,7 @@ using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 
-// TODO: This namespace is strange, not sure why i has "Runtime" in the name?
-namespace Umbraco.Web.Common.Runtime.Profiler
+namespace Umbraco.Web.Common.Profiler
 {
 
     public class WebProfiler : IProfiler
@@ -45,9 +44,7 @@ namespace Umbraco.Web.Common.Runtime.Profiler
         public void UmbracoApplicationBeginRequest(HttpContext context)
         {
             if (ShouldProfile(context.Request))
-            {
                 Start();
-            }
         }
 
         public void UmbracoApplicationEndRequest(HttpContext context)
