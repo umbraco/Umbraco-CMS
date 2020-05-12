@@ -94,6 +94,26 @@
         return JSON.stringify(obj, toJsonReplacer, pretty);
     }
 
+    /**
+     * Equivalent to angular.fromJson
+     */
+    const fromJson = (val) => {
+        if (!isString(val)) {
+            return val;
+        }
+        return JSON.parse(val);
+    }
+
+    /**
+     * Not equivalent to angular.forEach. But like the angularJS method this does not fail on null or undefined.
+     */
+    const forEach = (obj, iterator) => {
+        if (obj) {
+            return obj.forEach(iterator);
+        }
+        return obj;
+    }
+
     let _utilities = {
         noop: noop,
         copy: copy,
@@ -106,7 +126,9 @@
         isString: isString,
         isNumber: isNumber,
         isObject: isObject,
-        toJson: toJson
+        fromJson: fromJson,
+        toJson: toJson,
+        forEach: forEach
     };
 
     if (typeof (window.Utilities) === 'undefined') {
