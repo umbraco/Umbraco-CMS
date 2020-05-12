@@ -17,7 +17,6 @@ using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Extensions;
 
 namespace Umbraco.Tests.Integration
 {

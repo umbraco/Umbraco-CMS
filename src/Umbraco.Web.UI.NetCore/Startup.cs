@@ -5,8 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Extensions;
-using Umbraco.Web.Website.Extensions;
-using Umbraco.Web.BackOffice.Extensions;
 
 namespace Umbraco.Web.UI.BackOffice
 {
