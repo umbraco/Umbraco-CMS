@@ -149,7 +149,7 @@ namespace Umbraco.Web.Website.ActionResults
             if (context is null) throw new ArgumentNullException(nameof(context));
 
             var httpContext = context.HttpContext;
-            var ioHelper = httpContext.RequestServices.GetRequiredService<IOHelper>();
+            var ioHelper = httpContext.RequestServices.GetRequiredService<IIOHelper>();
             var destinationUrl = ioHelper.ResolveUrl(Url);
 
             if (!(_queryStringValues is null) && _queryStringValues.Count > 0)
