@@ -29,7 +29,7 @@ namespace Umbraco.Tests.PublishedContent
                     // AutoPublishedContentType will auto-generate other properties
                     new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEAlias), 
                 };
-            var type = new AutoPublishedContentType(0, "anything", propertyTypes);
+            var type = new AutoPublishedContentType(0, "anything", "anything", "anything", propertyTypes);
             PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
 
             var rCtx = GetRoutingContext("/test", 1234);

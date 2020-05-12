@@ -61,6 +61,17 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual(stripped, result);
         }
 
+        [TestCase("'+alert(1234)+'", "+alert1234+")]
+        [TestCase("'+alert(56+78)+'", "+alert56+78+")]
+        [TestCase("{{file}}", "file")]
+        [TestCase("'+alert('hello')+'", "+alerthello+")]
+        [TestCase("Test", "Test")]
+        public void Clean_From_XSS(string input, string result)
+        {
+            var cleaned = input.CleanForXss();
+            Assert.AreEqual(cleaned, result);
+        }
+
         [TestCase("This is a string to encrypt")]
         [TestCase("This is a string to encrypt\nThis is a second line")]
         [TestCase("    White space is preserved    ")]

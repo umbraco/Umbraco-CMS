@@ -19,6 +19,8 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         XmlDocument BuildXmlCache();
 
+        XmlDocument BuildPreviewXmlCache();
+
         /// <summary>
         /// Get the count of published items
         /// </summary>

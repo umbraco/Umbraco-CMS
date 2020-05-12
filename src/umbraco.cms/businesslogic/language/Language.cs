@@ -85,6 +85,10 @@ namespace umbraco.cms.businesslogic.language
             var culture = GetCulture(cultureCode);
             if (culture != null)
             {
+                // check if language exists already
+                var existingLanguage = GetByCultureCode(culture.Name);
+                if (existingLanguage != null) return;
+
                 //insert it
                 var lang = new Umbraco.Core.Models.Language(cultureCode)
                 {

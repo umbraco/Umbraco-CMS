@@ -10,7 +10,9 @@ using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Tests.Resolvers
 {
-	[TestFixture]
+
+
+    [TestFixture]
 	public class LazyManyObjectResolverTests
 	{
 

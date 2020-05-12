@@ -8,7 +8,10 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Xml;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core.Collections;
+using Formatting = Newtonsoft.Json.Formatting;
 
 namespace Umbraco.Core
 {
@@ -123,6 +126,11 @@ namespace Umbraco.Core
                 if (target == typeof(object) || inputType == target)
                 {
                     return Attempt.Succeed(input);
+                }
+
+                if (target == typeof(string) && inputType == typeof(JObject))
+                {
+                    return Attempt<object>.Succeed(JsonConvert.SerializeObject(input, Formatting.None));
                 }
 
                 // Check for string so that overloaders of ToString() can take advantage of the conversion.

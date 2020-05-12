@@ -236,7 +236,10 @@ namespace Umbraco.Core.Security
 
             if (dataProtectionProvider != null)
             {
-                manager.UserTokenProvider = new DataProtectorTokenProvider<T, int>(dataProtectionProvider.Create("ASP.NET Identity"));
+                manager.UserTokenProvider = new DataProtectorTokenProvider<T, int>(dataProtectionProvider.Create("ASP.NET Identity"))
+                {
+                    TokenLifespan = TimeSpan.FromDays(3)
+                };
             }
 
             manager.UserLockoutEnabledByDefault = true;
@@ -540,7 +543,7 @@ namespace Umbraco.Core.Security
             var result = await base.SetLockoutEndDateAsync(userId, lockoutEnd);
 
             // The way we unlock is by setting the lockoutEnd date to the current datetime
-            if (result.Succeeded && lockoutEnd >= DateTimeOffset.UtcNow)
+            if (result.Succeeded && lockoutEnd > DateTimeOffset.UtcNow)
             {
                 RaiseAccountLockedEvent(userId);
             }
@@ -748,6 +751,7 @@ namespace Umbraco.Core.Security
             var httpContext = HttpContext.Current == null ? (HttpContextBase)null : new HttpContextWrapper(HttpContext.Current);
             return httpContext.GetCurrentRequestIpAddress();
         }
+
     }
 
 }

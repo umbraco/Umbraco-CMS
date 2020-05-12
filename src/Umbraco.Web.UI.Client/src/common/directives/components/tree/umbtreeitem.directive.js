@@ -18,7 +18,7 @@
    </example>
  */
 angular.module("umbraco.directives")
-.directive('umbTreeItem', function ($compile, $http, $templateCache, $interpolate, $log, $location, $rootScope, $window, treeService, $timeout, localizationService) {
+.directive('umbTreeItem', function ($compile, $http, $templateCache, $interpolate, $log, $location, $rootScope, $window, treeService, $timeout, localizationService, appState) {
     return {
         restrict: 'E',
         replace: true,
@@ -132,7 +132,23 @@ angular.module("umbraco.directives")
                 }
                 if (node.selected) {
                     css.push("umb-tree-node-checked");
-                }
+				}
+				
+				//is this the current action node (this is not the same as the current selected node!)
+                var actionNode = appState.getMenuState("currentNode");
+				if(actionNode) {
+
+					if(actionNode.id === node.id && actionNode.id !== "-1") {
+						css.push("active");
+                    }
+                    
+                    // special handling of root nodes with id -1 
+                    // as there can be many nodes with id -1 in a tree we need to check the treeAlias instead
+                    if(actionNode.id === "-1" && actionNode.metaData.treeAlias === node.metaData.treeAlias) {
+                        css.push("active");
+                    }
+
+				}
                 
                 return css.join(" ");
             };

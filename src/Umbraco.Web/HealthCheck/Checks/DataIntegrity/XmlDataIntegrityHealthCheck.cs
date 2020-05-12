@@ -181,7 +181,10 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
             if (totalXml != total || totalNonGuidXml > 0)
             {
                 //if the counts don't match
-                actions.Add(new HealthCheckAction(CheckContentXmlTableAction, Id));
+                actions.Add(new HealthCheckAction(CheckContentXmlTableAction, Id)
+                {
+                    Name = _textService.Localize("healthcheck/rectifyButton")
+                });
                 hasError = true;
             }            
 

@@ -1,7 +1,7 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerController",
-    function ($rootScope, $scope, dialogService, entityResource, mediaResource, mediaHelper, $timeout, userService, $location, localizationService) {
+    function ($rootScope, $scope, dialogService, entityResource, mediaHelper, $timeout, userService, $location, localizationService) {
 
         //check the pre-values for multi-picker
         var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
@@ -9,14 +9,22 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         var disableFolderSelect = $scope.model.config.disableFolderSelect && $scope.model.config.disableFolderSelect !== '0' ? true : false;
 
         if (!$scope.model.config.startNodeId) {
-            userService.getCurrentUser().then(function(userData) {
-                $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
-                $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
-            });
+
+
+            if ( $scope.model.config.ignoreUserStartNodes === "1") {
+                $scope.model.config.startNodeId = -1;
+                $scope.model.config.startNodeIsVirtual = true;
+
+            } else {
+                userService.getCurrentUser().then(function (userData) {
+                    $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                    $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
+                });
+            }
         }
 
         function setupViewModel() {
-            $scope.images = [];
+            $scope.mediaItems = [];
             $scope.ids = [];
 
             $scope.isMultiPicker = multiPicker;
@@ -41,7 +49,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     // on whether it is simply resaved or not.
                     // This is done by remapping the int/guid ids into a new array of items, where we create "Deleted item" placeholders
                     // when there is no match for a selected id. This will ensure that the values being set on save, are the same as before.
-                    
+
                     medias = _.map(ids,
                         function(id) {
                             var found = _.find(medias,
@@ -72,7 +80,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                                 media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
                             }
 
-                            $scope.images.push(media);
+                            $scope.mediaItems.push(media);
 
                             if ($scope.model.config.idType === "udi") {
                                 $scope.ids.push(media.udi);
@@ -89,7 +97,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         setupViewModel();
 
         $scope.remove = function(index) {
-            $scope.images.splice(index, 1);
+            $scope.mediaItems.splice(index, 1);
             $scope.ids.splice(index, 1);
             $scope.sync();
         };
@@ -99,12 +107,13 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         };
 
        $scope.add = function() {
-
+           
            $scope.mediaPickerOverlay = {
                view: "mediapicker",
                title: "Select media",
                startNodeId: $scope.model.config.startNodeId,
                startNodeIsVirtual: $scope.model.config.startNodeIsVirtual,
+               dataTypeId: ($scope.model && $scope.model.dataTypeId) ? $scope.model.dataTypeId : null,
                multiPicker: multiPicker,
                onlyImages: onlyImages,
                disableFolderSelect: disableFolderSelect,
@@ -117,7 +126,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                            media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
                        }
 
-                       $scope.images.push(media);
+                       $scope.mediaItems.push(media);
 
                        if ($scope.model.config.idType === "udi") {
                            $scope.ids.push(media.udi);
@@ -145,7 +154,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                // content picker. Then we don't have to worry about setting ids, render models, models, we just set one and let the
                // watch do all the rest.
                 $timeout(function(){
-                    angular.forEach($scope.images, function(value, key) {
+                    angular.forEach($scope.mediaItems, function(value, key) {
                         r.push($scope.model.config.idType === "udi" ? value.udi : value.id);
                     });
                     $scope.ids = r;

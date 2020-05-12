@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -47,59 +48,49 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
 
             if (query == null) query = new Query<IAuditItem>();
+
+            var queryHasWhereClause = query.GetWhereClauses().Any();
             var translatorIds = new SqlTranslator<IAuditItem>(sql, query);
             var translatedQuery = translatorIds.Translate();
 
-            var customFilterWheres = customFilter != null ? customFilter.GetWhereClauses().ToArray() : null;
+            var customFilterWheres = customFilter?.GetWhereClauses().ToArray();
             var hasCustomFilter = customFilterWheres != null && customFilterWheres.Length > 0;
             if (hasCustomFilter)
             {
                 var filterSql = new Sql();
-                var first = true;
-                foreach (var filterClaus in customFilterWheres)
+                foreach (var filterClause in customFilterWheres)
                 {
-                    if (first == false)
-                    {
-                        filterSql.Append(" AND ");
-                    }
-                    filterSql.Append(string.Format("({0})", filterClaus.Item1), filterClaus.Item2);
-                    first = false;
+                    filterSql.Append($"AND ({filterClause.Item1})", filterClause.Item2);
                 }
 
-                translatedQuery = GetFilteredSqlForPagedResults(translatedQuery, filterSql);
+                translatedQuery = GetFilteredSqlForPagedResults(translatedQuery, filterSql, queryHasWhereClause);
             }
 
             if (auditTypeFilter.Length > 0)
             {
                 var filterSql = new Sql();
-                var first = true;
-                foreach (var filterClaus in auditTypeFilter)
+                foreach (var filterClause in auditTypeFilter)
                 {
-                    if (first == false || hasCustomFilter)
-                    {
-                        filterSql.Append(" AND ");
-                    }
-                    filterSql.Append("(logHeader = @logHeader)", new {logHeader = filterClaus.ToString() });
-                    first = false;
+                    filterSql.Append("AND (logHeader = @logHeader)", new { logHeader = filterClause.ToString() });
                 }
 
-                translatedQuery = GetFilteredSqlForPagedResults(translatedQuery, filterSql);
+                translatedQuery = GetFilteredSqlForPagedResults(translatedQuery, filterSql, queryHasWhereClause || hasCustomFilter);
             }
 
             if (orderDirection == Direction.Descending)
                 translatedQuery.OrderByDescending("Datestamp");
             else
-                translatedQuery.OrderBy("Datestamp");            
+                translatedQuery.OrderBy("Datestamp");
 
             // Get page of results and total count
             var pagedResult = Database.Page<LogDto>(pageIndex + 1, pageSize, translatedQuery);
             totalRecords = pagedResult.TotalItems;
 
             var pages = pagedResult.Items.Select(
-                dto => new AuditItem(dto.Id, dto.Comment, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId)).ToArray();
+                dto => new AuditItem(dto.NodeId, dto.Comment, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId)).ToArray();
 
             //Mapping the DateStamp
-            for (int i = 0; i < pages.Length; i++)
+            for (var i = 0; i < pages.Length; i++)
             {
                 pages[i].CreateDate = pagedResult.Items[i].Datestamp;
             }
@@ -151,7 +142,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IEnumerable<IAuditItem> PerformGetByQuery(IQuery<IAuditItem> query)
         {
             throw new NotImplementedException();
-        }        
+        }
 
         protected override string GetBaseWhereClause()
         {
@@ -169,14 +160,17 @@ namespace Umbraco.Core.Persistence.Repositories
         }
         #endregion
 
-        private Sql GetFilteredSqlForPagedResults(Sql sql, Sql filterSql)
+        private Sql GetFilteredSqlForPagedResults(Sql sql, Sql filterSql, bool hasWhereClause)
         {
             Sql filteredSql;
 
             // Apply filter
             if (filterSql != null)
             {
-                var sqlFilter = " WHERE " + filterSql.SQL.TrimStart("AND ");
+                //ensure we don't append a WHERE if there is already one
+                var sqlFilter = hasWhereClause
+                    ? filterSql.SQL
+                    : " WHERE " + filterSql.SQL.TrimStart("AND ");
 
                 //NOTE: this is certainly strange - NPoco handles this much better but we need to re-create the sql
                 // instance a couple of times to get the parameter order correct, for some reason the first

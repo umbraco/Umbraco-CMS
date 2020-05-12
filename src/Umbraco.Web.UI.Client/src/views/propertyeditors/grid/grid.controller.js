@@ -281,10 +281,12 @@ angular.module("umbraco")
               availableItems: area.$allowedEditors,
               event: event,
               show: true,
-              submit: function(model) {
-                  $scope.addControl(model.selectedItem, area, index);
-                  $scope.editorOverlay.show = false;
-                  $scope.editorOverlay = null;
+              submit: function (model) {
+                  if (model.selectedItem) {
+                      $scope.addControl(model.selectedItem, area, index);
+                      $scope.editorOverlay.show = false;
+                      $scope.editorOverlay = null;
+                  }
               }
           };
        };

@@ -6,13 +6,7 @@ using System.Web.Http.Filters;
 
 namespace Umbraco.Web.WebApi.Filters
 {
-    /// <summary>
-    /// Allows an Action to execute with an arbitrary number of QueryStrings
-    /// </summary>
-    /// <remarks>
-    /// Just like you can POST an arbitrary number of parameters to an Action, you can't GET an arbitrary number
-    /// but this will allow you to do it
-    /// </remarks>
+    [Obsolete("Use HttpQueryStringModelBinder to model bind FormDataCollection in a GET request")]
     public sealed class HttpQueryStringFilterAttribute : ActionFilterAttribute
     {
         public string ParameterName { get; private set; }

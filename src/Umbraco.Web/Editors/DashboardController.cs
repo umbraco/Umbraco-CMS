@@ -27,6 +27,8 @@ namespace Umbraco.Web.Editors
     [WebApi.UmbracoAuthorize]
     public class DashboardController : UmbracoApiController
     {
+        //we have just one instance of HttpClient shared for the entire application
+        private static readonly HttpClient HttpClient = new HttpClient();
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
         [ValidateAngularAntiForgeryToken]
         public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
@@ -54,13 +56,10 @@ namespace Umbraco.Web.Editors
                 //content is null, go get it
                 try
                 {
-                    using (var web = new HttpClient())
-                    {
-                        //fetch dashboard json and parse to JObject
-                        var json = await web.GetStringAsync(url);
-                        content = JObject.Parse(json);
-                        result = content;
-                    }
+                    //fetch dashboard json and parse to JObject
+                    var json = await HttpClient.GetStringAsync(url);
+                    content = JObject.Parse(json);
+                    result = content;
 
                     ApplicationContext.ApplicationCache.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 30, 0));
                 }
@@ -93,17 +92,14 @@ namespace Umbraco.Web.Editors
                 //content is null, go get it
                 try
                 {
-                    using (var web = new HttpClient())
-                    {
-                        //fetch remote css
-                        content = await web.GetStringAsync(url);
+                    //fetch remote css
+                    content = await HttpClient.GetStringAsync(url);
 
-                        //can't use content directly, modified closure problem
-                        result = content;
+                    //can't use content directly, modified closure problem
+                    result = content;
 
-                        //save server content for 30 mins
-                        ApplicationContext.ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 30, 0));
-                    }
+                    //save server content for 30 mins
+                    ApplicationContext.ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 30, 0));
                 }
                 catch (HttpRequestException ex)
                 {
@@ -119,12 +115,12 @@ namespace Umbraco.Web.Editors
                 Content = new StringContent(result, Encoding.UTF8, "text/css")
             };
         }
-        
+
         [ValidateAngularAntiForgeryToken]
         public IEnumerable<Tab<DashboardControl>> GetDashboard(string section)
         {
             var dashboardHelper = new DashboardHelper(Services.SectionService);
-            return dashboardHelper.GetDashboard(section, Security.CurrentUser);            
+            return dashboardHelper.GetDashboard(section, Security.CurrentUser);
         }
     }
 }

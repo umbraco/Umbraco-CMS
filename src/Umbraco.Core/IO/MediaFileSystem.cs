@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -17,15 +19,15 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.IO
 {
-	/// <summary>
-	/// A custom file system provider for media
-	/// </summary>
-	[FileSystemProvider("media")]
-	public class MediaFileSystem : FileSystemWrapper
-	{
-	    private readonly IContentSection _contentConfig;
+    /// <summary>
+    /// A custom file system provider for media
+    /// </summary>
+    [FileSystemProvider("media")]
+    public class MediaFileSystem : FileSystemWrapper
+    {
+        private readonly IContentSection _contentConfig;
         private readonly UploadAutoFillProperties _uploadAutoFillProperties;
-	    private readonly ILogger _logger;
+        private readonly ILogger _logger;
 
         private readonly object _folderCounterLock = new object();
         private long _folderCounter;
@@ -39,8 +41,8 @@ namespace Umbraco.Core.IO
         };
 
         public MediaFileSystem(IFileSystem wrapped)
-			: this(wrapped, UmbracoConfig.For.UmbracoSettings().Content, ApplicationContext.Current.ProfilingLogger.Logger)
-		{ }
+            : this(wrapped, UmbracoConfig.For.UmbracoSettings().Content, ApplicationContext.Current.ProfilingLogger.Logger)
+        { }
 
         public MediaFileSystem(IFileSystem wrapped, IContentSection contentConfig, ILogger logger)
             : base(wrapped)
@@ -60,13 +62,13 @@ namespace Umbraco.Core.IO
 
         [Obsolete("This low-level method should NOT exist.")]
         public string GetRelativePath(int propertyId, string fileName)
-		{
+        {
             var sep = _contentConfig.UploadAllowDirectories
-				? Path.DirectorySeparatorChar
-				: '-';
+                ? Path.DirectorySeparatorChar
+                : '-';
 
-			return propertyId.ToString(CultureInfo.InvariantCulture) + sep + fileName;
-		}
+            return propertyId.ToString(CultureInfo.InvariantCulture) + sep + fileName;
+        }
 
         [Obsolete("This low-level method should NOT exist.", false)]
         public string GetRelativePath(string subfolder, string fileName)
@@ -264,7 +266,7 @@ namespace Umbraco.Core.IO
             var filename = Path.GetFileName(sourcepath);
             var filepath = GetMediaPath(filename, content.Key, propertyType.Key);
             this.CopyFile(sourcepath, filepath);
-            
+
             return filepath;
         }
 
@@ -293,6 +295,12 @@ namespace Umbraco.Core.IO
         {
             var property = GetProperty(content, propertyTypeAlias);
             var svalue = property.Value as string;
+            if (svalue != null && svalue.DetectIsJson())
+            {
+                // the property value is a JSON serialized image crop data set - grab the "src" property as the file source
+                var jObject = JsonConvert.DeserializeObject<JObject>(svalue);
+                svalue = jObject != null ? jObject.GetValueAsString("src") : svalue;
+            }
             var oldpath = svalue == null ? null : GetRelativePath(svalue);
             var filepath = StoreFile(content, property.PropertyType, filename, filestream, oldpath);
             property.Value = GetUrl(filepath);
@@ -321,7 +329,7 @@ namespace Umbraco.Core.IO
         /// <param name="filepath"></param>
         /// <param name="filestream"></param>
         private void SetUploadFile(IContentBase content, Property property, string filepath, Stream filestream)
-        {            
+        {
             // will use filepath for extension, and filestream for length
             _uploadAutoFillProperties.Populate(content, property.Alias, filepath, filestream);
         }
@@ -357,7 +365,8 @@ namespace Umbraco.Core.IO
             {
                 var jpgInfo = ImageFile.FromStream(stream);
 
-                if (jpgInfo.Format != ImageFileFormat.Unknown
+                if (jpgInfo != null
+                    && jpgInfo.Format != ImageFileFormat.Unknown
                     && jpgInfo.Properties.ContainsKey(ExifTag.PixelYDimension)
                     && jpgInfo.Properties.ContainsKey(ExifTag.PixelXDimension))
                 {
@@ -369,19 +378,27 @@ namespace Umbraco.Core.IO
                     }
                 }
             }
-            catch (Exception)
+            catch
             {
                 //We will just swallow, just means we can't read exif data, we don't want to log an error either
             }
 
             //we have no choice but to try to read in via GDI
-            using (var image = Image.FromStream(stream))
+            try
             {
-
-                var fileWidth = image.Width;
-                var fileHeight = image.Height;
-                return new Size(fileWidth, fileHeight);
+                using (var image = Image.FromStream(stream))
+                {
+                    var fileWidth = image.Width;
+                    var fileHeight = image.Height;
+                    return new Size(fileWidth, fileHeight);
+                }
             }
+            catch
+            {
+                //We will just swallow, just means we can't read via GDI, we don't want to log an error either
+            }
+
+            return new Size(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize);
         }
 
         #endregion
@@ -430,8 +447,8 @@ namespace Umbraco.Core.IO
             }
         }
 
-	    public void DeleteMediaFiles(IEnumerable<string> files)
-	    {
+        public void DeleteMediaFiles(IEnumerable<string> files)
+        {
             files = files.Distinct();
 
             Parallel.ForEach(files, file =>

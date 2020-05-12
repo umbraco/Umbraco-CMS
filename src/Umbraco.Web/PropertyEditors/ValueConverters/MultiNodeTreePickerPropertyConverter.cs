@@ -164,13 +164,23 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     var multiNodeTreePicker = new List<IPublishedContent>();
 
                     var objectType = UmbracoObjectTypes.Unknown;
+                    IPublishedContent multiNodeTreePickerItem = null;
 
                     foreach (var udi in udis)
                     {
-                        var multiNodeTreePickerItem =
-                            GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Document, umbHelper.TypedContent)
-                            ?? GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Media, umbHelper.TypedMedia)
-                            ?? GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Member, umbHelper.TypedMember);
+                        switch (udi.EntityType)
+                        {
+                            case Constants.UdiEntityType.Document:
+                                multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Document, umbHelper.TypedContent);
+                                break;
+                            case Constants.UdiEntityType.Media:
+                                multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Media, umbHelper.TypedMedia);
+                                break;
+                            case Constants.UdiEntityType.Member:
+                                multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Member, umbHelper.TypedMember);
+                                break;
+                        }
+
                         if (multiNodeTreePickerItem != null)
                         {
                             multiNodeTreePicker.Add(multiNodeTreePickerItem);

@@ -42,16 +42,22 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
+            var sourceAsString = source?.ToString();
+            if(sourceAsString.IsNullOrWhiteSpace())
+            {
+                return new string[0];
+            }
+
             // if Json storage type deserialzie and return as string array
             if (JsonStorageType(propertyType.DataTypeId))
             {
-                var jArray = JsonConvert.DeserializeObject<JArray>(source.ToString());
+                var jArray = JsonConvert.DeserializeObject<JArray>(sourceAsString);
                 return jArray.ToObject<string[]>();
             }
 
             // Otherwise assume CSV storage type and return as string array
             var csvTags =
-                source.ToString()
+                sourceAsString
                     .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
                     .ToArray();
             return csvTags;

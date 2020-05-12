@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -36,8 +37,11 @@ namespace Umbraco.Core.Models
         /// </returns>
         internal static string[] GetUserAvatarUrls(this IUser user, ICacheProvider staticCache)
         {
-            //check if the user has explicitly removed all avatars including a gravatar, this will be possible and the value will be "none"
-            if (user.Avatar == "none")
+            // If FIPS is required, never check the Gravatar service as it only supports MD5 hashing.  
+            // Unfortunately, if the FIPS setting is enabled on Windows, using MD5 will throw an exception
+            // and the website will not run.
+            // Also, check if the user has explicitly removed all avatars including a gravatar, this will be possible and the value will be "none"
+            if (user.Avatar == "none" || CryptoConfig.AllowOnlyFipsAlgorithms)
             {
                 return new string[0];
             }
@@ -189,19 +193,6 @@ namespace Umbraco.Core.Models
 
             // check for a start node in the path
             return startNodeIds.Any(x => formattedPath.Contains(string.Concat(",", x, ",")));
-        }
-
-        internal static bool IsInBranchOfStartNode(this IUser user, IUmbracoEntity entity, IEntityService entityService, int recycleBinId, out bool hasPathAccess)
-        {
-            switch (recycleBinId)
-            {
-                case Constants.System.RecycleBinMedia:
-                    return IsInBranchOfStartNode(entity.Path, user.CalculateMediaStartNodeIds(entityService), user.GetMediaStartNodePaths(entityService), out hasPathAccess);
-                case Constants.System.RecycleBinContent:
-                    return IsInBranchOfStartNode(entity.Path, user.CalculateContentStartNodeIds(entityService), user.GetContentStartNodePaths(entityService), out hasPathAccess);
-                default:
-                    throw new NotSupportedException("Path access is only determined on content or media");
-            }
         }
 
         internal static bool IsInBranchOfStartNode(string path, int[] startNodeIds, string[] startNodePaths, out bool hasPathAccess)

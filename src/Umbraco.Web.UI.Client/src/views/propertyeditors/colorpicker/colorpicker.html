@@ -1,20 +1,17 @@
 ﻿<div ng-controller="Umbraco.PropertyEditors.ColorPickerController">
 
-	<div ng-if="!isConfigured" >
-		<localize key="colorpicker_noColors">You haven't defined any colors</localize>
-	</div>
 
-    <ul class="thumbnails color-picker">
-        <li ng-repeat="(key, val) in model.config.items" ng-class="{active: isActiveColor(val)}">
-            <a ng-click="toggleItem(val)" class="thumbnail" hex-bg-color="{{val.value}}">
-                <div class="check_circle">
-                    <i class="icon icon-check small"></i>
-                </div>
-            </a>
-            <span class="color-label" ng-if="model.useLabel" ng-bind="val.label"></span>
-        </li>
-    </ul>
+    <div ng-if="!isConfigured">
+        <localize key="colorpicker_noColors">You haven't defined any colors</localize>
+    </div>
 
-    <input type="hidden" name="modelValue" ng-model="model.value" val-property-validator="validateMandatory"/>
+    <umb-color-swatches colors="model.config.items"
+                        selected-color="model.activeColor.value"
+                        size="m"
+                        use-label="model.useLabel"
+                        on-select="onSelect(color)">
+    </umb-color-swatches>
+
+    <input type="hidden" name="modelValue" ng-model="model.value" val-property-validator="validateMandatory" />
 
 </div>

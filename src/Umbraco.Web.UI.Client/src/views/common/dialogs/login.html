@@ -88,21 +88,23 @@
                 <div class="flex justify-center items-center">
                     <umb-button type="button"
                                 button-style="success"
-                                label="Get started"
-                                action="getStarted()">
-                    </umb-button>
-                    <umb-button ng-if="!avatarFile.uploaded"
-                                type="button"
-                                button-style="link"
-                                label="Skip"
+                                label="Done"
                                 action="getStarted()">
                     </umb-button>
                 </div>
             </div>
-
+           
         </div>
+        <div ng-show="invitedUser == null && inviteStep === 3" ng-if="inviteStep === 3" class="umb-login-container">
+            <div class="form">
+                <h1 style="margin-bottom: 10px; text-align: left;">Hi there</h1>
+                <p style="line-height: 1.6; margin-bottom: 25px;">
+                    <localize key="user_userinviteExpiredMessage">Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.</localize>
+                </p>
 
-        <div ng-show="invitedUser == null" class="umb-login-container">
+            </div>
+        </div>
+        <div ng-show="invitedUser == null && !inviteStep" class="umb-login-container">
 
             <div class="form">
                 <h1>{{greeting}}</h1>

@@ -33,7 +33,7 @@ namespace umbraco.uicontrols {
             base.CreateChildControls();
 
             _tabList.TagName = "ul";
-            _tabList.Attributes.Add("class", "nav nav-tabs umb-nav-tabs span12 -padding-left");
+            _tabList.Attributes.Add("class", "nav nav-tabs umb-nav-tabs -padding-left");
             base.row.Controls.Add(_tabList);
 
             _body.TagName = "div";

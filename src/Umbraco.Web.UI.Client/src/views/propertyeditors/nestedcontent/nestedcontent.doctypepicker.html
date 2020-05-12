@@ -22,7 +22,7 @@
                     </td>
                     <td>
                         <select id="{{model.alias}}_doctype_select"
-                            ng-options="dt.alias as dt.name for dt in model.docTypes | orderBy: 'name'"
+                            ng-options="dt.alias as dt.name for dt in selectableDocTypesFor(config) | orderBy: 'name'"
                             ng-model="config.ncAlias" required></select>
                     </td>
                     <td>

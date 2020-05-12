@@ -61,6 +61,8 @@ namespace umbraco.presentation.webservices
         [WebMethod]
         public string SaveXslt(string fileName, string oldName, string fileContents, bool ignoreDebugging)
         {
+            fileName = fileName.CleanForXss();
+
             if (AuthorizeRequest(DefaultApps.developer.ToString()))
             {
                 IOHelper.EnsurePathExists(SystemDirectories.Xslt);

@@ -32,8 +32,12 @@
     <key alias="rename" version="7.3.0">Omdøb</key>
     <key alias="restore" version="7.3.0">Gendan</key>
     <key alias="SetPermissionsForThePage">Sæt rettigheder for siden %0%</key>
+    <key alias="chooseWhereToCopy">Vælg hvor du vil kopiere</key>
     <key alias="chooseWhereToMove">Vælg hvortil du vil flytte</key>
-    <key alias="toInTheTreeStructureBelow">I træstrukturen nedenfor</key>
+    <key alias="toInTheTreeStructureBelow">til i træstrukturen nedenfor</key>
+    <key alias="wasMovedTo">blev flyttet til</key>
+    <key alias="wasCopiedTo">blev kopieret til</key>
+    <key alias="wasDeleted">blev slettet</key>
     <key alias="rights">Rettigheder</key>
     <key alias="rollback">Fortryd ændringer</key>
     <key alias="sendtopublish">Send til udgivelse</key>
@@ -147,6 +151,7 @@
     <key alias="rollback">Brugeren har tilbagerullet indholdet til en tidligere tilstand</key>
     <key alias="sendtopublish">Brugeren har sendt indholdet til udgivelse</key>
     <key alias="sendtotranslate">Brugeren har sendt indholdet til oversættelse</key>
+    <key alias="sort">Brugeren har sorteret de underliggende sider</key>
     <key alias="smallCopy">Kopieret</key>
     <key alias="smallPublish">Udgivet</key>
     <key alias="smallMove">Flyttet</key>
@@ -156,6 +161,7 @@
     <key alias="smallRollBack">Indhold tilbagerullet</key>
     <key alias="smallSendToPublish">Sendt til udgivelse</key>
     <key alias="smallSendToTranslate">Sendt til oversættelse</key>
+    <key alias="smallSort">Sorteret</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">For at skifte det valgte indholds dokumenttype, skal du først vælge en ny dokumenttype, som er gyldig på denne placering.</key>
@@ -176,6 +182,11 @@
     <key alias="to">til</key>
     <key alias="validationErrorPropertyWithMoreThanOneMapping">Overførsel af egenskaber kunne ikke fuldføres, da en eller flere egenskaber er indstillet til at blive overført mere end én gang.</key>
     <key alias="validDocTypesNote">Kun andre dokumenttyper, der er gyldige på denne placering, vises.</key>
+  </area>
+  <area alias="codefile">
+    <key alias="createFolderFailedById">Oprettelse af mappen under parent med ID %0% fejlede</key>
+    <key alias="createFolderFailedByName">Oprettelse af mappen under parent med navnet %0% fejlede</key>
+      <key alias="deleteItemFailed">Sletning af filen/mappen fejlede: %0%</key>
   </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">Udgivet</key>
@@ -209,7 +220,7 @@
     <key alias="nodeName">Sidetitel</key>
     <key alias="otherElements">Egenskaber</key>
     <key alias="parentNotPublished">Dette dokument er udgivet, men ikke synligt da den overliggende side '%0%' ikke er udgivet!</key>
-    <key alias="parentNotPublishedAnomaly">Upd: dette dokument er udgiver, men er ikke i cachen (intern fejl)</key>
+    <key alias="parentNotPublishedAnomaly">Ups: dette dokument er udgivet, men er ikke i cachen (intern fejl)</key>
     <key alias="getUrlException">Kunne ikke hente url'en</key>
     <key alias="routeError">Dette dokument er udgivet, men dets url ville kollidere med indholdet %0%</key>
     <key alias="publish">Udgiv</key>
@@ -259,11 +270,15 @@
     <key alias="dropFilesHere">Slip filerne her...</key>
     <key alias="urls">Link til medie</key>
     <key alias="orClickHereToUpload">eller klik her for at vælge filer</key>
-    <key alias="dragFilesHereToUpload">Du kan trække filer herind for at uploade</key>
+    <key alias="dragFilesHereToUpload">Du kan trække filer herind for at uploade.</key>
     <key alias="onlyAllowedFiles">Tilladte filtyper er kun</key>
     <key alias="disallowedFileType">Kan ikke uploade denne fil, den har ikke en godkendt filtype</key>
     <key alias="maxFileSize">Maks filstørrelse er</key>
     <key alias="mediaRoot">Medie rod</key>
+    <key alias="moveFailed">Flytning af mediet fejlede</key>
+    <key alias="copyFailed">Kopiering af mediet fejlede</key>
+    <key alias="createFolderFailed">Oprettelse af mappen under parent med id %0% fejlede</key>
+    <key alias="renameFolderFailed">Omdøbning af mappen med id %0% fejlede</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Opret et nyt medlem</key>
@@ -273,6 +288,7 @@
     <key alias="chooseNode">Hvor ønsker du at oprette den nye %0%</key>
     <key alias="createUnder">Opret under</key>
     <key alias="createContentBlueprint">Vælg den dokumenttype, du vil oprette en indholdsskabelon til</key>
+    <key alias="enterFolderName">Angiv et navn for mappen</key>
     <key alias="updateData">Vælg en type og skriv en titel</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokument typer. Du skal tillade disse i indstillinger under <strong>"dokument typer"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte media typer. Du skal tillade disse i indstillinger under <strong>"media typer"</strong>.]]></key>
@@ -441,6 +457,8 @@
     <key alias="email">Indtast din e-mail</key>
     <key alias="enterMessage">Indtast en besked...</key>
     <key alias="usernameHint">Dit brugernavn er typisk din e-mailadresse</key>
+    <key alias="enterAlias">Indtast alias...</key>
+    <key alias="generatingAlias">Genererer alias...</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Tillad på rodniveau</key>
@@ -562,6 +580,7 @@
     <key alias="hide">Skjul</key>
     <key alias="history">Historik</key>
     <key alias="icon">Ikon</key>
+    <key alias="id">Id</key>
     <key alias="import">Importer</key>
     <key alias="innerMargin">Indre margen</key>
     <key alias="insert">Indsæt</key>
@@ -821,7 +840,8 @@
     <key alias="relateToOriginal">Relater det kopierede element til originalen</key>
   </area>
   <area alias="notifications">
-    <key alias="editNotifications">Rediger dine notificeringer for %0%</key>
+    <key alias="editNotifications"><![CDATA[Vælg dine notificeringer for <strong>%0%</strong>]]></key>
+    <key alias="notificationsSavedFor">Notificeringer er gemt for</key>
     <key alias="mailBody">
       <![CDATA[
 Hej %0%
@@ -989,10 +1009,13 @@ Mange hilsner fra Umbraco robotten
   </area>
   <area alias="imagecropper">
     <key alias="reset">Nulstil</key>
+    <key alias="updateEditCrop">Acceptér</key>
+    <key alias="undoEditCrop">Fortryd</key>
   </area>
 
 
   <area alias="rollback">
+    <key alias="headline">Vælg en version at sammenligne med den nuværende version</key>
     <key alias="currentVersion">Nuværende version</key>
     <key alias="diffHelp"><![CDATA[Her vises forskellene mellem den nuværende version og den valgte version<br /><del>Rød</del> tekst vil ikke blive vist i den valgte version. <ins>Grøn betyder tilføjet</ins>]]></key>
     <key alias="documentRolledBack">Dokument tilbagerullet</key>
@@ -1068,8 +1091,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="dictionaryItemSaved">Ordbogsnøgle gemt</key>
     <key alias="editContentPublishedHeader">Indhold publiceret</key>
     <key alias="editContentPublishedText">og nu synligt for besøgende</key>
+    <key alias="editContentPublishedWithExpireDateText">og nu synligt for besøgende indtil %0% kl. %1%</key>
     <key alias="editContentSavedHeader">Indhold gemt</key>
     <key alias="editContentSavedText">Husk at publicere for at gøre det synligt for besøgende</key>
+    <key alias="editContentSavedWithReleaseDateText">Ændringerne bliver publiceret den %0% kl. %1%</key>
     <key alias="editContentSendToPublish">Send til Godkendelse</key>
     <key alias="editContentSendToPublishText">Rettelser er blevet sendt til godkendelse</key>
     <key alias="editMediaSaved">Medie gemt</key>
@@ -1140,6 +1165,7 @@ Mange hilsner fra Umbraco robotten
   </area>
 
   <area alias="template">
+    <key alias="deleteByIdFailed">Sletning af skabelonen med ID %0% fejlede</key>
     <key alias="edittemplate">Rediger skabelon</key>
 
     <key alias="insertSections">Sektioner</key>
@@ -1433,9 +1459,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="macros">Makroer</key>
     <key alias="mediaTypes">Medietyper</key>
     <key alias="member">Medlemmer</key>
-    <key alias="memberGroups">Medlemsgruppe</key>
+    <key alias="memberGroups">Medlemsgrupper</key>
     <key alias="memberRoles">Roller</key>
-    <key alias="memberTypes">Medlemstype</key>
+    <key alias="memberTypes">Medlemstyper</key>
     <key alias="documentTypes">Dokumenttyper</key>
     <key alias="relationTypes">Relationstyper</key>
     <key alias="packager">Pakker</key>
@@ -1551,7 +1577,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="userInvited">er blevet inviteret</key>
     <key alias="userInvitedSuccessHelp">En invitation er blevet sendt til den nye bruger med oplysninger om, hvordan man logger ind i Umbraco.</key>
     <key alias="userinviteWelcomeMessage">Hej og velkommen til Umbraco! På bare 1 minut vil du være klar til at komme i gang, vi skal bare have dig til at oprette en adgangskode og tilføje et billede til din avatar.</key>
-    <key alias="userinviteAvatarMessage">Upload et billede for at gøre det nemt for andre brugere at genkende dig.</key>
+    <key alias="userinviteAvatarMessage">Hvis du uploader et billede af dig selv, gør du det nemt for andre brugere at genkende dig. Klik på cirklen ovenfor for at uploade et billede.</key>
     <key alias="writer">Forfatter</key>
     <key alias="translator">Oversætter</key>
     <key alias="change">Skift</key>
@@ -1609,8 +1635,8 @@ Mange hilsner fra Umbraco robotten
   <area alias="recycleBin">
     <key alias="contentTrashed">Slettet indhold med Id: {0} Relateret til original "parent" med id: {1}</key>
     <key alias="mediaTrashed">Slettet medie med Id: {0} relateret til original "parent" / mappe med id: {1}</key>
-    <key alias="itemCannotBeRestored">Kan ikke automatisk genoprette dette dokument/medie</key>
-    <key alias="noRestoreRelation">Der findes ikke nogen "Genopret" relation for dette dokument/medie. Brug "Flyt" muligheden fra menuen for at flytte det manuelt.</key>
-    <key alias="restoreUnderRecycled">Det dokument/medie du ønsker at genoprette under ('%0%') er i skraldespanden. Brug "Flyt" muligheden fra menuen for at flytte det manuelt.</key>
+    <key alias="itemCannotBeRestored">Kan ikke automatisk genoprette dette element</key>
+    <key alias="itemCannotBeRestoredHelpText">Der er ikke nogen placering hvor dette element automatisk kan genoprettes. Du kan flytte elementet manuelt i træet nedenfor.</key>
+    <key alias="wasRestored">blev genoprettet under</key>
   </area>
 </language>

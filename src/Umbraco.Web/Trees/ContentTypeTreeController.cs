@@ -117,21 +117,11 @@ namespace Umbraco.Web.Trees
                 if (enableInheritedDocumentTypes)
                 {
                     menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
-
-                    //no move action if this is a child doc type
-                    if (parent == null)
-                    {
-                        menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)), true);
-                    }
                 }
-                else
+                //no move action if this is a child doc type
+                if (parent == null)
                 {
-                    menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)));
-                    //no move action if this is a child doc type
-                    if (parent == null)
-                    {
-                        menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)), true);
-                    }
+                    menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)), true);
                 }
                 menu.Items.Add<ActionCopy>(Services.TextService.Localize(string.Format("actions/{0}", ActionCopy.Instance.Alias)));
                 menu.Items.Add<ActionExport>(Services.TextService.Localize(string.Format("actions/{0}", ActionExport.Instance.Alias)), true).ConvertLegacyMenuItem(new UmbracoEntity

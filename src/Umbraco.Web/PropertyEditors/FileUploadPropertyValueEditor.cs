@@ -110,7 +110,7 @@ namespace Umbraco.Web.PropertyEditors
                     _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
 
                     var ext = _mediaFileSystem.GetExtension(filepath);
-                    if (_mediaFileSystem.IsImageFile(ext))
+                    if (_mediaFileSystem.IsImageFile(ext) && ext != ".svg")
                     {
                         var preValues = editorValue.PreValues.FormatAsDictionary();
                         var sizes = preValues.Any() ? preValues.First().Value.Value : string.Empty;

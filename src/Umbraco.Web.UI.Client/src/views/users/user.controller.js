@@ -93,8 +93,14 @@
                   //in the ASP.NET Identity world, this config option will allow an admin user to change another user's password
                   //if the user has access to the user section. So if this editor is being access, the user of course has access to this section.
                   //the authorization check is also done on the server side when submitted.
-                  vm.changePasswordModel.config.allowManuallyChangingPassword = !vm.user.isCurrentUser;
-                  
+                    
+                  // only update the setting if not the current logged in user, otherwise leave the value as it is
+                  // currently set in the web.config
+                  if (!vm.user.isCurrentUser)
+                  {
+                      vm.changePasswordModel.config.allowManuallyChangingPassword = true;
+                  }
+                    
                   vm.loading = false;
                 });
             });
@@ -129,7 +135,10 @@
 
                 //anytime a user is changing another user's password, we are in effect resetting it so we need to set that flag here
                 if (vm.user.changePassword) {
-                    vm.user.changePassword.reset = !vm.user.changePassword.oldPassword && !vm.user.isCurrentUser;
+                    //NOTE: the check for allowManuallyChangingPassword is due to this legacy user membership provider setting, if that is true, then the current user
+                    //can change their own password without entering their current one (this is a legacy setting since that is a security issue but we need to maintain compat).
+                    //if allowManuallyChangingPassword=false, then we are using default settings and the user will need to enter their old password to change their own password.
+                    vm.user.changePassword.reset = (!vm.user.changePassword.oldPassword && !vm.user.isCurrentUser) || vm.changePasswordModel.config.allowManuallyChangingPassword;
                 }
 
                 vm.page.saveButtonState = "busy";

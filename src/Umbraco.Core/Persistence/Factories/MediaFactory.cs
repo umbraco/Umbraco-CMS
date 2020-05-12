@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
@@ -130,7 +131,7 @@ namespace Umbraco.Core.Persistence.Factories
             return nodeDto;
         }
 
-        private static readonly Regex MediaPathPattern = new Regex(@"(/media/.+?)(?:['""]|$)", RegexOptions.Compiled);
+        private static readonly Regex MediaPathPattern = new Regex($@"({SystemDirectories.Media.TrimStart("~")}/.+?)(?:['""]|$)", RegexOptions.Compiled);
 
         /// <summary>
         /// Try getting a media path out of the string being stored for media
@@ -140,6 +141,9 @@ namespace Umbraco.Core.Persistence.Factories
         /// <returns></returns>
         internal static bool TryMatch(string text, out string mediaPath)
         {
+            //TODO: In v8 we should allow exposing this via the property editor in a much nicer way so that the property editor
+            // can tell us directly what any URL is for a given property if it contains an asset
+
             mediaPath = null;
 
             if (string.IsNullOrWhiteSpace(text))

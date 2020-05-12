@@ -5,11 +5,20 @@
       <input type="text" name="item_{{$index}}" ng-model="item.value" class="umb-editor umb-textstring textstring"
              ng-keyup="addRemoveOnKeyDown($event, $index)" focus-when="{{item.hasFocus}}"/>
       <i class="icon icon-navigation handle" localize="title" title="@general_move"></i>
-      <a prevent-default href="" class="remove" localize="title" title="@content_removeTextBox"
-         ng-show="model.value.length > model.config.min"
-         ng-click="remove($index)">
-        <i class="icon icon-remove"></i>
-      </a>
+
+    <div class="umb-multiple-textbox__confirm" ng-show="model.value.length > model.config.min">
+        <button class="umb-multiple-textbox__confirm-action" type="button" prevet-default ng-click="showPrompt($index, item)" localize="title" title="@content_removeTextBox">
+            <i class="icon-trash"></i>
+        </button>
+
+        <umb-confirm-action
+            ng-if="promptIsVisible === $index"
+            direction="left"
+            on-confirm="remove($index)"
+            on-cancel="hidePrompt()">
+        </umb-confirm-action>
+    </div>
+
     </div>
   </div>
   <a prevent-default href="" class="add-link" localize="title" title="@content_addTextBox"

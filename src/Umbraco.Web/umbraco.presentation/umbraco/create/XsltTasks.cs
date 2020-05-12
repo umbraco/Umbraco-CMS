@@ -28,7 +28,7 @@ namespace umbraco
             IOHelper.EnsureFileExists(Path.Combine(IOHelper.MapPath(SystemDirectories.Xslt), "web.config"), Files.BlockingWebConfig);
 
             var template = Alias.Substring(0, Alias.IndexOf("|||"));
-            var fileName = Alias.Substring(Alias.IndexOf("|||") + 3, Alias.Length - Alias.IndexOf("|||") - 3).Replace(" ", "");
+            var fileName = Alias.Substring(Alias.IndexOf("|||") + 3, Alias.Length - Alias.IndexOf("|||") - 3);
             if (fileName.ToLowerInvariant().EndsWith(".xslt") == false)
                 fileName += ".xslt";
             var xsltTemplateSource = IOHelper.MapPath(SystemDirectories.Umbraco + "/xslt/templates/" + template);

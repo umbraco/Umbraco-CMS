@@ -43,12 +43,12 @@
         <h5>
             <localize key="defaultdialogs_linkToPage">Link to page</localize>
         </h5>
-
         <div ng-hide="miniListView">
             <umb-tree-search-box hide-search-callback="hideSearch"
                                  search-callback="onSearchResults"
                                  search-from-id="{{searchInfo.searchFromId}}"
                                  search-from-name="{{searchInfo.searchFromName}}"
+                                 datatype-id="{{searchInfo.dataTypeId}}"
                                  show-search="{{searchInfo.showSearch}}"
                                  section="{{section}}">
             </umb-tree-search-box>
@@ -64,6 +64,7 @@
                 <umb-tree section="content"
                           hideheader="true"
                           hideoptions="true"
+						  customtreeparams="{{customTreeParams}}"
                           eventhandler="dialogTreeEventHandler"
                           enablelistviewexpand="true"
                           isdialog="true"

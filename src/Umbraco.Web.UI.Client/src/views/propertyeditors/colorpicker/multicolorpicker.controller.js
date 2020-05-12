@@ -5,8 +5,9 @@
         var defaultLabel = null;
 
         $scope.newColor = defaultColor;
-        $scope.newLavel = defaultLabel;
+        $scope.newLabel = defaultLabel;
         $scope.hasError = false;
+        $scope.focusOnNew = false;
 
         $scope.labels = {};
 
@@ -104,7 +105,6 @@
         };
 
         $scope.add = function (evt) {
-
             evt.preventDefault();
 
             if ($scope.newColor) {
@@ -117,7 +117,9 @@
                         value: $scope.newColor,
                         label: newLabel
                     });
+                    $scope.newLabel = "";
                     $scope.hasError = false;
+                    $scope.focusOnNew = true;
                     return;
                 }
 

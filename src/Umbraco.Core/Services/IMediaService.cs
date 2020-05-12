@@ -27,6 +27,15 @@ namespace Umbraco.Core.Services
         Attempt<OperationStatus> MoveToRecycleBin(IMedia media, int userId = 0);
 
         /// <summary>
+        /// Moves an <see cref="IMedia"/> object to a new location
+        /// </summary>
+        /// <param name="media">The <see cref="IMedia"/> to move</param>
+        /// <param name="parentId">Id of the Media's new Parent</param>
+        /// <param name="userId">Id of the User moving the Media</param>
+        /// <returns>True if moving succeeded, otherwise False</returns>
+        Attempt<OperationStatus> Move(IMedia media, int parentId, int userId = 0);
+
+        /// <summary>
         /// Permanently deletes an <see cref="IMedia"/> object
         /// </summary>
         /// <remarks>
@@ -269,6 +278,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Id of the User moving the Media</param>
         void Move(IMedia media, int parentId, int userId = 0);
 
+
         /// <summary>
         /// Deletes an <see cref="IMedia"/> object by moving it to the Recycle Bin
         /// </summary>
@@ -279,7 +289,15 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
         /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use EmptyRecycleBin with explicit indication of user ID instead")]
         void EmptyRecycleBin();
+
+        /// <summary>
+        /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
+        /// </summary>
+        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>        
+        void EmptyRecycleBin(int userId = 0);
 
         /// <summary>
         /// Deletes all media of specified type. All children of deleted media is moved to Recycle Bin.

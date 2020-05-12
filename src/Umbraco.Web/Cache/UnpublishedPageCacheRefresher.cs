@@ -6,6 +6,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using System.Linq;
 using Newtonsoft.Json;
+using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Sync;
 
@@ -44,7 +45,7 @@ namespace Umbraco.Web.Cache
             return jsonObject;
         }
 
-      
+
         internal static string SerializeToJsonPayloadForPermanentDeletion(params int[] contentIds)
         {
             var items = contentIds.Select(x => new JsonPayload
@@ -55,19 +56,32 @@ namespace Umbraco.Web.Cache
             var json = JsonConvert.SerializeObject(items);
             return json;
         }
+        internal static string SerializeToJsonPayload(OperationType operationType, params IContent[] contents)
+        {
+            var items = contents.Select(x => new JsonPayload
+            {
+                Id = x.Id,
+                Key = x.Key,
+                Operation = operationType
+            }).ToArray();
+            var json = JsonConvert.SerializeObject(items);
+            return json;
+        }
 
         #endregion
 
         #region Sub classes
 
         internal enum OperationType
-        {            
-            Deleted
+        {
+            Deleted,
+            Refresh
         }
 
         internal class JsonPayload
-        {            
+        {
             public int Id { get; set; }
+            public Guid? Key { get; set; }
             public OperationType Operation { get; set; }
         }
 
@@ -79,6 +93,7 @@ namespace Umbraco.Web.Cache
             ClearAllIsolatedCacheByEntityType<IContent>();
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
+            content.Instance.ClearPreviewXmlContent();
             base.RefreshAll();
         }
 
@@ -87,6 +102,9 @@ namespace Umbraco.Web.Cache
             ClearRepositoryCacheItemById(id);
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             content.Instance.UpdateSortOrder(id);
+            var d = new Document(id);
+            content.Instance.UpdateDocumentCache(d);
+            content.Instance.UpdatePreviewXmlContent(d);
             DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
             base.Refresh(id);
         }
@@ -97,6 +115,7 @@ namespace Umbraco.Web.Cache
             ClearRepositoryCacheItemById(id);
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
+            content.Instance.ClearPreviewXmlContent(id);
             base.Remove(id);
         }
 
@@ -106,6 +125,9 @@ namespace Umbraco.Web.Cache
             ClearRepositoryCacheItemById(instance.Id);
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             content.Instance.UpdateSortOrder(instance);
+            var d = new Document(instance);
+            content.Instance.UpdateDocumentCache(d);
+            content.Instance.UpdatePreviewXmlContent(d);
             DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
             base.Refresh(instance);
         }
@@ -116,6 +138,7 @@ namespace Umbraco.Web.Cache
             ClearRepositoryCacheItemById(instance.Id);
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
+            content.Instance.ClearPreviewXmlContent(instance.Id);
             base.Remove(instance);
         }
 
@@ -129,9 +152,26 @@ namespace Umbraco.Web.Cache
 
             foreach (var payload in DeserializeFromJsonPayload(jsonPayload))
             {
-                ApplicationContext.Current.Services.IdkMap.ClearCache(payload.Id);
                 ClearRepositoryCacheItemById(payload.Id);
-                content.Instance.UpdateSortOrder(payload.Id);
+                ClearRepositoryCacheItemById(payload.Key);
+                ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
+
+                if (payload.Operation == OperationType.Deleted)
+                {
+                    ApplicationContext.Current.Services.IdkMap.ClearCache(payload.Id);
+                    content.Instance.ClearPreviewXmlContent(payload.Id);
+                    base.Remove(payload.Id);
+                }
+
+                if (payload.Operation == OperationType.Refresh)
+                {
+                    content.Instance.UpdateSortOrder(payload.Id);
+                    var d = new Document(payload.Id);
+                    content.Instance.UpdateDocumentCache(d);
+                    content.Instance.UpdatePreviewXmlContent(d);
+
+                    base.Refresh(payload.Id);
+                }
             }
 
             DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
@@ -145,6 +185,15 @@ namespace Umbraco.Web.Cache
             if (contentCache)
             {
                 contentCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IContent>(id));
+            }
+        }
+
+        private void ClearRepositoryCacheItemById(Guid? key)
+        {
+            var contentCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IContent>();
+            if (contentCache)
+            {
+                contentCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IContent>(key));
             }
         }
     }

@@ -12,6 +12,10 @@ function TemplatesDeleteController($scope, templateResource , treeService, navig
 
         //mark it for deletion (used in the UI)
         $scope.currentNode.loading = true;
+
+        // Reset the error message
+        $scope.error = null;
+
         templateResource.deleteById($scope.currentNode.id).then(function () {
             $scope.currentNode.loading = false;
 
@@ -21,6 +25,9 @@ function TemplatesDeleteController($scope, templateResource , treeService, navig
             //TODO: Need to sync tree, etc...
             treeService.removeNode($scope.currentNode);
             navigationService.hideMenu();
+        }, function (err) {
+            $scope.currentNode.loading = false;
+            $scope.error = err;
         });
 
     };

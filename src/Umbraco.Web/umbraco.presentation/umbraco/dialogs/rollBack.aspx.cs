@@ -34,8 +34,8 @@ namespace umbraco.presentation.dialogs
                 diffPanel.Visible = true;
                 Document rollback = new Document(currentDoc.Id, new Guid(allVersions.SelectedValue));
 
-                propertiesCompare.Text = "<tr><th style='width: 25%;' valign='top'>" + ui.Text("general", "name") + ":</th><td>" + rollback.Text + "</td></tr>";
-                propertiesCompare.Text += "<tr><th style='width: 25%;' valign='top'>" + ui.Text("content", "createDate") + ":</th><td>" + rollback.VersionDate.ToLongDateString() + " " + rollback.VersionDate.ToLongTimeString() + " " + ui.Text("general", "by") + ": " + rollback.Writer.Name + "</td></tr>";
+                propertiesCompare.Text = "<tr><th>" + ui.Text("general", "name") + ":</th><td>" + rollback.Text + "</td></tr>";
+                propertiesCompare.Text += "<tr><th>" + ui.Text("content", "createDate") + ":</th><td>" + rollback.VersionDate.ToLongDateString() + " " + rollback.VersionDate.ToLongTimeString() + " " + ui.Text("general", "by") + ": " + rollback.Writer.Name + "</td></tr>";
 
                 if (rbl_mode.SelectedValue == "diff")
                     lt_notice.Text = ui.Text("rollback", "diffHelp");
@@ -66,14 +66,14 @@ namespace umbraco.presentation.dialogs
 
                                     string cThevalue = library.StripHtml(cP.Value.ToString());
 
-                                    propertiesCompare.Text += "<tr><th style='width: 25%;' valign='top'>" + p.PropertyType.Name + ":</th><td>" + library.ReplaceLineBreaks(cms.businesslogic.utilities.Diff.Diff2Html(cThevalue, thevalue)) + "</td></tr>";
+                                    propertiesCompare.Text += "<tr><th>" + p.PropertyType.Name + ":</th><td>" + library.ReplaceLineBreaks(cms.businesslogic.utilities.Diff.Diff2Html(cThevalue, thevalue)) + "</td></tr>";
 
 
                                 }
                                 else
                                 {
                                     //If no current version of the value... display with no diff.
-                                    propertiesCompare.Text += "<tr><th style='width: 25%;' valign='top'>" + p.PropertyType.Name + ":</th><td>" + thevalue + "</td></tr>";
+                                    propertiesCompare.Text += "<tr><th>" + p.PropertyType.Name + ":</th><td>" + thevalue + "</td></tr>";
                                 }
 
 
@@ -81,7 +81,7 @@ namespace umbraco.presentation.dialogs
                             else
                             {
                                 //If display mode is html
-                                propertiesCompare.Text += "<tr><th style='width: 25%;' valign='top'>" + p.PropertyType.Name + ":</th><td>" + thevalue + "</td></tr>";
+                                propertiesCompare.Text += "<tr><th>" + p.PropertyType.Name + ":</th><td>" + thevalue + "</td></tr>";
                             }
 
                             //previewVersionContent.Controls.Add(new LiteralControl("<div style=\"margin-top: 4px; border: 1px solid #DEDEDE; padding: 4px;\"><p style=\"padding: 0px; margin: 0px;\" class=\"guiDialogNormal\"><b>" + p.PropertyType.Name + "</b><br/>"));
@@ -115,6 +115,11 @@ namespace umbraco.presentation.dialogs
 
             currentVersionTitle.Text = currentDoc.Text;
             currentVersionMeta.Text = ui.Text("content", "createDate") + ": " + currentDoc.VersionDate.ToShortDateString() + " " + currentDoc.VersionDate.ToShortTimeString();
+
+		    pp_selectVersion.Text = ui.Text("rollback", "headline");
+		    pp_currentVersion.Text = ui.Text("rollback", "currentVersion");
+		    pp_view.Text = ui.Text("rollback", "view");
+		    pp_rollBackTo.Text = ui.Text("rollback", "rollbackTo");
 
             if (!IsPostBack) {
                 allVersions.Items.Add(new ListItem(ui.Text("rollback", "selectVersion")+ "...", ""));

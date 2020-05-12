@@ -404,7 +404,7 @@ namespace Umbraco.Core.Services
             {
                 var saveEventArgs = new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions);
                 if (raiseEvents)
-                {                    
+                {
                     if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                     {
                         uow.Commit();

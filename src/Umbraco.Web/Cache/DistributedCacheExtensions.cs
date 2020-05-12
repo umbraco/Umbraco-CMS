@@ -109,7 +109,7 @@ namespace Umbraco.Web.Cache
         public static void RemoveTemplateCache(this DistributedCache dc, int templateId)
         {
             dc.Remove(DistributedCache.TemplateRefresherGuid, templateId);
-        } 
+        }
 
         #endregion
 
@@ -126,8 +126,8 @@ namespace Umbraco.Web.Cache
         }
 
         #endregion
-        
-        #region Data type cache     
+
+        #region Data type cache
 
         public static void RefreshDataTypeCache(this DistributedCache dc, IDataTypeDefinition dataType)
         {
@@ -172,12 +172,12 @@ namespace Umbraco.Web.Cache
 
         public static void RefreshUnpublishedPageCache(this DistributedCache dc, params IContent[] content)
         {
-            dc.Refresh(DistributedCache.UnpublishedPageCacheRefresherGuid, x => x.Id, content);
+            dc.RefreshByJson(DistributedCache.UnpublishedPageCacheRefresherGuid, UnpublishedPageCacheRefresher.SerializeToJsonPayload(UnpublishedPageCacheRefresher.OperationType.Refresh, content));
         }
 
         public static void RemoveUnpublishedPageCache(this DistributedCache dc, params IContent[] content)
         {
-            dc.Remove(DistributedCache.UnpublishedPageCacheRefresherGuid, x => x.Id, content);
+            dc.RefreshByJson(DistributedCache.UnpublishedPageCacheRefresherGuid, UnpublishedPageCacheRefresher.SerializeToJsonPayload(UnpublishedPageCacheRefresher.OperationType.Deleted, content));
         }
 
         public static void RemoveUnpublishedCachePermanently(this DistributedCache dc, params int[] contentIds)
@@ -197,7 +197,7 @@ namespace Umbraco.Web.Cache
         public static void RemoveMemberCache(this DistributedCache dc, params IMember[] members)
         {
             dc.Remove(DistributedCache.MemberCacheRefresherGuid, x => x.Id, members);
-        } 
+        }
 
         [Obsolete("Use the RefreshMemberCache with strongly typed IMember objects instead")]
         public static void RefreshMemberCache(this DistributedCache dc, int memberId)
@@ -209,7 +209,7 @@ namespace Umbraco.Web.Cache
         public static void RemoveMemberCache(this DistributedCache dc, int memberId)
         {
             dc.Remove(DistributedCache.MemberCacheRefresherGuid, memberId);
-        } 
+        }
 
         #endregion
 
@@ -228,7 +228,7 @@ namespace Umbraco.Web.Cache
         #endregion
 
         #region Media Cache
-        
+
         public static void RefreshMediaCache(this DistributedCache dc, params IMedia[] media)
         {
             dc.RefreshByJson(DistributedCache.MediaCacheRefresherGuid, MediaCacheRefresher.SerializeToJsonPayload(MediaCacheRefresher.OperationType.Saved, media));
@@ -285,7 +285,7 @@ namespace Umbraco.Web.Cache
             if (macro == null) return;
             dc.RefreshByJson(DistributedCache.MacroCacheRefresherGuid, MacroCacheRefresher.SerializeToJsonPayload(macro));
         }
-        
+
         public static void RemoveMacroCache(this DistributedCache dc, global::umbraco.cms.businesslogic.macro.Macro macro)
         {
             if (macro == null) return;
@@ -296,7 +296,7 @@ namespace Umbraco.Web.Cache
         {
             if (macro == null || macro.Model == null) return;
             dc.RefreshByJson(DistributedCache.MacroCacheRefresherGuid, MacroCacheRefresher.SerializeToJsonPayload(macro));
-        } 
+        }
 
         #endregion
 

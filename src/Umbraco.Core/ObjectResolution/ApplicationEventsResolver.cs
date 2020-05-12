@@ -89,16 +89,20 @@ namespace Umbraco.Core.ObjectResolution
 	        }
 	    }
 
-	    protected override int GetObjectWeight(object o)
-	    {
+        protected override int GetObjectWeight(object o) => GetObjectWeightInternal(o, DefaultPluginWeight);
+
+        internal static int GetObjectWeightInternal(object o, int defaultPluginWeight)
+        {
             var type = o.GetType();
             var attr = type.GetCustomAttribute<WeightAttribute>(true);
             if (attr != null) return attr.Weight;
             var name = type.Assembly.FullName;
 
             // we should really attribute all our Core handlers, so this is temp
-            var core = name.InvariantStartsWith("Umbraco.") || name.InvariantStartsWith("Concorde.");
-            return core ? -DefaultPluginWeight : DefaultPluginWeight;
+            var core = name.InvariantStartsWith("umbraco,") // This handles the umbraco.dll (Umbraco.Web) project
+                || name.InvariantStartsWith("Umbraco.")     // This handles all other Umbraco.* assemblies - in the case of v7, this is ONLY Umbraco.Core
+                || name.InvariantStartsWith("Concorde.");   // Special case for Cloud assemblies
+            return core ? -defaultPluginWeight : defaultPluginWeight;
         }
 
         /// <summary>

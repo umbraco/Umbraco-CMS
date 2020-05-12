@@ -120,9 +120,8 @@ namespace Umbraco.Web.PropertyEditors
                         var label = x["label"].ToString();
 
                         sortOrder++;
-                        var value = useLabel
-                            ? JsonConvert.SerializeObject(new { value = color, label = label, sortOrder = sortOrder })
-                            : color;
+
+                        var value = JsonConvert.SerializeObject(new { value = color, label = label, sortOrder = sortOrder });
 
                         return new PreValue(id, value, sortOrder);
                     })

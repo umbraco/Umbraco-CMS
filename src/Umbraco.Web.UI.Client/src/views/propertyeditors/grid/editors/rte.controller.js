@@ -1,7 +1,7 @@
 (function() {
     "use strict";
 
-    function GridRichTextEditorController($scope, tinyMceService, macroService, editorState) {
+    function GridRichTextEditorController($scope, tinyMceService, macroService, editorState, entityResource) {
 
         var vm = this;
 
@@ -10,27 +10,46 @@
         vm.openMacroPicker = openMacroPicker;
         vm.openEmbed = openEmbed;
 
+        var dataTypeId = ($scope.model && $scope.model.dataTypeId) ? $scope.model.dataTypeId : null;
+
         function openLinkPicker(editor, currentTarget, anchorElement) {
-						
-            vm.linkPickerOverlay = {
-                view: "linkpicker",
-                currentTarget: currentTarget,
-				anchors: tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)),
-                show: true,
-                submit: function(model) {
-                    tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
-                    vm.linkPickerOverlay.show = false;
-                    vm.linkPickerOverlay = null;
-                }
-            };
+
+            entityResource.getAnchors(JSON.stringify($scope.model.value)).then(function(anchorValues) {
+                
+                vm.linkPickerOverlay = {
+                    view: "linkpicker",
+                    currentTarget: currentTarget,
+                    anchors: anchorValues,
+                    dataTypeId: dataTypeId,
+                    ignoreUserStartNodes : $scope.model.config.ignoreUserStartNodes,
+                    show: true,
+                    submit: function(model) {
+                        tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
+                        vm.linkPickerOverlay.show = false;
+                        vm.linkPickerOverlay = null;
+                    }
+                };
+            });
+
         }
 
         function openMediaPicker(editor, currentTarget, userData) {
+            var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+            var startNodeIsVirtual = userData.startMediaIds.length !== 1;
+
+
+            if ($scope.model.config.ignoreUserStartNodes === "1") {
+                startNodeId = -1;
+                startNodeIsVirtual = true;
+            }
+
             vm.mediaPickerOverlay = {
                 currentTarget: currentTarget,
                 onlyImages: true,
                 showDetails: true,
-                startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
+                startNodeId: startNodeId,
+                startNodeIsVirtual: startNodeIsVirtual,
+                dataTypeId: dataTypeId,
                 view: "mediapicker",
                 show: true,
                 submit: function(model) {

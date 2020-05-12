@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, treeService) {
+function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, treeService, mediaHelper) {
 
    //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
    // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -57,6 +57,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
       totalPages: 0,
       items: []
    };
+
+   $scope.createAllowedButtonSingle = false;
+   $scope.createAllowedButtonSingleWithBlueprints = false;
+   $scope.createAllowedButtonMultiWithBlueprints = false;
+
 
    //when this is null, we don't check permissions
    $scope.currentNodePermissions = null;
@@ -181,7 +186,9 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
         // Another special case for members, only fields on the base table (cmsMember) can be used for sorting
         if (e.isSystem && $scope.entityType == "member") {
-            e.allowSorting = e.alias == 'username' || e.alias == 'email';
+            e.allowSorting = e.alias == 'username' ||
+                             e.alias == 'email' ||
+                             e.alias == 'updateDate';
         }
 
         if (e.isSystem) {
@@ -216,10 +223,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
             },
             500);
 
-        if (reload === true) {
-            $scope.reloadView($scope.contentId, true);
-        }
-
         if (err.data && angular.isArray(err.data.notifications)) {
             for (var i = 0; i < err.data.notifications.length; i++) {
                 notificationsService.showNotification(err.data.notifications[i]);
@@ -253,12 +256,12 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    with simple values */
 
    $scope.getContent = function() {
-       $scope.reloadView($scope.contentId, true);
+       $scope.reloadView($scope.contentId);
    }
 
-   $scope.reloadView = function (id, reloadFolders) {
-
+   $scope.reloadView = function (id) {
       $scope.viewLoaded = false;
+      $scope.folders = [];
 
       listViewHelper.clearSelection($scope.listViewResultSet.items, $scope.folders, $scope.selection);
 
@@ -268,23 +271,18 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          $scope.listViewResultSet = data;
 
          //update all values for display
+         var section = appState.getSectionState("currentSection");
          if ($scope.listViewResultSet.items) {
             _.each($scope.listViewResultSet.items, function (e, index) {
                setPropertyValues(e);
+               // create the folders collection (only for media list views)
+               if (section === "media" && !mediaHelper.hasFilePropertyType(e)) {
+                   $scope.folders.push(e);
+               }
             });
          }
 
-         if (reloadFolders && $scope.entityType === 'media') {
-            //The folders aren't loaded - we only need to do this once since we're never changing node ids
-            mediaResource.getChildFolders($scope.contentId)
-                    .then(function (folders) {
-                       $scope.folders = folders;
-                       $scope.viewLoaded = true;
-                    });
-
-         } else {
-            $scope.viewLoaded = true;
-         }
+          $scope.viewLoaded = true;
 
          //NOTE: This might occur if we are requesting a higher page number than what is actually available, for example
          // if you have more than one page and you delete all items on the last page. In this case, we need to reset to the last
@@ -402,13 +400,14 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                         if (activeNode) {
                             navigationService.reloadNode(activeNode);
                         }
+                        $scope.getContent();
                     });
                 }
             });
     };
 
    $scope.publish = function () {
-        applySelected(
+       var attempt = applySelected(
                 function (selected, index) { return contentResource.publishById(getIdCallback(selected[index])); },
                 function (count, total) {
                     var key = (total === 1 ? "bulk_publishedItemOfItem" : "bulk_publishedItemOfItems");
@@ -418,10 +417,15 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                     var key = (total === 1 ? "bulk_publishedItem" : "bulk_publishedItems");
                     return localizationService.localize(key, [total]);
                 });
+        if (attempt) {
+            attempt.then(function () {
+                $scope.getContent();
+            });
+        }
    };
 
     $scope.unpublish = function() {
-        applySelected(
+        var attempt = applySelected(
             function(selected, index) { return contentResource.unPublish(getIdCallback(selected[index])); },
             function(count, total) {
                 var key = (total === 1 ? "bulk_unpublishedItemOfItem" : "bulk_unpublishedItemOfItems");
@@ -431,6 +435,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                 var key = (total === 1 ? "bulk_unpublishedItem" : "bulk_unpublishedItems");
                 return localizationService.localize(key, [total]);
             });
+        if (attempt) {
+            attempt.then(function () {
+                $scope.getContent();
+            });
+        }
     };
 
     $scope.move = function() {
@@ -465,7 +474,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
        // a specific value from one of the methods, so we'll have to try this way. Even though the first method
        // will fire once per every node moved, the destination path will be the same and we need to use that to sync.
        var newPath = null;
-       applySelected(
+       var attempt = applySelected(
                function(selected, index) {
                    return contentResource.move({ parentId: target.id, id: getIdCallback(selected[index]) })
                        .then(function(path) {
@@ -502,6 +511,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                        });
                }
            });
+       if (attempt) {
+           attempt.then(function () {
+               $scope.getContent();
+           });
+       }  
    }
 
    $scope.copy = function () {
@@ -529,7 +543,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    };
 
    function performCopy(target, relateToOriginal) {
-      applySelected(
+      var attempt = applySelected(
              function (selected, index) { return contentResource.copy({ parentId: target.id, id: getIdCallback(selected[index]), relateToOriginal: relateToOriginal }); },
              function (count, total) {
                  var key = (total === 1 ? "bulk_copiedItemOfItem" : "bulk_copiedItemOfItems");
@@ -539,6 +553,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                  var key = (total === 1 ? "bulk_copiedItem" : "bulk_copiedItems");
                  return localizationService.localize(key, [total]);
              });
+       if (attempt) {
+           attempt.then(function () {
+               $scope.getContent();
+           });
+       }
    }
 
    function getCustomPropertyValue(alias, properties) {
@@ -609,7 +628,32 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          id = -1;
       }
 
-      $scope.listViewAllowedTypes = getContentTypesCallback(id);
+       //$scope.listViewAllowedTypes = getContentTypesCallback(id);
+      getContentTypesCallback(id).then(function (listViewAllowedTypes) {
+          $scope.listViewAllowedTypes = listViewAllowedTypes;
+
+          var blueprints = false;
+          _.each(listViewAllowedTypes, function (allowedType) {
+              if (_.isEmpty(allowedType.blueprints)) {
+                  // this helps the view understand that there are no blueprints available
+                  allowedType.blueprints = null;
+              }
+              else {
+                  blueprints = true;
+              }
+          });
+
+          if (listViewAllowedTypes.length === 1 && blueprints === false) {
+              $scope.createAllowedButtonSingle = true;
+          }
+          if (listViewAllowedTypes.length === 1 && blueprints === true) {
+              $scope.createAllowedButtonSingleWithBlueprints = true;
+          }
+          if (listViewAllowedTypes.length > 1) {
+              $scope.createAllowedButtonMultiWithBlueprints = true;
+          }
+      });
+
 
       $scope.contentId = id;
       $scope.isTrashed = id === "-20" || id === "-21";
@@ -623,7 +667,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
              $scope.options.allowBulkMove ||
              $scope.options.allowBulkDelete;
 
-      $scope.reloadView($scope.contentId, true);
+      $scope.reloadView($scope.contentId);
    }
 
    function getLocalizedKey(alias) {
@@ -660,6 +704,22 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          }
       }
    }
+
+
+   function createBlank(entityType,docTypeAlias) {
+       $location
+         .path("/" + entityType + "/" + entityType + "/edit/" + $scope.contentId)
+         .search("doctype=" + docTypeAlias + "&create=true");
+   }
+
+   function createFromBlueprint(entityType,docTypeAlias, blueprintId) {
+       $location
+         .path("/" + entityType + "/" + entityType + "/edit/" + $scope.contentId)
+         .search("doctype=" + docTypeAlias + "&create=true&blueprintId=" + blueprintId);
+   }
+
+   $scope.createBlank = createBlank;
+   $scope.createFromBlueprint = createFromBlueprint;
 
    //GO!
    initView();

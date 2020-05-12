@@ -12,7 +12,7 @@
 
                 <ul ng-if="nodeUrl" class="nav nav-stacked" style="margin-bottom: 0;">
                     <li>
-                        <a href="{{nodeUrl}}" target="_blank">
+                        <a ng-attr-href="{{node.extension !== 'svg' ? nodeUrl : undefined}}" ng-click="node.extension === 'svg' && openSVG()" target="_blank">
                             <i class="icon icon-window-popin"></i>
                             <span>{{nodeUrl}}</span>
                         </a>
@@ -29,11 +29,11 @@
             <umb-box-header title-key="general_general"></umb-box-header>
             <umb-box-content class="block-form">
 
-                <umb-control-group data-element="node-info-create-date" label="@content_createDate">
+                <umb-control-group ng-if="node.id !== 0" data-element="node-info-create-date" label="@content_createDate">
                     {{node.createDateFormatted}} by {{ node.owner.name }}
                 </umb-control-group>
 
-                <umb-control-group data-element="node-info-update-date" label="@content_updateDate">
+                <umb-control-group ng-if="node.id !== 0" data-element="node-info-update-date" label="@content_updateDate">
                     {{node.updateDateFormatted}}
                 </umb-control-group>
 
@@ -47,7 +47,7 @@
                     </umb-node-preview>
                 </umb-control-group>
 
-                <umb-control-group data-element="node-info-id" label="Id">
+                <umb-control-group ng-if="node.id !== 0" data-element="node-info-id" label="Id">
                     <div>{{ node.id }}</div>
                     <small>{{ node.key }}</small>
                 </umb-control-group>

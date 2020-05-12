@@ -110,6 +110,11 @@ namespace Umbraco.Core
 				/// Property alias for the Media's file extension.
 				/// </summary>
 				public const string Extension = "umbracoExtension";
+
+				/// <summary>
+				/// The default height/width of an image file if the size can't be determined from the metadata
+				/// </summary>
+				public const int DefaultSize = 200;
 			}
 
 			/// <summary>

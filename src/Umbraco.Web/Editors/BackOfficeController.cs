@@ -76,6 +76,16 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public async Task<ActionResult> VerifyInvite(string invite)
         {
+            //if you are hitting VerifyInvite, you're already signed in as a different user, and the token is invalid
+            //you'll exit on one of the return RedirectToAction("Default") but you're still logged in so you just get
+            //dumped at the default admin view with no detail
+            if(Security.IsAuthenticated())
+            {
+                AuthenticationManager.SignOut(
+                    Core.Constants.Security.BackOfficeAuthenticationType,
+                    Core.Constants.Security.BackOfficeExternalAuthenticationType);
+            }
+            
             if (invite == null)
             {
                 Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: NULL");
@@ -119,16 +129,15 @@ namespace Umbraco.Web.Editors
             if (result.Succeeded == false)
             {
                 Logger.Warn<BackOfficeController>("Could not verify email, Error: " + string.Join(",", result.Errors) + ", Token: " + invite);
-                return RedirectToAction("Default");
+                return new RedirectResult(Url.Action("Default") + "#/login/false?invite=3");
             }
 
             //sign the user in
-
-            AuthenticationManager.SignOut(
-                Core.Constants.Security.BackOfficeAuthenticationType,
-                Core.Constants.Security.BackOfficeExternalAuthenticationType);
-
+            DateTime? previousLastLoginDate = identityUser.LastLoginDateUtc;
             await SignInManager.SignInAsync(identityUser, false, false);
+            //reset the lastlogindate back to previous as the user hasn't actually logged in, to add a flag or similar to SignInManager would be a breaking change
+            identityUser.LastLoginDateUtc = previousLastLoginDate;
+            await UserManager.UpdateAsync(identityUser);
 
             return new RedirectResult(Url.Action("Default") + "#/login/false?invite=1");
         }
@@ -168,7 +177,7 @@ namespace Umbraco.Web.Editors
                 //the dictionary returned is fine but the delimiter between an 'area' and a 'value' is a '/' but the javascript
                 // in the back office requres the delimiter to be a '_' so we'll just replace it
                 .ToDictionary(key => key.Key.Replace("/", "_"), val => val.Value);
-
+            var formatting = GlobalSettings.DebugMode ? Formatting.Indented : Formatting.None;
             return new JsonNetResult { Data = textForCulture, Formatting = Formatting.Indented };
         }
 
@@ -221,7 +230,7 @@ namespace Umbraco.Web.Editors
                     typeof(BackOfficeController) + "GetManifestAssetList",
                     () => getResult(),
                     new TimeSpan(0, 10, 0));
-
+            var formatting = GlobalSettings.DebugMode ? Formatting.Indented : Formatting.None;
             return new JsonNetResult { Data = result, Formatting = Formatting.Indented };
         }
 
@@ -235,7 +244,7 @@ namespace Umbraco.Web.Editors
                 new DirectoryInfo(Server.MapPath(SystemDirectories.AppPlugins)),
                 new DirectoryInfo(Server.MapPath(SystemDirectories.Config)),
                 HttpContext.IsDebuggingEnabled);
-
+            var formatting = GlobalSettings.DebugMode ? Formatting.Indented : Formatting.None;
             return new JsonNetResult { Data = gridConfig.EditorsConfig.Editors, Formatting = Formatting.Indented };
         }
 

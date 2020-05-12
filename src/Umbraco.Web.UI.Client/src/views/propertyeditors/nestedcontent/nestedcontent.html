@@ -37,38 +37,18 @@
         </div>
 
         <div class="umb-nested-content__footer-bar" ng-hide="nodes.length >= maxItems">
-            <a class="umb-nested-content__icon" ng-click="openNodeTypePicker($event)" prevent-default>
+            <a href class="umb-nested-content__icon" ng-click="openNodeTypePicker($event)" prevent-default>
                 <i class="icon icon-add"></i>
             </a>
         </div>
 
-        <div class="usky-grid umb-nested-content__node-type-picker" ng-if="overlayMenu.show">
-            <div class="cell-tools-menu" ng-style="overlayMenu.style" style="margin: 0;" delayed-mouseleave="closeNodeTypePicker()" on-delayed-mouseleave="closeNodeTypePicker()">
-                <h5>
-                    <localize key="grid_insertControl" />
-                </h5>
-
-                <div class="form-search" ng-hide="overlayMenu.showFilter === false" style="margin-bottom: 15px;">
-                    <i class="icon-search"></i>
-                    <input type="text"
-                           ng-model="searchTerm"
-                           class="umb-search-field search-query input-block-level -full-width-input"
-                           localize="placeholder"
-                           placeholder="@placeholders_filter"
-                           umb-auto-focus
-                           no-dirty-check />
-                </div>
-
-                <ul class="elements">
-                    <li ng-repeat="scaffold in overlayMenu.scaffolds | filter:searchTerm">
-                        <a ng-click="addNode(scaffold.alias)" href>
-                            <i class="icon {{scaffold.icon}}"></i>
-                            {{scaffold.name}}
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
     </ng-form>
+
+    <umb-overlay
+        ng-if="overlayMenu.show"
+        position="target"
+        view="overlayMenu.view"
+        model="overlayMenu">
+    </umb-overlay>
+
 </div>

@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Models
 {
-    internal enum PropertyTagBehavior
+    public enum PropertyTagBehavior
     {
         Replace,
         Remove,

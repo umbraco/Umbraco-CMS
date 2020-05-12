@@ -26,7 +26,7 @@ function relationResource($q, $http, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "relationApiBaseUrl",
                         "GetByChildId",
-                        [{ childId: id, relationTypeAlias: alias }])),
+                        { childId: id, relationTypeAlias: alias })),
                 "Failed to get relation by child ID " + id + " and type of " + alias);
         },
 

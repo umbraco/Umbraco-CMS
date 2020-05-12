@@ -63,7 +63,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
             TreeSyncPath = DeepLink.GetTreePathFromFilePath(filename).TrimEnd(".css");
 
             // name derives from path, without the .css extension, clean for xss
-            NameTxt.Text = stylesheet.Path.TrimEnd(".css").CleanForXss('\\', '/');
+            NameTxt.Text = stylesheet.Path.TrimEnd(".css").CleanForXss('\\', '/').Replace("\\", "/");
 
             if (IsPostBack == false)
             {

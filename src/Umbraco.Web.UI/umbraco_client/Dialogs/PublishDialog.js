@@ -37,12 +37,13 @@
                 },
                 startPublish: function() {
                     this.processStatus("publishing");
-                    
+
+                    var includeUnpublished = self._koViewModel.includeUnpublished();
                     $.post(self._opts.restServiceLocation + "PublishDocument",
                     JSON.stringify({
                         documentId: self._opts.documentId,
                         publishDescendants: self._koViewModel.publishAll(),
-                        includeUnpublished: self._koViewModel.includeUnpublished()
+                        includeUnpublished: includeUnpublished
                     }),
                     function (e) {
                         self._koViewModel.processStatus("complete");
@@ -59,7 +60,13 @@
 
                         //sync the tree
                         UmbClientMgr.mainTree().setActiveTreeType('content');
-                        UmbClientMgr.mainTree().syncTree(self._opts.documentPath, true);
+                        UmbClientMgr.mainTree().syncTree(self._opts.documentPath, true)
+                        if (includeUnpublished) {
+                            var node = UmbClientMgr.mainTree().getActionNode();
+                            if (node.expanded === true) {
+                                UmbClientMgr.mainTree().reloadActionNode();
+                            }
+                        }
                     });
                 }
             };

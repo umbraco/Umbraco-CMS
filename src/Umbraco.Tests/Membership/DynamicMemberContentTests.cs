@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Membership
                     new PublishedPropertyType("bodyText", 0, "?"), 
                     new PublishedPropertyType("author", 0, "?")
                 };
-            var type = new AutoPublishedContentType(0, "anything", propertyTypes);
+            var type = new AutoPublishedContentType(0, "anything", "anything", "anything", propertyTypes);
             PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
 
         }

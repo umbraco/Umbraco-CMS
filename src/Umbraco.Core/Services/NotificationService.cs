@@ -58,54 +58,7 @@ namespace Umbraco.Core.Services
             if (entity is IContent == false)
                 throw new NotSupportedException();
 
-            var content = (IContent) entity;
-
-            // lazily get previous version
-            IContentBase prevVersion = null;
-
-            // do not load *all* users in memory at once
-            // do not load notifications *per user* (N+1 select)
-            // cannot load users & notifications in 1 query (combination btw User2AppDto and User2NodeNotifyDto)
-            // => get batches of users, get all their notifications in 1 query
-            // re. users:
-            //  users being (dis)approved = not an issue, filtered in memory not in SQL
-            //  users being modified or created = not an issue, ordering by ID, as long as we don't *insert* low IDs
-            //  users being deleted = not an issue for GetNextUsers
-            var id = 0;
-            var nodeIds = content.Path.Split(',').Select(int.Parse).ToArray();
-            const int pagesz = 400; // load batches of 400 users
-            do
-            {
-                // users are returned ordered by id, notifications are returned ordered by user id
-                var users = ((UserService) _userService).GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
-                var notifications = GetUsersNotifications(users.Select(x => x.Id), action, nodeIds, Constants.ObjectTypes.DocumentGuid).ToList();
-                if (notifications.Count == 0) break;
-
-                var i = 0;
-                foreach (var user in users)
-                {
-                    // continue if there's no notification for this user
-                    if (notifications[i].UserId != user.Id) continue; // next user
-
-                    // lazy load prev version
-                    if (prevVersion == null)
-                    {
-                        prevVersion = GetPreviousVersion(entity.Id);
-                    }
-
-                    // queue notification
-                    var req = CreateNotificationRequest(operatingUser, user, content, prevVersion, actionName, http, createSubject, createBody);
-                    Enqueue(req);
-
-                    // skip other notifications for this user
-                    while (i < notifications.Count && notifications[i++].UserId == user.Id) ;
-                    if (i >= notifications.Count) break; // break if no more notifications
-                }
-
-                // load more users if any
-                id = users.Count == pagesz ? users.Last().Id + 1 : -1;
-
-            } while (id > 0);
+            SendNotifications(operatingUser, new[] { (IContent)entity }, action, actionName, http, createSubject, createBody);
         }
 
         /// <summary>
@@ -154,7 +107,14 @@ namespace Umbraco.Core.Services
             // lazily get versions
             var prevVersionDictionary = new Dictionary<int, IContentBase>();
 
-            // see notes above
+            // do not load *all* users in memory at once
+            // do not load notifications *per user* (N+1 select)
+            // cannot load users & notifications in 1 query (combination btw User2AppDto and User2NodeNotifyDto)
+            // => get batches of users, get all their notifications in 1 query
+            // re. users:
+            //  users being (dis)approved = not an issue, filtered in memory not in SQL
+            //  users being modified or created = not an issue, ordering by ID, as long as we don't *insert* low IDs
+            //  users being deleted = not an issue for GetNextUsers
             var id = 0;
             const int pagesz = 400; // load batches of 400 users
             do
@@ -164,40 +124,52 @@ namespace Umbraco.Core.Services
                 var notifications = GetUsersNotifications(users.Select(x => x.Id), action, Enumerable.Empty<int>(), Constants.ObjectTypes.DocumentGuid).ToList();
                 if (notifications.Count == 0) break;
 
-                var i = 0;
-                foreach (var user in users)
+                while (notifications.Count > 0)
                 {
-                    // continue if there's no notification for this user
-                    if (notifications[i].UserId != user.Id) continue; // next user
+                    var notification = notifications[0];
+                    var isMatched = false;
+
+                    // grab user whose associated to the notification
+                    var user = users.Where(x => x.Id == notification.UserId).FirstOrDefault();
+
+                    if (user == null)
+                    {
+                        notifications.RemoveAll(x => x.UserId == notification.UserId);
+                    }
 
                     for (var j = 0; j < entitiesL.Count; j++)
                     {
                         var content = entitiesL[j];
                         var path = paths[j];
-                        
+
                         // test if the notification applies to the path ie to this entity
-                        if (path.Contains(notifications[i].EntityId) == false) continue; // next entity
-                        
+                        if (path.Contains(notification.EntityId) == false) continue; // next entity
+
+                        isMatched = true;
+
                         if (prevVersionDictionary.ContainsKey(content.Id) == false)
                         {
                             prevVersionDictionary[content.Id] = GetPreviousVersion(content.Id);
                         }
-                        
+
                         // queue notification
                         var req = CreateNotificationRequest(operatingUser, user, content, prevVersionDictionary[content.Id], actionName, http, createSubject, createBody);
                         Enqueue(req);
+
+                        // don't process any further entities as a notification has been sent
+                        break;
                     }
 
-                    // skip other notifications for this user, essentially this means moving i to the next index of notifications
-                    // for the next user.
-                    do
+                    // when a match has been found, skip other notifications for user.
+                    if (isMatched)
                     {
-                        i++;
-                    } while (i < notifications.Count && notifications[i].UserId == user.Id);
-                    
-                    if (i >= notifications.Count) break; // break if no more notifications
-                }
+                        notifications.RemoveAll(x => x.UserId == notification.UserId);
+                        continue;
+                    }
 
+                    notifications.Remove(notification);
+                }
+                
                 // load more users if any
                 id = users.Count == pagesz ? users.Last().Id + 1 : -1;
 

@@ -30,7 +30,7 @@ namespace umbraco.providers.members
     /// <summary>
     /// Custom Membership Provider for Umbraco Members (User authentication for Frontend applications NOT umbraco CMS)  
     /// </summary>
-    [Obsolete("This has been superceded by Umbraco.Web.Security.Providers.MembersMembershipProvider")]
+    [Obsolete("This has been superseded by Umbraco.Web.Security.Providers.MembersMembershipProvider")]
     public class UmbracoMembershipProvider : UmbracoMembershipProviderBase, IUmbracoMemberTypeMembershipProvider
     {
         public UmbracoMembershipProvider()
@@ -111,7 +111,7 @@ namespace umbraco.providers.members
         /// <exception cref="T:System.ArgumentException">The name of the provider has a length of zero.</exception>
         public override void Initialize(string name, NameValueCollection config)
         {
-            // Intialize values from web.config
+            // Initialize values from web.config
             if (config == null) throw new ArgumentNullException("config");
 
             if (string.IsNullOrEmpty(name)) name = Constants.Conventions.Member.UmbracoMemberProviderName;
@@ -189,7 +189,7 @@ namespace umbraco.providers.members
         /// </returns>
         protected override bool PerformChangePassword(string username, string oldPassword, string newPassword)
         {
-            //NOTE: due to backwards compatibilty reasons, this provider doesn't care about the old password and 
+            //NOTE: due to backwards compatibility reasons, this provider doesn't care about the old password and 
             // allows simply setting the password manually so we don't really care about the old password.
             // This is allowed based on the overridden AllowManuallyChangingPassword option.
 

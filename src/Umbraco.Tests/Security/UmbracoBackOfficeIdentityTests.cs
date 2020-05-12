@@ -4,9 +4,14 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Security;
+using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Profiling;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 
@@ -15,8 +20,23 @@ namespace Umbraco.Tests.Security
     [TestFixture]
     public class UmbracoBackOfficeIdentityTests
     {
-
         public const string TestIssuer = "TestIssuer";
+
+        [SetUp]
+        public void Initialize()
+        {
+            var sqlSyntax = new SqlCeSyntaxProvider();
+
+            //This is needed because the Migration resolver is creating migration instances with their full ctors
+            ApplicationContext.EnsureContext(
+                new ApplicationContext(
+                    new DatabaseContext(Mock.Of<IScopeProviderInternal>(), Mock.Of<ILogger>(), sqlSyntax, "test"),
+                    new ServiceContext(),
+                    CacheHelper.CreateDisabledCacheHelper(),
+                    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())),
+                true);
+        }
+
 
         [Test]
         public void Create_From_Claims_Identity()

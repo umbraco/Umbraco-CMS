@@ -13,44 +13,7 @@
         var submitOnEnter = true;
     </script>
 
-    <style type="text/css">
-        .propertyItemheader {
-            width: 140px !Important;
-        }
-
-        .diff {
-            margin-top: 10px;
-            height: 100%;
-            overflow: auto;
-            border-top: 1px solid #ccc;
-            border-top: 1px solid #ccc;
-            padding: 5px;
-        }
-
-            .diff table td {
-                border-bottom: 1px solid #ccc;
-                padding: 3px;
-            }
-
-            .diff del {
-                background: rgb(255, 230, 230) none repeat scroll 0%;
-                -moz-background-clip: -moz-initial;
-                -moz-background-origin: -moz-initial;
-                -moz-background-inline-policy: -moz-initial;
-            }
-
-            .diff ins {
-                background: rgb(230, 255, 230) none repeat scroll 0%;
-                -moz-background-clip: -moz-initial;
-                -moz-background-origin: -moz-initial;
-                -moz-background-inline-policy: -moz-initial;
-            }
-
-            .diff .diffnotice {
-                text-align: center;
-                margin-bottom: 10px;
-            }
-    </style>
+    
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">

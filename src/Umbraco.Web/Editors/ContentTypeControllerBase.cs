@@ -109,6 +109,25 @@ namespace Umbraco.Web.Editors
 
             var availableCompositions = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, filterContentTypes, filterPropertyTypes);
 
+            Func<IContentTypeComposition, IEnumerable<EntityContainer>> getEntityContainers = contentType =>
+            {
+                if (contentType == null)
+                {
+                    return null;
+                }
+                switch (type)
+                {
+                    case UmbracoObjectTypes.DocumentType:
+                        return Services.ContentTypeService.GetContentTypeContainers(contentType as IContentType);
+                    case UmbracoObjectTypes.MediaType:
+                        return Services.ContentTypeService.GetMediaTypeContainers(contentType as IMediaType);
+                    case UmbracoObjectTypes.MemberType:
+                        return new EntityContainer[0];
+                    default:
+                        throw new ArgumentOutOfRangeException("The entity type was not a content type");
+                }
+            };
+
             var currCompositions = source == null ? new IContentTypeComposition[] { } : source.ContentTypeComposition.ToArray();
             var compAliases = currCompositions.Select(x => x.Alias).ToArray();
             var ancestors = availableCompositions.Ancestors.Select(x => x.Alias);
@@ -117,9 +136,6 @@ namespace Umbraco.Web.Editors
                 .Select(x => new Tuple<EntityBasic, bool>(Mapper.Map<IContentTypeComposition, EntityBasic>(x.Composition), x.Allowed))
                 .Select(x =>
                 {
-                    //translate the name
-                    x.Item1.Name = TranslateItem(x.Item1.Name);
-
                     //we need to ensure that the item is enabled if it is already selected
                     // but do not allow it if it is any of the ancestors
                     if (compAliases.Contains(x.Item1.Alias) && ancestors.Contains(x.Item1.Alias) == false)
@@ -127,6 +143,14 @@ namespace Umbraco.Web.Editors
                         //re-set x to be allowed (NOTE: I didn't know you could set an enumerable item in a lambda!)
                         x = new Tuple<EntityBasic, bool>(x.Item1, true);
                     }
+
+                    //translate the name
+                    x.Item1.Name = TranslateItem(x.Item1.Name);
+
+                    var contentType = allContentTypes.FirstOrDefault(c => c.Key == x.Item1.Key);
+                    var containers = getEntityContainers(contentType)?.ToArray();
+                    var containerPath = $"/{(containers != null && containers.Any() ? $"{string.Join("/", containers.Select(c => c.Name))}/" : null)}";
+                    x.Item1.AdditionalData["containerPath"] = containerPath;
 
                     return x;
                 })
@@ -136,7 +160,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Returns a list of content types where a particular composition content type is used
         /// </summary>
-        /// <param name="type">Type of content Type, eg documentType or mediaType</param>      
+        /// <param name="type">Type of content Type, eg documentType or mediaType</param>
         /// <param name="contentTypeId">Id of composition content type</param>
         /// <returns></returns>
         protected IEnumerable<EntityBasic> PerformGetWhereCompositionIsUsedInContentTypes(int contentTypeId,
@@ -187,7 +211,7 @@ namespace Umbraco.Web.Editors
                 .Select(x =>
                 {
                     //translate the name
-                    x.Name = TranslateItem(x.Name);               
+                    x.Name = TranslateItem(x.Name);
 
                     return x;
                 })
@@ -279,9 +303,12 @@ namespace Umbraco.Web.Editors
                 //check if the type is trying to allow type 0 below itself - id zero refers to the currently unsaved type
                 //always filter these 0 types out
                 var allowItselfAsChild = false;
+                var allowIfselfAsChildSortOrder = -1;
                 if (contentTypeSave.AllowedContentTypes != null)
                 {
+                    allowIfselfAsChildSortOrder = contentTypeSave.AllowedContentTypes.IndexOf(0);
                     allowItselfAsChild = contentTypeSave.AllowedContentTypes.Any(x => x == 0);
+
                     contentTypeSave.AllowedContentTypes = contentTypeSave.AllowedContentTypes.Where(x => x > 0).ToList();
                 }
 
@@ -310,10 +337,12 @@ namespace Umbraco.Web.Editors
                 saveContentType(newCt);
 
                 //we need to save it twice to allow itself under itself.
-                if (allowItselfAsChild)
+                if (allowItselfAsChild && newCt != null)
                 {
-                    //NOTE: This will throw if the composition isn't right... but it shouldn't be at this stage
-                    newCt.AddContentType(newCt);
+                    newCt.AllowedContentTypes =
+                        newCt.AllowedContentTypes.Union(
+                            new []{ new ContentTypeSort(newCt.Id, allowIfselfAsChildSortOrder) }
+                        );
                     saveContentType(newCt);
                 }
                 return newCt;

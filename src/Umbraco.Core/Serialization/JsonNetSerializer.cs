@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Serialization
 {
@@ -60,6 +61,7 @@ namespace Umbraco.Core.Serialization
         /// <returns></returns>
         public IStreamedResult ToStream(object input)
         {
+            var formatting = GlobalSettings.DebugMode ? Formatting.Indented : Formatting.None;
             string s = JsonConvert.SerializeObject(input, Formatting.Indented, _settings);
             byte[] bytes = Encoding.UTF8.GetBytes(s);
             MemoryStream ms = new MemoryStream(bytes);

@@ -141,7 +141,7 @@ namespace Umbraco.Web.Editors
             where TPersisted : IContentBase 
             where T : ContentPropertyBasic
         {
-            //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
+            //lastly, if it is not valid, add the modelstate to the outgoing object and throw a 403
             if (!ModelState.IsValid)
             {
                 display.Errors = ModelState.ToErrorDictionary();

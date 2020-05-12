@@ -72,21 +72,16 @@ namespace Umbraco.Core.Cache
         /// <returns></returns>
         public override object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
-            return GetCacheItem(cacheKey, getCacheItem, null, dependentFiles: null);
+            return GetCacheItemInternal(cacheKey, getCacheItem, null);
         }
 
-        /// <summary>
-        /// This overload is here for legacy purposes
-        /// </summary>
-        /// <param name="cacheKey"></param>
-        /// <param name="getCacheItem"></param>
-        /// <param name="timeout"></param>
-        /// <param name="isSliding"></param>
-        /// <param name="priority"></param>
-        /// <param name="removedCallback"></param>
-        /// <param name="dependency"></param>
-        /// <returns></returns>
+        [Obsolete("This is here for legacy reasons only, do not use this method, it has memory leaks")]
         internal object GetCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, CacheDependency dependency = null)
+        {
+            return GetCacheItemInternal(cacheKey, getCacheItem, timeout, isSliding, priority, removedCallback, () => dependency);
+        }
+
+        private object GetCacheItemInternal(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, Func<CacheDependency> dependency = null)
         {
             cacheKey = GetCacheKey(cacheKey);
 
@@ -141,7 +136,7 @@ namespace Umbraco.Core.Cache
 
                     lck.UpgradeToWriteLock();
                     //NOTE: 'Insert' on System.Web.Caching.Cache actually does an add or update!
-                    _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
+                    _cache.Insert(cacheKey, result, dependency?.Invoke(), absolute, sliding, priority, removedCallback);
                 }
             }
 
@@ -160,29 +155,22 @@ namespace Umbraco.Core.Cache
 
         public object GetCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
-            CacheDependency dependency = null;
-            if (dependentFiles != null && dependentFiles.Any())
-            {
-                dependency = new CacheDependency(dependentFiles);
-            }
-            return GetCacheItem(cacheKey, getCacheItem, timeout, isSliding, priority, removedCallback, dependency);
+            return GetCacheItemInternal(cacheKey, getCacheItem, timeout, isSliding, priority, removedCallback,
+                // Don't create a CacheDependency object unless we need it, see https://github.com/umbraco/Umbraco-CMS/issues/7773
+                () => dependentFiles != null && dependentFiles.Length > 0 ? new CacheDependency(dependentFiles) : null);
         }
 
         #endregion
 
         #region Insert
 
-        /// <summary>
-        /// This overload is here for legacy purposes
-        /// </summary>
-        /// <param name="cacheKey"></param>
-        /// <param name="getCacheItem"></param>
-        /// <param name="timeout"></param>
-        /// <param name="isSliding"></param>
-        /// <param name="priority"></param>
-        /// <param name="removedCallback"></param>
-        /// <param name="dependency"></param>
+        [Obsolete("This is here for legacy reasons only, do not use this method, it has memory leaks")]
         internal void InsertCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, CacheDependency dependency = null)
+        {
+            InsertCacheItemInternal(cacheKey, getCacheItem, timeout, isSliding, priority, removedCallback, () => dependency);
+        }
+
+        private void InsertCacheItemInternal(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, Func<CacheDependency> dependency = null)
         {
             // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
             // and make sure we don't store a null value.
@@ -199,18 +187,15 @@ namespace Umbraco.Core.Cache
             using (new WriteLock(_locker))
             {
                 //NOTE: 'Insert' on System.Web.Caching.Cache actually does an add or update!
-                _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
+                _cache.Insert(cacheKey, result, dependency?.Invoke(), absolute, sliding, priority, removedCallback);
             }
         }
 
         public void InsertCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
-            CacheDependency dependency = null;
-            if (dependentFiles != null && dependentFiles.Any())
-            {
-                dependency = new CacheDependency(dependentFiles);
-            }
-            InsertCacheItem(cacheKey, getCacheItem, timeout, isSliding, priority, removedCallback, dependency);
+            InsertCacheItemInternal(cacheKey, getCacheItem, timeout, isSliding, priority, removedCallback,
+                // Don't create a CacheDependency object unless we need it, see https://github.com/umbraco/Umbraco-CMS/issues/7773
+                () => dependentFiles != null && dependentFiles.Length > 0 ? new CacheDependency(dependentFiles) : null);
         }
 
         #endregion

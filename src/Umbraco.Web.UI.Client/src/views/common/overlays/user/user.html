@@ -1,5 +1,4 @@
 <div ng-controller="Umbraco.Overlays.UserController">
-
     <div class="umb-control-group" ng-if="!showPasswordFields">
 
        <h5><localize key="user_yourProfile" /></h5>
@@ -78,7 +77,7 @@
     </div>
 
 
-    <div class="umb-control-group" ng-if="!showPasswordFields">
+    <div class="umb-control-group" ng-if="!showPasswordFields && history.length">
         <h5><localize key="user_yourHistory" /></h5>
         <ul class="umb-tree">
             <li ng-repeat="item in history | orderBy:'time':true">
@@ -126,7 +125,7 @@
 
     </div>
 
-    <div class="umb-control-group">
+    <div class="umb-control-group" ng-if="tab.length">
         <div ng-repeat="tab in dashboard">
             <div ng-repeat="property in tab.properties">
                 <div>

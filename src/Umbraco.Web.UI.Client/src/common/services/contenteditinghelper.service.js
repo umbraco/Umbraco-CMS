@@ -253,9 +253,9 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 }
             }
 
-            // If we have a scheduled publish or unpublish date change the default button to 
+            // If we have a scheduled publish date change the default button to 
             // "save" and update the label to "save and schedule
-            if(args.content.releaseDate || args.content.removeDate) {
+            if(args.content.releaseDate) {
 
                 // if save button is alread the default don't change it just update the label
                 if (buttons.defaultButton && buttons.defaultButton.letter === "A") {

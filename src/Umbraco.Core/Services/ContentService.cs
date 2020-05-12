@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
@@ -34,6 +35,7 @@ namespace Umbraco.Core.Services
         //Support recursive locks because some of the methods that require locking call other methods that require locking.
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        private static readonly Regex AnchorRegex = new Regex("<a id=\"(.*?)\">", RegexOptions.Compiled);
 
         public ContentService(
             IDatabaseUnitOfWorkProvider provider,
@@ -297,6 +299,45 @@ namespace Umbraco.Core.Services
             }
 
             return content;
+        }
+
+        public IEnumerable<string> GetAnchorValuesFromRTEs(int id)
+        {
+            var result = new List<string>();
+
+            var content = GetById(id);
+
+            foreach (var contentProperty in content.Properties)
+            {
+                if (contentProperty.PropertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.TinyMCEAlias))
+                {
+                    var value = contentProperty.Value?.ToString();
+
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        result.AddRange(GetAnchorValuesFromRTEContent(value));
+                    }
+
+                }
+            }
+
+
+            return result;
+        }
+
+
+        public IEnumerable<string> GetAnchorValuesFromRTEContent(string rteContent)
+        {
+            var result = new List<string>();
+
+            var matches = AnchorRegex.Matches(rteContent);
+
+            foreach (Match match in matches)
+            {
+                result.Add(match.Value.Split('\"')[1]);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -694,7 +735,7 @@ namespace Umbraco.Core.Services
                     }
                     query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", contentPath[0].Path), TextColumnType.NVarchar));
                 }
-                    
+
 
                 // get filter
                 IQuery<IContent> filterQuery = null;
@@ -987,11 +1028,11 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var sql = new Sql(@"
-                    SELECT id 
+                    SELECT id
                     FROM umbracoNode
                     JOIN cmsDocument ON umbracoNode.id=cmsDocument.nodeId AND cmsDocument.published=@0
                     WHERE umbracoNode.trashed=@1 AND umbracoNode.id IN (@2)",
-                    true, false, ids);                    
+                    true, false, ids);
                 var x = uow.Database.Fetch<int>(sql);
                 return ids.Length == x.Count;
             }
@@ -1741,7 +1782,15 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
         /// </summary>
-        public void EmptyRecycleBin()
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use EmptyRecycleBin with explicit indication of user ID instead")]
+        public void EmptyRecycleBin() => EmptyRecycleBin(0);
+
+        /// <summary>
+        /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
+        /// </summary>
+        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>
+        public void EmptyRecycleBin(int userId = 0)
         {
             using (new WriteLock(Locker))
             {
@@ -1771,7 +1820,7 @@ namespace Umbraco.Core.Services
                     recycleBinEventArgs.RecycleBinEmptiedSuccessfully = success;
                     uow.Events.Dispatch(EmptiedRecycleBin, this, recycleBinEventArgs);
 
-                    Audit(uow, AuditType.Delete, "Empty Content Recycle Bin performed by user", 0, Constants.System.RecycleBinContent);
+                    Audit(uow, AuditType.Delete, "Empty Content Recycle Bin performed by user", userId, Constants.System.RecycleBinContent);
                     uow.Commit();
                 }
             }
@@ -2060,12 +2109,15 @@ namespace Umbraco.Core.Services
             using (new WriteLock(Locker))
             {
                 var allContent = GetByIds(ids).ToDictionary(x => x.Id, x => x);
-                var items = ids.Select(x => allContent[x]);
+                if (allContent.Any() == false)
+                {
+                    return false;
+                }
+                var items = ids.Select(x => allContent[x]).ToArray();
 
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    var asArray = items.ToArray();
-                    var saveEventArgs = new SaveEventArgs<IContent>(asArray);
+                    var saveEventArgs = new SaveEventArgs<IContent>(items);
                     if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                     {
                         uow.Commit();
@@ -2075,7 +2127,7 @@ namespace Umbraco.Core.Services
                     var repository = RepositoryFactory.CreateContentRepository(uow);
 
                     var i = 0;
-                    foreach (var content in asArray)
+                    foreach (var content in items)
                     {
                         //If the current sort order equals that of the content
                         //we don't need to update it, so just increment the sort order
@@ -2122,7 +2174,7 @@ namespace Umbraco.Core.Services
                         _publishingStrategy.PublishingFinalized(uow, shouldBePublished, false);
                     }
 
-                    Audit(uow, AuditType.Sort, "Sorting content performed by user", userId, 0);
+                    Audit(uow, AuditType.Sort, "Sort child items performed by user", userId, items.First().ParentId);
                     uow.Commit();
                 }
             }
@@ -2184,6 +2236,17 @@ namespace Umbraco.Core.Services
             {
                 var repository = RepositoryFactory.CreateContentRepository(uow);
                 var result = repository.BuildXmlCache();
+                uow.Commit();
+                return result;
+            }
+        }
+
+        public XmlDocument BuildPreviewXmlCache()
+        {
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                var repository = RepositoryFactory.CreateContentRepository(uow);
+                var result = repository.BuildPreviewXmlCache();
                 uow.Commit();
                 return result;
             }
@@ -2572,8 +2635,18 @@ namespace Umbraco.Core.Services
                         _publishingStrategy.PublishingFinalized(uow, descendants, false);
                     }
 
-                    Audit(uow, AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
                     uow.Commit();
+
+                    if (publishStatus.StatusType == PublishStatusType.Success)
+                    {
+                        Audit(uow, AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
+                    }
+                    else
+                    {
+                        Audit(uow, AuditType.Save, "Save performed by user", userId, content.Id);
+                    }
+                    uow.Commit();
+
                     return Attempt.If(publishStatus.StatusType == PublishStatusType.Success, publishStatus);
                 }
             }
@@ -2592,6 +2665,8 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
+                var currVersion = content.Version;
+
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
                     var saveEventArgs = new SaveEventArgs<IContent>(content, evtMsgs);
@@ -2633,7 +2708,9 @@ namespace Umbraco.Core.Services
                     uow.Commit();
                 }
 
-                return OperationStatus.Success(evtMsgs);
+                return currVersion == content.Version
+                    ? OperationStatus.NoOperation(evtMsgs)
+                    : OperationStatus.Success(evtMsgs);
             }
         }
 

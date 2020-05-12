@@ -293,6 +293,8 @@ ngMobile.directive('ngClick', ['$parse', '$timeout', '$rootElement',
  * A leftward swipe is a quick, right-to-left slide of the finger.
  * Though ngSwipeLeft is designed for touch-based devices, it will work with a mouse click and drag too.
  *
+ *                  [well, it did until we disabled that feature to avoid problems with selecting text]
+ *
  * @element ANY
  * @param {expression} ngSwipeLeft {@link guide/expression Expression} to evaluate
  * upon left swipe. (Event object is available as `$event`)
@@ -388,7 +390,7 @@ function makeSwipeDirective(directiveName, direction) {
             deltaY / deltaX < MAX_VERTICAL_RATIO;
       }
 
-      element.bind('touchstart mousedown', function(event) {
+      element.bind('touchstart', function(event) {
         startCoords = getCoordinates(event);
         valid = true;
         totalX = 0;
@@ -401,7 +403,7 @@ function makeSwipeDirective(directiveName, direction) {
         valid = false;
       });
 
-      element.bind('touchmove mousemove', function(event) {
+      element.bind('touchmove', function(event) {
         if (!valid) return;
 
         // Android will send a touchcancel if it thinks we're starting to scroll.
@@ -440,7 +442,7 @@ function makeSwipeDirective(directiveName, direction) {
         }
       });
 
-      element.bind('touchend mouseup', function(event) {
+      element.bind('touchend', function(event) {
         if (validSwipe(event)) {
           // Prevent this swipe from bubbling up to any other elements with ngSwipes.
           event.stopPropagation();

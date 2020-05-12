@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -458,5 +460,23 @@ namespace Umbraco.Core.Security
 
             return ticket;
         }
+
+        /// <summary>
+        /// Ensures that the thread culture is set based on the back office user's culture
+        /// </summary>
+        /// <param name="identity"></param>
+        internal static void EnsureCulture(this IIdentity identity)
+        {
+            if (identity is UmbracoBackOfficeIdentity umbIdentity && umbIdentity.IsAuthenticated)
+            {
+                Thread.CurrentThread.CurrentUICulture =
+                    Thread.CurrentThread.CurrentCulture =
+                        UserCultures.GetOrAdd(umbIdentity.Culture, s => new CultureInfo(s));
+            }
+        }
+        /// <summary>
+        /// Used so that we aren't creating a new CultureInfo object for every single request
+        /// </summary>
+        private static readonly ConcurrentDictionary<string, CultureInfo> UserCultures = new ConcurrentDictionary<string, CultureInfo>();
     }
 }

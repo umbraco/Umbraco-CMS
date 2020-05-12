@@ -89,7 +89,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
             var sqlSyntax = new SqlServerSyntaxProvider();
 
             var indexDefinition = CreateIndexDefinition();
-            indexDefinition.IsClustered = false;
+            indexDefinition.IndexType = IndexTypes.Clustered;
 
             var actual = sqlSyntax.Format(indexDefinition);
             Assert.AreEqual("CREATE CLUSTERED INDEX [IX_A] ON [TheTable] ([A])", actual);

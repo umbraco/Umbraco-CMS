@@ -284,7 +284,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var nonAssignedRoles = roleNames.Except(assignedRoles, StringComparer.CurrentCultureIgnoreCase);
                 foreach (var toAssign in nonAssignedRoles)
                 {
-                    var groupId = rolesForNames.First(x => x.Text == toAssign).NodeId;
+                    var groupId = rolesForNames.First(x => x.Text.InvariantEquals(toAssign)).NodeId;
                     Database.Insert(new Member2MemberGroupDto { Member = mId, MemberGroup = groupId });
                 }
             }

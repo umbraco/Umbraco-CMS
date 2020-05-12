@@ -85,7 +85,7 @@ namespace umbraco.cms.businesslogic.web
 
             new Access().FireAfterAddMemberShipRoleToDocument(doc, role, e);
         }
-        
+
 
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
         public static void AddMemberGroupToDocument(int DocumentId, int MemberGroupId)
@@ -102,7 +102,7 @@ namespace umbraco.cms.businesslogic.web
             {
                 Save();
             }
-            
+
         }
 
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
@@ -120,7 +120,7 @@ namespace umbraco.cms.businesslogic.web
             {
                 Save();
             }
-            
+
         }
 
         public static void AddMembershipUserToDocument(int documentId, string membershipUserName)
@@ -133,8 +133,8 @@ namespace umbraco.cms.businesslogic.web
             if (e.Cancel) return;
 
             var entry = ApplicationContext.Current.Services.PublicAccessService.AddRule(
-                doc.ContentEntity, 
-                Constants.Conventions.PublicAccess.MemberUsernameRuleType, 
+                doc.ContentEntity,
+                Constants.Conventions.PublicAccess.MemberUsernameRuleType,
                 membershipUserName);
 
             if (entry.Success == false && entry.Result.Entity == null)
@@ -147,7 +147,7 @@ namespace umbraco.cms.businesslogic.web
                 Save();
                 new Access().FireAfterAddMembershipUserToDocument(doc, membershipUserName, e);
             }
-            
+
         }
 
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
@@ -156,8 +156,8 @@ namespace umbraco.cms.businesslogic.web
             var doc = new Document(DocumentId);
 
             var entry = ApplicationContext.Current.Services.PublicAccessService.AddRule(
-                doc.ContentEntity, 
-                Constants.Conventions.PublicAccess.MemberGroupIdRuleType, 
+                doc.ContentEntity,
+                Constants.Conventions.PublicAccess.MemberGroupIdRuleType,
                 MemberGroupId.ToString(CultureInfo.InvariantCulture));
 
             if (entry.Success == false && entry.Result.Entity == null)
@@ -187,13 +187,13 @@ namespace umbraco.cms.businesslogic.web
                 Save();
                 new Access().FireAfterRemoveMemberShipRoleFromDocument(doc, role, e);
             };
-            
+
         }
 
         public static bool RenameMemberShipRole(string oldRolename, string newRolename)
         {
             var hasChange = ApplicationContext.Current.Services.PublicAccessService.RenameMemberGroupRoleRules(oldRolename, newRolename);
-            
+
             if (hasChange)
                 Save();
 
@@ -219,16 +219,16 @@ namespace umbraco.cms.businesslogic.web
                 if (Simple)
                 {
                     // if using simple mode, make sure that all existing groups are removed
-                    entry.ClearRules();    
+                    entry.ClearRules();
                 }
-                
+
                 //ensure the correct ids are applied
                 entry.LoginNodeId = loginContent.Id;
                 entry.NoAccessNodeId = noAccessContent.Id;
             }
             else
             {
-                entry = new PublicAccessEntry(doc.ContentEntity, 
+                entry = new PublicAccessEntry(doc.ContentEntity,
                     ApplicationContext.Current.Services.ContentService.GetById(LoginDocumentId),
                     ApplicationContext.Current.Services.ContentService.GetById(ErrorDocumentId),
                     new List<PublicAccessRule>());
@@ -239,7 +239,7 @@ namespace umbraco.cms.businesslogic.web
                 Save();
                 new Access().FireAfterAddProtection(new Document(DocumentId), e);
             }
-            
+
         }
 
         public static void RemoveProtection(int DocumentId)
@@ -260,7 +260,7 @@ namespace umbraco.cms.businesslogic.web
             Save();
 
             new Access().FireAfterRemoveProtection(doc, e);
-        } 
+        }
         #endregion
 
         #region Reading methods
@@ -274,7 +274,7 @@ namespace umbraco.cms.businesslogic.web
             if (entry == null) return false;
 
             return entry.Rules
-                .Any(x => x.RuleType == Constants.Conventions.PublicAccess.MemberGroupIdRuleType 
+                .Any(x => x.RuleType == Constants.Conventions.PublicAccess.MemberGroupIdRuleType
                     && x.RuleValue == GroupId.ToString(CultureInfo.InvariantCulture));
 
         }
@@ -331,7 +331,7 @@ namespace umbraco.cms.businesslogic.web
             {
                 throw new Exception("Document isn't protected using Simple mechanism. Use GetAccessingMemberGroups instead");
             }
-            
+
             var memberIdRule = entry.Rules.First(x => x.RuleType == Constants.Conventions.PublicAccess.MemberIdRuleType);
             return new member.Member(int.Parse(memberIdRule.RuleValue));
 
@@ -347,7 +347,7 @@ namespace umbraco.cms.businesslogic.web
 
             //legacy would throw an exception here if it was not 'simple' and simple means based on a username
             if (entry.Rules.All(x => x.RuleType != Constants.Conventions.PublicAccess.MemberUsernameRuleType))
-            {                
+            {
                 throw new Exception("Document isn't protected using Simple mechanism. Use GetAccessingMemberGroups instead");
             }
 
@@ -383,8 +383,8 @@ namespace umbraco.cms.businesslogic.web
         public static bool HasAccess(int documentId, object memberId)
         {
             return ApplicationContext.Current.Services.PublicAccessService.HasAccess(
-                documentId, 
-                memberId, 
+                documentId,
+                memberId,
                 ApplicationContext.Current.Services.ContentService,
                 MembershipProviderExtensions.GetMembersMembershipProvider(),
                 //TODO: This should really be targeting a specific provider by name!!
@@ -410,14 +410,14 @@ namespace umbraco.cms.businesslogic.web
 
             //legacy states that if it is protected by a member id then it is 'simple'
             return entry.Rules.Any(x => x.RuleType == Constants.Conventions.PublicAccess.MemberIdRuleType)
-                ? ProtectionType.Simple 
+                ? ProtectionType.Simple
                 : ProtectionType.Advanced;
 
         }
 
         public static bool IsProtected(int DocumentId, string Path)
         {
-            return ApplicationContext.Current.Services.PublicAccessService.IsProtected(Path.EnsureEndsWith("," + DocumentId));             
+            return ApplicationContext.Current.Services.PublicAccessService.IsProtected(Path.EnsureEndsWith("," + DocumentId));
         }
 
         //return the protection status of this exact document - not based on inheritance
@@ -430,7 +430,7 @@ namespace umbraco.cms.businesslogic.web
         {
             var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(Path);
             if (entry == null) return -1;
-            var entity = ApplicationContext.Current.Services.EntityService.Get(entry.NoAccessNodeId, UmbracoObjectTypes.Document, false);
+            var entity = ApplicationContext.Current.Services.EntityService.Get(entry.NoAccessNodeId, UmbracoObjectTypes.Document);
             return entity.Id;
 
         }
@@ -439,10 +439,10 @@ namespace umbraco.cms.businesslogic.web
         {
             var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(Path);
             if (entry == null) return -1;
-            var entity = ApplicationContext.Current.Services.EntityService.Get(entry.LoginNodeId, UmbracoObjectTypes.Document, false);
+            var entity = ApplicationContext.Current.Services.EntityService.Get(entry.LoginNodeId, UmbracoObjectTypes.Document);
             return entity.Id;
 
-        } 
+        }
         #endregion
 
 
