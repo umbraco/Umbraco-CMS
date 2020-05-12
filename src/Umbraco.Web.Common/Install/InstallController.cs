@@ -14,12 +14,10 @@ namespace Umbraco.Web.Common.Install
 {
 
     /// <summary>
-    /// The MVC Installation controller
+    /// The Installation controller
     /// </summary>
-    /// <remarks>
-    /// NOTE: All views must have their full paths as we do not have a custom view engine for the installation views!
-    /// </remarks>
     [InstallAuthorize]
+    [Area(Umbraco.Core.Constants.Web.Mvc.InstallArea)]
     public class InstallController : Controller
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
@@ -72,7 +70,7 @@ namespace Umbraco.Web.Common.Install
             }
 
             // gen the install base urlAddUmbracoCore
-            ViewData.SetInstallApiBaseUrl(Url.GetUmbracoApiService("GetSetup", "InstallApi", "UmbracoInstall").TrimEnd("GetSetup"));
+            ViewData.SetInstallApiBaseUrl(Url.GetUmbracoApiService("GetSetup", "InstallApi", Umbraco.Core.Constants.Web.Mvc.InstallArea).TrimEnd("GetSetup"));
 
             // get the base umbraco folder
             ViewData.SetUmbracoBaseFolder(_hostingEnvironment.ToAbsolute(_globalSettings.UmbracoPath));
@@ -81,7 +79,6 @@ namespace Umbraco.Web.Common.Install
 
             await _installHelper.InstallStatus(false, "");
 
-            // always ensure full path (see NOTE in the class remarks)
             return View();
         }
     }

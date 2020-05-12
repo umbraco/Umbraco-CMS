@@ -17,7 +17,6 @@ using Umbraco.Core.Strings;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
-using Umbraco.Web.BackOffice.AspNetCore;
 using Umbraco.Extensions;
 
 namespace Umbraco.Tests.Integration.Testing
@@ -35,7 +34,7 @@ namespace Umbraco.Tests.Integration.Testing
         public static LightInjectContainer GetUmbracoContainer(out UmbracoServiceProviderFactory serviceProviderFactory)
         {
             var container = UmbracoServiceProviderFactory.CreateServiceContainer();
-            serviceProviderFactory = new UmbracoServiceProviderFactory(container);
+            serviceProviderFactory = new UmbracoServiceProviderFactory(container, false);
             var umbracoContainer = serviceProviderFactory.GetContainer();
             return umbracoContainer;
         }

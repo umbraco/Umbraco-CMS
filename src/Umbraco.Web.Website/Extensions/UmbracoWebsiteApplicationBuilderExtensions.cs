@@ -1,13 +1,10 @@
 using System;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
 using SixLabors.ImageSharp.Web.DependencyInjection;
-using Umbraco.Core;
-using Umbraco.Extensions;
 
-namespace Umbraco.Web.Website.AspNetCore
+namespace Umbraco.Extensions
 {
-    public static class UmbracoBackOfficeApplicationBuilderExtensions
+    public static class UmbracoWebsiteApplicationBuilderExtensions
     {
         public static IApplicationBuilder UseUmbracoWebsite(this IApplicationBuilder app)
         {
@@ -16,6 +13,7 @@ namespace Umbraco.Web.Website.AspNetCore
             if (!app.UmbracoCanBoot()) return app;
 
             // Important we handle image manipulations before the static files, otherwise the querystring is just ignored.
+            // TODO: Since we are dependent on these we need to register them but what happens when we call this multiple times since we are dependent on this for UseUmbracoBackOffice too?
             app.UseImageSharp();
             app.UseStaticFiles();
 

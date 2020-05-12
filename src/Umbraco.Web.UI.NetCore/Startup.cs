@@ -1,30 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Data.SqlClient;
-using System.IO;
-using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json.Serialization;
-using Umbraco.Composing;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Web.BackOffice.AspNetCore;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Filters;
-using Umbraco.Web.Website.AspNetCore;
-using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
-
 
 namespace Umbraco.Web.UI.BackOffice
 {
@@ -62,24 +42,11 @@ namespace Umbraco.Web.UI.BackOffice
             {
                 options.ShouldProfile = request => false; // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
             });
-
-            //Finally initialize Current
-            // TODO: This should be moved to the UmbracoServiceProviderFactory when the container is cross-wired and then don't use the overload above to `out var factory`
-            Current.Initialize(
-                factory.GetInstance<ILogger> (),
-                factory.GetInstance<Configs>(),
-                factory.GetInstance<IIOHelper>(),
-                factory.GetInstance<IHostingEnvironment>(),
-                factory.GetInstance<IBackOfficeInfo>(),
-                factory.GetInstance<IProfiler>()
-            );
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
-
             //app.UseMiniProfiler();            
             if (_env.IsDevelopment())
             {
@@ -89,29 +56,15 @@ namespace Umbraco.Web.UI.BackOffice
             app.UseStatusCodePages();
             app.UseRouting();
 
-
-            app.UseUmbracoRouting();
             app.UseUmbracoCore();
+            app.UseUmbracoRouting();
             app.UseUmbracoRequestLogging();
             app.UseUmbracoWebsite();
-            app.UseUmbracoBackOffice();            
-            app.UseUmbracoRuntimeMinification();
-
+            app.UseUmbracoBackOffice();
+            app.UseUmbracoInstaller();
             
             app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute("Backoffice", "/umbraco/{Action}", new
-                {
-                    Controller = "BackOffice",
-                    Action = "Default"
-                });
-
-                // TODO: Fix this routing with an area
-                endpoints.MapControllerRoute("Install", "/install/{controller}/{Action}", defaults:new { Area = "Install"});
-
-                //TODO register routing correct: Name must be like this
-                endpoints.MapControllerRoute("umbraco-api-UmbracoInstall-InstallApi", "/install/api/{Action}", defaults:new { Area = "Install", Controller = "InstallApi"});
-
+            {   
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");               

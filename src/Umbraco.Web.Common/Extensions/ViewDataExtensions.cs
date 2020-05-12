@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Semver;
 
 
-namespace Umbraco.Web
+namespace Umbraco.Extensions
 {
     public static class ViewDataExtensions
     {

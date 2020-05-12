@@ -99,10 +99,5 @@ namespace Umbraco.Web
             return new UmbracoContextReference(umbracoContext, true, _umbracoContextAccessor);
         }
 
-        // dummy TextWriter that does not write
-        private class NullWriter : TextWriter
-        {
-            public override Encoding Encoding => Encoding.UTF8;
-        }
     }
 }
