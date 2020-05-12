@@ -460,8 +460,11 @@
     $src = "$($this.SolutionRoot)\src"
     $out = $this.BuildOutput
 
+    # Check if the solution has been built		
+    if (!(Test-Path "$src\Umbraco.Web.UI.Client\node_modules")) {throw "Umbraco needs to be built before generating the Angular Docs"}
+
     "Moving to Umbraco.Web.UI.Docs folder"
-    cd ..\src\Umbraco.Web.UI.Docs
+    cd $src\Umbraco.Web.UI.Docs
 
     "Generating the docs and waiting before executing the next commands"
 	& npm install
