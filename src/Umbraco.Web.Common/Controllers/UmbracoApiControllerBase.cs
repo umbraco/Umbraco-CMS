@@ -1,26 +1,26 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Services;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Features;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web.Common.Attributes;
 
 namespace Umbraco.Web.Common.Controllers
 {
     /// <summary>
     /// Provides a base class for Umbraco API controllers.
     /// </summary>
-    /// <remarks>These controllers are NOT auto-routed.</remarks>
+    /// <remarks>
+    /// <para>These controllers are NOT auto-routed.</para>
+    /// <para>The base class is <see cref="ControllerBase"/> which are netcore API controllers without any view support</para>
+    /// </remarks>
     [FeatureAuthorize]
-    public abstract class UmbracoApiControllerBase : Controller, IUmbracoFeature
+    [TypeFilter(typeof(HttpResponseExceptionFilter))]
+    [UmbracoApiController]
+    public abstract class UmbracoApiControllerBase : ControllerBase, IUmbracoFeature
     {
-
+        public UmbracoApiControllerBase()
+        {
+        }
     }
 }

@@ -5,7 +5,7 @@ using Umbraco.Net;
 using Umbraco.Web.Common.Lifetime;
 using Umbraco.Web.Common.Middleware;
 
-namespace Umbraco.Web.Common.Runtime.Profiler
+namespace Umbraco.Web.Common.Profiler
 {
     internal sealed class WebProfilerComponent : IComponent
     {
