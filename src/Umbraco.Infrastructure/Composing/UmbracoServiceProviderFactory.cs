@@ -14,9 +14,10 @@ namespace Umbraco.Core.Composing
     /// </summary>
     public class UmbracoServiceProviderFactory : IServiceProviderFactory<IServiceContainer>
     {
-        public UmbracoServiceProviderFactory(ServiceContainer container)
+        public UmbracoServiceProviderFactory(ServiceContainer container, bool initializeCurrent)
         {
             _container = new LightInjectContainer(container);
+            _initializeCurrent = initializeCurrent;
         }
 
         /// <summary>
@@ -37,6 +38,7 @@ namespace Umbraco.Core.Composing
             var container = CreateServiceContainer();
             UmbracoContainer = _container = new LightInjectContainer(container);
             IsActive = true;
+            _initializeCurrent = true;
         }
 
         // see here for orig lightinject version https://github.com/seesharper/LightInject.Microsoft.DependencyInjection/blob/412566e3f70625e6b96471db5e1f7cd9e3e1eb18/src/LightInject.Microsoft.DependencyInjection/LightInject.Microsoft.DependencyInjection.cs#L263
@@ -45,6 +47,7 @@ namespace Umbraco.Core.Composing
 
         IServiceCollection _services;
         readonly LightInjectContainer _container;
+        private readonly bool _initializeCurrent;
 
         internal LightInjectContainer GetContainer() => _container;
 
@@ -78,14 +81,18 @@ namespace Umbraco.Core.Composing
         {
             var provider = containerBuilder.CreateServiceProvider(_services);
 
-            // after cross wiring, configure "Current"
-            Current.Initialize(
-                _container.GetInstance<Umbraco.Core.Logging.ILogger>(),
-                _container.GetInstance<Configs>(),
-                _container.GetInstance<IIOHelper>(),
-                _container.GetInstance<Umbraco.Core.Hosting.IHostingEnvironment>(),
-                _container.GetInstance<IBackOfficeInfo>(),
-                _container.GetInstance<Umbraco.Core.Logging.IProfiler>());
+            if (_initializeCurrent)
+            {
+                // after cross wiring, configure "Current"
+                Current.Initialize(
+                    _container.GetInstance<Umbraco.Core.Logging.ILogger>(),
+                    _container.GetInstance<Configs>(),
+                    _container.GetInstance<IIOHelper>(),
+                    _container.GetInstance<Umbraco.Core.Hosting.IHostingEnvironment>(),
+                    _container.GetInstance<IBackOfficeInfo>(),
+                    _container.GetInstance<Umbraco.Core.Logging.IProfiler>());
+            }
+            
 
             return provider;
         }

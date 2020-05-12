@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Integration.Testing
         public static LightInjectContainer GetUmbracoContainer(out UmbracoServiceProviderFactory serviceProviderFactory)
         {
             var container = UmbracoServiceProviderFactory.CreateServiceContainer();
-            serviceProviderFactory = new UmbracoServiceProviderFactory(container);
+            serviceProviderFactory = new UmbracoServiceProviderFactory(container, false);
             var umbracoContainer = serviceProviderFactory.GetContainer();
             return umbracoContainer;
         }

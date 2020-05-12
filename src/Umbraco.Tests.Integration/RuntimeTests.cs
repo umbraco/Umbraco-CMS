@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Integration
         {
             // LightInject / Umbraco
             var container = UmbracoServiceProviderFactory.CreateServiceContainer();
-            var serviceProviderFactory = new UmbracoServiceProviderFactory(container);
+            var serviceProviderFactory = new UmbracoServiceProviderFactory(container, false);
             var umbracoContainer = serviceProviderFactory.GetContainer();
 
             // Special case since we are not using the Generic Host, we need to manually add an AspNetCore service to the container
