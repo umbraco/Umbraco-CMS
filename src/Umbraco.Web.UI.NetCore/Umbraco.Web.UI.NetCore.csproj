@@ -63,6 +63,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Content Include="Config\grid.editors.config.js" />
       <Content Include="Config\logviewer.searches.config.js" />
     </ItemGroup>
 
