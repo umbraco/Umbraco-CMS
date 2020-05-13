@@ -1,8 +1,10 @@
 {
+    "baseUrl": "https://localhost:44331",
     "viewportHeight": 1024,
     "viewportWidth": 1200,
     "env": {
         "username": "<insert username/email>",
         "password": "<insert password>"
-    }
+    },
+    "supportFile": "cypress/support/index.ts"
 }
