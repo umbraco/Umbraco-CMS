@@ -13,27 +13,58 @@ namespace Umbraco.Web.BackOffice.Routing
     {
         private readonly IGlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IRuntimeState _runtimeState;
+        private readonly string _umbracoAreaPathSegment;
 
-        public BackOfficeAreaRoutes(IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        public BackOfficeAreaRoutes(IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IRuntimeState runtimeState)
         {
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
+            _runtimeState = runtimeState;
+            _umbracoAreaPathSegment = _globalSettings.GetUmbracoMvcArea(_hostingEnvironment);
         }
 
         public void CreateRoutes(IEndpointRouteBuilder endpoints)
         {
-            var umbracoPath = _globalSettings.GetUmbracoMvcArea(_hostingEnvironment);
+            switch (_runtimeState.Level)
+            {
+                case RuntimeLevel.Install:
+                    // a new install so we don't route the back office
+                    break;
+                case RuntimeLevel.Upgrade:
+                    // for upgrades we only need to route the back office and auth controllers
+                    MapMinimalBackOffice(endpoints);
+                    break;
+                case RuntimeLevel.Run:
 
-            // TODO: We need to auto-route "Umbraco Api Controllers" for the back office
+                    MapMinimalBackOffice(endpoints);
 
-            // TODO: We will also need to detect runtime state here and redirect to the installer,
-            // Potentially switch this to dynamic routing so we can essentially disable/overwrite the back office routes to redirect to install
-            // when required, example https://www.strathweb.com/2019/08/dynamic-controller-routing-in-asp-net-core-3-0/
+                    endpoints.MapAreaControllerRoute(
+                        "Umbraco_preview", // TODO: Same name as before but we should change these so they have a convention
+                        Constants.Web.Mvc.BackOfficeArea,
+                        $"{_umbracoAreaPathSegment}/preview/{{Action}}/{{editor?}}",
+                        new { controller = ControllerExtensions.GetControllerName<PreviewController>(), action = "Index" });
 
+                    AutoRouteBackOfficeControllers(endpoints);
+
+                    break;
+                case RuntimeLevel.BootFailed:
+                case RuntimeLevel.Unknown:
+                case RuntimeLevel.Boot:
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Map the minimal routes required to load the back office login and auth
+        /// </summary>
+        /// <param name="endpoints"></param>
+        private void MapMinimalBackOffice(IEndpointRouteBuilder endpoints)
+        {
             endpoints.MapAreaControllerRoute(
                 "Umbraco_back_office", // TODO: Same name as before but we should change these so they have a convention
                 Constants.Web.Mvc.BackOfficeArea,
-                $"{umbracoPath}/{{Action}}/{{id?}}",
+                $"{_umbracoAreaPathSegment}/{{Action}}/{{id?}}",
                 new { controller = ControllerExtensions.GetControllerName<BackOfficeController>(), action = "Default" },
                 // Limit the action/id to only allow characters - this is so this route doesn't hog all other
                 // routes like: /umbraco/channels/word.aspx, etc...
@@ -44,12 +75,22 @@ namespace Umbraco.Web.BackOffice.Routing
                     id = @"[a-zA-Z]*"
                 });
 
+            var authControllerName = ControllerExtensions.GetControllerName<AuthenticationController>();
             endpoints.MapAreaControllerRoute(
-                "Umbraco_preview", // TODO: Same name as before but we should change these so they have a convention
-                Constants.Web.Mvc.BackOfficeArea,
-                $"{umbracoPath}/preview/{{Action}}/{{editor?}}",
-                // TODO: Change this to use ControllerExtensions.GetControllerName once the PreviewController is moved to Umbraco.Web.BackOffice.Controllers
-                new { controller = "Preview", action = "Index" });
+               $"umbraco-{Constants.Web.Mvc.BackOfficeArea.ToLowerInvariant()}-{authControllerName.ToLowerInvariant()}",
+               Constants.Web.Mvc.BackOfficeArea,
+               // TODO: The "BackOffice" path name needs to be a constant - actually all of these routes need to be in a helper so the names are by convention
+               $"{_umbracoAreaPathSegment}/BackOffice/{authControllerName}/{{Action}}/{{id?}}",
+               new { controller = authControllerName, action = "Default" });
+
+        }
+
+        /// <summary>
+        /// Auto-routes all back office controllers
+        /// </summary>
+        private void AutoRouteBackOfficeControllers(IEndpointRouteBuilder endpoints)
+        {
+
         }
     }
 }

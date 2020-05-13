@@ -104,9 +104,9 @@ namespace Umbraco.Web.Editors
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
                 () =>
-                    View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings)),
+                    View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _treeCollection, _hostingEnvironment, _runtimeSettings, _securitySettings)),
                 () =>
-                    View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings))
+                    View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _treeCollection, _hostingEnvironment, _runtimeSettings, _securitySettings))
                     );
         }
 
@@ -184,7 +184,7 @@ namespace Umbraco.Web.Editors
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
                 //The default view to render when there is no external login info or errors
-                () => View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings)),
+                () => View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _treeCollection, _hostingEnvironment, _runtimeSettings, _securitySettings)),
                 //The ActionResult to perform if external login is successful
                 () => Redirect("/"));
         }

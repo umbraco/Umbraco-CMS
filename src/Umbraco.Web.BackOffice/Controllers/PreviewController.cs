@@ -1,25 +1,28 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using System;
 using System.Threading.Tasks;
-using System.Web;
-using System.Web.Mvc;
-using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
-using Umbraco.Web.Composing;
+using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.Common.ActionResults;
+using Umbraco.Web.Common.Filters;
+using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
-using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
     [DisableBrowserCache]
+    [Area(Umbraco.Core.Constants.Web.Mvc.BackOfficeArea)]
     public class PreviewController : Controller
     {
         private readonly UmbracoFeatures _features;
@@ -36,6 +39,7 @@ namespace Umbraco.Web.Editors
         private readonly IRuntimeSettings _runtimeSettings;
         private readonly ISecuritySettings _securitySettings;
         private readonly IRuntimeMinifier _runtimeMinifier;
+        private readonly ICompositeViewEngine _viewEngines;
 
         public PreviewController(
             UmbracoFeatures features,
@@ -51,7 +55,8 @@ namespace Umbraco.Web.Editors
             ICookieManager cookieManager,
             IRuntimeSettings settings,
             ISecuritySettings securitySettings,
-            IRuntimeMinifier runtimeMinifier)
+            IRuntimeMinifier runtimeMinifier,
+            ICompositeViewEngine viewEngines)
         {
             _features = features;
             _globalSettings = globalSettings;
@@ -67,6 +72,7 @@ namespace Umbraco.Web.Editors
             _runtimeSettings = settings;
             _securitySettings = securitySettings;
             _runtimeMinifier = runtimeMinifier;
+            _viewEngines = viewEngines;
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
@@ -75,15 +81,13 @@ namespace Umbraco.Web.Editors
         {
             var availableLanguages = _localizationService.GetAllLanguages();
 
-            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _contentSettings, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings);
+            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _contentSettings, _treeCollection, _hostingEnvironment, _runtimeSettings, _securitySettings);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {
-                var viewEngineResult = ViewEngines.Engines.FindPartialView(ControllerContext, model.PreviewExtendedHeaderView);
+                var viewEngineResult = _viewEngines.FindView(ControllerContext, model.PreviewExtendedHeaderView, false);
                 if (viewEngineResult.View == null)
-                {
                     throw new InvalidOperationException("Could not find the view " + model.PreviewExtendedHeaderView + ", the following locations were searched: " + Environment.NewLine + string.Join(Environment.NewLine, viewEngineResult.SearchedLocations));
-                }
             }
 
             return View(_globalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
@@ -94,13 +98,14 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [MinifyJavaScriptResult(Order = 0)]
-        [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
+        // TODO: Replace this with response caching https://docs.microsoft.com/en-us/aspnet/core/performance/caching/response?view=aspnetcore-3.1
+        //[OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
         public async Task<JavaScriptResult> Application()
         {
             var files = await _runtimeMinifier.GetAssetPathsAsync(BackOfficeWebAssets.UmbracoPreviewJsBundleName);
             var result = BackOfficeJavaScriptInitializer.GetJavascriptInitialization(files, "umbraco.preview", _globalSettings, _hostingEnvironment);
 
-            return JavaScript(result);
+            return new JavaScriptResult(result);
         }
 
         /// <summary>
@@ -114,7 +119,7 @@ namespace Umbraco.Web.Editors
 
             var previewToken = _publishedSnapshotService.EnterPreview(user, id);
 
-            Response.Cookies.Set(new HttpCookie(Constants.Web.PreviewCookieName, previewToken));
+            _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, previewToken);
 
             // use a numeric url because content may not be in cache and so .Url would fail
             var query = culture.IsNullOrWhiteSpace() ? string.Empty : $"?culture={culture}";
@@ -126,17 +131,15 @@ namespace Umbraco.Web.Editors
         public ActionResult End(string redir = null)
         {
             var previewToken = _cookieManager.GetPreviewCookieValue();
-            var service = Current.PublishedSnapshotService;
-            service.ExitPreview(previewToken);
 
-            System.Web.HttpContext.Current.ExpireCookie(Constants.Web.PreviewCookieName);
+            _publishedSnapshotService.ExitPreview(previewToken);
+
+            _cookieManager.ExpireCookie(Constants.Web.PreviewCookieName);
 
             if (Uri.IsWellFormedUriString(redir, UriKind.Relative)
                 && redir.StartsWith("//") == false
-                && Uri.TryCreate(redir, UriKind.Relative, out Uri url))
-            {
+                && Uri.TryCreate(redir, UriKind.Relative, out var url))
                 return Redirect(url.ToString());
-            }
 
             return Redirect("/");
         }

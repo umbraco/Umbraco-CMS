@@ -10,6 +10,7 @@ using Umbraco.Web.WebAssets;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
+
     [Area(Umbraco.Core.Constants.Web.Mvc.BackOfficeArea)]
     public class BackOfficeController : Controller
     {
