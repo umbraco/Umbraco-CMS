@@ -10,23 +10,22 @@ using Umbraco.Web.WebAssets;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
+    [Area(Umbraco.Core.Constants.Web.Mvc.BackOfficeArea)]
     public class BackOfficeController : Controller
     {
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IGlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
 
-        public BackOfficeController(IRuntimeMinifier runtimeMinifier, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IUmbracoApplicationLifetime umbracoApplicationLifetime)
+        public BackOfficeController(IRuntimeMinifier runtimeMinifier, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             _runtimeMinifier = runtimeMinifier;
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
-            _umbracoApplicationLifetime = umbracoApplicationLifetime;
         }
 
-        // GET
-        public IActionResult Index()
+        [HttpGet]
+        public IActionResult Default()
         {
             return View();
         }
@@ -36,6 +35,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [MinifyJavaScriptResult(Order = 0)]
+        [HttpGet]
         public async Task<IActionResult> Application()
         {
             var result = await _runtimeMinifier.GetScriptForLoadingBackOfficeAsync(_globalSettings, _hostingEnvironment);

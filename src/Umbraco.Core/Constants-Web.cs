@@ -53,6 +53,8 @@
             public static class Mvc
             {
                 public const string InstallArea = "UmbracoInstall";
+
+                public const string BackOfficeArea = "UmbracoBackOffice";
             }
         }
     }

@@ -51,8 +51,10 @@ namespace Umbraco.Web.Common.Install
         [TypeFilter(typeof(StatusCodeResultAttribute), Arguments = new object []{System.Net.HttpStatusCode.ServiceUnavailable})]
         public async Task<ActionResult> Index()
         {
+            var umbracoPath = Url.GetBackOfficeUrl();
+
             if (_runtime.Level == RuntimeLevel.Run)
-                return Redirect(_globalSettings.UmbracoPath.EnsureEndsWith('/'));
+                return Redirect(umbracoPath);
 
             if (_runtime.Level == RuntimeLevel.Upgrade)
             {
@@ -69,8 +71,8 @@ namespace Umbraco.Web.Common.Install
                 }
             }
 
-            // gen the install base urlAddUmbracoCore
-            ViewData.SetInstallApiBaseUrl(Url.GetUmbracoApiService("GetSetup", "InstallApi", Umbraco.Core.Constants.Web.Mvc.InstallArea).TrimEnd("GetSetup"));
+            // gen the install base url
+            ViewData.SetInstallApiBaseUrl(Url.GetInstallerApiUrl());
 
             // get the base umbraco folder
             ViewData.SetUmbracoBaseFolder(_hostingEnvironment.ToAbsolute(_globalSettings.UmbracoPath));
