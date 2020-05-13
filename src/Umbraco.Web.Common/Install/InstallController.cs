@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Logging;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Filters;
@@ -26,6 +28,8 @@ namespace Umbraco.Web.Common.Install
         private readonly IGlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly ILogger _logger;
+        private readonly LinkGenerator _linkGenerator;
         private readonly IRuntimeMinifier _runtimeMinifier;
 
         public InstallController(
@@ -35,7 +39,9 @@ namespace Umbraco.Web.Common.Install
             IGlobalSettings globalSettings,
             IRuntimeMinifier runtimeMinifier,
             IHostingEnvironment hostingEnvironment,
-            IUmbracoVersion umbracoVersion)
+            IUmbracoVersion umbracoVersion,
+            ILogger logger,
+            LinkGenerator linkGenerator)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _installHelper = installHelper;
@@ -44,6 +50,8 @@ namespace Umbraco.Web.Common.Install
             _runtimeMinifier = runtimeMinifier;
             _hostingEnvironment = hostingEnvironment;
             _umbracoVersion = umbracoVersion;
+            _logger = logger;
+            _linkGenerator = linkGenerator;
         }
 
         [HttpGet]
@@ -82,6 +90,29 @@ namespace Umbraco.Web.Common.Install
             await _installHelper.InstallStatus(false, "");
 
             return View();
+        }
+
+        [HttpGet]
+        public ActionResult Redirect()
+        {
+            var uri = HttpContext.Request.GetEncodedUrl();
+            
+            // redirect to install
+            ReportRuntime(_logger, _runtime.Level, "Umbraco must install or upgrade.");
+
+            var installUrl = $"{_linkGenerator.GetInstallerUrl()}?redir=true&url={uri}";
+            return Redirect(installUrl);
+        }
+
+        private static bool _reported;
+        private static RuntimeLevel _reportedLevel;
+
+        private static void ReportRuntime(ILogger logger, RuntimeLevel level, string message)
+        {
+            if (_reported && _reportedLevel == level) return;
+            _reported = true;
+            _reportedLevel = level;
+            logger.Warn(typeof(UmbracoInstallApplicationBuilderExtensions), message);
         }
     }
 }

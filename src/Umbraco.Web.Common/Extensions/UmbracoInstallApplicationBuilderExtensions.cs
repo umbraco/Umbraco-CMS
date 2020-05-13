@@ -15,8 +15,8 @@ namespace Umbraco.Extensions
         {
             app.UseEndpoints(endpoints =>
             {
-                var backOfficeRoutes = app.ApplicationServices.GetRequiredService<InstallAreaRoutes>();
-                backOfficeRoutes.CreateRoutes(endpoints);
+                var installerRoutes = app.ApplicationServices.GetRequiredService<InstallAreaRoutes>();
+                installerRoutes.CreateRoutes(endpoints);
             });
 
             return app;
