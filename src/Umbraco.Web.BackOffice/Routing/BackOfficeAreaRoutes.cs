@@ -78,7 +78,7 @@ namespace Umbraco.Web.BackOffice.Routing
                         id = @"[a-zA-Z]*"
                     });
 
-            endpoints.MapUmbracoApiRoute<AuthenticationController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeArea, true, defaultAction: string.Empty);
+            endpoints.MapUmbracoApiRoute<AuthenticationController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeApiArea, true, defaultAction: string.Empty);
         }
 
         /// <summary>

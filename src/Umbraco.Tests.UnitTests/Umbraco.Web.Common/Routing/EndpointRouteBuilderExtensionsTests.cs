@@ -16,14 +16,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
     [TestFixture]
     public class EndpointRouteBuilderExtensionsTests
     {
-        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeArea, "test", null, true)]
-        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeArea, "test", "GetStuff", true)]
-        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeArea, null, null, true)]
-        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeArea, null, "GetStuff", true)]
-        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeArea, "test", null, false)]
-        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeArea, "test", "GetStuff", false)]
-        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeArea, null, null, false)]
-        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeArea, null, "GetStuff", false)]
+        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeApiArea, "test", null, true)]
+        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeApiArea, "test", "GetStuff", true)]
+        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeApiArea, null, null, true)]
+        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeApiArea, null, "GetStuff", true)]
+        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeApiArea, "test", null, false)]
+        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeApiArea, "test", "GetStuff", false)]
+        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeApiArea, null, null, false)]
+        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeApiArea, null, "GetStuff", false)]
         [TestCase("umbraco", null, "test", null, true)]
         [TestCase("umbraco", null, "test", "GetStuff", true)]
         [TestCase("umbraco", null, null, null, true)]
@@ -65,10 +65,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
             Assert.AreEqual(controllerName, endpoint.RoutePattern.Defaults["controller"]);
         }
 
-        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeArea, true, null)]
-        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeArea, true, "GetStuff")]
-        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeArea, false, null)]
-        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeArea, false, "GetStuff")]
+        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeApiArea, true, null)]
+        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeApiArea, true, "GetStuff")]
+        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeApiArea, false, null)]
+        [TestCase("umbraco", Constants.Web.Mvc.BackOfficeApiArea, false, "GetStuff")]
         [TestCase("umbraco", null, true, null)]
         [TestCase("umbraco", null, true, "GetStuff")]
         [TestCase("umbraco", null, false, null)]

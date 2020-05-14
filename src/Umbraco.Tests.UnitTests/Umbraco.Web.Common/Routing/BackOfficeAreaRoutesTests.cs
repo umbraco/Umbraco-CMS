@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Routing;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Moq;
 using NUnit.Framework;
 using System.Linq;
@@ -63,6 +64,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
             Assert.AreEqual(Constants.Web.Mvc.BackOfficeArea, endpoint3.RoutePattern.Defaults["area"]);
             Assert.AreEqual("Index", endpoint3.RoutePattern.Defaults["action"]);
             Assert.AreEqual(previewControllerName, endpoint3.RoutePattern.Defaults["controller"]);
+            Assert.AreEqual(endpoint3.RoutePattern.Defaults["area"], typeof(PreviewController).GetCustomAttribute<AreaAttribute>(false).RouteValue);
 
             var endpoint4 = (RouteEndpoint)route.Endpoints[3];
             var apiControllerName = ControllerExtensions.GetControllerName<Testing1Controller>();
@@ -79,13 +81,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
             Assert.AreEqual(Constants.Web.Mvc.BackOfficeArea, endpoint1.RoutePattern.Defaults["area"]);
             Assert.AreEqual("Default", endpoint1.RoutePattern.Defaults["action"]);
             Assert.AreEqual(ControllerExtensions.GetControllerName<BackOfficeController>(), endpoint1.RoutePattern.Defaults["controller"]);
+            Assert.AreEqual(endpoint1.RoutePattern.Defaults["area"], typeof(BackOfficeController).GetCustomAttribute<AreaAttribute>(false).RouteValue);
 
             var endpoint2 = (RouteEndpoint)route.Endpoints[1];
             var controllerName = ControllerExtensions.GetControllerName<AuthenticationController>();
-            Assert.AreEqual($"umbraco/backoffice/{Constants.Web.Mvc.BackOfficeArea.ToLowerInvariant()}/{controllerName.ToLowerInvariant()}/{{action}}/{{id?}}", endpoint2.RoutePattern.RawText);
-            Assert.AreEqual(Constants.Web.Mvc.BackOfficeArea, endpoint2.RoutePattern.Defaults["area"]);
+            Assert.AreEqual($"umbraco/backoffice/{Constants.Web.Mvc.BackOfficeApiArea.ToLowerInvariant()}/{controllerName.ToLowerInvariant()}/{{action}}/{{id?}}", endpoint2.RoutePattern.RawText);
+            Assert.AreEqual(Constants.Web.Mvc.BackOfficeApiArea, endpoint2.RoutePattern.Defaults["area"]);
             Assert.IsFalse(endpoint2.RoutePattern.Defaults.ContainsKey("action"));
             Assert.AreEqual(controllerName, endpoint2.RoutePattern.Defaults["controller"]);
+            Assert.AreEqual(endpoint1.RoutePattern.Defaults["area"], typeof(BackOfficeController).GetCustomAttribute<AreaAttribute>(false).RouteValue);
         }
 
         private BackOfficeAreaRoutes GetBackOfficeAreaRoutes(RuntimeLevel level)

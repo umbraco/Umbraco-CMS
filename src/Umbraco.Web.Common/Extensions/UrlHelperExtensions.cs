@@ -22,7 +22,7 @@ namespace Umbraco.Extensions
         {
             var backOfficeControllerType = Type.GetType("Umbraco.Web.BackOffice.Controllers");
             if (backOfficeControllerType == null) return "/"; // this would indicate that the installer is installed without the back office
-            return url.Action("Default", ControllerExtensions.GetControllerName(backOfficeControllerType), new { area = Constants.Web.Mvc.BackOfficeArea });
+            return url.Action("Default", ControllerExtensions.GetControllerName(backOfficeControllerType), new { area = Constants.Web.Mvc.BackOfficeApiArea });
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Routing;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Moq;
 using NUnit.Framework;
 using System.Linq;
@@ -41,12 +42,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
             Assert.AreEqual(Constants.Web.Mvc.InstallArea, endpoint1.RoutePattern.Defaults["area"]);
             Assert.AreEqual("Index", endpoint1.RoutePattern.Defaults["action"]);
             Assert.AreEqual(ControllerExtensions.GetControllerName<InstallApiController>(), endpoint1.RoutePattern.Defaults["controller"]);
+            Assert.AreEqual(endpoint1.RoutePattern.Defaults["area"], typeof(InstallApiController).GetCustomAttribute<AreaAttribute>(false).RouteValue);
 
             var endpoint2 = (RouteEndpoint)route.Endpoints[1];
             Assert.AreEqual($"install/{{action}}/{{id?}}", endpoint2.RoutePattern.RawText);
             Assert.AreEqual(Constants.Web.Mvc.InstallArea, endpoint2.RoutePattern.Defaults["area"]);
             Assert.AreEqual("Index", endpoint2.RoutePattern.Defaults["action"]);
             Assert.AreEqual(ControllerExtensions.GetControllerName<InstallController>(), endpoint2.RoutePattern.Defaults["controller"]);
+            Assert.AreEqual(endpoint2.RoutePattern.Defaults["area"], typeof(InstallController).GetCustomAttribute<AreaAttribute>(false).RouteValue);
 
             var fallbackRoute = endpoints.DataSources.Last();
             Assert.AreEqual(1, fallbackRoute.Endpoints.Count);
