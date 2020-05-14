@@ -47,7 +47,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
 
         /** Internal method to track expanded paths on a tree */
         _trackExpandedPaths: function (node, expandedPaths) {
-            if (!node.children || !angular.isArray(node.children) || node.children.length == 0) {
+            if (!node.children || !Utilities.isArray(node.children) || node.children.length == 0) {
                 return;
             }
 
@@ -69,12 +69,14 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 if (childPath.startsWith(p + ",")) {
                     //this means that the node's path supercedes this path stored so we can remove the current 'p' and replace it with node.path
                     expandedPaths.splice(expandedPaths.indexOf(p), 1); //remove it
-                    expandedPaths.push(childPath); //replace it
+                    if (expandedPaths.indexOf(childPath) === -1) {
+                        expandedPaths.push(childPath); //replace it
+                    }
                 }
                 else if (p.startsWith(childPath + ",")) {
                     //this means we've already tracked a deeper node so we shouldn't track this one
                 }
-                else {
+                else if (expandedPaths.indexOf(childPath) === -1) {
                     expandedPaths.push(childPath); //track it
                 }
             });
@@ -172,7 +174,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             //we determine this based on the server variables
             if (Umbraco.Sys.ServerVariables.umbracoPlugins &&
                 Umbraco.Sys.ServerVariables.umbracoPlugins.trees &&
-                angular.isArray(Umbraco.Sys.ServerVariables.umbracoPlugins.trees)) {
+                Utilities.isArray(Umbraco.Sys.ServerVariables.umbracoPlugins.trees)) {
 
                 var found = _.find(Umbraco.Sys.ServerVariables.umbracoPlugins.trees, function (item) {
                     return invariantEquals(item.alias, treeAlias);
@@ -471,7 +473,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
 
             for (var i = 0; i < treeNode.children.length; i++) {
                 var child = treeNode.children[i];
-                if (child.children && angular.isArray(child.children) && child.children.length > 0) {
+                if (child.children && Utilities.isArray(child.children) && child.children.length > 0) {
                     //recurse
                     found = this.getDescendantNode(child, id);
                     if (found) {
@@ -771,7 +773,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             if (!args.path) {
                 throw "No path defined on args object for syncTree";
             }
-            if (!angular.isArray(args.path)) {
+            if (!Utilities.isArray(args.path)) {
                 throw "Path must be an array";
             }
             if (args.path.length < 1) {

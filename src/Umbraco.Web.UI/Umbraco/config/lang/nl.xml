@@ -90,7 +90,7 @@
     <key alias="saveAndPublish">Opslaan en publiceren</key>
     <key alias="saveToPublish">Opslaan en verzenden voor goedkeuring</key>
     <key alias="saveListView">Sla list view op</key>
-    <key alias="showPage">voorbeeld bekijken</key>
+    <key alias="saveAndPreview">voorbeeld bekijken</key>
     <key alias="showPageDisabled">Voorbeeld bekijken is uitgeschakeld omdat er geen template is geselecteerd</key>
     <key alias="styleChoose">Stijl kiezen</key>
     <key alias="styleShow">Stijlen tonen</key>
@@ -263,7 +263,6 @@
     <key alias="linkinternal">Interne link:</key>
     <key alias="linklocaltip">Plaats een hekje (“#”) voor voor interne links.</key>
     <key alias="linknewwindow">In nieuw venster openen?</key>
-    <key alias="macroContainerSettings">Macro Settings</key>
     <key alias="macroDoesNotHaveProperties">Deze macro heeft geen eigenschappen die u kunt bewerken</key>
     <key alias="paste">Plakken</key>
     <key alias="permissionsEdit">Bewerk rechten voor</key>

@@ -11,7 +11,9 @@
                 alias="vm.contentType.alias"
                 description="vm.contentType.description"
                 navigation="vm.page.navigation"
-                icon="vm.contentType.icon">
+                icon="vm.contentType.icon"
+                editorfor="vm.header.editorfor"
+                setpagetitle="vm.header.setPageTitle">
             </umb-editor-header>
 
             <umb-editor-container class="editors-document-type-container">
@@ -38,6 +40,14 @@
 
                 <umb-editor-footer-content-right>
 
+                    <umb-button ng-if="model.infiniteMode"
+                        type="button"
+                        button-style="link"
+                        label-key="general_close"
+                        shortcut="esc"
+                        action="vm.close()">
+                    </umb-button>
+
                     <umb-button
                         ng-if="!vm.page.modelsBuilder"
                         type="button"
@@ -45,8 +55,7 @@
                         state="vm.page.saveButtonState"
                         button-style="success"
                         shortcut="ctrl+s"
-                        label="Save"
-                        label-key="buttons_save">
+                        label-key="{{vm.saveButtonKey}}">
                     </umb-button>
 
                     <umb-button-group

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Models
 {
@@ -103,11 +102,11 @@ namespace Umbraco.Core.Models
 
         public static void SetPublishInfo(this IContent content, string culture, string name, DateTime date)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentNullOrEmptyException(nameof(name));
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
 
-            if (culture.IsNullOrWhiteSpace())
-                throw new ArgumentNullOrEmptyException(nameof(culture));
+            if (culture == null) throw new ArgumentNullException(nameof(culture));
+            if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(culture));
 
             content.PublishCultureInfos.AddOrUpdate(culture, name, date);
         }
@@ -153,11 +152,11 @@ namespace Umbraco.Core.Models
 
         public static void SetCultureInfo(this IContentBase content, string culture, string name, DateTime date)
         {
-            if (name.IsNullOrWhiteSpace())
-                throw new ArgumentNullOrEmptyException(nameof(name));
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
 
-            if (culture.IsNullOrWhiteSpace())
-                throw new ArgumentNullOrEmptyException(nameof(culture));
+            if (culture == null) throw new ArgumentNullException(nameof(culture));
+            if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(culture));
 
             content.CultureInfos.AddOrUpdate(culture, name, date);
         }
@@ -276,8 +275,8 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public static bool ClearPublishInfo(this IContent content, string culture)
         {
-            if (culture.IsNullOrWhiteSpace())
-                throw new ArgumentNullOrEmptyException(nameof(culture));
+            if (culture == null) throw new ArgumentNullException(nameof(culture));
+            if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(culture));
 
             var removed = content.PublishCultureInfos.Remove(culture);
             if (removed)

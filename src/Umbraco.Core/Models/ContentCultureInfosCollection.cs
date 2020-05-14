@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using Umbraco.Core.Collections;
-using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Models
 {
@@ -23,7 +21,9 @@ namespace Umbraco.Core.Models
         /// </summary>
         public void AddOrUpdate(string culture, string name, DateTime date)
         {
-            if (culture.IsNullOrWhiteSpace()) throw new ArgumentNullOrEmptyException(nameof(culture));
+            if (culture == null) throw new ArgumentNullException(nameof(culture));
+            if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(culture));
+
             culture = culture.ToLowerInvariant();
 
             if (TryGetValue(culture, out var item))

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using System.Web;
 using System.Web.Routing;
 using Umbraco.Core;
@@ -10,14 +8,9 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Security;
-using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
-using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web
 {
@@ -39,40 +32,26 @@ namespace Umbraco.Web
     public class UmbracoInjectedModule : IHttpModule
     {
         private readonly IGlobalSettings _globalSettings;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly IPublishedSnapshotService _publishedSnapshotService;
-        private readonly IUserService _userService;
-        private readonly UrlProviderCollection _urlProviders;
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
         private readonly IPublishedRouter _publishedRouter;
-        private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
+        private readonly RoutableDocumentFilter _routableDocumentLookup;
 
         public UmbracoInjectedModule(
             IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            IPublishedSnapshotService publishedSnapshotService,
-            IUserService userService,
-            UrlProviderCollection urlProviders,
             IRuntimeState runtime,
             ILogger logger,
             IPublishedRouter publishedRouter,
-            IVariationContextAccessor variationContextAccessor,
-            IUmbracoContextFactory umbracoContextFactory)
+            IUmbracoContextFactory umbracoContextFactory,
+            RoutableDocumentFilter routableDocumentLookup)
         {
-            _combinedRouteCollection = new Lazy<RouteCollection>(CreateRouteCollection);
-
             _globalSettings = globalSettings;
-            _umbracoContextAccessor = umbracoContextAccessor;
-            _publishedSnapshotService = publishedSnapshotService;
-            _userService = userService;
-            _urlProviders = urlProviders;
             _runtime = runtime;
             _logger = logger;
             _publishedRouter = publishedRouter;
-            _variationContextAccessor = variationContextAccessor;
             _umbracoContextFactory = umbracoContextFactory;
+            _routableDocumentLookup = routableDocumentLookup;
         }
 
         #region HttpModule event handlers
@@ -182,18 +161,18 @@ namespace Umbraco.Web
             var reason = EnsureRoutableOutcome.IsRoutable;
 
             // ensure this is a document request
-            if (EnsureDocumentRequest(httpContext, uri) == false)
+            if (!_routableDocumentLookup.IsDocumentRequest(httpContext, context.OriginalRequestUrl))
             {
                 reason = EnsureRoutableOutcome.NotDocumentRequest;
             }
             // ensure the runtime is in the proper state
             // and deal with needed redirects, etc
-            else if (EnsureRuntime(httpContext, uri) == false)
+            else if (!EnsureRuntime(httpContext, uri))
             {
                 reason = EnsureRoutableOutcome.NotReady;
             }
             // ensure Umbraco has documents to serve
-            else if (EnsureHasContent(context, httpContext) == false)
+            else if (!EnsureHasContent(context, httpContext))
             {
                 reason = EnsureRoutableOutcome.NoContent;
             }
@@ -201,55 +180,7 @@ namespace Umbraco.Web
             return Attempt.If(reason == EnsureRoutableOutcome.IsRoutable, reason);
         }
 
-        /// <summary>
-        /// Ensures that the request is a document request (i.e. one that the module should handle)
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="uri"></param>
-        /// <returns></returns>
-        private bool EnsureDocumentRequest(HttpContextBase httpContext, Uri uri)
-        {
-            var maybeDoc = true;
-            var lpath = uri.AbsolutePath.ToLowerInvariant();
-
-            // handle directory-urls used for asmx
-            // TODO: legacy - what's the point really?
-            var asmxPos = lpath.IndexOf(".asmx/", StringComparison.OrdinalIgnoreCase);
-            if (asmxPos >= 0)
-            {
-                // use uri.AbsolutePath, not path, 'cos path has been lowercased
-                httpContext.RewritePath(uri.AbsolutePath.Substring(0, asmxPos + 5), // filePath
-                    uri.AbsolutePath.Substring(asmxPos + 5), // pathInfo
-                    uri.Query.TrimStart('?'));
-                maybeDoc = false;
-            }
-
-            // a document request should be
-            // /foo/bar/nil
-            // /foo/bar/nil/
-            // /foo/bar/nil.aspx
-            // where /foo is not a reserved path
-
-            // if the path contains an extension that is not .aspx
-            // then it cannot be a document request
-            var extension = Path.GetExtension(lpath);
-            if (maybeDoc && extension.IsNullOrWhiteSpace() == false && extension != ".aspx")
-                maybeDoc = false;
-
-            // at that point, either we have no extension, or it is .aspx
-
-            // if the path is reserved then it cannot be a document request
-            if (maybeDoc && _globalSettings.IsReservedPathOrUrl(lpath, httpContext, _combinedRouteCollection.Value))
-                maybeDoc = false;
-
-            //NOTE: No need to warn, plus if we do we should log the document, as this message doesn't really tell us anything :)
-            //if (!maybeDoc)
-            //{
-            //    Logger.Warn<UmbracoModule>("Not a document");
-            //}
-
-            return maybeDoc;
-        }
+        
 
         private bool EnsureRuntime(HttpContextBase httpContext, Uri uri)
         {
@@ -264,7 +195,7 @@ namespace Umbraco.Web
                 case RuntimeLevel.Unknown:
                 case RuntimeLevel.Boot:
                 case RuntimeLevel.BootFailed:
-                    throw new Exception($"panic: Unexpected runtime level: {level}.");
+                    throw new PanicException($"Unexpected runtime level: {level}.");
 
                 case RuntimeLevel.Run:
                     // ok
@@ -505,36 +436,6 @@ namespace Umbraco.Web
 
         #endregion
 
-        /// <summary>
-        /// This is used to be passed into the GlobalSettings.IsReservedPathOrUrl and will include some 'fake' routes
-        /// used to determine if a path is reserved.
-        /// </summary>
-        /// <remarks>
-        /// This is basically used to reserve paths dynamically
-        /// </remarks>
-        private readonly Lazy<RouteCollection> _combinedRouteCollection;
-
-        private RouteCollection CreateRouteCollection()
-        {
-            var routes = new RouteCollection();
-
-            foreach (var route in RouteTable.Routes)
-                routes.Add(route);
-
-            foreach (var reservedPath in UmbracoModule.ReservedPaths)
-            {
-                try
-                {
-                    routes.Add("_umbreserved_" + reservedPath.ReplaceNonAlphanumericChars(""),
-                        new Route(reservedPath.TrimStart('/'), new StopRoutingHandler()));
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error<UmbracoModule>("Could not add reserved path route", ex);
-                }
-            }
-
-            return routes;
-        }
+        
     }
 }

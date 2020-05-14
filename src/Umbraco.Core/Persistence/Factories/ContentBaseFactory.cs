@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Persistence.Factories
 {
     internal class ContentBaseFactory
     {
-        private static readonly Regex MediaPathPattern = new Regex(@"(/media/.+?)(?:['""]|$)", RegexOptions.Compiled);
-
         /// <summary>
         /// Builds an IContent item from a dto and content type.
         /// </summary>
@@ -189,7 +187,7 @@ namespace Umbraco.Core.Persistence.Factories
         /// <summary>
         /// Builds a dto from an IMedia item.
         /// </summary>
-        public static MediaDto BuildDto(IMedia entity)
+        public static MediaDto BuildDto(PropertyEditorCollection propertyEditors, IMedia entity)
         {
             var contentDto = BuildContentDto(entity, Constants.ObjectTypes.Media);
 
@@ -197,7 +195,7 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 NodeId = entity.Id,
                 ContentDto = contentDto,
-                MediaVersionDto = BuildMediaVersionDto(entity, contentDto)
+                MediaVersionDto = BuildMediaVersionDto(propertyEditors, entity, contentDto)
             };
 
             return dto;
@@ -291,8 +289,16 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        private static MediaVersionDto BuildMediaVersionDto(IMedia entity, ContentDto contentDto)
+        private static MediaVersionDto BuildMediaVersionDto(PropertyEditorCollection propertyEditors, IMedia entity, ContentDto contentDto)
         {
+            string path = null;
+            if (entity.Properties.TryGetValue(Constants.Conventions.Media.File, out var property)
+                && propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out var editor)
+                && editor is IDataEditorWithMediaPath dataEditor)
+            {
+                var value = property.GetValue();
+                path = dataEditor.GetMediaPath(value);
+            }
             var dto = new MediaVersionDto
             {
                 Id = entity.VersionId,

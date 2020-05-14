@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Examine;
@@ -29,18 +30,21 @@ namespace Umbraco.Web.Search
             composition.Register<MediaIndexPopulator>(Lifetime.Singleton);
 
             composition.Register<IndexRebuilder>(Lifetime.Singleton);
+            composition.RegisterUnique<IUmbracoIndexConfig, UmbracoIndexConfig>();
             composition.RegisterUnique<IUmbracoIndexesCreator, UmbracoIndexesCreator>();
             composition.RegisterUnique<IPublishedContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
                     factory.GetInstance<PropertyEditorCollection>(),
                     factory.GetInstance<UrlSegmentProviderCollection>(),
                     factory.GetInstance<IUserService>(),
+                    factory.GetInstance<IScopeProvider>(),
                     true));
             composition.RegisterUnique<IContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
                     factory.GetInstance<PropertyEditorCollection>(),
                     factory.GetInstance<UrlSegmentProviderCollection>(),
                     factory.GetInstance<IUserService>(),
+                    factory.GetInstance<IScopeProvider>(),
                     false));
             composition.RegisterUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
             composition.RegisterUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();

@@ -2,20 +2,24 @@
 @using Umbraco.Web.Templates
 
 @if (Model.value != null)
-{   
+{
     var url = Model.value.image;
     if(Model.editor.config != null && Model.editor.config.size != null){
-        url += "?width=" + Model.editor.config.size.width;
-        url += "&height=" + Model.editor.config.size.height;
-
-        if(Model.value.focalPoint != null){
-            url += "&center=" + Model.value.focalPoint.top +"," + Model.value.focalPoint.left;
-            url += "&mode=crop";
-        }
+        url = ImageCropperTemplateExtensions.GetCropUrl(url,
+            width: Model.editor.config.size.width,
+            height: Model.editor.config.size.height,
+            cropDataSet: Model.value.focalPoint == null ? null : new Umbraco.Core.PropertyEditors.ValueConverters.ImageCropperValue
+            {
+                FocalPoint = new Umbraco.Core.PropertyEditors.ValueConverters.ImageCropperValue.ImageCropperFocalPoint
+                {
+                    Top = Model.value.focalPoint.top,
+                    Left = Model.value.focalPoint.left
+                }
+            });
     }
 
     var altText = Model.value.altText ?? Model.value.caption ?? string.Empty;
-    
+
     <img src="@url" alt="@altText">
     
     if (Model.value.caption != null)

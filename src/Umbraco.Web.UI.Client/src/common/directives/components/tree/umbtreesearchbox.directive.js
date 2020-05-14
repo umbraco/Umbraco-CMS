@@ -14,7 +14,8 @@ function treeSearchBox(localizationService, searchService, $q) {
             section: "@",
             datatypeKey: "@",
             hideSearchCallback: "=",
-            searchCallback: "="
+            searchCallback: "=",
+            autoFocus: "="
         },
         restrict: "E",    // restrict to an element
         replace: true,   // replace the html element with the template
@@ -72,6 +73,9 @@ function treeSearchBox(localizationService, searchService, $q) {
                         //set back to null so it can be re-created
                         canceler = null;
                     });
+                }
+                else {
+                    scope.hideSearch();
                 }
             }
 

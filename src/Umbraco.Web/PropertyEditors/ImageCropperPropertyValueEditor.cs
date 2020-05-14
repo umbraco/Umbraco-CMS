@@ -185,20 +185,21 @@ namespace Umbraco.Web.PropertyEditors
 
         public string ToMediaPath(Property property)
         {
-            string value = property.GetValue()?.ToString();
+            var value = property.GetValue()?.ToString();
 
-            if (value != null)
+            if (value == null)
+                return string.Empty;
+
+            try
             {
-                try
-                {
-                    return JsonConvert.DeserializeObject<ImageCropperValue>(value)?.Src;
-                }
-                catch
-                {
-                }
+                return JsonConvert.DeserializeObject<ImageCropperValue>(value)?.Src;
+            }
+            catch
+            {
             }
 
-            return String.Empty;
+            // it is not null and it's not json, return the string value
+            return value;
         }
     }
 }

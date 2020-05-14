@@ -375,11 +375,14 @@
 
   })
 
+  $nugetsourceUmbraco = "https://api.nuget.org/v3/index.json"
+
   $ubuild.DefineMethod("RestoreNuGet",
   {
     Write-Host "Restore NuGet"
     Write-Host "Logging to $($this.BuildTemp)\nuget.restore.log"
-    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\Umbraco.sln" > "$($this.BuildTemp)\nuget.restore.log"
+	$params = "-Source", $nugetsourceUmbraco   
+    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\Umbraco.sln" > "$($this.BuildTemp)\nuget.restore.log" @params
     if (-not $?) { throw "Failed to restore NuGet packages." }
   })
 
@@ -458,23 +461,22 @@
     Write-Host "Prepare Angular Documentation"
 
     $src = "$($this.SolutionRoot)\src"
-      $out = $this.BuildOutput
+    $out = $this.BuildOutput
 
-    $this.CompileBelle()
-
-    "Moving to Umbraco.Web.UI.Client folder"
-    cd .\src\Umbraco.Web.UI.Client
+    "Moving to Umbraco.Web.UI.Docs folder"
+    cd ..\src\Umbraco.Web.UI.Docs
 
     "Generating the docs and waiting before executing the next commands"
-    & gulp docs | Out-Null
+	& npm install
+    & npx gulp docs
 
     # change baseUrl
     $BaseUrl = "https://our.umbraco.com/apidocs/v8/ui/"
-    $IndexPath = "./docs/api/index.html"
+    $IndexPath = "./api/index.html"
     (Get-Content $IndexPath).replace('location.href.replace(rUrl, indexFile)', "`'" + $BaseUrl + "`'") | Set-Content $IndexPath
 
     # zip it
-    & $this.BuildEnv.Zip a -tzip -r "$out\ui-docs.zip" "$src\Umbraco.Web.UI.Client\docs\api\*.*"
+    & $this.BuildEnv.Zip a -tzip -r "$out\ui-docs.zip" "$src\Umbraco.Web.UI.Docs\api\*.*"
   })
 
   $ubuild.DefineMethod("Build",

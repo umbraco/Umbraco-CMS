@@ -16,7 +16,7 @@ function fileManager($rootScope) {
     var mgr = {
         /**
          * @ngdoc function
-         * @name umbraco.services.fileManager#addFiles
+         * @name umbraco.services.fileManager#setFiles
          * @methodOf umbraco.services.fileManager
          * @function
          *
@@ -27,10 +27,10 @@ function fileManager($rootScope) {
         setFiles: function (args) {
 
             //propertyAlias, files
-            if (!angular.isString(args.propertyAlias)) {
+            if (!Utilities.isString(args.propertyAlias)) {
                 throw "args.propertyAlias must be a non empty string";
             }
-            if (!angular.isObject(args.files)) {
+            if (!Utilities.isObject(args.files)) {
                 throw "args.files must be an object";
             }
 
@@ -40,7 +40,7 @@ function fileManager($rootScope) {
             }
 
             var metaData = [];
-            if (angular.isArray(args.metaData)) {
+            if (Utilities.isArray(args.metaData)) {
                 metaData = args.metaData;
             }
 

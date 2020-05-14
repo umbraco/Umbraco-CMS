@@ -15,6 +15,8 @@
         vm.selectUserGroup = selectUserGroup;
         vm.deleteUserGroups = deleteUserGroups;
 
+        vm.filter = null;
+
         var currentUser = null;
 
         function onInit() {
@@ -81,7 +83,7 @@
             }
             // Disallow selection of the admin/translators group, the checkbox is not visible in the UI, but clicking(and thus selecting) is still possible.
             // Currently selection can only be used for deleting, and the Controller will also disallow deleting the admin group.
-            if (userGroup.alias === "admin" || userGroup.alias === "translator")
+            if (userGroup.isSystemUserGroup)
                 return;
             
             listViewHelper.selectHandler(userGroup, $index, vm.userGroups, vm.selection, $event);
@@ -110,7 +112,7 @@
                                 userGroupsResource.deleteUserGroups(_.pluck(vm.selection, "id")).then(function (data) {
                                     clearSelection();
                                     onInit();
-                                }, angular.noop);
+                                }, Utilities.noop);
                                 overlayService.close();
                             }
                         };

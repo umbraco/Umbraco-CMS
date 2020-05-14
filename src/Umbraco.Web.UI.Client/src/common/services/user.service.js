@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-    .factory('userService', function ($rootScope, eventsService, $q, $location, requestRetryQueue, authResource, $timeout, angularHelper) {
+    .factory('userService', function ($rootScope, eventsService, $q, $location, requestRetryQueue, authResource, emailMarketingResource, $timeout, angularHelper) {
 
         var currentUser = null;
         var lastUserId = null;
@@ -128,7 +128,7 @@ angular.module('umbraco.services')
         function setUserTimeoutInternal(newTimeout) {
 
             var asNumber = parseFloat(newTimeout);
-            if (!isNaN(asNumber) && currentUser && angular.isNumber(asNumber)) {
+            if (!isNaN(asNumber) && currentUser && Utilities.isNumber(asNumber)) {
                 currentUser.remainingAuthSeconds = newTimeout;
                 lastServerTimeoutSet = new Date();
             }
@@ -185,7 +185,19 @@ angular.module('umbraco.services')
             authenticate: function (login, password) {
 
                 return authResource.performLogin(login, password)
-                    .then(this.setAuthenticationSuccessful);
+                    .then(function(data) {
+
+                        // Check if user has a start node set.
+                        if(data.startContentIds.length === 0 && data.startMediaIds.length === 0){
+                            var errorMsg = "User has no start-nodes";
+                            var result = { errorMsg: errorMsg, user: data, authenticated: false, lastUserId: lastUserId, loginType: "credentials" };
+                            eventsService.emit("app.notAuthenticated", result);
+                            throw result;
+                        }
+                        
+                        return data;
+                        
+                    }).then(this.setAuthenticationSuccessful);
             },
             setAuthenticationSuccessful: function (data) {
 
@@ -262,6 +274,11 @@ angular.module('umbraco.services')
             /** Called whenever a server request is made that contains a x-umb-user-seconds response header for which we can update the user's remaining timeout seconds */
             setUserTimeout: function (newTimeout) {
                 setUserTimeoutInternal(newTimeout);
+            },
+
+            /** Calls out to a Remote Azure Function to deal with email marketing service */
+            addUserToEmailMarketing: (user) => {
+                return emailMarketingResource.postAddUserToEmailMarketing(user);
             }
         };
 

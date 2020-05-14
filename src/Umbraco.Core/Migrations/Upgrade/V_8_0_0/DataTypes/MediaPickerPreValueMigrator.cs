@@ -7,7 +7,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
         private readonly string[] _editors =
         {
             Constants.PropertyEditors.Legacy.Aliases.MediaPicker2,
-            Constants.PropertyEditors.Aliases.MediaPicker
+            Constants.PropertyEditors.Aliases.MediaPicker,
+            Constants.PropertyEditors.Aliases.MultipleMediaPicker
         };
 
         public override bool CanMigrate(string editorAlias)

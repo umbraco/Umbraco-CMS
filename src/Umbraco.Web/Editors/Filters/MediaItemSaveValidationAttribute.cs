@@ -1,7 +1,6 @@
-﻿using System.Linq;
+﻿using System;
 using System.Net;
 using System.Net.Http;
-using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
@@ -21,25 +20,27 @@ namespace Umbraco.Web.Editors.Filters
     {
         private readonly ILogger _logger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly ILocalizedTextService _textService;
         private readonly IMediaService _mediaService;
         private readonly IEntityService _entityService;
 
-        public MediaItemSaveValidationAttribute() : this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.MediaService, Current.Services.EntityService)
+        public MediaItemSaveValidationAttribute() : this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.TextService, Current.Services.MediaService, Current.Services.EntityService)
         {
         }
 
-        public MediaItemSaveValidationAttribute(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, IMediaService mediaService, IEntityService entityService)
+        public MediaItemSaveValidationAttribute(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService, IMediaService mediaService, IEntityService entityService)
         {
-            _logger = logger;
-            _umbracoContextAccessor = umbracoContextAccessor;
-            _mediaService = mediaService;
-            _entityService = entityService;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _textService = textService ?? throw new ArgumentNullException(nameof(textService));
+            _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
+            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
         }
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             var model = (MediaItemSave)actionContext.ActionArguments["contentItem"];
-            var contentItemValidator = new MediaSaveModelValidator(_logger, _umbracoContextAccessor);
+            var contentItemValidator = new MediaSaveModelValidator(_logger, _umbracoContextAccessor, _textService);
 
             if (ValidateUserAccess(model, actionContext))
             {
