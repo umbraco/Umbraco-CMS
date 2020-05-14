@@ -3,11 +3,11 @@ using Umbraco.Net;
 
 namespace Umbraco.Web.Common.AspNetCore
 {
-    public class AspNetIpResolver : IIpResolver
+    public class AspNetCoreIpResolver : IIpResolver
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AspNetIpResolver(IHttpContextAccessor httpContextAccessor)
+        public AspNetCoreIpResolver(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
         }
