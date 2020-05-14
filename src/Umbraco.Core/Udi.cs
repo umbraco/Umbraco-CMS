@@ -233,7 +233,7 @@ namespace Umbraco.Core
                 // just pick every service connectors - just making sure that not two of them
                 // would register the same entity type, with different udi types (would not make
                 // much sense anyways).
-                var connectors = Current.TypeLoader.GetTypes<IServiceConnector>();
+                var connectors = Current.HasFactory ? (Current.TypeLoader?.GetTypes<IServiceConnector>() ?? Enumerable.Empty<Type>()) : Enumerable.Empty<Type>();
                 var result = new Dictionary<string, UdiType>();
                 foreach (var connector in connectors)
                 {
@@ -316,7 +316,7 @@ namespace Umbraco.Core
 
             if (udiType == UdiType.GuidUdi)
                 return new GuidUdi(uri);
-            if (udiType == UdiType.GuidUdi)
+            if (udiType == UdiType.StringUdi)
                 return new StringUdi(uri);
 
             throw new ArgumentException(string.Format("Uri \"{0}\" is not a valid udi.", uri));
@@ -368,7 +368,7 @@ namespace Umbraco.Core
             return (udi1 == udi2) == false;
         }
 
-        private class UnknownTypeUdi : Udi
+        internal class UnknownTypeUdi : Udi
         {
             private UnknownTypeUdi()
                 : base("unknown", "umb://unknown/")

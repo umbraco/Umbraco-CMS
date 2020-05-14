@@ -29,7 +29,7 @@ angular.module("umbraco.directives")
                 }
 
                 var editorConfig = scope.configuration ? scope.configuration : null;
-                if (!editorConfig || angular.isString(editorConfig)) {
+                if (!editorConfig || Utilities.isString(editorConfig)) {
                     editorConfig = tinyMceService.defaultPrevalues();
                     //for the grid by default, we don't want to include the macro toolbar
                     editorConfig.toolbar = _.without(editorConfig, "umbmacro");
@@ -144,7 +144,6 @@ angular.module("umbraco.directives")
                         //we need to add a timeout here, to force a redraw so TinyMCE can find
                         //the elements needed
                         $timeout(function () {
-                            tinymce.DOM.events.domLoaded = true;
                             tinymce.init(baseLineConfigObj);
                         }, 150, false);
                     }

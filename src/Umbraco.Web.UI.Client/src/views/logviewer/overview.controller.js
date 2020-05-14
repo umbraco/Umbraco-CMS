@@ -4,6 +4,7 @@
     function LogViewerOverviewController($q, $location, $timeout, logViewerResource, navigationService) {
 
         var vm = this;
+
         vm.loading = false;
         vm.canLoadLogs = false;
         vm.searches = [];
@@ -50,6 +51,7 @@
         vm.searchLogQuery = searchLogQuery;
         vm.findMessageTemplate = findMessageTemplate;
         vm.searchErrors = searchErrors;
+        vm.showMore = showMore;
 
         function preFlightCheck(){
             vm.loading = true;
@@ -66,6 +68,9 @@
             });
         }
 
+        function showMore() {
+            vm.commonLogMessagesCount += 10;
+        }
 
         function init() {
 

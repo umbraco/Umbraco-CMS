@@ -14,7 +14,8 @@
                         action="confirm()"
                         button-style="{{confirmButtonStyle || 'primary'}}"
                         state="confirmButtonState"
-                        label-key="general_ok">
+                        disabled="confirmDisabled === true"
+                        label-key="{{confirmLabelKey || 'general_ok'}}">
             </umb-button>
         </div>
 	</div>

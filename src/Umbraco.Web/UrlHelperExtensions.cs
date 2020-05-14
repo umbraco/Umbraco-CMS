@@ -2,15 +2,12 @@
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Management.Instrumentation;
 using System.Web.Mvc;
 using System.Web.Routing;
 using ClientDependency.Core.Config;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Exceptions;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Editors;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 
@@ -70,7 +67,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string GetUmbracoApiService(this UrlHelper url, string actionName, Type apiControllerType, RouteValueDictionary routeVals = null)
         {
-            if (string.IsNullOrEmpty(actionName)) throw new ArgumentNullOrEmptyException(nameof(actionName));
+            if (actionName == null) throw new ArgumentNullException(nameof(actionName));
+            if (string.IsNullOrEmpty(actionName)) throw new ArgumentException("Value can't be empty.", nameof(actionName));
             if (apiControllerType == null) throw new ArgumentNullException(nameof(apiControllerType));
 
             var area = "";
@@ -99,8 +97,10 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string GetUmbracoApiService(this UrlHelper url, string actionName, string controllerName, string area, RouteValueDictionary routeVals = null)
         {
-            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
-            if (string.IsNullOrEmpty(actionName)) throw new ArgumentNullOrEmptyException(nameof(actionName));
+            if (actionName == null) throw new ArgumentNullException(nameof(actionName));
+            if (string.IsNullOrEmpty(actionName)) throw new ArgumentException("Value can't be empty.", nameof(actionName));
+            if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
+            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentException("Value can't be empty.", nameof(controllerName));
 
             if (routeVals == null)
             {

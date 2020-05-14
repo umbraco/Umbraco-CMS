@@ -5,15 +5,18 @@
         button-style="white"
         action="dropdown.isOpen = !dropdown.isOpen"
         label-key="general_actions"
-        show-caret="true">
+        show-caret="true"
+        has-popup="true"
+        is-expanded="dropdown.isOpen"
+        >
     </umb-button>
 
-    <umb-dropdown ng-if="dropdown.isOpen" class="umb-actions" on-close="dropdown.isOpen = false">
+    <umb-dropdown ng-if="dropdown.isOpen" class="umb-actions" on-close="dropdown.isOpen = false" deep-blur="dropdown.isOpen = false">
         <umb-dropdown-item class="umb-action" ng-class="{'sep':action.separatorm, '-opens-dialog': action.opensDialog}" ng-repeat="action in actions">
-            <a href="" ng-click="executeMenuItem(action)" prevent-default>
-                <i class="icon icon-{{action.cssclass}}"></i>
+            <button type="button" ng-click="executeMenuItem(action)">
+                <i class="icon icon-{{action.cssclass}}" aria-hidden="true"></i>
                 <span class="menu-label">{{action.name}}</span>
-            </a>
+            </button>
         </umb-dropdown-item>
     </umb-dropdown>
 

@@ -68,7 +68,7 @@
     <key alias="save">שמור</key>
     <key alias="saveAndPublish">שמור ופרסם</key>
     <key alias="saveToPublish">שמור ושלח לאישור</key>
-    <key alias="showPage">תצוגה מקדימה</key>
+    <key alias="saveAndPreview">תצוגה מקדימה</key>
     <key alias="styleChoose">בחר עיצוב</key>
     <key alias="styleShow">הצג עיצוב</key>
     <key alias="tableInsert">הוספת טבלה</key>
@@ -175,7 +175,6 @@
     <key alias="linkinternal">קישור פנימי:</key>
     <key alias="linklocaltip">בעת שימוש בקישוריים פנימיים, הוסף "#" בתחילת הקישור</key>
     <key alias="linknewwindow">לפתוח בחלון חדש?</key>
-    <key alias="macroContainerSettings">הגדרות מאקרו</key>
     <key alias="macroDoesNotHaveProperties">המאקרו לא מכיל מאפיינים שניתן לערוך</key>
     <key alias="paste">הדבק</key>
     <key alias="permissionsEdit">ערוך הרשאות עבור</key>

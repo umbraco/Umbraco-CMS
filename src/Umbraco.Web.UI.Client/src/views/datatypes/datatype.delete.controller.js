@@ -8,7 +8,13 @@
  */
 function DataTypeDeleteController($scope, dataTypeResource, treeService, navigationService, localizationService) {
 
-    $scope.performDelete = function() {
+    var vm = this;
+
+    vm.propertyJoinSeparator = ', <i class="icon-alert red"></i>';
+    vm.hasReferences = false;
+    vm.references = [];
+
+    vm.performDelete = function() {
 
         //mark it for deletion (used in the UI)
         $scope.currentNode.loading = true;
@@ -24,7 +30,7 @@ function DataTypeDeleteController($scope, dataTypeResource, treeService, navigat
         });
     };
 
-    $scope.performContainerDelete = function () {
+    vm.performContainerDelete = function () {
 
         //mark it for deletion (used in the UI)
         $scope.currentNode.loading = true;
@@ -41,16 +47,42 @@ function DataTypeDeleteController($scope, dataTypeResource, treeService, navigat
 
     };
 
-    $scope.cancel = function() {
+    vm.cancel = function() {
         navigationService.hideDialog();
     };
 
-    $scope.labels = {};
+    vm.onReferenceClicked = function(event) {
+        if (event.metaKey !== true) {
+            navigationService.hideDialog();
+        }
+    };
+
+    vm.labels = {};
     localizationService
-        .format(["editdatatype_yesDelete", "editdatatype_andAllRelated"], "%0% " + $scope.currentNode.name + " %1%")
+        .localize("editdatatype_acceptDeleteConsequence", [$scope.currentNode.name])
         .then(function (data) {
-            $scope.labels.deleteConfirm = data;
+            vm.labels.deleteConfirm = data;
         });
+
+    var init = function() {
+
+        if($scope.currentNode.nodeType === "dataTypes") {
+
+            vm.loading = true;
+
+            dataTypeResource.getReferences($scope.currentNode.id)
+                .then(function (data) {
+                    vm.loading = false;
+                    vm.references = data;
+
+                    vm.hasReferences = data.documentTypes.length > 0 || data.mediaTypes.length > 0 || data.memberTypes.length > 0;
+                });
+
+        }
+
+    }
+
+    init();
 }
 
 angular.module("umbraco").controller("Umbraco.Editors.DataType.DeleteController", DataTypeDeleteController);

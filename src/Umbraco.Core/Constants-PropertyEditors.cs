@@ -85,12 +85,7 @@ namespace Umbraco.Core
                 /// ListView.
                 /// </summary>
                 public const string ListView = "Umbraco.ListView";
-
-                /// <summary>
-                /// Macro Container.
-                /// </summary>
-                public const string MacroContainer = "Umbraco.MacroContainer";
-
+                
                 /// <summary>
                 /// Media Picker.
                 /// </summary>

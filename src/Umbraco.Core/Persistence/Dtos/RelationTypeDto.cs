@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [ExplicitColumns]
     internal class RelationTypeDto
     {
-        public const int NodeIdSeed = 4;
+        public const int NodeIdSeed = 10;
 
         [Column("id")]
         [PrimaryKeyColumn(IdentitySeed = NodeIdSeed)]
@@ -23,17 +23,20 @@ namespace Umbraco.Core.Persistence.Dtos
         public bool Dual { get; set; }
 
         [Column("parentObjectType")]
-        public Guid ParentObjectType { get; set; }
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public Guid? ParentObjectType { get; set; }
 
         [Column("childObjectType")]
-        public Guid ChildObjectType { get; set; }
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public Guid? ChildObjectType { get; set; }
 
         [Column("name")]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRelationType_name")]
         public string Name { get; set; }
 
         [Column("alias")]
-        [NullSetting(NullSetting = NullSettings.Null)]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
         [Length(100)]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRelationType_alias")]
         public string Alias { get; set; }

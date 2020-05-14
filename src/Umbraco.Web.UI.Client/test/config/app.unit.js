@@ -13,7 +13,7 @@ var app = angular.module('umbraco', [
     'ngSanitize',
     
     //'ngMessages',
-    'tmh.dynamicLocale',
+    'tmh.dynamicLocale'
     //'ngFileUpload',
     //'LocalStorageModule',
     //'chart.js'

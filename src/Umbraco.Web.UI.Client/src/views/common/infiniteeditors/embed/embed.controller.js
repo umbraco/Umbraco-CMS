@@ -21,8 +21,8 @@
             supportsDimensions: false
         };
 
-        if ($scope.model.original) {
-            angular.extend($scope.model.embed, $scope.model.original);
+        if ($scope.model.modify) {
+            angular.extend($scope.model.embed, $scope.model.modify);
 
             showPreview();
         }

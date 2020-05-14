@@ -10,6 +10,7 @@
                 page="page"
                 content="content"
                 culture="culture"
+                segment="segment"
                 on-select-app="appChanged(app)"
                 on-select-app-anchor="appAnchorChanged(app, anchor)"
                 on-back="onBack()"
@@ -24,6 +25,7 @@
                     <umb-breadcrumbs
                         ng-if="ancestors && ancestors.length > 0"
                         ancestors="ancestors"
+                        for-new-entity="page.isNew"
                         entity-type="content">
                     </umb-breadcrumbs>
 
@@ -44,9 +46,9 @@
                         alias="preview"
                         ng-if="!page.isNew && content.allowPreview && page.showPreviewButton"
                         type="button"
-                        button-style="info"
+                        button-style="link"
                         action="preview(content)"
-                        label-key="buttons_showPage">
+                        label-key="buttons_saveAndPreview">
                     </umb-button>
 
                     <umb-button
@@ -60,9 +62,9 @@
                         shortcut="ctrl+s"
                         add-ellipsis="{{page.saveButtonEllipsis}}">
                     </umb-button>
-                    
-                    <umb-button-group 
-                        ng-if="defaultButton && !content.trashed && !content.isElement" 
+
+                    <umb-button-group
+                        ng-if="defaultButton && !content.trashed && !content.isElement"
                         button-style="success"
                         default-button="defaultButton"
                         sub-buttons="subButtons"
