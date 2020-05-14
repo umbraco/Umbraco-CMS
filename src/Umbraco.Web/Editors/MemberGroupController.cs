@@ -67,7 +67,7 @@ namespace Umbraco.Web.Editors
                 return Services.MemberGroupService.GetAll()
                     .Select(Mapper.Map<IMemberGroup, MemberGroupDisplay>);
             }
-
+            
             return Enumerable.Empty<MemberGroupDisplay>();
         }
 

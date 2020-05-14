@@ -5,8 +5,15 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "publicAccess", Namespace = "")]
     public class PublicAccess
     {
+
         [DataMember(Name = "groups")]
-        public MemberGroupDisplay[] Groups { get; set; }
+        public RoleDisplay[] Groups { get; set; }
+
+        [DataMember(Name = "allGroups")]
+        public RoleDisplay[] AllGroups { get; set; }
+
+        [DataMember(Name = "hasProtection")]
+        public bool HasProtection { get; set; }
 
         [DataMember(Name = "loginPage")]
         public EntityBasic LoginPage { get; set; }
@@ -16,5 +23,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "members")]
         public MemberDisplay[] Members { get; set; }
+
+
     }
 }

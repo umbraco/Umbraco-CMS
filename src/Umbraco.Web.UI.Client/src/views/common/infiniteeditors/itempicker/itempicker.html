@@ -24,7 +24,7 @@
                                 no-dirty-check />
                     </div>
 
-                    <ul class="umb-card-grid -three-in-row">
+                    <ul class="umb-card-grid -three-in-row" ng-if="vm.listType=='grid'">
                         <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:'name' | filter:searchTerm"
                             ng-click="vm.selectItem(availableItem)">
                             <a class="umb-card-grid-item" href="" title="{{ availableItem.name }}">
@@ -35,19 +35,45 @@
                             </a>
                         </li>
                     </ul>
+
+                    <ul class="umb-tree" ng-if="vm.listType =='tree'">
+                        <li
+                            ng-class="{'umb-tree-node-checked' : vm.isSelected(availableItem) }"
+                            class="umb-tree-item"
+                            ng-click="vm.selectItem(availableItem)"
+                            ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:'name' | filter:searchTerm">
+                            
+                            <!-- Inline styles below to replicate "level" in tree picker -->
+                            <div class="umb-tree-item__inner" style="padding-left: 20px">
+                                <i class="icon umb-tree-icon sprTree {{ availableItem.icon }}" role="button"></i>
+                                <a class="umb-tree-item__label" title="" href="">{{ availableItem.name }}</a>
+                            </div>
+                            
+                            
+                        </li>
+                    </ul>
+
                 </umb-box-content>
             </umb-box>
         </umb-editor-container>
 
         <umb-editor-footer>
             <umb-editor-footer-content-right>
-                <umb-button
-                    type="button"
-                    button-style="link"
-                    label-key="general_close"
-                    shortcut="esc"
-                    action="vm.close()">
+                <umb-button type="button"
+                            button-style="link"
+                            label-key="general_close"
+                            shortcut="esc"
+                            action="vm.close()">
                 </umb-button>
+
+                <umb-button ng-if="vm.multiPicker"
+                            type="button"
+                            button-style="success"
+                            label-key="general_submit"
+                            action="vm.submit(model)">
+                </umb-button>
+
+
             </umb-editor-footer-content-right>
         </umb-editor-footer>
 

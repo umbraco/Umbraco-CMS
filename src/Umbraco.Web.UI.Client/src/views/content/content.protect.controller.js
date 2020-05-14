@@ -37,6 +37,7 @@
                 vm.loginPage = publicAccess.loginPage;
                 vm.errorPage = publicAccess.errorPage;
                 vm.groups = publicAccess.groups || [];
+                vm.allGroups = publicAccess.allGroups || [];
                 vm.members = publicAccess.members || [];
                 vm.canRemove = true;
 
@@ -58,13 +59,19 @@
             if (vm.type === "group") {
                 vm.loading = true;
                 // get all existing member groups for lookup upon selection
-                // NOTE: if/when member groups support infinite editing, we can't rely on using a cached lookup list of valid groups anymore
-                memberGroupResource.getGroups().then(function (groups) {
-                    vm.step = vm.type;
-                    vm.allGroups = groups;
-                    vm.hasGroups = groups.length > 0;
-                    vm.loading = false;
-                });
+                // NOTE: if/when member groups support infinite editing, we can't rely on using a cached lookup 
+                // list of valid groups anymore
+
+                var groups = vm.allGroups;
+
+                vm.step = vm.type;
+                vm.allGroups = groups;
+                vm.hasGroups = groups.length > 0;
+                vm.loading = false;
+
+                vm.allGroups.push();
+
+                
             }
             else {
                 vm.step = vm.type;
@@ -123,29 +130,64 @@
 
         function pickGroup() {
             navigationService.allowHideDialog(false);
-            editorService.memberGroupPicker({
-                multiPicker: true,
-                submit: function(model) {
-                    var selectedGroupIds = model.selectedMemberGroups
-                        ? model.selectedMemberGroups
-                        : [model.selectedMemberGroup];
-                    _.each(selectedGroupIds,
-                        function (groupId) {
-                            // find the group in the lookup list and add it if it isn't already
-                            var group = _.find(vm.allGroups, function(g) { return g.id === parseInt(groupId); });
-                            if (group && !_.find(vm.groups, function (g) { return g.id === group.id })) {
-                                vm.groups.push(group);
-                            }
+
+            //TODO: Replace memberGroupPicker with something that can also fetch roles.
+            console.log(vm.allGroups);
+            var masterTemplate = {
+                title: 'Foo',
+                listType: 'tree',
+                multiPicker : true,
+                availableItems: vm.allGroups,
+                submit: function (model) {
+
+                    if (model.selectedItems) {
+
+                        model.selectedItems.forEach(function(role) {
+
+                            var alreadyInGroups = vm.groups.filter(function(group){return group.id === role.id}).length>0;
+
+                            if(!alreadyInGroups)
+                                vm.groups.push(role);
                         });
+                    }
+
                     editorService.close();
                     navigationService.allowHideDialog(true);
                     $scope.dialog.confirmDiscardChanges = true;
+
                 },
-                close: function() {
+                close: function (oldModel) {
+                    // close dialog
                     editorService.close();
-                    navigationService.allowHideDialog(true);
+                    
                 }
-            });
+            };
+            editorService.itemPicker(masterTemplate);
+
+
+            //editorService.memberGroupPicker({
+            //    multiPicker: true,
+            //    submit: function(model) {
+            //        var selectedGroupIds = model.selectedMemberGroups
+            //            ? model.selectedMemberGroups
+            //            : [model.selectedMemberGroup];
+            //        _.each(selectedGroupIds,
+            //            function (groupId) {
+            //                // find the group in the lookup list and add it if it isn't already
+            //                var group = _.find(vm.allGroups, function(g) { return g.id === parseInt(groupId); });
+            //                if (group && !_.find(vm.groups, function (g) { return g.id === group.id })) {
+            //                    vm.groups.push(group);
+            //                }
+            //            });
+            //        editorService.close();
+            //        navigationService.allowHideDialog(true);
+            //        $scope.dialog.confirmDiscardChanges = true;
+            //    },
+            //    close: function() {
+            //        editorService.close();
+            //        navigationService.allowHideDialog(true);
+            //    }
+            //});
         }
 
         function removeGroup(group) {

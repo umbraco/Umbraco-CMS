@@ -36,7 +36,9 @@ using Umbraco.Web.Editors.Filters;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
+using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security.Providers;
 
 namespace Umbraco.Web.Editors
 {
@@ -2320,9 +2322,31 @@ namespace Umbraco.Web.Editors
             }
 
             var entry = Services.PublicAccessService.GetEntryForContent(content);
+
+            RoleDisplay[] allRoles;
+            var rolesProvider = Roles.Provider;
+
+            if (rolesProvider is MembersRoleProvider)
+            {
+                var allGroups = Services.MemberGroupService.GetAll().ToArray();
+                allRoles = allGroups.Select(x => new RoleDisplay() {Id = x.Id.ToString(), Name = x.Name, Icon = "icon-users-alt"}).ToArray();
+            }
+            else
+            {
+                // custom provider
+                var allCustomRoles = rolesProvider.GetAllRoles();
+                allRoles = allCustomRoles.Select(x=> new RoleDisplay(){Id = x, Name = x, Icon = "icon-users-alt"}).ToArray();
+            }
+
+
             if (entry == null || entry.ProtectedNodeId != content.Id)
             {
-                return Request.CreateResponse(HttpStatusCode.OK);
+                return Request.CreateResponse(HttpStatusCode.OK, new PublicAccess
+                {
+                    HasProtection = false,
+                    AllGroups = allRoles
+                });
+
             }
 
             var loginPageEntity = Services.EntityService.Get(entry.LoginNodeId, UmbracoObjectTypes.Document);
@@ -2357,18 +2381,46 @@ namespace Umbraco.Web.Editors
                     break;
             }
 
-            var allGroups = Services.MemberGroupService.GetAll().ToArray();
-            var groups = entry.Rules
-                .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
-                .Select(rule => allGroups.FirstOrDefault(g => g.Name == rule.RuleValue))
-                .Where(memberGroup => memberGroup != null)
-                .Select(Mapper.Map<MemberGroupDisplay>)
-                .ToArray();
+
+            RoleDisplay[] roles;
+            
+
+            if (rolesProvider is MembersRoleProvider)
+            {
+                var allGroups = Services.MemberGroupService.GetAll().ToArray();
+                var groups = entry.Rules
+                    .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
+                    .Select(rule => allGroups.FirstOrDefault(g => g.Name == rule.RuleValue))
+                    .Where(memberGroup => memberGroup != null)
+                    .Select(x=> new RoleDisplay(){Id = x.Id.ToString(), Name = x.Name, Icon = "icon-users-alt"})
+                    .ToArray();
+
+                roles = groups;
+                allRoles = allGroups.Select(x => new RoleDisplay() {Id = x.Id.ToString(), Name = x.Name, Icon = "icon-icon-users-alt"}).ToArray();
+
+            }
+            else
+            {
+                // custom provider
+
+                var allCustomRoles = rolesProvider.GetAllRoles();
+                    
+                var selectedRoles =  entry.Rules
+                    .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
+                    .Select(rule => allCustomRoles.FirstOrDefault(g => g == rule.RuleValue))
+                    .Where(role => role != null)
+                    .Select(x=> new RoleDisplay(){Id = x, Name = x, Icon = "icon-users-alt"})
+                    .ToArray();
+
+                roles = selectedRoles;
+                allRoles = allCustomRoles.Select(x=> new RoleDisplay(){Id = x, Name = x, Icon = "icon-users-alt"}).ToArray();
+            }
 
             return Request.CreateResponse(HttpStatusCode.OK, new PublicAccess
             {
                 Members = members,
-                Groups = groups,
+                Groups = roles,
+                AllGroups = allRoles,
                 LoginPage = loginPageEntity != null ? Mapper.Map<EntityBasic>(loginPageEntity) : null,
                 ErrorPage = errorPageEntity != null ? Mapper.Map<EntityBasic>(errorPageEntity) : null
             });
