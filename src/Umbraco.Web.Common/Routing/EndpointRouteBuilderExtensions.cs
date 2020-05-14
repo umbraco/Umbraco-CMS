@@ -106,7 +106,7 @@ namespace Umbraco.Web.Common.Routing
             string defaultAction = "Index",
             object constraints = null)
             where T : ControllerBase
-            => endpoints.MapUmbracoRoute(typeof(T), rootSegment, areaName, isBackOffice ? "BackOffice/Api" : "Api", defaultAction, true, constraints);
+            => endpoints.MapUmbracoApiRoute(typeof(T), rootSegment, areaName, isBackOffice, defaultAction, constraints);
 
         /// <summary>
         /// Used to map Umbraco api controllers consistently
