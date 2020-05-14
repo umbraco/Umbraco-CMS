@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 
-namespace Umbraco.Web.Install
+namespace Umbraco.Web.Common.Install
 {
     /// <summary>
     /// Ensures authorization occurs for the installer if it has already completed.

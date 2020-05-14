@@ -23,7 +23,7 @@ namespace Umbraco.Web.Common.Install
     [UmbracoApiController]
     [TypeFilter(typeof(HttpResponseExceptionFilter))]
     [TypeFilter(typeof(AngularJsonOnlyConfigurationAttribute))]
-    [Web.Install.InstallAuthorize]
+    [InstallAuthorize]
     [Area(Umbraco.Core.Constants.Web.Mvc.InstallArea)]
     public class InstallApiController : ControllerBase
     {
