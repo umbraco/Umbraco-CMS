@@ -163,6 +163,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override int CreatorId => _contentNode.CreatorId;
 
         /// <inheritdoc />
+        [Obsolete("Use CreatorName(IUserService) extension instead")]
         public override string CreatorName => GetProfileNameById(_contentNode.CreatorId);
 
         /// <inheritdoc />
@@ -172,6 +173,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override int WriterId => ContentData.WriterId;
 
         /// <inheritdoc />
+        [Obsolete("Use WriterName(IUserService) extension instead")]
         public override string WriterName => GetProfileNameById(ContentData.WriterId);
 
         /// <inheritdoc />
@@ -233,8 +235,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // invariant content items)
 
             // if there is no 'published' published content, no culture can be published
-            var hasPublished = _contentNode.PublishedContent != null;
-            if (!hasPublished)
+            if (!_contentNode.HasPublished)
                 return false;
 
             // if there is a 'published' published content, and does not vary = published
@@ -247,7 +248,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // there is a 'published' published content, and varies
             // = depends on the culture
-            return _contentNode.PublishedContent.ContentData.CultureInfos.ContainsKey(culture);
+            return _contentNode.HasPublishedCulture(culture);
         }
 
         #endregion
@@ -327,7 +328,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // beware what you use that one for - you don't want to cache its result
         private IAppCache GetAppropriateCache()
         {
-            var publishedSnapshot = (PublishedSnapshot)_publishedSnapshotAccessor.PublishedSnapshot;
+            var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
             var cache = publishedSnapshot == null
                 ? null
                 : ((IsPreviewing == false || PublishedSnapshotService.FullCacheWhenPreviewing) && (ContentType.ItemType != PublishedItemType.Member)
@@ -338,7 +339,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private IAppCache GetCurrentSnapshotCache()
         {
-            var publishedSnapshot = (PublishedSnapshot)_publishedSnapshotAccessor.PublishedSnapshot;
+            var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
             return publishedSnapshot?.SnapshotCache;
         }
 

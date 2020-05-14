@@ -1,5 +1,4 @@
 ﻿using System;
-using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -13,7 +12,8 @@ namespace Umbraco.Core.Models.PublishedContent
         /// </summary>
         public PublishedCultureInfo(string culture, string name, string urlSegment, DateTime date)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
 
             Culture = culture ?? throw new ArgumentNullException(nameof(culture));
             Name = name;

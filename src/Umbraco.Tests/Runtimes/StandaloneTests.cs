@@ -83,7 +83,7 @@ namespace Umbraco.Tests.Runtimes
             var composerTypes = typeLoader.GetTypes<IComposer>() // all of them
                 .Where(x => !x.FullName.StartsWith("Umbraco.Tests.")) // exclude test components
                 .Where(x => x != typeof(WebInitialComposer) && x != typeof(WebFinalComposer)); // exclude web runtime
-            var composers = new Composers(composition, composerTypes, profilingLogger);
+            var composers = new Composers(composition, composerTypes, Enumerable.Empty<Attribute>(), profilingLogger);
             composers.Compose();
 
             // must registers stuff that WebRuntimeComponent would register otherwise
@@ -97,6 +97,7 @@ namespace Umbraco.Tests.Runtimes
             composition.Register<IVariationContextAccessor, TestVariationContextAccessor>(Lifetime.Singleton);
             composition.Register<IDefaultCultureAccessor, TestDefaultCultureAccessor>(Lifetime.Singleton);
             composition.Register<ISiteDomainHelper>(_ => Mock.Of<ISiteDomainHelper>(), Lifetime.Singleton);
+            composition.Register(_ => Mock.Of<IImageUrlGenerator>(), Lifetime.Singleton);
             composition.RegisterUnique(f => new DistributedCache());
             composition.WithCollectionBuilder<UrlProviderCollectionBuilder>().Append<DefaultUrlProvider>();
             composition.RegisterUnique<IDistributedCacheBinder, DistributedCacheBinder>();
@@ -272,7 +273,7 @@ namespace Umbraco.Tests.Runtimes
                 .Where(x => !x.FullName.StartsWith("Umbraco.Tests"));
             // single?
             //var componentTypes = new[] { typeof(CoreRuntimeComponent) };
-            var composers = new Composers(composition, composerTypes, profilingLogger);
+            var composers = new Composers(composition, composerTypes, Enumerable.Empty<Attribute>(), profilingLogger);
 
             // get components to compose themselves
             composers.Compose();

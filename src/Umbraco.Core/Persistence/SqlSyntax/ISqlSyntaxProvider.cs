@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text.RegularExpressions;
 using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
@@ -76,6 +77,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string ConvertIntegerToOrderableString { get; }
         string ConvertDateToOrderableString { get; }
         string ConvertDecimalToOrderableString { get; }
+        
+        /// <summary>
+        /// Returns the default isolation level for the database
+        /// </summary>
+        IsolationLevel DefaultIsolationLevel { get; }
 
         IEnumerable<string> GetTablesInSchema(IDatabase db);
         IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db);
@@ -121,5 +127,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         /// unspecified.</para>
         /// </remarks>
         bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName);
+
+        void ReadLock(IDatabase db, params int[] lockIds);
+        void WriteLock(IDatabase db, params int[] lockIds);
     }
 }

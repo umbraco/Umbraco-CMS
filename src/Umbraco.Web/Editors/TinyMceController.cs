@@ -104,24 +104,6 @@ namespace Umbraco.Web.Editors
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, $"Error when trying to move {currentFile} to {newFilePath}", ex);
             }
 
-            // Now remove all old files so that the temp folder(s) never grow
-            // Anything older than one day gets deleted
-            var tempFiles = Directory.GetFiles(SystemDirectories.TempFileUploads, "*", SearchOption.AllDirectories);
-            foreach (var tempFile in tempFiles)
-            {
-                if (DateTime.UtcNow - File.GetLastWriteTimeUtc(tempFile) > TimeSpan.FromDays(1))
-                {
-                    try
-                    {
-                        File.Delete(tempFile);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error<TinyMceController>(ex, "Could not delete temp file {FileName}", tempFile);
-                    }
-                }
-            }
-
             return Request.CreateResponse(HttpStatusCode.OK, new { tmpLocation = relativeNewFilePath });
         }
     }

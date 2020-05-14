@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -294,6 +295,24 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(languageUpdated.IsoCode, Is.EqualTo("pt-BR"));
                 Assert.That(languageUpdated.CultureName, Is.EqualTo("pt-BR"));
                 Assert.That(languageUpdated.FallbackLanguageId, Is.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void Perform_Update_With_Existing_Culture()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                var repository = CreateRepository(provider);
+
+                // Act
+                var language = repository.Get(5);
+                language.IsoCode = "da-DK";
+                language.CultureName = "da-DK";
+
+                Assert.Throws<InvalidOperationException>(() => repository.Save(language));
             }
         }
 

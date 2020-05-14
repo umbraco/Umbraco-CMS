@@ -172,7 +172,7 @@ namespace Umbraco.Core.Services.Implement
             xml.Add(new XAttribute("Id", dataType.EditorAlias));
             xml.Add(new XAttribute("Definition", dataType.Key));
             xml.Add(new XAttribute("DatabaseType", dataType.DatabaseType.ToString()));
-            xml.Add(new XAttribute("Configuration", JsonConvert.SerializeObject(dataType.Configuration)));
+            xml.Add(new XAttribute("Configuration", JsonConvert.SerializeObject(dataType.Configuration, PropertyEditors.ConfigurationEditor.ConfigurationJsonSettings)));
 
             var folderNames = string.Empty;
             if (dataType.Level != 1)
@@ -360,7 +360,9 @@ namespace Umbraco.Core.Services.Implement
                                                    new XElement("Definition", definition.Key),
                                                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
+                                                   new XElement("MandatoryMessage", propertyType.MandatoryMessage),
                                                    new XElement("Validation", propertyType.ValidationRegExp),
+                                                   new XElement("ValidationRegExpMessage", propertyType.ValidationRegExpMessage),
                                                    new XElement("Description", new XCData(propertyType.Description)));
                 genericProperties.Add(genericProperty);
             }
@@ -487,7 +489,9 @@ namespace Umbraco.Core.Services.Implement
                                                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
                                                    new XElement("SortOrder", propertyType.SortOrder),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
+                                                   propertyType.MandatoryMessage != null ? new XElement("MandatoryMessage", propertyType.MandatoryMessage) : null,
                                                    propertyType.ValidationRegExp != null ? new XElement("Validation", propertyType.ValidationRegExp) : null,
+                                                   propertyType.ValidationRegExpMessage != null ? new XElement("ValidationRegExpMessage", propertyType.ValidationRegExpMessage) : null,
                                                    propertyType.Description != null ? new XElement("Description", new XCData(propertyType.Description)) : null,
                                                    new XElement("Variations", propertyType.Variations.ToString()));
 

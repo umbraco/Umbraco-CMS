@@ -82,7 +82,7 @@ namespace Umbraco.Core.Packaging
         {
             var packagesXml = EnsureStorage(out _);
             if (packagesXml?.Root == null)
-                yield break;;
+                yield break;
 
             foreach (var packageXml in packagesXml.Root.Elements("package"))
                 yield return _parser.ToPackageDefinition(packageXml);
@@ -139,7 +139,7 @@ namespace Umbraco.Core.Packaging
                 var updatedXml = _parser.ToXml(definition);
                 packageXml.ReplaceWith(updatedXml);
             }
-            
+
             packagesXml.Save(packagesFile);
 
             return true;
@@ -212,7 +212,7 @@ namespace Umbraco.Core.Packaging
                 compiledPackageXml.Save(packageXmlFileName);
 
                 // check if there's a packages directory below media
-                
+
                 if (Directory.Exists(IOHelper.MapPath(_mediaFolderPath)) == false)
                     Directory.CreateDirectory(IOHelper.MapPath(_mediaFolderPath));
 
@@ -510,7 +510,6 @@ namespace Umbraco.Core.Packaging
         private XElement GetStylesheetXml(string name, bool includeProperties)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
-;
             var sts = _fileService.GetStylesheetByName(name);
             if (sts == null) return null;
             var stylesheetXml = new XElement("Stylesheet");
@@ -562,7 +561,7 @@ namespace Umbraco.Core.Packaging
             package.Add(new XElement("url", definition.Url));
 
             var requirements = new XElement("requirements");
-            
+
             requirements.Add(new XElement("major", definition.UmbracoVersion == null ? UmbracoVersion.SemanticVersion.Major.ToInvariantString() : definition.UmbracoVersion.Major.ToInvariantString()));
             requirements.Add(new XElement("minor", definition.UmbracoVersion == null ? UmbracoVersion.SemanticVersion.Minor.ToInvariantString() : definition.UmbracoVersion.Minor.ToInvariantString()));
             requirements.Add(new XElement("patch", definition.UmbracoVersion == null ? UmbracoVersion.SemanticVersion.Patch.ToInvariantString() : definition.UmbracoVersion.Build.ToInvariantString()));
@@ -589,7 +588,7 @@ namespace Umbraco.Core.Packaging
                     contributors.Add(new XElement("contributor", contributor));
                 }
             }
-            
+
             info.Add(contributors);
 
             info.Add(new XElement("readme", new XCData(definition.Readme)));

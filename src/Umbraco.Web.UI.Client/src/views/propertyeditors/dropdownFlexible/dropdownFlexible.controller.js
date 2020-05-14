@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleController",
-    function($scope) {
+    function ($scope, validationMessageService) {
 
         //setup the default config
         var config = {
@@ -45,14 +45,14 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleCo
             $scope.model.value = [$scope.model.singleDropdownValue];
         }
 
-        if (angular.isArray($scope.model.config.items)) {
+        if (Utilities.isArray($scope.model.config.items)) {
             //PP: I dont think this will happen, but we have tests that expect it to happen..
             //if array is simple values, convert to array of objects
-            if(!angular.isObject($scope.model.config.items[0])){
+            if (!Utilities.isObject($scope.model.config.items[0])){
                 $scope.model.config.items = convertArrayToDictionaryArray($scope.model.config.items);
             }
         }
-        else if (angular.isObject($scope.model.config.items)) {
+        else if (Utilities.isObject($scope.model.config.items)) {
             $scope.model.config.items = convertObjectToDictionaryArray($scope.model.config.items);
         }
         else {
@@ -89,4 +89,10 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleCo
                 $scope.model.value = null;
             }
         }
+
+        // Set the message to use for when a mandatory field isn't completed.
+        // Will either use the one provided on the property type or a localised default.
+        validationMessageService.getMandatoryMessage($scope.model.validation).then(function (value) {
+            $scope.mandatoryMessage = value;
+        });
     });

@@ -223,7 +223,7 @@ namespace Umbraco.Tests.Cache
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
-
+            
             // gen 1
             d.Set(1, "one");
             Assert.AreEqual(1, d.Test.GetValues(1).Length);
@@ -321,7 +321,7 @@ namespace Umbraco.Tests.Cache
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
-
+            
             Assert.AreEqual(0, d.Test.GetValues(1).Length);
 
             // gen 1
@@ -416,7 +416,7 @@ namespace Umbraco.Tests.Cache
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
-
+            
             // gen 1
             d.Set(1, "one");
             Assert.AreEqual(1, d.Test.GetValues(1).Length);
@@ -578,7 +578,7 @@ namespace Umbraco.Tests.Cache
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
-
+            
             d.Set(1, "one");
             d.Set(2, "two");
 
@@ -689,7 +689,7 @@ namespace Umbraco.Tests.Cache
             {
                 // gen 3
                 Assert.AreEqual(2, d.Test.GetValues(1).Length);
-                d.Set(1, "ein");
+                d.SetLocked(1, "ein");
                 Assert.AreEqual(3, d.Test.GetValues(1).Length);
 
                 Assert.AreEqual(3, d.Test.LiveGen);
@@ -727,31 +727,25 @@ namespace Umbraco.Tests.Cache
             using (var w1 = d.GetScopedWriteLock(scopeProvider))
             {
                 Assert.AreEqual(1, t.LiveGen);
-                Assert.AreEqual(1, t.WLocked);
+                Assert.IsTrue(t.IsLocked);
                 Assert.IsTrue(t.NextGen);
 
-                using (var w2 = d.GetScopedWriteLock(scopeProvider))
+                Assert.Throws<InvalidOperationException>(() =>
                 {
-                    Assert.AreEqual(1, t.LiveGen);
-                    Assert.AreEqual(2, t.WLocked);
-                    Assert.IsTrue(t.NextGen);
-
-                    Assert.AreNotSame(w1, w2); // get a new writer each time
-
-                    d.Set(1, "one");
-
-                    Assert.AreEqual(0, d.CreateSnapshot().Gen);
-                }
+                    using (var w2 = d.GetScopedWriteLock(scopeProvider))
+                    {
+                    }
+                });
 
                 Assert.AreEqual(1, t.LiveGen);
-                Assert.AreEqual(1, t.WLocked);
+                Assert.IsTrue(t.IsLocked);
                 Assert.IsTrue(t.NextGen);
 
                 Assert.AreEqual(0, d.CreateSnapshot().Gen);
             }
 
             Assert.AreEqual(1, t.LiveGen);
-            Assert.AreEqual(0, t.WLocked);
+            Assert.IsFalse(t.IsLocked);
             Assert.IsTrue(t.NextGen);
 
             Assert.AreEqual(1, d.CreateSnapshot().Gen);
@@ -772,11 +766,14 @@ namespace Umbraco.Tests.Cache
 
             using (var w1 = d.GetScopedWriteLock(scopeProvider))
             {
+                // This one is interesting, although we don't allow recursive locks, since this is
+                // using the same ScopeContext/key, the lock acquisition is only done once
+
                 using (var w2 = d.GetScopedWriteLock(scopeProvider))
                 {
                     Assert.AreSame(w1, w2);
 
-                    d.Set(1, "one");
+                    d.SetLocked(1, "one");
                 }
             }
         }
@@ -797,19 +794,16 @@ namespace Umbraco.Tests.Cache
             using (var w1 = d.GetScopedWriteLock(scopeProvider1))
             {
                 Assert.AreEqual(1, t.LiveGen);
-                Assert.AreEqual(1, t.WLocked);
+                Assert.IsTrue(t.IsLocked);
                 Assert.IsTrue(t.NextGen);
 
-                using (var w2 = d.GetScopedWriteLock(scopeProvider2))
+                Assert.Throws<InvalidOperationException>(() =>
                 {
-                    Assert.AreEqual(1, t.LiveGen);
-                    Assert.AreEqual(2, t.WLocked);
-                    Assert.IsTrue(t.NextGen);
+                    using (var w2 = d.GetScopedWriteLock(scopeProvider2))
+                    {
+                    }
+                });
 
-                    Assert.AreNotSame(w1, w2);
-
-                    d.Set(1, "one");
-                }
             }
         }
 
@@ -848,13 +842,13 @@ namespace Umbraco.Tests.Cache
             Assert.IsFalse(d.Test.NextGen);
             Assert.AreEqual("uno", s2.Get(1));
 
-            var scopeProvider = GetScopeProvider();
 
+            var scopeProvider = GetScopeProvider();
             using (d.GetScopedWriteLock(scopeProvider))
             {
                 // gen 3
                 Assert.AreEqual(2, d.Test.GetValues(1).Length);
-                d.Set(1, "ein");
+                d.SetLocked(1, "ein");
                 Assert.AreEqual(3, d.Test.GetValues(1).Length);
 
                 Assert.AreEqual(3, d.Test.LiveGen);
@@ -881,6 +875,7 @@ namespace Umbraco.Tests.Cache
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
+            
 
             // gen 1
             d.Set(1, "one");
@@ -894,12 +889,11 @@ namespace Umbraco.Tests.Cache
             Assert.AreEqual("uno", s2.Get(1));
 
             var scopeProvider = GetScopeProvider();
-
             using (d.GetScopedWriteLock(scopeProvider))
             {
                 // creating a snapshot in a write-lock does NOT return the "current" content
                 // it uses the previous snapshot, so new snapshot created only on release
-                d.Set(1, "ein");
+                d.SetLocked(1, "ein");
                 var s3 = d.CreateSnapshot();
                 Assert.AreEqual(2, s3.Gen);
                 Assert.AreEqual("uno", s3.Get(1));
@@ -934,12 +928,11 @@ namespace Umbraco.Tests.Cache
 
             var scopeContext = new ScopeContext();
             var scopeProvider = GetScopeProvider(scopeContext);
-
             using (d.GetScopedWriteLock(scopeProvider))
             {
                 // creating a snapshot in a write-lock does NOT return the "current" content
                 // it uses the previous snapshot, so new snapshot created only on release
-                d.Set(1, "ein");
+                d.SetLocked(1, "ein");
                 var s3 = d.CreateSnapshot();
                 Assert.AreEqual(2, s3.Gen);
                 Assert.AreEqual("uno", s3.Get(1));
@@ -967,7 +960,7 @@ namespace Umbraco.Tests.Cache
             var d = new SnapDictionary<int, string>();
             var t = d.Test;
             t.CollectAuto = false;
-
+            
             // gen 1
             d.Set(1, "one");
             var s1 = d.CreateSnapshot();
@@ -984,12 +977,11 @@ namespace Umbraco.Tests.Cache
 
             var scopeContext = new ScopeContext();
             var scopeProvider = GetScopeProvider(scopeContext);
-
             using (d.GetScopedWriteLock(scopeProvider))
             {
                 // creating a snapshot in a write-lock does NOT return the "current" content
                 // it uses the previous snapshot, so new snapshot created only on release
-                d.Set(1, "ein");
+                d.SetLocked(1, "ein");
                 var s3 = d.CreateSnapshot();
                 Assert.AreEqual(2, s3.Gen);
                 Assert.AreEqual("uno", s3.Get(1));
@@ -997,7 +989,7 @@ namespace Umbraco.Tests.Cache
                 // we made some changes, so a next gen is required
                 Assert.AreEqual(3, t.LiveGen);
                 Assert.IsTrue(t.NextGen);
-                Assert.AreEqual(1, t.WLocked);
+                Assert.IsTrue(t.IsLocked);
 
                 // but live snapshot contains changes
                 var ls = t.LiveSnapshot;
@@ -1008,7 +1000,7 @@ namespace Umbraco.Tests.Cache
             // nothing is committed until scope exits
             Assert.AreEqual(3, t.LiveGen);
             Assert.IsTrue(t.NextGen);
-            Assert.AreEqual(1, t.WLocked);
+            Assert.IsTrue(t.IsLocked);
 
             // no changes until exit
             var s4 = d.CreateSnapshot();
@@ -1020,7 +1012,7 @@ namespace Umbraco.Tests.Cache
             // now things have changed
             Assert.AreEqual(2, t.LiveGen);
             Assert.IsFalse(t.NextGen);
-            Assert.AreEqual(0, t.WLocked);
+            Assert.IsFalse(t.IsLocked);
 
             // no changes since not completed
             var s5 = d.CreateSnapshot();
@@ -1097,9 +1089,10 @@ namespace Umbraco.Tests.Cache
             // writer is scope contextual and scoped
             //  when disposed, nothing happens
             //  when the context exists, the writer is released
+
             using (d.GetScopedWriteLock(scopeProvider))
             {
-                d.Set(1, "ein");
+                d.SetLocked(1, "ein");
                 Assert.IsTrue(d.Test.NextGen);
                 Assert.AreEqual(3, d.Test.LiveGen);
                 Assert.IsNotNull(d.Test.GenObj);
@@ -1107,7 +1100,7 @@ namespace Umbraco.Tests.Cache
             }
 
             // writer has not released
-            Assert.AreEqual(1, d.Test.WLocked);
+            Assert.IsTrue(d.Test.IsLocked);
             Assert.IsNotNull(d.Test.GenObj);
             Assert.AreEqual(2, d.Test.GenObj.Gen);
 
@@ -1118,7 +1111,7 @@ namespace Umbraco.Tests.Cache
             // panic!
             var s2 = d.CreateSnapshot();
 
-            Assert.AreEqual(1, d.Test.WLocked);
+            Assert.IsTrue(d.Test.IsLocked);
             Assert.IsNotNull(d.Test.GenObj);
             Assert.AreEqual(2, d.Test.GenObj.Gen);
             Assert.AreEqual(3, d.Test.LiveGen);
@@ -1127,7 +1120,7 @@ namespace Umbraco.Tests.Cache
             // release writer
             scopeContext.ScopeExit(true);
 
-            Assert.AreEqual(0, d.Test.WLocked);
+            Assert.IsFalse(d.Test.IsLocked);
             Assert.IsNotNull(d.Test.GenObj);
             Assert.AreEqual(2, d.Test.GenObj.Gen);
             Assert.AreEqual(3, d.Test.LiveGen);
@@ -1135,7 +1128,7 @@ namespace Umbraco.Tests.Cache
 
             var s3 = d.CreateSnapshot();
 
-            Assert.AreEqual(0, d.Test.WLocked);
+            Assert.IsFalse(d.Test.IsLocked);
             Assert.IsNotNull(d.Test.GenObj);
             Assert.AreEqual(3, d.Test.GenObj.Gen);
             Assert.AreEqual(3, d.Test.LiveGen);
@@ -1147,6 +1140,47 @@ namespace Umbraco.Tests.Cache
             var scopeProvider = Mock.Of<IScopeProvider>();
             Mock.Get(scopeProvider)
                 .Setup(x => x.Context).Returns(scopeContext);
+            return scopeProvider;
+        }
+    }
+
+    /// <summary>
+    /// Used for tests so that we don't have to wrap every Set/Clear call in locks
+    /// </summary>
+    public static class SnapDictionaryExtensions
+    {
+        internal static void Set<TKey, TValue>(this SnapDictionary<TKey, TValue> d, TKey key, TValue value)
+            where TValue : class
+        {
+            using (d.GetScopedWriteLock(GetScopeProvider()))
+            {
+                d.SetLocked(key, value);
+            }
+        }
+
+        internal static void Clear<TKey, TValue>(this SnapDictionary<TKey, TValue> d)
+            where TValue : class
+        {
+            using (d.GetScopedWriteLock(GetScopeProvider()))
+            {
+                d.ClearLocked();
+            }
+        }
+
+        internal static void Clear<TKey, TValue>(this SnapDictionary<TKey, TValue> d, TKey key)
+            where TValue : class
+        {
+            using (d.GetScopedWriteLock(GetScopeProvider()))
+            {
+                d.ClearLocked(key);
+            }
+        }
+
+        private static IScopeProvider GetScopeProvider()
+        {
+            var scopeProvider = Mock.Of<IScopeProvider>();
+            Mock.Get(scopeProvider)
+                .Setup(x => x.Context).Returns(() => null);
             return scopeProvider;
         }
     }

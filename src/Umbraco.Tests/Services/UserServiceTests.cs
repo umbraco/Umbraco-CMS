@@ -865,7 +865,7 @@ namespace Umbraco.Tests.Services
             var userService = ServiceContext.UserService;
 
             // Act & Assert
-            Assert.Throws<ArgumentNullOrEmptyException>(() => userService.CreateUserWithIdentity(string.Empty, "john@umbraco.io"));
+            Assert.Throws<ArgumentException>(() => userService.CreateUserWithIdentity(string.Empty, "john@umbraco.io"));
         }
 
         [Test]
@@ -922,6 +922,24 @@ namespace Umbraco.Tests.Services
             Assert.IsNotNull(profile);
             Assert.AreEqual(user.Username, profile.Name);
             Assert.AreEqual(user.Id, profile.Id);
+        }
+
+        [Test]
+        public void Get_By_Profile_Id_Must_return_null_if_user_not_exists()
+        {
+            var profile = ServiceContext.UserService.GetProfileById(42);
+
+            // Assert
+            Assert.IsNull(profile);
+        }
+
+        [Test]
+        public void GetProfilesById_Must_empty_if_users_not_exists()
+        {
+            var profiles = ServiceContext.UserService.GetProfilesById(42);
+
+            // Assert
+            CollectionAssert.IsEmpty(profiles);
         }
 
         [Test]
