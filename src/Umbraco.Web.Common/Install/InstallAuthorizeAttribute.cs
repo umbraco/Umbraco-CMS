@@ -13,11 +13,11 @@ namespace Umbraco.Web.Common.Install
     /// </summary>
     public class InstallAuthorizeAttribute : TypeFilterAttribute
     {
-        public InstallAuthorizeAttribute() : base(typeof(HttpInstallAuthorizeFilter))
+        public InstallAuthorizeAttribute() : base(typeof(InstallAuthorizeFilter))
         {
         }
 
-        private class HttpInstallAuthorizeFilter : IAuthorizationFilter
+        private class InstallAuthorizeFilter : IAuthorizationFilter
         {
             public void OnAuthorization(AuthorizationFilterContext authorizationFilterContext)
             {
