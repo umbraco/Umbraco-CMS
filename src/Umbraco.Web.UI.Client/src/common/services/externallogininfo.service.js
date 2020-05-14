@@ -32,7 +32,8 @@ function externalLoginInfoService(externalLoginInfo) {
     }
 
     return {
-        hasDenyLocalLogin: hasDenyLocalLogin
+        hasDenyLocalLogin: hasDenyLocalLogin,
+        getLoginProviders: getLoginProviders
     };
 }
 angular.module('umbraco.services').factory('externalLoginInfoService', externalLoginInfoService);
