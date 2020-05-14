@@ -73,6 +73,8 @@ namespace Umbraco.Extensions
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
 
+            app.UseMiddleware<BootFailedMiddleware>();
+
             if (!app.UmbracoCanBoot()) return app;
 
             app.UseMiddleware<UmbracoRequestMiddleware>();

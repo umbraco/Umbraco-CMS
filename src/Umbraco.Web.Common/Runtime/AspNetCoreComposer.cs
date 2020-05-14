@@ -18,6 +18,9 @@ using Umbraco.Web.Common.Install;
 using Umbraco.Extensions;
 using System.Linq;
 using Umbraco.Web.Common.Controllers;
+using System;
+using Umbraco.Web.Common.Middleware;
+using Umbraco.Web.Common.ModelBinding;
 
 namespace Umbraco.Web.Common.Runtime
 {
@@ -77,6 +80,11 @@ namespace Umbraco.Web.Common.Runtime
 
             composition.RegisterUnique<InstallAreaRoutes>();
 
+            composition.RegisterUnique<UmbracoRequestLoggingMiddleware>();
+            composition.RegisterUnique<UmbracoRequestMiddleware>();
+            composition.RegisterUnique<BootFailedMiddleware>();
+
+            composition.RegisterUnique<UmbracoJsonModelBinder>();
         }
     }
 }

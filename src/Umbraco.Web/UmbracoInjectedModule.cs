@@ -361,25 +361,6 @@ namespace Umbraco.Web
         /// <param name="app"></param>
         public void Init(HttpApplication app)
         {
-            if (_runtime.Level == RuntimeLevel.BootFailed)
-            {
-                // there's nothing we can do really
-                app.BeginRequest += (sender, args) =>
-                {
-                    // would love to avoid throwing, and instead display a customized Umbraco 500
-                    // page - however if we don't throw here, something else might go wrong, and
-                    // it's this later exception that would be reported. could not figure out how
-                    // to prevent it, either with httpContext.Response.End() or .ApplicationInstance
-                    // .CompleteRequest()
-
-                    // also, if something goes wrong with our DI setup, the logging subsystem may
-                    // not even kick in, so here we try to give as much detail as possible
-
-                    BootFailedException.Rethrow(Current.RuntimeState.BootFailedException);
-                };
-                return;
-            }
-
             app.BeginRequest += (sender, e) =>
             {
                 var httpContext = ((HttpApplication) sender).Context;
