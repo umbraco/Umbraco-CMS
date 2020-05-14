@@ -7,11 +7,12 @@ using Umbraco.Net;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.WebAssets;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
 
-    [Area(Umbraco.Core.Constants.Web.Mvc.BackOfficeArea)]
+    [Area(Constants.Web.Mvc.BackOfficeArea)]
     public class BackOfficeController : Controller
     {
         private readonly IRuntimeMinifier _runtimeMinifier;

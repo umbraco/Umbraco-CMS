@@ -22,7 +22,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.BackOffice.Controllers
 {
     [DisableBrowserCache]
-    [Area(Umbraco.Core.Constants.Web.Mvc.BackOfficeArea)]
+    [Area(Constants.Web.Mvc.BackOfficeArea)]
     public class PreviewController : Controller
     {
         private readonly UmbracoFeatures _features;

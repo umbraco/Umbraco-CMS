@@ -47,7 +47,7 @@ namespace Umbraco.Web.BackOffice.Routing
                 case RuntimeLevel.Run:
 
                     MapMinimalBackOffice(endpoints);
-                    endpoints.MapUmbracoRoute<PreviewController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeArea, "preview");
+                    endpoints.MapUmbracoRoute<PreviewController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeArea, null);
                     AutoRouteBackOfficeControllers(endpoints);
 
                     break;
@@ -67,6 +67,7 @@ namespace Umbraco.Web.BackOffice.Routing
             endpoints.MapUmbracoRoute<BackOfficeController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeArea,
                 string.Empty,
                 "Default",
+                includeControllerNameInRoute: false,
                 constraints:
                     // Limit the action/id to only allow characters - this is so this route doesn't hog all other
                     // routes like: /umbraco/channels/word.aspx, etc...

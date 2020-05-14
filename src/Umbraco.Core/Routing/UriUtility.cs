@@ -41,6 +41,7 @@ namespace Umbraco.Web
 
         // adds the virtual directory if any
         // see also VirtualPathUtility.ToAbsolute
+        // TODO: Does this do anything differently than IHostingEnvironment.ToAbsolute? Seems it does less, maybe should be removed?
         public string ToAbsolute(string url)
         {
             //return ResolveUrl(url);

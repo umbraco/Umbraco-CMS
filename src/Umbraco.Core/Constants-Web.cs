@@ -54,7 +54,7 @@
             {
                 public const string InstallArea = "UmbracoInstall";
 
-                public const string BackOfficeArea = "UmbracoBackOffice";
+                public const string BackOfficeArea = "UmbracoApi";
             }
         }
     }

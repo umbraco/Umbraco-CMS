@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Routing;
 using System;
 using System.Threading.Tasks;
 using Umbraco.Core;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Routing;
@@ -14,19 +15,19 @@ namespace Umbraco.Web.Common.Install
     public class InstallAreaRoutes : IAreaRoutes
     {
         private readonly IRuntimeState _runtime;
-        private readonly UriUtility _uriUtility;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly LinkGenerator _linkGenerator;
 
-        public InstallAreaRoutes(IRuntimeState runtime, UriUtility uriUtility, LinkGenerator linkGenerator)
+        public InstallAreaRoutes(IRuntimeState runtime, IHostingEnvironment hostingEnvironment, LinkGenerator linkGenerator)
         {
             _runtime = runtime;
-            _uriUtility = uriUtility;
+            _hostingEnvironment = hostingEnvironment;
             _linkGenerator = linkGenerator;
         }
 
         public void CreateRoutes(IEndpointRouteBuilder endpoints)
         {
-            var installPathSegment = _uriUtility.ToAbsolute(Core.Constants.SystemDirectories.Install);
+            var installPathSegment = _hostingEnvironment.ToAbsolute(Core.Constants.SystemDirectories.Install).TrimStart('/');
 
             switch (_runtime.Level)
             {
