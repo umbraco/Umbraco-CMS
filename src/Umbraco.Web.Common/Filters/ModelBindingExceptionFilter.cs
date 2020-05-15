@@ -41,7 +41,7 @@ namespace Umbraco.Web.Common.Filters
                     && IsMessageAboutTheSameModelType(filterContext.Exception.Message)))
             {
                 filterContext.HttpContext.Response.Headers.Add(HttpResponseHeader.RetryAfter.ToString(), "1");
-                filterContext.Result = new RedirectResult(filterContext.HttpContext.Request.GetDisplayUrl(), false);
+                filterContext.Result = new RedirectResult(filterContext.HttpContext.Request.GetEncodedUrl(), false);
 
                 filterContext.ExceptionHandled = true;
             }

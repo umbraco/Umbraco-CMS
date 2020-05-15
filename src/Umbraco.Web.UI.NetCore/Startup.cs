@@ -11,12 +11,9 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.BackOffice.AspNetCore;
-using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Extensions;
-using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.Website.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
-
 
 namespace Umbraco.Web.UI.BackOffice
 {
@@ -48,10 +45,7 @@ namespace Umbraco.Web.UI.BackOffice
             services.AddUmbracoCore(_env, out var factory);
             services.AddUmbracoWebsite();
 
-            services.AddMvc(options =>
-                {
-                    options.ModelBinderProviders.Insert(0, new ContentModelBinderProvider());
-                });
+            services.AddMvc();
             services.AddMiniProfiler(options =>
             {
                 options.ShouldProfile = request => false; // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
