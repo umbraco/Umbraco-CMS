@@ -19,7 +19,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Umbraco</title>
-     
+
     @Html.Raw(runtimeMinifier.RenderCssHere(BackOfficeWebAssets.UmbracoUpgradeCssBundleName));
 
     @*Because we're lazy loading angular js, the embedded cloak style will not be loaded initially, but we need it*@
@@ -45,7 +45,7 @@
         });
     }
 
-@Html.BareMinimumServerVariablesScript(Url, Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.ContentSettings, Model.TreeCollection, Model.HttpContextAccessor, Model.HostingEnvironment, Model.RuntimeSettings, Model.SecuritySettings, runtimeMinifier)
+@Html.BareMinimumServerVariablesScript(Url, Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.ContentSettings, Model.TreeCollection, Model.HostingEnvironment, Model.RuntimeSettings, Model.SecuritySettings, runtimeMinifier)
 
 <script type="text/javascript">
     document.angularReady = function (app) {

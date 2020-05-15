@@ -51,7 +51,6 @@ namespace Umbraco.Web.Editors
             IUmbracoVersion umbracoVersion,
             IContentSettings contentSettings,
             TreeCollection treeCollection,
-            IHttpContextAccessor httpContextAccessor,
             IHostingEnvironment hostingEnvironment,
             IRuntimeSettings settings,
             ISecuritySettings securitySettings,
@@ -64,7 +63,6 @@ namespace Umbraco.Web.Editors
             _umbracoVersion = umbracoVersion;
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));
-            _httpContextAccessor = httpContextAccessor;
             _hostingEnvironment = hostingEnvironment;
             _settings = settings;
             _securitySettings = securitySettings;
