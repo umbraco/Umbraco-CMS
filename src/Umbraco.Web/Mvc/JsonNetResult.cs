@@ -13,6 +13,7 @@ namespace Umbraco.Web.Mvc
     /// <summary>
     /// Custom json result using newtonsoft json.net
     /// </summary>
+    /// Migrated already to .Net Core
     public class JsonNetResult : ActionResult
     {
         public Encoding ContentEncoding { get; set; }

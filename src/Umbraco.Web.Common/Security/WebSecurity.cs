@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Security;
@@ -11,46 +12,46 @@ namespace Umbraco.Web.Common.Security
 
     public class WebSecurity : IWebSecurity
     {
-        public IUser CurrentUser => throw new NotImplementedException();
+        public IUser CurrentUser => new User(Current.Configs.Global());
 
         public ValidateRequestAttempt AuthorizeRequest(bool throwExceptions = false)
         {
-            throw new NotImplementedException();
+            return ValidateRequestAttempt.Success;
         }
 
         public void ClearCurrentLogin()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         public Attempt<int> GetUserId()
         {
-            throw new NotImplementedException();
+            return Attempt.Succeed(-1);
         }
 
         public bool IsAuthenticated()
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public double PerformLogin(int userId)
         {
-            throw new NotImplementedException();
+            return 100;
         }
 
         public bool UserHasSectionAccess(string section, IUser user)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public bool ValidateCurrentUser()
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public ValidateRequestAttempt ValidateCurrentUser(bool throwExceptions, bool requiresApproval = true)
         {
-            throw new NotImplementedException();
+            return ValidateRequestAttempt.Success;
         }
     }
 }

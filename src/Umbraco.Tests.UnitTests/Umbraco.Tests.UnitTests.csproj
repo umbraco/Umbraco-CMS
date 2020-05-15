@@ -21,6 +21,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
       <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
+      <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
     </ItemGroup>
 
     <ItemGroup>
