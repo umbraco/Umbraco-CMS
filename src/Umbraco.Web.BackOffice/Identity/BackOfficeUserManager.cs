@@ -185,7 +185,7 @@ namespace Umbraco.Web.BackOffice.Identity
         protected virtual IPasswordHasher<T> GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration)
         {
             //we can use the user aware password hasher (which will be the default and preferred way)
-            return new UserAwarePasswordHasher<T>(new PasswordSecurity(passwordConfiguration));
+            return new PasswordHasher<T>();
         }
         
         /// <summary>

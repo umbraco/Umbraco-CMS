@@ -1,7 +1,6 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using SixLabors.ImageSharp.Web.DependencyInjection;
-using Umbraco.Extensions;
 
 namespace Umbraco.Extensions
 {
