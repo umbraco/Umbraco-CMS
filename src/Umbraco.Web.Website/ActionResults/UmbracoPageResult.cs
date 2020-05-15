@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Website.ActionResults
 {
@@ -33,9 +35,6 @@ namespace Umbraco.Web.Website.ActionResults
             ResetRouteData(routeData);
             ValidateRouteData(routeData);
 
-            var routeDef = (RouteDefinition)routeData.DataTokens[Constants.Web.UmbracoRouteDefinitionDataToken];
-            routeData.Values["action"] = routeDef.ActionName;
-
             var factory = context.HttpContext.RequestServices.GetRequiredService<IControllerFactory>();
             Controller controller = null;
 
@@ -44,7 +43,7 @@ namespace Umbraco.Web.Website.ActionResults
 
             try
             {
-                controller = CreateController(controllerContext, factory, routeDef);
+                controller = CreateController(controllerContext, factory);
 
                 CopyControllerData(controllerContext, controller);
 
@@ -65,6 +64,7 @@ namespace Umbraco.Web.Website.ActionResults
         {
             using (_profilingLogger.TraceDuration<UmbracoPageResult>("Executing Umbraco RouteDefinition controller", "Finished"))
             {
+                //TODO I do not think this will work, We need to test this, when we can, in the .NET Core executable.
                 var aec = new ActionExecutingContext(context, new List<IFilterMetadata>(), new Dictionary<string, object>(), controller);
                 var actionExecutedDelegate = CreateActionExecutedDelegate(aec);
 
@@ -132,10 +132,10 @@ namespace Umbraco.Web.Website.ActionResults
         /// <summary>
         /// Creates a controller using the controller factory
         /// </summary>
-        private static Controller CreateController(ControllerContext context, IControllerFactory factory, RouteDefinition routeDef)
+        private static Controller CreateController(ControllerContext context, IControllerFactory factory)
         {
             if (!(factory.CreateController(context) is Controller controller))
-                throw new InvalidOperationException("Could not create controller with name " + routeDef.ControllerName + ".");
+                throw new InvalidOperationException("Could not create controller with name " + context.ActionDescriptor.ControllerName + ".");
 
             return controller;
         }
