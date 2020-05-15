@@ -1,24 +1,28 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Integration.Implementations;
-using Umbraco.Tests.Integration.Testing;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Website;
 using Umbraco.Web.Website.Controllers;
 
 namespace Umbraco.Tests.Integration
 {
     [TestFixture]
     [UmbracoTest(WithApplication = true)]
-    public class SurfaceControllerTests : UmbracoIntegrationTest
+    public class SurfaceControllerTests
     {
         private IUmbracoContextAccessor _umbracoContextAccessor;
 
@@ -31,16 +35,16 @@ namespace Umbraco.Tests.Integration
         [Test]
         public void Can_Construct_And_Get_Result()
         {
-            var testHelper = new TestHelper();
-            var httpContextAccessor = testHelper.GetHttpContextAccessor();
-            var hostingEnvironment = testHelper.GetHostingEnvironment();
+            var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
+            var hostingEnvironment = Mock.Of<IHostingEnvironment>();
+            var globalSettings = new GlobalSettingsBuilder().Build();
 
             var umbracoContextFactory = new UmbracoContextFactory(
                 _umbracoContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                GlobalSettings,
+                globalSettings,
                 Mock.Of<IUserService>(),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
@@ -63,16 +67,16 @@ namespace Umbraco.Tests.Integration
         [Test]
         public void Umbraco_Context_Not_Null()
         {
-            var testHelper = new TestHelper();
-            var httpContextAccessor = testHelper.GetHttpContextAccessor();
-            var hostingEnvironment = testHelper.GetHostingEnvironment();
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
+            var hostingEnvironment = Mock.Of<IHostingEnvironment>();
 
             var umbracoContextFactory = new UmbracoContextFactory(
                 _umbracoContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                GlobalSettings,
+                globalSettings,
                 Mock.Of<IUserService>(),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
@@ -99,16 +103,16 @@ namespace Umbraco.Tests.Integration
             content.Setup(x => x.Id).Returns(2);
 
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
-            var testHelper = new TestHelper();
-            var httpContextAccessor = testHelper.GetHttpContextAccessor();
-            var hostingEnvironment = testHelper.GetHostingEnvironment();
+            var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
+            var hostingEnvironment = Mock.Of<IHostingEnvironment>();
+            var globalSettings = new GlobalSettingsBuilder().Build();
 
             var umbracoContextFactory = new UmbracoContextFactory(
                 _umbracoContextAccessor,
                 publishedSnapshotService.Object,
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                GlobalSettings,
+                globalSettings,
                 Mock.Of<IUserService>(),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
@@ -131,20 +135,20 @@ namespace Umbraco.Tests.Integration
             Assert.AreEqual(2, result.Content.Id);
         }
 
-        /*
+
         [Test]
         public void Mock_Current_Page()
         {
-            var testHelper = new TestHelper();
-            var httpContextAccessor = testHelper.GetHttpContextAccessor();
-            var hostingEnvironment = testHelper.GetHostingEnvironment();
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
+            var hostingEnvironment = Mock.Of<IHostingEnvironment>();
 
             var umbracoContextFactory = new UmbracoContextFactory(
                 _umbracoContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                GlobalSettings,
+                globalSettings,
                 Mock.Of<IUserService>(),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
@@ -159,14 +163,12 @@ namespace Umbraco.Tests.Integration
 
             var content = Mock.Of<IPublishedContent>(publishedContent => publishedContent.Id == 12345);
 
-            // TODO: Figure out how to create published router
-            var publishedRouter = BaseWebTest.CreatePublishedRouter(TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings());
-            var frequest = publishedRouter.CreateRequest(umbracoContext, new Uri("http://localhost/test"));
-            frequest.PublishedContent = content;
+            var publishedRequestMock = new Mock<IPublishedRequest>();
+            publishedRequestMock.Setup(x => x.PublishedContent).Returns(content);
 
-            var routeDefinition = new RouteDefinition
+           var routeDefinition = new RouteDefinition
             {
-                PublishedRequest = frequest
+                PublishedRequest = publishedRequestMock.Object
             };
 
             var routeData = new RouteData();
@@ -183,7 +185,7 @@ namespace Umbraco.Tests.Integration
 
             Assert.AreEqual(12345, result.Content.Id);
         }
-        */
+
 
         public class TestSurfaceController : SurfaceController
         {
