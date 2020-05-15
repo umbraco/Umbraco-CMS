@@ -7,8 +7,10 @@
 - User information in `cypress.env.json` (See [Getting started](#getting-started))
 
 ### Getting started
-First it is important you create a new file in the root of the project called `cypress.env.json`.
-This file is added to `.gitignore` and can contain values that is different for each developer machine.
+The tests is located in the project/folder named `Umbraco.Tests.AcceptanceTests`. Ensur to run `npm install` in that folder, or let your IDE do that.
+
+Next, it is important you create a new file in the root of the project called `cypress.env.json`.
+This file is already added to `.gitignore` and can contain values that is different for each developer machine.
 
 The file need the following content:
 ```
@@ -18,6 +20,8 @@ The file need the following content:
 }
 ```
 Replace the `<email for superadmin>` and `<password for superadmin>` placeholders with correct info.
+
+
 
 ### Executing tests
 
