@@ -20,29 +20,16 @@ angular.module("umbraco.directives")
 
             scope.outSideClick = function() {
                 navigationService.hideNavigation();
-                closeBackdrop();
             };
 
             keyboardService.bind("esc", function() {
                 navigationService.hideNavigation();
-                closeBackdrop();
             });
 
             //ensure to unregister from all events!
             scope.$on('$destroy', function () {
                 keyboardService.unbind("esc");
             });
-
-            function closeBackdrop() {
-                var onTopClass = 'on-top-of-backdrop';
-                var leftColumn = $('#leftcolumn');
-                var isLeftColumnOnTop = leftColumn.hasClass(onTopClass);
-
-                if(isLeftColumnOnTop){
-                    backdropService.close();
-                    leftColumn.removeClass(onTopClass);
-                }
-            }
         }
     };
 });
