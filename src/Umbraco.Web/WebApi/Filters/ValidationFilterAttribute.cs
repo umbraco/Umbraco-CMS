@@ -13,6 +13,7 @@ namespace Umbraco.Web.WebApi.Filters
     /// An action filter used to do basic validation against the model and return a result
     /// straight away if it fails.
     /// </summary>
+    /// Migrated to .NET core
     internal sealed class ValidationFilterAttribute : ActionFilterAttribute
     {
         public override void OnActionExecuting(HttpActionContext actionContext)
