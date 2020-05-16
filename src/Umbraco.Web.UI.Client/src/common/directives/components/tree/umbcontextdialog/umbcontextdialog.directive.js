@@ -22,21 +22,8 @@
                 keyboardService.unbind("esc");
             });
 
-            // Close any potential backdrop and remove the #leftcolumn modifier class
-            function closeBackdrop() {
-                var onTopClass = 'on-top-of-backdrop';
-                var leftColumn = $('#leftcolumn');
-                var isLeftColumnOnTop = leftColumn.hasClass(onTopClass);
-
-                if(isLeftColumnOnTop){
-                    backdropService.close();
-                    leftColumn.removeClass(onTopClass);
-                }
-            }
-
             function hide() {
-                closeBackdrop()
-                
+
                 if ($scope.dialog.confirmDiscardChanges) {
                     localizationService.localizeMany(["prompt_unsavedChanges", "prompt_unsavedChangesWarning", "prompt_discardChanges", "prompt_stay"]).then(
                         function (values) {
