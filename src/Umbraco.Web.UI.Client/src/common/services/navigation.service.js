@@ -116,6 +116,17 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         }
     }
 
+    function closeBackdrop() {
+        var onTopClass = 'on-top-of-backdrop';
+        var leftColumn = $('#leftcolumn');
+        var isLeftColumnOnTop = leftColumn.hasClass(onTopClass);
+
+        if(isLeftColumnOnTop){
+            backdropService.close();
+            leftColumn.removeClass(onTopClass);
+        }
+    }
+
     var service = {
 
         /**
@@ -472,6 +483,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             appState.setMenuState("currentNode", null);
             appState.setMenuState("menuActions", []);
             setMode("tree");
+            closeBackdrop();
         },
 
         /** Executes a given menu action */
@@ -656,6 +668,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             if (showMenu) {
                 this.showMenu({ skipDefault: true, node: appState.getMenuState("currentNode") });
             } else {
+                closeBackdrop();
                 setMode("default");
             }
         },
