@@ -2,12 +2,10 @@ using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Identity;
 
 namespace Umbraco.Web.UI.BackOffice
 {

@@ -77,9 +77,6 @@ namespace Umbraco.Web.Install.InstallSteps
             if (!resetResult.Succeeded)
                 throw new InvalidOperationException("Could not reset password: " + string.Join(", ", "error" /*resetResult.Errors.ToErrorMessage()*/));
 
-
-
-
             if (user.SubscribeToNewsLetter)
             {
                 if (_httpClient == null)

@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -11,7 +11,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
     [TestFixture]
     public class UmbracoBackOfficeServiceCollectionExtensionsTests
     {
-        [Test]
+        /*[Test]
         public void AddUmbracoBackOfficeIdentity_ExpectBackOfficeUserStoreResolvable()
         {
             var services = new ServiceCollection();
@@ -25,6 +25,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
 
             var userStore = serviceProvider.GetService<IUserStore<BackOfficeIdentityUser>>();
             Assert.AreEqual(typeof(BackOfficeUserStore), userStore.GetType());
-        }
+        }*/
     }
 }
