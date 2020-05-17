@@ -124,7 +124,6 @@ angular.module("umbraco.directives")
             */
             scope.options = function (n, ev) {
                 umbTreeCtrl.emitEvent("treeOptionsClick", { element: element, tree: scope.tree, node: n, event: ev });
-                navigationService.hideDialog();
             };
 
             /**
@@ -148,7 +147,6 @@ angular.module("umbraco.directives")
                 }
 
                 umbTreeCtrl.emitEvent("treeNodeSelect", { element: element, tree: scope.tree, node: n, event: ev });
-                navigationService.hideDialog();
                 ev.preventDefault();
             };
 
@@ -176,8 +174,6 @@ angular.module("umbraco.directives")
                 else {
                     scope.loadChildren(node, false);
                 }
-
-                navigationService.hideDialog();
             };
 
             /* helper to force reloading children of a tree node */
