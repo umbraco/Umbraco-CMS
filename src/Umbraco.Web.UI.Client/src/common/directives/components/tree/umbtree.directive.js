@@ -321,13 +321,13 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
 
             // Close any potential backdrop and remove the #leftcolumn modifier class
             function closeBackdrop() {
-                var onTopClass = 'on-top-of-backdrop';
+                var aboveClass = 'above-backdrop';
                 var leftColumn = $('#leftcolumn');
-                var isLeftColumnOnTop = leftColumn.hasClass(onTopClass);
+                var isLeftColumnOnTop = leftColumn.hasClass(aboveClass);
 
                 if(isLeftColumnOnTop){
                     backdropService.close();
-                    leftColumn.removeClass(onTopClass);
+                    leftColumn.removeClass(aboveClass);
                 }
             }
 

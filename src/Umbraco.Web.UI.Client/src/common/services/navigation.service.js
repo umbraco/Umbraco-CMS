@@ -28,7 +28,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
 
     eventsService.on('appState.backdrop', function(e, args){
         var element = $(args.element);
-        element.addClass('on-top-of-backdrop');
+        element.addClass('above-backdrop');
     });
 
     //A list of query strings defined that when changed will not cause a reload of the route
@@ -117,13 +117,13 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
     }
 
     function closeBackdrop() {
-        var onTopClass = 'on-top-of-backdrop';
+        var aboveClass = 'above-backdrop';
         var leftColumn = $('#leftcolumn');
-        var isLeftColumnOnTop = leftColumn.hasClass(onTopClass);
+        var isLeftColumnOnTop = leftColumn.hasClass(aboveClass);
 
         if(isLeftColumnOnTop){
             backdropService.close();
-            leftColumn.removeClass(onTopClass);
+            leftColumn.removeClass(aboveClass);
         }
     }
 
