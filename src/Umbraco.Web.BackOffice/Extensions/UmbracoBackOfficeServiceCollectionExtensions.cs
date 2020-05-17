@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Mapping;
 using Umbraco.Net;
-using Umbraco.Web.BackOffice.Identity;
 using Umbraco.Web.Common.AspNetCore;
 
 namespace Umbraco.Extensions

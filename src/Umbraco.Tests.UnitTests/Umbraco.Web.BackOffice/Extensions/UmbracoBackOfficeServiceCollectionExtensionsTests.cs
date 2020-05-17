@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Identity;
+using Umbraco.Core.BackOffice;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
 {

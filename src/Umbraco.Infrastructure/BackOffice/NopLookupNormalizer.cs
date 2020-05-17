@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace Umbraco.Web.BackOffice.Identity
+namespace Umbraco.Core.BackOffice
 {
     /// <summary>
     /// No-op lookup normalizer to maintain compatibility with ASP.NET Identity 2

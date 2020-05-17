@@ -3,7 +3,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using Umbraco.Core;
-using Umbraco.Web.BackOffice.Identity;
+using Umbraco.Core.BackOffice;
 
 namespace Umbraco.Extensions
 {

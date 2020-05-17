@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 
-namespace Umbraco.Web.BackOffice.Identity
+namespace Umbraco.Core.BackOffice
 {
     /// <summary>
     /// An IUserStore interface part to implement if the store supports validating user session Ids

@@ -9,7 +9,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Security;
 using Umbraco.Net;
 
-namespace Umbraco.Web.BackOffice.Identity
+namespace Umbraco.Core.BackOffice
 {
     public class BackOfficeUserManager : BackOfficeUserManager<BackOfficeIdentityUser>
     {

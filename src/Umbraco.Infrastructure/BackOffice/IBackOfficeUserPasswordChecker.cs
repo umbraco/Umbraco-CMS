@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Umbraco.Web.BackOffice.Identity
+namespace Umbraco.Core.BackOffice
 {
     /// <summary>
     /// Used by the BackOfficeUserManager to check the username/password which allows for developers to more easily

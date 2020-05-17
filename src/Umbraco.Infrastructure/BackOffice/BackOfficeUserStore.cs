@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -13,7 +12,7 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Web.BackOffice.Identity
+namespace Umbraco.Core.BackOffice
 {
     public class BackOfficeUserStore : DisposableObjectSlim,
             IUserPasswordStore<BackOfficeIdentityUser>,
