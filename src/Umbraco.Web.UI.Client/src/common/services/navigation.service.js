@@ -704,6 +704,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
           */
         hideNavigation: function () {
             appState.setMenuState("menuActions", []);
+            closeBackdrop();
             setMode("default");
         }
     };
