@@ -1,140 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Mapping;
 using Umbraco.Core.Security;
-using Umbraco.Core.Services;
 using Umbraco.Net;
 
 namespace Umbraco.Web.BackOffice.Identity
 {
     public class BackOfficeUserManager : BackOfficeUserManager<BackOfficeIdentityUser>
     {
-        public const string OwinMarkerKey = "Umbraco.Web.Security.Identity.BackOfficeUserManagerMarker";
-
-        public BackOfficeUserManager(
-            IPasswordConfiguration passwordConfiguration,
-            IIpResolver ipResolver,
-            IUserStore<BackOfficeIdentityUser> store,
-            IOptions<IdentityOptions> optionsAccessor,
-            IEnumerable<IUserValidator<BackOfficeIdentityUser>> userValidators,
-            IEnumerable<IPasswordValidator<BackOfficeIdentityUser>> passwordValidators,
-            ILookupNormalizer keyNormalizer,
-            IdentityErrorDescriber errors,
-            ILogger<UserManager<BackOfficeIdentityUser>> logger)
-            : base(passwordConfiguration, ipResolver, store, optionsAccessor, userValidators, passwordValidators, keyNormalizer, errors, null, logger)
+        public BackOfficeUserManager(IIpResolver ipResolver, IUserStore<BackOfficeIdentityUser> store, IOptions<IdentityOptions> optionsAccessor, IPasswordHasher<BackOfficeIdentityUser> passwordHasher, IEnumerable<IUserValidator<BackOfficeIdentityUser>> userValidators, IEnumerable<IPasswordValidator<BackOfficeIdentityUser>> passwordValidators, ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors, IServiceProvider services, ILogger<UserManager<BackOfficeIdentityUser>> logger)
+            : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
         {
-            InitUserManager(this);
         }
-        
-        #region Static Create methods
-        
-        /// <summary>
-        /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager
-        /// </summary>
-        public static BackOfficeUserManager Create(
-            IUserService userService,
-            IEntityService entityService,
-            IExternalLoginService externalLoginService,
-            IGlobalSettings globalSettings,
-            UmbracoMapper mapper,
-            IPasswordConfiguration passwordConfiguration,
-            IIpResolver ipResolver,
-            IdentityErrorDescriber errors,
-            IDataProtectionProvider dataProtectionProvider,
-            ILogger<UserManager<BackOfficeIdentityUser>> logger)
-        {
-            var store = new BackOfficeUserStore(userService, entityService, externalLoginService, globalSettings, mapper);
-            
-            return Create(
-                passwordConfiguration,
-                ipResolver,
-                store,
-                errors,
-                dataProtectionProvider,
-                logger);
-        }
-
-        /// <summary>
-        /// Creates a BackOfficeUserManager instance with all default options and a custom BackOfficeUserManager instance
-        /// </summary>
-        public static BackOfficeUserManager Create(
-            IPasswordConfiguration passwordConfiguration,
-            IIpResolver ipResolver,
-            IUserStore<BackOfficeIdentityUser> customUserStore,
-            IdentityErrorDescriber errors,
-            IDataProtectionProvider dataProtectionProvider,
-            ILogger<UserManager<BackOfficeIdentityUser>> logger)
-        {
-            var options = new IdentityOptions();
-
-            // Configure validation logic for usernames
-            var userValidators = new List<UserValidator<BackOfficeIdentityUser>> { new BackOfficeUserValidator<BackOfficeIdentityUser>() };
-            options.User.RequireUniqueEmail = true;
-
-            // Configure validation logic for passwords
-            var passwordValidators = new List<IPasswordValidator<BackOfficeIdentityUser>> { new PasswordValidator<BackOfficeIdentityUser>() };
-            options.Password.RequiredLength = passwordConfiguration.RequiredLength;
-            options.Password.RequireNonAlphanumeric = passwordConfiguration.RequireNonLetterOrDigit;
-            options.Password.RequireDigit = passwordConfiguration.RequireDigit;
-            options.Password.RequireLowercase = passwordConfiguration.RequireLowercase;
-            options.Password.RequireUppercase = passwordConfiguration.RequireUppercase;
-            
-            // Ensure Umbraco security stamp claim type is used
-            options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
-            options.ClaimsIdentity.UserNameClaimType = ClaimTypes.Name;
-            options.ClaimsIdentity.RoleClaimType = ClaimTypes.Role;
-            options.ClaimsIdentity.SecurityStampClaimType = Constants.Web.SecurityStampClaimType;
-
-            options.Lockout.AllowedForNewUsers = true;
-            options.Lockout.MaxFailedAccessAttempts = passwordConfiguration.MaxFailedAccessAttemptsBeforeLockout;
-            //NOTE: This just needs to be in the future, we currently don't support a lockout timespan, it's either they are locked
-            // or they are not locked, but this determines what is set on the account lockout date which corresponds to whether they are
-            // locked out or not.
-            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(30);
-
-            return new BackOfficeUserManager(
-                passwordConfiguration,
-                ipResolver,
-                customUserStore,
-                new OptionsWrapper<IdentityOptions>(options),
-                userValidators,
-                passwordValidators,
-                new NopLookupNormalizer(), 
-                errors,
-                logger);
-        }
-
-        #endregion
     }
 
     public class BackOfficeUserManager<T> : UserManager<T>
         where T : BackOfficeIdentityUser
     {
         private PasswordGenerator _passwordGenerator;
-
+        
         public BackOfficeUserManager(
-            IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
             IUserStore<T> store,
             IOptions<IdentityOptions> optionsAccessor,
+            IPasswordHasher<T> passwordHasher,
             IEnumerable<IUserValidator<T>> userValidators,
             IEnumerable<IPasswordValidator<T>> passwordValidators,
             ILookupNormalizer keyNormalizer,
             IdentityErrorDescriber errors,
             IServiceProvider services,
             ILogger<UserManager<T>> logger)
-            : base(store, optionsAccessor, null, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
+            : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
         {
-            PasswordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            // PasswordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             IpResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));
         }
 
@@ -153,16 +56,7 @@ namespace Umbraco.Web.BackOffice.Identity
         // TODO: Support this
         public override bool SupportsUserPhoneNumber => false;
         #endregion
-
-        /// <summary>
-        /// Initializes the user manager with the correct options
-        /// </summary>
-        protected void InitUserManager(BackOfficeUserManager<T> manager)
-        {
-            // use a custom hasher based on our membership provider
-            PasswordHasher = GetDefaultPasswordHasher(PasswordConfiguration);
-        }
-
+        
         /// <summary>
         /// Used to validate a user's session
         /// </summary>
@@ -201,6 +95,8 @@ namespace Umbraco.Web.BackOffice.Identity
         /// <returns></returns>
         public string GeneratePassword()
         {
+            throw new NotImplementedException();
+
             if (_passwordGenerator == null) _passwordGenerator = new PasswordGenerator(PasswordConfiguration);
             var password = _passwordGenerator.GeneratePassword();
             return password;
