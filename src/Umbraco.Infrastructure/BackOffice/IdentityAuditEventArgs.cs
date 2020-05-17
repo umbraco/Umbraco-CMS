@@ -3,7 +3,7 @@ using System.Threading;
 using Umbraco.Extensions;
 
 
-namespace Umbraco.Web.BackOffice.Identity
+namespace Umbraco.Core.BackOffice
 {
     /// <summary>
     /// This class is used by events raised from the BackofficeUserManager
@@ -108,9 +108,9 @@ namespace Umbraco.Web.BackOffice.Identity
         protected int GetCurrentRequestBackofficeUserId()
         {
             var userId = -1;
-            var backOfficeIdentity = Thread.CurrentPrincipal.GetUmbracoIdentity();
+            /*var backOfficeIdentity = Thread.CurrentPrincipal.GetUmbracoIdentity();
             if (backOfficeIdentity != null)
-                int.TryParse(backOfficeIdentity.Id.ToString(), out userId);
+                int.TryParse(backOfficeIdentity.Id.ToString(), out userId);*/
             return userId;
         }
     }

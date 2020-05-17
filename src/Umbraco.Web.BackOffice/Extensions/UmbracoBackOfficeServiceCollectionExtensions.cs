@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Mapping;
 using Umbraco.Net;
 using Umbraco.Web.Common.AspNetCore;
@@ -13,7 +12,7 @@ namespace Umbraco.Extensions
 {
     public static class UmbracoBackOfficeServiceCollectionExtensions
     {
-        public static void AddUmbracoBackOfficeIdentity(this IServiceCollection services, IFactory factory)
+        public static void AddUmbracoBackOfficeIdentity(this IServiceCollection services)
         {
             // UmbracoMapper - hack?
             services.AddSingleton<IdentityMapDefinition>();
