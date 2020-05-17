@@ -9,7 +9,7 @@
             var allowedNumberOfVisibleEditors = 3;
             var aboveBackDropCssClass = 'above-backdrop';
             var sectionId = '#leftcolumn';
-            scope.isLeftColumnAbove = false;
+            var isLeftColumnAbove = false;
             scope.editors = [];
             
             function addEditor(editor) {
@@ -22,9 +22,9 @@
                 scope.editors.push(editor);
 
                 if(scope.editors.length === 1){
-                    scope.isLeftColumnAbove = $(sectionId).hasClass(aboveBackDropCssClass);
+                    isLeftColumnAbove = $(sectionId).hasClass(aboveBackDropCssClass);
 
-                    if(scope.isLeftColumnAbove){
+                    if(isLeftColumnAbove){
                         $(sectionId).removeClass(aboveBackDropCssClass);
                     }
                 }
@@ -49,11 +49,11 @@
                 updateEditors(-1);
 
                 if(scope.editors.length === 1){
-                    if(scope.isLeftColumnAbove){
+                    if(isLeftColumnAbove){
                         $('#leftcolumn').addClass(aboveBackDropCssClass);
                     }
 
-                    scope.isLeftColumnAbove = false;
+                    isLeftColumnAbove = false;
                 }
             }
             
