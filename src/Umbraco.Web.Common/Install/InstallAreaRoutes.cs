@@ -51,7 +51,7 @@ namespace Umbraco.Web.Common.Install
                     endpoints.MapGet($"{installPathSegment}/{{controller?}}/{{action?}}", context =>
                     {
                         // redirect to umbraco
-                        context.Response.Redirect(_linkGenerator.GetBackOfficeUrl(), false);
+                        context.Response.Redirect(_linkGenerator.GetBackOfficeUrl(_hostingEnvironment), false);
                         return Task.CompletedTask;
                     });
 
