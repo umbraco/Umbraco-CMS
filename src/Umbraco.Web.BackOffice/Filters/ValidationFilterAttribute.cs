@@ -12,7 +12,7 @@ namespace Umbraco.Web.BackOffice.Filters
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var modelState = context.ModelState;
-            if (!context.ModelState.IsValid)
+            if (!modelState.IsValid)
             {
                 context.Result = new BadRequestObjectResult(modelState);
             }
