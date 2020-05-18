@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace Umbraco.Web.Common.Attributes
 {
@@ -8,6 +9,6 @@ namespace Umbraco.Web.Common.Attributes
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public sealed class IsBackOfficeAttribute : Attribute
-    {
+    {        
     }
 }

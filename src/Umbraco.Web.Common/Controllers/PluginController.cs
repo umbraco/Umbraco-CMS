@@ -79,7 +79,7 @@ namespace Umbraco.Web.Common.Controllers
         /// </summary>
         /// <param name="controllerType">The controller type.</param>
         /// <returns>Metadata for the controller type.</returns>
-        internal static PluginControllerMetadata GetMetadata(Type controllerType)
+        public static PluginControllerMetadata GetMetadata(Type controllerType)
         {
             return MetadataStorage.GetOrAdd(controllerType, type =>
             {

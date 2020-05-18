@@ -7,12 +7,12 @@ using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Editors
 {
-
+    // TODO: Almost nothing here needs to exist since we can inject these into the view
     public class BackOfficeModel
     {
         public BackOfficeModel(UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion,
             IContentSettings contentSettings, TreeCollection treeCollection,
-            IHttpContextAccessor httpContextAccessor, IHostingEnvironment hostingEnvironment,
+            IHostingEnvironment hostingEnvironment,
             IRuntimeSettings runtimeSettings, ISecuritySettings securitySettings)
         {
             Features = features;
@@ -20,7 +20,6 @@ namespace Umbraco.Web.Editors
             UmbracoVersion = umbracoVersion;
             ContentSettings = contentSettings;
             TreeCollection = treeCollection;
-            HttpContextAccessor = httpContextAccessor;
             HostingEnvironment = hostingEnvironment;
             RuntimeSettings = runtimeSettings;
             SecuritySettings = securitySettings;
@@ -32,7 +31,6 @@ namespace Umbraco.Web.Editors
         public IUmbracoVersion UmbracoVersion { get; }
         public IContentSettings ContentSettings { get; }
         public TreeCollection TreeCollection { get; }
-        public IHttpContextAccessor HttpContextAccessor { get; }
         public IHostingEnvironment HostingEnvironment { get; }
         public IRuntimeSettings RuntimeSettings { get; set; }
         public ISecuritySettings SecuritySettings { get; set; }

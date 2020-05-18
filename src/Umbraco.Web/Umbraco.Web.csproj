@@ -151,10 +151,10 @@
     <Compile Include="Macros\PartialViewMacroEngine.cs" />
     <Compile Include="Mvc\UmbracoViewPageOfTModel.cs" />
     <Compile Include="Security\IdentityFactoryMiddleware.cs" />
+    <Compile Include="WebApi\Filters\OnlyLocalRequestsAttribute.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyRuntimeMinifier.cs" />
     <Compile Include="Models\NoNodesViewModel.cs" />
     <Compile Include="Mvc\RenderNoContentController.cs" />
-    <Compile Include="Editors\BackOfficePreviewModel.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
     <Compile Include="Editors\Filters\DataTypeValidateAttribute.cs" />
@@ -217,7 +217,6 @@
     <Compile Include="UmbracoDbProviderFactoryCreator.cs" />
     <Compile Include="ViewDataExtensions.cs" />
     <Compile Include="WebApi\Filters\AdminUsersAuthorizeAttribute.cs" />
-    <Compile Include="WebApi\Filters\OnlyLocalRequestsAttribute.cs" />
     <Compile Include="Runtime\WebInitialComposer.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeUserPasswordCheckerResult.cs" />
@@ -227,7 +226,6 @@
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\Current.cs" />
     <Compile Include="Editors\BackOfficeAssetsController.cs" />
-    <Compile Include="Editors\BackOfficeModel.cs" />
     <Compile Include="Editors\BackOfficeServerVariables.cs" />
     <Compile Include="Editors\LogViewerController.cs" />
     <Compile Include="ImageProcessorLogger.cs" />
@@ -255,7 +253,6 @@
     <Compile Include="Editors\LanguageController.cs" />
     <Compile Include="WebApi\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
-    <Compile Include="Editors\PreviewController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\TourController.cs" />
     <Compile Include="Editors\Filters\UserGroupAuthorizationAttribute.cs" />

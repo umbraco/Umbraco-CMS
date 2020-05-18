@@ -10,7 +10,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="controllerType"></param>
         /// <returns></returns>
-        internal static string GetControllerName(Type controllerType)
+        public static string GetControllerName(Type controllerType)
         {
             if (!controllerType.Name.EndsWith("Controller"))
             {
@@ -24,7 +24,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="controllerInstance"></param>
         /// <returns></returns>
-        internal static string GetControllerName(this Controller controllerInstance)
+        public static string GetControllerName(this Controller controllerInstance)
         {
             return GetControllerName(controllerInstance.GetType());
         }
@@ -35,7 +35,7 @@ namespace Umbraco.Extensions
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <remarks></remarks>
-        internal static string GetControllerName<T>()
+        public static string GetControllerName<T>()
         {
             return GetControllerName(typeof(T));
         }

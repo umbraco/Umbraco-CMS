@@ -32,7 +32,14 @@ namespace Umbraco.Web.UI.BackOffice
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddUmbracoConfiguration(_config);            
+            // TODO: We will need to decide on if we want to use the ServiceBasedControllerActivator to create our controllers
+            // or use the default IControllerActivator: DefaultControllerActivator (which doesn't directly use the container to resolve controllers)
+            // This will affect whether we need to explicitly register controllers in the container like we do today in v8.
+            // What we absolutely must do though is make sure we explicitly opt-in to using one or the other *always* for our controllers instead of
+            // relying on a global configuration set by a user since if a custom IControllerActivator is used for our own controllers we may not
+            // guarantee it will work. And then... is that even possible?
+
+            services.AddUmbracoConfiguration(_config);
             services.AddUmbracoCore(_env, out var factory);
             services.AddUmbracoWebComponents();
             services.AddUmbracoRuntimeMinifier(_config);
@@ -56,7 +63,7 @@ namespace Umbraco.Web.UI.BackOffice
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
-            //app.UseMiniProfiler();            
+            //app.UseMiniProfiler();
             if (_env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -71,12 +78,12 @@ namespace Umbraco.Web.UI.BackOffice
             app.UseUmbracoWebsite();
             app.UseUmbracoBackOffice();
             app.UseUmbracoInstaller();
-            
+
             app.UseEndpoints(endpoints =>
-            {   
+            {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");               
+                    pattern: "{controller}/{action=Index}/{id?}");
             });
         }
     }

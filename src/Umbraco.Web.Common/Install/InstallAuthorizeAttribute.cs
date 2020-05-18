@@ -3,11 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Hosting;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Common.Install
 {
+    /// <summary>
+    /// Ensures authorization occurs for the installer if it has already completed.
+    /// If install has not yet occurred then the authorization is successful.
+    /// </summary>
     public class InstallAuthorizeAttribute : TypeFilterAttribute
     {
         public InstallAuthorizeAttribute() : base(typeof(InstallAuthorizeFilter))
@@ -16,21 +19,21 @@ namespace Umbraco.Web.Common.Install
 
         private class InstallAuthorizeFilter : IAuthorizationFilter
         {
-            public void OnAuthorization(AuthorizationFilterContext context)
+            public void OnAuthorization(AuthorizationFilterContext authorizationFilterContext)
             {
-                var sp = context.HttpContext.RequestServices;
-                var runtimeState = sp.GetRequiredService<IRuntimeState>();
-                var umbracoContextAccessor = sp.GetRequiredService<IUmbracoContextAccessor>();
-                var globalSettings = sp.GetRequiredService<IGlobalSettings>();
-                var hostingEnvironment = sp.GetRequiredService<IHostingEnvironment>();
+                var serviceProvider = authorizationFilterContext.HttpContext.RequestServices;
+                var runtimeState = serviceProvider.GetService<IRuntimeState>();
+                var umbracoContext = serviceProvider.GetService<IUmbracoContext>();
+                var logger = serviceProvider.GetService<ILogger>();
 
-                if (!IsAllowed(runtimeState, umbracoContextAccessor))
+                if (!IsAllowed(runtimeState, umbracoContext, logger))
                 {
-                    context.Result = new RedirectResult(globalSettings.GetBackOfficePath(hostingEnvironment));
+                    authorizationFilterContext.Result = new ForbidResult();
                 }
+
             }
 
-            private bool IsAllowed(IRuntimeState runtimeState, IUmbracoContextAccessor umbracoContextAccessor)
+            private static bool IsAllowed(IRuntimeState runtimeState, IUmbracoContext umbracoContext, ILogger logger)
             {
                 try
                 {
@@ -38,13 +41,15 @@ namespace Umbraco.Web.Common.Install
                     // otherwise we need to ensure that a user is logged in
                     return runtimeState.Level == RuntimeLevel.Install
                            || runtimeState.Level == RuntimeLevel.Upgrade
-                           || umbracoContextAccessor.UmbracoContext.Security.ValidateCurrentUser();
+                           || (umbracoContext?.Security?.ValidateCurrentUser() ?? false);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    logger.Error<InstallAuthorizeAttribute>(ex, "An error occurred determining authorization");
                     return false;
                 }
             }
         }
     }
+
 }

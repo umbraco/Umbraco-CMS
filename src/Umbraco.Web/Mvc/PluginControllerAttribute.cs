@@ -3,9 +3,8 @@ using System.Linq;
 
 namespace Umbraco.Web.Mvc
 {
-    /// <summary>
-    /// Indicates that a controller is a plugin tree controller and should be routed to its own area.
-    /// </summary>
+    // TODO: This has been moved to netcore so can be removed when ready
+
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class PluginControllerAttribute : Attribute
     {

@@ -1,5 +1,6 @@
 namespace Umbraco.Web
 {
+
     public interface ICookieManager
     {
         void ExpireCookie(string cookieName);

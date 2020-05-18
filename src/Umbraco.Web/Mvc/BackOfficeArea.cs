@@ -7,9 +7,7 @@ using Umbraco.Web.Editors;
 
 namespace Umbraco.Web.Mvc
 {
-    /// <summary>
-    /// An area registration for back office components
-    /// </summary>
+    // TODO: This has been ported to netcore, can be removed
     internal class BackOfficeArea : AreaRegistration
     {
         private readonly IGlobalSettings _globalSettings;
