@@ -381,7 +381,7 @@
   {
     Write-Host "Restore NuGet"
     Write-Host "Logging to $($this.BuildTemp)\nuget.restore.log"
-	$params = "-Source", $nugetsourceUmbraco   
+	$params = "-Source", $nugetsourceUmbraco
     &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\Umbraco.sln" > "$($this.BuildTemp)\nuget.restore.log" @params
     if (-not $?) { throw "Failed to restore NuGet packages." }
   })
@@ -535,6 +535,7 @@
   # run
   if (-not $get)
   {
+cd
     if ($command.Length -eq 0)
     {
       $command = @( "Build" )
