@@ -26,14 +26,14 @@ namespace Umbraco.Web.Compose
         {
             //BackOfficeUserManager.AccountLocked += ;
             //BackOfficeUserManager.AccountUnlocked += ;
-            BackOfficeUserManager.ForgotPasswordRequested += OnForgotPasswordRequest;
-            BackOfficeUserManager.ForgotPasswordChangedSuccess += OnForgotPasswordChange;
-            BackOfficeUserManager.LoginFailed += OnLoginFailed;
+            BackOfficeOwinUserManager.ForgotPasswordRequested += OnForgotPasswordRequest;
+            BackOfficeOwinUserManager.ForgotPasswordChangedSuccess += OnForgotPasswordChange;
+            BackOfficeOwinUserManager.LoginFailed += OnLoginFailed;
             //BackOfficeUserManager.LoginRequiresVerification += ;
-            BackOfficeUserManager.LoginSuccess += OnLoginSuccess;
-            BackOfficeUserManager.LogoutSuccess += OnLogoutSuccess;
-            BackOfficeUserManager.PasswordChanged += OnPasswordChanged;
-            BackOfficeUserManager.PasswordReset += OnPasswordReset;
+            BackOfficeOwinUserManager.LoginSuccess += OnLoginSuccess;
+            BackOfficeOwinUserManager.LogoutSuccess += OnLogoutSuccess;
+            BackOfficeOwinUserManager.PasswordChanged += OnPasswordChanged;
+            BackOfficeOwinUserManager.PasswordReset += OnPasswordReset;
             //BackOfficeUserManager.ResetAccessFailedCount += ;
         }
 

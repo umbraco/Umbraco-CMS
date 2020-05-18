@@ -43,8 +43,8 @@ namespace Umbraco.Web.Security
             if (services == null) throw new ArgumentNullException(nameof(services));
 
             //Configure Umbraco user manager to be created per request
-            app.CreatePerOwinContext<BackOfficeUserManager>(
-                (options, owinContext) => BackOfficeUserManager.Create(
+            app.CreatePerOwinContext<BackOfficeOwinUserManager>(
+                (options, owinContext) => BackOfficeOwinUserManager.Create(
                     services.UserService,
                     services.EntityService,
                     services.ExternalLoginService,
@@ -56,7 +56,7 @@ namespace Umbraco.Web.Security
                     app.GetDataProtectionProvider(),
                     new NullLogger<BackOfficeUserManager<BackOfficeIdentityUser>>()));
 
-            app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
+            app.SetBackOfficeUserManagerType<BackOfficeOwinUserManager, BackOfficeIdentityUser>();
 
             //Create a sign in manager per request
             app.CreatePerOwinContext<BackOfficeSignInManager>((options, context) => BackOfficeSignInManager.Create(context, globalSettings, app.CreateLogger<BackOfficeSignInManager>()));
@@ -77,8 +77,8 @@ namespace Umbraco.Web.Security
             if (customUserStore == null) throw new ArgumentNullException(nameof(customUserStore));
 
             //Configure Umbraco user manager to be created per request
-            app.CreatePerOwinContext<BackOfficeUserManager>(
-                (options, owinContext) => BackOfficeUserManager.Create(
+            app.CreatePerOwinContext<BackOfficeOwinUserManager>(
+                (options, owinContext) => BackOfficeOwinUserManager.Create(
                     passwordConfiguration,
                     ipResolver,
                     customUserStore,
@@ -86,7 +86,7 @@ namespace Umbraco.Web.Security
                     app.GetDataProtectionProvider(),
                     new NullLogger<BackOfficeUserManager<BackOfficeIdentityUser>>()));
 
-            app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
+            app.SetBackOfficeUserManagerType<BackOfficeOwinUserManager, BackOfficeIdentityUser>();
 
             //Create a sign in manager per request
             app.CreatePerOwinContext<BackOfficeSignInManager>((options, context) => BackOfficeSignInManager.Create(context, globalSettings, app.CreateLogger(typeof(BackOfficeSignInManager).FullName)));
@@ -153,7 +153,7 @@ namespace Umbraco.Web.Security
                 // logs in. This is a security feature which is used when you
                 // change a password or add an external login to your account.
                 OnValidateIdentity = UmbracoSecurityStampValidator
-                    .OnValidateIdentity<BackOfficeSignInManager, BackOfficeUserManager, BackOfficeIdentityUser>(
+                    .OnValidateIdentity<BackOfficeSignInManager, BackOfficeOwinUserManager, BackOfficeIdentityUser>(
                         TimeSpan.FromMinutes(30),
                         (signInManager, manager, user) => signInManager.CreateUserIdentityAsync(user),
                         identity => identity.GetUserId()),
@@ -240,7 +240,7 @@ namespace Umbraco.Web.Security
             // a generic strongly typed instance
             app.Use((context, func) =>
             {
-                context.Set(BackOfficeUserManager.OwinMarkerKey, new BackOfficeUserManagerMarker<TManager, TUser>());
+                context.Set(BackOfficeOwinUserManager.OwinMarkerKey, new BackOfficeUserManagerMarker<TManager, TUser>());
                 return func();
             });
         }

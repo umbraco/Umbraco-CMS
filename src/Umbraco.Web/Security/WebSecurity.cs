@@ -70,8 +70,8 @@ namespace Umbraco.Web.Security
             }
         }
 
-        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
-        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
+        private BackOfficeOwinUserManager _userManager;
+        protected BackOfficeOwinUserManager UserManager
             => _userManager ?? (_userManager = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().GetBackOfficeUserManager());
 
         [Obsolete("This needs to be removed, ASP.NET Identity should always be used for this operation, this is currently only used in the installer which needs to be updated")]

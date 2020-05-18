@@ -86,7 +86,7 @@ namespace Umbraco.Web.Security
             if (validate == false)
                 return true;
 
-            var manager = owinCtx.Get<BackOfficeUserManager>();
+            var manager = owinCtx.Get<BackOfficeOwinUserManager>();
             if (manager == null)
                 return false;
 

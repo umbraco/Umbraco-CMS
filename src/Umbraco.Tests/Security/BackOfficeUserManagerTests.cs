@@ -10,7 +10,7 @@ using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Net;
-using BackOfficeUserManager = Umbraco.Web.Security.BackOfficeUserManager;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.Security
 {
@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Security
             mockPasswordConfiguration.Setup(x => x.HashAlgorithmType)
                 .Returns("HMACSHA256");
 
-            var userManager = BackOfficeUserManager.Create(
+            var userManager = BackOfficeOwinUserManager.Create(
                 mockPasswordConfiguration.Object,
                 mockIpResolver.Object,
                 mockUserStore.Object,

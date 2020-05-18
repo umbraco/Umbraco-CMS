@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Umbraco.Core;
-using Umbraco.Core.BackOffice;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
@@ -32,7 +31,7 @@ namespace Umbraco.Web.Editors
             IUser currentUser,
             IUser savingUser,
             ChangingPasswordModel passwordModel,
-            Security.BackOfficeUserManager<BackOfficeIdentityUser> userMgr)
+            BackOfficeOwinUserManager userMgr)
         {
             if (passwordModel == null) throw new ArgumentNullException(nameof(passwordModel));
             if (userMgr == null) throw new ArgumentNullException(nameof(userMgr));

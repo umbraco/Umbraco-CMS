@@ -1,5 +1,4 @@
 ﻿using Microsoft.Owin;
-using Umbraco.Core.BackOffice;
 
 namespace Umbraco.Web.Security
 {
@@ -10,6 +9,6 @@ namespace Umbraco.Web.Security
     /// </summary>
     internal interface IBackOfficeUserManagerMarker
     {
-        BackOfficeUserManager<BackOfficeIdentityUser> GetManager(IOwinContext owin);
+        BackOfficeOwinUserManager GetManager(IOwinContext owin);
     }
 }

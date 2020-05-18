@@ -40,7 +40,7 @@ namespace Umbraco.Web.Editors
     [IsBackOffice]
     public class AuthenticationController : UmbracoApiController
     {
-        private Security.BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
+        private BackOfficeOwinUserManager _userManager;
         private BackOfficeSignInManager _signInManager;
         private readonly IUserPasswordConfiguration _passwordConfiguration;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -71,8 +71,8 @@ namespace Umbraco.Web.Editors
             _requestAccessor = requestAccessor ?? throw new ArgumentNullException(nameof(securitySettings));
         }
 
-        protected Security.BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager
-                                                                                        ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager());
+        protected BackOfficeOwinUserManager UserManager => _userManager
+                                                           ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager());
 
         protected BackOfficeSignInManager SignInManager => _signInManager
             ?? (_signInManager = TryGetOwinContext().Result.GetBackOfficeSignInManager());

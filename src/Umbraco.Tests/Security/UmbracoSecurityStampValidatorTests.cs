@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Security
     public class UmbracoSecurityStampValidatorTests
     {
         private Mock<IOwinContext> _mockOwinContext;
-        private Mock<Umbraco.Web.Security.BackOfficeUserManager<BackOfficeIdentityUser>> _mockUserManager;
+        private Mock<BackOfficeOwinUserManager> _mockUserManager;
         private Mock<BackOfficeSignInManager> _mockSignInManager;
 
         private AuthenticationTicket _testAuthTicket;
@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Security
         public void OnValidateIdentity_When_GetUserIdCallback_Is_Null_Expect_ArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => UmbracoSecurityStampValidator
-                .OnValidateIdentity<BackOfficeSignInManager, Umbraco.Web.Security.BackOfficeUserManager<BackOfficeIdentityUser>, BackOfficeIdentityUser>(
+                .OnValidateIdentity<BackOfficeSignInManager, BackOfficeOwinUserManager, BackOfficeIdentityUser>(
                     TimeSpan.MaxValue, null, null));
         }
 
@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Security
         public async Task OnValidateIdentity_When_Validation_Interval_Not_Met_Expect_No_Op()
         {
             var func = UmbracoSecurityStampValidator
-                .OnValidateIdentity<BackOfficeSignInManager, Umbraco.Web.Security.BackOfficeUserManager<BackOfficeIdentityUser>, BackOfficeIdentityUser>(
+                .OnValidateIdentity<BackOfficeSignInManager, BackOfficeOwinUserManager, BackOfficeIdentityUser>(
                     TimeSpan.MaxValue, null, identity => throw new Exception());
 
             _testAuthTicket.Properties.IssuedUtc = DateTimeOffset.UtcNow;
@@ -62,11 +62,11 @@ namespace Umbraco.Tests.Security
         public void OnValidateIdentity_When_Time_To_Validate_But_No_UserManager_Expect_InvalidOperationException()
         {
             var func = UmbracoSecurityStampValidator
-                .OnValidateIdentity<BackOfficeSignInManager, Umbraco.Web.Security.BackOfficeUserManager<BackOfficeIdentityUser>, BackOfficeIdentityUser>(
+                .OnValidateIdentity<BackOfficeSignInManager, BackOfficeOwinUserManager, BackOfficeIdentityUser>(
                     TimeSpan.MinValue, null, identity => throw new Exception());
 
-            _mockOwinContext.Setup(x => x.Get<Umbraco.Web.Security.BackOfficeUserManager<BackOfficeIdentityUser>>(It.IsAny<string>()))
-                .Returns((Umbraco.Web.Security.BackOfficeUserManager<BackOfficeIdentityUser>) null);
+            _mockOwinContext.Setup(x => x.Get<BackOfficeOwinUserManager>(It.IsAny<string>()))
+                .Returns((BackOfficeOwinUserManager) null);
 
             var context = new CookieValidateIdentityContext(
                 _mockOwinContext.Object,
@@ -80,7 +80,7 @@ namespace Umbraco.Tests.Security
         public void OnValidateIdentity_When_Time_To_Validate_But_No_SignInManager_Expect_InvalidOperationException()
         {
             var func = UmbracoSecurityStampValidator
-                .OnValidateIdentity<BackOfficeSignInManager, Umbraco.Web.Security.BackOfficeUserManager<BackOfficeIdentityUser>, BackOfficeIdentityUser>(
+                .OnValidateIdentity<BackOfficeSignInManager, BackOfficeOwinUserManager, BackOfficeIdentityUser>(
                     TimeSpan.MinValue, null, identity => throw new Exception());
 
             _mockOwinContext.Setup(x => x.Get<BackOfficeSignInManager>(It.IsAny<string>()))
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Security
             var userId = Guid.NewGuid().ToString();
             
             var func = UmbracoSecurityStampValidator
-                .OnValidateIdentity<BackOfficeSignInManager, Umbraco.Web.Security.BackOfficeUserManager<BackOfficeIdentityUser>, BackOfficeIdentityUser>(
+                .OnValidateIdentity<BackOfficeSignInManager, BackOfficeOwinUserManager, BackOfficeIdentityUser>(
                     TimeSpan.MinValue, null, identity => userId);
 
             _mockUserManager.Setup(x => x.FindByIdAsync(userId))
@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Security
             var userId = Guid.NewGuid().ToString();
 
             var func = UmbracoSecurityStampValidator
-                .OnValidateIdentity<BackOfficeSignInManager, Umbraco.Web.Security.BackOfficeUserManager<BackOfficeIdentityUser>, BackOfficeIdentityUser>(
+                .OnValidateIdentity<BackOfficeSignInManager, BackOfficeOwinUserManager, BackOfficeIdentityUser>(
                     TimeSpan.MinValue, null, identity => userId);
 
             _mockUserManager.Setup(x => x.FindByIdAsync(userId)).ReturnsAsync(_testUser);
@@ -146,7 +146,7 @@ namespace Umbraco.Tests.Security
             var userId = Guid.NewGuid().ToString();
 
             var func = UmbracoSecurityStampValidator
-                .OnValidateIdentity<BackOfficeSignInManager, Umbraco.Web.Security.BackOfficeUserManager<BackOfficeIdentityUser>, BackOfficeIdentityUser>(
+                .OnValidateIdentity<BackOfficeSignInManager, BackOfficeOwinUserManager, BackOfficeIdentityUser>(
                     TimeSpan.MinValue, null, identity => userId);
 
             _mockUserManager.Setup(x => x.FindByIdAsync(userId)).ReturnsAsync(_testUser);
@@ -170,7 +170,7 @@ namespace Umbraco.Tests.Security
             var userId = Guid.NewGuid().ToString();
 
             var func = UmbracoSecurityStampValidator
-                .OnValidateIdentity<BackOfficeSignInManager, Umbraco.Web.Security.BackOfficeUserManager<BackOfficeIdentityUser>, BackOfficeIdentityUser>(
+                .OnValidateIdentity<BackOfficeSignInManager, BackOfficeOwinUserManager, BackOfficeIdentityUser>(
                     TimeSpan.MinValue, null, identity => userId);
 
             _mockUserManager.Setup(x => x.FindByIdAsync(userId)).ReturnsAsync(_testUser);
@@ -194,7 +194,7 @@ namespace Umbraco.Tests.Security
             var expectedIdentity = new ClaimsIdentity(new List<Claim> {new Claim("sub", "bob")});
 
             var regenFuncCalled = false;
-            Func<BackOfficeSignInManager, Umbraco.Web.Security.BackOfficeUserManager<BackOfficeIdentityUser>, BackOfficeIdentityUser, Task<ClaimsIdentity>> regenFunc =
+            Func<BackOfficeSignInManager, BackOfficeOwinUserManager, BackOfficeIdentityUser, Task<ClaimsIdentity>> regenFunc =
                 (signInManager, userManager, user) =>
                 {
                     regenFuncCalled = true;
@@ -202,7 +202,7 @@ namespace Umbraco.Tests.Security
                 };
 
             var func = UmbracoSecurityStampValidator
-                .OnValidateIdentity<BackOfficeSignInManager, Umbraco.Web.Security.BackOfficeUserManager<BackOfficeIdentityUser>, BackOfficeIdentityUser>(
+                .OnValidateIdentity<BackOfficeSignInManager, BackOfficeOwinUserManager, BackOfficeIdentityUser>(
                     TimeSpan.MinValue, regenFunc, identity => userId);
 
             _mockUserManager.Setup(x => x.FindByIdAsync(userId)).ReturnsAsync(_testUser);
@@ -250,7 +250,7 @@ namespace Umbraco.Tests.Security
                 new AuthenticationProperties());
             _testOptions = new CookieAuthenticationOptions { AuthenticationType = _testAuthType };
 
-            _mockUserManager = new Mock<Umbraco.Web.Security.BackOfficeUserManager<BackOfficeIdentityUser>>(
+            _mockUserManager = new Mock<BackOfficeOwinUserManager>(
                 new Mock<IPasswordConfiguration>().Object,
                 new Mock<IIpResolver>().Object,
                 new Mock<IUserStore<BackOfficeIdentityUser>>().Object,
@@ -267,7 +267,7 @@ namespace Umbraco.Tests.Security
                 new Mock<IOwinRequest>().Object);
 
             _mockOwinContext = new Mock<IOwinContext>();
-            _mockOwinContext.Setup(x => x.Get<Umbraco.Web.Security.BackOfficeUserManager<BackOfficeIdentityUser>>(It.IsAny<string>()))
+            _mockOwinContext.Setup(x => x.Get<BackOfficeOwinUserManager>(It.IsAny<string>()))
                 .Returns(_mockUserManager.Object);
             _mockOwinContext.Setup(x => x.Get<BackOfficeSignInManager>(It.IsAny<string>()))
                 .Returns(_mockSignInManager.Object);

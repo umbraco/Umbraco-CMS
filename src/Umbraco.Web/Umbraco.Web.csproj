@@ -195,12 +195,10 @@
     <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
     <Compile Include="Security\BackOfficeSignInManager.cs" />
-    <Compile Include="Security\BackOfficeUserManager.cs" />
+    <Compile Include="Security\BackOfficeOwinUserManager.cs" />
     <Compile Include="Security\BackOfficeUserManagerMarker.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyComponent.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyComposer.cs" />
-    <Compile Include="Security\BackOfficeUserStore.cs" />
-    <Compile Include="Security\BackOfficeUserValidator.cs" />
     <Compile Include="Security\ConfiguredPasswordValidator.cs" />
     <Compile Include="Security\MembershipProviderBase.cs" />
     <Compile Include="Security\MembershipProviderExtensions.cs" />

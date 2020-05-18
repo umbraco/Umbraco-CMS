@@ -45,7 +45,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly UmbracoFeatures _features;
         private readonly IRuntimeState _runtimeState;
-        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
+        private BackOfficeOwinUserManager _userManager;
         private BackOfficeSignInManager _signInManager;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IGridConfig _gridConfig;
@@ -92,7 +92,7 @@ namespace Umbraco.Web.Editors
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
 
-        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager ?? (_userManager = OwinContext.GetBackOfficeUserManager());
+        protected BackOfficeOwinUserManager UserManager => _userManager ?? (_userManager = OwinContext.GetBackOfficeUserManager());
 
         protected IAuthenticationManager AuthenticationManager => OwinContext.Authentication;
 

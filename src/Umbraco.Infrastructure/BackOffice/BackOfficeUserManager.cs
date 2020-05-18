@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,7 +56,7 @@ namespace Umbraco.Core.BackOffice
         // TODO: Support this
         public override bool SupportsUserPhoneNumber => false;
         #endregion
-        
+
         /// <summary>
         /// Used to validate a user's session
         /// </summary>
@@ -86,7 +86,7 @@ namespace Umbraco.Core.BackOffice
         /// Gets/sets the default back office user password checker
         /// </summary>
         public IBackOfficeUserPasswordChecker BackOfficeUserPasswordChecker { get; set; }
-        public IPasswordConfiguration PasswordConfiguration { get; }
+        public IPasswordConfiguration PasswordConfiguration { get; protected set; }
         public IIpResolver IpResolver { get; }
 
         /// <summary>
@@ -332,57 +332,57 @@ namespace Umbraco.Core.BackOffice
             return result;
         }
 
-        internal void RaiseAccountLockedEvent(int userId)
+        public void RaiseAccountLockedEvent(int userId)
         {
             OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
-        internal void RaiseAccountUnlockedEvent(int userId)
+        public void RaiseAccountUnlockedEvent(int userId)
         {
             OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
-        internal void RaiseForgotPasswordRequestedEvent(int userId)
+        public void RaiseForgotPasswordRequestedEvent(int userId)
         {
             OnForgotPasswordRequested(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordRequested, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
-        internal void RaiseForgotPasswordChangedSuccessEvent(int userId)
+        public void RaiseForgotPasswordChangedSuccessEvent(int userId)
         {
             OnForgotPasswordChangedSuccess(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordChangedSuccess, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
-        internal void RaiseLoginFailedEvent(int userId)
+        public void RaiseLoginFailedEvent(int userId)
         {
             OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
-        internal void RaiseInvalidLoginAttemptEvent(string username)
+        public void RaiseInvalidLoginAttemptEvent(string username)
         {
             OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed, IpResolver.GetCurrentRequestIpAddress(), username, string.Format("Attempted login for username '{0}' failed", username)));
         }
 
-        internal void RaiseLoginRequiresVerificationEvent(int userId)
+        public void RaiseLoginRequiresVerificationEvent(int userId)
         {
             OnLoginRequiresVerification(new IdentityAuditEventArgs(AuditEvent.LoginRequiresVerification, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
-        internal void RaiseLoginSuccessEvent(int userId)
+        public void RaiseLoginSuccessEvent(int userId)
         {
             OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
-        internal void RaiseLogoutSuccessEvent(int userId)
+        public void RaiseLogoutSuccessEvent(int userId)
         {
             OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
-        internal void RaisePasswordChangedEvent(int userId)
+        public void RaisePasswordChangedEvent(int userId)
         {
             OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
-        internal void RaiseResetAccessFailedCountEvent(int userId)
+        public void RaiseResetAccessFailedCountEvent(int userId)
         {
             OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
