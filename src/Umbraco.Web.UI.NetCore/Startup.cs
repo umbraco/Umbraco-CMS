@@ -39,7 +39,7 @@ namespace Umbraco.Web.UI.BackOffice
             // relying on a global configuration set by a user since if a custom IControllerActivator is used for our own controllers we may not
             // guarantee it will work. And then... is that even possible?
 
-            services.AddUmbracoConfiguration(_config);            
+            services.AddUmbracoConfiguration(_config);
             services.AddUmbracoCore(_env, out var factory);
             services.AddUmbracoWebComponents();
             services.AddUmbracoRuntimeMinifier(_config);
@@ -62,7 +62,7 @@ namespace Umbraco.Web.UI.BackOffice
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
-            //app.UseMiniProfiler();            
+            //app.UseMiniProfiler();
             if (_env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -77,12 +77,12 @@ namespace Umbraco.Web.UI.BackOffice
             app.UseUmbracoWebsite();
             app.UseUmbracoBackOffice();
             app.UseUmbracoInstaller();
-            
+
             app.UseEndpoints(endpoints =>
-            {   
+            {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");               
+                    pattern: "{controller}/{action=Index}/{id?}");
             });
         }
     }

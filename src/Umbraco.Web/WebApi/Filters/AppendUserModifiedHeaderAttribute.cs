@@ -9,6 +9,7 @@ namespace Umbraco.Web.WebApi.Filters
     /// <summary>
     /// Appends a custom response header to notify the UI that the current user data has been modified
     /// </summary>
+    /// Migrated to NET core
     public sealed class AppendUserModifiedHeaderAttribute : ActionFilterAttribute
     {
         private readonly string _userIdParameter;
