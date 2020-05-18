@@ -23,7 +23,7 @@ namespace Umbraco.Extensions
                 backOfficeControllerType = Assembly.Load("Umbraco.Web.BackOffice")?.GetType("Umbraco.Web.BackOffice.Controllers.BackOfficeController");
                 if (backOfficeControllerType == null) return "/"; // this would indicate that the installer is installed without the back office
             }
-            catch (Exception)
+            catch
             {
                 return hostingEnvironment.ApplicationVirtualPath; // this would indicate that the installer is installed without the back office
             }
