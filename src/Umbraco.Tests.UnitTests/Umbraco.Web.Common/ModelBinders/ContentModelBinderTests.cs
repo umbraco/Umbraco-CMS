@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -12,7 +11,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.Models;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
 {
     [TestFixture]
     public class ContentModelBinderTests
@@ -92,9 +91,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
             var httpContext = new DefaultHttpContext();
             var routeData = new RouteData();
             if (withUmbracoDataToken)
-            {
                 routeData.DataTokens.Add(Constants.Web.UmbracoDataToken, source);
-            }
 
             var actionContext = new ActionContext(httpContext, routeData, new ActionDescriptor());
             var metadataProvider = new EmptyModelMetadataProvider();
