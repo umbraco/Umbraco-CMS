@@ -11,6 +11,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -75,7 +76,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             var resetResult = await _userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
             if (!resetResult.Succeeded)
-                throw new InvalidOperationException("Could not reset password: " + string.Join(", ", "error" /*resetResult.Errors.ToErrorMessage()*/));
+                throw new InvalidOperationException("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));
 
             if (user.SubscribeToNewsLetter)
             {

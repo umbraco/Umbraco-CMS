@@ -352,12 +352,5 @@ namespace Umbraco.Web.Security
         /// Used so that we aren't creating a new CultureInfo object for every single request
         /// </summary>
         private static readonly ConcurrentDictionary<string, CultureInfo> UserCultures = new ConcurrentDictionary<string, CultureInfo>();
-
-        public static string ToErrorMessage(this IEnumerable<IdentityError> errors)
-        {
-            if (errors == null) throw new ArgumentNullException(nameof(errors));
-            return string.Join(", ", errors.Select(x => x.Description).ToList());
-        }
-
     }
 }

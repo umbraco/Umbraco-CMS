@@ -25,6 +25,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Media;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Editors
 {

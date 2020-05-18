@@ -24,6 +24,7 @@ using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.WebAssets;
+using Umbraco.Extensions;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebAssets;
 using BackOfficeIdentityUser = Umbraco.Core.BackOffice.BackOfficeIdentityUser;

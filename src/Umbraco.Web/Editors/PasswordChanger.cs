@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Extensions;
 using Umbraco.Web.Models;
 using Umbraco.Web.Security;
 using IUser = Umbraco.Core.Models.Membership.IUser;

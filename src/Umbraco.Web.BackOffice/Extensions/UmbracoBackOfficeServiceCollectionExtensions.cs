@@ -22,7 +22,7 @@ namespace Umbraco.Extensions
             services.TryAddSingleton(s => new MapDefinitionCollection(new[] {s.GetService<IdentityMapDefinition>()}));
             services.TryAddSingleton<UmbracoMapper>();
 
-            services.TryAddScoped<IIpResolver, AspNetIpResolver>();
+            services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
 
             services.AddIdentityCore<BackOfficeIdentityUser>();
             services.AddIdentityCore<BackOfficeIdentityUser>(options =>
