@@ -14,7 +14,7 @@ using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.Security
 {
-    public class BackOfficeUserManagerTests
+    public class BackOfficeOwinUserManagerTests
     {
         [Test]
         public async Task CheckPasswordAsync_When_Default_Password_Hasher_Validates_Umbraco7_Hash_Expect_Valid_Password()

@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Mapping;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
 
@@ -115,6 +116,11 @@ namespace Umbraco.Web.Security
         }
 
         #endregion
+
+        protected override IPasswordHasher<BackOfficeIdentityUser> GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration)
+        {
+            return new UserAwarePasswordHasher<BackOfficeIdentityUser>(new PasswordSecurity(passwordConfiguration));
+        }
 
         protected void InitUserManager(BackOfficeOwinUserManager manager, IDataProtectionProvider dataProtectionProvider)
         {

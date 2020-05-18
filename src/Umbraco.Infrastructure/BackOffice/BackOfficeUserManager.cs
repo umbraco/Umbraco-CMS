@@ -37,7 +37,6 @@ namespace Umbraco.Core.BackOffice
             ILogger<UserManager<T>> logger)
             : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
         {
-            // PasswordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             IpResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));
         }
 
@@ -95,8 +94,6 @@ namespace Umbraco.Core.BackOffice
         /// <returns></returns>
         public string GeneratePassword()
         {
-            throw new NotImplementedException();
-
             if (_passwordGenerator == null) _passwordGenerator = new PasswordGenerator(PasswordConfiguration);
             var password = _passwordGenerator.GeneratePassword();
             return password;
