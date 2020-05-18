@@ -1,0 +1,24 @@
+.umb-button-ellipsis{
+    padding: 0 5px;
+    text-align: center;
+    margin: 0 10px 0 auto;
+    cursor: pointer;
+    border-radius: @baseBorderRadius;
+    color: black; // TODO: Can vary! / be overridden
+    position: relative;
+    opacity: 1;
+    transition: opacity .3s ease-out;
+
+    &--hidden{
+        opacity: 0;
+
+        &:hover,
+        &:focus {
+            opacity: 1;
+        }
+    }
+
+    &__icon {
+        color: inherit;
+    }
+}
