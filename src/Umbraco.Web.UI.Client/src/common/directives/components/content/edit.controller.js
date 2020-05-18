@@ -210,7 +210,7 @@
         function appendRuntimeData() {
             $scope.content.variants.forEach((variant) => {
                 variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
-                variant.htmlId = "_content_variant_" + variant.compositeId;
+                variant.htmlId = "_content_variant_" + variant.compositeId + "_";
             });
         }
 
