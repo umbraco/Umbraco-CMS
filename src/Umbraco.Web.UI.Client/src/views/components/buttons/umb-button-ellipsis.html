@@ -1,30 +1,15 @@
-<button data-element="{{vm.element}}" class="btn-reset {{vm.cssClass}}" on-click="vm.click()">
-    <!-- <span class="button-ellipsis__icon" aria-hidden="true">&bull;&bull;&bull;</span>
-     -->
-     <i></i><i></i><i></i>
+<button
+    data-element="{{vm.element}}"
+    class="btn-reset umb-button-ellipsis {{vm.cssClass}}"
+    ng-class="{'umb-button-ellipsis--hidden': vm.state === 'hidden'}"
+    ng-click="vm.clickButton($event)">
+    <span class="umb-button-ellipsis__icon" aria-hidden="true">&bull;&bull;&bull;</span>
     <span class="button-ellipsis__text" ng-class="{'sr-only': vm.showText !== true}">{{vm.text}}</span>
 </button>
 
-<!-- <button data-element="tree-item-options"
-    class="umb-options btn-reset sr-only sr-only--focusable sr-only--hoverable"
-    ng-click="options(node, $event)"
-    ng-if="::node.menuUrl"
-    aria-label="{{optionsText}} {{node.name}}">
-    <i></i><i></i><i></i> HEP HEP
-</button>
-
-<button class="btn-reset umb-tab-button umb-tab-button--expand" ng-click="vm.toggleTray()" type="button">
+<!--<button class="btn-reset umb-tab-button umb-tab-button--expand" ng-click="vm.toggleTray()" type="button">
     <i></i><i></i><i></i> HEP
     <span class="sr-only"><localize key="visuallyHiddenTexts_tabExpand">View more options</localize></span>
-</button>
-
-<button
-data-element="tree-item-options"
-class="umb-options btn-reset sr-only sr-only--focusable sr-only--hoverable"
-ng-hide="tree.root.isContainer || !tree.root.menuUrl"
-ng-click="options(tree.root, $event)"
-ng-swipe-right="options(tree.root, $event)">
-<i></i><i></i><i></i> HEP HEP HEP
 </button>
 
 <a data-element="sub-view-{{moreButton.alias}}"

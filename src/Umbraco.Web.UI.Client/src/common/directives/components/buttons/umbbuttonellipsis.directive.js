@@ -15,8 +15,8 @@
             text="{{text}}"
             labelKey="{{labelKey}}"
             showLabel="{{showLabel}}"
-            onClick="{{vm.open()}}"
-            dataElement="{{element}}"
+            action="{{vm.open()}}"
+            element="{{element}}"
             >
         </umb-button-ellipsis>
 
@@ -25,11 +25,11 @@
 
 @param {string} text Set the text for the checkbox label.
 @param {string} labelKey Set a dictinary/localization string for the checkbox label
-@param {callback} onClick Callback when the value of the checkbox change by interaction.
+@param {callback} action Callback when the value of the checkbox change by interaction.
 @param {string} cssClass Set a css class modifier
 @param {boolean} showText Set to <code>true</code> to show the text. <code>false</code> by default
 @param {string} element *TODO: Need to document this - Not sure why it's done like this*
-
+@param {string} state Set the initial state of the component. To have it hidden use <code>hidden</code>
 **/
 
 (function () {
@@ -40,7 +40,7 @@
         var vm = this;
 
         vm.$onInit = onInit;
-        vm.click = click;
+        vm.clickButton = clickButton;
 
         function onInit() {
             // If a labelKey is passed let's update the returned text if it's does not contain an opening square bracket [
@@ -53,17 +53,10 @@
             }
         }
 
-        function click() {
-            console.log('click click');
-            if(vm.onClick) {
-                vm.onClick(); // How to dynamically get the passed args?
+        function clickButton(event) {
+            if(vm.action) {
+                vm.action({$event: event});
             }
-
-            // if (vm.onChange) {
-            //     $timeout(function () {
-            //         vm.onChange({ model: vm.model, value: vm.value });
-            //     }, 0);
-            // }
         }
     }
 
@@ -75,10 +68,11 @@
         bindings: {
             text: "@",
             labelKey: "@?",
-            onClick: "&",
+            action: "&",
             cssClass: "@?",
-            showText: "<",
-            element: "@?"
+            showText: "<?",
+            element: "@?",
+            state: "@?"
         }
     };
 
