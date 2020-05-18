@@ -6,6 +6,7 @@ using System.Web.Http.Filters;
 
 namespace Umbraco.Web.WebApi.Filters
 {
+    // Migrated to .NET Core
     public class OnlyLocalRequestsAttribute : ActionFilterAttribute
     {
         public override void OnActionExecuting(HttpActionContext actionContext)

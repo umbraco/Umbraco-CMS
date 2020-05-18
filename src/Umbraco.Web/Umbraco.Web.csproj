@@ -147,6 +147,7 @@
     <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Security\IdentityFactoryMiddleware.cs" />
+    <Compile Include="WebApi\Filters\OnlyLocalRequestsAttribute.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyRuntimeMinifier.cs" />
     <Compile Include="Models\NoNodesViewModel.cs" />
     <Compile Include="Mvc\RenderNoContentController.cs" />
@@ -225,7 +226,6 @@
     <Compile Include="UmbracoDbProviderFactoryCreator.cs" />
     <Compile Include="ViewDataExtensions.cs" />
     <Compile Include="WebApi\Filters\AdminUsersAuthorizeAttribute.cs" />
-    <Compile Include="WebApi\Filters\OnlyLocalRequestsAttribute.cs" />
     <Compile Include="Runtime\WebInitialComposer.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeUserPasswordCheckerResult.cs" />
