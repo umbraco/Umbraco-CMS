@@ -12,7 +12,10 @@ namespace Umbraco.Web.Common.Security
 
     public class WebSecurity : IWebSecurity
     {
-        public IUser CurrentUser => new User(Current.Configs.Global());
+        public IUser CurrentUser => new User(Current.Configs.Global())
+        {
+
+        };
 
         public ValidateRequestAttempt AuthorizeRequest(bool throwExceptions = false)
         {

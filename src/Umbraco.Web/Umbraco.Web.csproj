@@ -145,6 +145,7 @@
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
+    <Compile Include="Editors\TourController.cs" />
     <Compile Include="Macros\MacroRenderer.cs" />
     <Compile Include="Macros\MemberUserKeyProvider.cs" />
     <Compile Include="Macros\PartialViewMacroController.cs" />
@@ -264,7 +265,6 @@
     <Compile Include="WebApi\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
     <Compile Include="Editors\TemplateController.cs" />
-    <Compile Include="Editors\TourController.cs" />
     <Compile Include="Editors\Filters\UserGroupAuthorizationAttribute.cs" />
     <Compile Include="Editors\Filters\UserGroupEditorAuthorizationHelper.cs" />
     <Compile Include="Editors\UserGroupsController.cs" />
