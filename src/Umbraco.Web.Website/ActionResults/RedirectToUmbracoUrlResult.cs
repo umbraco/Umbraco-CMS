@@ -1,7 +1,10 @@
 ﻿using System;
-using System.Web.Mvc;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Umbraco.Web.Mvc
+namespace Umbraco.Web.Website.ActionResults
 {
     /// <summary>
     /// Redirects to the current URL rendering an Umbraco page including it's query strings
@@ -11,8 +14,7 @@ namespace Umbraco.Web.Mvc
     /// to the current page but the current page is actually a rewritten URL normally done with something like
     /// Server.Transfer. It is also handy if you want to persist the query strings.
     /// </remarks>
-    /// Migrated already to .Net Core
-    public class RedirectToUmbracoUrlResult : ActionResult
+    public class RedirectToUmbracoUrlResult : IActionResult
     {
         private readonly IUmbracoContext _umbracoContext;
 
@@ -25,19 +27,18 @@ namespace Umbraco.Web.Mvc
             _umbracoContext = umbracoContext;
         }
 
-        public override void ExecuteResult(ControllerContext context)
+        public Task ExecuteResultAsync(ActionContext context)
         {
-            if (context == null) throw new ArgumentNullException("context");
-
-            if (context.IsChildAction)
-            {
-                throw new InvalidOperationException("Cannot redirect from a Child Action");
-            }
+            if (context is null) throw new ArgumentNullException(nameof(context));
 
             var destinationUrl = _umbracoContext.OriginalRequestUrl.PathAndQuery;
-            context.Controller.TempData.Keep();
+            var tempDataDictionaryFactory = context.HttpContext.RequestServices.GetRequiredService<ITempDataDictionaryFactory>();
+            var tempData = tempDataDictionaryFactory.GetTempData(context.HttpContext);
+            tempData?.Keep();
 
-            context.HttpContext.Response.Redirect(destinationUrl, endResponse: false);
+            context.HttpContext.Response.Redirect(destinationUrl);
+
+            return Task.CompletedTask;
         }
     }
 }

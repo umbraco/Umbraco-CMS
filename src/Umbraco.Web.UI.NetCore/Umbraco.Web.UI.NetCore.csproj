@@ -13,6 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Controllers\" />
       <Folder Include="Views\" />
       <Folder Include="wwwroot\Media" />
       <Folder Include="wwwroot\Umbraco\views\install" />
@@ -63,6 +64,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Content Include="Config\grid.editors.config.js" />
       <Content Include="Config\logviewer.searches.config.js" />
     </ItemGroup>
 

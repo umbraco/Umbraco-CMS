@@ -10,6 +10,7 @@ namespace Umbraco.Web.Mvc
     /// <summary>
     /// Used by posted forms to proxy the result to the page in which the current URL matches on
     /// </summary>
+    /// Migrated already to .Net Core
     public class UmbracoPageResult : ActionResult
     {
         private readonly IProfilingLogger _profilingLogger;

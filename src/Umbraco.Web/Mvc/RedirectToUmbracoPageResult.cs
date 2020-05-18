@@ -14,6 +14,7 @@ namespace Umbraco.Web.Mvc
     /// <summary>
     /// Redirects to an Umbraco page by Id or Entity
     /// </summary>
+    /// Migrated already to .Net Core
     public class RedirectToUmbracoPageResult : ActionResult
     {
         private IPublishedContent _publishedContent;

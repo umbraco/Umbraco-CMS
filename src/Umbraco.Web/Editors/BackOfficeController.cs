@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -15,7 +14,6 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Manifest;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Core.Services;
@@ -23,12 +21,9 @@ using Umbraco.Web.Features;
 using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
-using JArray = Newtonsoft.Json.Linq.JArray;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Runtime;
 using Umbraco.Core.WebAssets;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebAssets;
@@ -52,7 +47,6 @@ namespace Umbraco.Web.Editors
         private readonly IContentSettings _contentSettings;
         private readonly TreeCollection _treeCollection;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IRuntimeSettings _runtimeSettings;
         private readonly ISecuritySettings _securitySettings;
         private readonly IRuntimeMinifier _runtimeMinifier;
@@ -84,7 +78,6 @@ namespace Umbraco.Web.Editors
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));
             _hostingEnvironment = hostingEnvironment;
-            _httpContextAccessor = httpContextAccessor;
             _runtimeSettings = settings;
             _securitySettings = securitySettings;
             _runtimeMinifier = runtimeMinifier;
@@ -194,6 +187,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="culture"></param>
         /// <returns></returns>
+        /// <remarks>Migrated already to .Net Core</remarks>
         [HttpGet]
         public JsonNetResult LocalizedText(string culture = null)
         {
@@ -240,6 +234,7 @@ namespace Umbraco.Web.Editors
             return JavaScript(result);
         }
 
+        /// Migrated already to .Net Core
         [UmbracoAuthorize(Order = 0)]
         [HttpGet]
         public JsonNetResult GetGridConfig()
@@ -257,7 +252,7 @@ namespace Umbraco.Web.Editors
         [MinifyJavaScriptResult(Order = 1)]
         public JavaScriptResult ServerVariables()
         {
-            var serverVars = new BackOfficeServerVariables(Url, _runtimeState, _features, GlobalSettings, _umbracoVersion, _contentSettings, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings, _runtimeMinifier);
+            var serverVars = new BackOfficeServerVariables(Url, _runtimeState, _features, GlobalSettings, _umbracoVersion, _contentSettings, _treeCollection, _hostingEnvironment, _runtimeSettings, _securitySettings, _runtimeMinifier);
 
             //cache the result if debugging is disabled
             var result = _hostingEnvironment.IsDebugMode

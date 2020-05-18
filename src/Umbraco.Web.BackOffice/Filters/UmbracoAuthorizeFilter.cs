@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using System;
 using Umbraco.Core;
 using Umbraco.Extensions;
 using Umbraco.Web.Security;
+using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
@@ -20,12 +22,26 @@ namespace Umbraco.Web.BackOffice.Filters
         /// Can be used by unit tests to enable/disable this filter
         /// </summary>
         internal static bool Enable = true;
-        
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IUmbracoContextAccessor _umbracoContext;
         private readonly IRuntimeState _runtimeState;
         private readonly LinkGenerator _linkGenerator;
         private readonly bool _redirectToUmbracoLogin;
         private string _redirectUrl;
+
+        private UmbracoAuthorizeFilter(
+            IHostingEnvironment hostingEnvironment,
+            IUmbracoContextAccessor umbracoContext,
+            IRuntimeState runtimeState, LinkGenerator linkGenerator,
+            bool redirectToUmbracoLogin, string redirectUrl)
+        {
+            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
+            _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
+            _linkGenerator = linkGenerator ?? throw new ArgumentNullException(nameof(linkGenerator));
+            _redirectToUmbracoLogin = redirectToUmbracoLogin;
+            _redirectUrl = redirectUrl;
+        }
 
         /// <summary>
         /// Default constructor
@@ -34,11 +50,9 @@ namespace Umbraco.Web.BackOffice.Filters
         /// <param name="runtimeState"></param>
         /// <param name="linkGenerator"></param>
         public UmbracoAuthorizeFilter(
-            IUmbracoContextAccessor umbracoContext, IRuntimeState runtimeState, LinkGenerator linkGenerator)
-        {
-            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
-            _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
-            _linkGenerator = linkGenerator ?? throw new ArgumentNullException(nameof(linkGenerator));
+            IHostingEnvironment hostingEnvironment, IUmbracoContextAccessor umbracoContext, IRuntimeState runtimeState, LinkGenerator linkGenerator)
+            : this(hostingEnvironment, umbracoContext, runtimeState, linkGenerator, false, null)
+        {            
         }
 
         /// <summary>
@@ -49,11 +63,10 @@ namespace Umbraco.Web.BackOffice.Filters
         /// <param name="linkGenerator"></param>
         /// <param name="redirectToUmbracoLogin">If true will redirect to the umbraco login page if not authorized</param>
         public UmbracoAuthorizeFilter(
-            IUmbracoContextAccessor umbracoContext, IRuntimeState runtimeState, LinkGenerator linkGenerator,
+            IHostingEnvironment hostingEnvironment, IUmbracoContextAccessor umbracoContext, IRuntimeState runtimeState, LinkGenerator linkGenerator,
             bool redirectToUmbracoLogin)
-            : this(umbracoContext, runtimeState, linkGenerator)
+            : this(hostingEnvironment, umbracoContext, runtimeState, linkGenerator, redirectToUmbracoLogin, null)
         {            
-            _redirectToUmbracoLogin = redirectToUmbracoLogin;
         }
 
         /// <summary>
@@ -64,11 +77,10 @@ namespace Umbraco.Web.BackOffice.Filters
         /// /// <param name="linkGenerator"></param>
         /// <param name="redirectUrl">If specified will redirect to this URL if not authorized</param>
         public UmbracoAuthorizeFilter(
-            IUmbracoContextAccessor umbracoContext, IRuntimeState runtimeState, LinkGenerator linkGenerator,
+            IHostingEnvironment hostingEnvironment, IUmbracoContextAccessor umbracoContext, IRuntimeState runtimeState, LinkGenerator linkGenerator,
             string redirectUrl)
-            : this(umbracoContext, runtimeState, linkGenerator)
+            : this(hostingEnvironment, umbracoContext, runtimeState, linkGenerator, false, redirectUrl)
         {
-            _redirectUrl = redirectUrl;
         }
 
         public void OnAuthorization(AuthorizationFilterContext context)
@@ -77,7 +89,7 @@ namespace Umbraco.Web.BackOffice.Filters
             {
                 if (_redirectToUmbracoLogin)
                 {
-                    _redirectUrl = _linkGenerator.GetBackOfficeUrl();
+                    _redirectUrl = _linkGenerator.GetBackOfficeUrl(_hostingEnvironment);
                 }
 
                 if (!_redirectUrl.IsNullOrWhiteSpace())

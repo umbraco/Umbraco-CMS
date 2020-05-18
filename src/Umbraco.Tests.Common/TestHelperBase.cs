@@ -16,7 +16,6 @@ using Umbraco.Net;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;
-using Umbraco.Core.Sync;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
 
