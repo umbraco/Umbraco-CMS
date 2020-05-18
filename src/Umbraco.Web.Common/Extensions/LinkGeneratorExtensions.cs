@@ -3,6 +3,7 @@ using Umbraco.Core;
 using Microsoft.AspNetCore.Routing;
 using System.Reflection;
 using Umbraco.Web.Common.Install;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Extensions
 {
@@ -13,7 +14,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public static string GetBackOfficeUrl(this LinkGenerator linkGenerator)
+        public static string GetBackOfficeUrl(this LinkGenerator linkGenerator, IHostingEnvironment hostingEnvironment)
         {
 
             Type backOfficeControllerType;
@@ -24,7 +25,7 @@ namespace Umbraco.Extensions
             }
             catch (Exception)
             {
-                return "/"; // this would indicate that the installer is installed without the back office
+                return hostingEnvironment.ApplicationVirtualPath; // this would indicate that the installer is installed without the back office
             }
 
             return linkGenerator.GetPathByAction("Default", ControllerExtensions.GetControllerName(backOfficeControllerType), new { area = Constants.Web.Mvc.BackOfficeApiArea });
