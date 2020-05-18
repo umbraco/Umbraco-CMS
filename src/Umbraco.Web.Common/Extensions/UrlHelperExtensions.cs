@@ -4,14 +4,39 @@ using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Web.Common.Controllers;
-using Umbraco.Extensions;
 using Umbraco.Web.WebApi;
-using Microsoft.AspNetCore.Mvc.Routing;
+using Umbraco.Web.Common.Install;
 
 namespace Umbraco.Extensions
 {
-    public static class HttpUrlHelperExtensions
+
+    public static class UrlHelperExtensions
     {
+
+        /// <summary>
+        /// Return the back office url if the back office is installed
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public static string GetBackOfficeUrl(this IUrlHelper url)
+        {
+            var backOfficeControllerType = Type.GetType("Umbraco.Web.BackOffice.Controllers");
+            if (backOfficeControllerType == null) return "/"; // this would indicate that the installer is installed without the back office
+            return url.Action("Default", ControllerExtensions.GetControllerName(backOfficeControllerType), new { area = Constants.Web.Mvc.BackOfficeApiArea });
+        }
+
+        /// <summary>
+        /// Return the installer API url
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public static string GetInstallerApiUrl(this IUrlHelper url)
+        {
+            // there is no default action here so we need to get it by action and trim the action
+            return url.Action("GetSetup", ControllerExtensions.GetControllerName<InstallApiController>(), new { area = Constants.Web.Mvc.InstallArea })
+                .TrimEnd("GetSetup");
+        }
+
         /// <summary>
         /// Return the Url for a Web Api service
         /// </summary>

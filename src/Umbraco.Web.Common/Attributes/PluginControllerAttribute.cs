@@ -1,19 +1,20 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Linq;
 
 namespace Umbraco.Web.Common.Attributes
 {
     /// <summary>
-    /// Indicates that a controller is a plugin controller and should be routed to its own area.
+    /// Indicates that a controller is a plugin controller and will be routed to its own area.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public class PluginControllerAttribute : Attribute
+    public class PluginControllerAttribute : AreaAttribute
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PluginControllerAttribute"/> class.
         /// </summary>
         /// <param name="areaName"></param>
-        public PluginControllerAttribute(string areaName)
+        public PluginControllerAttribute(string areaName) : base(areaName)
         {
             // validate this, only letters and digits allowed.
             if (areaName.Any(c => !char.IsLetterOrDigit(c)))

@@ -94,7 +94,7 @@ namespace Umbraco.Core.Composing
         /// <para>Enables support for MVC, WebAPI, but *not* per-request scope. This is used early in the boot
         /// process, where anything "scoped" should not be linked to a web request.</para>
         /// </remarks>
-        void ConfigureForWeb();
+        void ConfigureForWeb();  // TODO: Unsure if we need this anymore
 
         /// <summary>
         /// Creates the factory.

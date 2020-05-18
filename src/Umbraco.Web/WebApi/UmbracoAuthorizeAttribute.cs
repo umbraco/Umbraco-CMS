@@ -7,9 +7,8 @@ using Umbraco.Web.Security;
 namespace Umbraco.Web.WebApi
 {
 
-    /// <summary>
-    /// Ensures authorization is successful for a back office user.
-    /// </summary>
+    // TODO: This has been migrated to netcore and can be removed when ready
+
     public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute
     {
         private readonly bool _requireApproval;

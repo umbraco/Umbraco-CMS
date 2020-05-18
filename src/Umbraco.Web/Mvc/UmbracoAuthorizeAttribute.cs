@@ -7,9 +7,8 @@ using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Mvc
 {
-    /// <summary>
-    /// Ensures authorization is successful for a back office user.
-    /// </summary>
+    // TODO: This has been migrated to netcore and can be removed when ready
+
     public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute
     {
         // see note in HttpInstallAuthorizeAttribute

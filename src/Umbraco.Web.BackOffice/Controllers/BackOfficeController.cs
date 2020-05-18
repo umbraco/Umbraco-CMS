@@ -16,9 +16,12 @@ using Umbraco.Web.BackOffice.ActionResults;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.WebAssets;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
+
+    [Area(Constants.Web.Mvc.BackOfficeArea)]
     public class BackOfficeController : Controller
     {
         private readonly IRuntimeMinifier _runtimeMinifier;
@@ -40,8 +43,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             _gridConfig = gridConfig ?? throw new ArgumentNullException(nameof(gridConfig));
         }
 
-        // GET
-        public IActionResult Index()
+        [HttpGet]
+        public IActionResult Default()
         {
             return View();
         }
@@ -51,6 +54,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [MinifyJavaScriptResult(Order = 0)]
+        [HttpGet]
         public async Task<IActionResult> Application()
         {
             var result = await _runtimeMinifier.GetScriptForLoadingBackOfficeAsync(_globalSettings, _hostingEnvironment);

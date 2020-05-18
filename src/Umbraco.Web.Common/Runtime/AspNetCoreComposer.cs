@@ -14,6 +14,10 @@ using Umbraco.Web.Macros;
 using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Common.Profiler;
+using Umbraco.Web.Common.Install;
+using Umbraco.Extensions;
+using System.Linq;
+using Umbraco.Web.Common.Controllers;
 
 namespace Umbraco.Web.Common.Runtime
 {
@@ -40,12 +44,12 @@ namespace Umbraco.Web.Common.Runtime
             // The umbraco request lifetime
             composition.RegisterMultipleUnique<IUmbracoRequestLifetime, IUmbracoRequestLifetimeManager, UmbracoRequestLifetime>();
 
-
             //Password hasher
             composition.RegisterUnique<IPasswordHasher, AspNetCorePasswordHasher>();
 
 
             composition.RegisterUnique<ICookieManager, AspNetCoreCookieManager>();
+            composition.Register<IIpResolver, AspNetCoreIpResolver>();
             composition.RegisterUnique<IUserAgentProvider, AspNetCoreUserAgentProvider>();
 
             composition.RegisterMultipleUnique<ISessionIdResolver, ISessionManager, AspNetCoreSessionManager>();
@@ -66,6 +70,12 @@ namespace Umbraco.Web.Common.Runtime
             //NOTE: i tried to not have these registered if we weren't installing or upgrading but post install when the site restarts
             //it still needs to use the install controller so we can't do that
             composition.ComposeInstaller();
+
+            var umbracoApiControllerTypes = composition.TypeLoader.GetUmbracoApiControllers().ToList();
+            composition.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
+                .Add(umbracoApiControllerTypes);
+
+            composition.RegisterUnique<InstallAreaRoutes>();
 
         }
     }

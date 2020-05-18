@@ -14,8 +14,8 @@ namespace Umbraco.Web.Common.Controllers
     /// <para>These controllers are NOT auto-routed.</para>
     /// <para>The base class is <see cref="ControllerBase"/> which are netcore API controllers without any view support</para>
     /// </remarks>
-    [FeatureAuthorize]
-    [TypeFilter(typeof(HttpResponseExceptionFilter))]
+    [FeatureAuthorize] // TODO: This could be part of our conventions
+    [TypeFilter(typeof(HttpResponseExceptionFilter))] // TODO: This could be part of our conventions
     [UmbracoApiController]
     public abstract class UmbracoApiControllerBase : ControllerBase, IUmbracoFeature
     {
