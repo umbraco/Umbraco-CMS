@@ -12,8 +12,9 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.BackOffice;
+using Umbraco.Extensions;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Security;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Security
@@ -331,38 +332,6 @@ namespace Umbraco.Web.Security
             // get the ticket
 
             return secureDataFormat.Unprotect(formsCookie);
-        }
-
-          /// <summary>
-        /// This will return the current back office identity if the IPrincipal is the correct type
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        public static UmbracoBackOfficeIdentity GetUmbracoIdentity(this IPrincipal user)
-        {
-            //If it's already a UmbracoBackOfficeIdentity
-            if (user.Identity is UmbracoBackOfficeIdentity backOfficeIdentity) return backOfficeIdentity;
-
-            //Check if there's more than one identity assigned and see if it's a UmbracoBackOfficeIdentity and use that
-            if (user is ClaimsPrincipal claimsPrincipal)
-            {
-                backOfficeIdentity = claimsPrincipal.Identities.OfType<UmbracoBackOfficeIdentity>().FirstOrDefault();
-                if (backOfficeIdentity != null) return backOfficeIdentity;
-            }
-
-            //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd and has the back office session
-            if (user.Identity is ClaimsIdentity claimsIdentity && claimsIdentity.IsAuthenticated && claimsIdentity.HasClaim(x => x.Type == Constants.Security.SessionIdClaimType))
-            {
-                try
-                {
-                    return UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);
-                }
-                catch (InvalidOperationException)
-                {
-                }
-            }
-
-            return null;
         }
 
         /// <summary>

@@ -28,7 +28,6 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.ControllerTesting;
@@ -46,8 +45,8 @@ using Umbraco.Web.Routing;
 using Umbraco.Core.Media;
 using Umbraco.Net;
 using Umbraco.Persistance.SqlCe;
-using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Security;
+using BackOfficeIdentityUser = Umbraco.Core.BackOffice.BackOfficeIdentityUser;
 
 namespace Umbraco.Tests.Web.Controllers
 {

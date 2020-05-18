@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Umbraco.Extensions;
 
 
 namespace Umbraco.Web.Security

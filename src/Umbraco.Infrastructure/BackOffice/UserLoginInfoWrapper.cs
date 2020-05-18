@@ -3,7 +3,7 @@ using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Core.BackOffice
 {
-    internal class UserLoginInfoWrapper : IUserLoginInfo
+    public class UserLoginInfoWrapper : IUserLoginInfo
     {
         private readonly UserLoginInfo _info;
 

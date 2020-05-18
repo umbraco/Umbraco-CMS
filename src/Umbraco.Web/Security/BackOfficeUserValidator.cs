@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Umbraco.Web.Models.Identity;
+using Umbraco.Core.BackOffice;
 
 namespace Umbraco.Web.Security
 {

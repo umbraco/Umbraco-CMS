@@ -1,16 +1,9 @@
 ﻿using System;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Extensions;
 using Umbraco.Core.BackOffice;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Tests.Integration.Extensions;
-using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Integration.Testing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
@@ -25,6 +18,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
 
             Assert.IsNotNull(userStore);
             Assert.AreEqual(typeof(BackOfficeUserStore), userStore.GetType());
+        }
+
+        [Test]
+        public void AddUmbracoBackOfficeIdentity_ExpectBackOfficeClaimsPrincipalFactoryResolvable()
+        {
+            var principalFactory = Services.GetService<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>>();
+
+            Assert.IsNotNull(principalFactory);
+            Assert.AreEqual(typeof(BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>), principalFactory.GetType());
         }
 
         [Test]

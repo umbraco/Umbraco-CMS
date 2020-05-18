@@ -3,8 +3,8 @@ using System.Web;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
-using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Security;
+using BackOfficeIdentityUser = Umbraco.Core.BackOffice.BackOfficeIdentityUser;
 
 namespace Umbraco.Web
 {

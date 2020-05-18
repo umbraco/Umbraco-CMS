@@ -14,7 +14,6 @@ using Umbraco.Core.WebAssets;
 using Umbraco.Net;
 using Umbraco.Web.BackOffice.ActionResults;
 using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.Identity;
 using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.WebAssets;
 

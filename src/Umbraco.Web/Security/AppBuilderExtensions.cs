@@ -11,6 +11,7 @@ using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
 using Owin;
 using Umbraco.Core;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -19,7 +20,6 @@ using Umbraco.Core.Mapping;
 using Umbraco.Net;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Models.Identity;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Security

@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Mapping;
@@ -14,14 +15,17 @@ namespace Umbraco.Extensions
     {
         public static void AddUmbracoBackOfficeIdentity(this IServiceCollection services)
         {
+            services.AddDataProtection();
+
             // UmbracoMapper - hack?
-            services.AddSingleton<IdentityMapDefinition>();
-            services.AddSingleton(s => new MapDefinitionCollection(new[] {s.GetService<IdentityMapDefinition>()}));
-            services.AddSingleton<UmbracoMapper>();
+            services.TryAddSingleton<IdentityMapDefinition>();
+            services.TryAddSingleton(s => new MapDefinitionCollection(new[] {s.GetService<IdentityMapDefinition>()}));
+            services.TryAddSingleton<UmbracoMapper>();
 
-            services.AddScoped<IIpResolver, AspNetIpResolver>();
+            services.TryAddScoped<IIpResolver, AspNetIpResolver>();
 
-            services.AddIdentity<BackOfficeIdentityUser, IdentityRole>(options =>
+            services.AddIdentityCore<BackOfficeIdentityUser>();
+            services.AddIdentityCore<BackOfficeIdentityUser>(options =>
                 {
                     options.User.RequireUniqueEmail = true;
 
@@ -43,9 +47,12 @@ namespace Umbraco.Extensions
                 })
                 .AddDefaultTokenProviders()
                 .AddUserStore<BackOfficeUserStore>()
-                .AddUserManager<BackOfficeUserManager>();
+                .AddUserManager<BackOfficeUserManager>()
+                .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>>();
 
-            // .AddClaimsPrincipalFactory<UserClaimsPrincipalFactory<BackOfficeIdentityUser, IdentityRole>>() // TODO: extract custom claims principal factory
+            services.AddScoped<ILookupNormalizer, NopLookupNormalizer>();
+            services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<BackOfficeIdentityUser>>();
+
         }
     }
 }

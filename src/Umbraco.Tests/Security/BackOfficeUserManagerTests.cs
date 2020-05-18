@@ -6,11 +6,11 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Owin.Security.DataProtection;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Net;
-using Umbraco.Web.Models.Identity;
-using Umbraco.Web.Security;
+using BackOfficeUserManager = Umbraco.Web.Security.BackOfficeUserManager;
 
 namespace Umbraco.Tests.Security
 {

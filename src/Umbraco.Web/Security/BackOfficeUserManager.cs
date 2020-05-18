@@ -8,12 +8,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Owin.Security.DataProtection;
 using Umbraco.Core;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
-using Umbraco.Web.Models.Identity;
 
 namespace Umbraco.Web.Security
 {

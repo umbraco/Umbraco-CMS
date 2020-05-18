@@ -20,7 +20,6 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Core.Services;
 using Umbraco.Web.Features;
-using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
 using JArray = Newtonsoft.Json.Linq.JArray;
@@ -32,6 +31,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Core.WebAssets;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebAssets;
+using BackOfficeIdentityUser = Umbraco.Core.BackOffice.BackOfficeIdentityUser;
 
 namespace Umbraco.Web.Editors
 {
