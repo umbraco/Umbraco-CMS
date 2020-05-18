@@ -14,13 +14,13 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// before their timeout expires.
     /// </remarks>
     [IsBackOffice]
-    [UmbracoUserTimeoutFilter]
+    //[UmbracoUserTimeoutFilter] //TODO reintroduce
     [UmbracoAuthorize]
     [DisableBrowserCache]
     [UmbracoWebApiRequireHttps]
-    [CheckIfUserTicketDataIsStale]
-    [UnhandedExceptionLoggerConfiguration]
-    [EnableDetailedErrors]
+    //[CheckIfUserTicketDataIsStale] //TODO reintroduce
+    //[UnhandedExceptionLoggerConfiguration] //TODO reintroduce
+    //[EnableDetailedErrors] //TODO reintroduce
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
     {
 
