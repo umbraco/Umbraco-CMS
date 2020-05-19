@@ -1,4 +1,5 @@
 <button
+    type="button"
     data-element="{{vm.element}}"
     class="btn-reset umb-button-ellipsis {{vm.cssClass}}"
     style="color:{{vm.color}};"
@@ -8,19 +9,11 @@
     <span class="button-ellipsis__text" ng-class="{'sr-only': vm.showText !== true}">{{vm.text}}</span>
 </button>
 
-<!--<button class="btn-reset umb-tab-button umb-tab-button--expand" ng-click="vm.toggleTray()" type="button">
-    <i></i><i></i><i></i> HEP
-    <span class="sr-only"><localize key="visuallyHiddenTexts_tabExpand">View more options</localize></span>
-</button>
 
-<a data-element="sub-view-{{moreButton.alias}}"
+<!-- <a data-element="sub-view-{{moreButton.alias}}"
 href=""
 ng-click="toggleDropdown()"
 ng-class="{'is-active': moreButton.active}">
 <div class="umb-sub-views-nav-item-more__icon"><i></i><i></i><i></i>HEP HEPY HEY HEY</div>
 <span class="umb-sub-views-nav-item-text">{{ moreButton.name }}</span>
-</a>
-
-<a href="#" ng-click="trayClick()" prevent-default aria-label="More sections">
-    <span class="section__name">&bull;&bull;&bull;</span>
 </a> -->
