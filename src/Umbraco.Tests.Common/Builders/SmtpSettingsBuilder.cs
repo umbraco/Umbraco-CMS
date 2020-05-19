@@ -16,6 +16,7 @@ namespace Umbraco.Tests.Common.Builders
         private string _host;
         private int? _port;
         private string _pickupDirectoryLocation;
+        private string _deliveryMethod;
 
         public SmtpSettingsBuilder(TParent parentBuilder) : base(parentBuilder)
         {
@@ -45,12 +46,19 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
+        public SmtpSettingsBuilder<TParent> WithDeliveryMethod(string deliveryMethod)
+        {
+            _deliveryMethod = deliveryMethod;
+            return this;
+        }
+
         public override ISmtpSettings Build()
         {
             var from = _from ?? null;
             var host = _host ?? null;
             var port = _port ?? 25;
             var pickupDirectoryLocation = _pickupDirectoryLocation ?? null;
+            var deliveryMethod = _deliveryMethod ?? null;
 
             return new TestSmtpSettings()
             {
@@ -58,6 +66,7 @@ namespace Umbraco.Tests.Common.Builders
                 Host = host,
                 Port = port,
                 PickupDirectoryLocation = pickupDirectoryLocation,
+                DeliveryMethod = deliveryMethod
             };
         }
 
@@ -67,6 +76,7 @@ namespace Umbraco.Tests.Common.Builders
             public string Host { get; set; }
             public int Port { get; set; }
             public string PickupDirectoryLocation { get; set; }
+            public string DeliveryMethod { get; set; }
         }
     }
 }

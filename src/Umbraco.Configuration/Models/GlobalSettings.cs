@@ -72,10 +72,10 @@ namespace Umbraco.Configuration.Models
             _configuration.GetValue(Prefix + "NoNodesViewPath", "~/config/splashes/NoNodes.cshtml");
 
         public bool IsSmtpServerConfigured =>
-            _configuration.GetSection(Constants.Configuration.ConfigPrefix + "Smtp")?.GetChildren().Any() ?? false;
+            _configuration.GetSection(Constants.Configuration.ConfigGlobalPrefix + "Smtp")?.GetChildren().Any() ?? false;
 
         public ISmtpSettings SmtpSettings =>
-            new SmtpSettingsImpl(_configuration.GetSection(Constants.Configuration.ConfigPrefix + "Smtp"));
+            new SmtpSettingsImpl(_configuration.GetSection(Constants.Configuration.ConfigGlobalPrefix + "Smtp"));
 
         private class SmtpSettingsImpl : ISmtpSettings
         {
@@ -90,6 +90,7 @@ namespace Umbraco.Configuration.Models
             public string Host => _configurationSection.GetValue<string>("Host");
             public int Port => _configurationSection.GetValue<int>("Port");
             public string PickupDirectoryLocation => _configurationSection.GetValue<string>("PickupDirectoryLocation");
+            public string DeliveryMethod => _configurationSection.GetValue<string>("DeliveryMethod");
         }
     }
 }

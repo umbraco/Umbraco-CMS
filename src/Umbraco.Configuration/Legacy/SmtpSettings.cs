@@ -8,5 +8,6 @@ namespace Umbraco.Configuration
         public string Host { get; set; }
         public int Port { get; set; }
         public string PickupDirectoryLocation { get; set; }
+        public string DeliveryMethod { get; set; }
     }
 }

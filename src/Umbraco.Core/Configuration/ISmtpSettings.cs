@@ -6,5 +6,6 @@ namespace Umbraco.Core.Configuration
         string Host { get; }
         int Port{ get; }
         string PickupDirectoryLocation { get; }
+        string DeliveryMethod { get; }
     }
 }
