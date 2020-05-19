@@ -8,10 +8,9 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Net;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Web.Security;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Compose
 {

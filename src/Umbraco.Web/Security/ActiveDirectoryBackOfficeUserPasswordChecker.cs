@@ -1,8 +1,8 @@
 ﻿using System;
 using System.DirectoryServices.AccountManagement;
 using System.Threading.Tasks;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
-using Umbraco.Web.Models.Identity;
 
 namespace Umbraco.Web.Security
 {

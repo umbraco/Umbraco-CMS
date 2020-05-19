@@ -18,15 +18,16 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Core.Services;
 using Umbraco.Web.Features;
-using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.WebAssets;
+using Umbraco.Extensions;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebAssets;
+using BackOfficeIdentityUser = Umbraco.Core.BackOffice.BackOfficeIdentityUser;
 
 namespace Umbraco.Web.Editors
 {
@@ -40,7 +41,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly UmbracoFeatures _features;
         private readonly IRuntimeState _runtimeState;
-        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
+        private BackOfficeOwinUserManager _userManager;
         private BackOfficeSignInManager _signInManager;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IGridConfig _gridConfig;
@@ -85,7 +86,7 @@ namespace Umbraco.Web.Editors
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
 
-        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager ?? (_userManager = OwinContext.GetBackOfficeUserManager());
+        protected BackOfficeOwinUserManager UserManager => _userManager ?? (_userManager = OwinContext.GetBackOfficeUserManager());
 
         protected IAuthenticationManager AuthenticationManager => OwinContext.Authentication;
 

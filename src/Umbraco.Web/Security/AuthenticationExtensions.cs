@@ -12,8 +12,9 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.BackOffice;
+using Umbraco.Extensions;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Security;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Security
@@ -333,38 +334,6 @@ namespace Umbraco.Web.Security
             return secureDataFormat.Unprotect(formsCookie);
         }
 
-          /// <summary>
-        /// This will return the current back office identity if the IPrincipal is the correct type
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        public static UmbracoBackOfficeIdentity GetUmbracoIdentity(this IPrincipal user)
-        {
-            //If it's already a UmbracoBackOfficeIdentity
-            if (user.Identity is UmbracoBackOfficeIdentity backOfficeIdentity) return backOfficeIdentity;
-
-            //Check if there's more than one identity assigned and see if it's a UmbracoBackOfficeIdentity and use that
-            if (user is ClaimsPrincipal claimsPrincipal)
-            {
-                backOfficeIdentity = claimsPrincipal.Identities.OfType<UmbracoBackOfficeIdentity>().FirstOrDefault();
-                if (backOfficeIdentity != null) return backOfficeIdentity;
-            }
-
-            //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd and has the back office session
-            if (user.Identity is ClaimsIdentity claimsIdentity && claimsIdentity.IsAuthenticated && claimsIdentity.HasClaim(x => x.Type == Constants.Security.SessionIdClaimType))
-            {
-                try
-                {
-                    return UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);
-                }
-                catch (InvalidOperationException)
-                {
-                }
-            }
-
-            return null;
-        }
-
         /// <summary>
         /// Ensures that the thread culture is set based on the back office user's culture
         /// </summary>
@@ -383,12 +352,5 @@ namespace Umbraco.Web.Security
         /// Used so that we aren't creating a new CultureInfo object for every single request
         /// </summary>
         private static readonly ConcurrentDictionary<string, CultureInfo> UserCultures = new ConcurrentDictionary<string, CultureInfo>();
-
-        public static string ToErrorMessage(this IEnumerable<IdentityError> errors)
-        {
-            if (errors == null) throw new ArgumentNullException(nameof(errors));
-            return string.Join(", ", errors.Select(x => x.Description).ToList());
-        }
-
     }
 }

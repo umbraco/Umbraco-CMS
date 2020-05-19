@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Owin.Security.DataProtection;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.Security

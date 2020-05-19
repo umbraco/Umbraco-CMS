@@ -1,7 +1,7 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Mapping;
-using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Models.Mapping;
 
 namespace Umbraco.Web.Composing.CompositionExtensions

@@ -5,11 +5,10 @@ using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models.Membership;
 using Microsoft.Owin;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Web.Models.Identity;
 
 namespace Umbraco.Web.Security
 {
@@ -71,8 +70,8 @@ namespace Umbraco.Web.Security
             }
         }
 
-        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
-        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
+        private BackOfficeOwinUserManager _userManager;
+        protected BackOfficeOwinUserManager UserManager
             => _userManager ?? (_userManager = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().GetBackOfficeUserManager());
 
         [Obsolete("This needs to be removed, ASP.NET Identity should always be used for this operation, this is currently only used in the installer which needs to be updated")]

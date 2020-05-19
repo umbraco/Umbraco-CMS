@@ -43,6 +43,7 @@ namespace Umbraco.Web.UI.BackOffice
             services.AddUmbracoCore(_env, out var factory);
             services.AddUmbracoWebComponents();
             services.AddUmbracoRuntimeMinifier(_config);
+            services.AddUmbracoBackOfficeIdentity();
 
             services.AddMvc();
 

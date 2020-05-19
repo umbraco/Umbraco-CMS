@@ -1,12 +1,11 @@
 ﻿using System;
-using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Web.Models.Identity
+namespace Umbraco.Core.BackOffice
 {
     public class IdentityMapDefinition : IMapDefinition
     {

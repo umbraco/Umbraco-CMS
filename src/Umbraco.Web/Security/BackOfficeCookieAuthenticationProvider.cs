@@ -4,10 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
@@ -77,12 +75,12 @@ namespace Umbraco.Web.Security
                 Expires = DateTime.Now.AddYears(-1),
                 Path = "/"
             });
-            context.Response.Cookies.Append(Core.Constants.Web.PreviewCookieName, "", new CookieOptions
+            context.Response.Cookies.Append(Constants.Web.PreviewCookieName, "", new CookieOptions
             {
                 Expires = DateTime.Now.AddYears(-1),
                 Path = "/"
             });
-            context.Response.Cookies.Append(Core.Constants.Security.BackOfficeExternalCookieName, "", new CookieOptions
+            context.Response.Cookies.Append(Constants.Security.BackOfficeExternalCookieName, "", new CookieOptions
             {
                 Expires = DateTime.Now.AddYears(-1),
                 Path = "/"

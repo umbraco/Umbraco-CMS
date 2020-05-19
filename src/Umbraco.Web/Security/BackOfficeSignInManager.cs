@@ -8,9 +8,9 @@ using Microsoft.Owin;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Security;
-using Umbraco.Web.Models.Identity;
+using Umbraco.Core.BackOffice;
 
 namespace Umbraco.Web.Security
 {

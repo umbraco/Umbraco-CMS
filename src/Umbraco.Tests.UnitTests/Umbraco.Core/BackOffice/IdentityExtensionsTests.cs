@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 using NUnit.Framework;
-using Umbraco.Web.Security;
+using Umbraco.Extensions;
 
 namespace Umbraco.Tests.Security
 {
-    public class AuthenticationExtensionsTests
+    public class IdentityExtensionsTests
     {
         [Test]
         public void ToErrorMessage_When_Errors_Are_Null_Expect_ArgumentNullException()

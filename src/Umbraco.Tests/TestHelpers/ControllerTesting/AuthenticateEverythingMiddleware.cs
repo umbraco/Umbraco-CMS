@@ -4,7 +4,7 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Infrastructure;
 using Owin;
-using Umbraco.Core.Security;
+using Umbraco.Core.BackOffice;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting
 {

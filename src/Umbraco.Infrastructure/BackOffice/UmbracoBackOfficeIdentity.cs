@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using Umbraco.Web;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Core.BackOffice
 {
 
     /// <summary>

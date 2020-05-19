@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,8 +9,9 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Web.Security;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -34,8 +34,9 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly ISecuritySettings _securitySettings;
         private readonly IConnectionStrings _connectionStrings;
         private readonly ICookieManager _cookieManager;
+        private readonly BackOfficeUserManager _userManager;
 
-        public NewInstallStep(IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration, ISecuritySettings securitySettings, IConnectionStrings connectionStrings, ICookieManager cookieManager)
+        public NewInstallStep(IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration, ISecuritySettings securitySettings, IConnectionStrings connectionStrings, ICookieManager cookieManager, BackOfficeUserManager userManager)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
@@ -44,6 +45,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _securitySettings = securitySettings ?? throw new ArgumentNullException(nameof(securitySettings));
             _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
             _cookieManager = cookieManager;
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
 
         public override async Task<InstallSetupResult> ExecuteAsync(UserModel user)
@@ -59,26 +61,21 @@ namespace Umbraco.Web.Install.InstallSteps
 
             _userService.Save(admin);
 
-            //TODO: This needs to be reintroduced, when users are compatible with ASP.NET Core Identity.
-            // var userManager = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().GetBackOfficeUserManager();
-            // var membershipUser = await userManager.FindByIdAsync(Constants.Security.SuperUserId.ToString());
-            // if (membershipUser == null)
-            // {
-            //     throw new InvalidOperationException(
-            //         $"No user found in membership provider with id of {Constants.Security.SuperUserId}.");
-            // }
-            //
-            // //To change the password here we actually need to reset it since we don't have an old one to use to change
-            // var resetToken = await userManager.GeneratePasswordResetTokenAsync(membershipUser);
-            // if (string.IsNullOrWhiteSpace(resetToken))
-            //     throw new InvalidOperationException("Could not reset password: unable to generate internal reset token");
-            //
-            // var resetResult = await userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
-            // if (!resetResult.Succeeded)
-            //     throw new InvalidOperationException("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));
+            var membershipUser = await _userManager.FindByIdAsync(Constants.Security.SuperUserId.ToString());
+            if (membershipUser == null)
+            {
+                throw new InvalidOperationException(
+                    $"No user found in membership provider with id of {Constants.Security.SuperUserId}.");
+            }
 
+            //To change the password here we actually need to reset it since we don't have an old one to use to change
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(membershipUser);
+            if (string.IsNullOrWhiteSpace(resetToken))
+                throw new InvalidOperationException("Could not reset password: unable to generate internal reset token");
 
-
+            var resetResult = await _userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
+            if (!resetResult.Succeeded)
+                throw new InvalidOperationException("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));
 
             if (user.SubscribeToNewsLetter)
             {

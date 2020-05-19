@@ -1,8 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Umbraco.Web.Models.Identity;
 
-namespace Umbraco.Web.Security
+namespace Umbraco.Core.BackOffice
 {
     public class BackOfficeUserValidator<T> : UserValidator<T>
         where T : BackOfficeIdentityUser
