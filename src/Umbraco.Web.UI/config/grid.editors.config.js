@@ -10,6 +10,38 @@
         "nameTemplate": "{{ value && value.udi ? (value.udi | ncNodeName) : '' }}",
         "alias": "media",
         "view": "media",
+        "config": {
+            "size": {
+                "width": 500,
+                "height": 500
+            }
+        },
+        "icon": "icon-picture"
+    },
+    {
+        "name": "Landscape Image",
+        "nameTemplate": "{{ value && value.udi ? (value.udi | ncNodeName) : '' }}",
+        "alias": "media.landscape",
+        "view": "media",
+        "config": {
+            "size": {
+                "width": 800,
+                "height": 450
+            }
+        },
+        "icon": "icon-picture"
+    },
+    {
+        "name": "Portrait Image",
+        "nameTemplate": "{{ value && value.udi ? (value.udi | ncNodeName) : '' }}",
+        "alias": "media.portrait",
+        "view": "media",
+        "config": {
+            "size": {
+                "width": 450,
+                "height": 800
+            }
+        },
         "icon": "icon-picture"
     },
     {

@@ -40,14 +40,16 @@
                     </h5>
 
                     <div>
-                        <umb-image-crop height="{{cropSize.height}}"
-                                        width="{{cropSize.width}}"
-                                        crop="target.coordinates"
-                                        center="target.focalPoint"
-                                        max-size="450"
-                                        src="target.url">
+                        <umb-image-crop height="{{model.cropSize.height}}"
+                                        width="{{model.cropSize.width}}"
+                                        crop="model.target.coordinates"
+                                        center="model.target.focalPoint"
+                                        max-size="400"
+                                        src="model.target.image">
                         </umb-image-crop>
                     </div>
+
+                    <pre>{{model|json}}</pre>
                 </div>
 
             </div>
