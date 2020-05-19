@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Collections.Generic;
+using System.Net.Mail;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web;
@@ -328,12 +329,20 @@ namespace Umbraco.Web.Editors
                         UmbracoUserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings),
                         new[] { identityUser.UserName, callbackUrl });
 
-                    // TODO: Port email service to ASP.NET Core
-                    /*await UserManager.SendEmailAsync(identityUser.Id,
-                        Services.TextService.Localize("login/resetPasswordEmailCopySubject",
-                            // Ensure the culture of the found user is used for the email!
-                            UmbracoUserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings)),
-                        message);*/
+                    var subject = Services.TextService.Localize("login/resetPasswordEmailCopySubject",
+                        // Ensure the culture of the found user is used for the email!
+                        UmbracoUserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings));
+
+                    var emailSender = new EmailSender(GlobalSettings, true);
+                    var mailMessage = new MailMessage()
+                    {
+                        Subject = subject,
+                        Body = message,
+                        IsBodyHtml = true
+                    };
+                    mailMessage.To.Add(user.Email);
+
+                    await emailSender.SendAsync(mailMessage);
 
                     UserManager.RaiseForgotPasswordRequestedEvent(user.Id);
                 }

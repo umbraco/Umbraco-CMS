@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Mail;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -500,17 +501,16 @@ namespace Umbraco.Web.Editors
                 UmbracoUserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
 
-            // TODO: Port email service to ASP.NET Core
-            /*await UserManager.EmailService.SendAsync(
-                //send the special UmbracoEmailMessage which configures it's own sender
-                //to allow for events to handle sending the message if no smtp is configured
-                new UmbracoEmailMessage(new EmailSender(GlobalSettings, true))
-                {
-                    Body = emailBody,
-                    Destination = userDisplay.Email,
-                    Subject = emailSubject
-                });*/
+            var emailSender = new EmailSender(GlobalSettings, true);
+            var mailMessage = new MailMessage()
+            {
+                Subject = emailSubject,
+                Body = emailBody,
+                IsBodyHtml = true
+            };
+            mailMessage.To.Add(to.Email);
 
+            await emailSender.SendAsync(mailMessage);
         }
 
         /// <summary>
