@@ -9,6 +9,12 @@
     opacity: 0.8;
     transition: opacity .3s ease-out;
 
+    &.show-text{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
     &:hover,
     &:focus{
         opacity: 1;
@@ -25,5 +31,13 @@
 
     &__icon {
         color: inherit;
+        flex-basis: 100%;
+    }
+
+    &__text {
+        color: inherit;
+        font-size: 12px;
+        line-height: 1em;
+        flex-basis: 100%;
     }
 }
