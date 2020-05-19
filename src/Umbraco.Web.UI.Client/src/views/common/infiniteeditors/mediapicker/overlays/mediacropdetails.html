@@ -36,29 +36,17 @@
 
                 <div ng-if="!model.disableFocalPoint">
                     <h5>
-                        <localize key="@general_focalPoint">Focal point</localize>
+                        <localize key="@general_cropSection">Crop section</localize>
                     </h5>
 
-                    <div ng-if="model.target.url">
-                        <umb-image-gravity src="model.target.url"
-                                           center="model.target.focalPoint"
-                                           on-value-changed="vm.focalPointChanged(left, top)">
-                        </umb-image-gravity>
-                    </div>
-
-                    <div ng-if="model.cropSize">
-
-                        <h5>
-                            <localize key="general_preview">Preview</localize>
-                        </h5>
-
-                        <umb-image-thumbnail center="target.focalPoint"
-                                             src="target.url"
-                                             height="{{model.cropSize.height}}"
-                                             width="{{model.cropSize.width}}"
-                                             max-size="400">
-                        </umb-image-thumbnail>
-
+                    <div>
+                        <umb-image-crop height="{{cropSize.height}}"
+                                        width="{{cropSize.width}}"
+                                        crop="target.coordinates"
+                                        center="target.focalPoint"
+                                        max-size="450"
+                                        src="target.url">
+                        </umb-image-crop>
                     </div>
                 </div>
 
