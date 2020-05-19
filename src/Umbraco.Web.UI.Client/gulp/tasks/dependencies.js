@@ -237,6 +237,14 @@ function dependencies() {
             "name": "underscore",
             "src":  ["node_modules/underscore/underscore-min.js"],
             "base": "./node_modules/underscore"
+        },
+        {
+            "name": "wicg-inert",
+            "src": [
+                "./node_modules/wicg-inert/dist/inert.min.js",
+                "./node_modules/wicg-inert/dist/inert.min.js.map"
+            ],
+            "base": "./node_modules/wicg-inert"
         }
     ];
 
