@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -175,7 +176,8 @@ namespace Umbraco.Web.Common.Extensions
             var globalSettings = configs.Global();
             var connStrings = configs.ConnectionStrings();
             var appSettingMainDomLock = globalSettings.MainDomLock;
-            var mainDomLock = appSettingMainDomLock == "SqlMainDomLock"
+            var isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            var mainDomLock = appSettingMainDomLock == "SqlMainDomLock" || isLinux == true
                 ? (IMainDomLock)new SqlMainDomLock(logger, globalSettings, connStrings, dbProviderFactoryCreator)
                 : new MainDomSemaphoreLock(logger, hostingEnvironment);
 

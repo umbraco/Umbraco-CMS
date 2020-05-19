@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Web;
 using Umbraco.Core;
@@ -31,7 +32,8 @@ namespace Umbraco.Web
 
             // Determine if we should use the sql main dom or the default
             var appSettingMainDomLock = globalSettings.MainDomLock;
-            var mainDomLock = appSettingMainDomLock == "SqlMainDomLock"
+            var isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            var mainDomLock = appSettingMainDomLock == "SqlMainDomLock" || isLinux == true
                 ? (IMainDomLock)new SqlMainDomLock(logger, globalSettings, connectionStrings, dbProviderFactoryCreator)
                 : new MainDomSemaphoreLock(logger, hostingEnvironment);
 
