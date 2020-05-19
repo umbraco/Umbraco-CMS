@@ -210,27 +210,14 @@ namespace Umbraco.Web
 
                 case RuntimeLevel.Install:
                 case RuntimeLevel.Upgrade:
-                    // redirect to install
-                    ReportRuntime(level, "Umbraco must install or upgrade.");
-                    var installPath = _uriUtility.ToAbsolute(Constants.SystemDirectories.Install);
-                    var installUrl = $"{installPath}/?redir=true&url={HttpUtility.UrlEncode(uri.ToString())}";
-                    httpContext.Response.Redirect(installUrl, true);
+
+                    // NOTE: We have moved the logic that was here to netcore already
+
                     return false; // cannot serve content
 
                 default:
                     throw new NotSupportedException($"Unexpected runtime level: {level}.");
             }
-        }
-
-        private static bool _reported;
-        private static RuntimeLevel _reportedLevel;
-
-        private void ReportRuntime(RuntimeLevel level, string message)
-        {
-            if (_reported && _reportedLevel == level) return;
-            _reported = true;
-            _reportedLevel = level;
-            _logger.Warn<UmbracoModule>(message);
         }
 
         // ensures Umbraco has at least one published node
@@ -309,47 +296,7 @@ namespace Umbraco.Web
         }
 
 
-        /// <summary>
-        /// Any object that is in the HttpContext.Items collection that is IDisposable will get disposed on the end of the request
-        /// </summary>
-        /// <param name="http"></param>
-        private void DisposeRequestCacheItems(HttpContext http, IRequestCache requestCache)
-        {
-            // do not process if client-side request
-            if (http.Request.Url.IsClientSideRequest())
-                return;
-
-            //get a list of keys to dispose
-            var keys = new HashSet<string>();
-            foreach (var i in requestCache)
-            {
-                if (i.Value is IDisposeOnRequestEnd || i.Key is IDisposeOnRequestEnd)
-                {
-                    keys.Add(i.Key);
-                }
-            }
-            //dispose each item and key that was found as disposable.
-            foreach (var k in keys)
-            {
-                try
-                {
-                    requestCache.Get(k).DisposeIfDisposable();
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error<UmbracoModule>("Could not dispose item with key " + k, ex);
-                }
-                try
-                {
-                    k.DisposeIfDisposable();
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error<UmbracoModule>("Could not dispose item key " + k, ex);
-                }
-            }
-        }
-
+        
         #endregion
 
         #region IHttpModule
@@ -361,53 +308,11 @@ namespace Umbraco.Web
         /// <param name="app"></param>
         public void Init(HttpApplication app)
         {
-            if (_runtime.Level == RuntimeLevel.BootFailed)
-            {
-                // there's nothing we can do really
-                app.BeginRequest += (sender, args) =>
-                {
-                    // would love to avoid throwing, and instead display a customized Umbraco 500
-                    // page - however if we don't throw here, something else might go wrong, and
-                    // it's this later exception that would be reported. could not figure out how
-                    // to prevent it, either with httpContext.Response.End() or .ApplicationInstance
-                    // .CompleteRequest()
-
-                    // also, if something goes wrong with our DI setup, the logging subsystem may
-                    // not even kick in, so here we try to give as much detail as possible
-
-                    BootFailedException.Rethrow(Current.RuntimeState.BootFailedException);
-                };
-                return;
-            }
-
             app.BeginRequest += (sender, e) =>
             {
                 var httpContext = ((HttpApplication) sender).Context;
 
-                LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, _requestCache);
-
-                _logger.Verbose<UmbracoModule>("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, httpContext.Request.Url);
                 BeginRequest(new HttpContextWrapper(httpContext));
-            };
-
-            //disable asp.net headers (security)
-            // This is the correct place to modify headers according to MS:
-            // https://our.umbraco.com/forum/umbraco-7/using-umbraco-7/65241-Heap-error-from-header-manipulation?p=0#comment220889
-            app.PostReleaseRequestState += (sender, args) =>
-            {
-                var httpContext = ((HttpApplication) sender).Context;
-                try
-                {
-                    httpContext.Response.Headers.Remove("Server");
-                    //this doesn't normally work since IIS sets it but we'll keep it here anyways.
-                    httpContext.Response.Headers.Remove("X-Powered-By");
-                    httpContext.Response.Headers.Remove("X-AspNet-Version");
-                    httpContext.Response.Headers.Remove("X-AspNetMvc-Version");
-                }
-                catch (PlatformNotSupportedException)
-                {
-                    // can't remove headers this way on IIS6 or cassini.
-                }
             };
 
             app.PostAuthenticateRequest += (sender, e) =>
@@ -427,16 +332,7 @@ namespace Umbraco.Web
             {
                 var httpContext = ((HttpApplication) sender).Context;
 
-                if (Current.UmbracoContext != null && Current.UmbracoContext.IsFrontEndUmbracoRequest)
-                {
-                    LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, _requestCache);
-
-                    _logger.Verbose<UmbracoModule>("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, httpContext.Request.Url, DateTime.Now.Subtract(Current.UmbracoContext.ObjectCreated).TotalMilliseconds);
-                }
-
                 UmbracoModule.OnEndRequest(this, new UmbracoRequestEventArgs(Current.UmbracoContext));
-
-                DisposeRequestCacheItems(httpContext, _requestCache);
             };
         }
 

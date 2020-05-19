@@ -27,8 +27,6 @@ namespace Umbraco.Extensions
             return runtime.State.Level > RuntimeLevel.BootFailed;
         }
 
-        
-
         /// <summary>
         /// Start Umbraco
         /// </summary>
@@ -38,27 +36,20 @@ namespace Umbraco.Extensions
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
 
-            if (app.UmbracoCanBoot())
-            {
-                var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
+            if (!app.UmbracoCanBoot()) return app;
 
-                // Register a listener for application shutdown in order to terminate the runtime
-                var hostLifetime = app.ApplicationServices.GetRequiredService<IApplicationShutdownRegistry>();
-                var runtimeShutdown = new CoreRuntimeShutdown(runtime, hostLifetime);
-                hostLifetime.RegisterObject(runtimeShutdown);
+            var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
+            // Register a listener for application shutdown in order to terminate the runtime
+            var hostLifetime = app.ApplicationServices.GetRequiredService<IApplicationShutdownRegistry>();
+            var runtimeShutdown = new CoreRuntimeShutdown(runtime, hostLifetime);
+            hostLifetime.RegisterObject(runtimeShutdown);
 
-                // Register our global threadabort enricher for logging
-                var threadAbortEnricher = app.ApplicationServices.GetRequiredService<ThreadAbortExceptionEnricher>();
-                LogContext.Push(threadAbortEnricher); // NOTE: We are not in a using clause because we are not removing it, it is on the global context
+            // Register our global threadabort enricher for logging
+            var threadAbortEnricher = app.ApplicationServices.GetRequiredService<ThreadAbortExceptionEnricher>();
+            LogContext.Push(threadAbortEnricher); // NOTE: We are not in a using clause because we are not removing it, it is on the global context
 
-                // Start the runtime!
-                runtime.Start();
-            }
-            else
-            {
-                // TODO: Register simple middleware to show the error like we used to in UmbracoModule? Or maybe that's part of a UseUmbracoWebsite/backoffice type thing .. probably :)
-
-            }
+            // Start the runtime!
+            runtime.Start();
 
             return app;
         }
@@ -73,13 +64,24 @@ namespace Umbraco.Extensions
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
 
-            if (!app.UmbracoCanBoot()) return app;
+            if (!app.UmbracoCanBoot())
+            {
+                app.UseMiddleware<BootFailedMiddleware>();
+            }
+            else
+            {
+                app.UseMiddleware<UmbracoRequestMiddleware>();
+                app.UseMiddleware<MiniProfilerMiddleware>();
+            }
 
-            app.UseMiddleware<UmbracoRequestMiddleware>();
-            app.UseMiddleware<MiniProfilerMiddleware>();
             return app;
         }
 
+        /// <summary>
+        /// Adds request based serilog enrichers to the LogContext for each request
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns></returns>
         public static IApplicationBuilder UseUmbracoRequestLogging(this IApplicationBuilder app)
         {
             if (app == null) throw new ArgumentNullException(nameof(app));

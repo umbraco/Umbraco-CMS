@@ -34,10 +34,6 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static IServiceCollection AddUmbracoWebComponents(this IServiceCollection services)
         {
-            services.AddTransient<UmbracoRequestLoggingMiddleware>();
-            services.AddTransient<UmbracoRequestMiddleware>();
-
-            services.TryAddSingleton<UmbracoJsonModelBinder>();
             services.ConfigureOptions<UmbracoMvcConfigureOptions>();
             services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoApiBehaviorApplicationModelProvider>());
 
