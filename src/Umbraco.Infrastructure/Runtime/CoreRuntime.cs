@@ -185,23 +185,19 @@ namespace Umbraco.Core.Runtime
                 // register ourselves (TODO: Should we put this in RegisterEssentials?)
                 composition.Register<IRuntime>(_ => this, Lifetime.Singleton);
 
-                // determine our runtime level
-                DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
-
-                // get composers, and compose
-                var composerTypes = ResolveComposerTypes(typeLoader);
-
-                IEnumerable<Attribute> enableDisableAttributes;
-                using (ProfilingLogger.DebugDuration<CoreRuntime>("Scanning enable/disable composer attributes"))
+                try
                 {
-                    enableDisableAttributes = typeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
+                    // determine our runtime level
+                    DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
+                }
+                finally
+                {
+                    // always run composers
+                    RunComposers(typeLoader, composition);
                 }
 
-                var composers = new Composers(composition, composerTypes, enableDisableAttributes, ProfilingLogger);
-                composers.Compose();
-
-                // create the factory
-                factory = composition.CreateFactory();
+                 // create the factory
+                 factory = composition.CreateFactory();
             }
             catch (Exception e)
             {
@@ -284,6 +280,21 @@ namespace Umbraco.Core.Runtime
                 msg += ".";
                 Logger.Error<CoreRuntime>(exception, msg);
             };
+        }
+
+        private void RunComposers(TypeLoader typeLoader, Composition composition)
+        {
+            // get composers, and compose
+            var composerTypes = ResolveComposerTypes(typeLoader);
+
+            IEnumerable<Attribute> enableDisableAttributes;
+            using (ProfilingLogger.DebugDuration<CoreRuntime>("Scanning enable/disable composer attributes"))
+            {
+                enableDisableAttributes = typeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
+            }
+
+            var composers = new Composers(composition, composerTypes, enableDisableAttributes, ProfilingLogger);
+            composers.Compose();
         }
 
         private bool AcquireMainDom(IMainDom mainDom, IApplicationShutdownRegistry applicationShutdownRegistry)

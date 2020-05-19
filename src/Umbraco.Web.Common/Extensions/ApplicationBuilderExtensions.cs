@@ -36,8 +36,9 @@ namespace Umbraco.Extensions
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
 
-            var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
+            if (!app.UmbracoCanBoot()) return app;
 
+            var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
             // Register a listener for application shutdown in order to terminate the runtime
             var hostLifetime = app.ApplicationServices.GetRequiredService<IApplicationShutdownRegistry>();
             var runtimeShutdown = new CoreRuntimeShutdown(runtime, hostLifetime);
@@ -65,14 +66,14 @@ namespace Umbraco.Extensions
 
             if (!app.UmbracoCanBoot())
             {
-                app.UseMiddleware<BootFailedMiddleware>();                
+                app.UseMiddleware<BootFailedMiddleware>();
             }
             else
             {
                 app.UseMiddleware<UmbracoRequestMiddleware>();
                 app.UseMiddleware<MiniProfilerMiddleware>();
             }
-            
+
             return app;
         }
 

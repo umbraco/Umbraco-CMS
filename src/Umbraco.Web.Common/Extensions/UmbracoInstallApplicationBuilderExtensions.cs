@@ -13,6 +13,8 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static IApplicationBuilder UseUmbracoInstaller(this IApplicationBuilder app)
         {
+            if (!app.UmbracoCanBoot()) return app;
+
             app.UseEndpoints(endpoints =>
             {
                 var installerRoutes = app.ApplicationServices.GetRequiredService<InstallAreaRoutes>();
