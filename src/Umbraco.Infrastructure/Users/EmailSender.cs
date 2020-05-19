@@ -70,8 +70,8 @@ namespace Umbraco.Core
             {
                 using (var client = new SmtpClient())
                 {
-                    var appSettingsDeliveryMethod = _globalSettings.SmtpSettings.DeliveryMethod;
-                    var deliveryMethod = (SmtpDeliveryMethod)Enum.Parse(typeof(SmtpDeliveryMethod), appSettingsDeliveryMethod, true);
+                    var smtpSettingsDeliveryMethod = _globalSettings.SmtpSettings.DeliveryMethod;
+                    var deliveryMethod = (SmtpDeliveryMethod)Enum.Parse(typeof(SmtpDeliveryMethod), smtpSettingsDeliveryMethod, true);
 
                     await client.ConnectAsync(_globalSettings.SmtpSettings.Host, _globalSettings.SmtpSettings.Port);
 
