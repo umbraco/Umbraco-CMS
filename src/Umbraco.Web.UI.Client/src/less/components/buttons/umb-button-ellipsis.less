@@ -4,10 +4,15 @@
     margin: 0 10px 0 auto;
     cursor: pointer;
     border-radius: @baseBorderRadius;
-    color: black; // TODO: Can vary! / be overridden
+    color: black;
     position: relative;
-    opacity: 1;
+    opacity: 0.8;
     transition: opacity .3s ease-out;
+
+    &:hover,
+    &:focus{
+        opacity: 1;
+    }
 
     &--hidden{
         opacity: 0;
