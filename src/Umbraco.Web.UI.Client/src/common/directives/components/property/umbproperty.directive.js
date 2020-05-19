@@ -17,8 +17,13 @@ angular.module("umbraco.directives")
             templateUrl: 'views/components/property/umb-property.html',
             link: function (scope) {
                 userService.getCurrentUser().then(function (u) {
-                    var isAdmin = u.userGroups.indexOf('admin') !== -1;
-                    scope.propertyAlias = (Umbraco.Sys.ServerVariables.isDebuggingEnabled === true || isAdmin) ? scope.property.alias : null;
+                    var hasAccessToSettings = u.allowedSections.indexOf("settings") !== -1 ? true : false;
+                    
+                    // creating local propertyAlias to avoid changing the value of the referenced scope.alias.
+                    scope.propertyAlias = null;
+                    if(hasAccessToSettings && Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
+                        scope.propertyAlias = scope.property.alias;
+                    }
                 });
             },
             //Define a controller for this directive to expose APIs to other directives

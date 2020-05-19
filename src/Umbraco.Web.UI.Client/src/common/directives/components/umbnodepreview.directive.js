@@ -102,12 +102,14 @@
             if (!scope.editLabelKey) {
                 scope.editLabelKey = "general_edit";
             }
-
             userService.getCurrentUser().then(function (u) {
-
+                var hasAccessToSettings = u.allowedSections.indexOf("settings") !== -1 ? true : false;
+                
                 // creating local nodeAliasDisplay to avoid changing the value of the referenced scope.alias.
-                var hasAccessToSettings = user.allowedSections.indexOf("settings") !== -1 ? true : false;
-                scope.nodeAliasDisplay = hasAccessToSettings ? scope.alias : null;
+                scope.nodeAliasDisplay = null;
+                if(hasAccessToSettings && Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
+                    scope.nodeAliasDisplay = scope.alias;
+                }
             });
         }
 
