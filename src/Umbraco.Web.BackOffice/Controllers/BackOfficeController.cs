@@ -31,7 +31,13 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ILocalizedTextService _textService;
         private readonly IGridConfig _gridConfig;
 
-        public BackOfficeController(IRuntimeMinifier runtimeMinifier, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService, IGridConfig gridConfig)
+        public BackOfficeController(
+            IRuntimeMinifier runtimeMinifier,
+            IGlobalSettings globalSettings,
+            IHostingEnvironment hostingEnvironment,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ILocalizedTextService textService,
+            IGridConfig gridConfig)
         {
             _runtimeMinifier = runtimeMinifier;
             _globalSettings = globalSettings;
@@ -107,5 +113,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             return new JsonNetResult { Data = _gridConfig.EditorsConfig.Editors, Formatting = Formatting.None };
         }
+
+
     }
 }

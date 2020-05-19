@@ -214,10 +214,11 @@ namespace Umbraco.Web.Editors
                             "dataTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DataTypeController>(
                                 controller => controller.GetById(0))
                         },
-                        {
-                            "dashboardApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DashboardController>(
-                                controller => controller.GetDashboard(null))
-                        },
+                        //TODO Reintroduce
+                        // {
+                        //     "dashboardApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DashboardController>(
+                        //         controller => controller.GetDashboard(null))
+                        // },
                         {
                             "logApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogController>(
                                 controller => controller.GetPagedEntityLog(0, 0, 0, Direction.Ascending, null))
@@ -310,10 +311,11 @@ namespace Umbraco.Web.Editors
                             "helpApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HelpController>(
                                 controller => controller.GetContextHelpForPage("","",""))
                         },
-                        {
-                            "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
-                                controller => controller.GetSupportedLocales())
-                        },
+                        //TODO Reintroduce
+                        // {
+                        //     "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
+                        //         controller => controller.GetSupportedLocales())
+                        // },
                         {
                             "languageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LanguageController>(
                                 controller => controller.GetAllLanguages())
