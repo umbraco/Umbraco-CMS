@@ -279,10 +279,11 @@ namespace Umbraco.Web.Editors
                             "tagsDataBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TagsDataController>(
                                 controller => controller.GetTags("", "", null))
                         },
-                        {
-                            "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
-                                controller => controller.GetIndexerDetails())
-                        },
+                        //TODO reintroduce
+                        // {
+                        //     "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
+                        //         controller => controller.GetIndexerDetails())
+                        // },
                         {
                             "healthCheckBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
                                 controller => controller.GetAllHealthChecks())
