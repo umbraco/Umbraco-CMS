@@ -14,9 +14,7 @@
         <umb-button-ellipsis
             text="{{text}}"
             labelKey="{{labelKey}}"
-            showLabel="{{showLabel}}"
             action="{{vm.open()}}"
-            element="{{element}}"
             >
         </umb-button-ellipsis>
 
@@ -29,7 +27,7 @@
 @param {string} cssClass Set a css class modifier
 @param {string} color Set a hex code like <code>#f5c1bc</code>
 @param {boolean} showText Set to <code>true</code> to show the text. <code>false</code> by default
-@param {string} element *TODO: Need to document this - Not sure why it's done like this*
+@param {string} element Pass an element name, which will be highlighted if one has the tours opened
 @param {string} state Set the initial state of the component. To have it hidden use <code>hidden</code>
 **/
 
