@@ -24,7 +24,6 @@ namespace Umbraco.Extensions
 
             services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
 
-            services.AddIdentityCore<BackOfficeIdentityUser>();
             services.AddIdentityCore<BackOfficeIdentityUser>(options =>
                 {
                     options.User.RequireUniqueEmail = true;

@@ -61,7 +61,6 @@ namespace Umbraco.Web.Install.InstallSteps
 
             _userService.Save(admin);
 
-            //TODO: This needs to be reintroduced, when users are compatible with ASP.NET Core Identity.
             var membershipUser = await _userManager.FindByIdAsync(Constants.Security.SuperUserId.ToString());
             if (membershipUser == null)
             {
