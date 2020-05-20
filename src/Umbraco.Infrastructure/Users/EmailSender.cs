@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Mail;
 using System.Threading.Tasks;
-using Umbraco.Core.Composing;
+using MimeKit;
+using MimeKit.Text;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
+using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace Umbraco.Core
 {
@@ -21,7 +24,7 @@ namespace Umbraco.Core
         {
         }
 
-        internal EmailSender(IGlobalSettings globalSettings, bool enableEvents)
+        public EmailSender(IGlobalSettings globalSettings, bool enableEvents)
         {
             _globalSettings = globalSettings;
             _enableEvents = enableEvents;
@@ -45,7 +48,9 @@ namespace Umbraco.Core
             {
                 using (var client = new SmtpClient())
                 {
-                    client.Send(message);
+                    client.Connect(_globalSettings.SmtpSettings.Host, _globalSettings.SmtpSettings.Port);
+                    client.Send(ConstructEmailMessage(message));
+                    client.Disconnect(true);
                 }
             }
         }
@@ -65,14 +70,19 @@ namespace Umbraco.Core
             {
                 using (var client = new SmtpClient())
                 {
-                    if (client.DeliveryMethod == SmtpDeliveryMethod.Network)
+                    await client.ConnectAsync(_globalSettings.SmtpSettings.Host, _globalSettings.SmtpSettings.Port);
+
+                    var mailMessage = ConstructEmailMessage(message);
+                    if (_globalSettings.SmtpSettings.DeliveryMethod == SmtpDeliveryMethod.Network)
                     {
-                        await client.SendMailAsync(message);
+                        await client.SendAsync(mailMessage);
                     }
                     else
                     {
-                        client.Send(message);
+                        client.Send(mailMessage);
                     }
+
+                    await client.DisconnectAsync(true);
                 }
             }
         }
@@ -83,7 +93,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// We assume this is possible if either an event handler is registered or an smtp server is configured
         /// </remarks>
-        internal static bool CanSendRequiredEmail(IGlobalSettings globalSettings) => EventHandlerRegistered || globalSettings.IsSmtpServerConfigured;
+        public static bool CanSendRequiredEmail(IGlobalSettings globalSettings) => EventHandlerRegistered || globalSettings.IsSmtpServerConfigured;
 
         /// <summary>
         /// returns true if an event handler has been registered
@@ -102,6 +112,23 @@ namespace Umbraco.Core
         {
             var handler = SendEmail;
             if (handler != null) handler(null, e);
+        }
+
+        private MimeMessage ConstructEmailMessage(MailMessage mailMessage)
+        {
+            var fromEmail = mailMessage.From?.Address;
+            if(string.IsNullOrEmpty(fromEmail))
+                fromEmail = _globalSettings.SmtpSettings.From;
+
+            var messageToSend = new MimeMessage
+            {
+                Subject = mailMessage.Subject,
+                From = { new MailboxAddress(fromEmail)},
+                Body = new TextPart(mailMessage.IsBodyHtml ? TextFormat.Html : TextFormat.Plain) { Text = mailMessage.Body }
+            };
+            messageToSend.To.AddRange(mailMessage.To.Select(x=>new MailboxAddress(x.Address)));
+
+            return messageToSend;
         }
     }
 }

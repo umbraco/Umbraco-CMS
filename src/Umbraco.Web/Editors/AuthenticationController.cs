@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Collections.Generic;
+using System.Net.Mail;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web;
@@ -47,6 +48,7 @@ namespace Umbraco.Web.Editors
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeState _runtimeState;
         private readonly ISecuritySettings _securitySettings;
+        private readonly IEmailSender _emailSender;
 
         public AuthenticationController(
             IUserPasswordConfiguration passwordConfiguration,
@@ -60,13 +62,15 @@ namespace Umbraco.Web.Editors
             IRuntimeState runtimeState,
             UmbracoMapper umbracoMapper,
             ISecuritySettings securitySettings,
-            IPublishedUrlProvider publishedUrlProvider)
+            IPublishedUrlProvider publishedUrlProvider,
+            IEmailSender emailSender)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
             _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
             _securitySettings = securitySettings ?? throw new ArgumentNullException(nameof(securitySettings));
+            _emailSender = emailSender;
         }
 
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager
@@ -328,12 +332,19 @@ namespace Umbraco.Web.Editors
                         UmbracoUserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings),
                         new[] { identityUser.UserName, callbackUrl });
 
-                    // TODO: Port email service to ASP.NET Core
-                    /*await UserManager.SendEmailAsync(identityUser.Id,
-                        Services.TextService.Localize("login/resetPasswordEmailCopySubject",
-                            // Ensure the culture of the found user is used for the email!
-                            UmbracoUserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings)),
-                        message);*/
+                    var subject = Services.TextService.Localize("login/resetPasswordEmailCopySubject",
+                        // Ensure the culture of the found user is used for the email!
+                        UmbracoUserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings));
+
+                    var mailMessage = new MailMessage()
+                    {
+                        Subject = subject,
+                        Body = message,
+                        IsBodyHtml = true,
+                        To = { user.Email}
+                    };
+
+                    await _emailSender.SendAsync(mailMessage);
 
                     UserManager.RaiseForgotPasswordRequestedEvent(user.Id);
                 }

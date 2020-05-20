@@ -320,6 +320,7 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
             composition.RegisterUnique<ITreeService, TreeService>();
             composition.RegisterUnique<ISectionService, SectionService>();
+            composition.RegisterUnique<IEmailSender, EmailSender>();
 
             composition.RegisterUnique<IExamineManager, ExamineManager>();
 
