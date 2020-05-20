@@ -48,7 +48,15 @@ namespace Umbraco.Core
             {
                 using (var client = new SmtpClient())
                 {
+
                     client.Connect(_globalSettings.SmtpSettings.Host, _globalSettings.SmtpSettings.Port);
+
+                    if (!(_globalSettings.SmtpSettings.Username is null &&
+                          _globalSettings.SmtpSettings.Password is null))
+                    {
+                        client.Authenticate(_globalSettings.SmtpSettings.Username, _globalSettings.SmtpSettings.Password);
+                    }
+
                     client.Send(ConstructEmailMessage(message));
                     client.Disconnect(true);
                 }
@@ -71,6 +79,12 @@ namespace Umbraco.Core
                 using (var client = new SmtpClient())
                 {
                     await client.ConnectAsync(_globalSettings.SmtpSettings.Host, _globalSettings.SmtpSettings.Port);
+
+                    if (!(_globalSettings.SmtpSettings.Username is null &&
+                          _globalSettings.SmtpSettings.Password is null))
+                    {
+                        await client.AuthenticateAsync(_globalSettings.SmtpSettings.Username, _globalSettings.SmtpSettings.Password);
+                    }
 
                     var mailMessage = ConstructEmailMessage(message);
                     if (_globalSettings.SmtpSettings.DeliveryMethod == SmtpDeliveryMethod.Network)
