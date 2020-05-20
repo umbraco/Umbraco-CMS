@@ -1,3 +1,5 @@
+using System.Net.Mail;
+
 namespace Umbraco.Core.Configuration
 {
     public interface ISmtpSettings
@@ -6,5 +8,8 @@ namespace Umbraco.Core.Configuration
         string Host { get; }
         int Port{ get; }
         string PickupDirectoryLocation { get; }
+        SmtpDeliveryMethod DeliveryMethod { get; }
+        string Username { get; }
+        string Password { get; }
     }
 }

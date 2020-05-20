@@ -92,6 +92,10 @@ namespace Umbraco.Web.Common.Install
             return View();
         }
 
+        /// <summary>
+        /// Used to perform the redirect to the installer when the runtime level is <see cref="RuntimeLevel.Install"/> or <see cref="RuntimeLevel.Upgrade"/>
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public ActionResult Redirect()
         {
