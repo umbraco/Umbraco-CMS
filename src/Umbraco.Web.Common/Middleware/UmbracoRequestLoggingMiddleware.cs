@@ -8,6 +8,9 @@ using Umbraco.Core.Logging.Serilog.Enrichers;
 
 namespace Umbraco.Web.Common.Middleware
 {
+    /// <summary>
+    /// Adds request based serilog enrichers to the LogContext for each request
+    /// </summary>
     public class UmbracoRequestLoggingMiddleware : IMiddleware
     {
         private readonly HttpSessionIdEnricher _sessionIdEnricher;
