@@ -275,7 +275,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
             Assert.AreEqual(clone.Thumbnail, contentType.Thumbnail);
             Assert.AreEqual(clone.Icon, contentType.Icon);
             Assert.AreEqual(clone.IsContainer, contentType.IsContainer);
-            Assert.AreEqual(clone.MemberTypePropertyTypes, contentType.MemberTypePropertyTypes);
 
             // This double verifies by reflection
             var allProps = clone.GetType().GetProperties();

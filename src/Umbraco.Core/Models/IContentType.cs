@@ -8,6 +8,11 @@ namespace Umbraco.Core.Models
     public interface IContentType : IContentTypeComposition
     {
         /// <summary>
+        /// Internal property to store the Id of the default template
+        /// </summary>
+        int DefaultTemplateId { get; set; }
+
+        /// <summary>
         /// Gets the default Template of the ContentType
         /// </summary>
         ITemplate DefaultTemplate { get; }

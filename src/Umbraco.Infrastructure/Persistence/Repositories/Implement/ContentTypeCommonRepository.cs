@@ -136,7 +136,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             foreach (var c in contentTypes.Values)
             {
-                if (!(c is ContentType contentType)) continue;
+                if (!(c is IContentType contentType)) continue;
 
                 // map allowed templates
                 var allowedTemplates = new List<ITemplate>();
@@ -247,7 +247,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 contentType.NoGroupPropertyTypes = noGroupPropertyTypes;
 
                 // ensure builtin properties
-                if (contentType is MemberType memberType)
+                if (contentType is IMemberType memberType)
                 {
                     // ensure that the group exists (ok if it already exists)
                     memberType.AddPropertyGroup(Constants.Conventions.Member.StandardPropertiesGroupName);
@@ -259,8 +259,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                         if (added)
                         {
-                            var access = new MemberTypePropertyProfileAccess(false, false, false);
-                            memberType.MemberTypePropertyTypes[alias] = access;
+                            memberType.SetIsSensitiveProperty(alias, false);
+                            memberType.SetMemberCanEditProperty(alias, false);
+                            memberType.SetMemberCanViewProperty(alias, false);
                         }
                     }
                 }
@@ -285,10 +286,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var readonlyStorageType = builtinProperties.TryGetValue(dto.Alias, out var propertyType);
             var storageType = readonlyStorageType ? propertyType.ValueStorageType : Enum<ValueStorageType>.Parse(dto.DataTypeDto.DbType);
 
-            if (contentType is MemberType memberType)
+            if (contentType is IMemberType memberType)
             {
-                var access = new MemberTypePropertyProfileAccess(dto.ViewOnProfile, dto.CanEdit, dto.IsSensitive);
-                memberType.MemberTypePropertyTypes[dto.Alias] = access;
+                memberType.SetIsSensitiveProperty(dto.Alias, dto.IsSensitive);
+                memberType.SetMemberCanEditProperty(dto.Alias, dto.CanEdit);
+                memberType.SetMemberCanViewProperty(dto.Alias, dto.ViewOnProfile);
             }
 
             return new PropertyType(_shortStringHelper, dto.DataTypeDto.EditorAlias, storageType, readonlyStorageType, dto.Alias)

@@ -247,7 +247,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Delete<ContentTypeTemplateDto>("WHERE contentTypeNodeId = @Id", new { Id = entity.Id });
 
             // we could do it all in foreach if we assume that the default template is an allowed template??
-            var defaultTemplateId = ((ContentType) entity).DefaultTemplateId;
+            var defaultTemplateId = entity.DefaultTemplateId;
             if (defaultTemplateId > 0)
             {
                 Database.Insert(new ContentTypeTemplateDto
