@@ -10,6 +10,7 @@ using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 
@@ -120,7 +121,7 @@ namespace Umbraco.Web.PropertyEditors
 
                 if (width != int.MinValue && height != int.MinValue)
                 {
-                    location = imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(location) { ImageCropMode = "max", Width = width, Height = height });
+                    location = imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(location) { ImageCropMode = ImageCropMode.Max, Width = width, Height = height });
                 }
 
                 img.SetAttributeValue("src", location);

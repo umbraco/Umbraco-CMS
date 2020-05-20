@@ -9,6 +9,7 @@ using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 
@@ -79,7 +80,7 @@ namespace Umbraco.Web.Editors
             }
 
             var rnd = imageLastModified.HasValue ? $"&rnd={imageLastModified:yyyyMMddHHmmss}" : null;
-            var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(imagePath) { UpScale = false, Width = width, AnimationProcessMode = "first", ImageCropMode = "max", CacheBusterValue = rnd });
+            var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(imagePath) { UpScale = false, Width = width, AnimationProcessMode = "first", ImageCropMode = ImageCropMode.Max, CacheBusterValue = rnd });
 
             return new RedirectResult(imageUrl, false);
         }
@@ -105,7 +106,7 @@ namespace Umbraco.Web.Editors
                                            int? focalPointLeft = null,
                                            int? focalPointTop = null,
                                            string animationProcessMode = "first",
-                                           string mode = "max",
+                                           ImageCropMode mode = ImageCropMode.Max,
                                            bool upscale = false,
                                            string cacheBusterValue = "")
 {
