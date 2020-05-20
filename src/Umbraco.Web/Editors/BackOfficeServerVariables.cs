@@ -309,10 +309,11 @@ namespace Umbraco.Web.Editors
                             "publishedSnapshotCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedSnapshotCacheStatusController>(
                                 controller => controller.GetStatus())
                         },
-                        {
-                            "helpApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HelpController>(
-                                controller => controller.GetContextHelpForPage("","",""))
-                        },
+                        //TODO Reintroduce
+                        // {
+                        //     "helpApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HelpController>(
+                        //         controller => controller.GetContextHelpForPage("","",""))
+                        // },
                         //TODO Reintroduce
                         // {
                         //     "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(

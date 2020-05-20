@@ -255,7 +255,6 @@
     <Compile Include="Editors\DictionaryController.cs" />
     <Compile Include="Editors\Filters\MemberSaveModelValidator.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
-    <Compile Include="Editors\HelpController.cs" />
     <Compile Include="Editors\Filters\IsCurrentUserModelFilterAttribute.cs" />
     <Compile Include="Editors\LanguageController.cs" />
     <Compile Include="WebApi\ParameterSwapControllerActionSelector.cs" />
