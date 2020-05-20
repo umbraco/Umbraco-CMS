@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Configuration;
+﻿using System.Net.Mail;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Tests.Common.Builders
 {
@@ -16,7 +18,9 @@ namespace Umbraco.Tests.Common.Builders
         private string _host;
         private int? _port;
         private string _pickupDirectoryLocation;
-        private string _deliveryMethod;
+        private SmtpDeliveryMethod? _deliveryMethod;
+        private string _username;
+        private string _password;
 
         public SmtpSettingsBuilder(TParent parentBuilder) : base(parentBuilder)
         {
@@ -34,9 +38,21 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
+        public SmtpSettingsBuilder<TParent> WithUsername(string username)
+        {
+            _username = username;
+            return this;
+        }
+
         public SmtpSettingsBuilder<TParent> WithPost(int port)
         {
             _port = port;
+            return this;
+        }
+
+        public SmtpSettingsBuilder<TParent> WithPassword(string password)
+        {
+            _password = password;
             return this;
         }
 
@@ -46,7 +62,7 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-        public SmtpSettingsBuilder<TParent> WithDeliveryMethod(string deliveryMethod)
+        public SmtpSettingsBuilder<TParent> WithDeliveryMethod(SmtpDeliveryMethod deliveryMethod)
         {
             _deliveryMethod = deliveryMethod;
             return this;
@@ -58,7 +74,9 @@ namespace Umbraco.Tests.Common.Builders
             var host = _host ?? null;
             var port = _port ?? 25;
             var pickupDirectoryLocation = _pickupDirectoryLocation ?? null;
-            var deliveryMethod = _deliveryMethod ?? null;
+            var deliveryMethod = _deliveryMethod ?? SmtpDeliveryMethod.Network;
+            var username = _username ?? null;
+            var password = _password ?? null;
 
             return new TestSmtpSettings()
             {
@@ -66,7 +84,9 @@ namespace Umbraco.Tests.Common.Builders
                 Host = host,
                 Port = port,
                 PickupDirectoryLocation = pickupDirectoryLocation,
-                DeliveryMethod = deliveryMethod
+                DeliveryMethod = deliveryMethod,
+                Username = username,
+                Password = password,
             };
         }
 
@@ -76,7 +96,9 @@ namespace Umbraco.Tests.Common.Builders
             public string Host { get; set; }
             public int Port { get; set; }
             public string PickupDirectoryLocation { get; set; }
-            public string DeliveryMethod { get; set; }
+            public SmtpDeliveryMethod DeliveryMethod { get; set; }
+            public string Username { get; set; }
+            public string Password { get; set; }
         }
     }
 }

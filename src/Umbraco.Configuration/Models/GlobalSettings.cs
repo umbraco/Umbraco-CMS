@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Mail;
 using Microsoft.Extensions.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -90,7 +91,11 @@ namespace Umbraco.Configuration.Models
             public string Host => _configurationSection.GetValue<string>("Host");
             public int Port => _configurationSection.GetValue<int>("Port");
             public string PickupDirectoryLocation => _configurationSection.GetValue<string>("PickupDirectoryLocation");
-            public string DeliveryMethod => _configurationSection.GetValue<string>("DeliveryMethod");
+            public SmtpDeliveryMethod DeliveryMethod => _configurationSection.GetValue<SmtpDeliveryMethod>("DeliveryMethod");
+
+            public string Username => _configurationSection.GetValue<string>("Username");
+
+            public string Password => _configurationSection.GetValue<string>("Password");
         }
     }
 }

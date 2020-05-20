@@ -53,6 +53,7 @@ namespace Umbraco.Web.Editors
         private readonly ISqlContext _sqlContext;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly ISecuritySettings _securitySettings;
+        private readonly IEmailSender _emailSender;
 
         public UsersController(
             IGlobalSettings globalSettings,
@@ -69,7 +70,8 @@ namespace Umbraco.Web.Editors
             IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
             IPublishedUrlProvider publishedUrlProvider,
-            ISecuritySettings securitySettings)
+            ISecuritySettings securitySettings,
+            IEmailSender emailSender)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _mediaFileSystem = mediaFileSystem;
@@ -78,6 +80,7 @@ namespace Umbraco.Web.Editors
             _sqlContext = sqlContext;
             _imageUrlGenerator = imageUrlGenerator;
             _securitySettings = securitySettings;
+            _emailSender = emailSender;
         }
 
         /// <summary>
@@ -501,16 +504,15 @@ namespace Umbraco.Web.Editors
                 UmbracoUserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
 
-            var emailSender = new EmailSender(GlobalSettings, true);
             var mailMessage = new MailMessage()
             {
                 Subject = emailSubject,
                 Body = emailBody,
-                IsBodyHtml = true
+                IsBodyHtml = true,
+                To = { to.Email}
             };
-            mailMessage.To.Add(to.Email);
 
-            await emailSender.SendAsync(mailMessage);
+            await _emailSender.SendAsync(mailMessage);
         }
 
         /// <summary>

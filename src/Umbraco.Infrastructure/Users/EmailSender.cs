@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Mail;
 using System.Threading.Tasks;
-using MailKit.Security;
 using MimeKit;
 using MimeKit.Text;
 using Umbraco.Core.Configuration;
@@ -70,20 +70,18 @@ namespace Umbraco.Core
             {
                 using (var client = new SmtpClient())
                 {
-                    var smtpSettingsDeliveryMethod = _globalSettings.SmtpSettings.DeliveryMethod;
-                    var deliveryMethod = (SmtpDeliveryMethod)Enum.Parse(typeof(SmtpDeliveryMethod), smtpSettingsDeliveryMethod, true);
-
                     await client.ConnectAsync(_globalSettings.SmtpSettings.Host, _globalSettings.SmtpSettings.Port);
 
-                    if (deliveryMethod == SmtpDeliveryMethod.Network)
+                    var mailMessage = ConstructEmailMessage(message);
+                    if (_globalSettings.SmtpSettings.DeliveryMethod == SmtpDeliveryMethod.Network)
                     {
-                        await client.SendAsync(ConstructEmailMessage(message));
+                        await client.SendAsync(mailMessage);
                     }
                     else
                     {
-                        client.Send(ConstructEmailMessage(message));
+                        client.Send(mailMessage);
                     }
-                    
+
                     await client.DisconnectAsync(true);
                 }
             }
@@ -118,24 +116,17 @@ namespace Umbraco.Core
 
         private MimeMessage ConstructEmailMessage(MailMessage mailMessage)
         {
-            var messageToSend = new MimeMessage
-            {
-                Subject = mailMessage.Subject
-            };
-
             var fromEmail = mailMessage.From?.Address;
             if(string.IsNullOrEmpty(fromEmail))
                 fromEmail = _globalSettings.SmtpSettings.From;
-            
-            messageToSend.From.Add(new MailboxAddress(fromEmail));
 
-            foreach (var mailAddress in mailMessage.To)
-                messageToSend.To.Add(new MailboxAddress(mailAddress.Address));
-
-            if (mailMessage.IsBodyHtml)
-                messageToSend.Body = new TextPart(TextFormat.Html) { Text = mailMessage.Body };
-            else
-                messageToSend.Body = new TextPart(TextFormat.Plain) { Text = mailMessage.Body };
+            var messageToSend = new MimeMessage
+            {
+                Subject = mailMessage.Subject,
+                From = { new MailboxAddress(fromEmail)},
+                Body = new TextPart(mailMessage.IsBodyHtml ? TextFormat.Html : TextFormat.Plain) { Text = mailMessage.Body }
+            };
+            messageToSend.To.AddRange(mailMessage.To.Select(x=>new MailboxAddress(x.Address)));
 
             return messageToSend;
         }
