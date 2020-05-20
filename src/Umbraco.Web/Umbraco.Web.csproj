@@ -145,7 +145,6 @@
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
-    <Compile Include="Editors\TourController.cs" />
     <Compile Include="Macros\MacroRenderer.cs" />
     <Compile Include="Macros\MemberUserKeyProvider.cs" />
     <Compile Include="Macros\PartialViewMacroController.cs" />
