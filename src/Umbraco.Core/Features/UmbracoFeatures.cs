@@ -19,12 +19,12 @@ namespace Umbraco.Web.Features
         /// <summary>
         /// Gets the disabled features.
         /// </summary>
-        internal DisabledFeatures Disabled { get; }
+        public DisabledFeatures Disabled { get; }
 
         /// <summary>
         /// Gets the enabled features.
         /// </summary>
-        internal EnabledFeatures Enabled { get; }
+        public EnabledFeatures Enabled { get; }
 
         /// <summary>
         /// Determines whether a controller is enabled.

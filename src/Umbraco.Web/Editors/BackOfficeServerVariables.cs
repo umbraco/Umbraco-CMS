@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Web;
 using System.Web.Mvc;
-using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Features;
@@ -18,8 +17,6 @@ using Umbraco.Web.Trees;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Runtime;
 using Umbraco.Core.WebAssets;
 using Umbraco.Web.Security;
 

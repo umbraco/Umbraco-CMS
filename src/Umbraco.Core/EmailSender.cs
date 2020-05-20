@@ -83,7 +83,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// We assume this is possible if either an event handler is registered or an smtp server is configured
         /// </remarks>
-        internal static bool CanSendRequiredEmail(IGlobalSettings globalSettings) => EventHandlerRegistered || globalSettings.IsSmtpServerConfigured;
+        public static bool CanSendRequiredEmail(IGlobalSettings globalSettings) => EventHandlerRegistered || globalSettings.IsSmtpServerConfigured;
 
         /// <summary>
         /// returns true if an event handler has been registered

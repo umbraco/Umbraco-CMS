@@ -2,6 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Extensions;
+using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Routing;
 
 namespace Umbraco.Web.BackOffice.Runtime
@@ -11,6 +12,7 @@ namespace Umbraco.Web.BackOffice.Runtime
         public void Compose(Composition composition)
         {
             composition.RegisterUnique<BackOfficeAreaRoutes>();
+            composition.RegisterUnique<BackOfficeServerVariables>();
         }
     }
 }

@@ -9,6 +9,6 @@ namespace Umbraco.Web.Trees
     /// This ensures that umbraco will look in the umbraco folders for views for this tree.
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    internal class CoreTreeAttribute : Attribute
+    public class CoreTreeAttribute : Attribute
     { }
 }

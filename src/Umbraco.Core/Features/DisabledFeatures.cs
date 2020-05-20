@@ -5,7 +5,7 @@ namespace Umbraco.Web.Features
     /// <summary>
     /// Represents disabled features.
     /// </summary>
-    internal class DisabledFeatures
+    public class DisabledFeatures
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DisabledFeatures"/> class.

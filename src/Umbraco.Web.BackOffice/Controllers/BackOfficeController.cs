@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Hosting;
@@ -35,6 +36,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizedTextService _textService;
         private readonly IGridConfig _gridConfig;
+        private readonly BackOfficeServerVariables _backOfficeServerVariables;
+        private readonly AppCaches _appCaches;
 
         public BackOfficeController(
             BackOfficeUserManager userManager,
@@ -44,7 +47,9 @@ namespace Umbraco.Web.BackOffice.Controllers
             IUmbracoApplicationLifetime umbracoApplicationLifetime,
             IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizedTextService textService,
-            IGridConfig gridConfig)
+            IGridConfig gridConfig,
+            BackOfficeServerVariables backOfficeServerVariables,
+            AppCaches appCaches)
         {
             _userManager = userManager;
             _runtimeMinifier = runtimeMinifier;
@@ -54,6 +59,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             _umbracoContextAccessor = umbracoContextAccessor;
             _textService = textService;
             _gridConfig = gridConfig ?? throw new ArgumentNullException(nameof(gridConfig));
+            _backOfficeServerVariables = backOfficeServerVariables;
+            _appCaches = appCaches;
         }
 
         [HttpGet]
@@ -117,11 +124,31 @@ namespace Umbraco.Web.BackOffice.Controllers
             return new JsonNetResult { Data = nestedDictionary, Formatting = Formatting.None };
         }
 
-        //[UmbracoAuthorize(Order = 0)] TODO: Re-implement UmbracoAuthorizeAttribute
+        [UmbracoAuthorize(Order = 0)] // TODO: Re-implement UmbracoAuthorizeAttribute
         [HttpGet]
         public JsonNetResult GetGridConfig()
         {
             return new JsonNetResult { Data = _gridConfig.EditorsConfig.Editors, Formatting = Formatting.None };
+        }
+
+        /// <summary>
+        /// Returns the JavaScript object representing the static server variables javascript object
+        /// </summary>
+        /// <returns></returns>
+        [UmbracoAuthorize(Order = 0)]
+        [MinifyJavaScriptResult(Order = 1)]
+        public async Task<JavaScriptResult> ServerVariables()
+        {
+            //cache the result if debugging is disabled
+            var serverVars = ServerVariablesParser.Parse(await _backOfficeServerVariables.GetServerVariablesAsync());
+            var result = _hostingEnvironment.IsDebugMode
+                ? serverVars
+                : _appCaches.RuntimeCache.GetCacheItem<string>(
+                    typeof(BackOfficeController) + "ServerVariables",
+                    () => serverVars,
+                    new TimeSpan(0, 10, 0));
+
+            return new JavaScriptResult(result);
         }
 
         [HttpGet]

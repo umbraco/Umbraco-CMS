@@ -98,9 +98,9 @@ namespace Umbraco.Web.Editors
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
                 () =>
-                    View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _treeCollection, _hostingEnvironment, _runtimeSettings, _securitySettings)),
+                    View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _hostingEnvironment, _runtimeSettings, _securitySettings)),
                 () =>
-                    View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _treeCollection, _hostingEnvironment, _runtimeSettings, _securitySettings))
+                    View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _hostingEnvironment, _runtimeSettings, _securitySettings))
                     );
         }
 
@@ -178,7 +178,7 @@ namespace Umbraco.Web.Editors
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
                 //The default view to render when there is no external login info or errors
-                () => View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _treeCollection, _hostingEnvironment, _runtimeSettings, _securitySettings)),
+                () => View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _hostingEnvironment, _runtimeSettings, _securitySettings)),
                 //The ActionResult to perform if external login is successful
                 () => Redirect("/"));
         }
@@ -270,7 +270,9 @@ namespace Umbraco.Web.Editors
         }
 
 
-
+        // TODO: for converting to netcore, some examples:
+        // * https://github.com/dotnet/aspnetcore/blob/master/src/Identity/samples/IdentitySample.Mvc/Controllers/AccountController.cs
+        // * https://github.com/dotnet/aspnetcore/blob/master/src/MusicStore/samples/MusicStore/Controllers/AccountController.cs
         [HttpPost]
         public ActionResult ExternalLogin(string provider, string redirectUrl = null)
         {
@@ -283,6 +285,9 @@ namespace Umbraco.Web.Editors
             return new ChallengeResult(provider, redirectUrl);
         }
 
+        // TODO: for converting to netcore, some examples:
+        // * https://github.com/dotnet/aspnetcore/blob/master/src/Identity/samples/IdentitySample.Mvc/Controllers/AccountController.cs
+        // * https://github.com/dotnet/aspnetcore/blob/master/src/MusicStore/samples/MusicStore/Controllers/AccountController.cs
         [UmbracoAuthorize]
         [HttpPost]
         public ActionResult LinkLogin(string provider)
@@ -293,26 +298,9 @@ namespace Umbraco.Web.Editors
                 User.Identity.GetUserId());
         }
 
-        //[HttpGet]
-        //public async Task<ActionResult> ValidatePasswordResetCode([Bind(Prefix = "u")]int userId, [Bind(Prefix = "r")]string resetCode)
-        //{
-        //    var user = await UserManager.FindByIdAsync(userId.ToString());
-        //    if (user != null)
-        //    {
-        //        var result = await UserManager.VerifyUserTokenAsync(user, "ResetPassword", "ResetPassword", resetCode);
-        //        if (result)
-        //        {
-        //            //Add a flag and redirect for it to be displayed
-        //            TempData[ViewDataExtensions.TokenPasswordResetCode] = new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode };
-        //            return RedirectToLocal(Url.Action("Default", "BackOffice"));
-        //        }
-        //    }
-
-        //    //Add error and redirect for it to be displayed
-        //    TempData[ViewDataExtensions.TokenPasswordResetCode] = new[] { Services.TextService.Localize("login/resetCodeExpired") };
-        //    return RedirectToLocal(Url.Action("Default", "BackOffice"));
-        //}
-
+        // TODO: for converting to netcore, some examples:
+        // * https://github.com/dotnet/aspnetcore/blob/master/src/Identity/samples/IdentitySample.Mvc/Controllers/AccountController.cs
+        // * https://github.com/dotnet/aspnetcore/blob/master/src/MusicStore/samples/MusicStore/Controllers/AccountController.cs
         [HttpGet]
         public async Task<ActionResult> ExternalLinkLoginCallback()
         {
@@ -374,6 +362,9 @@ namespace Umbraco.Web.Editors
             return await ExternalSignInAsync(loginInfo, externalSignInResponse);
         }
 
+        // TODO: for converting to netcore, some examples:
+        // * https://github.com/dotnet/aspnetcore/blob/master/src/Identity/samples/IdentitySample.Mvc/Controllers/AccountController.cs
+        // * https://github.com/dotnet/aspnetcore/blob/master/src/MusicStore/samples/MusicStore/Controllers/AccountController.cs
         private async Task<ActionResult> ExternalSignInAsync(ExternalLoginInfo loginInfo, Func<ActionResult> response)
         {
             if (loginInfo == null) throw new ArgumentNullException("loginInfo");
