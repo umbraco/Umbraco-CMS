@@ -171,10 +171,11 @@ namespace Umbraco.Web.Editors
                             "mediaApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MediaController>(
                                 controller => controller.GetRootMedia())
                         },
-                        {
-                            "imagesApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImagesController>(
-                                controller => controller.GetBigThumbnail(""))
-                        },
+                        //TODO reintroduce
+                        // {
+                        //     "imagesApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImagesController>(
+                        //         controller => controller.GetBigThumbnail(""))
+                        // },
                         {
                             "sectionApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<SectionController>(
                                 controller => controller.GetSections())

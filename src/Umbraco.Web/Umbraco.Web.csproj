@@ -346,7 +346,6 @@
     <Compile Include="Editors\Filters\ContentSaveValidationAttribute.cs" />
     <Compile Include="Editors\ContentTypeControllerBase.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
-    <Compile Include="Editors\ImagesController.cs" />
     <Compile Include="Editors\PackageInstallController.cs" />
     <Compile Include="Editors\RelationController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
