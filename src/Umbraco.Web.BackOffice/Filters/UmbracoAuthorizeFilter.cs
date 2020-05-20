@@ -54,34 +54,6 @@ namespace Umbraco.Web.BackOffice.Filters
             : this(hostingEnvironment, umbracoContext, runtimeState, linkGenerator, false, null)
         {
         }
-        //
-        // /// <summary>
-        // /// Constructor with redirect umbraco login behavior
-        // /// </summary>
-        // /// <param name="umbracoContext"></param>
-        // /// <param name="runtimeState"></param>
-        // /// <param name="linkGenerator"></param>
-        // /// <param name="redirectToUmbracoLogin">If true will redirect to the umbraco login page if not authorized</param>
-        // public UmbracoAuthorizeFilter(
-        //     IHostingEnvironment hostingEnvironment, IUmbracoContextAccessor umbracoContext, IRuntimeState runtimeState, LinkGenerator linkGenerator,
-        //     bool redirectToUmbracoLogin)
-        //     : this(hostingEnvironment, umbracoContext, runtimeState, linkGenerator, redirectToUmbracoLogin, null)
-        // {
-        // }
-        //
-        // /// <summary>
-        // /// Constructor with redirect url behavior
-        // /// </summary>
-        // /// <param name="umbracoContext"></param>
-        // /// <param name="runtimeState"></param>
-        // /// /// <param name="linkGenerator"></param>
-        // /// <param name="redirectUrl">If specified will redirect to this URL if not authorized</param>
-        // public UmbracoAuthorizeFilter(
-        //     IHostingEnvironment hostingEnvironment, IUmbracoContextAccessor umbracoContext, IRuntimeState runtimeState, LinkGenerator linkGenerator,
-        //     string redirectUrl)
-        //     : this(hostingEnvironment, umbracoContext, runtimeState, linkGenerator, false, redirectUrl)
-        // {
-        // }
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
