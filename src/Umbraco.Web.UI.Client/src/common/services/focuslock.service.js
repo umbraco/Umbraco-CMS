@@ -1,28 +1,38 @@
 /**
  @ngdoc service
- * @name umbraco.services.focusService
+ * @name umbraco.services.focusLockService
  *
  * @description
- * <b>Added in Umbraco 8.1</b>. Application-wide service for focus related stuff.
+ * <b>Added in Umbraco 8.7</b>. Application-wide service for locking focus within overlays or sections that are triggered by the backdrop service.
  * 
  */
 
 (function () {
     "use strict";
 
-    function focusLockService(eventsService) {
-    
-        eventsService.on("appState.editors.open", (name, args) => {
-            console.log('editor open', args);
-        });
-
-        eventsService.on("appState.editors.close", (name, args) => {
-            console.log('editor close:', args);
-        });
+    function focusLockService($timeout, eventsService) {
+        var elementToInert = document.querySelector('#mainwrapper');
+        var setInertAttribute = false;
 
         eventsService.on("appState.overlay", (name, args) => {
-            console.log('overlay', args);
+            if(args){
+                setInertAttribute = true;
+                return;
+            }
         });
+
+        // TODO; at a later stage hook into these events as well and determine whether the inert should be set or not
+        // At some point it will also be neccessary to check if the attribute has already been set since the backdrop can
+        // potentially already be open in another context and then that context can trigger an infinte editor for instance, which
+        // will trigger the backdrop again
+
+        // eventsService.on("appState.editors.open", (name, args) => {
+        //     console.log('editor open:', args);
+        // });
+
+        // eventsService.on("appState.editors.close", (name, args) => {
+        //     console.log('editor close:', args);
+        // });
 
         var service = {
             
@@ -38,7 +48,12 @@
              * 
              */
             addInertAttribute: function() {
-                console.log('add inert attribute');
+                // If the backdrop was triggered by an overlay we add the inert attribute
+                $timeout(function(){
+                    if(setInertAttribute) {
+                        elementToInert.setAttribute('inert', true);
+                    }
+                })
             },
 
             /**
@@ -52,7 +67,7 @@
              * 
              */
             removeInertAttribute: function() {
-                console.log('remove inert attribute');
+                elementToInert.removeAttribute('inert');
             }
         };
 
