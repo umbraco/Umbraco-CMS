@@ -93,7 +93,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<UmbracoMapper>(),
                     Factory.GetInstance<ISecuritySettings>(),
                     Factory.GetInstance<IPublishedUrlProvider>(),
-                    Factory.GetInstance<IRequestAccessor>()
+                    Factory.GetInstance<IRequestAccessor>(),
+                    Factory.GetInstance<IEmailSender>()
                 );
                 return usersController;
             }
