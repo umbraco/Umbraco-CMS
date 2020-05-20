@@ -183,65 +183,68 @@ namespace Umbraco.Web.Editors
                 () => Redirect("/"));
         }
 
-        /// <summary>
-        /// Get the json localized text for a given culture or the culture for the current user
-        /// </summary>
-        /// <param name="culture"></param>
-        /// <returns></returns>
-        /// <remarks>Migrated already to .Net Core</remarks>
-        [HttpGet]
-        public JsonNetResult LocalizedText(string culture = null)
-        {
-            var cultureInfo = string.IsNullOrWhiteSpace(culture)
-                //if the user is logged in, get their culture, otherwise default to 'en'
-                ? Security.IsAuthenticated()
-                    //current culture is set at the very beginning of each request
-                    ? Thread.CurrentThread.CurrentCulture
-                    : CultureInfo.GetCultureInfo(GlobalSettings.DefaultUILanguage)
-                : CultureInfo.GetCultureInfo(culture);
 
-            var allValues = Services.TextService.GetAllStoredValues(cultureInfo);
-            var pathedValues = allValues.Select(kv =>
-            {
-                var slashIndex = kv.Key.IndexOf('/');
-                var areaAlias = kv.Key.Substring(0, slashIndex);
-                var valueAlias = kv.Key.Substring(slashIndex+1);
-                return new
-                {
-                    areaAlias,
-                    valueAlias,
-                    value = kv.Value
-                };
-            });
+        // NOTE: Migrated
+        ///// <summary>
+        ///// Get the json localized text for a given culture or the culture for the current user
+        ///// </summary>
+        ///// <param name="culture"></param>
+        ///// <returns></returns>
+        ///// <remarks>Migrated already to .Net Core</remarks>
+        //[HttpGet]
+        //public JsonNetResult LocalizedText(string culture = null)
+        //{
+        //    var cultureInfo = string.IsNullOrWhiteSpace(culture)
+        //        //if the user is logged in, get their culture, otherwise default to 'en'
+        //        ? Security.IsAuthenticated()
+        //            //current culture is set at the very beginning of each request
+        //            ? Thread.CurrentThread.CurrentCulture
+        //            : CultureInfo.GetCultureInfo(GlobalSettings.DefaultUILanguage)
+        //        : CultureInfo.GetCultureInfo(culture);
 
-            Dictionary<string, Dictionary<string, string>> nestedDictionary = pathedValues
-                .GroupBy(pv => pv.areaAlias)
-                .ToDictionary(pv => pv.Key, pv =>
-                    pv.ToDictionary(pve => pve.valueAlias, pve => pve.value));
+        //    var allValues = Services.TextService.GetAllStoredValues(cultureInfo);
+        //    var pathedValues = allValues.Select(kv =>
+        //    {
+        //        var slashIndex = kv.Key.IndexOf('/');
+        //        var areaAlias = kv.Key.Substring(0, slashIndex);
+        //        var valueAlias = kv.Key.Substring(slashIndex+1);
+        //        return new
+        //        {
+        //            areaAlias,
+        //            valueAlias,
+        //            value = kv.Value
+        //        };
+        //    });
 
-            return new JsonNetResult { Data = nestedDictionary, Formatting = Formatting.None };
-        }
+        //    Dictionary<string, Dictionary<string, string>> nestedDictionary = pathedValues
+        //        .GroupBy(pv => pv.areaAlias)
+        //        .ToDictionary(pv => pv.Key, pv =>
+        //            pv.ToDictionary(pve => pve.valueAlias, pve => pve.value));
 
-        /// <summary>
-        /// Returns the JavaScript main file including all references found in manifests
-        /// </summary>
-        /// <returns></returns>
-        [MinifyJavaScriptResult(Order = 0)]
-        [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
-        public async Task<JavaScriptResult> Application()
-        {
-            var result = await _runtimeMinifier.GetScriptForLoadingBackOfficeAsync(GlobalSettings, _hostingEnvironment);
+        //    return new JsonNetResult { Data = nestedDictionary, Formatting = Formatting.None };
+        //}
 
-            return JavaScript(result);
-        }
+        // NOTE: Migrated
+        ///// <summary>
+        ///// Returns the JavaScript main file including all references found in manifests
+        ///// </summary>
+        ///// <returns></returns>
+        //[MinifyJavaScriptResult(Order = 0)]
+        //[OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
+        //public async Task<JavaScriptResult> Application()
+        //{
+        //    var result = await _runtimeMinifier.GetScriptForLoadingBackOfficeAsync(GlobalSettings, _hostingEnvironment);
 
-        /// Migrated already to .Net Core
-        [UmbracoAuthorize(Order = 0)]
-        [HttpGet]
-        public JsonNetResult GetGridConfig()
-        {
-            return new JsonNetResult { Data = _gridConfig.EditorsConfig.Editors, Formatting = Formatting.None };
-        }
+        //    return JavaScript(result);
+        //}
+
+        // NOTE: Migrated
+        //[UmbracoAuthorize(Order = 0)]
+        //[HttpGet]
+        //public JsonNetResult GetGridConfig()
+        //{
+        //    return new JsonNetResult { Data = _gridConfig.EditorsConfig.Editors, Formatting = Formatting.None };
+        //}
 
 
 
@@ -290,25 +293,25 @@ namespace Umbraco.Web.Editors
                 User.Identity.GetUserId());
         }
 
-        [HttpGet]
-        public async Task<ActionResult> ValidatePasswordResetCode([Bind(Prefix = "u")]int userId, [Bind(Prefix = "r")]string resetCode)
-        {
-            var user = await UserManager.FindByIdAsync(userId.ToString());
-            if (user != null)
-            {
-                var result = await UserManager.VerifyUserTokenAsync(user, "ResetPassword", "ResetPassword", resetCode);
-                if (result)
-                {
-                    //Add a flag and redirect for it to be displayed
-                    TempData[ViewDataExtensions.TokenPasswordResetCode] = new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode };
-                    return RedirectToLocal(Url.Action("Default", "BackOffice"));
-                }
-            }
+        //[HttpGet]
+        //public async Task<ActionResult> ValidatePasswordResetCode([Bind(Prefix = "u")]int userId, [Bind(Prefix = "r")]string resetCode)
+        //{
+        //    var user = await UserManager.FindByIdAsync(userId.ToString());
+        //    if (user != null)
+        //    {
+        //        var result = await UserManager.VerifyUserTokenAsync(user, "ResetPassword", "ResetPassword", resetCode);
+        //        if (result)
+        //        {
+        //            //Add a flag and redirect for it to be displayed
+        //            TempData[ViewDataExtensions.TokenPasswordResetCode] = new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode };
+        //            return RedirectToLocal(Url.Action("Default", "BackOffice"));
+        //        }
+        //    }
 
-            //Add error and redirect for it to be displayed
-            TempData[ViewDataExtensions.TokenPasswordResetCode] = new[] { Services.TextService.Localize("login/resetCodeExpired") };
-            return RedirectToLocal(Url.Action("Default", "BackOffice"));
-        }
+        //    //Add error and redirect for it to be displayed
+        //    TempData[ViewDataExtensions.TokenPasswordResetCode] = new[] { Services.TextService.Localize("login/resetCodeExpired") };
+        //    return RedirectToLocal(Url.Action("Default", "BackOffice"));
+        //}
 
         [HttpGet]
         public async Task<ActionResult> ExternalLinkLoginCallback()

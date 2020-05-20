@@ -6,15 +6,18 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
+using Umbraco.Extensions;
 using Umbraco.Net;
 using Umbraco.Web.BackOffice.ActionResults;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.ActionResults;
+using Umbraco.Web.Models;
 using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
 
@@ -24,6 +27,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     [Area(Constants.Web.Mvc.BackOfficeArea)]
     public class BackOfficeController : Controller
     {
+        private readonly BackOfficeUserManager _userManager;
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IGlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -32,8 +36,17 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ILocalizedTextService _textService;
         private readonly IGridConfig _gridConfig;
 
-        public BackOfficeController(IRuntimeMinifier runtimeMinifier, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IUmbracoApplicationLifetime umbracoApplicationLifetime, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService, IGridConfig gridConfig)
+        public BackOfficeController(
+            BackOfficeUserManager userManager,
+            IRuntimeMinifier runtimeMinifier,
+            IGlobalSettings globalSettings,
+            IHostingEnvironment hostingEnvironment,
+            IUmbracoApplicationLifetime umbracoApplicationLifetime,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ILocalizedTextService textService,
+            IGridConfig gridConfig)
         {
+            _userManager = userManager;
             _runtimeMinifier = runtimeMinifier;
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
@@ -46,6 +59,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         public IActionResult Default()
         {
+            // TODO: Migrate this
             return View();
         }
 
@@ -108,6 +122,35 @@ namespace Umbraco.Web.BackOffice.Controllers
         public JsonNetResult GetGridConfig()
         {
             return new JsonNetResult { Data = _gridConfig.EditorsConfig.Editors, Formatting = Formatting.None };
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> ValidatePasswordResetCode([Bind(Prefix = "u")]int userId, [Bind(Prefix = "r")]string resetCode)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user != null)
+            {
+                var result = await _userManager.VerifyUserTokenAsync(user, "ResetPassword", "ResetPassword", resetCode);
+                if (result)
+                {
+                    //Add a flag and redirect for it to be displayed
+                    TempData[ViewDataExtensions.TokenPasswordResetCode] = new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode };
+                    return RedirectToLocal(Url.Action("Default", "BackOffice"));
+                }
+            }
+
+            //Add error and redirect for it to be displayed
+            TempData[ViewDataExtensions.TokenPasswordResetCode] = new[] { _textService.Localize("login/resetCodeExpired") };
+            return RedirectToLocal(Url.Action("Default", "BackOffice"));
+        }
+
+        private ActionResult RedirectToLocal(string returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            return Redirect("/");
         }
     }
 }

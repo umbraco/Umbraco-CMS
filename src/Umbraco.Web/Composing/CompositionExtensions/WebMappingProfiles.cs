@@ -10,6 +10,9 @@ namespace Umbraco.Web.Composing.CompositionExtensions
     {
         public static Composition ComposeWebMappingProfiles(this Composition composition)
         {
+            // TODO: All/Most of these should be moved to ComposeCoreMappingProfiles which requires All/most of the
+            // definitions to be moved to core
+
             composition.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
                 .Add<AuditMapDefinition>()
                 .Add<CodeFileMapDefinition>()
