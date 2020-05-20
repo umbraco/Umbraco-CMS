@@ -122,8 +122,7 @@ namespace Umbraco.Core.Models.Membership
                 (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
                 enum1 => enum1.GetHashCode());
 
-        #region Implementation of IMembershipUser
-
+        
         [DataMember]
         public DateTime? EmailConfirmedDate
         {
@@ -200,10 +199,6 @@ namespace Umbraco.Core.Models.Membership
         [IgnoreDataMember]
         public string Comments { get; set; }
 
-        #endregion
-
-        #region Implementation of IUser
-
         public UserState UserState
         {
             get
@@ -235,13 +230,6 @@ namespace Umbraco.Core.Models.Membership
         {
             get { return _allowedSections ?? (_allowedSections = new List<string>(_userGroups.SelectMany(x => x.AllowedSections).Distinct())); }
         }
-
-        /// <summary>
-        /// This used purely for hacking backwards compatibility into this class for &lt; 7.7 compat
-        /// </summary>
-        [DoNotClone]
-        [IgnoreDataMember]
-        internal List<IUserGroup> GroupsToSave = new List<IUserGroup>();
 
         public IProfile ProfileData => new WrappedUserProfile(this);
 
@@ -361,7 +349,25 @@ namespace Umbraco.Core.Models.Membership
             }
         }
 
-        #endregion
+        public T FromUserCache<T>(string cacheKey)
+            where T : class
+        {
+            lock (_additionalDataLock)
+            {
+                return AdditionalData.TryGetValue(cacheKey, out var allContentStartNodes)
+                    ? allContentStartNodes as T
+                    : null;
+            }
+        }
+
+        public void ToUserCache<T>(string cacheKey, T vals)
+            where T : class
+        {
+            lock (_additionalDataLock)
+            {
+                AdditionalData[cacheKey] = vals;
+            }
+        }
 
         /// <summary>
         /// This is used as an internal cache for this entity - specifically for calculating start nodes so we don't re-calculated all of the time
@@ -378,10 +384,6 @@ namespace Umbraco.Core.Models.Membership
                 }
             }
         }
-
-        [IgnoreDataMember]
-        [DoNotClone]
-        internal object AdditionalDataLock => _additionalDataLock;
 
         protected override void PerformDeepClone(object clone)
         {

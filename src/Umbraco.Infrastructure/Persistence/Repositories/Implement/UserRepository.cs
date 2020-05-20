@@ -424,7 +424,7 @@ ORDER BY colName";
             // as new, as we do not want to create a new user - instead, persist
             // it as updated
             // see also: UserFactory.BuildEntity
-            if (((User) entity).AdditionalData.ContainsKey("IS_V7_ZERO"))
+            if (entity.FromUserCache<string>("IS_V7_ZERO") != null)
             {
                 PersistUpdatedItem(entity);
                 return;

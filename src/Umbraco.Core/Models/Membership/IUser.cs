@@ -52,5 +52,21 @@ namespace Umbraco.Core.Models.Membership
         /// A Json blob stored for recording tour data for a user
         /// </summary>
         string TourData { get; set; }
+
+        /// <summary>
+        /// Returns an item from the user instance's cache
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cacheKey"></param>
+        /// <returns></returns>
+        T FromUserCache<T>(string cacheKey) where T : class;
+
+        /// <summary>
+        /// Puts an item in the user instance's cache
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cacheKey"></param>
+        /// <param name="vals"></param>
+        void ToUserCache<T>(string cacheKey, T vals) where T : class;
     }
 }
