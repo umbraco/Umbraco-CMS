@@ -55,5 +55,18 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <returns>An enumerable list of integer ids</returns>
         IEnumerable<int> CompositionIds();
+
+        /// <summary>
+        /// Returns a list of content type ids that have been removed from this instance's composition
+        /// </summary>
+        IEnumerable<int> RemovedContentTypes { get; }
+
+        /// <summary>
+        /// Gets the property types obtained via composition.
+        /// </summary>
+        /// <remarks>
+        /// <para>Gets them raw, ie with their original variation.</para>
+        /// </remarks>
+        IEnumerable<IPropertyType> GetOriginalComposedPropertyTypes();
     }
 }

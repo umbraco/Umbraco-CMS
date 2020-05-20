@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentTypeComposition
     {
         private List<IContentTypeComposition> _contentTypeComposition = new List<IContentTypeComposition>();
-        internal List<int> RemovedContentTypeKeyTracker = new List<int>();
+        private List<int> _removedContentTypeKeyTracker = new List<int>();
 
         protected ContentTypeCompositionBase(IShortStringHelper shortStringHelper, int parentId) : base(shortStringHelper, parentId)
         { }
@@ -29,6 +29,8 @@ namespace Umbraco.Core.Models
         {
             AddContentType(parent);
         }
+
+        public IEnumerable<int> RemovedContentTypes => _removedContentTypeKeyTracker;
 
         /// <summary>
         /// Gets or sets the content types that compose this content type.
@@ -101,14 +103,8 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Gets the property types obtained via composition.
-        /// </summary>
-        /// <remarks>
-        /// <para>Gets them raw, ie with their original variation.</para>
-        /// </remarks>
-        [IgnoreDataMember]
-        internal IEnumerable<IPropertyType> RawComposedPropertyTypes => GetRawComposedPropertyTypes();
+        /// <inheritdoc />
+        public IEnumerable<IPropertyType> GetOriginalComposedPropertyTypes() => GetRawComposedPropertyTypes();
 
         private IEnumerable<IPropertyType> GetRawComposedPropertyTypes(bool start = true)
         {
@@ -167,12 +163,12 @@ namespace Umbraco.Core.Models
                 if (contentTypeComposition == null)//You can't remove a composition from another composition
                     return false;
 
-                RemovedContentTypeKeyTracker.Add(contentTypeComposition.Id);
+                _removedContentTypeKeyTracker.Add(contentTypeComposition.Id);
 
                 //If the ContentType we are removing has Compositions of its own these needs to be removed as well
                 var compositionIdsToRemove = contentTypeComposition.CompositionIds().ToList();
                 if (compositionIdsToRemove.Any())
-                    RemovedContentTypeKeyTracker.AddRange(compositionIdsToRemove);
+                    _removedContentTypeKeyTracker.AddRange(compositionIdsToRemove);
 
                 OnPropertyChanged(nameof(ContentTypeComposition));
                 return _contentTypeComposition.Remove(contentTypeComposition);
@@ -305,7 +301,7 @@ namespace Umbraco.Core.Models
             var clonedEntity = (ContentTypeCompositionBase)clone;
 
             //need to manually assign since this is an internal field and will not be automatically mapped
-            clonedEntity.RemovedContentTypeKeyTracker = new List<int>();
+            clonedEntity._removedContentTypeKeyTracker = new List<int>();
             clonedEntity._contentTypeComposition = ContentTypeComposition.Select(x => (IContentTypeComposition)x.DeepClone()).ToList();
         }
     }

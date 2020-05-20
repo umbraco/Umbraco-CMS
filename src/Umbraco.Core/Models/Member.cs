@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 using Umbraco.Composing;
 using Umbraco.Core.Logging;
@@ -404,21 +405,60 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual string ContentTypeAlias => ContentType.Alias;
 
-        /* Internal experiment - only used for mapping queries.
-         * Adding these to have first level properties instead of the Properties collection.
-         */
+        /// <summary>
+        /// Internal/Experimental - only used for mapping queries. 
+        /// </summary>
+        /// <remarks>
+        /// Adding these to have first level properties instead of the Properties collection.
+        /// </remarks>
         [IgnoreDataMember]
-        internal string LongStringPropertyValue { get; set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public string LongStringPropertyValue { get; set; }
+        /// <summary>
+        /// Internal/Experimental - only used for mapping queries. 
+        /// </summary>
+        /// <remarks>
+        /// Adding these to have first level properties instead of the Properties collection.
+        /// </remarks>
         [IgnoreDataMember]
-        internal string ShortStringPropertyValue { get; set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public string ShortStringPropertyValue { get; set; }
+        /// <summary>
+        /// Internal/Experimental - only used for mapping queries. 
+        /// </summary>
+        /// <remarks>
+        /// Adding these to have first level properties instead of the Properties collection.
+        /// </remarks>
         [IgnoreDataMember]
-        internal int IntegerPropertyValue { get; set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public int IntegerPropertyValue { get; set; }
+        /// <summary>
+        /// Internal/Experimental - only used for mapping queries. 
+        /// </summary>
+        /// <remarks>
+        /// Adding these to have first level properties instead of the Properties collection.
+        /// </remarks>
         [IgnoreDataMember]
-        internal bool BoolPropertyValue { get; set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool BoolPropertyValue { get; set; }
+        /// <summary>
+        /// Internal/Experimental - only used for mapping queries. 
+        /// </summary>
+        /// <remarks>
+        /// Adding these to have first level properties instead of the Properties collection.
+        /// </remarks>
         [IgnoreDataMember]
-        internal DateTime DateTimePropertyValue { get; set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public DateTime DateTimePropertyValue { get; set; }
+        /// <summary>
+        /// Internal/Experimental - only used for mapping queries. 
+        /// </summary>
+        /// <remarks>
+        /// Adding these to have first level properties instead of the Properties collection.
+        /// </remarks>
         [IgnoreDataMember]
-        internal string PropertyTypeAlias { get; set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public string PropertyTypeAlias { get; set; }
 
         private Attempt<T> WarnIfPropertyTypeNotFoundOnGet<T>(string propertyAlias, string propertyName, T defaultVal)
         {
