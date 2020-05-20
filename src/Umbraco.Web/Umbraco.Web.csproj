@@ -155,7 +155,6 @@
     <Compile Include="WebAssets\CDF\ClientDependencyRuntimeMinifier.cs" />
     <Compile Include="Models\NoNodesViewModel.cs" />
     <Compile Include="Mvc\RenderNoContentController.cs" />
-    <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
     <Compile Include="Editors\Filters\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
@@ -399,7 +398,6 @@
     <Compile Include="WebApi\Filters\DisableBrowserCacheAttribute.cs" />
     <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterGrouping.cs" />
-    <Compile Include="WebApi\Filters\OutgoingEditorModelEventAttribute.cs" />
     <Compile Include="WebApi\Filters\OutgoingNoHyphenGuidFormatAttribute.cs" />
     <Compile Include="WebApi\Filters\OverridableAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\SetAngularAntiForgeryTokensAttribute.cs" />

@@ -135,7 +135,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        [OutgoingEditorModelEvent]
+        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
         public MemberDisplay GetByKey(Guid key)
         {
             var foundMember = Services.MemberService.GetByKey(key);
@@ -151,7 +151,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <returns></returns>
-        [OutgoingEditorModelEvent]
+        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
         public MemberDisplay GetEmpty(string contentTypeAlias = null)
         {
             IMember emptyContent;
@@ -178,7 +178,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [FileUploadCleanupFilter]
-        [OutgoingEditorModelEvent]
+        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
         [MemberSaveValidation]
         public async Task<MemberDisplay> PostSave(
             [ModelBinder(typeof(MemberBinder))]
