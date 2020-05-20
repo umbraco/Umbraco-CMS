@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyCollection"/> class.
         /// </summary>
-        internal PropertyCollection()
+        public PropertyCollection()
             : base(StringComparer.InvariantCultureIgnoreCase)
         { }
 
