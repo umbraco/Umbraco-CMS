@@ -66,7 +66,7 @@
                         }
                     }
                 });
-            }, 250);
+            }, false);
         }
 
         var directive = {
