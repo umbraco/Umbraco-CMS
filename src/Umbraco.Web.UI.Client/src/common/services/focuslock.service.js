@@ -53,7 +53,7 @@
                     if(setInertAttribute) {
                         elementToInert.setAttribute('inert', true);
                     }
-                })
+                });
             },
 
             /**
