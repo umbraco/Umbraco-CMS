@@ -21,6 +21,7 @@
                 // List of elements that can be focusable within the focus lock
                 var focusableElementsSelector = 'a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled])';
                 var bodyElement = document.querySelector('body');
+                
                 $timeout(function() {
                     var target = element[0];
     
@@ -28,14 +29,13 @@
                     var defaultFocusedElement = getAutoFocusElement(focusableElements);
                     var firstFocusableElement = focusableElements[0];
                     var lastFocusableElement = focusableElements[focusableElements.length -1];
-                    var focusedElement = defaultFocusedElement !== null ? defaultFocusedElement : document.querySelector(':focus');
-    
+
                     // We need to add the tabbing-active class in order to highlight the focused button since the default style is
                     // outline: none; set in the stylesheet specifically
                     bodyElement.classList.add('tabbing-active');
     
                     // If there is no default focused element put focus on the first focusable element in the nodelist
-                    if(focusedElement === null){
+                    if(defaultFocusedElement === null ){
                         firstFocusableElement.focus();
                     }
     
@@ -63,7 +63,7 @@
                             }
                         }
                     });
-                }, false);
+                }, 250);
             }
 
             onInit();
