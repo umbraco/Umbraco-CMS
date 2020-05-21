@@ -28,6 +28,11 @@
                 var lastFocusableElement = focusableElements[focusableElements.length -1];
                 var focusedElement = defaultFocusedElement !== null ? defaultFocusedElement : document.querySelector(':focus');
 
+                // TODO: figure out a clever solution when some of the focusable elements are wrapped in hidden containers...
+                console.log(focusableElements);
+                console.log(firstFocusableElement);
+                console.log(lastFocusableElement);
+
                 // We need to add the tabbing-active class in order to highlight the focused button since the default style is
                 // outline: none; set in the stylesheet specifically
                 bodyElement.classList.add('tabbing-active');
