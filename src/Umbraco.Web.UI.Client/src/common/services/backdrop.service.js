@@ -10,7 +10,7 @@
 (function () {
     "use strict";
 
-    function backdropService(eventsService, focusLockService) {
+    function backdropService(eventsService) {
 
         var args = {
             opacity: null,
@@ -45,8 +45,6 @@
 
             args.show = true;
 
-            focusLockService.addInertAttribute();
-
             eventsService.emit("appState.backdrop", args);
         }
 
@@ -65,7 +63,6 @@
             args.elementPreventClick = false,
             args.disableEventsOnClick = false,
             args.show = false
-            focusLockService.removeInertAttribute();
             eventsService.emit("appState.backdrop", args);
         }
 

@@ -8,7 +8,7 @@
 (function () {
     "use strict";
 
-    function overlayService(eventsService, backdropService) {
+    function overlayService(eventsService, backdropService, focusLockService) {
 
         var currentOverlay = null;
 
@@ -43,12 +43,14 @@
             }
 
             overlay.show = true;
+            focusLockService.addInertAttribute();
             backdropService.open(backdropOptions);
             currentOverlay = overlay;
             eventsService.emit("appState.overlay", overlay);
         }
 
         function close() {
+            focusLockService.removeInertAttribute();
             backdropService.close();
             currentOverlay = null;
             eventsService.emit("appState.overlay", null);
