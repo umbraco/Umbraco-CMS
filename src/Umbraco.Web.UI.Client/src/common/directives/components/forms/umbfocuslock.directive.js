@@ -4,7 +4,7 @@
     function FocusLock($timeout) {
 
         // List of elements that can be focusable within the focus lock
-        var focusableElementsSelector = 'a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])';
+        var focusableElementsSelector = 'a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled])';
         var bodyElement = document.querySelector('body');
         var elmentWithAutoFocus = null;
 
