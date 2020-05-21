@@ -5,21 +5,38 @@
 
         // List of elements that can be focusable within the focus lock
         var focusableElementsSelector = 'a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])';
+        var bodyElement = document.querySelector('body');
+        var elmentWithAutoFocus = null;
+
+        function getAutoFocusElement (elements) {
+            elements.forEach((element) => {
+                if(element.getAttribute('umb-auto-focus') === 'true') {
+                    elmentWithAutoFocus = element;
+                }
+            });
+
+            return elmentWithAutoFocus;
+        }
 
         function link(scope, el) {
             $timeout(function() {
                 var target = el[0];
 
                 var focusableElements = target.querySelectorAll(focusableElementsSelector);
+                var defaultFocusedElement = getAutoFocusElement(focusableElements);
                 var firstFocusableElement = focusableElements[0];
                 var lastFocusableElement = focusableElements[focusableElements.length -1];
-                var focusedElement = document.querySelector(':focus');
-    
-                // If focus has not been set then put focus on the first focusable element
+                var focusedElement = defaultFocusedElement !== null ? defaultFocusedElement : document.querySelector(':focus');
+
+                // We need to add the tabbing-active class in order to highlight the focused button since the default style is
+                // outline: none; set in the stylesheet specifically
+                bodyElement.classList.add('tabbing-active');
+
+                // If there is no default focused element put focus on the first focusable element in the nodelist
                 if(focusedElement === null){
                     firstFocusableElement.focus();
                 }
-        
+
                 target.addEventListener('keydown', function(event){
                     var isTabPressed = (event.key === 'Tab' || event.keyCode === 9);
         
