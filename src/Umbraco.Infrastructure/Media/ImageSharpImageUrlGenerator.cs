@@ -3,6 +3,7 @@ using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Infrastructure.Media
 {
@@ -19,9 +20,9 @@ namespace Umbraco.Infrastructure.Media
             else if (options.DefaultCrop) imageProcessorUrl.Append("?anchor=center&mode=crop");
             else
             {
-                imageProcessorUrl.Append("?mode=").Append((options.ImageCropMode ?? "crop").ToLower());
+                imageProcessorUrl.Append("?mode=").Append((options.ImageCropMode ?? ImageCropMode.Crop).ToString().ToLower());
 
-                if (options.ImageCropAnchor != null) imageProcessorUrl.Append("&anchor=").Append(options.ImageCropAnchor.ToLower());
+                if (options.ImageCropAnchor != null) imageProcessorUrl.Append("&anchor=").Append(options.ImageCropAnchor.ToString().ToLower());
             }
 
             var hasFormat = options.FurtherOptions != null && options.FurtherOptions.InvariantContains("&format=");

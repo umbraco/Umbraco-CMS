@@ -20,6 +20,7 @@ using Umbraco.Web;
 using Umbraco.Web.PropertyEditors;
 using System.Text;
 using Umbraco.Infrastructure.Media;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Tests.Models
 {
@@ -126,11 +127,11 @@ namespace Umbraco.Tests.Models
         [Test]
         public void GetCropUrl_SpecifiedCropModeTest()
         {
-            var urlStringMin = Generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { ImageCropMode = "Min", Width = 300, Height = 150 });
-            var urlStringBoxPad = Generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { ImageCropMode = "BoxPad", Width = 300, Height = 150 });
-            var urlStringPad = Generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { ImageCropMode = "Pad", Width = 300, Height = 150 });
-            var urlStringMax = Generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { ImageCropMode = "Max", Width = 300, Height = 150 });
-            var urlStringStretch = Generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { ImageCropMode = "Stretch", Width = 300, Height = 150 });
+            var urlStringMin = Generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { ImageCropMode = ImageCropMode.Min, Width = 300, Height = 150 });
+            var urlStringBoxPad = Generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { ImageCropMode = ImageCropMode.BoxPad, Width = 300, Height = 150 });
+            var urlStringPad = Generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { ImageCropMode = ImageCropMode.Pad, Width = 300, Height = 150 });
+            var urlStringMax = Generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { ImageCropMode = ImageCropMode.Max, Width = 300, Height = 150 });
+            var urlStringStretch = Generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { ImageCropMode = ImageCropMode.Stretch, Width = 300, Height = 150 });
 
             Assert.AreEqual(MediaPath + "?mode=min&width=300&height=150", urlStringMin);
             Assert.AreEqual(MediaPath + "?mode=boxpad&width=300&height=150", urlStringBoxPad);
@@ -145,7 +146,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void GetCropUrl_UploadTypeTest()
         {
-            var urlString = Generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { ImageCropMode = "Crop", ImageCropAnchor = "Center", Width = 100, Height = 270 });
+            var urlString = Generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { ImageCropMode = ImageCropMode.Crop, ImageCropAnchor = ImageCropAnchor.Center, Width = 100, Height = 270 });
             Assert.AreEqual(MediaPath + "?mode=crop&anchor=center&width=100&height=270", urlString);
         }
 
@@ -225,7 +226,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void GetCropUrl_BackgroundColorParameter()
         {
-            var urlString = Generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { ImageCropMode = "Pad", Width = 400, Height = 400, FurtherOptions = "&bgcolor=fff" });
+            var urlString = Generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { ImageCropMode = ImageCropMode.Pad, Width = 400, Height = 400, FurtherOptions = "&bgcolor=fff" });
             Assert.AreEqual(MediaPath + "?mode=pad&width=400&height=400&bgcolor=fff", urlString);
         }
     }

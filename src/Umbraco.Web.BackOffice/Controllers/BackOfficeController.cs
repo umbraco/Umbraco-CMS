@@ -33,7 +33,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IGlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizedTextService _textService;
         private readonly IGridConfig _gridConfig;
@@ -46,7 +45,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IRuntimeMinifier runtimeMinifier,
             IGlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
-            IUmbracoApplicationLifetime umbracoApplicationLifetime,
+
             IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizedTextService textService,
             IGridConfig gridConfig,
@@ -59,7 +58,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             _runtimeMinifier = runtimeMinifier;
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
-            _umbracoApplicationLifetime = umbracoApplicationLifetime;
             _umbracoContextAccessor = umbracoContextAccessor;
             _textService = textService;
             _gridConfig = gridConfig ?? throw new ArgumentNullException(nameof(gridConfig));
@@ -130,7 +128,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return new JsonNetResult { Data = nestedDictionary, Formatting = Formatting.None };
         }
 
-        [UmbracoAuthorize(Order = 0)] // TODO: Re-implement UmbracoAuthorizeAttribute
+        [UmbracoAuthorize(Order = 0)]
         [HttpGet]
         public JsonNetResult GetGridConfig()
         {
@@ -223,5 +221,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             return Redirect("/");
         }
+
+
     }
 }

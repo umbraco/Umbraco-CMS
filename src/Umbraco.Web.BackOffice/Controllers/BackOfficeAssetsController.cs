@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Web.Http;
-using Umbraco.Core.Composing;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Mvc;
+using Umbraco.Web.Common.Attributes;
 
 namespace Umbraco.Web.Editors
 {

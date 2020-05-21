@@ -143,10 +143,11 @@ namespace Umbraco.Web.Editors
                             "redirectUrlManagementApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RedirectUrlManagementController>(
                                 controller => controller.GetEnableState())
                         },
-                        {
-                            "tourApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TourController>(
-                                controller => controller.GetTours())
-                        },
+                        //TODO reintroduce
+                        // {
+                        //     "tourApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TourController>(
+                        //         controller => controller.GetTours())
+                        // },
                         {
                             "embedApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
                                 controller => controller.GetEmbed("", 0, 0))
@@ -167,10 +168,11 @@ namespace Umbraco.Web.Editors
                             "mediaApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MediaController>(
                                 controller => controller.GetRootMedia())
                         },
-                        {
-                            "imagesApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImagesController>(
-                                controller => controller.GetBigThumbnail(""))
-                        },
+                        //TODO reintroduce
+                        // {
+                        //     "imagesApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImagesController>(
+                        //         controller => controller.GetBigThumbnail(""))
+                        // },
                         {
                             "sectionApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<SectionController>(
                                 controller => controller.GetSections())
@@ -211,10 +213,11 @@ namespace Umbraco.Web.Editors
                             "dataTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DataTypeController>(
                                 controller => controller.GetById(0))
                         },
-                        {
-                            "dashboardApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DashboardController>(
-                                controller => controller.GetDashboard(null))
-                        },
+                        //TODO Reintroduce
+                        // {
+                        //     "dashboardApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DashboardController>(
+                        //         controller => controller.GetDashboard(null))
+                        // },
                         {
                             "logApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogController>(
                                 controller => controller.GetPagedEntityLog(0, 0, 0, Direction.Ascending, null))
@@ -275,10 +278,11 @@ namespace Umbraco.Web.Editors
                             "tagsDataBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TagsDataController>(
                                 controller => controller.GetTags("", "", null))
                         },
-                        {
-                            "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
-                                controller => controller.GetIndexerDetails())
-                        },
+                        //TODO reintroduce
+                        // {
+                        //     "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
+                        //         controller => controller.GetIndexerDetails())
+                        // },
                         {
                             "healthCheckBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
                                 controller => controller.GetAllHealthChecks())
@@ -303,14 +307,16 @@ namespace Umbraco.Web.Editors
                             "publishedSnapshotCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedSnapshotCacheStatusController>(
                                 controller => controller.GetStatus())
                         },
-                        {
-                            "helpApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HelpController>(
-                                controller => controller.GetContextHelpForPage("","",""))
-                        },
-                        {
-                            "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
-                                controller => controller.GetSupportedLocales())
-                        },
+                        //TODO Reintroduce
+                        // {
+                        //     "helpApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HelpController>(
+                        //         controller => controller.GetContextHelpForPage("","",""))
+                        // },
+                        //TODO Reintroduce
+                        // {
+                        //     "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
+                        //         controller => controller.GetSupportedLocales())
+                        // },
                         {
                             "languageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LanguageController>(
                                 controller => controller.GetAllLanguages())
@@ -331,10 +337,11 @@ namespace Umbraco.Web.Editors
                             "tinyMceApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TinyMceController>(
                                 controller => controller.UploadImage())
                         },
-                        {
-                            "imageUrlGeneratorApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImageUrlGeneratorController>(
-                                controller => controller.GetCropUrl(null, null, null, null, null))
-                        },
+                        //TODO Reintroduce
+                        // {
+                        //     "imageUrlGeneratorApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImageUrlGeneratorController>(
+                        //         controller => controller.GetCropUrl(null, null, null, null, null))
+                        // },
                     }
                 },
                 {

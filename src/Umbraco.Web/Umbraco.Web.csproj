@@ -155,11 +155,9 @@
     <Compile Include="WebAssets\CDF\ClientDependencyRuntimeMinifier.cs" />
     <Compile Include="Models\NoNodesViewModel.cs" />
     <Compile Include="Mvc\RenderNoContentController.cs" />
-    <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
     <Compile Include="Editors\Filters\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
-    <Compile Include="Editors\ImageUrlGeneratorController.cs" />
     <Compile Include="Editors\PackageController.cs" />
     <Compile Include="Editors\KeepAliveController.cs" />
     <Compile Include="Editors\MacrosController.cs" />
@@ -225,7 +223,6 @@
     <Compile Include="Security\IdentityAuditEventArgs.cs" />
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\Current.cs" />
-    <Compile Include="Editors\BackOfficeAssetsController.cs" />
     <Compile Include="Editors\BackOfficeServerVariables.cs" />
     <Compile Include="Editors\LogViewerController.cs" />
     <Compile Include="ImageProcessorLogger.cs" />
@@ -246,15 +243,12 @@
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\DictionaryController.cs" />
     <Compile Include="Editors\Filters\MemberSaveModelValidator.cs" />
-    <Compile Include="Editors\ExamineManagementController.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
-    <Compile Include="Editors\HelpController.cs" />
     <Compile Include="Editors\Filters\IsCurrentUserModelFilterAttribute.cs" />
     <Compile Include="Editors\LanguageController.cs" />
     <Compile Include="WebApi\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
     <Compile Include="Editors\TemplateController.cs" />
-    <Compile Include="Editors\TourController.cs" />
     <Compile Include="Editors\Filters\UserGroupAuthorizationAttribute.cs" />
     <Compile Include="Editors\Filters\UserGroupEditorAuthorizationHelper.cs" />
     <Compile Include="Editors\UserGroupsController.cs" />
@@ -340,9 +334,7 @@
     <Compile Include="Controllers\UmbLoginStatusController.cs" />
     <Compile Include="Editors\Filters\ContentSaveValidationAttribute.cs" />
     <Compile Include="Editors\ContentTypeControllerBase.cs" />
-    <Compile Include="Editors\DashboardController.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
-    <Compile Include="Editors\ImagesController.cs" />
     <Compile Include="Editors\PackageInstallController.cs" />
     <Compile Include="Editors\RelationController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
@@ -393,11 +385,9 @@
     <Compile Include="WebApi\Filters\DisableBrowserCacheAttribute.cs" />
     <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterGrouping.cs" />
-    <Compile Include="WebApi\Filters\OutgoingEditorModelEventAttribute.cs" />
     <Compile Include="WebApi\Filters\OutgoingNoHyphenGuidFormatAttribute.cs" />
     <Compile Include="WebApi\Filters\OverridableAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\SetAngularAntiForgeryTokensAttribute.cs" />
-    <Compile Include="WebApi\Filters\UmbracoWebApiRequireHttpsAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoTreeAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\ValidateAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="WebApi\HttpControllerContextExtensions.cs" />
