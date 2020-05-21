@@ -58,7 +58,7 @@ namespace Umbraco.Web.Security
 
             return new BackOfficeSignInManager(
                 userManager,
-                new BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>(userManager, new OptionsWrapper<IdentityOptions>(userManager.Options)),
+                new BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>(userManager, new OptionsWrapper<BackOfficeIdentityOptions>(userManager.Options)),
                 context.Authentication,
                 logger,
                 globalSettings,

@@ -14,7 +14,7 @@ namespace Umbraco.Extensions
         public const string TokenExternalSignInError = "ExternalSignInError";
         public const string TokenPasswordResetCode = "PasswordResetCode";
 
-        public static bool FromTempData(this ViewDataDictionary viewData, TempDataDictionary tempData, string token)
+        public static bool FromTempData(this ViewDataDictionary viewData, ITempDataDictionary tempData, string token)
         {
             if (tempData[token] == null) return false;
             viewData[token] = tempData[token];

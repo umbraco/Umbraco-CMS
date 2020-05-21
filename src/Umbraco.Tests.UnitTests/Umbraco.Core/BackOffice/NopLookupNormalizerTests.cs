@@ -12,7 +12,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
         [TestCase(" ")]
         public void NormalizeName_When_Name_Null_Or_Whitespace_Expect_Same_Returned(string name)
         {
-            var sut = new NopLookupNormalizer();
+            var sut = new BackOfficeLookupNormalizer();
 
             var normalizedName = sut.NormalizeName(name);
 
@@ -23,7 +23,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
         public void NormalizeName_Expect_Input_Returned()
         {
             var name = Guid.NewGuid().ToString();
-            var sut = new NopLookupNormalizer();
+            var sut = new BackOfficeLookupNormalizer();
 
             var normalizedName = sut.NormalizeName(name);
 
@@ -35,7 +35,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
         [TestCase(" ")]
         public void NormalizeEmail_When_Name_Null_Or_Whitespace_Expect_Same_Returned(string email)
         {
-            var sut = new NopLookupNormalizer();
+            var sut = new BackOfficeLookupNormalizer();
 
             var normalizedEmail = sut.NormalizeEmail(email);
 
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
         public void NormalizeEmail_Expect_Input_Returned()
         {
             var email = $"{Guid.NewGuid()}@umbraco";
-            var sut = new NopLookupNormalizer();
+            var sut = new BackOfficeLookupNormalizer();
 
             var normalizedEmail = sut.NormalizeEmail(email);
 

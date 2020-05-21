@@ -14,7 +14,7 @@ namespace Umbraco.Core.BackOffice
         private const string _identityProviderClaimType = "http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider";
         private const string _identityProviderClaimValue = "ASP.NET Identity";
 
-        public BackOfficeClaimsPrincipalFactory(UserManager<TUser> userManager, IOptions<IdentityOptions> optionsAccessor)
+        public BackOfficeClaimsPrincipalFactory(UserManager<TUser> userManager, IOptions<BackOfficeIdentityOptions> optionsAccessor)
             : base(userManager, optionsAccessor)
         {
         }

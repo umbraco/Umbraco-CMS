@@ -52,7 +52,7 @@ namespace Umbraco.Web.Security
                     mapper,
                     passwordConfiguration,
                     ipResolver,
-                    new IdentityErrorDescriber(),
+                    new BackOfficeIdentityErrorDescriber(),
                     app.GetDataProtectionProvider(),
                     new NullLogger<BackOfficeUserManager<BackOfficeIdentityUser>>()));
 
@@ -82,7 +82,7 @@ namespace Umbraco.Web.Security
                     passwordConfiguration,
                     ipResolver,
                     customUserStore,
-                    new IdentityErrorDescriber(),
+                    new BackOfficeIdentityErrorDescriber(),
                     app.GetDataProtectionProvider(),
                     new NullLogger<BackOfficeUserManager<BackOfficeIdentityUser>>()));
 

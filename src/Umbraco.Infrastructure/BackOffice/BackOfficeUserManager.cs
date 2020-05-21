@@ -11,9 +11,20 @@ using Umbraco.Net;
 
 namespace Umbraco.Core.BackOffice
 {
+
     public class BackOfficeUserManager : BackOfficeUserManager<BackOfficeIdentityUser>
     {
-        public BackOfficeUserManager(IIpResolver ipResolver, IUserStore<BackOfficeIdentityUser> store, IOptions<IdentityOptions> optionsAccessor, IPasswordHasher<BackOfficeIdentityUser> passwordHasher, IEnumerable<IUserValidator<BackOfficeIdentityUser>> userValidators, IEnumerable<IPasswordValidator<BackOfficeIdentityUser>> passwordValidators, ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors, IServiceProvider services, ILogger<UserManager<BackOfficeIdentityUser>> logger)
+        public BackOfficeUserManager(
+            IIpResolver ipResolver,
+            IUserStore<BackOfficeIdentityUser> store,
+            IOptions<BackOfficeIdentityOptions> optionsAccessor,
+            IPasswordHasher<BackOfficeIdentityUser> passwordHasher,
+            IEnumerable<IUserValidator<BackOfficeIdentityUser>> userValidators,
+            IEnumerable<IPasswordValidator<BackOfficeIdentityUser>> passwordValidators,
+            BackOfficeLookupNormalizer keyNormalizer,
+            BackOfficeIdentityErrorDescriber errors,
+            IServiceProvider services,
+            ILogger<UserManager<BackOfficeIdentityUser>> logger)
             : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
         {
         }
@@ -27,12 +38,12 @@ namespace Umbraco.Core.BackOffice
         public BackOfficeUserManager(
             IIpResolver ipResolver,
             IUserStore<T> store,
-            IOptions<IdentityOptions> optionsAccessor,
+            IOptions<BackOfficeIdentityOptions> optionsAccessor,
             IPasswordHasher<T> passwordHasher,
             IEnumerable<IUserValidator<T>> userValidators,
             IEnumerable<IPasswordValidator<T>> passwordValidators,
-            ILookupNormalizer keyNormalizer,
-            IdentityErrorDescriber errors,
+            BackOfficeLookupNormalizer keyNormalizer,
+            BackOfficeIdentityErrorDescriber errors,
             IServiceProvider services,
             ILogger<UserManager<T>> logger)
             : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
@@ -55,6 +66,15 @@ namespace Umbraco.Core.BackOffice
         // TODO: Support this
         public override bool SupportsUserPhoneNumber => false;
         #endregion
+
+        /// <summary>
+        /// Replace the underlying options property with our own strongly typed version
+        /// </summary>
+        public new BackOfficeIdentityOptions Options
+        {
+            get => (BackOfficeIdentityOptions)base.Options;
+            set => base.Options = value;
+        }
 
         /// <summary>
         /// Used to validate a user's session

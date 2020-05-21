@@ -1,13 +1,10 @@
-﻿using System;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
-using Umbraco.Core.Configuration;
 using Umbraco.Net;
+using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.AspNetCore;
 
 namespace Umbraco.Extensions
@@ -20,50 +17,42 @@ namespace Umbraco.Extensions
 
             services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
 
-            services
-                .AddIdentityCore<BackOfficeIdentityUser>()
+            services.BuildUmbracoBackOfficeIdentity()
                 .AddDefaultTokenProviders()
                 .AddUserStore<BackOfficeUserStore>()
                 .AddUserManager<BackOfficeUserManager>()
                 .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>>();
 
-            services.ConfigureOptions<UmbracoBackOfficeIdentityOptions>();
-            services.AddScoped<ILookupNormalizer, NopLookupNormalizer>();
-            services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<BackOfficeIdentityUser>>();
+            // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
+            services.ConfigureOptions<ConfigureUmbracoBackOfficeIdentityOptions>();
+            //services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<BackOfficeIdentityUser>>();
 
+            services
+                .AddAuthentication(Constants.Security.BackOfficeAuthenticationType)
+                .AddCookie(Constants.Security.BackOfficeAuthenticationType);
+            services.ConfigureOptions<ConfigureUmbracoBackOfficeCookieOptions>();
         }
 
-        /// <summary>
-        /// Used to configure <see cref="IdentityOptions"/> for the Umbraco Back office
-        /// </summary>
-        private class UmbracoBackOfficeIdentityOptions : IConfigureOptions<IdentityOptions>
+        private static IdentityBuilder BuildUmbracoBackOfficeIdentity(this IServiceCollection services)
         {
-            private readonly IUserPasswordConfiguration _userPasswordConfiguration;
+            // Borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Extensions.Core/src/IdentityServiceCollectionExtensions.cs#L33
+            // The reason we need our own is because the Identity system doesn't cater easily for multiple identity systems and particularly being
+            // able to configure IdentityOptions to a specific provider since there is no named options. So we have strongly typed options
+            // and strongly typed ILookupNormalizer and IdentityErrorDescriber since those are 'global' and we need to be unintrusive. 
 
-            public UmbracoBackOfficeIdentityOptions(IUserPasswordConfiguration userPasswordConfiguration)
-            {
-                _userPasswordConfiguration = userPasswordConfiguration;
-            }
+            // Services used by identity
+            services.TryAddScoped<IUserValidator<BackOfficeIdentityUser>, UserValidator<BackOfficeIdentityUser>>();
+            services.TryAddScoped<IPasswordValidator<BackOfficeIdentityUser>, PasswordValidator<BackOfficeIdentityUser>>();
+            services.TryAddScoped<IPasswordHasher<BackOfficeIdentityUser>, PasswordHasher<BackOfficeIdentityUser>>();
+            services.TryAddScoped<IUserConfirmation<BackOfficeIdentityUser>, DefaultUserConfirmation<BackOfficeIdentityUser>>();
+            services.TryAddScoped<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>, UserClaimsPrincipalFactory<BackOfficeIdentityUser>>();
+            services.TryAddScoped<UserManager<BackOfficeIdentityUser>>();
 
-            public void Configure(IdentityOptions options)
-            {
-                options.User.RequireUniqueEmail = true;
-                options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
-                options.ClaimsIdentity.UserNameClaimType = ClaimTypes.Name;
-                options.ClaimsIdentity.RoleClaimType = ClaimTypes.Role;
-                options.ClaimsIdentity.SecurityStampClaimType = Constants.Web.SecurityStampClaimType;
-                options.Lockout.AllowedForNewUsers = true;
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(30);
+            // CUSTOM:
+            services.TryAddScoped<BackOfficeLookupNormalizer>();
+            services.TryAddScoped<BackOfficeIdentityErrorDescriber>();
 
-                options.Password.RequiredLength = _userPasswordConfiguration.RequiredLength;
-                options.Password.RequireNonAlphanumeric = _userPasswordConfiguration.RequireNonLetterOrDigit;
-                options.Password.RequireDigit = _userPasswordConfiguration.RequireDigit;
-                options.Password.RequireLowercase = _userPasswordConfiguration.RequireLowercase;
-                options.Password.RequireUppercase = _userPasswordConfiguration.RequireUppercase;
-                options.Lockout.MaxFailedAccessAttempts = _userPasswordConfiguration.MaxFailedAccessAttemptsBeforeLockout;
-            }
+            return new IdentityBuilder(typeof(BackOfficeIdentityUser), services);
         }
-
-
     }
 }

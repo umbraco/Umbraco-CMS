@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Umbraco.Core;
@@ -38,6 +39,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IGridConfig _gridConfig;
         private readonly BackOfficeServerVariables _backOfficeServerVariables;
         private readonly AppCaches _appCaches;
+        private readonly SignInManager<BackOfficeIdentityUser> _signInManager;
 
         public BackOfficeController(
             BackOfficeUserManager userManager,
@@ -49,7 +51,9 @@ namespace Umbraco.Web.BackOffice.Controllers
             ILocalizedTextService textService,
             IGridConfig gridConfig,
             BackOfficeServerVariables backOfficeServerVariables,
-            AppCaches appCaches)
+            AppCaches appCaches,
+            SignInManager<BackOfficeIdentityUser> signInManager // TODO: Review this, do we want it/need it or create our own?
+            )
         {
             _userManager = userManager;
             _runtimeMinifier = runtimeMinifier;
@@ -61,13 +65,15 @@ namespace Umbraco.Web.BackOffice.Controllers
             _gridConfig = gridConfig ?? throw new ArgumentNullException(nameof(gridConfig));
             _backOfficeServerVariables = backOfficeServerVariables;
             _appCaches = appCaches;
+            _signInManager = signInManager;
         }
 
         [HttpGet]
-        public IActionResult Default()
+        public async Task<IActionResult> Default()
         {
-            // TODO: Migrate this
-            return View();
+            return await RenderDefaultOrProcessExternalLoginAsync(
+                () => View(),
+                () => View());
         }
 
         /// <summary>
@@ -170,6 +176,44 @@ namespace Umbraco.Web.BackOffice.Controllers
             TempData[ViewDataExtensions.TokenPasswordResetCode] = new[] { _textService.Localize("login/resetCodeExpired") };
             return RedirectToLocal(Url.Action("Default", "BackOffice"));
         }
+
+        /// <summary>
+        /// Used by Default and AuthorizeUpgrade to render as per normal if there's no external login info,
+        /// otherwise process the external login info.
+        /// </summary>
+        /// <returns></returns>
+        private async Task<ActionResult> RenderDefaultOrProcessExternalLoginAsync(
+            Func<ActionResult> defaultResponse,
+            Func<ActionResult> externalSignInResponse)
+        {
+            if (defaultResponse is null) throw new ArgumentNullException(nameof(defaultResponse));
+            if (externalSignInResponse is null) throw new ArgumentNullException(nameof(externalSignInResponse));
+
+            ViewData.SetUmbracoPath(_globalSettings.GetUmbracoMvcArea(_hostingEnvironment));
+
+            //check if there is the TempData with the any token name specified, if so, assign to view bag and render the view
+            if (ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||
+                ViewData.FromTempData(TempData, ViewDataExtensions.TokenPasswordResetCode))
+                return defaultResponse();
+
+            return defaultResponse();
+
+            //First check if there's external login info, if there's not proceed as normal
+            // TODO: Review this, not sure if this will work as expected until we integrate OAuth
+            // TODO: Do we pass in XsrfKey ? need to investigate how this all works now
+            //var loginInfo = await _signInManager.GetExternalLoginInfoAsync();
+
+            //if (loginInfo == null || loginInfo.ExternalIdentity.IsAuthenticated == false)
+            //{
+            //    return defaultResponse();
+            //}
+
+            ////we're just logging in with an external source, not linking accounts
+            //return await ExternalSignInAsync(loginInfo, externalSignInResponse);
+        }
+
+        // Used for XSRF protection when adding external logins
+        private const string XsrfKey = "XsrfId";
 
         private ActionResult RedirectToLocal(string returnUrl)
         {

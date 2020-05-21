@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using Microsoft.AspNetCore.Identity;
+using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Composing;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
@@ -13,6 +15,7 @@ namespace Umbraco.Web.BackOffice.Runtime
         {
             composition.RegisterUnique<BackOfficeAreaRoutes>();
             composition.RegisterUnique<BackOfficeServerVariables>();
+            composition.Register<SignInManager<BackOfficeIdentityUser>>(Lifetime.Scope);
         }
     }
 }
