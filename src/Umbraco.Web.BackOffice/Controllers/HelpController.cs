@@ -3,11 +3,20 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using Umbraco.Core.Logging;
+using Umbraco.Web.Editors;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
     public class HelpController : UmbracoAuthorizedJsonController
     {
+        private readonly ILogger _logger;
+
+        public HelpController(ILogger logger)
+        {
+            _logger = logger;
+        }
+
         private static HttpClient _httpClient;
         public async Task<List<HelpPage>> GetContextHelpForPage(string section, string tree, string baseUrl = "https://our.umbraco.com")
         {
@@ -28,7 +37,7 @@ namespace Umbraco.Web.Editors
             }
             catch (HttpRequestException rex)
             {
-                Logger.Info(GetType(), $"Check your network connection, exception: {rex.Message}");
+                _logger.Info(GetType(), $"Check your network connection, exception: {rex.Message}");
             }
 
             return new List<HelpPage>();

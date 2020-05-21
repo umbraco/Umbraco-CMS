@@ -303,7 +303,7 @@ namespace Umbraco.Web.Editors
         /// <param name="id"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        [OutgoingEditorModelEvent]
+        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
         [EnsureUserPermissionForContent("id")]
         public ContentItemDisplay GetById(int id)
         {
@@ -322,7 +322,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [OutgoingEditorModelEvent]
+        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
         [EnsureUserPermissionForContent("id")]
         public ContentItemDisplay GetById(Guid id)
         {
@@ -342,7 +342,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [OutgoingEditorModelEvent]
+        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
         [EnsureUserPermissionForContent("id")]
         public ContentItemDisplay GetById(Udi id)
         {
@@ -360,7 +360,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
-        [OutgoingEditorModelEvent]
+        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
         public ContentItemDisplay GetEmpty(string contentTypeAlias, int parentId)
         {
             var contentType = Services.ContentTypeService.Get(contentTypeAlias);
@@ -383,7 +383,7 @@ namespace Umbraco.Web.Editors
             return mapped;
         }
 
-        [OutgoingEditorModelEvent]
+        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
         public ContentItemDisplay GetEmpty(int blueprintId, int parentId)
         {
             var blueprint = Services.ContentService.GetBlueprintById(blueprintId);
@@ -608,7 +608,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [FileUploadCleanupFilter]
         [ContentSaveValidation]
-        [OutgoingEditorModelEvent]
+        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
         public ContentItemDisplay PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
         {
             var contentItemDisplay = PostSaveInternal(
@@ -1629,7 +1629,7 @@ namespace Umbraco.Web.Editors
         /// <param name="model">The content and variants to unpublish</param>
         /// <returns></returns>
         [EnsureUserPermissionForContent("model.Id", 'Z')]
-        [OutgoingEditorModelEvent]
+        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
         public ContentItemDisplay PostUnpublish(UnpublishContent model)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(model.Id));

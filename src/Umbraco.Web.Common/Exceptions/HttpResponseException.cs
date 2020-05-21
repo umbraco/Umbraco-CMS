@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Runtime.Serialization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace Umbraco.Web.Common.Exceptions
 {
@@ -12,6 +14,22 @@ namespace Umbraco.Web.Common.Exceptions
         {
             Status = status;
             Value = value;
+        }
+
+        public HttpResponseException(ActionResult actionResult)
+        {
+
+            Status = actionResult switch
+            {
+                IStatusCodeActionResult x => (HttpStatusCode)x.StatusCode.GetValueOrDefault((int)HttpStatusCode.InternalServerError),
+                _ => HttpStatusCode.InternalServerError
+            };
+
+            Value = actionResult switch
+            {
+                ObjectResult x => x.Value,
+                _ => null
+            };
         }
 
         public HttpStatusCode Status { get; set; }

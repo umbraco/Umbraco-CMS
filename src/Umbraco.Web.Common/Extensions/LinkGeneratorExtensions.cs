@@ -28,7 +28,7 @@ namespace Umbraco.Extensions
                 return hostingEnvironment.ApplicationVirtualPath; // this would indicate that the installer is installed without the back office
             }
 
-            return linkGenerator.GetPathByAction("Default", ControllerExtensions.GetControllerName(backOfficeControllerType), new { area = Constants.Web.Mvc.BackOfficeApiArea });
+            return linkGenerator.GetPathByAction("Default", ControllerExtensions.GetControllerName(backOfficeControllerType), values: new { area = Constants.Web.Mvc.BackOfficeApiArea });
         }
 
         /// <summary>

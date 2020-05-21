@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Core.Media;
+using Umbraco.Core.Models;
+using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 
@@ -20,6 +22,7 @@ namespace Umbraco.Web.Editors
     /// building to generate correct URLs
     /// </para>
     /// </remarks>
+    [PluginController("UmbracoApi")]
     public class ImageUrlGeneratorController : UmbracoAuthorizedJsonController
     {
         private readonly IImageUrlGenerator _imageUrlGenerator;
@@ -31,7 +34,13 @@ namespace Umbraco.Web.Editors
 
         public string GetCropUrl(string mediaPath, int? width = null, int? height = null, ImageCropMode? imageCropMode = null, string animationProcessMode = null)
         {
-            return mediaPath.GetCropUrl(_imageUrlGenerator, null, width: width, height: height, imageCropMode: imageCropMode, animationProcessMode: animationProcessMode);
+            return _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(mediaPath)
+            {
+                Width = width,
+                Height = height,
+                ImageCropMode = imageCropMode,
+                AnimationProcessMode = animationProcessMode
+            });
         }
     }
 }

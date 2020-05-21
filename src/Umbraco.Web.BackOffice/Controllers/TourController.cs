@@ -3,20 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
+using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Tour;
 
 namespace Umbraco.Web.Editors
@@ -25,28 +17,24 @@ namespace Umbraco.Web.Editors
     public class TourController : UmbracoAuthorizedJsonController
     {
         private readonly TourFilterCollection _filters;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ITourSettings _tourSettings;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IContentTypeService _contentTypeService;
 
         public TourController(
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger logger,
-            IRuntimeState runtimeState,
-            IShortStringHelper shortStringHelper,
-            UmbracoMapper umbracoMapper,
             TourFilterCollection filters,
-            IIOHelper ioHelper,
-            IPublishedUrlProvider publishedUrlProvider,
-            ITourSettings tourSettings)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
+            IHostingEnvironment hostingEnvironment,
+            ITourSettings tourSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IContentTypeService contentTypeService)
         {
             _filters = filters;
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
+
             _tourSettings = tourSettings;
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _contentTypeService = contentTypeService;
         }
 
         public IEnumerable<BackOfficeTourFile> GetTours()
@@ -56,7 +44,7 @@ namespace Umbraco.Web.Editors
             if (_tourSettings.EnableTours == false)
                 return result;
 
-            var user = UmbracoContext.Security.CurrentUser;
+            var user = _umbracoContextAccessor.UmbracoContext.Security.CurrentUser;
             if (user == null)
                 return result;
 
@@ -67,7 +55,7 @@ namespace Umbraco.Web.Editors
             var nonPluginFilters = _filters.Where(x => x.PluginName == null).ToList();
 
             //add core tour files
-            var coreToursPath = Path.Combine(_ioHelper.MapPath(Core.Constants.SystemDirectories.Config), "BackOfficeTours");
+            var coreToursPath = Path.Combine(_hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.Config), "BackOfficeTours");
             if (Directory.Exists(coreToursPath))
             {
                 foreach (var tourFile in Directory.EnumerateFiles(coreToursPath, "*.json"))
@@ -77,7 +65,7 @@ namespace Umbraco.Web.Editors
             }
 
             //collect all tour files in packages
-            var appPlugins = _ioHelper.MapPath(Core.Constants.SystemDirectories.AppPlugins);
+            var appPlugins = _hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.AppPlugins);
             if (Directory.Exists(appPlugins))
             {
                 foreach (var plugin in Directory.EnumerateDirectories(appPlugins))
@@ -150,7 +138,7 @@ namespace Umbraco.Web.Editors
                                                        doctypeAlias
                                                    };
 
-            var contentType = this.Services.ContentTypeService.Get(doctypeAlias);
+            var contentType = _contentTypeService.Get(doctypeAlias);
 
             if (contentType != null)
             {
@@ -192,14 +180,16 @@ namespace Umbraco.Web.Editors
 
             try
             {
-                var contents = File.ReadAllText(tourFile);
+                var contents = System.IO.File.ReadAllText(tourFile);
                 var tours = JsonConvert.DeserializeObject<BackOfficeTour[]>(contents);
 
                 var backOfficeTours = tours.Where(x =>
                     aliasFilters.Count == 0 || aliasFilters.All(filter => filter.IsMatch(x.Alias)) == false);
 
+                var user = _umbracoContextAccessor.UmbracoContext.Security.CurrentUser;
+
                 var localizedTours = backOfficeTours.Where(x =>
-                    string.IsNullOrWhiteSpace(x.Culture) || x.Culture.Equals(Security.CurrentUser.Language,
+                    string.IsNullOrWhiteSpace(x.Culture) || x.Culture.Equals(user.Language,
                         StringComparison.InvariantCultureIgnoreCase)).ToList();
 
                 var tour = new BackOfficeTourFile

@@ -96,7 +96,7 @@ namespace Umbraco.Web.Editors
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
         /// <returns></returns>
-        [OutgoingEditorModelEvent]
+        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
         public MediaItemDisplay GetEmpty(string contentTypeAlias, int parentId)
         {
             var contentType = Services.MediaTypeService.Get(contentTypeAlias);
@@ -144,7 +144,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [OutgoingEditorModelEvent]
+        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
         [EnsureUserPermissionForMedia("id")]
         public MediaItemDisplay GetById(int id)
         {
@@ -164,7 +164,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [OutgoingEditorModelEvent]
+        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
         [EnsureUserPermissionForMedia("id")]
         public MediaItemDisplay GetById(Guid id)
         {
@@ -184,7 +184,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [OutgoingEditorModelEvent]
+        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
         [EnsureUserPermissionForMedia("id")]
         public MediaItemDisplay GetById(Udi id)
         {
@@ -475,7 +475,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [FileUploadCleanupFilter]
         [MediaItemSaveValidation]
-        [OutgoingEditorModelEvent]
+        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
         public MediaItemDisplay PostSave(
             [ModelBinder(typeof(MediaItemBinder))]
                 MediaItemSave contentItem)

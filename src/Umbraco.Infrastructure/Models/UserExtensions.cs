@@ -10,6 +10,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Core.Security;
 using Umbraco.Core.Media;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Core.Models
 {
@@ -78,11 +79,11 @@ namespace Umbraco.Core.Models
             var avatarUrl = mediaFileSystem.GetUrl(user.Avatar);
             return new[]
             {
-                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 30, Height = 30 }),
-                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 60, Height = 60 }),
-                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 90, Height = 90 }),
-                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 150, Height = 150 }),
-                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 300, Height = 300 })
+                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = ImageCropMode.Crop, Width = 30, Height = 30 }),
+                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = ImageCropMode.Crop, Width = 60, Height = 60 }),
+                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = ImageCropMode.Crop, Width = 90, Height = 90 }),
+                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = ImageCropMode.Crop, Width = 150, Height = 150 }),
+                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = ImageCropMode.Crop, Width = 300, Height = 300 })
             };
 
         }

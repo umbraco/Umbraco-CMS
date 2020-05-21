@@ -2,10 +2,14 @@
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
+using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 
@@ -36,10 +40,10 @@ namespace Umbraco.Web.Editors
         /// <remarks>
         /// If there is no original image is found then this will return not found.
         /// </remarks>
-        public HttpResponseMessage GetBigThumbnail(string originalImagePath)
+        public IActionResult GetBigThumbnail(string originalImagePath)
         {
             return string.IsNullOrWhiteSpace(originalImagePath)
-                ? Request.CreateResponse(HttpStatusCode.OK)
+                ? Ok()
                 : GetResized(originalImagePath, 500);
         }
 
@@ -52,22 +56,20 @@ namespace Umbraco.Web.Editors
         /// <remarks>
         /// If there is no media, image property or image file is found then this will return not found.
         /// </remarks>
-        public HttpResponseMessage GetResized(string imagePath, int width)
+        public IActionResult GetResized(string imagePath, int width)
         {
             var ext = Path.GetExtension(imagePath);
 
             // we need to check if it is an image by extension
             if (_contentSettings.IsImageFile(ext) == false)
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                return NotFound();
 
             //redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file
-            var response = Request.CreateResponse(HttpStatusCode.Found);
-
             DateTimeOffset? imageLastModified = null;
             try
             {
                 imageLastModified = _mediaFileSystem.GetLastModified(imagePath);
-                
+
             }
             catch (Exception)
             {
@@ -78,10 +80,9 @@ namespace Umbraco.Web.Editors
             }
 
             var rnd = imageLastModified.HasValue ? $"&rnd={imageLastModified:yyyyMMddHHmmss}" : null;
-            var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(imagePath) { UpScale = false, Width = width, AnimationProcessMode = "first", ImageCropMode = "max", CacheBusterValue = rnd });
+            var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(imagePath) { UpScale = false, Width = width, AnimationProcessMode = "first", ImageCropMode = ImageCropMode.Max, CacheBusterValue = rnd });
 
-            response.Headers.Location = new Uri(imageUrl, UriKind.RelativeOrAbsolute);
-            return response;
+            return new RedirectResult(imageUrl, false);
         }
 
         /// <summary>
@@ -105,7 +106,7 @@ namespace Umbraco.Web.Editors
                                            int? focalPointLeft = null,
                                            int? focalPointTop = null,
                                            string animationProcessMode = "first",
-                                           string mode = "max",
+                                           ImageCropMode mode = ImageCropMode.Max,
                                            bool upscale = false,
                                            string cacheBusterValue = "")
 {

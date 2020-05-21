@@ -24,7 +24,7 @@ namespace Umbraco.Web.WebApi
     [UmbracoUserTimeoutFilter]
     [UmbracoAuthorize]
     [DisableBrowserCache]
-    [UmbracoWebApiRequireHttps]
+   // [UmbracoWebApiRequireHttps]
     [CheckIfUserTicketDataIsStale]
     [UnhandedExceptionLoggerConfiguration]
     [EnableDetailedErrors]

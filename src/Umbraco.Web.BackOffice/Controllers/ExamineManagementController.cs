@@ -3,15 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Web.Http;
 using Examine;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Examine;
+using Umbraco.Extensions;
+using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Mvc;
 using Umbraco.Web.Search;
 using SearchResult = Umbraco.Web.Models.ContentEditing.SearchResult;
 
@@ -67,10 +71,10 @@ namespace Umbraco.Web.Editors
                 return SearchResults.Empty();
 
             var msg = ValidateSearcher(searcherName, out var searcher);
-            if (!msg.IsSuccessStatusCode)
+            if (!msg.IsSuccessStatusCode())
                 throw new HttpResponseException(msg);
 
-            // NativeQuery will work for a single word/phrase too (but depends on the implementation) the lucene one will work. 
+            // NativeQuery will work for a single word/phrase too (but depends on the implementation) the lucene one will work.
             var results = searcher.CreateQuery().NativeQuery(query).Execute(maxResults: pageSize * (pageIndex + 1));
 
             var pagedResults = results.Skip(pageIndex * pageSize);
@@ -99,18 +103,19 @@ namespace Umbraco.Web.Editors
         /// This is kind of rudimentary since there's no way we can know that the index has rebuilt, we
         /// have a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache
         /// </remarks>
-        public ExamineIndexModel PostCheckRebuildIndex(string indexName)
+        public ActionResult<ExamineIndexModel> PostCheckRebuildIndex(string indexName)
         {
             var validate = ValidateIndex(indexName, out var index);
-            if (!validate.IsSuccessStatusCode)
+
+            if (!validate.IsSuccessStatusCode())
                 throw new HttpResponseException(validate);
 
             validate = ValidatePopulator(index);
-            if (!validate.IsSuccessStatusCode)
+            if (!validate.IsSuccessStatusCode())
                 throw new HttpResponseException(validate);
 
             var cacheKey = "temp_indexing_op_" + indexName;
-            var found = AppCaches.RuntimeCache.Get(cacheKey);
+            var found = _runtimeCache.Get(cacheKey);
 
             //if its still there then it's not done
             return found != null
@@ -124,15 +129,15 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="indexName"></param>
         /// <returns></returns>
-        public HttpResponseMessage PostRebuildIndex(string indexName)
+        public IActionResult PostRebuildIndex(string indexName)
         {
             var validate = ValidateIndex(indexName, out var index);
-            if (!validate.IsSuccessStatusCode)
-                return validate;
+            if (!validate.IsSuccessStatusCode())
+                throw new HttpResponseException(validate);
 
             validate = ValidatePopulator(index);
-            if (!validate.IsSuccessStatusCode)
-                return validate;
+            if (!validate.IsSuccessStatusCode())
+                throw new HttpResponseException(validate);
 
             _logger.Info<ExamineManagementController>("Rebuilding index '{IndexName}'", indexName);
 
@@ -146,7 +151,7 @@ namespace Umbraco.Web.Editors
             {
                 var cacheKey = "temp_indexing_op_" + index.Name;
                 //put temp val in cache which is used as a rudimentary way to know when the indexing is done
-                AppCaches.RuntimeCache.Insert(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5));
+                _runtimeCache.Insert(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5));
 
                 _indexRebuilder.RebuildIndex(indexName);
 
@@ -154,18 +159,16 @@ namespace Umbraco.Web.Editors
                 //foreach (var populator in _populators.Where(x => x.IsRegistered(indexName)))
                 //    populator.Populate(index);
 
-                return Request.CreateResponse(HttpStatusCode.OK);
+                return new OkResult();
             }
             catch (Exception ex)
             {
                 //ensure it's not listening
                 index.IndexOperationComplete -= Indexer_IndexOperationComplete;
-                Logger.Error<ExamineManagementController>(ex, "An error occurred rebuilding index");
-                var response = Request.CreateResponse(HttpStatusCode.Conflict);
-                response.Content =
-                    new
-                        StringContent($"The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {ex}");
-                response.ReasonPhrase = "Could Not Rebuild";
+                _logger.Error<ExamineManagementController>(ex, "An error occurred rebuilding index");
+                var response = new ConflictObjectResult("The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {ex}");
+
+                SetReasonPhrase(response, "Could Not Rebuild");
                 return response;
             }
         }
@@ -197,51 +200,59 @@ namespace Umbraco.Web.Editors
             return indexerModel;
         }
 
-        private HttpResponseMessage ValidateSearcher(string searcherName, out ISearcher searcher)
+        private ActionResult ValidateSearcher(string searcherName, out ISearcher searcher)
         {
             //try to get the searcher from the indexes
             if (_examineManager.TryGetIndex(searcherName, out var index))
             {
                 searcher = index.GetSearcher();
-                return Request.CreateResponse(HttpStatusCode.OK);
+                return new OkResult();
             }
 
 
             //if we didn't find anything try to find it by an explicitly declared searcher
             if (_examineManager.TryGetSearcher(searcherName, out searcher))
-                return Request.CreateResponse(HttpStatusCode.OK);
+                return new OkResult();
 
-            var response1 = Request.CreateResponse(HttpStatusCode.BadRequest);
-            response1.Content = new StringContent($"No searcher found with name = {searcherName}");
-            response1.ReasonPhrase = "Searcher Not Found";
+            var response1 = new BadRequestObjectResult($"No searcher found with name = {searcherName}");
+            SetReasonPhrase(response1, "Searcher Not Found");
             return response1;
         }
 
-        private HttpResponseMessage ValidatePopulator(IIndex index)
+        private ActionResult ValidatePopulator(IIndex index)
         {
             if (_indexRebuilder.CanRebuild(index))
-                return Request.CreateResponse(HttpStatusCode.OK);
+                return new OkResult();
 
-            var response = Request.CreateResponse(HttpStatusCode.BadRequest);
-            response.Content = new StringContent($"The index {index.Name} cannot be rebuilt because it does not have an associated {typeof(IIndexPopulator)}");
-            response.ReasonPhrase = "Index cannot be rebuilt";
+            var response = new BadRequestObjectResult($"The index {index.Name} cannot be rebuilt because it does not have an associated {typeof(IIndexPopulator)}");
+            SetReasonPhrase(response, "Index cannot be rebuilt");
             return response;
         }
 
-        private HttpResponseMessage ValidateIndex(string indexName, out IIndex index)
+        private ActionResult ValidateIndex(string indexName, out IIndex index)
         {
             index = null;
 
             if (_examineManager.TryGetIndex(indexName, out index))
             {
                 //return Ok!
-                return Request.CreateResponse(HttpStatusCode.OK);
+                return new OkResult();
             }
 
-            var response = Request.CreateResponse(HttpStatusCode.BadRequest);
-            response.Content = new StringContent($"No index found with name = {indexName}");
-            response.ReasonPhrase = "Index Not Found";
+            var response = new BadRequestObjectResult($"No index found with name = {indexName}");
+            SetReasonPhrase(response, "Index Not Found");
             return response;
+        }
+
+        private void SetReasonPhrase(IActionResult response, string reasonPhrase)
+        {
+            //TODO we should update this behavior, as HTTP2 do not have ReasonPhrase. Could as well be returned in body
+            // https://github.com/aspnet/HttpAbstractions/issues/395
+            var httpResponseFeature = HttpContext.Features.Get<IHttpResponseFeature>();
+            if (!(httpResponseFeature is null))
+            {
+                httpResponseFeature.ReasonPhrase = reasonPhrase;
+            }
         }
 
         private void Indexer_IndexOperationComplete(object sender, EventArgs e)

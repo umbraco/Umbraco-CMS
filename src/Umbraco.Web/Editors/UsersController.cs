@@ -203,7 +203,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [OutgoingEditorModelEvent]
+        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
         [AdminUsersAuthorize]
         public UserDisplay GetById(int id)
         {
@@ -523,7 +523,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="userSave"></param>
         /// <returns></returns>
-        [OutgoingEditorModelEvent]
+        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
         public async Task<UserDisplay> PostSaveUser(UserSave userSave)
         {
             if (userSave == null) throw new ArgumentNullException("userSave");

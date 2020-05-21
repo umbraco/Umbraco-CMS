@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Models
+﻿using Umbraco.Web.Models;
+
+namespace Umbraco.Core.Models
 {
     /// <summary>
     /// These are options that are passed to the IImageUrlGenerator implementation to determine
@@ -17,8 +19,8 @@
         public decimal? WidthRatio { get; set; }
         public decimal? HeightRatio { get; set; }
         public int? Quality { get; set; }
-        public string ImageCropMode { get; set; }
-        public string ImageCropAnchor { get; set; }
+        public ImageCropMode? ImageCropMode { get; set; }
+        public ImageCropAnchor? ImageCropAnchor { get; set; }
         public bool DefaultCrop { get; set; }
         public FocalPointPosition FocalPoint { get; set; }
         public CropCoordinates Crop { get; set; }
