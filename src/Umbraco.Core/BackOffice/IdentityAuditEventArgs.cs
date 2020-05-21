@@ -41,7 +41,7 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// This property is always empty except in the LoginFailed event for an unknown user trying to login
         /// </summary>
-        public string Username { get; private set; }
+        public string AffectedUsername { get; private set; }
 
 
         /// <summary>
@@ -52,65 +52,22 @@ namespace Umbraco.Core.BackOffice
         /// <param name="comment"></param>
         /// <param name="performingUser"></param>
         /// <param name="affectedUser"></param>
-        public IdentityAuditEventArgs(AuditEvent action, string ipAddress, string comment = null, int performingUser = -1, int affectedUser = -1)
+        public IdentityAuditEventArgs(AuditEvent action, string ipAddress, int performingUser, string comment, int affectedUser, string affectedUsername)
         {
             DateTimeUtc = DateTime.UtcNow;
             Action = action;
-
             IpAddress = ipAddress;
-            Comment = comment;
+            Comment = comment;            
+            PerformingUser = performingUser;
+            AffectedUsername = affectedUsername;
             AffectedUser = affectedUser;
-
-            PerformingUser = performingUser == -1
-                ? GetCurrentRequestBackofficeUserId()
-                : performingUser;
         }
 
-        /// <summary>
-        /// Creates an instance without a performing or affected user (the id will be set to -1)
-        /// </summary>
-        /// <param name="action"></param>
-        /// <param name="ipAddress"></param>
-        /// <param name="username"></param>
-        /// <param name="comment"></param>
-        public IdentityAuditEventArgs(AuditEvent action, string ipAddress, string username, string comment)
+        public IdentityAuditEventArgs(AuditEvent action, string ipAddress, int performingUser, string comment, string affectedUsername)
+            : this(action, ipAddress, performingUser, comment, -1, affectedUsername)
         {
-            DateTimeUtc = DateTime.UtcNow;
-            Action = action;
-
-            IpAddress = ipAddress;
-            Username = username;
-            Comment = comment;
-
-            PerformingUser = -1;
         }
 
-        public IdentityAuditEventArgs(AuditEvent action, string ipAddress, string username, string comment, int performingUser)
-        {
-            DateTimeUtc = DateTime.UtcNow;
-            Action = action;
-
-            IpAddress = ipAddress;
-            Username = username;
-            Comment = comment;
-
-            PerformingUser = performingUser == -1
-                ? GetCurrentRequestBackofficeUserId()
-                : performingUser;
-        }
-
-        /// <summary>
-        /// Returns the current logged in backoffice user's Id logging if there is one
-        /// </summary>
-        /// <returns></returns>
-        protected int GetCurrentRequestBackofficeUserId()
-        {
-            var userId = -1;
-            /*var backOfficeIdentity = Thread.CurrentPrincipal.GetUmbracoIdentity();
-            if (backOfficeIdentity != null)
-                int.TryParse(backOfficeIdentity.Id.ToString(), out userId);*/
-            return userId;
-        }
     }
 
     public enum AuditEvent

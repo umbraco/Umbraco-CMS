@@ -159,7 +159,7 @@ namespace Umbraco.Web.Security
                     if (requestContext != null)
                     {
                         var backofficeUserManager = requestContext.GetBackOfficeUserManager();
-                        if (backofficeUserManager != null) backofficeUserManager.RaiseAccountLockedEvent(user.Id);
+                        if (backofficeUserManager != null) backofficeUserManager.RaiseAccountLockedEvent(_request.User, user.Id);
                     }
 
                     return SignInResult.LockedOut;
@@ -170,7 +170,7 @@ namespace Umbraco.Web.Security
             {
                 var backofficeUserManager = requestContext.GetBackOfficeUserManager();
                 if (backofficeUserManager != null)
-                    backofficeUserManager.RaiseInvalidLoginAttemptEvent(userName);
+                    backofficeUserManager.RaiseInvalidLoginAttemptEvent(_request.User, userName);
             }
 
             return SignInResult.Failed;

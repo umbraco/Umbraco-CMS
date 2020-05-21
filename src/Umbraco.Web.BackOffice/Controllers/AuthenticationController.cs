@@ -12,7 +12,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     //[ValidationFilter] // TODO: I don't actually think this is required with our custom Application Model conventions applied
     [TypeFilter(typeof(AngularJsonOnlyConfigurationAttribute))] // TODO: This could be applied with our Application Model conventions
     [IsBackOffice] // TODO: This could be applied with our Application Model conventions
-    public class AuthenticationController : UmbracoApiController
+    public class AuthenticationController : ControllerBase
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         // TODO: We need to import the logic from Umbraco.Web.Editors.AuthenticationController and it should not be an auto-routed api controller

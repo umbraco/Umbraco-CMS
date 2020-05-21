@@ -256,7 +256,7 @@ namespace Umbraco.Web.Editors
             {
                 // get the user
                 var user = Services.UserService.GetByUsername(loginModel.Username);
-                UserManager.RaiseLoginSuccessEvent(user.Id);
+                UserManager.RaiseLoginSuccessEvent(User, user.Id);
 
                 return SetPrincipalAndReturnUserDetail(user, owinContext.Request.User);
             }
@@ -294,7 +294,7 @@ namespace Umbraco.Web.Editors
                     userId = attemptedUser.Id
                 });
 
-                UserManager.RaiseLoginRequiresVerificationEvent(attemptedUser.Id);
+                UserManager.RaiseLoginRequiresVerificationEvent(User, attemptedUser.Id);
 
                 return verifyResponse;
             }
@@ -348,7 +348,7 @@ namespace Umbraco.Web.Editors
 
                     await _emailSender.SendAsync(mailMessage);
 
-                    UserManager.RaiseForgotPasswordRequestedEvent(user.Id);
+                    UserManager.RaiseForgotPasswordRequestedEvent(User, user.Id);
                 }
             }
 
@@ -417,13 +417,13 @@ namespace Umbraco.Web.Editors
             var user = Services.UserService.GetByUsername(userName);
             if (result.Succeeded)
             {
-                UserManager.RaiseLoginSuccessEvent(user.Id);
+                UserManager.RaiseLoginSuccessEvent(User, user.Id);
                 return SetPrincipalAndReturnUserDetail(user, owinContext.Request.User);
             }
 
             if (result.IsLockedOut)
             {
-                UserManager.RaiseAccountLockedEvent(user.Id);
+                UserManager.RaiseAccountLockedEvent(User, user.Id);
                 return Request.CreateValidationErrorResponse("User is locked out");
             }
 
@@ -487,7 +487,7 @@ namespace Umbraco.Web.Editors
                     }
                 }
 
-                UserManager.RaiseForgotPasswordChangedSuccessEvent(model.UserId);
+                UserManager.RaiseForgotPasswordChangedSuccessEvent(User, model.UserId);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             return Request.CreateValidationErrorResponse(
@@ -514,7 +514,7 @@ namespace Umbraco.Web.Editors
             if (UserManager != null)
             {
                 int.TryParse(User.Identity.GetUserId(), out var userId);
-                UserManager.RaiseLogoutSuccessEvent(userId);
+                UserManager.RaiseLogoutSuccessEvent(User, userId);
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);

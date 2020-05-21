@@ -6,6 +6,13 @@ namespace Umbraco.Core
 {
     public static class ClaimsIdentityExtensions
     {
+        public static T GetUserId<T>(this IIdentity identity)
+        {
+            var strId = identity.GetUserId();
+            var converted = strId.TryConvertTo<T>();
+            return converted.ResultOr(default);
+        }
+
         /// <summary>
         /// Returns the user id from the <see cref="IIdentity"/> of either the claim type <see cref="ClaimTypes.NameIdentifier"/> or "sub"
         /// </summary>
