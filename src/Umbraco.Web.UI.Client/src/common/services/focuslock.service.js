@@ -68,6 +68,7 @@
              */
             removeInertAttribute: function() {
                 elementToInert.removeAttribute('inert');
+                setInertAttribute = false;
             }
         };
 
