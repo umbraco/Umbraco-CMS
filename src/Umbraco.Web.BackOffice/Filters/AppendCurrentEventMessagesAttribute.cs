@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Net.Http;
-using System.Web.Http.Filters;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Core.Events;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.WebApi.Filters
@@ -14,19 +14,28 @@ namespace Umbraco.Web.WebApi.Filters
     /// </summary>
     internal sealed class AppendCurrentEventMessagesAttribute : ActionFilterAttribute
     {
-        public override void OnActionExecuted(HttpActionExecutedContext context)
-        {
-            if (context.Response == null) return;
-            if (context.Request.Method == HttpMethod.Get) return;
-            if (Current.UmbracoContext == null) return;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IEventMessagesFactory _eventMessagesFactory;
 
-            var obj = context.Response.Content as ObjectContent;
-            if (obj == null) return;
+        public AppendCurrentEventMessagesAttribute(IUmbracoContextAccessor umbracoContextAccessor, IEventMessagesFactory eventMessagesFactory)
+        {
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _eventMessagesFactory = eventMessagesFactory;
+        }
+
+        public override void OnActionExecuted(ActionExecutedContext context)
+        {
+            if (context.HttpContext.Response == null) return;
+            if (context.HttpContext.Request.Method.Equals(HttpMethod.Get.ToString(), StringComparison.InvariantCultureIgnoreCase)) return;
+            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
+            if (umbracoContext == null) return;
+
+            if(!(context.Result is ObjectResult obj)) return;
 
             var notifications = obj.Value as INotificationModel;
             if (notifications == null) return;
 
-            var msgs = Current.EventMessages;
+            var msgs = _eventMessagesFactory.GetOrDefault();
             if (msgs == null) return;
 
             foreach (var eventMessage in msgs.GetAll())
