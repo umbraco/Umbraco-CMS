@@ -1,4 +1,6 @@
 /// <reference types="Cypress" />
+import {DocumentTypeBuilder, TemplateBuilder} from "umbraco-cypress-testhelpers";
+
 context('Templates', () => {
 
   beforeEach(() => {
@@ -30,4 +32,26 @@ context('Templates', () => {
         cy.umbracoEnsureTemplateNameNotExists(name);
    });
 
+    it('Delete template', () => {
+        const name = "Test template";
+        cy.umbracoEnsureTemplateNameNotExists(name);
+
+        const template = new TemplateBuilder()
+            .withName(name)
+            .build();
+
+        cy.saveTemplate(template);
+
+        cy.umbracoSection('settings');
+        cy.get('li .umb-tree-root:contains("Settings")').should("be.visible");
+
+        cy.umbracoTreeItem("settings", ["Templates", name]).rightclick();
+        cy.umbracoContextMenuAction("action-delete").click();
+
+        cy.umbracoButtonByLabelKey("general_ok").click();
+
+        cy.contains(name).should('not.exist');
+
+        cy.umbracoEnsureTemplateNameNotExists(name);
+    });
 });
