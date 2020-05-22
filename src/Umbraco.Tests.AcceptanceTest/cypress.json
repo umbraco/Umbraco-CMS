@@ -6,5 +6,6 @@
         "username": "<insert username/email in cypress.env.json>",
         "password": "<insert password in cypress.env.json>"
     },
-    "supportFile": "cypress/support/index.ts"
+    "supportFile": "cypress/support/index.ts",
+    "videoUploadOnPasses" : false
 }
