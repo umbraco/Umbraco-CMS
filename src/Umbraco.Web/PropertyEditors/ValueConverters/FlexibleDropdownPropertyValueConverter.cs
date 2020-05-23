@@ -49,5 +49,22 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                ? typeof(IEnumerable<string>)
                : typeof(string);
         }
+        
+        //an empty dropdown will also store a value as a string in the format '[]' or '[null]'
+        public override bool HasValue(IPublishedProperty property, string culture, string segment)
+        {
+            var value = property.GetSourceValue(culture, segment);
+            return value != null && (!(value is string) || (string.IsNullOrWhiteSpace((string)value) == false && !string.Equals((string)value, "[]") && !string.Equals((string)value, "[null]", StringComparison.CurrentCultureIgnoreCase)));
+        }
+        public override bool? IsValue(object value, PropertyValueLevel level)
+        {
+            switch (level)
+            {
+                case PropertyValueLevel.Source:
+                    return value != null && (!(value is string) || (string.IsNullOrWhiteSpace((string)value) == false && !string.Equals((string)value, "[]") && !string.Equals((string)value, "[null]", StringComparison.CurrentCultureIgnoreCase)));
+                default:
+                    throw new NotSupportedException($"Invalid level: {level}.");
+            }
+        }
     }
 }
