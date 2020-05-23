@@ -347,8 +347,14 @@ label:not([for]) {
   border: none !important;
 }
 
-table thead a {
+table thead a,
+table thead button {
   color: @gray-2;
+}
+
+table thead button:hover,
+table thead button:focus{
+    text-decoration: underline;
 }
 
 /* UI interactions */
