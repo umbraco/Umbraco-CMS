@@ -27,7 +27,7 @@
 @param {string} cssClass Set a css class modifier
 @param {string} color Set a hex code like <code>#f5c1bc</code>
 @param {boolean} showText Set to <code>true</code> to show the text. <code>false</code> by default
-@param {string} element Pass an element name, which will be highlighted if one has the tours opened
+@param {domElement} element Highlights a DOM-element (HTML-selector)
 @param {string} state Set the initial state of the component. To have it hidden use <code>hidden</code>
 **/
 
