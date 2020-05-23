@@ -78,13 +78,15 @@ namespace Umbraco.Core
             var ctorParameters = ctor.GetParameters();
             var ctorArgs = new object[ctorParameters.Length];
             var i = 0;
+
             foreach (var parameter in ctorParameters)
             {
                 // no! IsInstanceOfType is not ok here
                 // ReSharper disable once UseMethodIsInstanceOfType
-                var arg = args?.FirstOrDefault(a => parameter.ParameterType.IsAssignableFrom(a.GetType()));
+                var arg = args?.FirstOrDefault(a => parameter.ParameterType.IsAssignableFrom(a?.GetType()));
                 ctorArgs[i++] = arg ?? factory.GetInstance(parameter.ParameterType);
             }
+
             return ctor.Invoke(ctorArgs);
         }
     }
