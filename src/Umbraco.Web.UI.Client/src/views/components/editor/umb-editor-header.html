@@ -67,7 +67,7 @@
 
                 </div>
 
-                <h1 class="umb-panel-header-name" ng-if="nameLocked" title="{{key}}">{{ name }}</h1>
+                <h1 class="umb-panel-header-name" id="editor-headline-{{$id}}" ng-if="nameLocked" title="{{key}}">{{ name }}</h1>
 
                 <input data-element="editor-description"
                        no-password-manager
@@ -78,7 +78,7 @@
                        ng-if="!hideDescription && !descriptionLocked"
                        ng-model="$parent.description"/>
 
-                <p class="umb-panel-header-locked-description" ng-if="descriptionLocked">{{ description }}</p>
+                <p class="umb-panel-header-locked-description" id="editor-description-{{$id}}" ng-if="descriptionLocked">{{ description }}</p>
 
             </div>
 
