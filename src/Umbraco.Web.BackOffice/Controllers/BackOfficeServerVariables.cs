@@ -48,6 +48,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IGlobalSettings globalSettings,
             IUmbracoVersion umbracoVersion,
             IContentSettings contentSettings,
+            IHttpContextAccessor httpContextAccessor,
             //TreeCollection treeCollection, // TODO: If we need this we need to migrate trees
             IHostingEnvironment hostingEnvironment,
             IRuntimeSettings settings,
@@ -62,6 +63,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _globalSettings = globalSettings;
             _umbracoVersion = umbracoVersion;
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _httpContextAccessor = httpContextAccessor;
             //_treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));
             _hostingEnvironment = hostingEnvironment;
             _settings = settings;

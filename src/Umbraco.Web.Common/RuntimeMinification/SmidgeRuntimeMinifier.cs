@@ -65,7 +65,7 @@ namespace Umbraco.Web.Common.RuntimeMinification
             // affect this or vice versa.
         }
 
-        public string RenderCssHere(string bundleName) => _smidge.SmidgeHelper.CssHereAsync(bundleName, _hostingEnvironment.IsDebugMode).ToString();
+        public async Task<string> RenderCssHereAsync(string bundleName) => (await _smidge.SmidgeHelper.CssHereAsync(bundleName, _hostingEnvironment.IsDebugMode)).ToString();
 
         public void CreateJsBundle(string bundleName, params string[] filePaths)
         {
@@ -82,7 +82,7 @@ namespace Umbraco.Web.Common.RuntimeMinification
             // affect this or vice versa.
         }
 
-        public string RenderJsHere(string bundleName) => _smidge.SmidgeHelper.JsHereAsync(bundleName, _hostingEnvironment.IsDebugMode).ToString();
+        public async Task<string> RenderJsHereAsync(string bundleName) => (await _smidge.SmidgeHelper.JsHereAsync(bundleName, _hostingEnvironment.IsDebugMode)).ToString();
 
         public async Task<IEnumerable<string>> GetAssetPathsAsync(string bundleName) => await _smidge.SmidgeHelper.GenerateJsUrlsAsync(bundleName, _hostingEnvironment.IsDebugMode);
 

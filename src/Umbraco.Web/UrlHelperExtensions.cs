@@ -115,38 +115,8 @@ namespace Umbraco.Web
         }
 
 
-        /// <summary>
-        /// Return the Url for an action with a cache-busting hash appended
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="actionName"></param>
-        /// <param name="controllerName"></param>
-        /// <param name="routeVals"></param>
-        /// <returns></returns>
-        public static string GetUrlWithCacheBust(this UrlHelper url, string actionName, string controllerName, RouteValueDictionary routeVals = null)
-        {
-            var applicationJs = url.Action(actionName, controllerName, routeVals);
-            applicationJs = applicationJs + "?umb__rnd=" + GetCacheBustHash();
-            return applicationJs;
-        }
+        
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <returns></returns>
-        public static string GetCacheBustHash()
-        {
-            //make a hash of umbraco and client dependency version
-            //in case the user bypasses the installer and just bumps the web.config or client dependency config
-
-            //if in debug mode, always burst the cache
-            if (Current.HostingEnvironment.IsDebugMode)
-            {
-                return DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture).GenerateHash();
-            }
-
-            var version = Current.UmbracoVersion.SemanticVersion.ToSemanticString();
-            return $"{version}.{Current.RuntimeMinifier.CacheBuster}".GenerateHash();
-        }
+        
     }
 }

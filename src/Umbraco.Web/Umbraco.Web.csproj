@@ -261,7 +261,6 @@
     <Compile Include="Editors\MemberGroupController.cs" />
     <Compile Include="Composing\CompositionExtensions\Controllers.cs" />
     <Compile Include="HealthCheck\HealthCheckController.cs" />
-    <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Composing\ModuleInjector.cs" />
     <Compile Include="Mvc\FilteredControllerFactoryCollection.cs" />
     <Compile Include="Mvc\FilteredControllerFactoryCollectionBuilder.cs" />

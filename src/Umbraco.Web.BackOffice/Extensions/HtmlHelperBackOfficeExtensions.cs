@@ -1,36 +1,32 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Routing;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Web;
-using System.Web.Mvc;
-using Microsoft.Owin.Security;
-using Newtonsoft.Json;
+using System.Threading.Tasks;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Runtime;
 using Umbraco.Core.WebAssets;
-using Umbraco.Web.Composing;
-using Umbraco.Web.Editors;
+using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Features;
 using Umbraco.Web.Models;
-using Umbraco.Web.Security;
-using Umbraco.Web.Trees;
+using Umbraco.Web.WebApi;
 using Umbraco.Web.WebAssets;
 
-namespace Umbraco.Web
+namespace Umbraco.Extensions
 {
-    /// <summary>
-    /// HtmlHelper extensions for the back office
-    /// </summary>
     public static class HtmlHelperBackOfficeExtensions
     {
         /// <summary>
         /// Outputs a script tag containing the bare minimum (non secure) server vars for use with the angular app
         /// </summary>
         /// <param name="html"></param>
-        /// <param name="uri"></param>
+        /// <param name="linkGenerator"></param>
         /// <param name="features"></param>
         /// <param name="globalSettings"></param>
         /// <param name="umbracoVersion"></param>
@@ -46,10 +42,9 @@ namespace Umbraco.Web
         /// These are the bare minimal server variables that are required for the application to start without being authenticated,
         /// we will load the rest of the server vars after the user is authenticated.
         /// </remarks>
-        public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IContentSettings contentSettings, TreeCollection treeCollection, IHostingEnvironment hostingEnvironment, IRuntimeSettings settings, ISecuritySettings securitySettings, IRuntimeMinifier runtimeMinifier)
+        public static async Task<IHtmlContent> BareMinimumServerVariablesScriptAsync(this IHtmlHelper html, BackOfficeServerVariables backOfficeServerVariables)
         {
-            var serverVars = new BackOfficeServerVariables(uri, Current.RuntimeState, features, globalSettings, umbracoVersion, contentSettings, treeCollection, hostingEnvironment, settings, securitySettings, runtimeMinifier);
-            var minVars = serverVars.BareMinimumServerVariables();
+            var minVars = await backOfficeServerVariables.BareMinimumServerVariablesAsync();
 
             var str = @"<script type=""text/javascript"">
                 var Umbraco = {};
@@ -66,15 +61,24 @@ namespace Umbraco.Web
         /// <param name="html"></param>
         /// <param name="externalLoginErrors"></param>
         /// <returns></returns>
-        public static IHtmlString AngularValueExternalLoginInfoScript(this HtmlHelper html, IEnumerable<string> externalLoginErrors)
+        public static async Task<IHtmlContent> AngularValueExternalLoginInfoScriptAsync(this IHtmlHelper html,
+            IAuthenticationSchemeProvider authenticationSchemeProvider,
+            IEnumerable<string> externalLoginErrors)
         {
-            var loginProviders = html.ViewContext.HttpContext.GetOwinContext().Authentication.GetExternalAuthenticationTypes()
-                .Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
+            var providers = await authenticationSchemeProvider.GetAllSchemesAsync();
+
+            var loginProviders = providers
+                // TODO: We need to filter only back office enabled schemes.
+                // Before we used to have a property bag to check, now we don't so need to investigate the easiest/best
+                // way to do this. We have the type so maybe we check for a marker interface, but maybe there's another way,
+                // just need to investigate.
+                //.Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
                 .Select(p => new
                 {
-                    authType = p.AuthenticationType,
-                    caption = p.Caption,
-                    properties = p.Properties
+                    authType = p.Name,
+                    caption = p.DisplayName,
+                    // TODO: See above, if we need this property bag in the vars then we'll need to figure something out
+                    //properties = p.Properties
                 })
                 .ToArray();
 
@@ -105,7 +109,7 @@ namespace Umbraco.Web
         /// <param name="html"></param>
         /// <param name="val"></param>
         /// <returns></returns>
-        public static IHtmlString AngularValueResetPasswordCodeInfoScript(this HtmlHelper html, object val)
+        public static IHtmlContent AngularValueResetPasswordCodeInfoScript(this IHtmlHelper html, object val)
         {
             var sb = new StringBuilder();
             sb.AppendLine();
@@ -132,9 +136,9 @@ namespace Umbraco.Web
             return html.Raw(sb.ToString());
         }
 
-        public static IHtmlString AngularValueTinyMceAssets(this HtmlHelper html, IRuntimeMinifier runtimeMinifier)
+        public static async Task<IHtmlContent> AngularValueTinyMceAssetsAsync(this IHtmlHelper html, IRuntimeMinifier runtimeMinifier)
         {
-            var files = runtimeMinifier.GetAssetPathsAsync(BackOfficeWebAssets.UmbracoTinyMceJsBundleName).GetAwaiter().GetResult();
+            var files = await runtimeMinifier.GetAssetPathsAsync(BackOfficeWebAssets.UmbracoTinyMceJsBundleName);
 
             var sb = new StringBuilder();
 

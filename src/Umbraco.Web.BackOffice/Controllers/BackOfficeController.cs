@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Cache;
@@ -15,8 +15,6 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
-using Umbraco.Net;
-using Umbraco.Web.BackOffice.ActionResults;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.Models;
@@ -93,7 +91,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="culture"></param>
         /// <returns></returns>
         [HttpGet]
-        public JsonNetResult LocalizedText(string culture = null)
+        public Dictionary<string, Dictionary<string, string>> LocalizedText(string culture = null)
         {
             var securityHelper = _umbracoContextAccessor.GetRequiredUmbracoContext().Security;
             var isAuthenticated = securityHelper.IsAuthenticated();
@@ -125,14 +123,14 @@ namespace Umbraco.Web.BackOffice.Controllers
                 .ToDictionary(pv => pv.Key, pv =>
                     pv.ToDictionary(pve => pve.valueAlias, pve => pve.value));
 
-            return new JsonNetResult { Data = nestedDictionary, Formatting = Formatting.None };
+            return nestedDictionary;
         }
 
         [UmbracoAuthorize(Order = 0)]
         [HttpGet]
-        public JsonNetResult GetGridConfig()
+        public IEnumerable<IGridEditorConfig> GetGridConfig()
         {
-            return new JsonNetResult { Data = _gridConfig.EditorsConfig.Editors, Formatting = Formatting.None };
+            return _gridConfig.EditorsConfig.Editors;
         }
 
         /// <summary>
@@ -156,7 +154,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> ValidatePasswordResetCode([Bind(Prefix = "u")]int userId, [Bind(Prefix = "r")]string resetCode)
+        public async Task<IActionResult> ValidatePasswordResetCode([Bind(Prefix = "u")]int userId, [Bind(Prefix = "r")]string resetCode)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user != null)
@@ -180,9 +178,9 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// otherwise process the external login info.
         /// </summary>
         /// <returns></returns>
-        private async Task<ActionResult> RenderDefaultOrProcessExternalLoginAsync(
-            Func<ActionResult> defaultResponse,
-            Func<ActionResult> externalSignInResponse)
+        private async Task<IActionResult> RenderDefaultOrProcessExternalLoginAsync(
+            Func<IActionResult> defaultResponse,
+            Func<IActionResult> externalSignInResponse)
         {
             if (defaultResponse is null) throw new ArgumentNullException(nameof(defaultResponse));
             if (externalSignInResponse is null) throw new ArgumentNullException(nameof(externalSignInResponse));
@@ -213,7 +211,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";
 
-        private ActionResult RedirectToLocal(string returnUrl)
+        private IActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))
             {
