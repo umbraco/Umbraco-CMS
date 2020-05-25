@@ -330,6 +330,17 @@ namespace Umbraco.Tests.Composing
             var s1 = factory.GetInstance<Thing3>();
             var s2 = factory.GetInstance<Thing3>();
             Assert.AreSame(s1, s2);
+
+            register.Register(factory =>
+            {
+                var param1 = new Thing1();
+                var param2 = new Thing1();
+
+                return factory.CreateInstance<Thing4>(param1, param2);
+            });
+
+            var instance = factory.GetInstance<Thing4>();
+            Assert.AreNotEqual(instance.Thing, instance.AnotherThing);
         }
 
         public interface IThing { }
@@ -351,6 +362,18 @@ namespace Umbraco.Tests.Composing
             }
 
             public IEnumerable<ThingBase> Things { get; }
+        }
+
+        public class Thing4 : ThingBase
+        {
+            public readonly Thing1 Thing;
+            public readonly Thing1 AnotherThing;
+
+            public Thing4(Thing1 thing, Thing1 anotherThing)
+            {
+                Thing = thing;
+                AnotherThing = anotherThing;
+            }
         }
     }
 }
