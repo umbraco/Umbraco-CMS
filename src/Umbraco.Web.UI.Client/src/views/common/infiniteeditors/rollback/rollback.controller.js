@@ -116,6 +116,11 @@
             // extract all properties from the tabs and create new object for the diff
             currentVersion.tabs.forEach((tab, tabIndex) => {
                 tab.properties.forEach((property, propertyIndex) => {
+
+                    // this is a reference to the property being displayed in the editor - we need to clone it before
+                    // manipulating it here, so any changes made to the property value won't be reflected in the editor
+                    property = _.clone(property);
+
                     var oldProperty = previousVersion.tabs[tabIndex].properties[propertyIndex];
 
                     // we have to make properties storing values as object into strings (Grid, nested content, etc.)
