@@ -64,7 +64,7 @@
 							<label class="control-label" for="login">Login</label>
 							<div class="controls">
 								<input type="text" id="login" name="login"
-									placeholder="umbraco-database-user"
+									placeholder="umbraco-db-user"
 									required ng-model="installer.current.model.login"  />
 								<small class="inline-help">Enter the database user name</small>
 							</div>
@@ -76,7 +76,7 @@
 						<label class="control-label" for="password">Password</label>
 							<div class="controls">
 							<input type="password" id="password" name="password"
-								placeholder="umbraco-cms"
+								placeholder="umbraco-db-password"
 								required ng-model="installer.current.model.password"  />
 								<small class="inline-help">Enter the database password</small>
 							</div>
@@ -87,7 +87,6 @@
 						<div class="controls">
 						<label class="checkbox">
                             <input type="checkbox" id="integratedAuth" name="integratedAuth"
-                                   placeholder="umbraco-cms"
                                    ng-model="installer.current.model.integratedAuth" /> Use integrated authentication</label>
 						</div>
 					</div>
