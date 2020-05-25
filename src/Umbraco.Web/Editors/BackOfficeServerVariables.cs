@@ -282,10 +282,10 @@ namespace Umbraco.Web.Editors
                         //     "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
                         //         controller => controller.GetIndexerDetails())
                         // },
-                        {
-                            "healthCheckBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
-                                controller => controller.GetAllHealthChecks())
-                        },
+                        // {
+                        //     "healthCheckBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
+                        //         controller => controller.GetAllHealthChecks())
+                        // },
                         {
                             "templateQueryApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TemplateQueryController>(
                                 controller => controller.PostTemplateQuery(null))

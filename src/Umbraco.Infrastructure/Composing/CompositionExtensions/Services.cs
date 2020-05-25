@@ -4,6 +4,7 @@ using System.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Packaging;
@@ -97,11 +98,11 @@ namespace Umbraco.Core.Composing.CompositionExtensions
 
         private static LocalizedTextServiceFileSources SourcesFactory(IFactory container)
         {
-            var ioHelper = container.GetInstance<IIOHelper>();
+            var hostingEnvironment = container.GetInstance<IHostingEnvironment>();
             var globalSettings = container.GetInstance<IGlobalSettings>();
-            var mainLangFolder = new DirectoryInfo(ioHelper.MapPath(globalSettings.UmbracoPath + "/config/lang/"));
-            var appPlugins = new DirectoryInfo(ioHelper.MapPath(Constants.SystemDirectories.AppPlugins));
-            var configLangFolder = new DirectoryInfo(ioHelper.MapPath(Constants.SystemDirectories.Config + "/lang/"));
+            var mainLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(globalSettings.UmbracoPath + "/config/lang/"));
+            var appPlugins = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.AppPlugins));
+            var configLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Config + "/lang/"));
 
             var pluginLangFolders = appPlugins.Exists == false
                 ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()

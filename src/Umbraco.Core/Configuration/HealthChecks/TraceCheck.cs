@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
@@ -11,8 +12,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
     public class TraceCheck : AbstractConfigCheck
     {
 
-        public TraceCheck(ILocalizedTextService textService, IIOHelper ioHelper, ILogger logger)
-            : base(textService, ioHelper, logger)
+        public TraceCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILogger logger)
+            : base(textService, hostingEnvironment, logger)
         { }
 
         public override string FilePath => "~/Web.config";

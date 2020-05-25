@@ -49,6 +49,16 @@ namespace Umbraco.Core.Services.Implement
             _logger = logger;
             _cache = appCaches.RuntimeCache;
 
+            if (fileSourceFolder.Exists == false)
+            {
+                Current.Logger.Warn<LocalizedTextServiceFileSources>("The folder does not exist: {FileSourceFolder}, therefore no sources will be discovered", fileSourceFolder.FullName);
+            }
+            else
+            {
+                _fileSourceFolder = fileSourceFolder;
+                _supplementFileSources = supplementFileSources;
+            }
+
             //Create the lazy source for the _xmlSources
             _xmlSources = new Lazy<Dictionary<CultureInfo, Lazy<XDocument>>>(() =>
             {
@@ -124,15 +134,7 @@ namespace Umbraco.Core.Services.Implement
                 return result;
             });
 
-            if (fileSourceFolder.Exists == false)
-            {
-                Current.Logger.Warn<LocalizedTextServiceFileSources>("The folder does not exist: {FileSourceFolder}, therefore no sources will be discovered", fileSourceFolder.FullName);
-            }
-            else
-            {
-                _fileSourceFolder = fileSourceFolder;
-                _supplementFileSources = supplementFileSources;
-            }
+
         }
 
         /// <summary>

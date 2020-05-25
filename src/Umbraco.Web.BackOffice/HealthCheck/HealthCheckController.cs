@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Http;
-using Umbraco.Core;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Editors;
-using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Configuration.HealthChecks;
+using Umbraco.Web.BackOffice.Filters;
 
 namespace Umbraco.Web.HealthCheck
 {
