@@ -1,18 +1,26 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core.Services;
+using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Editors;
-using Umbraco.Web.Mvc;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Web.BackOffice.PropertyEditors
 {
     [PluginController("UmbracoApi")]
     public class NestedContentController : UmbracoAuthorizedJsonController
     {
-        [System.Web.Http.HttpGet]
+        private readonly IContentTypeService _contentTypeService;
+
+        public NestedContentController(IContentTypeService contentTypeService)
+        {
+            _contentTypeService = contentTypeService;
+        }
+
+        [HttpGet]
         public IEnumerable<object> GetContentTypes()
         {
-            return Services.ContentTypeService
+            return _contentTypeService
                 .GetAllElementTypes()
                 .OrderBy(x => x.SortOrder)
                 .Select(x => new

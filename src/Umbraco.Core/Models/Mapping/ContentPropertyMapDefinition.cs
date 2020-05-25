@@ -12,7 +12,7 @@ namespace Umbraco.Web.Models.Mapping
     /// A mapper which declares how to map content properties. These mappings are shared among media (and probably members) which is
     /// why they are in their own mapper
     /// </summary>
-    internal class ContentPropertyMapDefinition : IMapDefinition
+    public class ContentPropertyMapDefinition : IMapDefinition
     {
         private readonly ContentPropertyBasicMapper<ContentPropertyBasic> _contentPropertyBasicConverter;
         private readonly ContentPropertyDtoMapper _contentPropertyDtoConverter;

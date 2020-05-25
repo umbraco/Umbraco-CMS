@@ -200,10 +200,6 @@
       <DependentUpon>umbracoSettings.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <None Include="Config\tinyMceConfig.Release.config">
-      <DependentUpon>tinyMceConfig.config</DependentUpon>
-      <SubType>Designer</SubType>
-    </None>
     <Content Include="Umbraco\Install\Views\Index.cshtml" />
     <Content Include="Media\Web.config" />
     <Content Include="Properties\Settings.settings">
@@ -293,9 +289,6 @@
     <None Include="web.Template.config">
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Config\tinyMceConfig.config">
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="Config\umbracoSettings.config">
       <SubType>Designer</SubType>
     </Content>

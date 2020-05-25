@@ -5,21 +5,16 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Web;
 using System.Web.Mvc;
-using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.Profiling;
-using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Trees;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Runtime;
 using Umbraco.Core.WebAssets;
 using Umbraco.Web.Security;
 
@@ -151,10 +146,11 @@ namespace Umbraco.Web.Editors
                         //     "tourApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TourController>(
                         //         controller => controller.GetTours())
                         // },
-                        {
-                            "embedApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
-                                controller => controller.GetEmbed("", 0, 0))
-                        },
+                        //TODO reintroduce
+                        // {
+                        //     "embedApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
+                        //         controller => controller.GetEmbed("", 0, 0))
+                        // },
                         {
                             "userApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<UsersController>(
                                 controller => controller.PostSaveUser(null))
@@ -241,10 +237,10 @@ namespace Umbraco.Web.Editors
                             "relationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationController>(
                                 controller => controller.GetById(0))
                         },
-                        {
-                            "rteApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>(
-                                controller => controller.GetConfiguration())
-                        },
+                        // {
+                        //     "rteApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>(
+                        //         controller => controller.GetConfiguration())
+                        // },
                         {
                             "stylesheetApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<StylesheetController>(
                                 controller => controller.GetAll())
@@ -277,10 +273,10 @@ namespace Umbraco.Web.Editors
                             "contentTreeBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentTreeController>(
                                 controller => controller.GetNodes("-1", null))
                         },
-                        {
-                            "tagsDataBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TagsDataController>(
-                                controller => controller.GetTags("", "", null))
-                        },
+                        // {
+                        //     "tagsDataBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TagsDataController>(
+                        //         controller => controller.GetTags("", "", null))
+                        // },
                         //TODO reintroduce
                         // {
                         //     "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
@@ -294,10 +290,11 @@ namespace Umbraco.Web.Editors
                             "templateQueryApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TemplateQueryController>(
                                 controller => controller.PostTemplateQuery(null))
                         },
-                        {
-                            "codeFileApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<CodeFileController>(
-                                controller => controller.GetByPath("", ""))
-                        },
+                        //TODO Reintroduce
+                        // {
+                        //     "codeFileApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<CodeFileController>(
+                        //         controller => controller.GetByPath("", ""))
+                        // },
                         {
                             "publishedStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedStatusController>(
                                 controller => controller.GetPublishedStatusUrl())
@@ -332,10 +329,10 @@ namespace Umbraco.Web.Editors
                             "logViewerApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogViewerController>(
                                 controller => controller.GetNumberOfErrors(null, null))
                         },
-                        {
-                            "webProfilingBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<WebProfilingController>(
-                                controller => controller.GetStatus())
-                        },
+                        // {
+                        //     "webProfilingBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<WebProfilingController>(
+                        //         controller => controller.GetStatus())
+                        // },
                         {
                             "tinyMceApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TinyMceController>(
                                 controller => controller.UploadImage())

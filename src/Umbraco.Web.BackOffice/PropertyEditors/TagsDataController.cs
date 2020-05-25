@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Web.BackOffice.PropertyEditors
 {
     /// <summary>
     /// A controller used for type-ahead values for tags
