@@ -178,6 +178,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>For generic properties, the value is <c>null</c>.</remarks>
         [DataMember]
+        [DoNotClone]
         public Lazy<int> PropertyGroupId
         {
             get => _propertyGroupId;

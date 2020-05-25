@@ -128,7 +128,7 @@ angular.module('umbraco.services')
         function setUserTimeoutInternal(newTimeout) {
 
             var asNumber = parseFloat(newTimeout);
-            if (!isNaN(asNumber) && currentUser && angular.isNumber(asNumber)) {
+            if (!isNaN(asNumber) && currentUser && Utilities.isNumber(asNumber)) {
                 currentUser.remainingAuthSeconds = newTimeout;
                 lastServerTimeoutSet = new Date();
             }
@@ -185,7 +185,19 @@ angular.module('umbraco.services')
             authenticate: function (login, password) {
 
                 return authResource.performLogin(login, password)
-                    .then(this.setAuthenticationSuccessful);
+                    .then(function(data) {
+
+                        // Check if user has a start node set.
+                        if(data.startContentIds.length === 0 && data.startMediaIds.length === 0){
+                            var errorMsg = "User has no start-nodes";
+                            var result = { errorMsg: errorMsg, user: data, authenticated: false, lastUserId: lastUserId, loginType: "credentials" };
+                            eventsService.emit("app.notAuthenticated", result);
+                            throw result;
+                        }
+                        
+                        return data;
+                        
+                    }).then(this.setAuthenticationSuccessful);
             },
             setAuthenticationSuccessful: function (data) {
 

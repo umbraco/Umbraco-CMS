@@ -25,7 +25,7 @@ function ColorPickerController($scope, $timeout) {
         initActiveColor();
     }
 
-    if (!angular.isArray($scope.model.config.items)) {
+    if (!Utilities.isArray($scope.model.config.items)) {
         //make an array from the dictionary
         var items = [];
         for (var i in $scope.model.config.items) {

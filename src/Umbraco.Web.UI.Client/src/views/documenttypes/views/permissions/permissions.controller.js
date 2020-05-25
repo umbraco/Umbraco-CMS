@@ -20,12 +20,14 @@
         vm.selectedChildren = [];
 
         vm.overlayTitle = "";
+        vm.showAllowSegmentationOption = Umbraco.Sys.ServerVariables.umbracoSettings.showAllowSegmentationForDocumentTypes || false;
 
         vm.addChild = addChild;
         vm.removeChild = removeChild;
         vm.sortChildren = sortChildren;
         vm.toggleAllowAsRoot = toggleAllowAsRoot;
         vm.toggleAllowCultureVariants = toggleAllowCultureVariants;
+        vm.toggleAllowSegmentVariants = toggleAllowSegmentVariants;
         vm.canToggleIsElement = false;
         vm.toggleIsElement = toggleIsElement;
 
@@ -108,6 +110,10 @@
 
         function toggleAllowCultureVariants() {
             $scope.model.allowCultureVariant = $scope.model.allowCultureVariant ? false : true;
+        }
+
+        function toggleAllowSegmentVariants() {
+            $scope.model.allowSegmentVariant = $scope.model.allowSegmentVariant ? false : true;
         }
 
         function toggleIsElement() {
