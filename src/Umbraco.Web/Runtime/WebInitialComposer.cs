@@ -179,7 +179,7 @@ namespace Umbraco.Web.Runtime
                 .Remove<TinyMceValueConverter>()
                 .Remove<TextStringValueConverter>()
                 .Remove<MarkdownEditorValueConverter>();
-            
+
             // add all known factories, devs can then modify this list on application
             // startup either by binding to events or in their own global.asax
             composition.FilteredControllerFactory()
@@ -205,9 +205,9 @@ namespace Umbraco.Web.Runtime
                 //.Append<ContentFinderByUrlAndTemplate>() // disabled, this is an odd finder
                 .Append<ContentFinderByUrlAlias>();
                 //only append ContentFinderByRedirectUrl if RedirectUrlTracking is not disabled
-                if (!composition.Configs.Settings().WebRouting.DisableRedirectUrlTracking)
+                if (composition.Configs.Settings().WebRouting.DisableRedirectUrlTracking == false)
                 {
-                  composition.ContentFinders().Append<ContentFinderByRedirectUrl>();
+                    composition.ContentFinders().Append<ContentFinderByRedirectUrl>();
                 }
 
             composition.RegisterUnique<ISiteDomainHelper, SiteDomainHelper>();
