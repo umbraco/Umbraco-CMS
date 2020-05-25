@@ -65,6 +65,7 @@ namespace Umbraco.Extensions
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IEnumerable<string> externalLoginErrors)
         {
+            //TODO: I think this should be: _signInManager.GetExternalAuthenticationSchemesAsync() or however that works
             var providers = await authenticationSchemeProvider.GetAllSchemesAsync();
 
             var loginProviders = providers

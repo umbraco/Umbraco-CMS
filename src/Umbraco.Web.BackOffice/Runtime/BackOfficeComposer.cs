@@ -6,6 +6,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Routing;
+using Umbraco.Web.BackOffice.Security;
 
 namespace Umbraco.Web.BackOffice.Runtime
 {
@@ -15,7 +16,7 @@ namespace Umbraco.Web.BackOffice.Runtime
         {
             composition.RegisterUnique<BackOfficeAreaRoutes>();
             composition.RegisterUnique<BackOfficeServerVariables>();
-            composition.Register<SignInManager<BackOfficeIdentityUser>>(Lifetime.Scope);
+            composition.Register<BackOfficeSignInManager>(Lifetime.Scope);
         }
     }
 }

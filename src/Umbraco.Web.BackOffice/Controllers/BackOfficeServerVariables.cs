@@ -15,6 +15,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
@@ -39,7 +40,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ISecuritySettings _securitySettings;
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
-        private readonly UmbracoApiControllerTypeCollection _apiControllers;
 
         public BackOfficeServerVariables(
             LinkGenerator linkGenerator,
@@ -54,8 +54,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IRuntimeSettings settings,
             ISecuritySettings securitySettings,
             IRuntimeMinifier runtimeMinifier,
-            IAuthenticationSchemeProvider authenticationSchemeProvider,
-            UmbracoApiControllerTypeCollection apiControllers)
+            IAuthenticationSchemeProvider authenticationSchemeProvider)
         {
             _linkGenerator = linkGenerator;
             _runtimeState = runtimeState;
@@ -70,7 +69,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             _securitySettings = securitySettings;
             _runtimeMinifier = runtimeMinifier;
             _authenticationSchemeProvider = authenticationSchemeProvider;
-            _apiControllers = apiControllers;
         }
 
         /// <summary>
@@ -114,7 +112,11 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             // TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
             // so based on compat and how things are currently working we need to replace the serverVarsJs one
-            ((Dictionary<string, object>)defaults["umbracoUrls"])["serverVarsJs"] = _linkGenerator.GetPathByAction("ServerVariables", "BackOffice");
+            ((Dictionary<string, object>)defaults["umbracoUrls"])["serverVarsJs"]
+                = _linkGenerator.GetPathByAction(
+                    nameof(BackOfficeController.ServerVariables),
+                    ControllerExtensions.GetControllerName<BackOfficeController>(),
+                    new { area = Constants.Web.Mvc.BackOfficeArea });
 
             return defaults;
         }
@@ -126,6 +128,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         internal async Task<Dictionary<string, object>> GetServerVariablesAsync()
         {
             var globalSettings = _globalSettings;
+            var backOfficeControllerName = ControllerExtensions.GetControllerName<BackOfficeController>();
             var defaultVals = new Dictionary<string, object>
             {
                 {
@@ -136,211 +139,211 @@ namespace Umbraco.Web.BackOffice.Controllers
                         // having each url defined here explicitly - we can do that in v8! for now
                         // for umbraco services we'll stick to explicitly defining the endpoints.
 
-                        {"externalLoginsUrl", _linkGenerator.GetPathByAction("ExternalLogin", "BackOffice")},
-                        {"externalLinkLoginsUrl", _linkGenerator.GetPathByAction("LinkLogin", "BackOffice")},
-                        {"gridConfig", _linkGenerator.GetPathByAction("GetGridConfig", "BackOffice")},
+                        //{"externalLoginsUrl", _linkGenerator.GetPathByAction(nameof(BackOfficeController.ExternalLogin), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},
+                        //{"externalLinkLoginsUrl", _linkGenerator.GetPathByAction(nameof(BackOfficeController.LinkLogin), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},
+                        {"gridConfig", _linkGenerator.GetPathByAction(nameof(BackOfficeController.GetGridConfig), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},
                         // TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
-                        {"serverVarsJs", _linkGenerator.GetPathByAction("Application", "BackOffice")},
+                        {"serverVarsJs", _linkGenerator.GetPathByAction(nameof(BackOfficeController.Application), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},
                         //API URLs
                         {
                             "packagesRestApiBaseUrl", Constants.PackageRepository.RestApiBaseUrl
                         },
                         //{
                         //    "redirectUrlManagementApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RedirectUrlManagementController>(
-                        //        _apiControllers, controller => controller.GetEnableState())
+                        //        controller => controller.GetEnableState())
                         //},
-                        //{
-                        //    "tourApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TourController>(
-                        //        _apiControllers, controller => controller.GetTours())
-                        //},
+                        {
+                            "tourApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TourController>(
+                                controller => controller.GetTours())
+                        },
                         //{
                         //    "embedApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
-                        //        _apiControllers, controller => controller.GetEmbed("", 0, 0))
+                        //        controller => controller.GetEmbed("", 0, 0))
                         //},
                         //{
                         //    "userApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<UsersController>(
-                        //        _apiControllers, controller => controller.PostSaveUser(null))
+                        //        controller => controller.PostSaveUser(null))
                         //},
                         //{
                         //    "userGroupsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<UserGroupsController>(
-                        //        _apiControllers, controller => controller.PostSaveUserGroup(null))
+                        //        controller => controller.PostSaveUserGroup(null))
                         //},
                         //{
                         //    "contentApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentController>(
-                        //        _apiControllers, controller => controller.PostSave(null))
+                        //        controller => controller.PostSave(null))
                         //},
                         //{
                         //    "mediaApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MediaController>(
-                        //        _apiControllers, controller => controller.GetRootMedia())
+                        //        controller => controller.GetRootMedia())
                         //},
-                        //{
-                        //    "imagesApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImagesController>(
-                        //        _apiControllers, controller => controller.GetBigThumbnail(""))
-                        //},
+                        {
+                            "imagesApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ImagesController>(
+                                controller => controller.GetBigThumbnail(""))
+                        },
                         //{
                         //    "sectionApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<SectionController>(
-                        //        _apiControllers, controller => controller.GetSections())
+                        //        controller => controller.GetSections())
                         //},
                         //{
                         //    "treeApplicationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
-                        //        _apiControllers, controller => controller.GetApplicationTrees(null, null, null, TreeUse.None))
+                        //        controller => controller.GetApplicationTrees(null, null, null, TreeUse.None))
                         //},
                         //{
                         //    "contentTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
-                        //        _apiControllers, controller => controller.GetAllowedChildren(0))
+                        //        controller => controller.GetAllowedChildren(0))
                         //},
                         //{
                         //    "mediaTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MediaTypeController>(
-                        //        _apiControllers, controller => controller.GetAllowedChildren(0))
+                        //        controller => controller.GetAllowedChildren(0))
                         //},
                         //{
                         //    "macroRenderingApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MacroRenderingController>(
-                        //        _apiControllers, controller => controller.GetMacroParameters(0))
+                        //        controller => controller.GetMacroParameters(0))
                         //},
                         //{
                         //    "macroApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MacrosController>(
-                        //        _apiControllers, controller => controller.Create(null))
+                        //        controller => controller.Create(null))
                         //},
-                        //{
-                        //    "authenticationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<AuthenticationController>(
-                        //        _apiControllers, controller => controller.PostLogin(null))
-                        //},
+                        {
+                            "authenticationApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<AuthenticationController>(
+                                controller => controller.PostLogin(null))
+                        },
                         //{
                         //    "currentUserApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
-                        //        _apiControllers, controller => controller.PostChangePassword(null))
+                        //        controller => controller.PostChangePassword(null))
                         //},
                         //{
                         //    "entityApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<EntityController>(
-                        //        _apiControllers, controller => controller.GetById(0, UmbracoEntityTypes.Media))
+                        //        controller => controller.GetById(0, UmbracoEntityTypes.Media))
                         //},
                         //{
                         //    "dataTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DataTypeController>(
-                        //        _apiControllers, controller => controller.GetById(0))
+                        //        controller => controller.GetById(0))
                         //},
-                        //{
-                        //    "dashboardApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DashboardController>(
-                        //        _apiControllers, controller => controller.GetDashboard(null))
-                        //},
+                        {
+                            "dashboardApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<DashboardController>(
+                                controller => controller.GetDashboard(null))
+                        },
                         //{
                         //    "logApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogController>(
-                        //        _apiControllers, controller => controller.GetPagedEntityLog(0, 0, 0, Direction.Ascending, null))
+                        //        controller => controller.GetPagedEntityLog(0, 0, 0, Direction.Ascending, null))
                         //},
                         //{
                         //    "memberApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberController>(
-                        //        _apiControllers, controller => controller.GetByKey(Guid.Empty))
+                        //        controller => controller.GetByKey(Guid.Empty))
                         //},
                         //{
                         //    "packageInstallApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageInstallController>(
-                        //        _apiControllers, controller => controller.Fetch(string.Empty))
+                        //        controller => controller.Fetch(string.Empty))
                         //},
                         //{
                         //    "packageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageController>(
-                        //        _apiControllers, controller => controller.GetCreatedPackages())
+                        //        controller => controller.GetCreatedPackages())
                         //},
                         //{
                         //    "relationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationController>(
-                        //        _apiControllers, controller => controller.GetById(0))
+                        //        controller => controller.GetById(0))
                         //},
                         //{
                         //    "rteApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>(
-                        //        _apiControllers, controller => controller.GetConfiguration())
+                        //        controller => controller.GetConfiguration())
                         //},
                         //{
                         //    "stylesheetApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<StylesheetController>(
-                        //        _apiControllers, controller => controller.GetAll())
+                        //        controller => controller.GetAll())
                         //},
                         //{
                         //    "memberTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberTypeController>(
-                        //        _apiControllers, controller => controller.GetAllTypes())
+                        //        controller => controller.GetAllTypes())
                         //},
                         //{
                         //    "memberGroupApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberGroupController>(
-                        //        _apiControllers, controller => controller.GetAllGroups())
+                        //        controller => controller.GetAllGroups())
                         //},
                         //{
                         //    "updateCheckApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<UpdateCheckController>(
-                        //        _apiControllers, controller => controller.GetCheck())
+                        //        controller => controller.GetCheck())
                         //},
                         //{
                         //    "templateApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TemplateController>(
-                        //        _apiControllers, controller => controller.GetById(0))
+                        //        controller => controller.GetById(0))
                         //},
                         //{
                         //    "memberTreeBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberTreeController>(
-                        //        _apiControllers, controller => controller.GetNodes("-1", null))
+                        //        controller => controller.GetNodes("-1", null))
                         //},
                         //{
                         //    "mediaTreeBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MediaTreeController>(
-                        //        _apiControllers, controller => controller.GetNodes("-1", null))
+                        //        controller => controller.GetNodes("-1", null))
                         //},
                         //{
                         //    "contentTreeBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentTreeController>(
-                        //        _apiControllers, controller => controller.GetNodes("-1", null))
+                        //        controller => controller.GetNodes("-1", null))
                         //},
                         //{
                         //    "tagsDataBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TagsDataController>(
-                        //        _apiControllers, controller => controller.GetTags("", "", null))
+                        //        controller => controller.GetTags("", "", null))
                         //},
-                        //{
-                        //    "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
-                        //        _apiControllers, controller => controller.GetIndexerDetails())
-                        //},
+                        {
+                            "examineMgmtBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
+                                controller => controller.GetIndexerDetails())
+                        },
                         //{
                         //    "healthCheckBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
-                        //        _apiControllers, controller => controller.GetAllHealthChecks())
+                        //        controller => controller.GetAllHealthChecks())
                         //},
                         //{
                         //    "templateQueryApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TemplateQueryController>(
-                        //        _apiControllers, controller => controller.PostTemplateQuery(null))
+                        //        controller => controller.PostTemplateQuery(null))
                         //},
                         //{
                         //    "codeFileApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<CodeFileController>(
-                        //        _apiControllers, controller => controller.GetByPath("", ""))
+                        //        controller => controller.GetByPath("", ""))
                         //},
                         //{
                         //    "publishedStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedStatusController>(
-                        //        _apiControllers, controller => controller.GetPublishedStatusUrl())
+                        //        controller => controller.GetPublishedStatusUrl())
                         //},
                         //{
                         //    "dictionaryApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DictionaryController>(
-                        //        _apiControllers, controller => controller.DeleteById(int.MaxValue))
+                        //        controller => controller.DeleteById(int.MaxValue))
                         //},
                         //{
                         //    "publishedSnapshotCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedSnapshotCacheStatusController>(
-                        //        _apiControllers, controller => controller.GetStatus())
+                        //        controller => controller.GetStatus())
                         //},
-                        //{
-                        //    "helpApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HelpController>(
-                        //        _apiControllers, controller => controller.GetContextHelpForPage("","",""))
-                        //},
+                        {
+                            "helpApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<HelpController>(
+                                controller => controller.GetContextHelpForPage("","",""))
+                        },
                         //{
                         //    "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
-                        //        _apiControllers, controller => controller.GetSupportedLocales())
+                        //        controller => controller.GetSupportedLocales())
                         //},
                         //{
                         //    "languageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LanguageController>(
-                        //        _apiControllers, controller => controller.GetAllLanguages())
+                        //        controller => controller.GetAllLanguages())
                         //},
                         //{
                         //    "relationTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationTypeController>(
-                        //        _apiControllers, controller => controller.GetById(1))
+                        //        controller => controller.GetById(1))
                         //},
                         //{
                         //    "logViewerApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogViewerController>(
-                        //        _apiControllers, controller => controller.GetNumberOfErrors(null, null))
+                        //        controller => controller.GetNumberOfErrors(null, null))
                         //},
                         //{
                         //    "webProfilingBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<WebProfilingController>(
-                        //        _apiControllers, controller => controller.GetStatus())
+                        //        controller => controller.GetStatus())
                         //},
                         //{
                         //    "tinyMceApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TinyMceController>(
-                        //        _apiControllers, controller => controller.UploadImage())
+                        //        controller => controller.UploadImage())
                         //},
-                        //{
-                        //    "imageUrlGeneratorApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImageUrlGeneratorController>(
-                        //        _apiControllers, controller => controller.GetCropUrl(null, null, null, null, null))
-                        //},
+                        {
+                            "imageUrlGeneratorApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ImageUrlGeneratorController>(
+                                controller => controller.GetCropUrl(null, null, null, null, null))
+                        },
                     }
                 },
                 {
@@ -394,6 +397,8 @@ namespace Umbraco.Web.BackOffice.Controllers
                     "externalLogins", new Dictionary<string, object>
                     {
                         {
+                            //TODO: I think this should be: _signInManager.GetExternalAuthenticationSchemesAsync() or however that works
+
                             "providers", (await _authenticationSchemeProvider.GetAllSchemesAsync())
                                 // TODO: We need to filter only back office enabled schemes.
                                 // Before we used to have a property bag to check, now we don't so need to investigate the easiest/best

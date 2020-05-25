@@ -13,7 +13,6 @@ using Umbraco.Net;
 
 namespace Umbraco.Core.BackOffice
 {
-
     public class BackOfficeUserManager : BackOfficeUserManager<BackOfficeIdentityUser>
     {
         public BackOfficeUserManager(
@@ -399,59 +398,26 @@ namespace Umbraco.Core.BackOffice
         public static event EventHandler PasswordReset;
         public static event EventHandler ResetAccessFailedCount;
 
-        protected virtual void OnAccountLocked(IdentityAuditEventArgs e)
-        {
-            if (AccountLocked != null) AccountLocked(this, e);
-        }
+        protected virtual void OnAccountLocked(IdentityAuditEventArgs e) => AccountLocked?.Invoke(this, e);
 
-        protected virtual void OnAccountUnlocked(IdentityAuditEventArgs e)
-        {
-            if (AccountUnlocked != null) AccountUnlocked(this, e);
-        }
+        protected virtual void OnAccountUnlocked(IdentityAuditEventArgs e) => AccountUnlocked?.Invoke(this, e);
 
-        protected virtual void OnForgotPasswordRequested(IdentityAuditEventArgs e)
-        {
-            if (ForgotPasswordRequested != null) ForgotPasswordRequested(this, e);
-        }
+        protected virtual void OnForgotPasswordRequested(IdentityAuditEventArgs e) => ForgotPasswordRequested?.Invoke(this, e);
 
-        protected virtual void OnForgotPasswordChangedSuccess(IdentityAuditEventArgs e)
-        {
-            if (ForgotPasswordChangedSuccess != null) ForgotPasswordChangedSuccess(this, e);
-        }
+        protected virtual void OnForgotPasswordChangedSuccess(IdentityAuditEventArgs e) => ForgotPasswordChangedSuccess?.Invoke(this, e);
 
-        protected virtual void OnLoginFailed(IdentityAuditEventArgs e)
-        {
-            if (LoginFailed != null) LoginFailed(this, e);
-        }
+        protected virtual void OnLoginFailed(IdentityAuditEventArgs e) => LoginFailed?.Invoke(this, e);
 
-        protected virtual void OnLoginRequiresVerification(IdentityAuditEventArgs e)
-        {
-            if (LoginRequiresVerification != null) LoginRequiresVerification(this, e);
-        }
+        protected virtual void OnLoginRequiresVerification(IdentityAuditEventArgs e) => LoginRequiresVerification?.Invoke(this, e);
 
-        protected virtual void OnLoginSuccess(IdentityAuditEventArgs e)
-        {
-            if (LoginSuccess != null) LoginSuccess(this, e);
-        }
+        protected virtual void OnLoginSuccess(IdentityAuditEventArgs e) => LoginSuccess?.Invoke(this, e);
 
-        protected virtual void OnLogoutSuccess(IdentityAuditEventArgs e)
-        {
-            if (LogoutSuccess != null) LogoutSuccess(this, e);
-        }
+        protected virtual void OnLogoutSuccess(IdentityAuditEventArgs e) => LogoutSuccess?.Invoke(this, e);
 
-        protected virtual void OnPasswordChanged(IdentityAuditEventArgs e)
-        {
-            if (PasswordChanged != null) PasswordChanged(this, e);
-        }
+        protected virtual void OnPasswordChanged(IdentityAuditEventArgs e) => PasswordChanged?.Invoke(this, e);
 
-        protected virtual void OnPasswordReset(IdentityAuditEventArgs e)
-        {
-            if (PasswordReset != null) PasswordReset(this, e);
-        }
+        protected virtual void OnPasswordReset(IdentityAuditEventArgs e) => PasswordReset?.Invoke(this, e);
 
-        protected virtual void OnResetAccessFailedCount(IdentityAuditEventArgs e)
-        {
-            if (ResetAccessFailedCount != null) ResetAccessFailedCount(this, e);
-        }
+        protected virtual void OnResetAccessFailedCount(IdentityAuditEventArgs e) => ResetAccessFailedCount?.Invoke(this, e);
     }
 }

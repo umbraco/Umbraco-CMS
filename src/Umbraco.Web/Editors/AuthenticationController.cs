@@ -156,20 +156,6 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        /// <summary>
-        /// Checks if the current user's cookie is valid and if so returns OK or a 400 (BadRequest)
-        /// </summary>
-        /// <returns></returns>
-        [System.Web.Http.HttpGet]
-        public bool IsAuthenticated()
-        {
-            var attempt = UmbracoContext.Security.AuthorizeRequest();
-            if (attempt == ValidateRequestAttempt.Success)
-            {
-                return true;
-            }
-            return false;
-        }
 
         /// <summary>
         /// Returns the currently logged in Umbraco user
@@ -237,74 +223,6 @@ namespace Umbraco.Web.Editors
             return identityUser.Logins.ToDictionary(x => x.LoginProvider, x => x.ProviderKey);
         }
 
-        /// <summary>
-        /// Logs a user in
-        /// </summary>
-        /// <returns></returns>
-        [SetAngularAntiForgeryTokens]
-        public async Task<HttpResponseMessage> PostLogin(LoginModel loginModel)
-        {
-            var http = EnsureHttpContext();
-            var owinContext = TryGetOwinContext().Result;
-
-            // Sign the user in with username/password, this also gives a chance for developers to
-            // custom verify the credentials and auto-link user accounts with a custom IBackOfficePasswordChecker
-            var result = await SignInManager.PasswordSignInAsync(
-                loginModel.Username, loginModel.Password, isPersistent: true, shouldLockout: true);
-
-            if (result.Succeeded)
-            {
-                // get the user
-                var user = Services.UserService.GetByUsername(loginModel.Username);
-                UserManager.RaiseLoginSuccessEvent(User, user.Id);
-
-                return SetPrincipalAndReturnUserDetail(user, owinContext.Request.User);
-            }
-
-            if (result.RequiresTwoFactor)
-            {
-                var twofactorOptions = UserManager as IUmbracoBackOfficeTwoFactorOptions;
-                if (twofactorOptions == null)
-                {
-                    throw new HttpResponseException(
-                        Request.CreateErrorResponse(
-                            HttpStatusCode.BadRequest,
-                            "UserManager does not implement " + typeof(IUmbracoBackOfficeTwoFactorOptions)));
-                }
-
-                var twofactorView = twofactorOptions.GetTwoFactorView(
-                    owinContext,
-                    UmbracoContext,
-                    loginModel.Username);
-
-                if (twofactorView.IsNullOrWhiteSpace())
-                {
-                    throw new HttpResponseException(
-                        Request.CreateErrorResponse(
-                            HttpStatusCode.BadRequest,
-                            typeof(IUmbracoBackOfficeTwoFactorOptions) + ".GetTwoFactorView returned an empty string"));
-                }
-
-                var attemptedUser = Services.UserService.GetByUsername(loginModel.Username);
-
-                // create a with information to display a custom two factor send code view
-                var verifyResponse = Request.CreateResponse(HttpStatusCode.PaymentRequired, new
-                {
-                    twoFactorView = twofactorView,
-                    userId = attemptedUser.Id
-                });
-
-                UserManager.RaiseLoginRequiresVerificationEvent(User, attemptedUser.Id);
-
-                return verifyResponse;
-            }
-
-            // return BadRequest (400), we don't want to return a 401 because that get's intercepted
-            // by our angular helper because it thinks that we need to re-perform the request once we are
-            // authorized and we don't want to return a 403 because angular will show a warning message indicating
-            // that the user doesn't have access to perform this function, we just want to return a normal invalid message.
-            throw new HttpResponseException(HttpStatusCode.BadRequest);
-        }
 
         /// <summary>
         /// Processes a password reset request.  Looks for a match on the provided email address
@@ -534,7 +452,7 @@ namespace Umbraco.Web.Editors
             var userDetail = Mapper.Map<UserDetail>(user);
             // update the userDetail and set their remaining seconds
             userDetail.SecondsUntilTimeout = TimeSpan.FromMinutes(GlobalSettings.TimeOutInMinutes).TotalSeconds;
-
+        
             // create a response with the userDetail object
             var response = Request.CreateResponse(HttpStatusCode.OK, userDetail);
 

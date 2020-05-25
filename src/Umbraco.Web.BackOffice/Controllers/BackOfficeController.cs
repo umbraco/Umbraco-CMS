@@ -16,6 +16,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.Models;
 using Umbraco.Web.WebAssets;
@@ -36,20 +37,19 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IGridConfig _gridConfig;
         private readonly BackOfficeServerVariables _backOfficeServerVariables;
         private readonly AppCaches _appCaches;
-        private readonly SignInManager<BackOfficeIdentityUser> _signInManager;
+        private readonly BackOfficeSignInManager _signInManager;
 
         public BackOfficeController(
             BackOfficeUserManager userManager,
             IRuntimeMinifier runtimeMinifier,
             IGlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
-
             IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizedTextService textService,
             IGridConfig gridConfig,
             BackOfficeServerVariables backOfficeServerVariables,
             AppCaches appCaches,
-            SignInManager<BackOfficeIdentityUser> signInManager // TODO: Review this, do we want it/need it or create our own?
+            BackOfficeSignInManager signInManager // TODO: Review this, do we want it/need it or create our own?
             )
         {
             _userManager = userManager;

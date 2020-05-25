@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using Umbraco.Web.BackOffice.Routing;
+using Microsoft.AspNetCore.Builder;
 
 namespace Umbraco.Extensions
 {
@@ -19,6 +20,8 @@ namespace Umbraco.Extensions
                 var backOfficeRoutes = app.ApplicationServices.GetRequiredService<BackOfficeAreaRoutes>();
                 backOfficeRoutes.CreateRoutes(endpoints);
             });
+
+            app.UseAuthentication();
 
             app.UseUmbracoRuntimeMinification();
 
