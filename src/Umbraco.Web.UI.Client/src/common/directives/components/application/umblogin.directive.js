@@ -209,6 +209,7 @@
             }
 
             if (vm.loginForm.$invalid) {
+                SetTitle();
                 return;
             }
 
@@ -257,6 +258,7 @@
                     vm.loginForm.password.$setValidity('auth', true);
                 }
             });
+            SetTitle();
         }
 
         function requestPasswordResetSubmit(email) {
