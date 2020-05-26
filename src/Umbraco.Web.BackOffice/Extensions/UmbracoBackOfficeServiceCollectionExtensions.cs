@@ -11,6 +11,19 @@ namespace Umbraco.Extensions
 {
     public static class UmbracoBackOfficeServiceCollectionExtensions
     {
+        /// <summary>
+        /// Adds the services required for running the Umbraco back office
+        /// </summary>
+        /// <param name="services"></param>
+        public static void AddUmbracoBackOffice(this IServiceCollection services)
+        {
+            services.AddAntiforgery();
+        }
+
+        /// <summary>
+        /// Adds the services required for using Umbraco back office Identity
+        /// </summary>
+        /// <param name="services"></param>        
         public static void AddUmbracoBackOfficeIdentity(this IServiceCollection services)
         {
             services.AddDataProtection();

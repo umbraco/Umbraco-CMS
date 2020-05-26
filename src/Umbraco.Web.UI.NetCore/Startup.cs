@@ -39,10 +39,13 @@ namespace Umbraco.Web.UI.BackOffice
             // relying on a global configuration set by a user since if a custom IControllerActivator is used for our own controllers we may not
             // guarantee it will work. And then... is that even possible?
 
+            // TODO: we will need to simplify this and prob just have a one or 2 main method that devs call which call all other required methods,
+            // but for now we'll just be explicit with all of them
             services.AddUmbracoConfiguration(_config);
             services.AddUmbracoCore(_env, out var factory);
             services.AddUmbracoWebComponents();
             services.AddUmbracoRuntimeMinifier(_config);
+            services.AddUmbracoBackOffice();
             services.AddUmbracoBackOfficeIdentity();
 
             services.AddMvc();

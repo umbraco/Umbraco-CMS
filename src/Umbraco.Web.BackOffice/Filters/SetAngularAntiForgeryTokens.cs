@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Web.BackOffice.Security;
 
 namespace Umbraco.Extensions
 {
@@ -14,10 +15,10 @@ namespace Umbraco.Extensions
     /// </summary>
     public sealed class SetAngularAntiForgeryTokens : IAsyncActionFilter
     {
-        private readonly IAntiforgery _antiforgery;
+        private readonly IBackOfficeAntiforgery _antiforgery;
         private readonly IGlobalSettings _globalSettings;
 
-        public SetAngularAntiForgeryTokens(IAntiforgery antiforgery, IGlobalSettings globalSettings)
+        public SetAngularAntiForgeryTokens(IBackOfficeAntiforgery antiforgery, IGlobalSettings globalSettings)
         {
             _antiforgery = antiforgery;
             _globalSettings = globalSettings;
@@ -35,7 +36,8 @@ namespace Umbraco.Extensions
                         && context.HttpContext.Request.Cookies.TryGetValue(Constants.Web.CsrfValidationCookieName, out var csrfCookieVal))
                     {
                         //if they are not valid for some strange reason - we need to continue setting valid ones
-                        if (await _antiforgery.IsRequestValidAsync(context.HttpContext))
+                        var valResult = await _antiforgery.ValidateHeadersAsync(context.HttpContext);
+                        if (valResult.Success)
                         {
                             await next();
                             return;
