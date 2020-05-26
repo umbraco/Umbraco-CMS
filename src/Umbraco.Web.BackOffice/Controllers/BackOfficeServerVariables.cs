@@ -14,9 +14,12 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
+using Umbraco.Web.BackOffice.Profiling;
+using Umbraco.Web.BackOffice.PropertyEditors;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
+using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 
@@ -156,10 +159,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                             "tourApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TourController>(
                                 controller => controller.GetTours())
                         },
-                        //{
-                        //    "embedApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
-                        //        controller => controller.GetEmbed("", 0, 0))
-                        //},
+                        {
+                            "embedApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
+                                controller => controller.GetEmbed("", 0, 0))
+                        },
                         //{
                         //    "userApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<UsersController>(
                         //        controller => controller.PostSaveUser(null))
@@ -244,10 +247,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                         //    "relationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationController>(
                         //        controller => controller.GetById(0))
                         //},
-                        //{
-                        //    "rteApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>(
-                        //        controller => controller.GetConfiguration())
-                        //},
+                        {
+                            "rteApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>(
+                                controller => controller.GetConfiguration())
+                        },
                         //{
                         //    "stylesheetApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<StylesheetController>(
                         //        controller => controller.GetAll())
@@ -280,18 +283,18 @@ namespace Umbraco.Web.BackOffice.Controllers
                         //    "contentTreeBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentTreeController>(
                         //        controller => controller.GetNodes("-1", null))
                         //},
-                        //{
-                        //    "tagsDataBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TagsDataController>(
-                        //        controller => controller.GetTags("", "", null))
-                        //},
+                        {
+                            "tagsDataBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TagsDataController>(
+                                controller => controller.GetTags("", "", null))
+                        },
                         {
                             "examineMgmtBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
                                 controller => controller.GetIndexerDetails())
                         },
-                        //{
-                        //    "healthCheckBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
-                        //        controller => controller.GetAllHealthChecks())
-                        //},
+                        {
+                            "healthCheckBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
+                                controller => controller.GetAllHealthChecks())
+                        },
                         //{
                         //    "templateQueryApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TemplateQueryController>(
                         //        controller => controller.PostTemplateQuery(null))
@@ -332,10 +335,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                         //    "logViewerApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogViewerController>(
                         //        controller => controller.GetNumberOfErrors(null, null))
                         //},
-                        //{
-                        //    "webProfilingBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<WebProfilingController>(
-                        //        controller => controller.GetStatus())
-                        //},
+                        {
+                            "webProfilingBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<WebProfilingController>(
+                                controller => controller.GetStatus())
+                        },
                         //{
                         //    "tinyMceApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TinyMceController>(
                         //        controller => controller.UploadImage())
