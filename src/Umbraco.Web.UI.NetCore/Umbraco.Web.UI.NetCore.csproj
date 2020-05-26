@@ -13,7 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Controllers\" />
+      <Folder Include="Umbraco" />
       <Folder Include="Views\" />
       <Folder Include="wwwroot\Media" />
       <Folder Include="wwwroot\Umbraco\views\install" />
@@ -29,6 +29,14 @@
 
     <ItemGroup>
         <None Remove="App_Data\**" />
+        <None Include="Config\tinyMceConfig.Release.config">
+          <DependentUpon>tinyMceConfig.config</DependentUpon>
+          <SubType>Designer</SubType>
+        </None>
+        <None Include="Config\umbracoSettings.Release.config">
+          <DependentUpon>umbracoSettings.config</DependentUpon>
+          <SubType>Designer</SubType>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
@@ -45,6 +53,12 @@
         <Content Update="Areas\UmbracoInstall\Views\Install\Index.cshtml">
           <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
           <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+        <Content Update="Config\tinyMceConfig.config">
+          <SubType>Designer</SubType>
+        </Content>
+        <Content Update="Config\umbracoSettings.config">
+          <SubType>Designer</SubType>
         </Content>
     </ItemGroup>
 
