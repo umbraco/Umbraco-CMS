@@ -168,6 +168,7 @@
     <key alias="sendtopublish">Content sent for publishing</key>
     <key alias="sendtopublishvariant">Content sent for publishing for languages: %0%</key>
     <key alias="sort">Sort child items performed by user</key>
+    <key alias="custom">%0%</key>
     <key alias="smallCopy">Copy</key>
     <key alias="smallPublish">Publish</key>
     <key alias="smallPublishVariant">Publish</key>
@@ -180,6 +181,7 @@
     <key alias="smallSendToPublish">Send To Publish</key>
     <key alias="smallSendToPublishVariant">Send To Publish</key>
     <key alias="smallSort">Sort</key>
+    <key alias="smallCustom">Custom</key>
     <key alias="historyIncludingVariants">History (all variants)</key>
   </area>
   <area alias="changeDocType">

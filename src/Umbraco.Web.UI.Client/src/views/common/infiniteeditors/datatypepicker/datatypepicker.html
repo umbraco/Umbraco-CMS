@@ -37,9 +37,8 @@
                             <h5>{{key | umbCmsTitleCase}}</h5>
                             <ul class="umb-card-grid -six-in-row">
                                 <li ng-repeat="dataType in value | orderBy:'name'"
-                                    data-element="datatype-{{dataType.name}}"
-                                    ng-click="vm.viewOptionsForEditor(dataType)">
-                                    <a class="umb-card-grid-item" href="" title="{{ dataType.name }}">
+                                    data-element="datatype-{{dataType.name}}">
+                                    <a class="umb-card-grid-item" href="" ng-click="vm.viewOptionsForEditor(dataType)" title="{{ dataType.name }}">
                                         <span>
                                             <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
                                             {{ dataType.name }}
@@ -58,12 +57,11 @@
                                 <h5>{{result.group | umbCmsTitleCase}}</h5>
                                 <ul class="umb-card-grid -six-in-row">
                                     <li ng-repeat="dataType in result.entries | orderBy:'name'"
-                                        ng-mouseover="vm.showDetailsOverlay(dataType)"
-                                        ng-click="vm.pickDataType(dataType)">
+                                        ng-mouseover="vm.showDetailsOverlay(dataType)">
                                         <div ng-if="dataType.loading" class="umb-card-grid-item__loading">
                                             <div class="umb-button__progress"></div>
                                         </div>
-                                        <a class="umb-card-grid-item" href="" title="{{ dataType.name }}">
+                                        <a class="umb-card-grid-item" href="" ng-click="vm.pickDataType(dataType)" title="{{ dataType.name }}">
                                             <span>
                                                 <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
                                                 {{ dataType.name }}
@@ -78,9 +76,8 @@
                             <div ng-if="result.entries.length > 0">
                                 <h5>{{result.group | umbCmsTitleCase}}</h5>
                                 <ul class="umb-card-grid -six-in-row">
-                                    <li ng-repeat="dataType in result.entries | orderBy:'name'"
-                                        ng-click="vm.pickEditor(dataType)">
-                                        <a class="umb-card-grid-item" href="" title="{{ dataType.name }}">
+                                    <li ng-repeat="dataType in result.entries | orderBy:'name'">
+                                        <a class="umb-card-grid-item" href="" ng-click="vm.pickEditor(dataType)" title="{{ dataType.name }}">
                                             <span>
                                                 <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
                                                 {{ dataType.name }}

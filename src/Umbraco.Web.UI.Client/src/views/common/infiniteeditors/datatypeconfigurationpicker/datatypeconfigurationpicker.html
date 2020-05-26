@@ -18,15 +18,14 @@
                     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
                     <div ng-if="!vm.loading">
-
+                        <a href="" tabindex="0" umb-auto-focus></a>
                         <ul class="umb-card-grid -three-in-row">
                             <li ng-repeat="dataTypeConfig in vm.configs | orderBy:'name'"
-                                data-element="datatypeconfig-{{dataTypeConfig.name}}"
-                                ng-click="vm.pickDataType(dataTypeConfig)">
+                                data-element="datatypeconfig-{{dataTypeConfig.name}}">
                                 <div ng-if="dataTypeConfig.loading" class="umb-card-grid-item__loading">
                                     <div class="umb-button__progress"></div>
                                 </div>
-                                <a class="umb-card-grid-item" href="" title="{{ dataTypeConfig.name }}">
+                                <a class="umb-card-grid-item" href="" ng-click="vm.pickDataType(dataTypeConfig)" title="{{ dataTypeConfig.name }}">
                                     <span>
                                         <i class="{{ dataTypeConfig.icon }}" ng-class="{'icon-autofill': dataTypeConfig.icon == null}"></i>
                                         {{ dataTypeConfig.name }}
@@ -35,8 +34,8 @@
                             </li>
                         </ul>
                         <ul class="umb-card-grid -three-in-row">
-                            <li ng-click="vm.newDataType()">
-                                <a class="umb-card-grid-item-slot" href="" title="Create a new configuration of {{ model.dataType.name }}">
+                            <li>
+                                <a class="umb-card-grid-item-slot" href="" ng-click="vm.newDataType()" title="Create a new configuration of {{ model.editor.name }}">
                                     <span>
                                         <i class="icon icon-add"></i>
                                         Create new
