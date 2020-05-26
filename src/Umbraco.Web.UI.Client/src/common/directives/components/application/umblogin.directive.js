@@ -201,10 +201,11 @@
             // make sure that we are returning to the login view.
             if (formHelper.submitForm({ scope: $scope })) {
                 if (vm.loginForm.$invalid) {
+                    SetTitle();
                     return;
                 }
+                
                 vm.view = "login";
-
 
                 vm.loginStates.submitButton = "busy";
 
@@ -250,7 +251,6 @@
                         vm.loginForm.password.$setValidity('auth', true);
                     }
                 });
-            }
         }
 
         function requestPasswordResetSubmit(email) {
