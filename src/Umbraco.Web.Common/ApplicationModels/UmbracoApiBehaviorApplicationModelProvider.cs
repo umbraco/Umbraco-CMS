@@ -35,7 +35,7 @@ namespace Umbraco.Web.Common.ApplicationModels
 
             ActionModelConventions = new List<IActionModelConvention>()
             {
-                new ClientErrorResultFilterConvention(), // TODO: Need to determine exactly how this affects errors
+                new ClientErrorResultFilterConvention(), // Ensures the responses without any body is converted into a simple json object with info instead of a string like "Status Code: 404; Not Found"
                 new InvalidModelStateFilterConvention(), // automatically 400 responses if ModelState is invalid before hitting the controller
                 new ConsumesConstraintForFormFileParameterConvention(), // If an controller accepts files, it must accept multipart/form-data.
                 new InferParameterBindingInfoConvention(modelMetadataProvider), // no need for [FromBody] everywhere, A complex type parameter is assigned to FromBody
@@ -74,9 +74,9 @@ namespace Umbraco.Web.Common.ApplicationModels
                     foreach (var convention in ActionModelConventions)
                     {
                         convention.Apply(action);
-                    }   
+                    }
                 }
-                    
+
             }
         }
 
