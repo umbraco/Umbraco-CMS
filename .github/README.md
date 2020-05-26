@@ -1,4 +1,4 @@
-# [Umbraco CMS](https://umbraco.com) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](../LICENSE.md) [![Build status](https://umbraco.visualstudio.com/Umbraco%20Cms/_apis/build/status/Cms%208%20Continuous?branchName=v8/dev)](https://umbraco.visualstudio.com/Umbraco%20Cms/_build?definitionId=75) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) [![Twitter](https://img.shields.io/twitter/follow/umbraco.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=umbraco)
+# [Umbraco CMS](https://umbraco.com) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](../LICENSE.md) [![Build status](https://umbraco.visualstudio.com/Umbraco%20Cms/_apis/build/status/Cms%208%20Continuous?branchName=v8/contrib)](https://umbraco.visualstudio.com/Umbraco%20Cms/_build?definitionId=75) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) [![Twitter](https://img.shields.io/twitter/follow/umbraco.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=umbraco)
 
 Umbraco is the friendliest, most flexible and fastest growing ASP.NET CMS, and used by more than 500,000 websites worldwide. Our mission is to help you deliver delightful digital experiences by making Umbraco friendly, simpler and social.
 
@@ -21,7 +21,7 @@ Please also see our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 [Umbraco Cloud](https://umbraco.com/cloud) is the easiest and fastest way to use Umbraco yet, with full support for all your custom .NET code and integrations. You're up and running in less than a minute, and your life will be made easier with automated upgrades and a built-in deployment engine. We offer a free 14-day trial, no credit card needed.
 
-If you want to DIY, you can [download Umbraco]((https://our.umbraco.com/download)) either as a ZIP file or via NuGet. It's the same version of Umbraco CMS that powers Umbraco Cloud, but you'll need to find a place to host it yourself, and handling deployments and upgrades will be all up to you.
+If you want to DIY, then you can [download Umbraco]((https://our.umbraco.com/download)) either as a ZIP file or via NuGet. It's the same version of Umbraco CMS that powers Umbraco Cloud, but you'll need to find a place to host it yourself, and handling deployments and upgrades will be all up to you.
 
 ## Documentation
 
@@ -29,7 +29,7 @@ The documentation for Umbraco CMS can be found [on Our Umbraco](https://our.umbr
 
 ## Join the Umbraco community
 
-Our friendly community is available 24/7 at the community hub we call ["Our Umbraco"](https://our.umbraco.com/). Our Umbraco features forums for questions and answers, documentation, downloadable plugins for Umbraco, and a rich collection of community resources.
+Our friendly community is available 24/7 at the community hub, we call ["Our Umbraco"](https://our.umbraco.com/). Our Umbraco features forums for questions and answers, documentation, downloadable plugins for Umbraco, and a rich collection of community resources.
 
 Besides "Our", we all support each other also via Twitter: [Umbraco HQ](https://twitter.com/umbraco), [Release Updates](https://twitter.com/umbracoproject), [#umbraco](https://twitter.com/hashtag/umbraco)
 

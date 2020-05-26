@@ -1,19 +1,18 @@
-
-/**
+/** 
  * @ngdoc controller
- * @name Umbraco.MainController
+ * @name Umbraco.MainController  
  * @function
  * 
- * @description
+ * @description  
  * The main application controller
  * 
  */
 function MainController($scope, $location, appState, treeService, notificationsService, 
     userService, historyService, updateChecker, navigationService, eventsService, 
     tmhDynamicLocale, localStorageService, editorService, overlayService, assetsService, tinyMceAssets) {
-
+ 
     //the null is important because we do an explicit bool check on this in the view
-    $scope.authenticated = null;
+    $scope.authenticated = null; 
     $scope.touchDevice = appState.getGlobalState("touchDevice");
     $scope.infiniteMode = false;
     $scope.overlay = {};
@@ -67,13 +66,19 @@ function MainController($scope, $location, appState, treeService, notificationsS
     };
 
     var evts = [];
-    
+
     //when a user logs out or timesout
     evts.push(eventsService.on("app.notAuthenticated", function (evt, data) {
         $scope.authenticated = null;
         $scope.user = null;
         const isTimedOut = data && data.isTimedOut ? true : false;
+
         $scope.showLoginScreen(isTimedOut);
+
+        // Remove the localstorage items for tours shown
+        // Means that when next logged in they can be re-shown if not already dismissed etc
+        localStorageService.remove("emailMarketingTourShown");
+        localStorageService.remove("introTourShown");
     }));
 
     evts.push(eventsService.on("app.userRefresh", function(evt) {

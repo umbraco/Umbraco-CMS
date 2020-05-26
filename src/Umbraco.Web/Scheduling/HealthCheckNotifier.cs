@@ -51,7 +51,7 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
-            using (_logger.DebugDuration<KeepAlive>("Health checks executing", "Health checks complete"))
+            using (_logger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
             {
                 var healthCheckConfig = Current.Configs.HealthChecks();
 

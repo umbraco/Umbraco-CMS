@@ -303,7 +303,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets the content json for the content id
+        /// Gets the content json for the content guid
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -323,7 +323,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets the content json for the content id
+        /// Gets the content json for the content udi
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -341,7 +341,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets an empty content item for the
+        /// Gets an empty content item for the document type.
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
@@ -869,7 +869,7 @@ namespace Umbraco.Web.Editors
             return true;
         }
 
-        
+
 
         /// <summary>
         /// Helper method to perform the saving of the content and add the notifications to the result
@@ -897,7 +897,13 @@ namespace Umbraco.Web.Editors
                 if (variantCount > 1)
                 {
                     var cultureErrors = ModelState.GetCulturesWithErrors(Services.LocalizationService, cultureForInvariantErrors);
-                    foreach (var c in contentItem.Variants.Where(x => x.Save && !cultureErrors.Contains(x.Culture)).Select(x => x.Culture).ToArray())
+
+                    var savedWithoutErrors = contentItem.Variants
+                        .Where(x => x.Save && !cultureErrors.Contains(x.Culture) && x.Culture != null)
+                        .Select(x => x.Culture)
+                        .ToArray();
+
+                    foreach (var c in savedWithoutErrors)
                     {
                         AddSuccessNotification(notifications, c,
                             Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
@@ -1161,14 +1167,14 @@ namespace Umbraco.Web.Editors
             //validate if we can publish based on the mandatory language requirements
             var canPublish = ValidatePublishingMandatoryLanguages(
                 cultureErrors,
-                contentItem, cultureVariants, mandatoryCultures, 
+                contentItem, cultureVariants, mandatoryCultures,
                 mandatoryVariant => mandatoryVariant.Publish);
 
             //Now check if there are validation errors on each variant.
             //If validation errors are detected on a variant and it's state is set to 'publish', then we
             //need to change it to 'save'.
             //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.
-            
+
             foreach (var variant in contentItem.Variants)
             {
                 if (cultureErrors.Contains(variant.Culture))
@@ -1656,14 +1662,14 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public DomainSave PostSaveLanguageAndDomains(DomainSave model)
         {
-            foreach(var domain in model.Domains)
+            foreach (var domain in model.Domains)
             {
                 try
                 {
                     var uri = DomainUtilities.ParseUriFromDomainName(domain.Name, Request.RequestUri);
                 }
                 catch (UriFormatException)
-                {                    
+                {
                     var response = Request.CreateValidationErrorResponse(Services.TextService.Localize("assignDomain/invalidDomain"));
                     throw new HttpResponseException(response);
                 }
@@ -1679,9 +1685,9 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(response);
             }
 
-            var permission = Services.UserService.GetPermissions(Security.CurrentUser, node.Path);
+            var assignedPermissions = Services.UserService.GetAssignedPermissions(Security.CurrentUser, node.Id);
 
-            if (permission.AssignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
+            if (assignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
             {
                 var response = Request.CreateResponse(HttpStatusCode.BadRequest);
                 response.Content = new StringContent("You do not have permission to assign domains on that node.");
@@ -1829,15 +1835,20 @@ namespace Umbraco.Web.Editors
             base.HandleInvalidModelState(display);
 
         }
-        
+
         /// <summary>
         /// Maps the dto property values and names to the persisted model
         /// </summary>
         /// <param name="contentSave"></param>
         private void MapValuesForPersistence(ContentItemSave contentSave)
         {
-            // inline method to determine if a property type varies
-            bool Varies(Property property) => property.PropertyType.VariesByCulture();
+            // inline method to determine the culture and segment to persist the property
+            (string culture, string segment) PropertyCultureAndSegment(Property property, ContentVariantSave variant)
+            {
+                var culture = property.PropertyType.VariesByCulture() ? variant.Culture : null;
+                var segment = property.PropertyType.VariesBySegment() ? variant.Segment : null;
+                return (culture, segment);
+            }
 
             var variantIndex = 0;
 
@@ -1869,15 +1880,26 @@ namespace Umbraco.Web.Editors
                     ? variant.PropertyCollectionDto
                     : new ContentPropertyCollectionDto
                     {
-                        Properties = variant.PropertyCollectionDto.Properties.Where(x => !x.Culture.IsNullOrWhiteSpace())
+                        Properties = variant.PropertyCollectionDto.Properties.Where(
+                            x => !x.Culture.IsNullOrWhiteSpace() || !x.Segment.IsNullOrWhiteSpace())
                     };
 
                 //for each variant, map the property values
                 MapPropertyValuesForPersistence<IContent, ContentItemSave>(
                     contentSave,
                     propertyCollection,
-                    (save, property) => Varies(property) ? property.GetValue(variant.Culture) : property.GetValue(),         //get prop val
-                    (save, property, v) => { if (Varies(property)) property.SetValue(v, variant.Culture); else property.SetValue(v); },  //set prop val
+                    (save, property) =>
+                    {
+                        // Get property value
+                        (var culture, var segment) = PropertyCultureAndSegment(property, variant);
+                        return property.GetValue(culture, segment);
+                    },
+                    (save, property, v) =>
+                    {
+                        // Set property value
+                        (var culture, var segment) = PropertyCultureAndSegment(property, variant);
+                        property.SetValue(v, culture, segment);
+                    },
                     variant.Culture);
 
                 variantIndex++;
@@ -2157,7 +2179,10 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private ContentItemDisplay MapToDisplay(IContent content)
         {
-            var display = Mapper.Map<ContentItemDisplay>(content);
+            var display = Mapper.Map<ContentItemDisplay>(content, context =>
+            {
+                context.Items["CurrentUser"] = Security.CurrentUser;
+            });
             display.AllowPreview = display.AllowPreview && content.Trashed == false && content.ContentType.IsElement == false;
             return display;
         }

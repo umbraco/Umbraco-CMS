@@ -262,11 +262,7 @@
                 submitButtonLabel: "Save Search",
                 disableSubmitButton: true,
                 view: "logviewersearch",
-                query: {
-                    filterExpression: vm.logOptions.filterExpression,
-                    startDate: vm.logOptions.startDate,
-                    endDate: vm.logOptions.endDate
-                },
+                query: vm.logOptions.filterExpression,
                 submit: function (model) {
                     //Resource call with two params (name & query)
                     //API that opens the JSON and adds it to the bottom
@@ -286,10 +282,11 @@
         function deleteSavedSearch(searchItem) {
 
             var overlay = {
-                title: "Delete Search",
-                subtitle: "Are you sure you wish to delete",
+                title: "Delete Saved Search",
+                subtitle: "Are you sure you wish to delete?",
                 closeButtonLabel: "Cancel",
-                submitButtonLabel: "Delete Search",
+                submitButtonLabel: "Delete Saved Search",
+                submitButtonStyle: "danger",
                 view: "default",
                 submit: function (model) {
                     //Resource call with two params (name & query)

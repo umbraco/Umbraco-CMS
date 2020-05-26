@@ -20,6 +20,7 @@ using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using System.Web.Http.Controllers;
 
 namespace Umbraco.Web.Editors
 {
@@ -34,6 +35,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.DocumentTypes, Constants.Trees.MediaTypes, Constants.Trees.MemberTypes)]
     [EnableOverrideAuthorization]
+    [DataTypeControllerConfiguration]
     public class DataTypeController : BackOfficeNotificationsController
     {
         private readonly PropertyEditorCollection _propertyEditors;
@@ -42,6 +44,19 @@ namespace Umbraco.Web.Editors
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _propertyEditors = propertyEditors;
+        }
+
+        /// <summary>
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class DataTypeControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))
+                ));
+            }
         }
 
         /// <summary>
@@ -63,6 +78,40 @@ namespace Umbraco.Web.Editors
         public DataTypeDisplay GetById(int id)
         {
             var dataType = Services.DataTypeService.GetDataType(id);
+            if (dataType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return Mapper.Map<IDataType, DataTypeDisplay>(dataType);
+        }
+
+        /// <summary>
+        /// Gets the datatype json for the datatype guid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public DataTypeDisplay GetById(Guid id)
+        {
+            var dataType = Services.DataTypeService.GetDataType(id);
+            if (dataType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return Mapper.Map<IDataType, DataTypeDisplay>(dataType);
+        }
+
+        /// <summary>
+        /// Gets the datatype json for the datatype udi
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public DataTypeDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var dataType = Services.DataTypeService.GetDataType(guidUdi.Guid);
             if (dataType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -378,7 +427,7 @@ namespace Umbraco.Web.Editors
             {
                 var propertyEditor = propertyEditors.SingleOrDefault(x => x.Alias == dataType.Alias);
                 if (propertyEditor != null)
-                    dataType.HasPrevalues = propertyEditor.GetConfigurationEditor().Fields.Any(); ;
+                    dataType.HasPrevalues = propertyEditor.GetConfigurationEditor().Fields.Any();
             }
 
             var grouped = dataTypes

@@ -26,8 +26,10 @@ namespace Umbraco.Core.Models
         private string _propertyEditorAlias;
         private ValueStorageType _valueStorageType;
         private bool _mandatory;
+        private string _mandatoryMessage;
         private int _sortOrder;
         private string _validationRegExp;
+        private string _validationRegExpMessage;
         private ContentVariation _variations;
 
         /// <summary>
@@ -176,20 +178,31 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>For generic properties, the value is <c>null</c>.</remarks>
         [DataMember]
-        internal Lazy<int> PropertyGroupId
+        [DoNotClone]
+        public Lazy<int> PropertyGroupId
         {
             get => _propertyGroupId;
             set => SetPropertyValueAndDetectChanges(value, ref _propertyGroupId, nameof(PropertyGroupId));
         }
 
         /// <summary>
-        /// Gets of sets a value indicating whether a value for this property type is required.
+        /// Gets or sets a value indicating whether a value for this property type is required.
         /// </summary>
         [DataMember]
         public bool Mandatory
         {
             get => _mandatory;
             set => SetPropertyValueAndDetectChanges(value, ref _mandatory, nameof(Mandatory));
+        }
+
+        /// <summary>
+        /// Gets or sets the custom validation message used when a value for this PropertyType is required
+        /// </summary>
+        [DataMember]
+        public string MandatoryMessage
+        {
+            get => _mandatoryMessage;
+            set => SetPropertyValueAndDetectChanges(value, ref _mandatoryMessage, nameof(MandatoryMessage));
         }
 
         /// <summary>
@@ -210,6 +223,16 @@ namespace Umbraco.Core.Models
         {
             get => _validationRegExp;
             set => SetPropertyValueAndDetectChanges(value, ref _validationRegExp, nameof(ValidationRegExp));
+        }
+
+        /// <summary>
+        /// Gets or sets the custom validation message used when a pattern for this PropertyType must be matched
+        /// </summary>
+        [DataMember]
+        public string ValidationRegExpMessage
+        {
+            get => _validationRegExpMessage;
+            set => SetPropertyValueAndDetectChanges(value, ref _validationRegExpMessage, nameof(ValidationRegExpMessage));
         }
 
         /// <summary>

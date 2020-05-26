@@ -10,7 +10,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
     function isValidIdentifier(id) {
 
         //empty id <= 0
-        if (angular.isNumber(id)) {
+        if (Utilities.isNumber(id)) {
             if (id === 0) {
                 return false;
             }
@@ -39,7 +39,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
         /** Used by the content editor and mini content editor to perform saving operations */
         contentEditorPerformSave: function (args) {
-            if (!angular.isObject(args)) {
+            if (!Utilities.isObject(args)) {
                 throw "args must be an object";
             }
             if (!args.scope) {
@@ -152,7 +152,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
         here we'll build the buttons according to the chars of the user. */
         configureContentEditorButtons: function (args) {
 
-            if (!angular.isObject(args)) {
+            if (!Utilities.isObject(args)) {
                 throw "args must be an object";
             }
             if (!args.content) {
@@ -698,7 +698,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 // /belle/#/content/edit/9876 (where 9876 is the new id)
 
                 //clear the query strings
-                navigationService.clearSearch(["cculture"]);
+                navigationService.clearSearch(["cculture", "csegment"]);
                 if (softRedirect) {
                     navigationService.setSoftRedirect();
                 }

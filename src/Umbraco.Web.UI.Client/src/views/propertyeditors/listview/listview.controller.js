@@ -1,4 +1,4 @@
-function listViewController($scope, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper) {
+function listViewController($scope, $interpolate, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -168,6 +168,11 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         allowBulkDelete: $scope.model.config.bulkActionPermissions.allowBulkDelete,
         cultureName: $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture
     };
+    _.each($scope.options.includeProperties, function (property) {
+        property.nameExp = !!property.nameTemplate
+            ? $interpolate(property.nameTemplate)
+            : undefined;
+    });
 
     //watch for culture changes in the query strings and update accordingly
     $scope.$watch(function () {
@@ -271,6 +276,9 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     }
 
     $scope.reloadView = function (id, reloadActiveNode) {
+        if (!id) {
+            return;
+        }
         $scope.viewLoaded = false;
         $scope.folders = [];
 
@@ -319,31 +327,17 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         });
     };
 
-    var searchListView = _.debounce(function () {
-        $scope.$apply(function () {
-            makeSearch();
-        });
-    }, 500);
+    
 
-    $scope.forceSearch = function (ev) {
-        //13: enter
-        switch (ev.keyCode) {
-            case 13:
-                makeSearch();
-                break;
-        }
-    };
-
-    $scope.enterSearch = function () {
-        $scope.viewLoaded = false;
-        searchListView();
-    };
-
-    function makeSearch() {
+    $scope.makeSearch = function() {
         if ($scope.options.filter !== null && $scope.options.filter !== undefined) {
             $scope.options.pageNumber = 1;
             $scope.reloadView($scope.contentId);
         }
+    }
+
+    $scope.onSearchStartTyping = function() {
+        $scope.viewLoaded = false;
     }
 
     $scope.selectedItemsCount = function () {
@@ -388,7 +382,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         return serial(selected, fn, getStatusMsg, 0).then(function (result) {
             // executes once the whole selection has been processed
             // in case of an error (caught by serial), result will be the error
-            if (!(result.data && angular.isArray(result.data.notifications)))
+            if (!(result.data && Utilities.isArray(result.data.notifications)))
                 showNotificationsAndReset(result, true, getSuccessMsg(selected.length));
         });
     }
@@ -398,6 +392,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         const dialog = {
             view: "views/propertyeditors/listview/overlays/delete.html",
             deletesVariants: selectionHasVariants(),
+            isTrashed: $scope.isTrashed,
             submitButtonLabelKey: "contentTypeEditor_yesDelete",
             submitButtonStyle: "danger",
             submit: function (model) {
@@ -628,7 +623,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             currentNode: $scope.contentId,
             submit: function (model) {
                 if (model.target) {
-                    performCopy(model.target, model.relateToOriginal);
+                    performCopy(model.target, model.relateToOriginal, model.includeDescendants);
                 }
                 editorService.close();
             },
@@ -639,9 +634,9 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         editorService.copy(copyEditor);
     };
 
-    function performCopy(target, relateToOriginal) {
+    function performCopy(target, relateToOriginal, includeDescendants) {
         applySelected(
-            function (selected, index) { return contentResource.copy({ parentId: target.id, id: getIdCallback(selected[index]), relateToOriginal: relateToOriginal }); },
+            function (selected, index) { return contentResource.copy({ parentId: target.id, id: getIdCallback(selected[index]), relateToOriginal: relateToOriginal, recursive: includeDescendants }); },
             function (count, total) {
                 var key = (total === 1 ? "bulk_copiedItemOfItem" : "bulk_copiedItemOfItems");
                 return localizationService.localize(key, [count, total]);
@@ -699,6 +694,13 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
                 value = value.substring(0, value.length - 3);
             }
 
+            if (e.nameExp) {
+                var newValue = e.nameExp({ value });
+                if (newValue && (newValue = $.trim(newValue))) {
+                    value = newValue;
+                }
+            }
+
             // set what we've got on the result
             result[alias] = value;
         });
@@ -707,63 +709,65 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     }
 
     function isDate(val) {
-        if (angular.isString(val)) {
+        if (Utilities.isString(val)) {
             return val.match(/^(\d{4})\-(\d{2})\-(\d{2})\ (\d{2})\:(\d{2})\:(\d{2})$/);
         }
         return false;
     }
 
     function initView() {
-        //default to root id if the id is undefined
         var id = $routeParams.id;
         if (id === undefined) {
-            id = -1;
+            // no ID found in route params - don't list anything as we don't know for sure where we are
+            return;
         }
 
-        getContentTypesCallback(id).then(function (listViewAllowedTypes) {
-          $scope.listViewAllowedTypes = listViewAllowedTypes;
-
-          var blueprints = false;
-          _.each(listViewAllowedTypes, function (allowedType) {
-              if (_.isEmpty(allowedType.blueprints)) {
-                // this helps the view understand that there are no blueprints available
-                allowedType.blueprints = null;
-              }
-              else {
-                blueprints = true;
-                // turn the content type blueprints object into an array of sortable objects for the view
-                allowedType.blueprints = _.map(_.pairs(allowedType.blueprints || {}), function (pair) {
-                  return {
-                    id: pair[0],
-                    name: pair[1]
-                  };
-                });
-              }
-            });
-
-            if (listViewAllowedTypes.length === 1 && blueprints === false) {
-                $scope.createAllowedButtonSingle = true;
-            }
-            if (listViewAllowedTypes.length === 1 && blueprints === true) {
-                $scope.createAllowedButtonSingleWithBlueprints = true;
-            }
-            if (listViewAllowedTypes.length > 1) {
-                $scope.createAllowedButtonMultiWithBlueprints = true;
-            }
-        });
-
-
         $scope.contentId = id;
-        $scope.isTrashed = id === "-20" || id === "-21";
+        $scope.isTrashed = editorState.current ? editorState.current.trashed : id === "-20" || id === "-21";
 
         $scope.options.allowBulkPublish = $scope.options.allowBulkPublish && !$scope.isTrashed;
         $scope.options.allowBulkUnpublish = $scope.options.allowBulkUnpublish && !$scope.isTrashed;
+        $scope.options.allowBulkCopy = $scope.options.allowBulkCopy && !$scope.isTrashed;
 
         $scope.options.bulkActionsAllowed = $scope.options.allowBulkPublish ||
             $scope.options.allowBulkUnpublish ||
             $scope.options.allowBulkCopy ||
             $scope.options.allowBulkMove ||
             $scope.options.allowBulkDelete;
+
+        if ($scope.isTrashed === false) {
+            getContentTypesCallback(id).then(function (listViewAllowedTypes) {
+                $scope.listViewAllowedTypes = listViewAllowedTypes;
+
+                var blueprints = false;
+                _.each(listViewAllowedTypes, function (allowedType) {
+                    if (_.isEmpty(allowedType.blueprints)) {
+                        // this helps the view understand that there are no blueprints available
+                        allowedType.blueprints = null;
+                    }
+                    else {
+                        blueprints = true;
+                        // turn the content type blueprints object into an array of sortable objects for the view
+                        allowedType.blueprints = _.map(_.pairs(allowedType.blueprints || {}), function (pair) {
+                            return {
+                                id: pair[0],
+                                name: pair[1]
+                            };
+                        });
+                    }
+                });
+
+                if (listViewAllowedTypes.length === 1 && blueprints === false) {
+                    $scope.createAllowedButtonSingle = true;
+                }
+                if (listViewAllowedTypes.length === 1 && blueprints === true) {
+                    $scope.createAllowedButtonSingleWithBlueprints = true;
+                }
+                if (listViewAllowedTypes.length > 1) {
+                    $scope.createAllowedButtonMultiWithBlueprints = true;
+                }
+            });
+        }
 
         $scope.reloadView($scope.contentId);
     }

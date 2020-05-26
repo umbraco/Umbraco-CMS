@@ -80,7 +80,6 @@
             // Check if it is a new user
             const inviteVal = $location.search().invite;
 
-            vm.baseTitle = $scope.$root.locationTitle;
             //1 = enter password, 2 = password set, 3 = invalid token
             if (inviteVal && (inviteVal === "1" || inviteVal === "2")) {
 
@@ -451,9 +450,7 @@
                     break;
             } 
 
-            if (title != null) {
-                $scope.$root.locationTitle = title + " - " + vm.baseTitle;
-            }
+            $scope.$emit("$changeTitle", title);
         }
 
     }

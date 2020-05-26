@@ -24,6 +24,9 @@
         vm.close = close;
 
         vm.currentNode = null;
+        vm.header = {};
+        vm.header.editorfor = "content_mediatype";
+        vm.header.setPageTitle = true;
         vm.contentType = {};
         vm.page = {};
         vm.page.loading = false;

@@ -24,6 +24,7 @@ function valServer(serverValidationManager) {
 
             var currentProperty = umbPropCtrl.property;
             var currentCulture = currentProperty.culture;
+            var currentSegment = currentProperty.segment;
 
             if (umbVariantCtrl) {
                 //if we are inside of an umbVariantContent directive
@@ -31,7 +32,7 @@ function valServer(serverValidationManager) {
                 var currentVariant = umbVariantCtrl.editor.content;
 
                 // Lets check if we have variants and we are on the default language then ...
-                if (umbVariantCtrl.content.variants.length > 1 && !currentVariant.language.isDefault && !currentCulture && !currentProperty.unlockInvariantValue) {
+                if (umbVariantCtrl.content.variants.length > 1 && (!currentVariant.language || !currentVariant.language.isDefault) && !currentCulture && !currentSegment && !currentProperty.unlockInvariantValue) {
                     //This property is locked cause its a invariant property shown on a non-default language.
                     //Therefor do not validate this field.
                     return;
@@ -75,7 +76,7 @@ function valServer(serverValidationManager) {
                         if (modelCtrl.$invalid) {
                             modelCtrl.$setValidity('valServer', true);
                             //clear the server validation entry
-                            serverValidationManager.removePropertyError(currentProperty.alias, currentCulture, fieldName);
+                            serverValidationManager.removePropertyError(currentProperty.alias, currentCulture, fieldName, currentSegment);
                             stopWatch();
                         }
                     }, true);
@@ -90,23 +91,26 @@ function valServer(serverValidationManager) {
             }
             
             //subscribe to the server validation changes
+            function serverValidationManagerCallback(isValid, propertyErrors, allErrors) {
+                if (!isValid) {
+                    modelCtrl.$setValidity('valServer', false);
+                    //assign an error msg property to the current validator
+                    modelCtrl.errorMsg = propertyErrors[0].errorMsg;
+                    startWatch();
+                }
+                else {
+                    modelCtrl.$setValidity('valServer', true);
+                    //reset the error message
+                    modelCtrl.errorMsg = "";
+                    stopWatch();
+                }
+            }
             unsubscribe.push(serverValidationManager.subscribe(currentProperty.alias,
                 currentCulture,
                 fieldName,
-                function(isValid, propertyErrors, allErrors) {
-                    if (!isValid) {
-                        modelCtrl.$setValidity('valServer', false);
-                        //assign an error msg property to the current validator
-                        modelCtrl.errorMsg = propertyErrors[0].errorMsg;
-                        startWatch();
-                    }
-                    else {
-                        modelCtrl.$setValidity('valServer', true);
-                        //reset the error message
-                        modelCtrl.errorMsg = "";
-                        stopWatch();
-                    }
-                }));
+                serverValidationManagerCallback,
+                currentSegment)
+            );
 
             scope.$on('$destroy', function () {
                 stopWatch();

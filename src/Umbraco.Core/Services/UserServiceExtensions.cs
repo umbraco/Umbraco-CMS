@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Security;
 using Umbraco.Core.Models.Membership;
@@ -103,6 +104,30 @@ namespace Umbraco.Core.Services
             }
 
             return found;
+        }
+
+        /// <summary>
+        /// Gets the concrete assigned permissions for the provided user and node
+        /// </summary>
+        /// <param name="userService"></param>
+        /// <param name="user"></param>
+        /// <param name="nodeId"></param>
+        internal static string[] GetAssignedPermissions(this IUserService userService, IUser user, int nodeId)
+        {
+            var permissionCollection = userService.GetPermissions(user, nodeId);
+            return permissionCollection.SelectMany(c => c.AssignedPermissions).Distinct().ToArray();
+        }
+
+        internal static IEnumerable<IProfile> GetProfilesById(this IUserService userService, params int[] ids)
+        {
+            var fullUsers = userService.GetUsersById(ids);
+
+            return fullUsers.Select(user =>
+            {
+                var asProfile = user as IProfile;
+                return asProfile ?? new UserProfile(user.Id, user.Name);
+            });
+
         }
     }
 }
