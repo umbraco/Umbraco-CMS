@@ -197,14 +197,23 @@
         }
 
         function loginSubmit() {
-            
-            // make sure that we are returning to the login view.
+                       
             if (formHelper.submitForm({ scope: $scope })) {
+                //if the login and password are not empty we need to automatically
+                // validate them - this is because if there are validation errors on the server	
+                // then the user has to change both username & password to resubmit which isn't ideal,	            
+                // so if they're not empty, we'll just make sure to set them to valid.
+                if (vm.login && vm.password && vm.login.length > 0 && vm.password.length > 0) {	
+                    vm.loginForm.username.$setValidity('auth', true);
+                    vm.loginForm.password.$setValidity('auth', true);
+                }
+                
                 if (vm.loginForm.$invalid) {
                     SetTitle();
                     return;
                 }
                 
+                // make sure that we are returning to the login view.
                 vm.view = "login";
 
                 vm.loginStates.submitButton = "busy";
