@@ -99,7 +99,11 @@ namespace Umbraco.Web.Scheduling
 
                 var tasks = new List<IBackgroundTask>();
 
-                tasks.Add(RegisterKeepAlive());
+                if (settings.KeepAlive.DisableKeepAliveTask == false)
+                {
+                    tasks.Add(RegisterKeepAlive(settings.KeepAlive));
+                }
+
                 tasks.Add(RegisterScheduledPublishing());
                 tasks.Add(RegisterLogScrubber(settings));
                 tasks.Add(RegisterTempFileCleanup());
@@ -112,11 +116,11 @@ namespace Umbraco.Web.Scheduling
             });
         }
 
-        private IBackgroundTask RegisterKeepAlive()
+        private IBackgroundTask RegisterKeepAlive(IKeepAliveSection keepAliveSection)
         {
             // ping/keepalive
             // on all servers
-            var task = new KeepAlive(_keepAliveRunner, DefaultDelayMilliseconds, FiveMinuteMilliseconds, _runtime, _logger);
+            var task = new KeepAlive(_keepAliveRunner, DefaultDelayMilliseconds, FiveMinuteMilliseconds, _runtime, keepAliveSection, _logger);
             _keepAliveRunner.TryAdd(task);
             return task;
         }

@@ -47,13 +47,18 @@
 
                         <div class="editor clearfix" ng-if="model.parameter.editor">
 
-                            <a href="" class="editor-icon-wrapper" ng-click="vm.openMacroParameterPicker(model.parameter)">
-                                <i class="icon {{model.parameter.dataTypeIcon}}" ng-class="{'icon-autofill': model.parameter.dataTypeIcon == null}"></i>
-                            </a>
-
                             <div class="editor-details">
-                                <a href="" class="editor-name" ng-click="vm.openMacroParameterPicker(model.parameter)">{{model.parameter.dataTypeName}}</a>
-                                <a href="" class="editor-editor" ng-click="vm.openMacroParameterPicker(model.parameter)">{{model.parameter.editor}}</a>
+                                <button class="btn-reset editor-info" ng-click="vm.openMacroParameterPicker(model.parameter)">
+
+                                    <div class="editor-icon-wrapper">
+                                        <i class="icon {{model.parameter.dataTypeIcon}}" ng-class="{'icon-autofill': model.parameter.dataTypeIcon == null}"></i>
+                                    </div>
+
+                                    <div class="editor-details">
+                                        <a href="" class="editor-name">{{model.parameter.dataTypeName}}</a>
+                                        <a href="" class="editor-editor">{{model.parameter.editor}}</a>
+                                    </div>
+                                </button>
                             </div>
 
                         </div>

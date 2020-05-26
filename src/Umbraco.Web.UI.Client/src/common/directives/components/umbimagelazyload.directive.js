@@ -31,7 +31,7 @@ Use this directive to lazy-load an image only when it is scrolled into view.
 
 **/
 
-(function() {
+(function () {
     'use strict';
 
     function ImageLazyLoadDirective() {
@@ -41,7 +41,7 @@ Use this directive to lazy-load an image only when it is scrolled into view.
         function link(scope, element, attrs) {
 
             const observer = new IntersectionObserver(loadImg);
-            const img = angular.element(element)[0];
+            const img = element[0];
             img.src = placeholder;
             observer.observe(img);
 

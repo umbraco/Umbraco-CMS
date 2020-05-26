@@ -24,8 +24,7 @@ function valPropertyMsg(serverValidationManager, localizationService) {
             var hasError = false;
 
             //create properties on our custom scope so we can use it in our template
-            scope.errorMsg = "";
-            
+            scope.errorMsg = "";            
             
             //the property form controller api
             var formCtrl = ctrl[0];
@@ -34,11 +33,16 @@ function valPropertyMsg(serverValidationManager, localizationService) {
             //the property controller api
             var umbPropCtrl = ctrl[2];
             //the variants controller api
-            var umbVariantCtrl = ctrl[3];
+            var umbVariantCtrl = ctrl[3];            
             
             var currentProperty = umbPropCtrl.property;
             scope.currentProperty = currentProperty;
-            var currentCulture = currentProperty.culture;         
+
+            var currentCulture = currentProperty.culture;
+            var currentSegment = currentProperty.segment;     
+            
+            // validation object won't exist when editor loads outside the content form (ie in settings section when modifying a content type)
+            var isMandatory = currentProperty.validation ? currentProperty.validation.mandatory : undefined;
 
             var labels = {};
             localizationService.localize("errors_propertyHasErrors").then(function (data) {
@@ -51,7 +55,7 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                 var currentVariant = umbVariantCtrl.editor.content;
 
                 // Lets check if we have variants and we are on the default language then ...
-                if (umbVariantCtrl.content.variants.length > 1 && !currentVariant.language.isDefault && !currentCulture && !currentProperty.unlockInvariantValue) {
+                if (umbVariantCtrl.content.variants.length > 1 && (!currentVariant.language || !currentVariant.language.isDefault) && !currentCulture && !currentSegment && !currentProperty.unlockInvariantValue) {
                     //This property is locked cause its a invariant property shown on a non-default language.
                     //Therefor do not validate this field.
                     return;
@@ -67,7 +71,7 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                 //this can be null if no property was assigned
                 if (scope.currentProperty) {
                     //first try to get the error msg from the server collection
-                    var err = serverValidationManager.getPropertyError(scope.currentProperty.alias, null, "");
+                    var err = serverValidationManager.getPropertyError(scope.currentProperty.alias, null, "", null);
                     //if there's an error message use it
                     if (err && err.errorMsg) {
                         return err.errorMsg;
@@ -91,23 +95,25 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                 if (!watcher) {
                     watcher = scope.$watch("currentProperty.value",
                         function (newValue, oldValue) {
-                            
                             if (angular.equals(newValue, oldValue)) {
                                 return;
                             }
 
                             var errCount = 0;
+
                             for (var e in formCtrl.$error) {
-                                if (angular.isArray(formCtrl.$error[e])) {
+                                if (Utilities.isArray(formCtrl.$error[e])) {
                                     errCount++;
                                 }
-                            }
+                            }         
 
                             //we are explicitly checking for valServer errors here, since we shouldn't auto clear
                             // based on other errors. We'll also check if there's no other validation errors apart from valPropertyMsg, if valPropertyMsg
                             // is the only one, then we'll clear.
 
-                            if (errCount === 0 || (errCount === 1 && angular.isArray(formCtrl.$error.valPropertyMsg)) || (formCtrl.$invalid && angular.isArray(formCtrl.$error.valServer))) {
+                            if (errCount === 0 
+                                || (errCount === 1 && Utilities.isArray(formCtrl.$error.valPropertyMsg)) 
+                                || (formCtrl.$invalid && Utilities.isArray(formCtrl.$error.valServer))) {
                                 scope.errorMsg = "";
                                 formCtrl.$setValidity('valPropertyMsg', true);
                             } else if (showValidation && scope.errorMsg === "") {
@@ -136,6 +142,21 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                     }
                     //if there are any errors in the current property form that are not valPropertyMsg
                     else if (_.without(_.keys(formCtrl.$error), "valPropertyMsg").length > 0) {
+                        
+                        // errors exist, but if the property is NOT mandatory and has no value, the errors should be cleared
+                        if (isMandatory !== undefined && isMandatory === false && !currentProperty.value) {
+                            hasError = false;
+                            showValidation = false;
+                            scope.errorMsg = "";
+
+                            // if there's no value, the controls can be reset, which clears the error state on formCtrl
+                            for (let control of formCtrl.$getControls()) {
+                                control.$setValidity();
+                            }
+
+                            return;
+                        }
+
                         hasError = true;
                         //update the validation message if we don't already have one assigned.
                         if (showValidation && scope.errorMsg === "") {
@@ -201,25 +222,31 @@ function valPropertyMsg(serverValidationManager, localizationService) {
             // the correct field validation in their property editors.
 
             if (scope.currentProperty) { //this can be null if no property was assigned
+
+                function serverValidationManagerCallback(isValid, propertyErrors, allErrors) {
+                    hasError = !isValid;
+                    if (hasError) {
+                        //set the error message to the server message
+                        scope.errorMsg = propertyErrors[0].errorMsg;
+                        //flag that the current validator is invalid
+                        formCtrl.$setValidity('valPropertyMsg', false);
+                        startWatch();
+                    }
+                    else {
+                        scope.errorMsg = "";
+                        //flag that the current validator is valid
+                        formCtrl.$setValidity('valPropertyMsg', true);
+                        stopWatch();
+                    }
+                }
+
                 unsubscribe.push(serverValidationManager.subscribe(scope.currentProperty.alias,
                     currentCulture,
                     "",
-                    function(isValid, propertyErrors, allErrors) {
-                        hasError = !isValid;
-                        if (hasError) {
-                            //set the error message to the server message
-                            scope.errorMsg = propertyErrors[0].errorMsg;
-                            //flag that the current validator is invalid
-                            formCtrl.$setValidity('valPropertyMsg', false);
-                            startWatch();
-                        }
-                        else {
-                            scope.errorMsg = "";
-                            //flag that the current validator is valid
-                            formCtrl.$setValidity('valPropertyMsg', true);
-                            stopWatch();
-                        }
-                    }));
+                    serverValidationManagerCallback,
+                    currentSegment
+                    )
+                );
 
             }
 

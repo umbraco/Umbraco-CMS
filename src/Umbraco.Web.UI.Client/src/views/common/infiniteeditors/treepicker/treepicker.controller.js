@@ -58,10 +58,13 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         vm.hideSearch = hideSearch;
         vm.closeMiniListView = closeMiniListView;
         vm.selectListViewNode = selectListViewNode;
+        vm.listViewItemsLoaded = listViewItemsLoaded;
         vm.submit = submit;
         vm.close = close;
 
         var currentNode = $scope.model.currentNode;
+
+        var previouslyFocusedElement = null;
 
         function initDialogTree() {
             vm.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
@@ -73,25 +76,27 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         /**
          * Performs the initialization of this component
          */
-        function onInit () {
+        function onInit() {
 
-            // load languages
-            languageResource.getAll().then(function (languages) {
-                vm.languages = languages;
+            if (vm.showLanguageSelector) {
+                // load languages
+                languageResource.getAll().then(function (languages) {
+                    vm.languages = languages;
 
-                // set the default language
-                vm.languages.forEach(function (language) {
-                    if (language.isDefault) {
-                        vm.selectedLanguage = language;
-                        vm.languageSelectorIsOpen = false;
-                    }
+                    // set the default language
+                    vm.languages.forEach(function (language) {
+                        if (language.isDefault) {
+                            vm.selectedLanguage = language;
+                            vm.languageSelectorIsOpen = false;
+                        }
+                    });
                 });
-            });
+            }
 
             if (vm.treeAlias === "content") {
                 vm.entityType = "Document";
                 if (!$scope.model.title) {
-                    localizationService.localize("defaultdialogs_selectContent").then(function(value){
+                    localizationService.localize("defaultdialogs_selectContent").then(function (value) {
                         $scope.model.title = value;
                     });
                 }
@@ -99,7 +104,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             else if (vm.treeAlias === "documentTypes") {
                 vm.entityType = "DocumentType";
                 if (!$scope.model.title) {
-                    localizationService.localize("defaultdialogs_selectContentType").then(function(value){
+                    localizationService.localize("defaultdialogs_selectContentType").then(function (value) {
                         $scope.model.title = value;
                     });
                 }
@@ -107,7 +112,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             else if (vm.treeAlias === "member" || vm.section === "member") {
                 vm.entityType = "Member";
                 if (!$scope.model.title) {
-                    localizationService.localize("defaultdialogs_selectMember").then(function(value) {
+                    localizationService.localize("defaultdialogs_selectMember").then(function (value) {
                         $scope.model.title = value;
                     });
                 }
@@ -115,7 +120,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             else if (vm.treeAlias === "memberTypes") {
                 vm.entityType = "MemberType";
                 if (!$scope.model.title) {
-                    localizationService.localize("defaultdialogs_selectMemberType").then(function(value){
+                    localizationService.localize("defaultdialogs_selectMemberType").then(function (value) {
                         $scope.model.title = value;
                     });
                 }
@@ -123,7 +128,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             else if (vm.treeAlias === "media" || vm.section === "media") {
                 vm.entityType = "Media";
                 if (!$scope.model.title) {
-                    localizationService.localize("defaultdialogs_selectMedia").then(function(value){
+                    localizationService.localize("defaultdialogs_selectMedia").then(function (value) {
                         $scope.model.title = value;
                     });
                 }
@@ -131,7 +136,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             else if (vm.treeAlias === "mediaTypes") {
                 vm.entityType = "MediaType";
                 if (!$scope.model.title) {
-                    localizationService.localize("defaultdialogs_selectMediaType").then(function(value){
+                    localizationService.localize("defaultdialogs_selectMediaType").then(function (value) {
                         $scope.model.title = value;
                     });
                 }
@@ -171,7 +176,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                 if (angular.isFunction($scope.model.filter)) {
                     $scope.model.filterAdvanced = true;
                 }
-                else if (angular.isObject($scope.model.filter)) {
+                else if (Utilities.isObject($scope.model.filter)) {
                     $scope.model.filterAdvanced = true;
                 }
                 else {
@@ -184,7 +189,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                     if ($scope.model.filter.startsWith("{")) {
                         $scope.model.filterAdvanced = true;
                         //convert to object
-                        $scope.model.filter = angular.fromJson($scope.model.filter);
+                        $scope.model.filter = Utilities.fromJson($scope.model.filter);
                     }
                 }
             }
@@ -211,9 +216,9 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             if (vm.dataTypeKey) {
                 queryParams["dataTypeKey"] = vm.dataTypeKey;
             }
-                
+
             var queryString = $.param(queryParams); //create the query string from the params object
-            
+
             if (!queryString) {
                 vm.customTreeParams = $scope.model.customTreeParams;
             }
@@ -238,7 +243,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             $timeout(function () {
                 //reload the tree with it's updated querystring args
                 vm.dialogTreeApi.load(vm.section).then(function () {
-                    
+
                     //create the list of promises
                     var promises = [];
                     for (var i = 0; i < expandedPaths.length; i++) {
@@ -253,7 +258,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         function toggleLanguageSelector() {
             vm.languageSelectorIsOpen = !vm.languageSelectorIsOpen;
         };
-        
+
         function nodeExpandedHandler(args) {
 
             //store the reference to the expanded node path
@@ -266,7 +271,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                 openMiniListView(args.node);
             }
 
-            if (angular.isArray(args.children)) {
+            if (Utilities.isArray(args.children)) {
 
                 //iterate children
                 _.each(args.children,
@@ -415,7 +420,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             if ($scope.model.selection.length > 0) {
                 for (var i = 0; $scope.model.selection.length > i; i++) {
                     var selectedItem = $scope.model.selection[i];
-                    if (selectedItem.id === item.id) {
+                    if (selectedItem.id === parseInt(item.id)) {
                         found = true;
                         foundIndex = i;
                     }
@@ -441,7 +446,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             // be allowed to be clicked on
             nodes = _.filter(nodes,
                 function (n) {
-                    return !angular.isObject(n.metaData.listViewNode);
+                    return !Utilities.isObject(n.metaData.listViewNode);
                 });
 
             if ($scope.model.filterAdvanced) {
@@ -486,6 +491,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         }
 
         function openMiniListView(node) {
+            previouslyFocusedElement = document.activeElement;
             vm.miniListView = node;
         }
 
@@ -630,8 +636,8 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             _.each(vm.searchInfo.results,
                 function (result) {
                     var exists = _.find($scope.model.selection,
-                        function (selectedId) {
-                            return result.id == selectedId;
+                        function (item) {
+                            return result.id == item.id;
                         });
                     if (exists) {
                         result.selected = true;
@@ -649,20 +655,35 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
 
         function closeMiniListView() {
             vm.miniListView = undefined;
+            if (previouslyFocusedElement) {
+                $timeout(function () {
+                    previouslyFocusedElement.focus();
+                    previouslyFocusedElement = null;
+                });
+            }
+        }
+
+        function listViewItemsLoaded(items) {
+            var selectedIds = _.pluck($scope.model.selection, "id");
+            _.each(items, function (item) {
+                if (_.contains(selectedIds, item.id)) {
+                    item.selected = true;
+                }
+            });
         }
 
         function submit(model) {
-            if($scope.model.submit) {
+            if ($scope.model.submit) {
                 $scope.model.submit(model);
             }
         }
 
         function close() {
-            if($scope.model.close) {
+            if ($scope.model.close) {
                 $scope.model.close();
             }
         }
-        
+
         //initialize
         onInit();
 

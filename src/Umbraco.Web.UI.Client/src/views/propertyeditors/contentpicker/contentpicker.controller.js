@@ -152,7 +152,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         dataTypeKey: $scope.model.dataTypeKey,
         currentNode: editorState ? editorState.current : null,
         callback: function (data) {
-            if (angular.isArray(data)) {
+            if (Utilities.isArray(data)) {
                 _.each(data, function (item, i) {
                     $scope.add(item);
                 });
@@ -233,7 +233,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         $scope.currentPicker = dialogOptions;
 
         $scope.currentPicker.submit = function (model) {
-            if (angular.isArray(model.selection)) {
+            if (Utilities.isArray(model.selection)) {
                 _.each(model.selection, function (item, i) {
                     $scope.add(item);
                 });

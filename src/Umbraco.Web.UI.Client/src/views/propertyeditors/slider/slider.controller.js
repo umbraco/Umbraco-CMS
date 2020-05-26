@@ -56,7 +56,7 @@
                     return value.toFixed(stepDecimalPlaces);
                 },
                 from: function (value) {
-                    return value;
+                    return Number(value);
                 }
             },
             "range": {

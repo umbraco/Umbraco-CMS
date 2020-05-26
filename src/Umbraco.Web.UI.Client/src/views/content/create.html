@@ -5,7 +5,7 @@
     <div ng-if="!loading" class="umb-dialog-body with-footer" ng-cloak>
 
         <div class="umb-pane">
-            <h5 ng-show="selectContentType"><localize key="create_createUnder">Create a page under</localize> {{currentNode.name}}</h5>
+            <h5 ng-show="selectContentType" id="selectContentType"><localize key="create_createUnder">Create a page under</localize> {{currentNode.name}}</h5>
             <h5 ng-show="selectBlueprint"><localize key="blueprints_selectBlueprint">Select a blueprint</localize></h5>
 
             <div ng-if="allowedTypes && allowedTypes.length === 0">
@@ -34,9 +34,9 @@
                 </div>
             </div>
 
-            <ul class="umb-actions umb-actions-child" ng-if="selectContentType && allowedTypes.length > 0">
+            <ul class="umb-actions umb-actions-child" ng-if="selectContentType && allowedTypes.length > 0" aria-labelledby="selectContentType">
 
-                <li class="umb-action" data-element="action-create-{{docType.alias}}" ng-repeat="docType in allowedTypes | orderBy:'name':false">
+                <li class="umb-action" data-element="action-create-{{docType.alias}}" ng-repeat="docType in allowedTypes">
                     <button class="umb-action-link umb-outline btn-reset" ng-click="createOrSelectBlueprintIfAny(docType)" umb-auto-focus ng-if="$index === 0">
                         <i class="large icon {{docType.icon}}"></i>
                         <span class="menu-label">
@@ -58,6 +58,7 @@
                 </li>
 
             </ul>
+           
             <ul class="umb-actions umb-actions-child" ng-if="selectBlueprint">
 
                 <li class="umb-action" ng-repeat="blueprint in selectableBlueprints | orderBy:'name':false track by $index">

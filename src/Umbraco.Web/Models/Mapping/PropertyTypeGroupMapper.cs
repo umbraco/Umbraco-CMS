@@ -223,7 +223,13 @@ namespace Umbraco.Web.Models.Mapping
                     Alias = p.Alias,
                     Description = p.Description,
                     Editor = p.PropertyEditorAlias,
-                    Validation = new PropertyTypeValidation {Mandatory = p.Mandatory, Pattern = p.ValidationRegExp},
+                    Validation = new PropertyTypeValidation
+                        {
+                            Mandatory = p.Mandatory,
+                            MandatoryMessage = p.MandatoryMessage,
+                            Pattern = p.ValidationRegExp,
+                            PatternMessage = p.ValidationRegExpMessage,
+                        },
                     Label = p.Name,
                     View = propertyEditor.GetValueEditor().View,
                     Config = config,
@@ -235,7 +241,8 @@ namespace Umbraco.Web.Models.Mapping
                     SortOrder = p.SortOrder,
                     ContentTypeId = contentType.Id,
                     ContentTypeName = contentType.Name,
-                    AllowCultureVariant = p.VariesByCulture()
+                    AllowCultureVariant = p.VariesByCulture(),
+                    AllowSegmentVariant = p.VariesBySegment()
                 });
             }
 
