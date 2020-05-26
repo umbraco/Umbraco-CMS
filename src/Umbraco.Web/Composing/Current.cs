@@ -88,6 +88,12 @@ namespace Umbraco.Web.Composing
 
         public static UmbracoHelper UmbracoHelper
             => Factory.GetInstance<UmbracoHelper>();
+        public static IUmbracoComponentRenderer UmbracoComponentRenderer
+            => Factory.GetInstance<IUmbracoComponentRenderer>();
+        public static ITagQuery TagQuery
+            => Factory.GetInstance<ITagQuery>();
+        public static IPublishedContentQuery PublishedContentQuery
+            => Factory.GetInstance<IPublishedContentQuery>();
 
         public static DistributedCache DistributedCache
             => Factory.GetInstance<DistributedCache>();
@@ -181,6 +187,8 @@ namespace Umbraco.Web.Composing
         public static CacheRefresherCollection CacheRefreshers => CoreCurrent.CacheRefreshers;
 
         public static DataEditorCollection DataEditors => CoreCurrent.DataEditors;
+
+        public static DataValueReferenceFactoryCollection DataValueReferenceFactories => CoreCurrent.DataValueReferenceFactories;
 
         public static PropertyEditorCollection PropertyEditors => CoreCurrent.PropertyEditors;
 

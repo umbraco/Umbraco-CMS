@@ -332,6 +332,22 @@ namespace Umbraco.Tests.Composing
             Assert.AreSame(s1, s2);
         }
 
+        [Test]
+        public void CanRegisterMultipleSameTypeParametersWithCreateInstance()
+        {
+            var register = GetRegister();
+            var factory = register.CreateFactory();
+            register.Register<Thing4>(factory =>
+            {
+                var param1 = "param1";
+                var param2 = "param2";
+
+                return factory.CreateInstance<Thing4>(param1, param2);
+            });
+            var instance = factory.GetInstance<Thing4>();
+            Assert.AreNotEqual(instance.Thing, instance.AnotherThing);
+        }
+
         public interface IThing { }
 
         public abstract class ThingBase : IThing { }
@@ -351,6 +367,18 @@ namespace Umbraco.Tests.Composing
             }
 
             public IEnumerable<ThingBase> Things { get; }
+        }
+
+        public class Thing4 : ThingBase
+        {
+            public readonly string Thing;
+            public readonly string AnotherThing;
+
+            public Thing4(string thing, string anotherThing)
+            {
+                Thing = thing;
+                AnotherThing = anotherThing;
+            }
         }
     }
 }

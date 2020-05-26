@@ -31,7 +31,7 @@
             <span class="sr-only">...</span>
         </button>
 
-        <div class="umb-contentpicker__min-max-help" ng-if="model.config.multiPicker === true">
+        <div class="umb-contentpicker__min-max-help" ng-if="model.config.multiPicker === true && (model.config.maxNumber > 1 || model.config.minNumber > 0)">
 
             <!-- Both min and max items -->
             <span ng-if="model.config.minNumber && model.config.maxNumber && model.config.minNumber !== model.config.maxNumber">

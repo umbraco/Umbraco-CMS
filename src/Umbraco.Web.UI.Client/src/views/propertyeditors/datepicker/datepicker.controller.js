@@ -1,4 +1,4 @@
-function dateTimePickerController($scope, notificationsService, assetsService, angularHelper, userService, $element, dateHelper) {
+function dateTimePickerController($scope, angularHelper, dateHelper, validationMessageService) {
 
     let flatPickr = null;
 
@@ -62,6 +62,11 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
             
         setDatePickerVal();
 
+        // Set the message to use for when a mandatory field isn't completed.
+        // Will either use the one provided on the property type or a localised default.
+        validationMessageService.getMandatoryMessage($scope.model.validation).then(function (value) {
+            $scope.mandatoryMessage = value;
+        });
     }
 
     $scope.clearDate = function() {
@@ -80,13 +85,27 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     };
 
     $scope.datePickerChange = function(date) {
-        setDate(date);
+        const momentDate = moment(date);
+        setDate(momentDate);
         setDatePickerVal();
     };
 
-    $scope.inputChanged = function() {
-        setDate($scope.model.datetimePickerValue);
-        setDatePickerVal();
+    $scope.inputChanged = function () {        
+        if ($scope.model.datetimePickerValue === "" && $scope.hasDatetimePickerValue) {
+            // $scope.hasDatetimePickerValue indicates that we had a value before the input was changed,
+            // but now the input is empty.
+            $scope.clearDate();
+        } else if ($scope.model.datetimePickerValue) {
+            var momentDate = moment($scope.model.datetimePickerValue, $scope.model.config.format, true);
+            if (!momentDate || !momentDate.isValid()) {
+                momentDate = moment(new Date($scope.model.datetimePickerValue));
+            }
+            if (momentDate && momentDate.isValid()) {
+                setDate(momentDate);
+            }
+            setDatePickerVal();
+            flatPickr.setDate($scope.model.value, false);
+        }
     }
     
     //here we declare a special method which will be called whenever the value has changed from the server
@@ -98,15 +117,14 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
             var newDate = moment(newVal);
 
             if (newDate.isAfter(minDate)) {
-                setDate(newVal);
+                setDate(newDate);
             } else {
                 $scope.clearDate();
             }
         }
     };
 
-    function setDate(date) {
-        const momentDate = moment(date);
+    function setDate(momentDate) {        
         angularHelper.safeApply($scope, function() {
             // when a date is changed, update the model
             if (momentDate && momentDate.isValid()) {
@@ -118,12 +136,11 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
                 $scope.hasDatetimePickerValue = false;
                 $scope.model.datetimePickerValue = null;
             }
-            updateModelValue(date);
+            updateModelValue(momentDate);
         });
     }
 
-    function updateModelValue(date) {
-        const momentDate = moment(date);
+    function updateModelValue(momentDate) {
         if ($scope.hasDatetimePickerValue) {
             if ($scope.model.config.pickTime) {
                 //check if we are supposed to offset the time

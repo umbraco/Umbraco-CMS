@@ -22,10 +22,14 @@ function contentCreateController($scope,
     function initialize() {
         $scope.loading = true;
         $scope.allowedTypes = null;
-        $scope.countTypes = contentTypeResource.getCount;
         
         var getAllowedTypes = contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function (data) {
             $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
+            if ($scope.allowedTypes.length === 0) {
+                contentTypeResource.getCount().then(function(count) {
+                    $scope.countTypes = count;
+                });
+            }
         });
         var getCurrentUser = authResource.getCurrentUser().then(function (currentUser) {
             if (currentUser.allowedSections.indexOf("settings") > -1) {
@@ -59,6 +63,9 @@ function contentCreateController($scope,
             /* when we create a new node we want to make sure it uses the same 
             language as what is selected in the tree */
             .search("cculture", mainCulture)
+            /* when we create a new node we must make sure that any previously 
+            opened segments is reset */
+            .search("csegment", null)
             /* when we create a new node we must make sure that any previously 
             used blueprint is reset */
             .search("blueprintId", null);

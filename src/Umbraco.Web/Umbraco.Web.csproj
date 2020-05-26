@@ -61,9 +61,9 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ClientDependency" Version="1.9.7" />
+    <PackageReference Include="ClientDependency" Version="1.9.9" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
-    <PackageReference Include="Examine" Version="1.0.0" />
+    <PackageReference Include="Examine" Version="1.0.2" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
     <PackageReference Include="ImageProcessor">
       <Version>2.7.0.100</Version>
@@ -150,11 +150,14 @@
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
     <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
+    <Compile Include="Editors\ImageUrlGeneratorController.cs" />
     <Compile Include="Editors\PackageController.cs" />
     <Compile Include="Editors\KeepAliveController.cs" />
     <Compile Include="Editors\MacrosController.cs" />
     <Compile Include="Editors\RelationTypeController.cs" />
     <Compile Include="Editors\TinyMceController.cs" />
+    <Compile Include="HealthCheck\Checks\Data\DatabaseIntegrityCheck.cs" />
+    <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
     <Compile Include="IUmbracoContextFactory.cs" />
     <Compile Include="Install\ChangesMonitor.cs" />
     <Compile Include="Logging\WebProfiler.cs" />
@@ -223,6 +226,7 @@
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
     <Compile Include="Models\ContentEditing\UrlAndAnchors.cs" />
+    <Compile Include="Models\ImageProcessorImageUrlGenerator.cs" />
     <Compile Include="Models\Mapping\CommonMapper.cs" />
     <Compile Include="Models\Mapping\MapperContextExtensions.cs" />
     <Compile Include="Models\PublishedContent\HybridVariationContextAccessor.cs" />
@@ -234,6 +238,7 @@
     <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
     <Compile Include="Profiling\WebProfilingController.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
+    <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
@@ -249,11 +254,16 @@
     <Compile Include="Search\ExamineFinalComponent.cs" />
     <Compile Include="Search\ExamineFinalComposer.cs" />
     <Compile Include="Search\ExamineUserComponent.cs" />
+    <Compile Include="Search\IUmbracoTreeSearcherFields.cs" />
+    <Compile Include="Search\UmbracoTreeSearcherFields.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="Models\Link.cs" />
     <Compile Include="Models\LinkType.cs" />
     <Compile Include="Models\TemplateQuery\OperatorFactory.cs" />
+    <Compile Include="Templates\HtmlLocalLinkParser.cs" />
+    <Compile Include="Templates\HtmlImageSourceParser.cs" />
+    <Compile Include="Templates\HtmlUrlParser.cs" />
     <Compile Include="UmbracoContextFactory.cs" />
     <Compile Include="UmbracoContextReference.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByUdiRouteHandler.cs" />
@@ -1181,11 +1191,6 @@
     <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoInjectedModule.cs" />
     <Compile Include="UriUtility.cs" />
-    <Compile Include="Web References\org.umbraco.update\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.map</DependentUpon>
-    </Compile>
     <Compile Include="UmbracoAuthorizedHttpHandler.cs" />
     <Compile Include="UmbracoHttpHandler.cs" />
     <Compile Include="UmbracoWebService.cs">
@@ -1210,30 +1215,14 @@
     <EmbeddedResource Include="JavaScript\ServerVariables.js" />
   </ItemGroup>
   <ItemGroup>
-    <WebReferences Include="Web References\" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="JavaScript\PreviewInitialize.js" />
     <None Include="JavaScript\TinyMceInitialize.js" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
-    <Content Include="PublishedCache\NuCache\notes.txt" />
+    <None Include="PublishedCache\NuCache\readme.md" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
-    <None Include="Web References\org.umbraco.update\checkforupgrade.wsdl" />
-    <None Include="Web References\org.umbraco.update\Reference.map">
-      <Generator>MSDiscoCodeGenerator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </None>
     <None Include="..\Umbraco.Web.UI\Views\web.config">
       <Link>Mvc\web.config</Link>
-    </None>
-    <None Include="Web References\org.umbraco.update\UpgradeResult.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
-    </None>
-    <None Include="Web References\org.umbraco.update\UpgradeResult1.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
     </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

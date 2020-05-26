@@ -67,6 +67,7 @@
     height: 100%;
     width: 100%;
     border-radius: 3px;
+    border: 0 none;
     text-decoration: none !important;
     transition: border-color 100ms ease;
     background-color: @white;
@@ -193,9 +194,8 @@
     color: @black;
     box-sizing: border-box;
     justify-content: center;
-    border-top: 1px solid @gray-8;
-    border-bottom: 1px solid @gray-8;
-    border-right: 1px solid @gray-8;
+    border: 1px solid @gray-8;
+    border-left: 0;
     padding: 10px 0;
     background: @white; 
 }
@@ -411,6 +411,7 @@
 }
 
 .umb-gallery__thumbnail {
+    background: transparent;
     flex: 0 1 100px;
     border: 1px solid @ui-action-discreet-border;
     border-radius: 3px;

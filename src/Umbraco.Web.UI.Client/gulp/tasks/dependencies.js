@@ -259,19 +259,18 @@ function dependencies() {
     //css, fonts and image files
     
     var assetsTask = gulp.src(config.sources.globs.assets, { allowEmpty: true });
-    if (global.isProd === true) {
-        assetsTask = assetsTask.pipe(imagemin([
-            imagemin.gifsicle({interlaced: true}),
-            imagemin.jpegtran({progressive: true}),
-            imagemin.optipng({optimizationLevel: 5}),
-            imagemin.svgo({
-                plugins: [
-                    {removeViewBox: true},
-                    {cleanupIDs: false}
-                ]
-            })
-        ]));
-    }
+    assetsTask = assetsTask.pipe(imagemin([
+        imagemin.gifsicle({interlaced: true}),
+        imagemin.jpegtran({progressive: true}),
+        imagemin.optipng({optimizationLevel: 5}),
+        imagemin.svgo({
+            plugins: [
+                {removeViewBox: true},
+                {cleanupIDs: false}
+            ]
+        })
+    ]));
+    
     assetsTask = assetsTask.pipe(gulp.dest(config.root + config.targets.assets));
     
     stream.add(assetsTask);

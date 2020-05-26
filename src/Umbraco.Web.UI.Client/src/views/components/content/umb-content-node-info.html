@@ -8,13 +8,13 @@
                 <ul class="nav nav-stacked" style="margin-bottom: 0;">
                     <li ng-repeat="url in currentUrls">
                         <a href="{{url.text}}" target="_blank" ng-if="url.isUrl">
-                            <span ng-if="node.variants.length === 1 && url.culture" style="font-size: 13px; color: #cccccc; width: 50px;display: inline-block">{{url.culture}}</span>
+                            <span ng-if="currentUrlsHaveMultipleCultures && url.culture" style="font-size: 13px; color: #cccccc; width: 50px;display: inline-block">{{url.culture}}</span>
                             <i class="icon icon-out"></i>
                             <span>{{url.text}}</span>
                         </a>
                         <div ng-if="!url.isUrl" style="margin-top: 4px;">
 
-                            <span ng-if="node.variants.length === 1 && url.culture" style="font-size: 13px; color: #cccccc; width: 50px;display: inline-block">{{url.culture}}</span>
+                            <span ng-if="currentUrlsHaveMultipleCultures && url.culture" style="font-size: 13px; color: #cccccc; width: 50px;display: inline-block">{{url.culture}}</span>
                             <em>{{url.text}}</em>
 
                         </div>
@@ -44,7 +44,7 @@
 
             <umb-box-header
                 title="{{historyLabel}}">
-                
+
                 <umb-button
                     ng-hide="node.trashed"
                     type="button"
@@ -64,7 +64,7 @@
                     <umb-load-indicator ng-show="loadingAuditTrail"></umb-load-indicator>
 
                     <div ng-show="auditTrail.length === 0" style="padding: 10px;">
-                        <umb-empty-state 
+                        <umb-empty-state
                             position="center"
                             size="small">
                             <localize key="content_noChanges"></localize>
@@ -79,7 +79,7 @@
 
                             <div class="history-item__break">
                                 <div class="history-item__avatar">
-                                    <umb-avatar 
+                                    <umb-avatar
                                         color="secondary"
                                         size="xs"
                                         name="{{item.userName}}"
@@ -105,7 +105,7 @@
                                     <localize key="auditTrails_{{ item.logType | lowercase }}" tokens="[item.parameters]">{{ item.comment }}</localize>
                                 </span>
 
-                                
+
                             </div>
 
                         </div>
@@ -126,7 +126,7 @@
     </div>
 
     <div class="umb-package-details__sidebar">
-        
+
         <umb-box data-element="node-info-general">
             <umb-box-header title-key="general_general"></umb-box-header>
             <umb-box-content class="block-form">
@@ -169,9 +169,9 @@
                                 ng-change="updateTemplate(node.template)">
                             <option value="">{{chooseLabel}}...</option>
                         </select>
-                        <a href="" ng-show="allowChangeTemplate && node.template !== null" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()">
+                        <button type="button" ng-show="allowChangeTemplate && node.template !== null" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()">
                             <localize key="general_open">Open</localize>
-                        </a>
+                        </button>
                     </div>
                 </umb-control-group>
 

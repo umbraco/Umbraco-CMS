@@ -31,7 +31,6 @@
         vm.datePickerChange = datePickerChange;
         vm.submit = submit;
         vm.close = close;
-        vm.copyQuery = copyQuery;
 
         function onInit() {
 
@@ -119,11 +118,6 @@
 
         function addFilter(query) {
             query.filters.push({});
-        }
-
-        function copyQuery() {
-            var copyText = $scope.model.result.queryExpression;
-            navigator.clipboard.writeText(copyText);
         }
 
         function trashFilter(query, filter) {

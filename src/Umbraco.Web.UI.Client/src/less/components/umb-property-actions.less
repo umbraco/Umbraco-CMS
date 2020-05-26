@@ -39,7 +39,7 @@
 
     top: -15px;
     border-radius: 3px 3px 0 0;
-    
+
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
 
@@ -49,8 +49,8 @@
 
     .box-shadow(0 5px 20px rgba(0,0,0,.3));
 
-    background-color: white;
-    
+    background-color: @white;
+
 }
 
 .umb-property .umb-property-actions {
@@ -61,6 +61,7 @@
     opacity: 0;
     transition: opacity 120ms;
 }
+.umb-property:focus-within .umb-property-actions__toggle,
 .umb-property:hover .umb-property-actions__toggle,
 .umb-property .umb-property-actions__toggle:focus {
     opacity: 1;
@@ -71,12 +72,12 @@
 }
 
 .umb-property-actions__menu {
-    
+
     position: absolute;
     z-index: 1000;
 
     display: block;
-    
+
     float: left;
     min-width: 160px;
     list-style: none;
@@ -85,11 +86,11 @@
 
         border-top-left-radius: 0;
         margin-top:1px;
-        
+
     }
 
     .umb-contextmenu-item > button {
-        
+
         z-index:2;// need to stay on top of menu-toggle-open shadow.
 
     }

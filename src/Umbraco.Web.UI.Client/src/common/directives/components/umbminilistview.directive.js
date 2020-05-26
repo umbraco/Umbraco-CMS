@@ -58,7 +58,9 @@
                 
                 entityResource.getPagedChildren(miniListView.node.id, scope.entityType, miniListView.pagination)
                     .then(function (data) {
-
+                        if (scope.onItemsLoaded) {
+                            scope.onItemsLoaded({items: data.items});
+                        }
                         // update children
                         miniListView.children = data.items;
                         _.each(miniListView.children, function(c) {
@@ -208,6 +210,7 @@
                 startNodeId: "=",
                 onSelect: "&",
                 onClose: "&",
+                onItemsLoaded: "&",
                 entityTypeFilter: "="
             },
             link: link
