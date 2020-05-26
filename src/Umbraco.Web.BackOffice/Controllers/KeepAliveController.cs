@@ -1,10 +1,10 @@
-﻿using System.Runtime.Serialization;
-using System.Web.Http;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi;
-using Umbraco.Web.WebApi.Filters;
+﻿using System;
+using System.Runtime.Serialization;
+using Microsoft.AspNetCore.Mvc;
+using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.Common.Controllers;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
     public class KeepAliveController : UmbracoApiController
     {
@@ -19,6 +19,7 @@ namespace Umbraco.Web.Editors
             };
         }
     }
+
 
     public class KeepAlivePingResult
     {
