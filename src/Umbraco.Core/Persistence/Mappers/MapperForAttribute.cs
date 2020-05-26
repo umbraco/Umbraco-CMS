@@ -6,7 +6,7 @@ namespace Umbraco.Core.Persistence.Mappers
     /// An attribute used to decorate mappers to be associated with entities
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    internal sealed class MapperForAttribute : Attribute
+    public sealed class MapperForAttribute : Attribute
     {
         public Type EntityType { get; private set; }
 
