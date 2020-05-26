@@ -24,40 +24,40 @@
 
             // sets the ace worker path, if running from concatenated
             // or minified source
-            if (angular.isDefined(opts.workerPath)) {
+            if (Utilities.isDefined(opts.workerPath)) {
                 var config = window.ace.require('ace/config');
                 config.set('workerPath', opts.workerPath);
             }
 
             // ace requires loading
-            if (angular.isDefined(opts.require)) {
+            if (Utilities.isDefined(opts.require)) {
                 opts.require.forEach(function(n) {
                     window.ace.require(n);
                 });
             }
 
             // Boolean options
-            if (angular.isDefined(opts.showGutter)) {
+            if (Utilities.isDefined(opts.showGutter)) {
                 acee.renderer.setShowGutter(opts.showGutter);
             }
-            if (angular.isDefined(opts.useWrapMode)) {
+            if (Utilities.isDefined(opts.useWrapMode)) {
                 session.setUseWrapMode(opts.useWrapMode);
             }
-            if (angular.isDefined(opts.showInvisibles)) {
+            if (Utilities.isDefined(opts.showInvisibles)) {
                 acee.renderer.setShowInvisibles(opts.showInvisibles);
             }
-            if (angular.isDefined(opts.showIndentGuides)) {
+            if (Utilities.isDefined(opts.showIndentGuides)) {
                 acee.renderer.setDisplayIndentGuides(opts.showIndentGuides);
             }
-            if (angular.isDefined(opts.useSoftTabs)) {
+            if (Utilities.isDefined(opts.useSoftTabs)) {
                 session.setUseSoftTabs(opts.useSoftTabs);
             }
-            if (angular.isDefined(opts.showPrintMargin)) {
+            if (Utilities.isDefined(opts.showPrintMargin)) {
                 acee.setShowPrintMargin(opts.showPrintMargin);
             }
 
             // commands
-            if (angular.isDefined(opts.disableSearch) && opts.disableSearch) {
+            if (Utilities.isDefined(opts.disableSearch) && opts.disableSearch) {
                 acee.commands.addCommands([{
                     name: 'unfind',
                     bindKey: {
@@ -72,15 +72,15 @@
             }
 
             // Basic options
-            if (angular.isString(opts.theme)) {
+            if (Utilities.isString(opts.theme)) {
                 acee.setTheme('ace/theme/' + opts.theme);
             }
-            if (angular.isString(opts.mode)) {
+            if (Utilities.isString(opts.mode)) {
                 session.setMode('ace/mode/' + opts.mode);
             }
             // Advanced options
-            if (angular.isDefined(opts.firstLineNumber)) {
-                if (angular.isNumber(opts.firstLineNumber)) {
+            if (Utilities.isDefined(opts.firstLineNumber)) {
+                if (Utilities.isNumber(opts.firstLineNumber)) {
                     session.setOption('firstLineNumber', opts.firstLineNumber);
                 } else if (angular.isFunction(opts.firstLineNumber)) {
                     session.setOption('firstLineNumber', opts.firstLineNumber());
@@ -89,7 +89,7 @@
 
             // advanced options
             var key, obj;
-            if (angular.isDefined(opts.advanced)) {
+            if (Utilities.isDefined(opts.advanced)) {
                 for (key in opts.advanced) {
                     // create a javascript object with the key and value
                     obj = {
@@ -102,7 +102,7 @@
             }
 
             // advanced options for the renderer
-            if (angular.isDefined(opts.rendererOptions)) {
+            if (Utilities.isDefined(opts.rendererOptions)) {
                 for (key in opts.rendererOptions) {
                     // create a javascript object with the key and value
                     obj = {
@@ -206,7 +206,7 @@
                      */
                     var args = Array.prototype.slice.call(arguments, 1);
 
-                    if (angular.isDefined(callback)) {
+                    if (Utilities.isDefined(callback)) {
                         scope.$evalAsync(function() {
                             if (angular.isFunction(callback)) {
                                 callback(args);

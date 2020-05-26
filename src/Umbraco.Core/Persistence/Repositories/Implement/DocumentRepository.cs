@@ -321,7 +321,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     .InnerJoin<DocumentVersionDto>()
                     .On<ContentVersionDto, DocumentVersionDto>((c, d) => c.Id == d.Id)
                     .Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId") && !x.Current && x.VersionDate < SqlTemplate.Arg<DateTime>("versionDate"))
-                    .Where<DocumentVersionDto>( x => !x.Published)                    
+                    .Where<DocumentVersionDto>(x => !x.Published)
             );
             var versionDtos = Database.Fetch<ContentVersionDto>(template.Sql(new { nodeId, versionDate }));
             foreach (var versionDto in versionDtos)
@@ -519,8 +519,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IContent entity)
         {
-            var entityBase = entity as EntityBase;
-            var isEntityDirty = entityBase != null && entityBase.IsDirty();
+            var isEntityDirty = entity.IsDirty();
 
             // check if we need to make any database changes at all
             if ((entity.PublishedState == PublishedState.Published || entity.PublishedState == PublishedState.Unpublished)
@@ -535,29 +534,41 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // update
             entity.UpdatingEntity();
 
+            // Check if this entity is being moved as a descendant as part of a bulk moving operations.
+            // In this case we can bypass a lot of the below operations which will make this whole operation go much faster.
+            // When moving we don't need to create new versions, etc... because we cannot roll this operation back anyways.
+            var isMoving = entity.IsMoving();
+            // TODO: I'm sure we can also detect a "Copy" (of a descendant) operation and probably perform similar checks below.
+            // There is probably more stuff that would be required for copying but I'm sure not all of this logic would be, we could more than likely boost
+            // copy performance by 95% just like we did for Move
+
+
             var publishing = entity.PublishedState == PublishedState.Publishing;
 
-            // check if we need to create a new version
-            if (publishing && entity.PublishedVersionId > 0)
+            if (!isMoving)
             {
-                // published version is not published anymore
-                Database.Execute(Sql().Update<DocumentVersionDto>(u => u.Set(x => x.Published, false)).Where<DocumentVersionDto>(x => x.Id == entity.PublishedVersionId));
-            }
+                // check if we need to create a new version
+                if (publishing && entity.PublishedVersionId > 0)
+                {
+                    // published version is not published anymore
+                    Database.Execute(Sql().Update<DocumentVersionDto>(u => u.Set(x => x.Published, false)).Where<DocumentVersionDto>(x => x.Id == entity.PublishedVersionId));
+                }
 
-            // sanitize names
-            SanitizeNames(entity, publishing);
+                // sanitize names
+                SanitizeNames(entity, publishing);
 
-            // ensure that strings don't contain characters that are invalid in xml
-            // TODO: do we really want to keep doing this here?
-            entity.SanitizeEntityPropertiesForXmlStorage();
+                // ensure that strings don't contain characters that are invalid in xml
+                // TODO: do we really want to keep doing this here?
+                entity.SanitizeEntityPropertiesForXmlStorage();
 
-            // if parent has changed, get path, level and sort order
-            if (entity.IsPropertyDirty("ParentId"))
-            {
-                var parent = GetParentNodeDto(entity.ParentId);
-                entity.Path = string.Concat(parent.Path, ",", entity.Id);
-                entity.Level = parent.Level + 1;
-                entity.SortOrder = GetNewChildSortOrder(entity.ParentId, 0);
+                // if parent has changed, get path, level and sort order
+                if (entity.IsPropertyDirty("ParentId"))
+                {
+                    var parent = GetParentNodeDto(entity.ParentId);
+                    entity.Path = string.Concat(parent.Path, ",", entity.Id);
+                    entity.Level = parent.Level + 1;
+                    entity.SortOrder = GetNewChildSortOrder(entity.ParentId, 0);
+                }
             }
 
             // create the dto
@@ -568,146 +579,152 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             nodeDto.ValidatePathWithException();
             Database.Update(nodeDto);
 
-            // update the content dto
-            Database.Update(dto.ContentDto);
-
-            // update the content & document version dtos
-            var contentVersionDto = dto.DocumentVersionDto.ContentVersionDto;
-            var documentVersionDto = dto.DocumentVersionDto;
-            if (publishing)
+            if (!isMoving)
             {
-                documentVersionDto.Published = true; // now published
-                contentVersionDto.Current = false; // no more current
-            }
-            Database.Update(contentVersionDto);
-            Database.Update(documentVersionDto);
+                // update the content dto
+                Database.Update(dto.ContentDto);
 
-            // and, if publishing, insert new content & document version dtos
-            if (publishing)
-            {
-                entity.PublishedVersionId = entity.VersionId;
-
-                contentVersionDto.Id = 0; // want a new id
-                contentVersionDto.Current = true; // current version
-                contentVersionDto.Text = entity.Name;
-                Database.Insert(contentVersionDto);
-                entity.VersionId = documentVersionDto.Id = contentVersionDto.Id; // get the new id
-
-                documentVersionDto.Published = false; // non-published version
-                Database.Insert(documentVersionDto); 
-            }
-
-            // replace the property data (rather than updating)
-            // only need to delete for the version that existed, the new version (if any) has no property data yet
-            var versionToDelete = publishing ? entity.PublishedVersionId : entity.VersionId;
-            var deletePropertyDataSql = Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == versionToDelete);
-            Database.Execute(deletePropertyDataSql);
-
-            // insert property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishing ? entity.PublishedVersionId : 0,
-                entity.Properties, LanguageRepository, out var edited, out var editedCultures);
-            foreach (var propertyDataDto in propertyDataDtos)
-                Database.Insert(propertyDataDto);
-
-            // if !publishing, we may have a new name != current publish name,
-            // also impacts 'edited'
-            if (!publishing && entity.PublishName != entity.Name)
-                edited = true;
-
-            if (entity.ContentType.VariesByCulture())
-            {
-                // bump dates to align cultures to version
+                // update the content & document version dtos
+                var contentVersionDto = dto.DocumentVersionDto.ContentVersionDto;
+                var documentVersionDto = dto.DocumentVersionDto;
                 if (publishing)
-                    entity.AdjustDates(contentVersionDto.VersionDate);
+                {
+                    documentVersionDto.Published = true; // now published
+                    contentVersionDto.Current = false; // no more current
+                }
+                Database.Update(contentVersionDto);
+                Database.Update(documentVersionDto);
 
-                // names also impact 'edited'
-                // ReSharper disable once UseDeconstruction
-                foreach (var cultureInfo in entity.CultureInfos)
-                    if (cultureInfo.Name != entity.GetPublishName(cultureInfo.Culture))
-                    {
-                        edited = true;
-                        (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(cultureInfo.Culture);
+                // and, if publishing, insert new content & document version dtos
+                if (publishing)
+                {
+                    entity.PublishedVersionId = entity.VersionId;
 
-                        // TODO: change tracking
-                        // at the moment, we don't do any dirty tracking on property values, so we don't know whether the
-                        // culture has just been edited or not, so we don't update its update date - that date only changes
-                        // when the name is set, and it all works because the controller does it - but, if someone uses a
-                        // service to change a property value and save (without setting name), the update date does not change.
-                    }
+                    contentVersionDto.Id = 0; // want a new id
+                    contentVersionDto.Current = true; // current version
+                    contentVersionDto.Text = entity.Name;
+                    Database.Insert(contentVersionDto);
+                    entity.VersionId = documentVersionDto.Id = contentVersionDto.Id; // get the new id
 
-                // replace the content version variations (rather than updating)
+                    documentVersionDto.Published = false; // non-published version
+                    Database.Insert(documentVersionDto);
+                }
+
+                // replace the property data (rather than updating)
                 // only need to delete for the version that existed, the new version (if any) has no property data yet
-                var deleteContentVariations = Sql().Delete<ContentVersionCultureVariationDto>().Where<ContentVersionCultureVariationDto>(x => x.VersionId == versionToDelete);
-                Database.Execute(deleteContentVariations);
+                var versionToDelete = publishing ? entity.PublishedVersionId : entity.VersionId;
+                var deletePropertyDataSql = Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == versionToDelete);
+                Database.Execute(deletePropertyDataSql);
 
-                // replace the document version variations (rather than updating)
-                var deleteDocumentVariations = Sql().Delete<DocumentCultureVariationDto>().Where<DocumentCultureVariationDto>(x => x.NodeId == entity.Id);
-                Database.Execute(deleteDocumentVariations);
+                // insert property data
+                var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishing ? entity.PublishedVersionId : 0,
+                    entity.Properties, LanguageRepository, out var edited, out var editedCultures);
+                foreach (var propertyDataDto in propertyDataDtos)
+                    Database.Insert(propertyDataDto);
 
-                // TODO: NPoco InsertBulk issue?
-                // we should use the native NPoco InsertBulk here but it causes problems (not sure exactly all scenarios)
-                // but by using SQL Server and updating a variants name will cause: Unable to cast object of type
-                // 'Umbraco.Core.Persistence.FaultHandling.RetryDbConnection' to type 'System.Data.SqlClient.SqlConnection'.
-                // (same in PersistNewItem above)
+                // if !publishing, we may have a new name != current publish name,
+                // also impacts 'edited'
+                if (!publishing && entity.PublishName != entity.Name)
+                    edited = true;
 
-                // insert content variations
-                Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
+                if (entity.ContentType.VariesByCulture())
+                {
+                    // bump dates to align cultures to version
+                    if (publishing)
+                        entity.AdjustDates(contentVersionDto.VersionDate);
 
-                // insert document variations
-                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures));
+                    // names also impact 'edited'
+                    // ReSharper disable once UseDeconstruction
+                    foreach (var cultureInfo in entity.CultureInfos)
+                        if (cultureInfo.Name != entity.GetPublishName(cultureInfo.Culture))
+                        {
+                            edited = true;
+                            (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(cultureInfo.Culture);
+
+                            // TODO: change tracking
+                            // at the moment, we don't do any dirty tracking on property values, so we don't know whether the
+                            // culture has just been edited or not, so we don't update its update date - that date only changes
+                            // when the name is set, and it all works because the controller does it - but, if someone uses a
+                            // service to change a property value and save (without setting name), the update date does not change.
+                        }
+
+                    // replace the content version variations (rather than updating)
+                    // only need to delete for the version that existed, the new version (if any) has no property data yet
+                    var deleteContentVariations = Sql().Delete<ContentVersionCultureVariationDto>().Where<ContentVersionCultureVariationDto>(x => x.VersionId == versionToDelete);
+                    Database.Execute(deleteContentVariations);
+
+                    // replace the document version variations (rather than updating)
+                    var deleteDocumentVariations = Sql().Delete<DocumentCultureVariationDto>().Where<DocumentCultureVariationDto>(x => x.NodeId == entity.Id);
+                    Database.Execute(deleteDocumentVariations);
+
+                    // TODO: NPoco InsertBulk issue?
+                    // we should use the native NPoco InsertBulk here but it causes problems (not sure exactly all scenarios)
+                    // but by using SQL Server and updating a variants name will cause: Unable to cast object of type
+                    // 'Umbraco.Core.Persistence.FaultHandling.RetryDbConnection' to type 'System.Data.SqlClient.SqlConnection'.
+                    // (same in PersistNewItem above)
+
+                    // insert content variations
+                    Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
+
+                    // insert document variations
+                    Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures));
+                }
+
+                // refresh content
+                entity.SetCultureEdited(editedCultures);
+
+                // update the document dto
+                // at that point, when un/publishing, the entity still has its old Published value
+                // so we need to explicitly update the dto to persist the correct value
+                if (entity.PublishedState == PublishedState.Publishing)
+                    dto.Published = true;
+                else if (entity.PublishedState == PublishedState.Unpublishing)
+                    dto.Published = false;
+                entity.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
+                Database.Update(dto);
+
+                //update the schedule
+                if (entity.IsPropertyDirty("ContentSchedule"))
+                    PersistContentSchedule(entity, true);
+
+                // if entity is publishing, update tags, else leave tags there
+                // means that implicitly unpublished, or trashed, entities *still* have tags in db
+                if (entity.PublishedState == PublishedState.Publishing)
+                    SetEntityTags(entity, _tagRepository);
             }
-
-            // refresh content
-            entity.SetCultureEdited(editedCultures);
-
-            // update the document dto
-            // at that point, when un/publishing, the entity still has its old Published value
-            // so we need to explicitly update the dto to persist the correct value
-            if (entity.PublishedState == PublishedState.Publishing)
-                dto.Published = true;
-            else if (entity.PublishedState == PublishedState.Unpublishing)
-                dto.Published = false;
-            entity.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
-            Database.Update(dto);
-
-            //update the schedule
-            if (entity.IsPropertyDirty("ContentSchedule"))
-                PersistContentSchedule(entity, true);
-
-            // if entity is publishing, update tags, else leave tags there
-            // means that implicitly unpublished, or trashed, entities *still* have tags in db
-            if (entity.PublishedState == PublishedState.Publishing)
-                SetEntityTags(entity, _tagRepository);
 
             // trigger here, before we reset Published etc
             OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
 
-            // flip the entity's published property
-            // this also flips its published state
-            if (entity.PublishedState == PublishedState.Publishing)
+            if (!isMoving)
             {
-                entity.Published = true;
-                entity.PublishTemplateId = entity.TemplateId;
-                entity.PublisherId = entity.WriterId;
-                entity.PublishName = entity.Name;
-                entity.PublishDate = entity.UpdateDate;
+                // flip the entity's published property
+                // this also flips its published state
+                if (entity.PublishedState == PublishedState.Publishing)
+                {
+                    entity.Published = true;
+                    entity.PublishTemplateId = entity.TemplateId;
+                    entity.PublisherId = entity.WriterId;
+                    entity.PublishName = entity.Name;
+                    entity.PublishDate = entity.UpdateDate;
 
-                SetEntityTags(entity, _tagRepository);
+                    SetEntityTags(entity, _tagRepository);
+                }
+                else if (entity.PublishedState == PublishedState.Unpublishing)
+                {
+                    entity.Published = false;
+                    entity.PublishTemplateId = null;
+                    entity.PublisherId = null;
+                    entity.PublishName = null;
+                    entity.PublishDate = null;
+
+                    ClearEntityTags(entity, _tagRepository);
+                }
+
+                PersistRelations(entity);
+
+                // TODO: note re. tags: explicitly unpublished entities have cleared tags, but masked or trashed entities *still* have tags in the db - so what?
             }
-            else if (entity.PublishedState == PublishedState.Unpublishing)
-            {
-                entity.Published = false;
-                entity.PublishTemplateId = null;
-                entity.PublisherId = null;
-                entity.PublishName = null;
-                entity.PublishDate = null;
-
-                ClearEntityTags(entity, _tagRepository);
-            }
-
-            PersistRelations(entity);
-
-            // TODO: note re. tags: explicitly unpublished entities have cleared tags, but masked or trashed entities *still* have tags in the db - so what?
 
             entity.ResetDirtyProperties();
 
@@ -1183,7 +1200,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     if (temp.Template2Id.HasValue && templates.ContainsKey(temp.Template2Id.Value))
                         temp.Content.PublishTemplateId = temp.Template2Id;
                 }
-                
+
 
                 // set properties
                 if (loadProperties)
@@ -1216,7 +1233,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         SetVariations(temp.Content, contentVariations, documentVariations);
                 }
             }
-            
+
 
 
             foreach (var c in content)
@@ -1430,7 +1447,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 yield return dto;
             }
-                
+
         }
 
         private class ContentVariation

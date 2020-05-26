@@ -57,13 +57,13 @@ For extra details about options and events take a look here: https://refreshless
 **/
 
 
-(function() {
-	'use strict';
+(function () {
+    'use strict';
 
-	var umbRangeSlider = {
+    var umbRangeSlider = {
         template: '<div class="umb-range-slider"></div>',
-		controller: UmbRangeSliderController,
-		bindings: {
+        controller: UmbRangeSliderController,
+        bindings: {
             ngModel: '<',
             options: '<',
             onSetup: '&?',
@@ -73,15 +73,15 @@ For extra details about options and events take a look here: https://refreshless
             onChange: '&?',
             onStart: '&?',
             onEnd: '&?'
-		}
+        }
     };
-    
-	function UmbRangeSliderController($element, $timeout, $scope, assetsService) {
-        
+
+    function UmbRangeSliderController($element, $timeout, $scope, assetsService) {
+
         const ctrl = this;
         let sliderInstance = null;
 
-		ctrl.$onInit = function() {
+        ctrl.$onInit = function () {
 
             // load css file for the date picker
             assetsService.loadCss('lib/nouislider/nouislider.min.css', $scope);
@@ -94,13 +94,13 @@ For extra details about options and events take a look here: https://refreshless
 
         };
 
-		function grabElementAndRun() {
-			$timeout(function() {
+        function grabElementAndRun() {
+            $timeout(function () {
                 const element = $element.find('.umb-range-slider')[0];
-				setSlider(element);
-			}, 0, true);
+                setSlider(element);
+            }, 0, true);
         }
-        
+
         function setSlider(element) {
 
             sliderInstance = element;
@@ -117,82 +117,82 @@ For extra details about options and events take a look here: https://refreshless
 
             // create new slider
             noUiSlider.create(sliderInstance, options);
-            
-			if (ctrl.onSetup) {
-				ctrl.onSetup({
-					slider: sliderInstance
-				});
+
+            if (ctrl.onSetup) {
+                ctrl.onSetup({
+                    slider: sliderInstance
+                });
             }
 
             // If has ngModel set the date
-			if (ctrl.ngModel) {
+            if (ctrl.ngModel) {
                 sliderInstance.noUiSlider.set(ctrl.ngModel);
             }
 
             // destroy the slider instance when the dom element is removed
-			angular.element(element).on('$destroy', function() {
+            $(element).on('$destroy', function () {
                 sliderInstance.noUiSlider.off();
             });
 
             setUpCallbacks();
 
-			// Refresh the scope
-			$scope.$applyAsync();
+            // Refresh the scope
+            $scope.$applyAsync();
         }
-        
+
         function setUpCallbacks() {
-			if(sliderInstance) {
+            if (sliderInstance) {
 
                 // bind hook for update
-                if(ctrl.onUpdate) {
-                    sliderInstance.noUiSlider.on('update', function (values, handle, unencoded, tap, positions) { 
-                        $timeout(function() {
-                            ctrl.onUpdate({values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions});
+                if (ctrl.onUpdate) {
+                    sliderInstance.noUiSlider.on('update', function (values, handle, unencoded, tap, positions) {
+                        $timeout(function () {
+                            ctrl.onUpdate({ values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions });
                         });
                     });
                 }
 
                 // bind hook for slide
-                if(ctrl.onSlide) {
-                    sliderInstance.noUiSlider.on('slide', function (values, handle, unencoded, tap, positions) { 
-                        $timeout(function() {
-                            ctrl.onSlide({values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions});
+                if (ctrl.onSlide) {
+                    sliderInstance.noUiSlider.on('slide', function (values, handle, unencoded, tap, positions) {
+                        $timeout(function () {
+                            ctrl.onSlide({ values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions });
                         });
                     });
                 }
 
                 // bind hook for set
-                if(ctrl.onSet) {
-                    sliderInstance.noUiSlider.on('set', function (values, handle, unencoded, tap, positions) { 
-                        $timeout(function() {
-                            ctrl.onSet({values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions});
+                if (ctrl.onSet) {
+                    sliderInstance.noUiSlider.on('set', function (values, handle, unencoded, tap, positions) {
+                        $timeout(function () {
+                            ctrl.onSet({ values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions });
                         });
                     });
                 }
 
                 // bind hook for change
-                if(ctrl.onChange) {
-                    sliderInstance.noUiSlider.on('change', function (values, handle, unencoded, tap, positions) { 
-                        $timeout(function() {
-                            ctrl.onChange({values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions});
+                if (ctrl.onChange) {
+                    sliderInstance.noUiSlider.on('change', function (values, handle, unencoded, tap, positions) {
+                        $timeout(function () {
+                            ctrl.onChange({ values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions });
                         });
                     });
                 }
 
                 // bind hook for start
-                if(ctrl.onStart) {
-                    sliderInstance.noUiSlider.on('start', function (values, handle, unencoded, tap, positions) { 
-                        $timeout(function() {
-                            ctrl.onStart({values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions});
+                if (ctrl.onStart) {
+                    sliderInstance.noUiSlider.on('start', function (values, handle, unencoded, tap, positions) {
+                        $timeout(function () {
+                            ctrl.onStart({ values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions });
                         });
                     });
                 }
 
                 // bind hook for end
-                if(ctrl.onEnd) {
-                    sliderInstance.noUiSlider.on('end', function (values, handle, unencoded, tap, positions) { 
-                        $timeout(function() {
-                            ctrl.onEnd({values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions});
+                if (ctrl.onEnd) {
+                    sliderInstance.noUiSlider.on('end', function (values, handle, unencoded, tap, positions) {
+                        $timeout(function () {
+                            ctrl.onEnd({ values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions });
                         });
                     });
                 }
@@ -201,7 +201,7 @@ For extra details about options and events take a look here: https://refreshless
         }
 
     }
-    
+
     angular.module('umbraco.directives').component('umbRangeSlider', umbRangeSlider);
-    
+
 })();
