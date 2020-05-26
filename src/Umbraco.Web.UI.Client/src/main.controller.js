@@ -74,6 +74,7 @@ function MainController($scope, $location, appState, treeService, notificationsS
         $scope.authenticated = null;
         $scope.user = null;
         const isTimedOut = data && data.isTimedOut ? true : false;
+
         $scope.showLoginScreen(isTimedOut);
 
         // Remove the localstorage items for tours shown

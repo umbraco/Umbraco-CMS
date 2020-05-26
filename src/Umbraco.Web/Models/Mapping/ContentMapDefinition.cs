@@ -52,7 +52,7 @@ namespace Umbraco.Web.Models.Mapping
             _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IContent>(localizedTextService);
             _stateMapper = new ContentSavedStateMapper<ContentPropertyDisplay>();
             _basicStateMapper = new ContentBasicSavedStateMapper<ContentPropertyBasic>();
-            _contentVariantMapper = new ContentVariantMapper(_localizationService);
+            _contentVariantMapper = new ContentVariantMapper(_localizationService, localizedTextService);
         }
 
         public void DefineMaps(UmbracoMapper mapper)
@@ -104,7 +104,7 @@ namespace Umbraco.Web.Models.Mapping
             target.ContentDto.Properties = context.MapEnumerable<Property, ContentPropertyDto>(source.Properties);
         }
 
-        // Umbraco.Code.MapAll -Segment -Language
+        // Umbraco.Code.MapAll -Segment -Language -DisplayName
         private void Map(IContent source, ContentVariantDisplay target, MapperContext context)
         {
             target.CreateDate = source.CreateDate;

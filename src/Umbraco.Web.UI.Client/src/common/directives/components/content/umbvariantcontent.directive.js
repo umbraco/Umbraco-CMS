@@ -12,7 +12,6 @@
             editor: "<",
             editorIndex: "<",
             editorCount: "<",
-            openVariants: "<",
             onCloseSplitView: "&",
             onSelectVariant: "&",
             onOpenSplitView: "&",
@@ -25,7 +24,7 @@
         controller: umbVariantContentController
     };
     
-    function umbVariantContentController($scope, $element, $location) {
+    function umbVariantContentController($scope) {
 
         var unsubscribe = [];
 
@@ -42,13 +41,14 @@
         vm.showBackButton = showBackButton;
 
         function onInit() {
-            // disable the name field if the active content app is not "Content"
-            vm.nameDisabled = false;
-            angular.forEach(vm.editor.content.apps, function(app){
-                if(app.active && app.alias !== "umbContent" && app.alias !== "umbInfo" && app.alias !== "umbListView") {
-                    vm.nameDisabled = true;
-                }
-            });
+            
+            // Make copy of apps, so we can have a variant specific model for the App. (needed for validation etc.)
+            vm.editor.variantApps = Utilities.copy(vm.content.apps);
+
+            var activeApp = vm.content.apps.find((app) => app.active);
+
+            onAppChanged(activeApp);
+
         }
         
         function showBackButton() {
@@ -94,13 +94,22 @@
         }
         
         $scope.$on("editors.apps.appChanged", function($event, $args) {
-            var app = $args.app;
-            // disable the name field if the active content app is not "Content" or "Info"
-            vm.nameDisabled = false;
-            if(app && app.alias !== "umbContent" && app.alias !== "umbInfo" && app.alias !== "umbListView") {
-                vm.nameDisabled = true;
-            }
+            var activeApp = $args.app;
+
+            // sync varaintApps active with new active.
+            _.forEach(vm.editor.variantApps, function (app) {
+                app.active = (app.alias === activeApp.alias);
+            });
+
+            onAppChanged(activeApp);
         });
+
+        function onAppChanged(activeApp) {
+
+            // disable the name field if the active content app is not "Content" or "Info"
+            vm.nameDisabled = (activeApp && activeApp.alias !== "umbContent" && activeApp.alias !== "umbInfo" && activeApp.alias !== "umbListView");
+
+        }
 
         /**
          * Used to proxy a callback
