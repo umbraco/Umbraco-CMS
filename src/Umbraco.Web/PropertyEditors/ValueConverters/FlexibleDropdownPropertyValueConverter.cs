@@ -48,6 +48,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return propertyType.DataType.ConfigurationAs<DropDownFlexibleConfiguration>().Multiple
                ? typeof(IEnumerable<string>)
                : typeof(string);
-        }      
+        }
     }
 }
