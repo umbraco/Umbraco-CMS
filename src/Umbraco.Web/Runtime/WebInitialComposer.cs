@@ -70,7 +70,7 @@ namespace Umbraco.Web.Runtime
             //we need to eagerly scan controller types since they will need to be routed
             composition.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
                 .Add(composition.TypeLoader.GetSurfaceControllers());
-            
+
 
             // add all known factories, devs can then modify this list on application
             // startup either by binding to events or in their own global.asax
@@ -83,13 +83,7 @@ namespace Umbraco.Web.Runtime
             // register preview SignalR hub
             composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>());
 
-            var umbracoApiControllerTypes = composition.TypeLoader.GetUmbracoApiControllers().ToList();
 
-            // register back office trees
-            // the collection builder only accepts types inheriting from TreeControllerBase
-            // and will filter out those that are not attributed with TreeAttribute
-            composition.Trees()
-                .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
 
 
         }

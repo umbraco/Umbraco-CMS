@@ -208,10 +208,10 @@ namespace Umbraco.Web.Editors
                             "entityApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<EntityController>(
                                 controller => controller.GetById(0, UmbracoEntityTypes.Media))
                         },
-                        {
-                            "dataTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DataTypeController>(
-                                controller => controller.GetById(0))
-                        },
+                        // {
+                        //     "dataTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DataTypeController>(
+                        //         controller => controller.GetById(0))
+                        // },
                         //TODO Reintroduce
                         // {
                         //     "dashboardApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DashboardController>(

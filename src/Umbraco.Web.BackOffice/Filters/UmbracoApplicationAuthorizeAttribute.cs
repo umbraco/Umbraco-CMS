@@ -14,6 +14,7 @@ namespace Umbraco.Web.BackOffice.Filters
         /// </summary>
         internal static bool Enable = true;
 
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly string[] _appNames;
 
         /// <summary>
@@ -22,29 +23,29 @@ namespace Umbraco.Web.BackOffice.Filters
         /// <param name="appName">
         /// If the user has access to any of the specified apps, they will be authorized.
         /// </param>
-        public UmbracoApplicationAuthorizeAttribute(params string[] appName)
+        public UmbracoApplicationAuthorizeAttribute(IUmbracoContextAccessor umbracoContextAccessor, params string[] appName)
         {
+            _umbracoContextAccessor = umbracoContextAccessor;
             _appNames = appName;
         }
 
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var umbracoContextAccessor = context.HttpContext.RequestServices.GetRequiredService<IUmbracoContextAccessor>();
-            if (!IsAuthorized(umbracoContextAccessor))
+            if (!IsAuthorized())
             {
                 context.Result = new ForbidResult();
             }
         }
 
-        private bool IsAuthorized(IUmbracoContextAccessor umbracoContextAccessor)
+        private bool IsAuthorized()
         {
             if (Enable == false)
             {
                 return true;
             }
 
-            var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             var authorized = umbracoContext.Security.CurrentUser != null
                             && _appNames.Any(app => umbracoContext.Security.UserHasSectionAccess(
                                 app, umbracoContext.Security.CurrentUser));
