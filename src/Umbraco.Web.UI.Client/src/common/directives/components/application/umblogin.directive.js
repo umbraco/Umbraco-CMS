@@ -251,6 +251,7 @@
                         vm.loginForm.password.$setValidity('auth', true);
                     }
                 });
+            }
         }
 
         function requestPasswordResetSubmit(email) {
