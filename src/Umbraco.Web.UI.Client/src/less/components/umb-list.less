@@ -1,15 +1,18 @@
 .umb-list--condensed {
     .umb-list-item {
-        padding-top: 5px;
-        padding-bottom: 5px;
+        padding-top: 7px;
+        padding-bottom: 7px;
     }
 }
 
 .umb-list-item {
-    border-bottom: 1px solid @gray-9;
+    border-bottom: 1px solid @gray-11;
     padding-top: 15px;
     padding-bottom: 15px;
     display: flex;
+    &:last-of-type {
+        border-bottom: none;
+    }
 }
 
 a.umb-list-item:hover,

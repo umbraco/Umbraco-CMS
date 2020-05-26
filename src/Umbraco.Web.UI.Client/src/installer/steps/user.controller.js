@@ -13,14 +13,14 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
         $scope.passwordPattern = new RegExp(exp);
     }
 
-	$scope.validateAndInstall = function(){
-			installerService.install();
+	$scope.validateAndInstall = function() {
+	    installerService.install();
 	};
 
 	$scope.validateAndForward = function(){
-			if(this.myForm.$valid){
-				installerService.forward();
-			}
+		if (this.myForm.$valid) {
+			installerService.forward();
+		}
 	};
 	
 });

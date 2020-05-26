@@ -51,12 +51,12 @@ angular.mock.$Browser = function () {
 
     self.onUrlChange = function (listener) {
         self.pollFns.push(
-          function () {
-              if (self.$$lastUrl != self.$$url) {
-                  self.$$lastUrl = self.$$url;
-                  listener(self.$$url);
-              }
-          }
+            function () {
+                if (self.$$lastUrl != self.$$url) {
+                    self.$$lastUrl = self.$$url;
+                    listener(self.$$url);
+                }
+            }
         );
 
         return listener;
@@ -104,7 +104,7 @@ angular.mock.$Browser = function () {
      * @param {number=} number of milliseconds to flush. See {@link #defer.now}
      */
     self.defer.flush = function (delay) {
-        if (angular.isDefined(delay)) {
+        if (Utilities.isDefined(delay)) {
             self.defer.now += delay;
         } else {
             if (self.deferredFns.length) {
@@ -165,15 +165,15 @@ angular.mock.$Browser.prototype = {
             if (value == undefined) {
                 delete this.cookieHash[name];
             } else {
-                if (angular.isString(value) &&       //strings only
+                if (Utilities.isString(value) &&       //strings only
                     value.length <= 4096) {          //strict cookie storage limits
                     this.cookieHash[name] = value;
                 }
             }
         } else {
             if (!angular.equals(this.cookieHash, this.lastCookieHash)) {
-                this.lastCookieHash = angular.copy(this.cookieHash);
-                this.cookieHash = angular.copy(this.cookieHash);
+                this.lastCookieHash = Utilities.copy(this.cookieHash);
+                this.cookieHash = Utilities.copy(this.cookieHash);
             }
             return this.cookieHash;
         }
@@ -397,7 +397,7 @@ angular.mock.$LogProvider = function () {
             });
             if (errors.length) {
                 errors.unshift("Expected $log to be empty! Either a message was logged unexpectedly, or an expected " +
-                  "log message was not checked and removed:");
+                    "log message was not checked and removed:");
                 errors.push('');
                 throw new Error(errors.join('\n---------\n'));
             }
@@ -486,7 +486,7 @@ angular.mock.$LogProvider = function () {
      */
     angular.mock.TzDate = function (offset, timestamp) {
         var self = new Date(0);
-        if (angular.isString(timestamp)) {
+        if (Utilities.isString(timestamp)) {
             var tsStr = timestamp;
 
             self.origDate = jsonStringToDate(timestamp);
@@ -581,12 +581,12 @@ angular.mock.$LogProvider = function () {
         if (self.toISOString) {
             self.toISOString = function () {
                 return padNumber(self.origDate.getUTCFullYear(), 4) + '-' +
-                      padNumber(self.origDate.getUTCMonth() + 1, 2) + '-' +
-                      padNumber(self.origDate.getUTCDate(), 2) + 'T' +
-                      padNumber(self.origDate.getUTCHours(), 2) + ':' +
-                      padNumber(self.origDate.getUTCMinutes(), 2) + ':' +
-                      padNumber(self.origDate.getUTCSeconds(), 2) + '.' +
-                      padNumber(self.origDate.getUTCMilliseconds(), 3) + 'Z'
+                    padNumber(self.origDate.getUTCMonth() + 1, 2) + '-' +
+                    padNumber(self.origDate.getUTCDate(), 2) + 'T' +
+                    padNumber(self.origDate.getUTCHours(), 2) + ':' +
+                    padNumber(self.origDate.getUTCMinutes(), 2) + ':' +
+                    padNumber(self.origDate.getUTCSeconds(), 2) + '.' +
+                    padNumber(self.origDate.getUTCMilliseconds(), 3) + 'Z'
             }
         }
 
@@ -686,19 +686,19 @@ angular.mock.dump = function (object) {
         var out;
 
         if (angular.isElement(object)) {
-            object = angular.element(object);
-            out = angular.element('<div></div>');
+            object = $(object);
+            out = $('<div></div>');
             angular.forEach(object, function (element) {
-                out.append(angular.element(element).clone());
+                out.append($(element).clone());
             });
             out = out.html();
-        } else if (angular.isArray(object)) {
+        } else if (Utilities.isArray(object)) {
             out = [];
             angular.forEach(object, function (o) {
                 out.push(serialize(o));
             });
             out = '[ ' + out.join(', ') + ' ]';
-        } else if (angular.isObject(object)) {
+        } else if (Utilities.isObject(object)) {
             if (angular.isFunction(object.$eval) && angular.isFunction(object.$apply)) {
                 out = serializeScope(object);
             } else if (object instanceof Error) {
@@ -943,7 +943,7 @@ function createHttpBackendMock($rootScope, $delegate, $browser) {
             wasExpected = false;
 
         function prettyPrint(data) {
-            return (angular.isString(data) || angular.isFunction(data) || data instanceof RegExp)
+            return (Utilities.isString(data) || angular.isFunction(data) || data instanceof RegExp)
                 ? data
                 : angular.toJson(data);
         }
@@ -1004,7 +1004,7 @@ function createHttpBackendMock($rootScope, $delegate, $browser) {
         throw wasExpected ?
             Error('No response defined !') :
             Error('Unexpected request: ' + method + ' ' + url + '\n' +
-                  (expectation ? 'Expected ' + expectation : 'No more request expected'));
+                (expectation ? 'Expected ' + expectation : 'No more request expected'));
     }
 
     /**
@@ -1267,7 +1267,7 @@ function createHttpBackendMock($rootScope, $delegate, $browser) {
         $rootScope.$digest();
         if (!responses.length) throw Error('No pending request to flush !');
 
-        if (angular.isDefined(count)) {
+        if (Utilities.isDefined(count)) {
             while (count--) {
                 if (!responses.length) throw Error('No more pending request to flush !');
                 responses.shift()();
@@ -1365,8 +1365,8 @@ function MockHttpExpectation(method, url, data, headers) {
     this.match = function (m, u, d, h) {
         if (method != m) return false;
         if (!this.matchUrl(u)) return false;
-        if (angular.isDefined(d) && !this.matchData(d)) return false;
-        if (angular.isDefined(h) && !this.matchHeaders(h)) return false;
+        if (Utilities.isDefined(d) && !this.matchData(d)) return false;
+        if (Utilities.isDefined(h) && !this.matchHeaders(h)) return false;
         return true;
     };
 
@@ -1385,7 +1385,7 @@ function MockHttpExpectation(method, url, data, headers) {
     this.matchData = function (d) {
         if (angular.isUndefined(data)) return true;
         if (data && angular.isFunction(data.test)) return data.test(d);
-        if (data && !angular.isString(data)) return angular.toJson(data) == d;
+        if (data && !Utilities.isString(data)) return angular.toJson(data) == d;
         return data == d;
     };
 
@@ -1499,7 +1499,7 @@ angular.mock.$TimeoutDecorator = function ($delegate, $browser) {
  */
 angular.mock.$RootElementProvider = function () {
     this.$get = function () {
-        return angular.element('<div ng-app></div>');
+        return $('<div ng-app></div>');
     }
 };
 
@@ -1572,7 +1572,7 @@ angular.module('ngMockE2E', ['ng']).config(function ($provide) {
  *
  *     // adds a new phone to the phones array
  *     $httpBackend.whenPOST('/phones').respond(function(method, url, data) {
- *       phones.push(angular.fromJSON(data));
+ *       phones.push(JSON.parse(data));
  *     });
  *     $httpBackend.whenGET(/^\/templates\//).passThrough();
  *     //...
@@ -1710,7 +1710,7 @@ angular.mock.clearDataCache = function () {
         if (cache.hasOwnProperty(key)) {
             var handle = cache[key].handle;
 
-            handle && angular.element(handle.elem).unbind();
+            handle && $(handle.elem).unbind();
             delete cache[key];
         }
     }

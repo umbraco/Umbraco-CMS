@@ -49,13 +49,15 @@ namespace Umbraco.Web
         /// <param name="propertyAlias"></param>
         /// <param name="culture">The culture for the property, if the property is invariant than this is empty</param>
         internal static void AddPropertyError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
-            ValidationResult result, string propertyAlias, string culture = "")
+            ValidationResult result, string propertyAlias, string culture = "", string segment = "")
         {
             if (culture == null)
                 culture = "";
             modelState.AddValidationError(result, "_Properties", propertyAlias,
                 //if the culture is null, we'll add the term 'invariant' as part of the key
-                culture.IsNullOrWhiteSpace() ? "invariant" : culture);
+                culture.IsNullOrWhiteSpace() ? "invariant" : culture,
+                // if the segment is null, we'll add the term 'null' as part of the key
+                segment.IsNullOrWhiteSpace() ? "null" : segment);
         }
 
         /// <summary>

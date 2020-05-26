@@ -287,8 +287,8 @@ Use this directive to construct a header inside the main editor window.
             function setAccessibilityHeaderDirective(isNew, editorFor, nameLocked, entityName, contentTypeName, setTitle) {
 
                 var localizeVars = [
-                    isNew ? "placeholders_a11yCreateItem" : "placeholders_a11yEdit",
-                    "placeholders_a11yName",
+                    isNew ? "visuallyHiddenTexts_createItem" : "visuallyHiddenTexts_edit",
+                    "visuallyHiddenTexts_name",
                     isNew ? "general_new" : "general_edit"
                 ];
 

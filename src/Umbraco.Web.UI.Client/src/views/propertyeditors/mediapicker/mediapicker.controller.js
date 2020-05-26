@@ -49,12 +49,10 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     // when there is no match for a selected id. This will ensure that the values being set on save, are the same as before.
 
                     medias = ids.map(id => {
-                        var found = medias.find(m =>
-                            // We could use coercion (two ='s) here .. but not sure if this works equally well in all browsers and
-                            // it's prone to someone "fixing" it at some point without knowing the effects. Rather use toString()
-                            // compares and be completely sure it works.
-                            m.udi.toString() === id.toString() || m.id.toString() === id.toString());
-                        
+                        // We could use coercion (two ='s) here .. but not sure if this works equally well in all browsers and
+                        // it's prone to someone "fixing" it at some point without knowing the effects. Rather use toString()
+                        // compares and be completely sure it works.
+                        var found = medias.find(m => m.udi.toString() === id.toString() || m.id.toString() === id.toString());
                         if (found) {
                             return found;
                         } else {
