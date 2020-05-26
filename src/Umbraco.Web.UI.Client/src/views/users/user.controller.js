@@ -103,6 +103,7 @@
                         vm.changePasswordModel.config.allowManuallyChangingPassword = true;
                     }
 
+                    $scope.$emit("$setAccessibleHeader", false, "general_user", false, vm.user.name, "", true);
                     vm.loading = false;
                 });
             });

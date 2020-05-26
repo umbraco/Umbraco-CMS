@@ -502,6 +502,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
+        /// <summary>
+        /// Validate the <see cref="ContentNodeKit"/> and try to create a parent <see cref="LinkedNode{ContentNode}"/>
+        /// </summary>
+        /// <param name="kit"></param>
+        /// <param name="parent"></param>
+        /// <returns>
+        /// Returns false if the parent was not found or if the kit validation failed
+        /// </returns>
         private bool BuildKit(ContentNodeKit kit, out LinkedNode<ContentNode> parent)
         {
             // make sure parent exists
@@ -509,6 +517,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (parent == null)
             {
                 _logger.Warn<ContentStore>($"Skip item id={kit.Node.Id}, could not find parent id={kit.Node.ParentContentId}.");
+                return false;
+            }
+
+            // We cannot continue if there's no value. This shouldn't happen but it can happen if the database umbracoNode.path
+            // data is invalid/corrupt. If that is the case, the parentId might be ok but not the Path which can result in null
+            // because the data sort operation is by path.
+            if (parent.Value == null)
+            {
+                _logger.Warn<ContentStore>($"Skip item id={kit.Node.Id}, no Data assigned for linked node with path {kit.Node.Path} and parent id {kit.Node.ParentContentId}. This can indicate data corruption for the Path value for node {kit.Node.Id}. See the Health Check dashboard in Settings to resolve data integrity issues.");
                 return false;
             }
 
@@ -800,7 +817,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 //this zero's out the branch (recursively), if we're in a new gen this will add a NULL placeholder for the gen
                 ClearBranchLocked(existing);
-                //TODO: This removes the current GEN from the tree - do we really want to do that?
+                //TODO: This removes the current GEN from the tree - do we really want to do that? (not sure if this is still an issue....)
                 RemoveTreeNodeLocked(existing);
             }
 
@@ -865,6 +882,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void ClearBranchLocked(ContentNode content)
         {
+            // This should never be null, all code that calls this method is null checking but we've seen
+            // issues of null ref exceptions in issue reports so we'll double check here
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            
             SetValueLocked(_contentNodes, content.Id, null);
             if (_localDb != null) RegisterChange(content.Id, ContentNodeKit.Null);
 
@@ -1031,6 +1052,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
             parentLink = parentLink ?? GetRequiredParentLink(content, null);
 
             var parent = parentLink.Value;
+
+            // We are doing a null check here but this should no longer be possible because we have a null check in BuildKit
+            // for the parent.Value property and we'll output a warning. However I'll leave this additional null check in place. 
+            // see https://github.com/umbraco/Umbraco-CMS/issues/7868
+            if (parent == null)
+                throw new PanicException($"A null Value was returned on the {nameof(parentLink)} LinkedNode with id={content.ParentContentId}, potentially your database paths are corrupted.");
 
             // if parent has no children, clone parent + add as first child
             if (parent.FirstChildContentId < 0)
