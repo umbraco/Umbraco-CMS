@@ -9,9 +9,9 @@
             hide-icon="true"
             hide-description="true">
         </umb-editor-header>
-        
+
         <umb-editor-container>
-            
+
             <umb-load-indicator
                 ng-if="vm.loading">
             </umb-load-indicator>
@@ -21,21 +21,21 @@
 
                     <div ng-if="model.node.variants.length > 1">
                         <h5><localize key="general_language"></localize></h5>
-                        <select 
+                        <select
                             class="input-block-level"
                             ng-model="vm.selectedLanguage"
-                            ng-options="variant as variant.language.name for variant in model.node.variants track by variant.language.culture"
+                            ng-options="variant as variant.displayName for variant in model.node.variants track by variant.language.culture"
                             ng-change="vm.changeLanguage(vm.selectedLanguage)">
                         </select>
                     </div>
-                    
+
                     <div>
-                                            
+
                         <h5><localize key="rollback_currentVersion"></localize></h5>
                         <p>{{vm.currentVersion.name}} (Created: {{vm.currentVersion.createDate}})</p>
-                        
+
                         <h5><localize key="rollback_rollbackTo"></localize></h5>
-                        <select 
+                        <select
                             class="input-block-level"
                             ng-model="vm.selectedVersion"
                             ng-options="version.displayValue for version in vm.previousVersions track by version.versionId"
@@ -48,7 +48,7 @@
 
                         <h5>Changes</h5>
                         <small style="margin-bottom: 15px; display: block;"><localize key="rollback_diffHelp"></localize></small>
-        
+
                         <table class="table table-condensed table-bordered">
                             <tbody>
                                 <tr>
@@ -73,7 +73,7 @@
                                 </tr>
                             </tbody>
                         </table>
-        
+
                     </div>
 
                 </umb-box-content>

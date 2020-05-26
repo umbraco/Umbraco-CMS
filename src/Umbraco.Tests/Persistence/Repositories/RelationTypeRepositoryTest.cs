@@ -107,13 +107,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(provider);
 
                 // Act
-                var relationType = repository.Get(RelationTypeDto.NodeIdSeed);
+                var relationType = repository.Get(RelationTypeDto.NodeIdSeed + 2);
 
                 // Assert
                 Assert.That(relationType, Is.Not.Null);
                 Assert.That(relationType.HasIdentity, Is.True);
-                Assert.That(relationType.Alias, Is.EqualTo("relateContentOnCopy"));
-                Assert.That(relationType.Name, Is.EqualTo("Relate Content on Copy"));
+                Assert.That(relationType.IsBidirectional, Is.True);
+                Assert.That(relationType.Alias, Is.EqualTo("relateContentToMedia"));
+                Assert.That(relationType.Name, Is.EqualTo("Relate Content to Media"));
+                Assert.That(relationType.ChildObjectType, Is.EqualTo(Constants.ObjectTypes.Media));
+                Assert.That(relationType.ParentObjectType, Is.EqualTo(Constants.ObjectTypes.Document));
             }
         }
 
@@ -133,7 +136,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(relationTypes, Is.Not.Null);
                 Assert.That(relationTypes.Any(), Is.True);
                 Assert.That(relationTypes.Any(x => x == null), Is.False);
-                Assert.That(relationTypes.Count(), Is.EqualTo(7));
+                Assert.That(relationTypes.Count(), Is.EqualTo(8));
             }
         }
 
@@ -190,7 +193,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 int count = repository.Count(query);
 
                 // Assert
-                Assert.That(count, Is.EqualTo(5));
+                Assert.That(count, Is.EqualTo(6));
             }
         }
 
@@ -224,8 +227,9 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         public void CreateTestData()
         {
-            var relateContent = new RelationType("Relate Content on Copy", "relateContentOnCopy", true, Constants.ObjectTypes.Document, new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"));
-            var relateContentType = new RelationType("Relate ContentType on Copy", "relateContentTypeOnCopy", true, Constants.ObjectTypes.DocumentType, new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"));
+            var relateContent = new RelationType("Relate Content on Copy", "relateContentOnCopy", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document);
+            var relateContentType = new RelationType("Relate ContentType on Copy", "relateContentTypeOnCopy", true, Constants.ObjectTypes.DocumentType, Constants.ObjectTypes.DocumentType);
+            var relateContentMedia = new RelationType("Relate Content to Media", "relateContentToMedia", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Media);
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
@@ -234,6 +238,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 repository.Save(relateContent);//Id 2
                 repository.Save(relateContentType);//Id 3
+                repository.Save(relateContentMedia);//Id 4
                 scope.Complete();
             }
         }

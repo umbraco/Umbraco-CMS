@@ -83,7 +83,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         // gets all version ids, current first
         public virtual IEnumerable<int> GetVersionIds(int nodeId, int maxRows)
         {
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersionIds", tsql =>
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetVersionIds, tsql =>
                 tsql.Select<ContentVersionDto>(x => x.Id)
                     .From<ContentVersionDto>()
                     .Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId"))
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // TODO: test object node type?
 
             // get the version we want to delete
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersion", tsql =>
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetVersion, tsql =>
                 tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == SqlTemplate.Arg<int>("versionId"))
             );
             var versionDto = Database.Fetch<ContentVersionDto>(template.Sql(new { versionId })).FirstOrDefault();
@@ -121,7 +121,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // TODO: test object node type?
 
             // get the versions we want to delete, excluding the current one
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersions", tsql =>
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetVersions, tsql =>
                 tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId") && !x.Current && x.VersionDate < SqlTemplate.Arg<DateTime>("versionDate"))
             );
             var versionDtos = Database.Fetch<ContentVersionDto>(template.Sql(new { nodeId, versionDate }));
@@ -403,7 +403,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // content type alias is invariant
-            if(ordering.OrderBy.InvariantEquals("contentTypeAlias"))
+            if (ordering.OrderBy.InvariantEquals("contentTypeAlias"))
             {
                 var joins = Sql()
                     .InnerJoin<ContentTypeDto>("ctype").On<ContentDto, ContentTypeDto>((content, contentType) => content.ContentTypeId == contentType.NodeId, aliasRight: "ctype");
@@ -476,6 +476,123 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             long pageIndex, int pageSize, out long totalRecords,
             IQuery<TEntity> filter,
             Ordering ordering);
+
+        public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
+        {
+            var report = new Dictionary<int, ContentDataIntegrityReportEntry>();
+
+            var sql = SqlContext.Sql()
+                .Select<NodeDto>()
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
+
+            var nodesToRebuild = new Dictionary<int, List<NodeDto>>();
+            var validNodes = new Dictionary<int, NodeDto>();
+            var rootIds = new[] {Constants.System.Root, Constants.System.RecycleBinContent, Constants.System.RecycleBinMedia};
+            var currentParentIds = new HashSet<int>(rootIds);
+            var prevParentIds = currentParentIds;
+            var lastLevel = -1;
+
+            // use a forward cursor (query)
+            foreach (var node in Database.Query<NodeDto>(sql))
+            {
+                if (node.Level != lastLevel)
+                {
+                    // changing levels
+                    prevParentIds = currentParentIds;
+                    currentParentIds = null;
+                    lastLevel = node.Level;
+                }
+
+                if (currentParentIds == null)
+                {
+                    // we're reset
+                    currentParentIds = new HashSet<int>();
+                }
+
+                currentParentIds.Add(node.NodeId);
+
+                // paths parts without the roots
+                var pathParts = node.Path.Split(',').Where(x => !rootIds.Contains(int.Parse(x))).ToArray();
+
+                if (!prevParentIds.Contains(node.ParentId))
+                {
+                    // invalid, this will be because the level is wrong (which prob means path is wrong too)
+                    report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathAndLevelByParentId));
+                    AppendNodeToFix(nodesToRebuild, node);
+                }
+                else if (pathParts.Length  == 0)
+                {
+                    // invalid path
+                    report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathEmpty));
+                    AppendNodeToFix(nodesToRebuild, node);
+                }
+                else if (pathParts.Length != node.Level)
+                {
+                    // invalid, either path or level is wrong
+                    report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathLevelMismatch));
+                    AppendNodeToFix(nodesToRebuild, node);
+                }
+                else if (pathParts[pathParts.Length - 1] != node.NodeId.ToString())
+                {
+                    // invalid path
+                    report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathById));
+                    AppendNodeToFix(nodesToRebuild, node);
+                }
+                else if (!rootIds.Contains(node.ParentId) && pathParts[pathParts.Length - 2] != node.ParentId.ToString())
+                {
+                    // invalid path
+                    report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathByParentId));
+                    AppendNodeToFix(nodesToRebuild, node);
+                }
+                else
+                {
+                    // it's valid!
+
+                    // don't track unless we are configured to fix
+                    if (options.FixIssues)
+                        validNodes.Add(node.NodeId, node);
+                }
+            }
+
+            var updated = new List<NodeDto>();
+
+            if (options.FixIssues)
+            {
+                // iterate all valid nodes to see if these are parents for invalid nodes
+                foreach (var (nodeId, node) in validNodes)
+                {
+                    if (!nodesToRebuild.TryGetValue(nodeId, out var invalidNodes)) continue;
+
+                    // now we can try to rebuild the invalid paths.
+
+                    foreach (var invalidNode in invalidNodes)
+                    {
+                        invalidNode.Level = (short)(node.Level + 1);
+                        invalidNode.Path = node.Path + "," + invalidNode.NodeId;
+                        updated.Add(invalidNode);
+                    }
+                }
+
+                foreach (var node in updated)
+                {
+                    Database.Update(node);
+                    if (report.TryGetValue(node.NodeId, out var entry))
+                        entry.Fixed = true;
+                }
+            }
+
+            return new ContentDataIntegrityReport(report);
+        }
+
+        private static void AppendNodeToFix(IDictionary<int, List<NodeDto>> nodesToRebuild, NodeDto node)
+        {
+            if (nodesToRebuild.TryGetValue(node.ParentId, out var childIds))
+                childIds.Add(node);
+            else
+                nodesToRebuild[node.ParentId] = new List<NodeDto> { node };
+        }
 
         // here, filter can be null and ordering cannot
         protected IEnumerable<TEntity> GetPage<TDto>(IQuery<TEntity> query,
@@ -770,7 +887,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected virtual string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
         {
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.EnsureUniqueNodeName", tsql => tsql
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.EnsureUniqueNodeName, tsql => tsql
                 .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text, "name"))
                 .From<NodeDto>()
                 .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId")));
@@ -783,7 +900,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected virtual int GetNewChildSortOrder(int parentId, int first)
         {
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetSortOrder", tsql =>
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetSortOrder, tsql =>
                 tsql.Select($"COALESCE(MAX(sortOrder),{first - 1})").From<NodeDto>().Where<NodeDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId") && x.NodeObjectType == NodeObjectTypeId)
             );
 
@@ -792,7 +909,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected virtual NodeDto GetParentNodeDto(int parentId)
         {
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetParentNode", tsql =>
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetParentNode, tsql =>
                 tsql.Select<NodeDto>().From<NodeDto>().Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId"))
             );
 
@@ -801,7 +918,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected virtual int GetReservedId(Guid uniqueId)
         {
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetReservedId", tsql =>
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetReservedId, tsql =>
                 tsql.Select<NodeDto>(x => x.NodeId).From<NodeDto>().Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("uniqueId") && x.NodeObjectType == Constants.ObjectTypes.IdReservation)
             );
             var id = Database.ExecuteScalar<int?>(template.Sql(new { uniqueId = uniqueId }));
