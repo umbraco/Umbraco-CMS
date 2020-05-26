@@ -59,8 +59,24 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "ht
 		StartServerOnDebug = "false"
 	EndProjectSection
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTest\", "Umbraco.Tests.AcceptanceTest\", "{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTest", "Umbraco.Tests.AcceptanceTest\", "{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}"
 	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_58896"
+		Debug.AspNetCompiler.PhysicalPath = "Umbraco.Tests.AcceptanceTest\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_58896\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_58896"
+		Release.AspNetCompiler.PhysicalPath = "Umbraco.Tests.AcceptanceTest\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_58896\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "58896"
 		SlnRelativePath = "Umbraco.Tests.AcceptanceTest\"
 	EndProjectSection
 EndProject
@@ -126,13 +142,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.UI.NetCore", "U
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.Website", "Umbraco.Web.Website\Umbraco.Web.Website.csproj", "{5A246D54-3109-4D2B-BE7D-FC0787D126AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.Integration", "Umbraco.Tests.Integration\Umbraco.Tests.Integration.csproj", "{D6319409-777A-4BD0-93ED-B2DFD805B32C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Integration", "Umbraco.Tests.Integration\Umbraco.Tests.Integration.csproj", "{D6319409-777A-4BD0-93ED-B2DFD805B32C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.Common", "Umbraco.Tests.Common\Umbraco.Tests.Common.csproj", "{A499779C-1B3B-48A8-B551-458E582E6E96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Common", "Umbraco.Tests.Common\Umbraco.Tests.Common.csproj", "{A499779C-1B3B-48A8-B551-458E582E6E96}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.UnitTests", "Umbraco.Tests.UnitTests\Umbraco.Tests.UnitTests.csproj", "{9102ABDF-E537-4E46-B525-C9ED4833EED0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.UnitTests", "Umbraco.Tests.UnitTests\Umbraco.Tests.UnitTests.csproj", "{9102ABDF-E537-4E46-B525-C9ED4833EED0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.Common", "Umbraco.Web.Common\Umbraco.Web.Common.csproj", "{79E4293D-C92C-4649-AEC8-F1EFD95BDEB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.Common", "Umbraco.Web.Common\Umbraco.Web.Common.csproj", "{79E4293D-C92C-4649-AEC8-F1EFD95BDEB1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -146,6 +162,10 @@ Global
 		{4C4C194C-B5E4-4991-8F87-4373E24CC19F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{651E1350-91B6-44B7-BD60-7207006D7003}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{651E1350-91B6-44B7-BD60-7207006D7003}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{651E1350-91B6-44B7-BD60-7207006D7003}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -174,10 +194,6 @@ Global
 		{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9102ABDF-E537-4E46-B525-C9ED4833EED0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9102ABDF-E537-4E46-B525-C9ED4833EED0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9102ABDF-E537-4E46-B525-C9ED4833EED0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9102ABDF-E537-4E46-B525-C9ED4833EED0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{33085570-9BF2-4065-A9B0-A29D920D13BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{33085570-9BF2-4065-A9B0-A29D920D13BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33085570-9BF2-4065-A9B0-A29D920D13BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -214,6 +230,10 @@ Global
 		{A499779C-1B3B-48A8-B551-458E582E6E96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A499779C-1B3B-48A8-B551-458E582E6E96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A499779C-1B3B-48A8-B551-458E582E6E96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9102ABDF-E537-4E46-B525-C9ED4833EED0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9102ABDF-E537-4E46-B525-C9ED4833EED0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9102ABDF-E537-4E46-B525-C9ED4833EED0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9102ABDF-E537-4E46-B525-C9ED4833EED0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{79E4293D-C92C-4649-AEC8-F1EFD95BDEB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{79E4293D-C92C-4649-AEC8-F1EFD95BDEB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79E4293D-C92C-4649-AEC8-F1EFD95BDEB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -224,17 +244,17 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{227C3B55-80E5-4E7E-A802-BE16C5128B9D} = {2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}
+		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{5D3B8245-ADA6-453F-A008-50ED04BFE770} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{E3F9F378-AFE1-40A5-90BD-82833375DBFE} = {227C3B55-80E5-4E7E-A802-BE16C5128B9D}
 		{5B03EF4E-E0AC-4905-861B-8C3EC1A0D458} = {227C3B55-80E5-4E7E-A802-BE16C5128B9D}
 		{53594E5B-64A2-4545-8367-E3627D266AE8} = {FD962632-184C-4005-A5F3-E705D92FC645}
 		{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{C7311C00-2184-409B-B506-52A5FAEA8736} = {FD962632-184C-4005-A5F3-E705D92FC645}
-		{9102ABDF-E537-4E46-B525-C9ED4833EED0} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{FB5676ED-7A69-492C-B802-E7B24144C0FC} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{D6319409-777A-4BD0-93ED-B2DFD805B32C} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{A499779C-1B3B-48A8-B551-458E582E6E96} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
-		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
+		{9102ABDF-E537-4E46-B525-C9ED4833EED0} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A0F2E34-D2AF-4DAB-86A0-7D7764B3D0EC}
