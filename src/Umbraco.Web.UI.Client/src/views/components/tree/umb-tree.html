@@ -38,12 +38,11 @@
         <div class="umb-tree-root" data-element="tree-root" ng-class="getNodeCssClass(group)" ng-hide="hideheader === 'true'" on-right-click="altSelect(group, $event)">
             <h5>
                 <a ng-href="#/{{section}}" ng-click="select(group, $event)" class="umb-tree-root-link umb-outline" data-element="tree-root-link">
-                    <i ng-if="enablecheckboxes === 'true'" ng-class="selectEnabledNodeClass(group)"></i>
+                    <i ng-if="enablecheckboxes === 'true'" ng-class="selectEnabledNodeClass(group)" aria-hidden="true"></i>
                     {{group.name}}
                 </a>
             </h5>
 
-            <!-- TODO: Fix "Open context node" as a label-key or something that's passed through the umb-tree controller -->
             <umb-button-ellipsis
                 element="tree-item-options"
                 action="options(group, $event)"
