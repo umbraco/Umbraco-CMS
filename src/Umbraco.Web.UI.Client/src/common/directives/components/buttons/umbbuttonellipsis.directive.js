@@ -65,7 +65,7 @@
         }
 
         function setColor() {
-            vm.color = vm.color.length ? vm.color : '#000000';
+            vm.color = vm.color ? vm.color : '#000000';
         }
     }
 
