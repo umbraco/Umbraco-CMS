@@ -1326,12 +1326,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var dto = GetDto(content, published);
             db.InsertOrUpdate(dto,
-                "SET data=@data, rv=rv+1 WHERE nodeId=@id AND published=@published",
+                "SET data=@data, rv=rv+1,archived=@archived WHERE nodeId=@id AND published=@published",
                 new
                 {
                     data = dto.Data,
                     id = dto.NodeId,
-                    published = dto.Published
+                    published = dto.Published,
+                    archived = dto.Archived
                 });
         }
 
@@ -1460,6 +1461,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 NodeId = content.Id,
                 Published = published,
+                Archived = content.HasProperty("isArchived") ? content.GetValue<bool>("isArchived") : false,
 
                 // note that numeric values (which are Int32) are serialized without their
                 // type (eg "value":1234) and JsonConvert by default deserializes them as Int64
