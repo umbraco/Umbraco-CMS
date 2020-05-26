@@ -217,10 +217,10 @@ namespace Umbraco.Web.Editors
                         //     "dashboardApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DashboardController>(
                         //         controller => controller.GetDashboard(null))
                         // },
-                        {
-                            "logApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogController>(
-                                controller => controller.GetPagedEntityLog(0, 0, 0, Direction.Ascending, null))
-                        },
+                        // {
+                        //     "logApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogController>(
+                        //         controller => controller.GetPagedEntityLog(0, 0, 0, Direction.Ascending, null))
+                        // },
                         {
                             "memberApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberController>(
                                 controller => controller.GetByKey(Guid.Empty))
@@ -317,18 +317,18 @@ namespace Umbraco.Web.Editors
                         //     "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
                         //         controller => controller.GetSupportedLocales())
                         // },
-                        {
-                            "languageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LanguageController>(
-                                controller => controller.GetAllLanguages())
-                        },
+                        // {
+                        //     "languageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LanguageController>(
+                        //         controller => controller.GetAllLanguages())
+                        // },
                         {
 						    "relationTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationTypeController>(
                                 controller => controller.GetById(1))
                         },
-						{
-                            "logViewerApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogViewerController>(
-                                controller => controller.GetNumberOfErrors(null, null))
-                        },
+						// {
+      //                       "logViewerApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogViewerController>(
+      //                           controller => controller.GetNumberOfErrors(null, null))
+      //                   },
                         // {
                         //     "webProfilingBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<WebProfilingController>(
                         //         controller => controller.GetStatus())
