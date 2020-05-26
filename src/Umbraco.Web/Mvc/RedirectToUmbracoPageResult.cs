@@ -60,13 +60,12 @@ namespace Umbraco.Web.Mvc
             {
                 if (_publishedContent != null) return _publishedContent;
 
-                if (_pageId > 0)
+                if (_pageId != default(int))
                 {
-                    //need to get the URL for the page
                     _publishedContent = Current.UmbracoContext.Content.GetById(_pageId);
                 }
 
-                if (_key != Guid.Empty)
+                else if (_key != default(Guid))
                 {
                     _publishedContent = Current.UmbracoContext.Content.GetById(_key);
                 }
