@@ -20,6 +20,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     // provides efficient database access for NuCache
     internal class DatabaseDataSource : IDataSource
     {
+        private const int PageSize = 500;
+
         // we want arrays, we want them all loaded, not an enumerable
 
         private Sql<ISqlContext> ContentSourcesSelect(IScope scope, Func<Sql<ISqlContext>, Sql<ISqlContext>> joins = null)
@@ -79,33 +81,43 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
-            return scope.Database.Query<ContentSourceDto>(sql).Select(CreateContentNodeKit);
+            // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
+            // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
+
+            foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql))
+                yield return CreateContentNodeKit(row);
         }
 
         public IEnumerable<ContentNodeKit> GetBranchContentSources(IScope scope, int id)
         {
             var syntax = scope.SqlContext.SqlSyntax;
-            var sql = ContentSourcesSelect(scope, s => s
+            var sql = ContentSourcesSelect(scope,
+                s => s.InnerJoin<NodeDto>("x").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.NodeId || SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"), aliasRight: "x"))
+                    .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
+                    .Where<NodeDto>(x => x.NodeId == id, "x")
+                    .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
-                    .InnerJoin<NodeDto>("x").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.NodeId || SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"), aliasRight: "x"))
+            // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
+            // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
-                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
-                .Where<NodeDto>(x => x.NodeId == id, "x")
-                .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
-
-            return scope.Database.Query<ContentSourceDto>(sql).Select(CreateContentNodeKit);
+            foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql))
+                yield return CreateContentNodeKit(row);
         }
 
         public IEnumerable<ContentNodeKit> GetTypeContentSources(IScope scope, IEnumerable<int> ids)
         {
-            if (!ids.Any()) return Enumerable.Empty<ContentNodeKit>();
+            if (!ids.Any()) yield break;
 
             var sql = ContentSourcesSelect(scope)
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
                 .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
-            return scope.Database.Query<ContentSourceDto>(sql).Select(CreateContentNodeKit);
+            // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
+            // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
+
+            foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql))
+                yield return CreateContentNodeKit(row);
         }
 
         private Sql<ISqlContext> MediaSourcesSelect(IScope scope, Func<Sql<ISqlContext>, Sql<ISqlContext>> joins = null)
@@ -116,11 +128,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     x => Alias(x.Level, "Level"), x => Alias(x.Path, "Path"), x => Alias(x.SortOrder, "SortOrder"), x => Alias(x.ParentId, "ParentId"),
                     x => Alias(x.CreateDate, "CreateDate"), x => Alias(x.UserId, "CreatorId"))
                 .AndSelect<ContentDto>(x => Alias(x.ContentTypeId, "ContentTypeId"))
-
                 .AndSelect<ContentVersionDto>(x => Alias(x.Id, "VersionId"), x => Alias(x.Text, "EditName"), x => Alias(x.VersionDate, "EditVersionDate"), x => Alias(x.UserId, "EditWriterId"))
-
                 .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.Data, "EditData"))
-
                 .From<NodeDto>();
 
             if (joins != null)
@@ -128,9 +137,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
             sql = sql
                 .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
-
                 .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
-
                 .LeftJoin<ContentNuDto>("nuEdit").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && !right.Published, aliasRight: "nuEdit");
 
             return sql;
@@ -152,33 +159,43 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && !x.Trashed)
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
-            return scope.Database.Query<ContentSourceDto>(sql).Select(CreateMediaNodeKit);
+            // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
+            // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
+
+            foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql))
+                yield return CreateMediaNodeKit(row);
         }
 
         public IEnumerable<ContentNodeKit> GetBranchMediaSources(IScope scope, int id)
         {
             var syntax = scope.SqlContext.SqlSyntax;
-            var sql = MediaSourcesSelect(scope, s => s
-
-                    .InnerJoin<NodeDto>("x").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.NodeId || SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"), aliasRight: "x"))
-
+            var sql = MediaSourcesSelect(scope,
+                s => s.InnerJoin<NodeDto>("x").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.NodeId || SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"), aliasRight: "x"))
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && !x.Trashed)
                 .Where<NodeDto>(x => x.NodeId == id, "x")
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
-            return scope.Database.Query<ContentSourceDto>(sql).Select(CreateMediaNodeKit);
+            // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
+            // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
+
+            foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql))
+                yield return CreateMediaNodeKit(row);
         }
 
         public IEnumerable<ContentNodeKit> GetTypeMediaSources(IScope scope, IEnumerable<int> ids)
         {
-            if (!ids.Any()) return Enumerable.Empty<ContentNodeKit>();
+            if (!ids.Any()) yield break;
 
             var sql = MediaSourcesSelect(scope)
                     .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && !x.Trashed)
                     .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
                     .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
-            return scope.Database.Query<ContentSourceDto>(sql).Select(CreateMediaNodeKit);
+            // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
+            // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
+
+            foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql))
+                yield return CreateMediaNodeKit(row);
         }
 
         private static ContentNodeKit CreateContentNodeKit(ContentSourceDto dto)
