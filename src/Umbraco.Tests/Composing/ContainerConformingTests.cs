@@ -336,14 +336,16 @@ namespace Umbraco.Tests.Composing
         public void CanRegisterMultipleSameTypeParametersWithCreateInstance()
         {
             var register = GetRegister();
-            var factory = register.CreateFactory();
-            register.Register<Thing4>(factory =>
-            {
-                var param1 = "param1";
-                var param2 = "param2";
 
-                return factory.CreateInstance<Thing4>(param1, param2);
+            register.Register<Thing4>(c =>
+            {
+                const string param1 = "param1";
+                const string param2 = "param2";
+
+                return c.CreateInstance<Thing4>(param1, param2);
             });
+
+            var factory = register.CreateFactory();
             var instance = factory.GetInstance<Thing4>();
             Assert.AreNotEqual(instance.Thing, instance.AnotherThing);
         }
