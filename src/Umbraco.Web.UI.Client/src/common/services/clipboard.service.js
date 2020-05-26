@@ -12,6 +12,9 @@
  */
 function clipboardService(notificationsService, eventsService, localStorageService, iconHelper) {
     
+
+    var clearPropertyResolvers = [];
+
     
     var STORAGE_KEY = "umbClipboardService";
     
@@ -53,42 +56,32 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         return false;
     }
 
-    function removeKeys(values) {
-        for (var i = 0; i < values.length; i++) {
-            var obj = values[i];
 
-            // Entires with this property are entries of a nested content property. And those keys we can remove.
-            if (obj.ncContentTypeAlias) {
-                delete obj.key;
-                // Loop through all properties:
-                for (var k in obj) {
-                    // if this property is an array, we need to check if there's more keys to remove.
-                    if (Array.isArray(obj[k])) {
-                        removeKeys(obj[k])
-                    }
-                }
-            }
+    function clearPropertyForStorage(prop) {
+
+        for (var i=0; i<clearPropertyResolvers.length; i++) {
+            clearPropertyResolvers[i](prop, clearPropertyForStorage);
         }
+
     }
 
-    var prepareEntryForStorage = function(entryData) {
+    var prepareEntryForStorage = function(entryData, firstLevelClearupMethod) {
 
-        var shallowCloneData = Object.assign({}, entryData);// Notice only a shallow copy, since we dont need to deep copy. (that will happen when storing the data)
-        delete shallowCloneData.key;
-        delete shallowCloneData.$$hashKey;
+        var cloneData = Utilities.copy(entryData);
+        if (firstLevelClearupMethod != undefined) {
+            firstLevelClearupMethod(cloneData);
+        }
 
         // remove keys from sub-entries
-        for (var t = 0; t < shallowCloneData.variants[0].tabs.length; t++) {
-            var tab = shallowCloneData.variants[0].tabs[t];
+        for (var t = 0; t < cloneData.variants[0].tabs.length; t++) {
+            var tab = cloneData.variants[0].tabs[t];
             for (var p = 0; p < tab.properties.length; p++) {
                 var prop = tab.properties[p];
-                if (prop.view === "nestedcontent") {
-                    removeKeys(prop.value);
-                }
+                clearPropertyForStorage(prop);
             }
         }
-        
-        return shallowCloneData;
+
+        return cloneData;
     }
 
     var isEntryCompatible = function(entry, type, allowedAliases) {
@@ -106,6 +99,21 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     
     /**
     * @ngdoc method
+    * @name umbraco.services.clipboardService#registrerPropertyClearingResolver
+    * @methodOf umbraco.services.clipboardService
+    *
+    * @param {string} function A method executed for every property and inner properties copied.
+    *
+    * @description
+    * Executed for all properties including inner properties when performing a copy action.
+    */
+   service.registrerClearPropertyResolver = function(resolver) {
+        clearPropertyResolvers.push(resolver);
+    };
+
+
+    /**
+    * @ngdoc method
     * @name umbraco.services.clipboardService#copy
     * @methodOf umbraco.services.clipboardService
     *
@@ -119,13 +127,13 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * @description
     * Saves a single JS-object with a type and alias to the clipboard.
     */
-    service.copy = function(type, alias, data, displayLabel, displayIcon, uniqueKey) {
+    service.copy = function(type, alias, data, displayLabel, displayIcon, uniqueKey, firstLevelClearupMethod) {
         
         var storage = retriveStorage();
 
         displayLabel = displayLabel || data.name;
         displayIcon = displayIcon || iconHelper.convertFromLegacyIcon(data.icon);
-        uniqueKey = uniqueKey || data.key || data.$$hashKey || console.error("missing unique key for this content");
+        uniqueKey = uniqueKey || data.key || console.error("missing unique key for this content");
         
         // remove previous copies of this entry:
         storage.entries = storage.entries.filter(
@@ -134,7 +142,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
             }
         );
         
-        var entry = {unique:uniqueKey, type:type, alias:alias, data:prepareEntryForStorage(data), label:displayLabel, icon:displayIcon};
+        var entry = {unique:uniqueKey, type:type, alias:alias, data:prepareEntryForStorage(data, firstLevelClearupMethod), label:displayLabel, icon:displayIcon};
         storage.entries.push(entry);
         
         if (saveStorage(storage) === true) {
@@ -157,16 +165,17 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * @param {string} displayLabel A string setting the label to display when showing paste entries.
     * @param {string} displayIcon A string setting the icon to display when showing paste entries.
     * @param {string} uniqueKey A string prodiving an identifier for this entry, existing entries with this key will be removed to ensure that you only have the latest copy of this data.
+    * @param {string} firstLevelClearupMethod A string prodiving an identifier for this entry, existing entries with this key will be removed to ensure that you only have the latest copy of this data.
     *
     * @description
     * Saves a single JS-object with a type and alias to the clipboard.
     */
-    service.copyArray = function(type, aliases, datas, displayLabel, displayIcon, uniqueKey) {
+    service.copyArray = function(type, aliases, datas, displayLabel, displayIcon, uniqueKey, firstLevelClearupMethod) {
         
         var storage = retriveStorage();
         
         // Clean up each entry
-        var copiedDatas = datas.map(data => prepareEntryForStorage(data));
+        var copiedDatas = datas.map(data => prepareEntryForStorage(data, firstLevelClearupMethod));
         
         // remove previous copies of this entry:
         storage.entries = storage.entries.filter(
