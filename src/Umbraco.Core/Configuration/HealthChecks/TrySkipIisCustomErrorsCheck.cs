@@ -15,9 +15,9 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
     {
         private readonly Version _iisVersion;
 
-        public TrySkipIisCustomErrorsCheck(ILocalizedTextService textService, IIOHelper ioHelper, ILogger logger,
+        public TrySkipIisCustomErrorsCheck(ILocalizedTextService textService, ILogger logger,
             IHostingEnvironment hostingEnvironment)
-            : base(textService, ioHelper, logger)
+            : base(textService, hostingEnvironment, logger)
         {
             _iisVersion = hostingEnvironment.IISVersion;
         }

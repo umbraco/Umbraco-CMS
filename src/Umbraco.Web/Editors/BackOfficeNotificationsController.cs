@@ -17,7 +17,7 @@ namespace Umbraco.Web.Editors
     /// resulting message is INotificationModel in which case it will append any Event Messages
     /// currently in the request.
     /// </summary>
-    [AppendCurrentEventMessages]
+    //[AppendCurrentEventMessages] // Moved to netcore
     [PrefixlessBodyModelValidator]
     public abstract class BackOfficeNotificationsController : UmbracoAuthorizedJsonController
     {
