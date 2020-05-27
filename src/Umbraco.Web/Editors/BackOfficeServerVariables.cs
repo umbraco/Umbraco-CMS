@@ -303,10 +303,10 @@ namespace Umbraco.Web.Editors
                             "dictionaryApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DictionaryController>(
                                 controller => controller.DeleteById(int.MaxValue))
 						},
-                        {
-                            "publishedSnapshotCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedSnapshotCacheStatusController>(
-                                controller => controller.GetStatus())
-                        },
+                        // {
+                        //     "publishedSnapshotCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedSnapshotCacheStatusController>(
+                        //         controller => controller.GetStatus())
+                        // },
                         //TODO Reintroduce
                         // {
                         //     "helpApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HelpController>(
