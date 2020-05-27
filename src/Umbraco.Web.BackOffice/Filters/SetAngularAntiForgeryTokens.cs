@@ -36,7 +36,7 @@ namespace Umbraco.Extensions
                         && context.HttpContext.Request.Cookies.TryGetValue(Constants.Web.CsrfValidationCookieName, out var csrfCookieVal))
                     {
                         //if they are not valid for some strange reason - we need to continue setting valid ones
-                        var valResult = await _antiforgery.ValidateHeadersAsync(context.HttpContext);
+                        var valResult = await _antiforgery.ValidateRequestAsync(context.HttpContext);
                         if (valResult.Success)
                         {
                             await next();
