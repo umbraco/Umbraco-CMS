@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Core;
 using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Controllers;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
+    [IsBackOffice]
     public class KeepAliveController : UmbracoApiController
     {
         [OnlyLocalRequests]
