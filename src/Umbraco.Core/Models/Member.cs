@@ -18,6 +18,7 @@ namespace Umbraco.Core.Models
         private string _username;
         private string _email;
         private string _rawPasswordValue;
+        private string _passwordConfig;
 
         /// <summary>
         /// Constructor for creating an empty Member object
@@ -157,6 +158,13 @@ namespace Umbraco.Core.Models
                     SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, nameof(RawPasswordValue));
                 }
             }
+        }
+
+        [IgnoreDataMember]
+        public string PasswordConfiguration
+        {
+            get => _passwordConfig;
+            set => SetPropertyValueAndDetectChanges(value, ref _passwordConfig, nameof(PasswordConfiguration));
         }
 
         /// <summary>
@@ -516,6 +524,6 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public bool HasAdditionalData => _additionalData != null;
+        public bool HasAdditionalData => _additionalData != null;        
     }
 }

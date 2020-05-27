@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Owin.Security.DataProtection;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
@@ -30,7 +31,7 @@ namespace Umbraco.Tests.Security
             mockDataProtectionProvider.Setup(x => x.Create(It.IsAny<string>()))
                 .Returns(new Mock<IDataProtector>().Object);
             mockPasswordConfiguration.Setup(x => x.HashAlgorithmType)
-                .Returns("HMACSHA256");
+                .Returns(Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName);
 
             var userManager = BackOfficeOwinUserManager.Create(
                 mockPasswordConfiguration.Object,

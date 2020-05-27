@@ -3,6 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Security;
+using Umbraco.Core.Serialization;
 using Umbraco.Net;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.AspNetCore;
@@ -34,6 +37,7 @@ namespace Umbraco.Extensions
                 .AddDefaultTokenProviders()
                 .AddUserStore<BackOfficeUserStore>()
                 .AddUserManager<BackOfficeUserManager>()
+                .AddSignInManager<BackOfficeSignInManager>()
                 .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>>();
 
             // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
@@ -53,15 +57,20 @@ namespace Umbraco.Extensions
             // able to configure IdentityOptions to a specific provider since there is no named options. So we have strongly typed options
             // and strongly typed ILookupNormalizer and IdentityErrorDescriber since those are 'global' and we need to be unintrusive. 
 
+            // TODO: Could move all of this to BackOfficeComposer?
+
             // Services used by identity
             services.TryAddScoped<IUserValidator<BackOfficeIdentityUser>, UserValidator<BackOfficeIdentityUser>>();
             services.TryAddScoped<IPasswordValidator<BackOfficeIdentityUser>, PasswordValidator<BackOfficeIdentityUser>>();
-            services.TryAddScoped<IPasswordHasher<BackOfficeIdentityUser>, PasswordHasher<BackOfficeIdentityUser>>();
+            services.TryAddScoped<IPasswordHasher<BackOfficeIdentityUser>>(
+                services => new BackOfficePasswordHasher(
+                    new PasswordSecurity(services.GetRequiredService<IUserPasswordConfiguration>()),
+                    services.GetRequiredService<IJsonSerializer>()));
             services.TryAddScoped<IUserConfirmation<BackOfficeIdentityUser>, DefaultUserConfirmation<BackOfficeIdentityUser>>();
             services.TryAddScoped<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>, UserClaimsPrincipalFactory<BackOfficeIdentityUser>>();
             services.TryAddScoped<UserManager<BackOfficeIdentityUser>>();
 
-            // CUSTOM:
+            // CUSTOM:            
             services.TryAddScoped<BackOfficeLookupNormalizer>();
             services.TryAddScoped<BackOfficeIdentityErrorDescriber>();
 

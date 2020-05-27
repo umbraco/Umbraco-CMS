@@ -27,6 +27,7 @@ namespace Umbraco.Tests.Common.Builders
         private string _name;
         private string _username;
         private string _rawPasswordValue;
+        private string _passwordConfig;
         private string _email;
         private int? _failedPasswordAttempts;
         private bool? _isApproved;
@@ -181,6 +182,12 @@ namespace Umbraco.Tests.Common.Builders
         {
             get => _rawPasswordValue;
             set => _rawPasswordValue = value;
+        }
+
+        string IWithLoginBuilder.PasswordConfig
+        {
+            get => _passwordConfig;
+            set => _passwordConfig = value;
         }
 
         string IWithEmailBuilder.Email

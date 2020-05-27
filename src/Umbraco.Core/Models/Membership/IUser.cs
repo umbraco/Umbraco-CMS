@@ -5,6 +5,7 @@ using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models.Membership
 {
+
     /// <summary>
     /// Defines the interface for a <see cref="User"/>
     /// </summary>

@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var guidId = dto.Id.ToGuid();
 
-            var user = new User(globalSettings, dto.Id, dto.UserName, dto.Email, dto.Login,dto.Password,
+            var user = new User(globalSettings, dto.Id, dto.UserName, dto.Email, dto.Login, dto.Password, dto.PasswordConfig,
                 dto.UserGroupDtos.Select(x => ToReadOnlyGroup(x)).ToArray(),
                 dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Content).Select(x => x.StartNode).ToArray(),
                 dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Media).Select(x => x.StartNode).ToArray());
@@ -64,6 +64,7 @@ namespace Umbraco.Core.Persistence.Factories
                 Login = entity.Username,
                 NoConsole = entity.IsLockedOut,
                 Password = entity.RawPasswordValue,
+                PasswordConfig = entity.PasswordConfiguration,                
                 UserLanguage = entity.Language,
                 UserName = entity.Name,
                 SecurityStampToken = entity.SecurityStamp,

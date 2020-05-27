@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using Umbraco.Web.BackOffice.Routing;
-using Microsoft.AspNetCore.Builder;
 
 namespace Umbraco.Extensions
 {

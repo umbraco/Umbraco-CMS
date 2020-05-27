@@ -22,6 +22,7 @@ namespace Umbraco.Core.BackOffice
         private string _name;
         private int _accessFailedCount;
         private string _passwordHash;
+        private string _passwordConfig;
         private string _culture;
         private ObservableCollection<IIdentityUserLogin> _logins;
         private Lazy<IEnumerable<IIdentityUserLogin>> _getLogins;
@@ -172,6 +173,12 @@ namespace Umbraco.Core.BackOffice
         {
             get => _passwordHash;
             set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _passwordHash, nameof(PasswordHash));
+        }
+
+        public string PasswordConfig
+        {
+            get => _passwordConfig;
+            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _passwordConfig, nameof(PasswordConfig));
         }
 
 

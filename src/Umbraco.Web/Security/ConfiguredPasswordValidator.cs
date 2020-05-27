@@ -1,20 +1,31 @@
 ﻿using Microsoft.AspNet.Identity;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Security
 {
-    /// <summary>
-    /// Ensure that both the normal password validator rules are processed along with the underlying membership provider rules
-    /// </summary>
-    public class ConfiguredPasswordValidator : PasswordValidator
+    // NOTE: Migrated to netcore (in a different way)
+    public interface IPasswordValidator
     {
-        public ConfiguredPasswordValidator(IPasswordConfiguration config)
+        Task<Attempt<IEnumerable<string>>> ValidateAsync(IPasswordConfiguration config, string password);
+    }
+
+    // NOTE: Migrated to netcore (in a different way)
+    public class ConfiguredPasswordValidator : PasswordValidator, IPasswordValidator
+    {
+        async Task<Attempt<IEnumerable<string>>> IPasswordValidator.ValidateAsync(IPasswordConfiguration passwordConfiguration, string password)
         {
-            RequiredLength = config.RequiredLength;
-            RequireNonLetterOrDigit = config.RequireNonLetterOrDigit;
-            RequireDigit = config.RequireDigit;
-            RequireLowercase = config.RequireLowercase;
-            RequireUppercase = config.RequireUppercase;
+            RequiredLength = passwordConfiguration.RequiredLength;
+            RequireNonLetterOrDigit = passwordConfiguration.RequireNonLetterOrDigit;
+            RequireDigit = passwordConfiguration.RequireDigit;
+            RequireLowercase = passwordConfiguration.RequireLowercase;
+            RequireUppercase = passwordConfiguration.RequireUppercase;
+
+            var result = await ValidateAsync(password);
+            if (result.Succeeded)
+                return Attempt<IEnumerable<string>>.Succeed();
+            return Attempt<IEnumerable<string>>.Fail(result.Errors);
         }
     }
 }

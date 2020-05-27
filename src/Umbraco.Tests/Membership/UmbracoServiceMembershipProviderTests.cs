@@ -97,7 +97,7 @@ namespace Umbraco.Tests.Membership
                         .Returns(() => createdMember);
 
             var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object, TestHelper.GetUmbracoVersion(), TestHelper.GetHostingEnvironment(), TestHelper.GetIpResolver());
-            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" }, { "hashAlgorithmType", "HMACSHA256" } });
+            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" }, { "hashAlgorithmType", Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName } });
 
 
             MembershipCreateStatus status;

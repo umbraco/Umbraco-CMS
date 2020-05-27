@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
@@ -29,12 +30,18 @@ namespace Umbraco.Web.BackOffice.Security
             options.Lockout.AllowedForNewUsers = true;
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(30);
 
-            options.Password.RequiredLength = _userPasswordConfiguration.RequiredLength;
-            options.Password.RequireNonAlphanumeric = _userPasswordConfiguration.RequireNonLetterOrDigit;
-            options.Password.RequireDigit = _userPasswordConfiguration.RequireDigit;
-            options.Password.RequireLowercase = _userPasswordConfiguration.RequireLowercase;
-            options.Password.RequireUppercase = _userPasswordConfiguration.RequireUppercase;
+            ConfigurePasswordOptions(_userPasswordConfiguration, options.Password);
+
             options.Lockout.MaxFailedAccessAttempts = _userPasswordConfiguration.MaxFailedAccessAttemptsBeforeLockout;
+        }
+
+        public static void ConfigurePasswordOptions(IPasswordConfiguration input, PasswordOptions output)
+        {
+            output.RequiredLength = input.RequiredLength;
+            output.RequireNonAlphanumeric = input.RequireNonLetterOrDigit;
+            output.RequireDigit = input.RequireDigit;
+            output.RequireLowercase = input.RequireLowercase;
+            output.RequireUppercase = input.RequireUppercase;
         }
     }
 }

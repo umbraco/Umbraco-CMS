@@ -41,10 +41,10 @@ namespace Umbraco.Core.Models.Membership
         public User(IGlobalSettings globalSettings, string name, string email, string username, string rawPasswordValue)
             : this(globalSettings)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
-            if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Value cannot be null or whitespace.", "email");
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");
-            if (string.IsNullOrEmpty(rawPasswordValue)) throw new ArgumentException("Value cannot be null or empty.", "rawPasswordValue");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
+            if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(email));
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
+            if (string.IsNullOrEmpty(rawPasswordValue)) throw new ArgumentException("Value cannot be null or empty.", nameof(rawPasswordValue));
 
             _name = name;
             _email = email;
@@ -65,25 +65,29 @@ namespace Umbraco.Core.Models.Membership
         /// <param name="email"></param>
         /// <param name="username"></param>
         /// <param name="rawPasswordValue"></param>
+        /// <param name="passwordConfig"></param>
         /// <param name="userGroups"></param>
         /// <param name="startContentIds"></param>
         /// <param name="startMediaIds"></param>
-        public User(IGlobalSettings globalSettings, int id, string name, string email, string username, string rawPasswordValue, IEnumerable<IReadOnlyUserGroup> userGroups, int[] startContentIds, int[] startMediaIds)
+        public User(IGlobalSettings globalSettings, int id, string name, string email, string username,
+            string rawPasswordValue, string passwordConfig,
+            IEnumerable<IReadOnlyUserGroup> userGroups, int[] startContentIds, int[] startMediaIds)
             : this(globalSettings)
         {
             //we allow whitespace for this value so just check null
-            if (rawPasswordValue == null) throw new ArgumentNullException("rawPasswordValue");
-            if (userGroups == null) throw new ArgumentNullException("userGroups");
-            if (startContentIds == null) throw new ArgumentNullException("startContentIds");
-            if (startMediaIds == null) throw new ArgumentNullException("startMediaIds");
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");
+            if (rawPasswordValue == null) throw new ArgumentNullException(nameof(rawPasswordValue));
+            if (userGroups == null) throw new ArgumentNullException(nameof(userGroups));
+            if (startContentIds == null) throw new ArgumentNullException(nameof(startContentIds));
+            if (startMediaIds == null) throw new ArgumentNullException(nameof(startMediaIds));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
 
             Id = id;
             _name = name;
             _email = email;
             _username = username;
             _rawPasswordValue = rawPasswordValue;
+            _passwordConfig = passwordConfig;
             _userGroups = new HashSet<IReadOnlyUserGroup>(userGroups);
             _isApproved = true;
             _isLockedOut = false;
@@ -105,6 +109,7 @@ namespace Umbraco.Core.Models.Membership
         private DateTime? _invitedDate;
         private string _email;
         private string _rawPasswordValue;
+        private string _passwordConfig;
         private IEnumerable<string> _allowedSections;
         private HashSet<IReadOnlyUserGroup> _userGroups;
         private bool _isApproved;
@@ -147,11 +152,19 @@ namespace Umbraco.Core.Models.Membership
             get => _email;
             set => SetPropertyValueAndDetectChanges(value, ref _email, nameof(Email));
         }
-        [DataMember]
+
+        [IgnoreDataMember]
         public string RawPasswordValue
         {
             get => _rawPasswordValue;
             set => SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, nameof(RawPasswordValue));
+        }
+
+        [IgnoreDataMember]
+        public string PasswordConfiguration
+        {
+            get => _passwordConfig;
+            set => SetPropertyValueAndDetectChanges(value, ref _passwordConfig, nameof(PasswordConfiguration));
         }
 
         [DataMember]

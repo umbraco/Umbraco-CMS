@@ -1,26 +1,15 @@
 ﻿using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Security;
 
-namespace Umbraco.Tests.Security
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Security
 {
     [TestFixture]
     public class PasswordSecurityTests
     {
-        [Test]
-        public void Get_Hash_Algorithm_Default()
-        {
-            var passwordSecurity = new PasswordSecurity(Mock.Of<IPasswordConfiguration>(x => x.HashAlgorithmType == "HMACSHA256"));
-            var alg = passwordSecurity.GetHashAlgorithm("blah"); // not resolved
-            Assert.IsTrue(alg is HMACSHA256);
-        }
 
         [Test]
         public void Check_Password_Hashed_Non_KeyedHashAlgorithm()
@@ -40,7 +29,7 @@ namespace Umbraco.Tests.Security
         [Test]
         public void Check_Password_Hashed_KeyedHashAlgorithm()
         {
-            var passwordSecurity = new PasswordSecurity(Mock.Of<IPasswordConfiguration>(x => x.HashAlgorithmType == "HMACSHA256"));
+            var passwordSecurity = new PasswordSecurity(Mock.Of<IPasswordConfiguration>(x => x.HashAlgorithmType == Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName));
 
             string salt;
             var pass = "ThisIsAHashedPassword";
@@ -55,7 +44,7 @@ namespace Umbraco.Tests.Security
         [Test]
         public void Format_Pass_For_Storage_Hashed()
         {
-            var passwordSecurity = new PasswordSecurity(Mock.Of<IPasswordConfiguration>(x => x.HashAlgorithmType == "HMACSHA256"));
+            var passwordSecurity = new PasswordSecurity(Mock.Of<IPasswordConfiguration>(x => x.HashAlgorithmType == Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName));
 
             var salt = PasswordSecurity.GenerateSalt();
             var stored = "ThisIsAHashedPassword";
@@ -68,7 +57,7 @@ namespace Umbraco.Tests.Security
         [Test]
         public void Get_Stored_Password_Hashed()
         {
-            var passwordSecurity = new PasswordSecurity(Mock.Of<IPasswordConfiguration>(x => x.HashAlgorithmType == "HMACSHA256"));
+            var passwordSecurity = new PasswordSecurity(Mock.Of<IPasswordConfiguration>(x => x.HashAlgorithmType == Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName));
 
             var salt = PasswordSecurity.GenerateSalt();
             var stored = salt + "ThisIsAHashedPassword";
@@ -91,9 +80,7 @@ namespace Umbraco.Tests.Security
                 var result = PasswordSecurity.GenerateSalt();
 
                 if (i > 0)
-                {
                     Assert.AreEqual(lastLength, result.Length);
-                }
 
                 lastLength = result.Length;
             }

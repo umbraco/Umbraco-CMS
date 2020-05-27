@@ -57,6 +57,7 @@ namespace Umbraco.Core.BackOffice
             target.Name = source.Name;
             target.AccessFailedCount = source.FailedPasswordAttempts;
             target.PasswordHash = GetPasswordHash(source.RawPasswordValue);
+            target.PasswordConfig = source.PasswordConfiguration;
             target.StartContentIds = source.StartContentIds;
             target.StartMediaIds = source.StartMediaIds;
             target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString(); // project CultureInfo to string

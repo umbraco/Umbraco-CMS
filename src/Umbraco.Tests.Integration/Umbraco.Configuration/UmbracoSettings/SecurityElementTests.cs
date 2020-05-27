@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Umbraco.Core;
 
 namespace Umbraco.Tests.Integration.Umbraco.Configuration.UmbracoSettings
 {
@@ -68,7 +69,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Configuration.UmbracoSettings
         [Test]
         public void UserPasswordConfiguration_HashAlgorithmType()
         {
-            Assert.IsTrue(UserPasswordConfiguration.HashAlgorithmType == "HMACSHA256");
+            Assert.IsTrue(UserPasswordConfiguration.HashAlgorithmType == Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName);
         }
 
         [Test]
@@ -110,7 +111,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Configuration.UmbracoSettings
         [Test]
         public void MemberPasswordConfiguration_HashAlgorithmType()
         {
-            Assert.IsTrue(MemberPasswordConfiguration.HashAlgorithmType == "HMACSHA256");
+            Assert.IsTrue(MemberPasswordConfiguration.HashAlgorithmType == Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName);
         }
 
         [Test]
