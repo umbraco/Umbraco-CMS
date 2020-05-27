@@ -244,7 +244,6 @@ namespace Umbraco.Core.BackOffice
             if (string.IsNullOrEmpty(passwordHash)) throw new ArgumentException("Value can't be empty.", nameof(passwordHash));
 
             user.PasswordHash = passwordHash;
-            // TODO: Need to set the user.PasswordConfig based on what the current configuration is
 
             return Task.CompletedTask;
         }
