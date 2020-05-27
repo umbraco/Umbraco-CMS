@@ -18,13 +18,12 @@ angular.module("umbraco.directives")
             link: function (scope) {
 
                 scope.showPropertyAlias = false;
-                
-                userService.getCurrentUser().then(function (u) {
-                    var hasAccessToSettings = u.allowedSections.indexOf("settings") !== -1 ? true : false;
-
-                    scope.showPropertyAlias = (hasAccessToSettings && Umbraco.Sys.ServerVariables.isDebuggingEnabled)
-                    
-                });
+                if(Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
+                    userService.getCurrentUser().then(function (u) {
+                        var hasAccessToSettings = u.allowedSections.indexOf("settings") !== -1 ? true : false;
+                        scope.showPropertyAlias = hasAccessToSettings;
+                    });
+                }
             },
             //Define a controller for this directive to expose APIs to other directives
             controller: function ($scope) {

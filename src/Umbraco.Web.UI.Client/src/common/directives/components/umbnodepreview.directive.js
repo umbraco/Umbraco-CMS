@@ -104,12 +104,12 @@
             }
 
             scope.showNodeAlias = false;
-
-            userService.getCurrentUser().then(function (u) {
-                var hasAccessToSettings = u.allowedSections.indexOf("settings") !== -1 ? true : false;
-                
-                scope.showNodeAlias = (hasAccessToSettings && Umbraco.Sys.ServerVariables.isDebuggingEnabled);
-            });
+            if(Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
+                userService.getCurrentUser().then(function (u) {
+                    var hasAccessToSettings = u.allowedSections.indexOf("settings") !== -1 ? true : false;
+                    scope.showNodeAlias = (hasAccessToSettings;
+                });
+            }
         }
 
         var directive = {
