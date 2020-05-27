@@ -3,7 +3,6 @@
 var config = require('../config');
 var gulp = require('gulp');
 
-var _ = require('lodash');
 var MergeStream = require('merge-stream');
 
 var processJs = require('../util/processJs');
@@ -20,13 +19,12 @@ function js() {
         gulp.src(config.sources.globs.js).pipe( gulp.dest(config.root + config.targets.js) )
     );
 
-    _.forEach(config.sources.js, function (group) {
-        stream.add(
-            processJs(group.files, group.out)
-        );
+    Object.keys(config.sources.js).forEach(key => {
+        const groupItem = config.sources.js[key];
+        stream.add(processJs(groupItem.files, groupItem.out));
     });
 
-     return stream;
+    return stream;
 };
 
 module.exports = { js: js };

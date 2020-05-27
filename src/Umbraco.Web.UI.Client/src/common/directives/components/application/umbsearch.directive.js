@@ -94,22 +94,22 @@
                 var allGroups = _.values(vm.searchResults);
                 var down = event.keyCode === 40;
                 if (vm.activeResultGroup === null) {
-                    // it's the first time navigating, pick the appropriate group and result 
+                    // it's the first time navigating, pick the appropriate group and result
                     // - first group and first result when navigating down
                     // - last group and last result when navigating up
-                    vm.activeResultGroup = down ? _.first(allGroups) : _.last(allGroups);
-                    vm.activeResult = down ? _.first(vm.activeResultGroup.results) : _.last(vm.activeResultGroup.results);
+                    vm.activeResultGroup = down ? allGroups[0] : allGroups[allGroups.length - 1];
+                    vm.activeResult = down ? vm.activeResultGroup.results[0] : vm.activeResultGroup.results[vm.activeResultGroup.results.length - 1];
                 }
                 else if (down) {
                     // handle navigation down through the groups and results
-                    if (vm.activeResult === _.last(vm.activeResultGroup.results)) {
-                        if (vm.activeResultGroup === _.last(allGroups)) {
-                            vm.activeResultGroup = _.first(allGroups);
+                    if (vm.activeResult === vm.activeResultGroup.results[vm.activeResultGroup.results.length - 1]) {
+                        if (vm.activeResultGroup === allGroups[allGroups.length - 1]) {
+                            vm.activeResultGroup = allGroups[0];
                         }
                         else {
                             vm.activeResultGroup = allGroups[allGroups.indexOf(vm.activeResultGroup) + 1];
                         }
-                        vm.activeResult = _.first(vm.activeResultGroup.results);
+                        vm.activeResult = vm.activeResultGroup.results[0];
                     }
                     else {
                         vm.activeResult = vm.activeResultGroup.results[vm.activeResultGroup.results.indexOf(vm.activeResult) + 1];
@@ -117,14 +117,14 @@
                 }
                 else {
                     // handle navigation up through the groups and results
-                    if (vm.activeResult === _.first(vm.activeResultGroup.results)) {
-                        if (vm.activeResultGroup === _.first(allGroups)) {
-                            vm.activeResultGroup = _.last(allGroups);
+                    if (vm.activeResult === vm.activeResultGroup.results[0]) {
+                        if (vm.activeResultGroup === allGroups[0]) {
+                            vm.activeResultGroup = allGroups[allGroups.length - 1];
                         }
                         else {
                             vm.activeResultGroup = allGroups[allGroups.indexOf(vm.activeResultGroup) - 1];
                         }
-                        vm.activeResult = _.last(vm.activeResultGroup.results);
+                        vm.activeResult = vm.activeResultGroup.results[vm.activeResultGroup.results.length - 1];
                     }
                     else {
                         vm.activeResult = vm.activeResultGroup.results[vm.activeResultGroup.results.indexOf(vm.activeResult) - 1];
