@@ -103,7 +103,7 @@
                 scope.editLabelKey = "general_edit";
             }
 
-            scope.nodeNameTitle = "";
+            scope.nodeNameTitle = null;
             if(Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
                 userService.getCurrentUser().then(function (u) {
                     if (u.allowedSections.indexOf("settings") !== -1 ? true : false) {

@@ -17,7 +17,7 @@ angular.module("umbraco.directives")
             templateUrl: 'views/components/property/umb-property.html',
             link: function (scope) {
 
-                scope.controlLabelTitle = "";
+                scope.controlLabelTitle = null;
                 if(Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
                     userService.getCurrentUser().then(function (u) {
                         if(u.allowedSections.indexOf("settings") !== -1 ? true : false) {
