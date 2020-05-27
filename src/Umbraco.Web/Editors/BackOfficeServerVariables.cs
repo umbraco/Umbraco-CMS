@@ -225,14 +225,14 @@ namespace Umbraco.Web.Editors
                             "memberApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberController>(
                                 controller => controller.GetByKey(Guid.Empty))
                         },
-                        {
-                            "packageInstallApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageInstallController>(
-                                controller => controller.Fetch(string.Empty))
-                        },
-                        {
-                            "packageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageController>(
-                                controller => controller.GetCreatedPackages())
-                        },
+                        // {
+                        //     "packageInstallApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageInstallController>(
+                        //         controller => controller.Fetch(string.Empty))
+                        // },
+                        // {
+                        //     "packageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageController>(
+                        //         controller => controller.GetCreatedPackages())
+                        // },
                         {
                             "relationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationController>(
                                 controller => controller.GetById(0))
