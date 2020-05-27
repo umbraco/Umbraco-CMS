@@ -92,33 +92,6 @@
             vm.labels.addTemplate = values[13];
             vm.labels.allowCultureVariants = values[14];
 
-            var buttons = [
-                {
-                    "name": vm.labels.design,
-                    "alias": "design",
-                    "icon": "icon-document-dashed-line",
-                    "view": "views/documenttypes/views/design/design.html"
-                },
-                {
-                    "name": vm.labels.listview,
-                    "alias": "listView",
-                    "icon": "icon-list",
-                    "view": "views/documenttypes/views/listview/listview.html"
-                },
-                {
-                    "name": vm.labels.permissions,
-                    "alias": "permissions",
-                    "icon": "icon-keychain",
-                    "view": "views/documenttypes/views/permissions/permissions.html"
-                },
-                {
-                    "name": vm.labels.templates,
-                    "alias": "templates",
-                    "icon": "icon-layout",
-                    "view": "views/documenttypes/views/templates/templates.html"
-                }
-            ];
-
             vm.page.keyboardShortcutsOverview = [
                 {
                     "name": vm.labels.sections,
@@ -187,9 +160,6 @@
                     ]
                 }
             ];
-
-            loadButtons(buttons);
-
         });
 
         contentTypeHelper.checkModelsBuilderStatus().then(function (result) {
@@ -286,18 +256,16 @@
             });
         }
 
-        function loadButtons(buttons) {
-
-            angular.forEach(buttons,
+        function loadButtons() {
+			vm.page.navigation = vm.contentType.apps;
+			
+			angular.forEach(vm.contentType.apps,
                 function (val, index) {
-
                     if (disableTemplates === true && val.alias === "templates") {
-                        buttons.splice(index, 1);
+                        vm.page.navigation.splice(index, 1);
                     }
-
                 });
-
-            vm.page.navigation = buttons;
+			
             initializeActiveNavigationPanel();
         }
 
@@ -307,17 +275,15 @@
             var initialViewSetFromRouteParams = false;
             var view = $routeParams.view;
             if (view) {
-                var viewPath = "views/documenttypes/views/" + view + "/" + view + ".html";
                 for (var i = 0; i < vm.page.navigation.length; i++) {
-                    if (vm.page.navigation[i].view === viewPath) {
+                    if (vm.page.navigation[i].alias.toLowerCase() === view.toLowerCase()) {
                         vm.page.navigation[i].active = true;
                         initialViewSetFromRouteParams = true;
                         break;
                     }
                 }
             }
-
-            if (initialViewSetFromRouteParams === false) {
+			if (initialViewSetFromRouteParams === false) {
                 vm.page.navigation[0].active = true;
             }
         }
@@ -446,10 +412,12 @@
             // convert icons for content type
             convertLegacyIcons(contentType);
 
-            //set a shared state
-            editorState.set(contentType);
-
             vm.contentType = contentType;
+
+			//set a shared state
+            editorState.set(vm.contentType);
+			
+			loadButtons();
         }
 
         /** Syncs the template alias for new doc types before saving if a template is to be created */
@@ -536,7 +504,7 @@
         evts.push(eventsService.on("editors.groupsBuilder.changed", function(name, args) {
             angularHelper.getCurrentForm($scope).$setDirty();
         }));
-
+		
         //ensure to unregister from all events!
         $scope.$on('$destroy', function () {
             for (var e in evts) {

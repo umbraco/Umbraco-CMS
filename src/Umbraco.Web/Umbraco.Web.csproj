@@ -134,6 +134,10 @@
     <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
+    <Compile Include="ContentApps\ContentTypeTemplatesContentAppFactory.cs" />
+    <Compile Include="ContentApps\ContentTypePermissionsContentAppFactory.cs" />
+    <Compile Include="ContentApps\ContentTypeListViewContentAppFactory.cs" />
+    <Compile Include="ContentApps\ContentTypeDesignContentAppFactory.cs" />
     <Compile Include="ContentApps\ListViewContentAppFactory.cs" />
     <Compile Include="Dashboards\ContentDashboard.cs" />
     <Compile Include="Dashboards\DashboardCollection.cs" />
