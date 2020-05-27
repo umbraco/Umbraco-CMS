@@ -17,11 +17,12 @@ angular.module("umbraco.directives")
             templateUrl: 'views/components/property/umb-property.html',
             link: function (scope) {
 
-                scope.showPropertyAlias = false;
+                scope.controlLabelTitle = "";
                 if(Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
                     userService.getCurrentUser().then(function (u) {
-                        var hasAccessToSettings = u.allowedSections.indexOf("settings") !== -1 ? true : false;
-                        scope.showPropertyAlias = hasAccessToSettings;
+                        if(u.allowedSections.indexOf("settings") !== -1 ? true : false) {
+                            scope.controlLabelTitle = scope.property.alias;
+                        }
                     });
                 }
             },

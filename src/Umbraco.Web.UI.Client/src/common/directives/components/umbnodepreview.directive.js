@@ -103,11 +103,12 @@
                 scope.editLabelKey = "general_edit";
             }
 
-            scope.showNodeAlias = false;
+            scope.nodeNameTitle = "";
             if(Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
                 userService.getCurrentUser().then(function (u) {
-                    var hasAccessToSettings = u.allowedSections.indexOf("settings") !== -1 ? true : false;
-                    scope.showNodeAlias = (hasAccessToSettings;
+                    if (u.allowedSections.indexOf("settings") !== -1 ? true : false) {
+                        scope.nodeNameTitle = scope.alias;
+                    }
                 });
             }
         }
