@@ -37,6 +37,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IGlobalSettings _globalSettings;
 
         // TODO: We need to import the logic from Umbraco.Web.Editors.AuthenticationController
+        // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
 
         public AuthenticationController(
             IUmbracoContextAccessor umbracoContextAccessor,
@@ -84,12 +85,8 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (result.Succeeded)
             {
-                // get the user
-                var user = _userService.GetByUsername(loginModel.Username);
-                _userManager.RaiseLoginSuccessEvent(User, user.Id);
-
-                // TODO: This is not correct, no user will be set :/ 
-                return SetPrincipalAndReturnUserDetail(user, HttpContext.User);
+                // return the user detail
+                return GetUserDetail(_userService.GetByUsername(loginModel.Username));
             }
 
             if (result.RequiresTwoFactor)
@@ -140,22 +137,18 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         /// <summary>
-        /// This is used when the user is auth'd successfully and we need to return an OK with user details along with setting the current Principal in the request
+        /// Return the <see cref="UserDetail"/> for the given <see cref="IUser"/>
         /// </summary>
         /// <param name="user"></param>
         /// <param name="principal"></param>
         /// <returns></returns>
-        private UserDetail SetPrincipalAndReturnUserDetail(IUser user, ClaimsPrincipal principal)
+        private UserDetail GetUserDetail(IUser user)
         {
-            if (user == null) throw new ArgumentNullException("user");
-            if (principal == null) throw new ArgumentNullException(nameof(principal));
+            if (user == null) throw new ArgumentNullException(nameof(user));
 
             var userDetail = _umbracoMapper.Map<UserDetail>(user);
             // update the userDetail and set their remaining seconds
             userDetail.SecondsUntilTimeout = TimeSpan.FromMinutes(_globalSettings.TimeOutInMinutes).TotalSeconds;
-
-            // ensure the user is set for the current request
-            HttpContext.SetPrincipalForRequest(principal);
 
             return userDetail;
         }

@@ -362,8 +362,16 @@ namespace Umbraco.Core.BackOffice
             var currentUserId = umbIdentity?.GetUserId<int?>() ?? Constants.Security.SuperUserId;            
             var ip = IpResolver.GetCurrentRequestIpAddress();
             return new IdentityAuditEventArgs(auditEvent, ip, currentUserId, string.Empty, affectedUserId, affectedUsername);
-    }
+        }
+        private IdentityAuditEventArgs CreateArgs(AuditEvent auditEvent, BackOfficeIdentityUser currentUser, int affectedUserId, string affectedUsername)
+        {
+            var currentUserId = currentUser.Id;
+            var ip = IpResolver.GetCurrentRequestIpAddress();
+            return new IdentityAuditEventArgs(auditEvent, ip, currentUserId, string.Empty, affectedUserId, affectedUsername);
+        }
 
+        // TODO: Review where these are raised and see if they can be simplified and either done in the this usermanager or the signin manager, lastly we'll resort to the authenticaiton controller
+        // In some cases it will be nicer/easier to not pass in IPrincipal
         public void RaiseAccountLockedEvent(IPrincipal currentUser, int userId) => OnAccountLocked(CreateArgs(AuditEvent.AccountLocked, currentUser, userId, string.Empty));
 
         public void RaiseAccountUnlockedEvent(IPrincipal currentUser, int userId) => OnAccountUnlocked(CreateArgs(AuditEvent.AccountUnlocked, currentUser, userId, string.Empty));
@@ -378,7 +386,7 @@ namespace Umbraco.Core.BackOffice
 
         public void RaiseLoginRequiresVerificationEvent(IPrincipal currentUser, int userId) => OnLoginRequiresVerification(CreateArgs(AuditEvent.LoginRequiresVerification, currentUser, userId, string.Empty));
 
-        public void RaiseLoginSuccessEvent(IPrincipal currentUser, int userId) => OnLoginSuccess(CreateArgs(AuditEvent.LoginSucces, currentUser, userId, string.Empty));
+        public void RaiseLoginSuccessEvent(BackOfficeIdentityUser currentUser, int userId) => OnLoginSuccess(CreateArgs(AuditEvent.LoginSucces, currentUser, userId, string.Empty));
 
         public void RaiseLogoutSuccessEvent(IPrincipal currentUser, int userId) => OnLogoutSuccess(CreateArgs(AuditEvent.LogoutSuccess, currentUser, userId, string.Empty));
 

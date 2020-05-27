@@ -335,7 +335,6 @@ namespace Umbraco.Web.Editors
             var user = Services.UserService.GetByUsername(userName);
             if (result.Succeeded)
             {
-                UserManager.RaiseLoginSuccessEvent(User, user.Id);
                 return SetPrincipalAndReturnUserDetail(user, owinContext.Request.User);
             }
 
@@ -438,12 +437,7 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        /// <summary>
-        /// This is used when the user is auth'd successfully and we need to return an OK with user details along with setting the current Principal in the request
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="principal"></param>
-        /// <returns></returns>
+        // NOTE: This has been migrated to netcore, but in netcore we don't explicitly set the principal in this method, that's done in ConfigureUmbracoBackOfficeCookieOptions so don't worry about that
         private HttpResponseMessage SetPrincipalAndReturnUserDetail(IUser user, IPrincipal principal)
         {
             if (user == null) throw new ArgumentNullException("user");

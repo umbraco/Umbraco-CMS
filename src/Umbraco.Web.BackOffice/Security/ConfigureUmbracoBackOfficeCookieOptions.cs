@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
@@ -73,6 +74,17 @@ namespace Umbraco.Web.BackOffice.Security
                 _globalSettings,
                 _requestCache);
             // _explicitPaths); TODO: Implement this once we do OAuth somehow
+
+
+            options.Events = new CookieAuthenticationEvents
+            {
+                OnSignedIn = ctx =>
+                {
+                    // When we are signed in with the cookie, assign the principal to the current HttpContext
+                    ctx.HttpContext.User = ctx.Principal;
+                    return Task.CompletedTask;
+                }
+            };
         }
 
         public void Configure(CookieAuthenticationOptions options)

@@ -13,6 +13,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.WebAssets;
 using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Features;
 using Umbraco.Web.Models;
 using Umbraco.Web.WebApi;
@@ -59,14 +60,13 @@ namespace Umbraco.Extensions
         /// Used to render the script that will pass in the angular "externalLoginInfo" service/value on page load
         /// </summary>
         /// <param name="html"></param>
-        /// <param name="externalLoginErrors"></param>
+        /// <param name="signInManager"></param>
         /// <returns></returns>
         public static async Task<IHtmlContent> AngularValueExternalLoginInfoScriptAsync(this IHtmlHelper html,
-            IAuthenticationSchemeProvider authenticationSchemeProvider,
+            BackOfficeSignInManager signInManager,
             IEnumerable<string> externalLoginErrors)
         {
-            //TODO: I think this should be: _signInManager.GetExternalAuthenticationSchemesAsync() or however that works
-            var providers = await authenticationSchemeProvider.GetAllSchemesAsync();
+            var providers = await signInManager.GetExternalAuthenticationSchemesAsync();
 
             var loginProviders = providers
                 // TODO: We need to filter only back office enabled schemes.

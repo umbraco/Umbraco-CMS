@@ -18,6 +18,7 @@ using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.ActionResults;
+using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models;
 using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
@@ -25,7 +26,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.BackOffice.Controllers
 {
 
-    [Area(Constants.Web.Mvc.BackOfficeArea)]
+    [PluginController(Constants.Web.Mvc.BackOfficeArea)]
     public class BackOfficeController : Controller
     {
         private readonly BackOfficeUserManager _userManager;

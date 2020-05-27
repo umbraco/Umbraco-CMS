@@ -21,6 +21,12 @@ namespace Umbraco.Extensions
         public static void AddUmbracoBackOffice(this IServiceCollection services)
         {
             services.AddAntiforgery();
+
+            services
+                .AddAuthentication(Constants.Security.BackOfficeAuthenticationType)
+                .AddCookie(Constants.Security.BackOfficeAuthenticationType);
+
+            services.ConfigureOptions<ConfigureUmbracoBackOfficeCookieOptions>();
         }
 
         /// <summary>
@@ -42,12 +48,7 @@ namespace Umbraco.Extensions
 
             // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
             services.ConfigureOptions<ConfigureUmbracoBackOfficeIdentityOptions>();
-            //services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<BackOfficeIdentityUser>>();
-
-            services
-                .AddAuthentication(Constants.Security.BackOfficeAuthenticationType)
-                .AddCookie(Constants.Security.BackOfficeAuthenticationType);
-            services.ConfigureOptions<ConfigureUmbracoBackOfficeCookieOptions>();
+            //services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<BackOfficeIdentityUser>>();            
         }
 
         private static IdentityBuilder BuildUmbracoBackOfficeIdentity(this IServiceCollection services)

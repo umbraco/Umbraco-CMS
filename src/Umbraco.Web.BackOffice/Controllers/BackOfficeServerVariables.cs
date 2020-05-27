@@ -400,9 +400,9 @@ namespace Umbraco.Web.BackOffice.Controllers
                     "externalLogins", new Dictionary<string, object>
                     {
                         {
-                            //TODO: I think this should be: _signInManager.GetExternalAuthenticationSchemesAsync() or however that works
-
                             "providers", (await _authenticationSchemeProvider.GetAllSchemesAsync())
+                                // Filter only external providers
+                                .Where(x => !x.DisplayName.IsNullOrWhiteSpace())
                                 // TODO: We need to filter only back office enabled schemes.
                                 // Before we used to have a property bag to check, now we don't so need to investigate the easiest/best
                                 // way to do this. We have the type so maybe we check for a marker interface, but maybe there's another way,

@@ -2,14 +2,14 @@
 @using Umbraco.Web.Composing
 @using Umbraco.Web
 @using Umbraco.Web.WebAssets
+@using Umbraco.Web.BackOffice.Security
 @using Umbraco.Core.WebAssets
 @using Umbraco.Core.Configuration
 @using Umbraco.Core.Hosting
 @using Umbraco.Extensions
 @using Umbraco.Core.Logging
 @using Umbraco.Web.BackOffice.Controllers
-@using Microsoft.AspNetCore.Authentication
-@inject IAuthenticationSchemeProvider authenticationSchemeProvider
+@inject BackOfficeSignInManager signInManager
 @inject BackOfficeServerVariables backOfficeServerVariables
 @inject IUmbracoVersion umbracoVersion
 @inject IHostingEnvironment hostingEnvironment
@@ -111,7 +111,7 @@
     <script>
 
         document.angularReady = function(app) {
-            @await Html.AngularValueExternalLoginInfoScriptAsync(authenticationSchemeProvider, ViewData.GetExternalSignInError())
+            @await Html.AngularValueExternalLoginInfoScriptAsync(signInManager, ViewData.GetExternalSignInError())
             @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
             @await Html.AngularValueTinyMceAssetsAsync(runtimeMinifier)
 
@@ -119,7 +119,7 @@
             document.getElementById("mainwrapper").style.display = "inherit";
         }
     </script>
-    
+
     <script src="lib/lazyload-js/lazyload.min.js"></script>
     <script src="@Url.GetUrlWithCacheBust("Application", "BackOffice", null, hostingEnvironment, umbracoVersion, runtimeMinifier)"></script>
 
