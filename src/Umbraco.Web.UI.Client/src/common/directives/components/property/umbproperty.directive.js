@@ -16,14 +16,14 @@ angular.module("umbraco.directives")
             replace: true,
             templateUrl: 'views/components/property/umb-property.html',
             link: function (scope) {
+
+                scope.showPropertyAlias = false;
+                
                 userService.getCurrentUser().then(function (u) {
                     var hasAccessToSettings = u.allowedSections.indexOf("settings") !== -1 ? true : false;
+
+                    scope.showPropertyAlias = (hasAccessToSettings && Umbraco.Sys.ServerVariables.isDebuggingEnabled)
                     
-                    // creating local propertyAlias to avoid changing the value of the referenced scope.alias.
-                    scope.propertyAlias = null;
-                    if(hasAccessToSettings && Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
-                        scope.propertyAlias = scope.property.alias;
-                    }
                 });
             },
             //Define a controller for this directive to expose APIs to other directives

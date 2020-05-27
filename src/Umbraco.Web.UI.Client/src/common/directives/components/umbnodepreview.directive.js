@@ -102,14 +102,13 @@
             if (!scope.editLabelKey) {
                 scope.editLabelKey = "general_edit";
             }
+
+            scope.showNodeAlias = false;
+
             userService.getCurrentUser().then(function (u) {
                 var hasAccessToSettings = u.allowedSections.indexOf("settings") !== -1 ? true : false;
                 
-                // creating local nodeAliasDisplay to avoid changing the value of the referenced scope.alias.
-                scope.nodeAliasDisplay = null;
-                if(hasAccessToSettings && Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
-                    scope.nodeAliasDisplay = scope.alias;
-                }
+                scope.showNodeAlias = (hasAccessToSettings && Umbraco.Sys.ServerVariables.isDebuggingEnabled);
             });
         }
 
