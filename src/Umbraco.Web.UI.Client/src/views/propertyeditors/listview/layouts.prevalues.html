@@ -29,12 +29,12 @@
          </div>
 
          <div>
-           <umb-checkbox ng-if="layout.isSystem === 1" model="layout.selected" /> 
+           <umb-checkbox ng-if="layout.isSystem === 1" model="layout.selected" />
             <div class="list-view-layout__remove" ng-if="layout.isSystem !== 1">
-                <i class="icon-trash" ng-click="vm.showPrompt(layout)"></i>
                 <umb-confirm-action
-                    ng-if="layout.deletePrompt"
+                    show="layout.deletePrompt"
                     direction="left"
+                    on-delete="vm.showPrompt(layout)"
                     on-confirm="vm.removeLayout($index, layout)"
                     on-cancel="vm.hidePrompt(layout)">
                 </umb-confirm-action>
