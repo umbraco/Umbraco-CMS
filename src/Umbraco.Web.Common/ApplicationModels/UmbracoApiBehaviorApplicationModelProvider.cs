@@ -69,6 +69,8 @@ namespace Umbraco.Web.Common.ApplicationModels
                 if (!IsUmbracoApiController(controller))
                     continue;
 
+
+
                 foreach (var action in controller.Actions)
                 {
                     foreach (var convention in ActionModelConventions)

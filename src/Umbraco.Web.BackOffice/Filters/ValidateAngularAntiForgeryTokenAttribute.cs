@@ -109,7 +109,6 @@ namespace Umbraco.Web.BackOffice.Filters
                 _logger.Error<ValidateAntiForgeryTokenAttribute>(ex, "Could not validate XSRF token");
                 return false;
             }
-            return true;
         }
     }
 }

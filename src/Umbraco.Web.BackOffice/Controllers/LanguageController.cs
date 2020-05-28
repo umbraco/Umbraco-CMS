@@ -9,6 +9,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.Validation;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
@@ -20,6 +21,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// Backoffice controller supporting the dashboard for language administration.
     /// </summary>
     [PluginController("UmbracoApi")]
+    //[PrefixlessBodyModelValidator]
     public class LanguageController : UmbracoAuthorizedJsonController
     {
         private readonly ILocalizationService _localizationService;

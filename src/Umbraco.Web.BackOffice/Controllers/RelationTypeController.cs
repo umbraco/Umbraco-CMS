@@ -108,7 +108,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="relationType">The relation type to create.</param>
         /// <returns>A <see cref="HttpResponseMessage"/> containing the persisted relation type's ID.</returns>
-        public IActionResult PostCreate(RelationTypeSave relationType)
+        public int PostCreate(RelationTypeSave relationType)
         {
             var relationTypePersisted = new RelationType(relationType.Name, relationType.Name.ToSafeAlias(_shortStringHelper, true), relationType.IsBidirectional, relationType.ChildObjectType, relationType.ParentObjectType);
 
@@ -116,7 +116,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 _relationService.Save(relationTypePersisted);
 
-                return Ok(relationTypePersisted.Id);
+                return relationTypePersisted.Id;
             }
             catch (Exception ex)
             {

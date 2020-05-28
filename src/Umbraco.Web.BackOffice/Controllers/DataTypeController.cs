@@ -8,8 +8,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.WebApi.Filters;
-using System.Net.Http;
 using System.Text;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Mapping;
@@ -18,10 +16,10 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
+using Umbraco.Web.Editors;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
-
     /// <summary>
     /// The API controller used for editing data types
     /// </summary>
@@ -68,7 +66,6 @@ namespace Umbraco.Web.Editors
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
          }
 
-
         /// <summary>
         /// Gets data type by name
         /// </summary>
@@ -85,6 +82,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
         public DataTypeDisplay GetById(int id)
         {
             var dataType = _dataTypeService.GetDataType(id);
@@ -100,6 +98,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
         public DataTypeDisplay GetById(Guid id)
         {
             var dataType = _dataTypeService.GetDataType(id);
@@ -115,6 +114,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
         public DataTypeDisplay GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
@@ -265,7 +265,7 @@ namespace Umbraco.Web.Editors
         /// <param name="dataType"></param>
         /// <returns></returns>
         [TypeFilter(typeof(DataTypeValidateAttribute))]
-        public IActionResult PostSave(DataTypeSave dataType)
+        public ActionResult<DataTypeDisplay> PostSave(DataTypeSave dataType)
         {
             //If we've made it here, then everything has been wired up and validated by the attribute
 
@@ -297,7 +297,7 @@ namespace Umbraco.Web.Editors
             // map back to display model, and return
             var display = _umbracoMapper.Map<IDataType, DataTypeDisplay>(dataType.PersistedDataType);
             display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles/dataTypeSaved"), "");
-            return Ok(display);
+            return display;
         }
 
         /// <summary>
