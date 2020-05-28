@@ -96,7 +96,7 @@
                 
                 var elemTypeSelectorOverlay = {
                     view: "itempicker",
-                    title: localizedlocalized[0],
+                    title: localized[0],
                     availableItems: availableItems,
                     selectedItems: selectedItems,
                     createNewItem: {
@@ -105,7 +105,7 @@
                             vm.createElementTypeAndAdd(vm.addBlockFromElementTypeAlias);
                         },
                         icon: "icon-add",
-                        name: localizedlocalized[1]
+                        name: localized[1]
                     },
                     position: "target",
                     event: $event,
