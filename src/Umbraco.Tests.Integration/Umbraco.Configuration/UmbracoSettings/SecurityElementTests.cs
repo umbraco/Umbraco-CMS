@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Configuration.UmbracoSettings
         [Test]
         public void UserPasswordConfiguration_HashAlgorithmType()
         {
-            Assert.IsTrue(UserPasswordConfiguration.HashAlgorithmType == Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName);
+            Assert.AreEqual(Constants.Security.AspNetCoreV3PasswordHashAlgorithmName, UserPasswordConfiguration.HashAlgorithmType);
         }
 
         [Test]
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Configuration.UmbracoSettings
         [Test]
         public void MemberPasswordConfiguration_HashAlgorithmType()
         {
-            Assert.IsTrue(MemberPasswordConfiguration.HashAlgorithmType == Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName);
+            Assert.AreEqual(Constants.Security.AspNetCoreV3PasswordHashAlgorithmName, MemberPasswordConfiguration.HashAlgorithmType);
         }
 
         [Test]
