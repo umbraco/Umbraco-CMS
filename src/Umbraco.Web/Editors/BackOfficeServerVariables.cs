@@ -257,10 +257,10 @@ namespace Umbraco.Web.Editors
                             "updateCheckApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<UpdateCheckController>(
                                 controller => controller.GetCheck())
                         },
-                        {
-                            "templateApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TemplateController>(
-                                controller => controller.GetById(0))
-                        },
+                        // {
+                        //     "templateApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TemplateController>(
+                        //         controller => controller.GetById(0))
+                        // },
                         {
                             "memberTreeBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberTreeController>(
                                 controller => controller.GetNodes("-1", null))
