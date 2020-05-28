@@ -663,7 +663,7 @@
     <key alias="icon">Ikon</key>
     <key alias="id">Id</key>
     <key alias="import">Importer</key>
-    <key alias="excludeFromSubFolders">Søg kun i denne mappe</key>
+    <key alias="searchOnlyThisFolder">Søg kun i denne mappe</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Indre margen</key>
     <key alias="insert">Indsæt</key>

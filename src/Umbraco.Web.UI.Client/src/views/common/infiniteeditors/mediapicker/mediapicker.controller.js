@@ -40,7 +40,7 @@ angular.module("umbraco")
             $scope.allowMediaEdit = dialogOptions.allowMediaEdit ? dialogOptions.allowMediaEdit : false;
 
             $scope.filterOptions = {
-                excludeSubFolders: umbSessionStorage.get("mediaPickerExcludeSubFolders") || false
+                searchOnlyThisFolder: umbSessionStorage.get("mediaPickerSearchOnlyThisFolder") || false
             };
 
             var userStartNodes = [];
@@ -395,7 +395,7 @@ angular.module("umbraco")
             }
 
             function toggle() {
-                umbSessionStorage.set("mediaPickerExcludeSubFolders", $scope.filterOptions.excludeSubFolders);
+                umbSessionStorage.set("mediaPickerSearchOnlyThisFolder", $scope.filterOptions.searchOnlyThisFolder);
                 // Make sure to activate the changeSearch function everytime the toggle is clicked
                 changeSearch();
             }
@@ -408,7 +408,7 @@ angular.module("umbraco")
 
             function searchMedia() {
                 vm.loading = true;
-                entityResource.getPagedDescendants($scope.filterOptions.excludeSubFolders ? $scope.currentFolder.id : $scope.startNodeId, "Media", vm.searchOptions)
+                entityResource.getPagedDescendants($scope.filterOptions.searchOnlyThisFolder ? $scope.currentFolder.id : $scope.startNodeId, "Media", vm.searchOptions)
                     .then(function (data) {
                         // update image data to work with image grid
                         if (data.items) {
