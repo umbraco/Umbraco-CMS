@@ -71,17 +71,23 @@ The prompt can be opened in four direction up, down, left or right.</p>
 
     function link(scope, el, attr, ctrl) {
 
-      scope.clickConfirm = function() {
-          if(scope.onConfirm) {
-              scope.onConfirm();
-          }
-      };
+        scope.clickButton = function (event) {
+            if(scope.onDelete) {
+                scope.onDelete({$event: event});
+            }
+        }
 
-      scope.clickCancel = function() {
-          if(scope.onCancel) {
-              scope.onCancel();
-          }
-      };
+        scope.clickConfirm = function() {
+            if(scope.onConfirm) {
+                scope.onConfirm();
+            }
+        };
+
+        scope.clickCancel = function() {
+            if(scope.onCancel) {
+                scope.onCancel();
+            }
+        };
 
     }
 
@@ -91,6 +97,8 @@ The prompt can be opened in four direction up, down, left or right.</p>
       templateUrl: 'views/components/umb-confirm-action.html',
       scope: {
         direction: "@",
+        show: "<",
+        onDelete: "&",
         onConfirm: "&",
         onCancel: "&"
       },
