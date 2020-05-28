@@ -34,11 +34,11 @@ namespace Umbraco.Web.Compose
                 foreach (var cultureVal in propVals)
                 {
                     // Remove keys from published value & any nested NC's
-                    var updatedPublishedVal = CreateNewNestedContentKeys(cultureVal.PublishedValue?.ToString());
+                    var updatedPublishedVal = CreateNestedContentKeys(cultureVal.PublishedValue?.ToString(), false);
                     cultureVal.PublishedValue = updatedPublishedVal;
 
                     // Remove keys from edited/draft value & any nested NC's
-                    var updatedEditedVal = CreateNewNestedContentKeys(cultureVal.EditedValue?.ToString());
+                    var updatedEditedVal = CreateNestedContentKeys(cultureVal.EditedValue?.ToString(), false);
                     cultureVal.EditedValue = updatedEditedVal;
                 }
             }
@@ -61,11 +61,11 @@ namespace Umbraco.Web.Compose
                     foreach (var cultureVal in propVals)
                     {
                         // Remove keys from published value & any nested NC's
-                        var updatedPublishedVal = CreateMissingNestedContentKeys(cultureVal.PublishedValue?.ToString());
+                        var updatedPublishedVal = CreateNestedContentKeys(cultureVal.PublishedValue?.ToString(), true);
                         cultureVal.PublishedValue = updatedPublishedVal;
 
                         // Remove keys from edited/draft value & any nested NC's
-                        var updatedEditedVal = CreateMissingNestedContentKeys(cultureVal.EditedValue?.ToString());
+                        var updatedEditedVal = CreateNestedContentKeys(cultureVal.EditedValue?.ToString(), true);
                         cultureVal.EditedValue = updatedEditedVal;
                     }
                 }
@@ -89,11 +89,11 @@ namespace Umbraco.Web.Compose
                     foreach (var cultureVal in propVals)
                     {
                         // Remove keys from published value & any nested NC's
-                        var updatedPublishedVal = CreateMissingNestedContentKeys(cultureVal.PublishedValue?.ToString());
+                        var updatedPublishedVal = CreateNestedContentKeys(cultureVal.PublishedValue?.ToString(), true);
                         cultureVal.PublishedValue = updatedPublishedVal;
 
                         // Remove keys from edited/draft value & any nested NC's
-                        var updatedEditedVal = CreateMissingNestedContentKeys(cultureVal.EditedValue?.ToString());
+                        var updatedEditedVal = CreateNestedContentKeys(cultureVal.EditedValue?.ToString(), true);
                         cultureVal.EditedValue = updatedEditedVal;
                     }
                 }
@@ -107,21 +107,36 @@ namespace Umbraco.Web.Compose
             ContentService.Publishing -= ContentService_Publishing;
         }
 
-        private string CreateNewNestedContentKeys(string ncJson)
+        private string CreateNestedContentKeys(string ncJson, bool onlyMissingKeys)
         {
             if (string.IsNullOrWhiteSpace(ncJson))
                 return ncJson;
 
-            // Try & convert JSON to JArray (two props we will know should exist are key & ncContentTypeAlias)
+            // Convert JSON to JArray (two props we will know should exist are key & ncContentTypeAlias)
             var ncItems = JArray.Parse(ncJson);
 
             // NC prop contains one or more items/rows of things
             foreach (var nestedContentItem in ncItems.Children<JObject>())
             {
+                // If saving/publishing - we only generate keys for NC items that are missing
+                if (onlyMissingKeys)
+                {
+                    var ncKeyProp = nestedContentItem.Properties().SingleOrDefault(x => x.Name.ToLowerInvariant() == "key");
+                    if (ncKeyProp == null)
+                    {
+                        nestedContentItem.Properties().Append(new JProperty("key", Guid.NewGuid().ToString()));
+                    }
+                }
+                
+
                 foreach (var ncItemProp in nestedContentItem.Properties())
                 {
-                    if(ncItemProp.Name.InvariantEquals("key"))
-                        ncItemProp.Value = Guid.NewGuid().ToString();
+                    if(onlyMissingKeys == false)
+                    {
+                        // Only when copying a node - we generate new keys for all NC items
+                        if (ncItemProp.Name.InvariantEquals("key"))
+                            ncItemProp.Value = Guid.NewGuid().ToString();
+                    }
 
                     // No need to check this property for JSON - as this is a JSON prop we know
                     // That onyl contains the string of the doctype alias used as the NC item
@@ -130,46 +145,12 @@ namespace Umbraco.Web.Compose
 
                     // As we don't know what properties in the JSON may contain the nested NC
                     // We are detecting if its value stores JSON to help filter the list AND that in its JSON it has ncContentTypeAlias prop
-                    if (ncItemProp.Value.ToString().DetectIsJson() && ncItemProp.Value.ToString().Contains(NestedContentPropertyEditor.ContentTypeAliasPropertyKey))
+                    var ncItemPropVal = ncItemProp.Value?.ToString();
+
+                    if (ncItemPropVal.DetectIsJson() && ncItemPropVal.Contains(NestedContentPropertyEditor.ContentTypeAliasPropertyKey))
                     {
                         // Recurse & update this JSON property
-                        ncItemProp.Value = CreateNewNestedContentKeys(ncItemProp.Value.ToString());
-                    }
-                }
-            }
-
-            return ncItems.ToString();
-        }
-
-        private string CreateMissingNestedContentKeys(string ncJson)
-        {
-            if (string.IsNullOrWhiteSpace(ncJson))
-                return ncJson;
-
-            // Try & convert JSON to JArray (two props we will know should exist are key & ncContentTypeAlias)
-            var ncItems = JArray.Parse(ncJson);
-
-            // NC prop contains one or more items/rows of things
-            foreach (var nestedContentItem in ncItems.Children<JObject>())
-            {
-                var ncKeyProp = nestedContentItem.Properties().SingleOrDefault(x => x.Name.ToLowerInvariant() == "key");
-                if(ncKeyProp == null)
-                {
-                    nestedContentItem.Properties().Append(new JProperty("key", Guid.NewGuid().ToString()));
-                }
-
-                foreach (var ncItemProp in nestedContentItem.Properties())
-                {
-                    // No need to check this property for JSON (Its the key OR ncContentTypeAlias) which has no JSON
-                    if (ncItemProp.Name == NestedContentPropertyEditor.ContentTypeAliasPropertyKey || ncItemProp.Name.ToLowerInvariant() == "key")
-                        continue;
-
-                    // As we don't know what properties in the JSON may contain the nested NC
-                    // We are detecting if its value stores JSON to help filter the list AND that in its JSON it has ncContentTypeAlias prop
-                    if (ncItemProp.Value.ToString().DetectIsJson() && ncItemProp.Value.ToString().Contains(NestedContentPropertyEditor.ContentTypeAliasPropertyKey))
-                    {
-                        // Recurse & update this JSON property
-                        ncItemProp.Value = CreateMissingNestedContentKeys(ncItemProp.Value.ToString());
+                        ncItemProp.Value = CreateNestedContentKeys(ncItemPropVal, onlyMissingKeys);
                     }
                 }
             }
