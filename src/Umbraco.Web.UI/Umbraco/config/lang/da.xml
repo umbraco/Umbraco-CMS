@@ -8,7 +8,8 @@
     <key alias="assignDomain">Tilføj domæne</key>
     <key alias="auditTrail">Revisionsspor</key>
     <key alias="browse">Gennemse elementer</key>
-    <key alias="changeDocType">Skift dokumenttype</key>
+    <key alias="changeDocType">Skift Dokument Type</key>
+    <key alias="changeDataType">Skift Input Type</key>
     <key alias="copy">Kopier</key>
     <key alias="create">Opret</key>
     <key alias="export">Eksportér</key>
@@ -482,6 +483,7 @@
     <key alias="unLinkYour">Fjern link fra dit</key>
     <key alias="account">konto</key>
     <key alias="selectEditor">Vælg editor</key>
+    <key alias="selectEditorConfiguration">Vælg konfiguration</key>
     <key alias="selectSnippet">Vælg snippet</key>
     <key alias="variantdeletewarning">Dette vil slette noden og alle dets sprog. Hvis du kun vil slette et sprog, så afpublicér det i stedet.</key>
   </area>
@@ -784,6 +786,7 @@
     <key alias="generalHeader">Generelt</key>
     <key alias="editorHeader">Editor</key>
     <key alias="toggleAllowCultureVariants">Skift tillad sprogvarianter</key>
+    <key alias="toggleAllowSegmentVariants">Skift tillad segmentering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Baggrundsfarve</key>
@@ -1382,9 +1385,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="compositionInUse">Indholdstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som komposition</key>
     <key alias="noAvailableCompositions">Der er ingen indholdstyper tilgængelige at bruge som komposition</key>
     <key alias="compositionRemoveWarning">Når du fjerner en komposition vil alle associerede indholdsdata blive slettet. Når først dokumenttypen er gemt, er der ingen vej tilbage.</key>
-    <key alias="availableEditors">Tilgængelige editors</key>
+    <key alias="availableEditors">Opret ny indstilling</key>
     <key alias="reuse">Genbrug</key>
-    <key alias="editorSettings">Editor indstillinger</key>
+    <key alias="editorSettings">Input indstillinger</key>
+    <key alias="searchResultSettings">Tilgængelige indstillinger</key>
+    <key alias="searchResultEditors">Opret ny indstilling</key>
     <key alias="configuration">Konfiguration</key>
     <key alias="yesDelete">Ja, slet</key>
     <key alias="movedUnderneath">blev flyttet til</key>
@@ -1410,9 +1415,16 @@ Mange hilsner fra Umbraco robotten
     <key alias="tabHasNoSortOrder">fane har ingen sorteringsrækkefølge</key>
     <key alias="compositionUsageHeading">Hvor er denne komposition brugt?</key>
     <key alias="compositionUsageSpecification">Denne komposition brugt i kompositionen af de følgende indholdstyper:</key>
-    <key alias="variantsHeading">Tillad sprogvariation</key>
+    <key alias="variantsHeading">Tillad variationer</key>
+    <key alias="cultureVariantHeading">Tillad sprogvariation</key>
+    <key alias="segmentVariantHeading">Tillad segmentering</key>
+    <key alias="cultureVariantLabel">Tillader sprogvariationer</key>
+    <key alias="segmentVariantLabel">Tillader segmentering</key>
     <key alias="variantsDescription">Tillad at redaktører kan oprette indhold af denne type på flere sprog.</key>
+    <key alias="cultureVariantDescription">Tillad at redaktører kan oprette dette indhold på flere sprog.</key>
+    <key alias="segmentVariantDescription">Tillad at redaktører kan oprette flere udgaver af denne type indhold.</key>
     <key alias="allowVaryByCulture">Tillad sprogvariation</key>
+    <key alias="allowVaryBySegment">Tillad segmentering</key>
     <key alias="elementType">Element-type</key>
     <key alias="elementHeading">Er en Element-type</key>
     <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet.</key>
