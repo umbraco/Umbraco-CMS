@@ -34,11 +34,11 @@ namespace Umbraco.Web.Compose
                 foreach (var cultureVal in propVals)
                 {
                     // Remove keys from published value & any nested NC's
-                    var updatedPublishedVal = CreateNewNestedContentKeys(cultureVal.PublishedValue.ToString());
+                    var updatedPublishedVal = CreateNewNestedContentKeys(cultureVal.PublishedValue?.ToString());
                     cultureVal.PublishedValue = updatedPublishedVal;
 
                     // Remove keys from edited/draft value & any nested NC's
-                    var updatedEditedVal = CreateNewNestedContentKeys(cultureVal.EditedValue.ToString());
+                    var updatedEditedVal = CreateNewNestedContentKeys(cultureVal.EditedValue?.ToString());
                     cultureVal.EditedValue = updatedEditedVal;
                 }
             }
@@ -61,11 +61,11 @@ namespace Umbraco.Web.Compose
                     foreach (var cultureVal in propVals)
                     {
                         // Remove keys from published value & any nested NC's
-                        var updatedPublishedVal = CreateMissingNestedContentKeys(cultureVal.PublishedValue.ToString());
+                        var updatedPublishedVal = CreateMissingNestedContentKeys(cultureVal.PublishedValue?.ToString());
                         cultureVal.PublishedValue = updatedPublishedVal;
 
                         // Remove keys from edited/draft value & any nested NC's
-                        var updatedEditedVal = CreateMissingNestedContentKeys(cultureVal.EditedValue.ToString());
+                        var updatedEditedVal = CreateMissingNestedContentKeys(cultureVal.EditedValue?.ToString());
                         cultureVal.EditedValue = updatedEditedVal;
                     }
                 }
@@ -89,11 +89,11 @@ namespace Umbraco.Web.Compose
                     foreach (var cultureVal in propVals)
                     {
                         // Remove keys from published value & any nested NC's
-                        var updatedPublishedVal = CreateMissingNestedContentKeys(cultureVal.PublishedValue.ToString());
+                        var updatedPublishedVal = CreateMissingNestedContentKeys(cultureVal.PublishedValue?.ToString());
                         cultureVal.PublishedValue = updatedPublishedVal;
 
                         // Remove keys from edited/draft value & any nested NC's
-                        var updatedEditedVal = CreateMissingNestedContentKeys(cultureVal.EditedValue.ToString());
+                        var updatedEditedVal = CreateMissingNestedContentKeys(cultureVal.EditedValue?.ToString());
                         cultureVal.EditedValue = updatedEditedVal;
                     }
                 }
@@ -109,6 +109,9 @@ namespace Umbraco.Web.Compose
 
         private string CreateNewNestedContentKeys(string ncJson)
         {
+            if (string.IsNullOrWhiteSpace(ncJson))
+                return ncJson;
+
             // Try & convert JSON to JArray (two props we will know should exist are key & ncContentTypeAlias)
             var ncItems = JArray.Parse(ncJson);
 
@@ -140,6 +143,9 @@ namespace Umbraco.Web.Compose
 
         private string CreateMissingNestedContentKeys(string ncJson)
         {
+            if (string.IsNullOrWhiteSpace(ncJson))
+                return ncJson;
+
             // Try & convert JSON to JArray (two props we will know should exist are key & ncContentTypeAlias)
             var ncItems = JArray.Parse(ncJson);
 
