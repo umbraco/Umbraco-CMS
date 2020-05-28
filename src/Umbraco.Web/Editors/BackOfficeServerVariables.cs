@@ -233,10 +233,10 @@ namespace Umbraco.Web.Editors
                         //     "packageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageController>(
                         //         controller => controller.GetCreatedPackages())
                         // },
-                        {
-                            "relationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationController>(
-                                controller => controller.GetById(0))
-                        },
+                        // {
+                        //     "relationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationController>(
+                        //         controller => controller.GetById(0))
+                        // },
                         // {
                         //     "rteApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>(
                         //         controller => controller.GetConfiguration())

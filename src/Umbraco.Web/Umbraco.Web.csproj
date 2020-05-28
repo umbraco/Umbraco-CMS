@@ -331,7 +331,6 @@
     <Compile Include="Controllers\UmbLoginStatusController.cs" />
     <Compile Include="Editors\Filters\ContentSaveValidationAttribute.cs" />
     <Compile Include="Editors\ContentTypeControllerBase.cs" />
-    <Compile Include="Editors\RelationController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
     <Compile Include="Editors\TemplateQueryController.cs" />
     <Compile Include="Mvc\ActionExecutedEventArgs.cs" />
