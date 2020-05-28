@@ -2,10 +2,9 @@
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Web.WebApi.Filters;using Umbraco.Core.Models.Identity;
+using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
-using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Security;
 using Umbraco.Core.Mapping;
 using Umbraco.Web.Routing;
@@ -30,7 +29,7 @@ namespace Umbraco.Web.WebApi
     [EnableDetailedErrors]
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
     {
-        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
+        private BackOfficeOwinUserManager _userManager;
 
         protected UmbracoAuthorizedApiController()
         {
@@ -44,7 +43,7 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Gets the user manager.
         /// </summary>
-        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
+        protected BackOfficeOwinUserManager UserManager
             => _userManager ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager());
     }
 }

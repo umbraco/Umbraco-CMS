@@ -4,13 +4,12 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 
-namespace Umbraco.Web.Models.Identity
+namespace Umbraco.Core.BackOffice
 {
     public class BackOfficeIdentityUser : IdentityUser<int, IIdentityUserLogin, IdentityUserRole<string>, IdentityUserClaim<int>>, IRememberBeingDirty
     {
@@ -90,8 +89,8 @@ namespace Umbraco.Web.Models.Identity
         /// </summary>
         public bool HasIdentity => _hasIdentity;
 
-        public int[] CalculatedMediaStartNodeIds { get; internal set; }
-        public int[] CalculatedContentStartNodeIds { get; internal set; }
+        public int[] CalculatedMediaStartNodeIds { get; set; }
+        public int[] CalculatedContentStartNodeIds { get; set; }
 
         public override int Id
         {
@@ -258,7 +257,7 @@ namespace Umbraco.Web.Models.Identity
         /// <summary>
         /// Based on the user's lockout end date, this will determine if they are locked out
         /// </summary>
-        internal bool IsLockedOut
+        public bool IsLockedOut
         {
             get
             {
@@ -270,7 +269,7 @@ namespace Umbraco.Web.Models.Identity
         /// <summary>
         /// This is a 1:1 mapping with IUser.IsApproved
         /// </summary>
-        internal bool IsApproved { get; set; }
+        public bool IsApproved { get; set; }
 
         /// <summary>
         /// Overridden to make the retrieval lazy

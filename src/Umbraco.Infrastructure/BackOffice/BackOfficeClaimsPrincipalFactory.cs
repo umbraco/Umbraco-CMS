@@ -4,10 +4,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Security;
-using Umbraco.Web.Models.Identity;
+using Umbraco.Core.BackOffice;
 
-namespace Umbraco.Web.Security
+namespace Umbraco.Core.BackOffice
 {
     public class BackOfficeClaimsPrincipalFactory<TUser> : UserClaimsPrincipalFactory<TUser>
         where TUser : BackOfficeIdentityUser

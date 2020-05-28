@@ -1,7 +1,7 @@
 ﻿using System;
 using Umbraco.Core;
+using Umbraco.Core.BackOffice;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Models.Identity;
 
 namespace Umbraco.Web.Security
 {

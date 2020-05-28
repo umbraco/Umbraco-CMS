@@ -109,6 +109,8 @@ namespace Umbraco.Tests.Integration.Testing
                     // Add it!
                     services.AddUmbracoConfiguration(hostContext.Configuration);
                     services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly, NoAppCache.Instance, testHelper.GetLoggingConfiguration(), out _);
+
+                    CustomTestSetup(services);
                 });
 
             var host = await hostBuilder.StartAsync();
@@ -122,6 +124,8 @@ namespace Umbraco.Tests.Integration.Testing
         }
 
         #region Common services
+
+        protected virtual Action<IServiceCollection> CustomTestSetup => services => { };
 
         /// <summary>
         /// Returns the DI container

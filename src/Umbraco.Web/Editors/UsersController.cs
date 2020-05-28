@@ -12,6 +12,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -25,7 +26,6 @@ using Umbraco.Core.Strings;
 using Umbraco.Web.Editors.Filters;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -37,7 +37,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Media;
-using Umbraco.Web.Security;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Editors
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
-using Umbraco.Web.Security;
+using Umbraco.Core.BackOffice;
 
 namespace Umbraco.Tests.Security
 {

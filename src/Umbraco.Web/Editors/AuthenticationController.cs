@@ -25,10 +25,9 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Core.Mapping;
-using Umbraco.Web.Models.Identity;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
+using Umbraco.Extensions;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
@@ -42,7 +41,7 @@ namespace Umbraco.Web.Editors
     [IsBackOffice]
     public class AuthenticationController : UmbracoApiController
     {
-        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
+        private BackOfficeOwinUserManager _userManager;
         private BackOfficeSignInManager _signInManager;
         private readonly IUserPasswordConfiguration _passwordConfiguration;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -76,8 +75,8 @@ namespace Umbraco.Web.Editors
             _emailSender = emailSender;
         }
 
-        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager
-            ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager());
+        protected BackOfficeOwinUserManager UserManager => _userManager
+                                                           ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager());
 
         protected BackOfficeSignInManager SignInManager => _signInManager
             ?? (_signInManager = TryGetOwinContext().Result.GetBackOfficeSignInManager());

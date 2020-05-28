@@ -1,12 +1,10 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Web;
 using Microsoft.Owin;
 using Umbraco.Core;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {

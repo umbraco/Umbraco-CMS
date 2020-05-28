@@ -28,7 +28,6 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.ControllerTesting;
@@ -46,8 +45,8 @@ using Umbraco.Web.Routing;
 using Umbraco.Core.Media;
 using Umbraco.Net;
 using Umbraco.Persistance.SqlCe;
-using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Security;
+using BackOfficeIdentityUser = Umbraco.Core.BackOffice.BackOfficeIdentityUser;
 
 namespace Umbraco.Tests.Web.Controllers
 {
@@ -474,7 +473,7 @@ namespace Umbraco.Tests.Web.Controllers
             mockUserManager.Verify();
         }
 
-        private UsersController CreateSut(IMock<BackOfficeUserManager<BackOfficeIdentityUser>> mockUserManager = null)
+        private UsersController CreateSut(IMock<BackOfficeOwinUserManager> mockUserManager = null)
         {
             var mockLocalizedTextService = new Mock<ILocalizedTextService>();
             mockLocalizedTextService.Setup(x => x.Localize(It.IsAny<string>(), It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>()))
@@ -515,9 +514,9 @@ namespace Umbraco.Tests.Web.Controllers
             return usersController;
         }
 
-        private static Mock<BackOfficeUserManager<BackOfficeIdentityUser>> CreateMockUserManager()
+        private static Mock<BackOfficeOwinUserManager> CreateMockUserManager()
         {
-            return new Mock<BackOfficeUserManager<BackOfficeIdentityUser>>(
+            return new Mock<BackOfficeOwinUserManager>(
                 new Mock<IPasswordConfiguration>().Object,
                 new Mock<IIpResolver>().Object,
                 new Mock<IUserStore<BackOfficeIdentityUser>>().Object,

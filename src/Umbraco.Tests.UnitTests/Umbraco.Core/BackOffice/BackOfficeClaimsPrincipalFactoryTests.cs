@@ -7,13 +7,12 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
-using Umbraco.Web.Models.Identity;
-using Umbraco.Web.Security;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.Security
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
 {
     [TestFixture]
     public class BackOfficeClaimsPrincipalFactoryTests
@@ -131,7 +130,7 @@ namespace Umbraco.Tests.Security
             const string expectedClaimType = ClaimTypes.Role;
             const string expectedClaimValue = "b87309fb-4caf-48dc-b45a-2b752d051508";
 
-            _testUser.Roles.Add(new Core.Models.Identity.IdentityUserRole<string>{RoleId = expectedClaimValue});
+            _testUser.Roles.Add(new global::Umbraco.Core.Models.Identity.IdentityUserRole<string>{RoleId = expectedClaimValue});
             _mockUserManager.Setup(x => x.SupportsUserRole).Returns(true);
             _mockUserManager.Setup(x => x.GetRolesAsync(_testUser)).ReturnsAsync(new[] {expectedClaimValue});
 
@@ -148,7 +147,7 @@ namespace Umbraco.Tests.Security
             const string expectedClaimType = "custom";
             const string expectedClaimValue = "val";
 
-            _testUser.Claims.Add(new Core.Models.Identity.IdentityUserClaim<int> {ClaimType = expectedClaimType, ClaimValue = expectedClaimValue});
+            _testUser.Claims.Add(new global::Umbraco.Core.Models.Identity.IdentityUserClaim<int> {ClaimType = expectedClaimType, ClaimValue = expectedClaimValue});
             _mockUserManager.Setup(x => x.SupportsUserClaim).Returns(true);
             _mockUserManager.Setup(x => x.GetClaimsAsync(_testUser)).ReturnsAsync(
                 new List<Claim> {new Claim(expectedClaimType, expectedClaimValue)});

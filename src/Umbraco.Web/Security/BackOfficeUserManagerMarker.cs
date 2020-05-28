@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.Owin;
-using Umbraco.Web.Models.Identity;
+using Umbraco.Core.BackOffice;
 
 namespace Umbraco.Web.Security
 {
@@ -15,9 +15,9 @@ namespace Umbraco.Web.Security
         where TManager : BackOfficeUserManager<TUser>
         where TUser : BackOfficeIdentityUser
     {
-        public BackOfficeUserManager<BackOfficeIdentityUser> GetManager(IOwinContext owin)
+        public BackOfficeOwinUserManager GetManager(IOwinContext owin)
         {
-            var mgr = owin.Get<TManager>() as BackOfficeUserManager<BackOfficeIdentityUser>;
+            var mgr = owin.Get<TManager>() as BackOfficeOwinUserManager;
             if (mgr == null) throw new InvalidOperationException("Could not cast the registered back office user of type " + typeof(TManager) + " to " + typeof(BackOfficeUserManager<BackOfficeIdentityUser>));
             return mgr;
         }
