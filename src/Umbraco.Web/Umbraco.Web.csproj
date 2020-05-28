@@ -158,7 +158,6 @@
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
     <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
     <Compile Include="Editors\MacrosController.cs" />
-    <Compile Include="Editors\RelationTypeController.cs" />
     <Compile Include="Editors\TinyMceController.cs" />
     <Compile Include="HttpContextAccessorExtensions.cs" />
     <Compile Include="HttpContextExtensions.cs" />
