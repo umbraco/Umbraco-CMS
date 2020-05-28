@@ -120,7 +120,7 @@ namespace Umbraco.Web.Compose
             {
                 foreach (var ncItemProp in nestedContentItem.Properties())
                 {
-                    if(ncItemProp.Name.ToLowerInvariant() == "key")
+                    if(ncItemProp.Name.InvariantEquals("key"))
                         ncItemProp.Value = Guid.NewGuid().ToString();
 
                     // No need to check this property for JSON - as this is a JSON prop we know
