@@ -345,7 +345,6 @@
     <Compile Include="Editors\MacroRenderingController.cs" />
     <Compile Include="Editors\MemberTypeController.cs" />
     <Compile Include="Editors\UpdateCheckController.cs" />
-    <Compile Include="Editors\StylesheetController.cs" />
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Editors\MemberController.cs" />
     <Compile Include="Editors\CurrentUserController.cs" />

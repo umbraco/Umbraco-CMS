@@ -241,10 +241,10 @@ namespace Umbraco.Web.Editors
                         //     "rteApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>(
                         //         controller => controller.GetConfiguration())
                         // },
-                        {
-                            "stylesheetApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<StylesheetController>(
-                                controller => controller.GetAll())
-                        },
+                        // {
+                        //     "stylesheetApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<StylesheetController>(
+                        //         controller => controller.GetAll())
+                        // },
                         {
                             "memberTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberTypeController>(
                                 controller => controller.GetAllTypes())
