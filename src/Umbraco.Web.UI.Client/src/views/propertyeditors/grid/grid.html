@@ -200,9 +200,9 @@
                                                                           </div>
 
                                                                           <div class="umb-control-tool">
-                                                                              <button class="umb-control-tool-icon icon-trash btn-reset" ng-click="togglePrompt(control)" type="button"></button>
-                                                                              <umb-confirm-action ng-if="control.deletePrompt"
+                                                                              <umb-confirm-action show="control.deletePrompt"
                                                                                                   direction="left"
+                                                                                                  on-delete="togglePrompt(control)"
                                                                                                   on-confirm="removeControl(area, $index)"
                                                                                                   on-cancel="hidePrompt(control)">
                                                                               </umb-confirm-action>
