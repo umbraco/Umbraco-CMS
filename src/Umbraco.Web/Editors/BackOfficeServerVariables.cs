@@ -137,10 +137,10 @@ namespace Umbraco.Web.Editors
                         {
                             "packagesRestApiBaseUrl", Constants.PackageRepository.RestApiBaseUrl
                         },
-                        {
-                            "redirectUrlManagementApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RedirectUrlManagementController>(
-                                controller => controller.GetEnableState())
-                        },
+                        // {
+                        //     "redirectUrlManagementApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RedirectUrlManagementController>(
+                        //         controller => controller.GetEnableState())
+                        // },
                         //TODO reintroduce
                         // {
                         //     "tourApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TourController>(
@@ -295,10 +295,10 @@ namespace Umbraco.Web.Editors
                         //     "codeFileApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<CodeFileController>(
                         //         controller => controller.GetByPath("", ""))
                         // },
-                        {
-                            "publishedStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedStatusController>(
-                                controller => controller.GetPublishedStatusUrl())
-                        },
+                        // {
+                        //     "publishedStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedStatusController>(
+                        //         controller => controller.GetPublishedStatusUrl())
+                        // },
                         {
                             "dictionaryApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DictionaryController>(
                                 controller => controller.DeleteById(int.MaxValue))
