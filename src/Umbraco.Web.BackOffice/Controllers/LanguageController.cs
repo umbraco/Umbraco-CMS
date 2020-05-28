@@ -9,7 +9,6 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.Validation;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
