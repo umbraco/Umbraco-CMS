@@ -23,13 +23,6 @@ namespace Umbraco.Web.BackOffice.Security
         
         public string Protect(AuthenticationTicket data, string purpose)
         {
-            // TODO: What about 'purpose'?
-
-            // TODO: We used to cast this, not sure if this is needed
-            //var backofficeIdentity = (UmbracoBackOfficeIdentity)data.Principal.Identity;
-
-            // TODO: The below seems irrelevant except for the Expires changes, do we need that?
-
             //create a new ticket based on the passed in tickets details, however, we'll adjust the expires utc based on the specified timeout mins
             var ticket = new AuthenticationTicket(data.Principal,
                 new AuthenticationProperties(data.Properties.Items)
@@ -56,8 +49,6 @@ namespace Umbraco.Web.BackOffice.Security
         /// <returns></returns>
         public AuthenticationTicket Unprotect(string protectedText, string purpose)
         {
-            // TODO: What about 'purpose'?
-
             AuthenticationTicket decrypt;
             try
             {
