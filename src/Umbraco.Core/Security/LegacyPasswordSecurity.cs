@@ -7,13 +7,10 @@ namespace Umbraco.Core.Security
 {
 
     /// <summary>
-    /// Handles password hashing and formatting
+    /// Handles password hashing and formatting for legacy hashing algorithms
     /// </summary>
-    public class PasswordSecurity
+    public class LegacyPasswordSecurity
     {
-        // TODO: This class could/should be renamed since it's really purely about legacy hashing, we want to use the new hashing available
-        // to us but this is here for compatibility purposes.
-
         // TODO: This class no longer has the logic available to verify the old old old password format, we should
         // include this ability so that upgrades for very old versions/data can work and then auto-migrate to the new password format.
 
@@ -24,7 +21,7 @@ namespace Umbraco.Core.Security
         /// Constructor
         /// </summary>
         /// <param name="passwordConfiguration"></param>
-        public PasswordSecurity(IPasswordConfiguration passwordConfiguration)
+        public LegacyPasswordSecurity(IPasswordConfiguration passwordConfiguration)
         {
             _passwordConfiguration = passwordConfiguration;
             _generator = new PasswordGenerator(passwordConfiguration);

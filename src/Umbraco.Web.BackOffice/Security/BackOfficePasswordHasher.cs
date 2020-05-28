@@ -13,10 +13,10 @@ namespace Umbraco.Web.BackOffice.Security
     /// </summary>
     public class BackOfficePasswordHasher : PasswordHasher<BackOfficeIdentityUser>
     {
-        private readonly PasswordSecurity _passwordSecurity;
+        private readonly LegacyPasswordSecurity _passwordSecurity;
         private readonly IJsonSerializer _jsonSerializer;
 
-        public BackOfficePasswordHasher(PasswordSecurity passwordSecurity, IJsonSerializer jsonSerializer)
+        public BackOfficePasswordHasher(LegacyPasswordSecurity passwordSecurity, IJsonSerializer jsonSerializer)
         {
             _passwordSecurity = passwordSecurity;
             _jsonSerializer = jsonSerializer;

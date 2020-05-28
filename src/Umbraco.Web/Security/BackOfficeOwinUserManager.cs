@@ -119,7 +119,7 @@ namespace Umbraco.Web.Security
 
         protected override IPasswordHasher<BackOfficeIdentityUser> GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration)
         {
-            return new UserAwarePasswordHasher<BackOfficeIdentityUser>(new PasswordSecurity(passwordConfiguration));
+            return new UserAwarePasswordHasher<BackOfficeIdentityUser>(new LegacyPasswordSecurity(passwordConfiguration));
         }
 
         protected void InitUserManager(BackOfficeOwinUserManager manager, IDataProtectionProvider dataProtectionProvider)

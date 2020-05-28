@@ -63,13 +63,13 @@ namespace Umbraco.Web.Editors
         {
             _passwordConfig = passwordConfig ?? throw new ArgumentNullException(nameof(passwordConfig));
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
-            _passwordSecurity = new PasswordSecurity(_passwordConfig);
+            _passwordSecurity = new LegacyPasswordSecurity(_passwordConfig);
             _passwordValidator = new ConfiguredPasswordValidator();
         }
 
         private readonly IMemberPasswordConfiguration _passwordConfig;
         private readonly PropertyEditorCollection _propertyEditors;
-        private readonly PasswordSecurity _passwordSecurity;
+        private readonly LegacyPasswordSecurity _passwordSecurity;
         private readonly IPasswordValidator _passwordValidator;
 
         public PagedResult<MemberBasic> GetPagedResults(

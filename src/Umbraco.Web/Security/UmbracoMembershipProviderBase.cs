@@ -14,7 +14,7 @@ namespace Umbraco.Web.Security
         {
         }
 
-        public abstract PasswordSecurity PasswordSecurity { get; }
+        public abstract LegacyPasswordSecurity PasswordSecurity { get; }
         public abstract string DefaultMemberTypeAlias { get; }
 
         /// <summary>

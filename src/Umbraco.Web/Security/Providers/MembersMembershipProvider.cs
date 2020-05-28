@@ -80,7 +80,7 @@ namespace Umbraco.Web.Security.Providers
                     CustomHashAlgorithmType.IsNullOrWhiteSpace() ? Membership.HashAlgorithmType : CustomHashAlgorithmType,
                     MaxInvalidPasswordAttempts));
 
-            _passwordSecurity = new Lazy<PasswordSecurity>(() => new PasswordSecurity(PasswordConfiguration));
+            _passwordSecurity = new Lazy<LegacyPasswordSecurity>(() => new LegacyPasswordSecurity(PasswordConfiguration));
 
         }
 
@@ -114,10 +114,10 @@ namespace Umbraco.Web.Security.Providers
             }
         }
 
-        private Lazy<PasswordSecurity> _passwordSecurity;
+        private Lazy<LegacyPasswordSecurity> _passwordSecurity;
         private Lazy<IPasswordConfiguration> _passwordConfig;
 
-        public override PasswordSecurity PasswordSecurity => _passwordSecurity.Value;
+        public override LegacyPasswordSecurity PasswordSecurity => _passwordSecurity.Value;
         public IPasswordConfiguration PasswordConfiguration => _passwordConfig.Value;
 
         private class MembershipProviderPasswordConfiguration : IPasswordConfiguration
