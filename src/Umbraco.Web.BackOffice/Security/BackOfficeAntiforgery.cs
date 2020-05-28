@@ -33,11 +33,29 @@ namespace Umbraco.Web.BackOffice.Security
         /// <inheritdoc />
         public async Task<Attempt<string>> ValidateRequestAsync(HttpContext httpContext)
         {
-            httpContext.Request.Cookies.TryGetValue(Constants.Web.CsrfValidationCookieName, out var cookieToken);
+            if (!httpContext.Request.Headers.TryGetValue(Constants.Web.AngularHeadername, out var headerVals))
+            {
+                return Attempt.Fail("Missing header");
+            }
+            if (!httpContext.Request.Cookies.TryGetValue(Constants.Web.CsrfValidationCookieName, out var cookieToken))
+            {
+                return Attempt.Fail("Missing cookie");
+            }
 
-            return await ValidateHeadersAsync(
-                httpContext,
-                cookieToken == null ? null : cookieToken);
+            var headerToken = headerVals.FirstOrDefault();
+
+            // both header and cookie must be there
+            if (cookieToken == null || headerToken == null)
+            {
+                return Attempt.Fail("Missing token null");
+            }
+
+            if (await ValidateTokensAsync(httpContext, cookieToken, headerToken) == false)
+            {
+                return Attempt.Fail("Invalid token");
+            }
+
+            return Attempt<string>.Succeed();
         }
 
         /// <inheritdoc />
@@ -95,31 +113,6 @@ namespace Umbraco.Web.BackOffice.Security
             }
         }
 
-        private async Task<Attempt<string>> ValidateHeadersAsync(
-            HttpContext httpContext,
-            string cookieToken)
-        {
-            var requestHeaders = httpContext.Request.Headers;
-            if (!requestHeaders.TryGetValue(Constants.Web.AngularHeadername, out var headerVals))
-            {
-                return Attempt.Fail("Missing token");
-            }
-
-            var headerToken = headerVals.FirstOrDefault();
-
-            // both header and cookie must be there
-            if (cookieToken == null || headerToken == null)
-            {
-                return Attempt.Fail("Missing token null");
-            }
-
-            if (await ValidateTokensAsync(httpContext, cookieToken, headerToken) == false)
-            {
-                return Attempt.Fail("Invalid token");
-            }
-
-            return Attempt<string>.Succeed();
-        }
-
+        
     }
 }
