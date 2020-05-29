@@ -8,7 +8,7 @@ module.exports = {
         },
         dev: {
             sourcemaps: true,
-            embedtemplates: false
+            embedtemplates: true
         },
         test: {
             sourcemaps: false,
