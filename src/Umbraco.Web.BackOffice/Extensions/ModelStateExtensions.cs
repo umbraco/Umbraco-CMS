@@ -1,32 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Web.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Umbraco.Core;
 
-namespace Umbraco.Web
+namespace Umbraco.Extensions
 {
-    //Migrated to .NET Core except the Merge method
     internal static class ModelStateExtensions
     {
-
-        /// <summary>
-        /// Merges ModelState that has names matching the prefix
-        /// </summary>
-        /// <param name="state"></param>
-        /// <param name="dictionary"></param>
-        /// <param name="prefix"></param>
-        public static void Merge(this ModelStateDictionary state, ModelStateDictionary dictionary, string prefix)
-        {
-            if (dictionary == null)
-                return;
-            foreach (var keyValuePair in dictionary
-                //It can either equal the prefix exactly (model level errors) or start with the prefix. (property level errors)
-                .Where(keyValuePair => keyValuePair.Key == prefix || keyValuePair.Key.StartsWith(prefix + ".")))
-            {
-                state[keyValuePair.Key] = keyValuePair.Value;
-            }
-        }
 
         /// <summary>
         /// Checks if there are any model errors on any fields containing the prefix
@@ -46,7 +28,7 @@ namespace Umbraco.Web
         /// <param name="result"></param>
         /// <param name="propertyAlias"></param>
         /// <param name="culture">The culture for the property, if the property is invariant than this is empty</param>
-        internal static void AddPropertyError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
+        internal static void AddPropertyError(this ModelStateDictionary modelState,
             ValidationResult result, string propertyAlias, string culture = "", string segment = "")
         {
             if (culture == null)
@@ -65,7 +47,7 @@ namespace Umbraco.Web
         /// <param name="culture"></param>
         /// <param name="segment"></param>
         /// <param name="errMsg"></param>
-        internal static void AddVariantValidationError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
+        internal static void AddVariantValidationError(this ModelStateDictionary modelState,
             string culture, string segment, string errMsg)
         {
             var key = "_content_variant_" + (culture.IsNullOrWhiteSpace() ? "invariant" : culture) + "_" + (segment.IsNullOrWhiteSpace() ? "null" : segment) + "_";
@@ -82,7 +64,7 @@ namespace Umbraco.Web
         /// <returns>
         /// A list of cultures that have property validation errors. The default culture will be returned for any invariant property errors.
         /// </returns>
-        internal static IReadOnlyList<(string culture, string segment)> GetVariantsWithPropertyErrors(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
+        internal static IReadOnlyList<(string culture, string segment)> GetVariantsWithPropertyErrors(this ModelStateDictionary modelState,
             string cultureForInvariantErrors)
         {
             //Add any variant specific errors here
@@ -115,7 +97,7 @@ namespace Umbraco.Web
         /// <returns>
         /// A list of cultures that have validation errors. The default culture will be returned for any invariant errors.
         /// </returns>
-        internal static IReadOnlyList<(string culture, string segment)> GetVariantsWithErrors(this System.Web.Http.ModelBinding.ModelStateDictionary modelState, string cultureForInvariantErrors)
+        internal static IReadOnlyList<(string culture, string segment)> GetVariantsWithErrors(this ModelStateDictionary modelState, string cultureForInvariantErrors)
         {
             var propertyVariantErrors = modelState.GetVariantsWithPropertyErrors(cultureForInvariantErrors);
 
@@ -152,7 +134,7 @@ namespace Umbraco.Web
         /// <param name="parts">
         /// Each model state validation error has a name and in most cases this name is made up of parts which are delimited by a '.'
         /// </param>
-        internal static void AddValidationError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
+        internal static void AddValidationError(this ModelStateDictionary modelState,
             ValidationResult result, params string[] parts)
         {
             // if there are assigned member names, we combine the member name with the owner name
@@ -181,7 +163,7 @@ namespace Umbraco.Web
         /// <param name="key"></param>
         /// <param name="errorMsg"></param>
         /// <returns></returns>
-        private static bool TryAddModelError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState, string key, string errorMsg)
+        private static bool TryAddModelError(this ModelStateDictionary modelState, string key, string errorMsg)
         {
             if (modelState.TryGetValue(key, out var errs))
             {
@@ -193,7 +175,7 @@ namespace Umbraco.Web
             return true;
         }
 
-        public static IDictionary<string, object> ToErrorDictionary(this System.Web.Http.ModelBinding.ModelStateDictionary modelState)
+        public static IDictionary<string, object> ToErrorDictionary(this ModelStateDictionary modelState)
         {
             var modelStateError = new Dictionary<string, object>();
             foreach (var keyModelStatePair in modelState)
@@ -215,23 +197,20 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static JsonResult ToJsonErrors(this ModelStateDictionary state)
         {
-            return new JsonResult
-                {
-                    Data = new
-                        {
-                            success = state.IsValid.ToString().ToLower(),
-                            failureType = "ValidationError",
-                            validationErrors = from e in state
-                                               where e.Value.Errors.Count > 0
-                                               select new
-                                                   {
-                                                       name = e.Key,
-                                                       errors = e.Value.Errors.Select(x => x.ErrorMessage)
-                                                   .Concat(
-                                                       e.Value.Errors.Where(x => x.Exception != null).Select(x => x.Exception.Message))
-                                                   }
-                        }
-                };
+            return new JsonResult(new
+            {
+                success = state.IsValid.ToString().ToLower(),
+                failureType = "ValidationError",
+                validationErrors = from e in state
+                    where e.Value.Errors.Count > 0
+                    select new
+                    {
+                        name = e.Key,
+                        errors = e.Value.Errors.Select(x => x.ErrorMessage)
+                            .Concat(
+                                e.Value.Errors.Where(x => x.Exception != null).Select(x => x.Exception.Message))
+                    }
+            });
         }
 
     }

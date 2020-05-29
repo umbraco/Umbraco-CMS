@@ -7,6 +7,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Extensions;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
@@ -95,7 +96,7 @@ namespace Umbraco.Web.Editors
                 // run each IValueValidator (with null valueType and dataTypeConfiguration: not relevant here)
                 foreach (var validator in editorField.Validators)
                 foreach (var result in validator.Validate(field.Value, null, null))
-                    context.ModelState.AddModelError(field.Key,result.ErrorMessage);
+                    context.ModelState.AddValidationError(result, "Properties", field.Key);
             }
 
             if (context.ModelState.IsValid == false)
