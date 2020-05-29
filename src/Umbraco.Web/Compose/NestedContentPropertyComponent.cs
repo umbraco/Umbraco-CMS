@@ -66,63 +66,61 @@ namespace Umbraco.Web.Compose
             }
         }
 
-        private string CreateNestedContentKeys(string rawJson, bool onlyMissingKeys)
+        
+        // internal for tests
+        internal string CreateNestedContentKeys(string rawJson, bool onlyMissingKeys, Func<Guid> createGuid = null)
         {
-            if (string.IsNullOrWhiteSpace(rawJson))
+            // used so we can test nicely
+            if (createGuid == null)
+                createGuid = () => Guid.NewGuid();
+
+            if (string.IsNullOrWhiteSpace(rawJson) || !rawJson.DetectIsJson())
                 return rawJson;
 
-            // Parse JSON
-            var ncJson = JToken.Parse(rawJson);
+            // Parse JSON            
+            var complexEditorValue = JToken.Parse(rawJson);
 
-            // NC prop contains one or more items/rows of things
-            foreach (var nestedContentItem in ncJson.Children<JObject>())
+            UpdateNestedContentKeysRecursively(complexEditorValue, onlyMissingKeys, createGuid);
+
+            return complexEditorValue.ToString();
+        }
+
+        private void UpdateNestedContentKeysRecursively(JToken json, bool onlyMissingKeys, Func<Guid> createGuid)
+        {
+            // check if this is NC
+            var isNestedContent = json.SelectTokens($"$..['{NestedContentPropertyEditor.ContentTypeAliasPropertyKey}']", false).Any();
+
+            // select all values (flatten)
+            var allProperties = json.SelectTokens("$..*").OfType<JValue>().Select(x => x.Parent as JProperty).WhereNotNull().ToList();
+            foreach (var prop in allProperties)
             {
-                // If saving/publishing - we only generate keys for NC items that are missing
-                if (onlyMissingKeys)
+                if (prop.Name == NestedContentPropertyEditor.ContentTypeAliasPropertyKey)
                 {
-                    var ncKeyProp = nestedContentItem.Properties().SingleOrDefault(x => x.Name.InvariantEquals("key"));
-                    if (ncKeyProp == null)
+                    // get it's sibling 'key' property
+                    var ncKeyVal = prop.Parent["key"] as JValue;
+                    // TODO: This bool seems odd, if the key is null, shouldn't we fill it in regardless of onlyMissingKeys?
+                    if ((onlyMissingKeys && ncKeyVal == null) || (!onlyMissingKeys && ncKeyVal != null))
                     {
-                        nestedContentItem.Properties().Append(new JProperty("key", Guid.NewGuid().ToString()));
-                    }
+                        // create or replace
+                        prop.Parent["key"] = createGuid().ToString();
+                    }                   
                 }
-
-                foreach (var ncItemProp in nestedContentItem.Properties())
+                else if (!isNestedContent || prop.Name != "key")
                 {
-                    if (onlyMissingKeys == false)
+                    // this is an arbitrary property that could contain a nested complex editor
+                    var propVal = prop.Value?.ToString();
+                    // check if this might contain a nested NC
+                    if (!propVal.IsNullOrWhiteSpace() && propVal.DetectIsJson() && propVal.InvariantContains(NestedContentPropertyEditor.ContentTypeAliasPropertyKey))
                     {
-                        // Only when copying a node - we generate new keys for all NC items
-                        if (ncItemProp.Name.InvariantEquals("key"))
-                            ncItemProp.Value = Guid.NewGuid().ToString();
-                    }
-
-                    // No need to check this property for JSON - as this is a JSON prop we know
-                    // That only contains the string of the doctype alias used as the NC item
-                    if (ncItemProp.Name == NestedContentPropertyEditor.ContentTypeAliasPropertyKey)
-                        continue;
-
-                    // As we don't know what properties in the JSON may contain other complex editors or deep nested NC
-                    // We are detecting if its value stores JSON to help filter the list AND that in its JSON it has ncContentTypeAlias prop
-                    var ncItemPropVal = ncItemProp.Value?.ToString();
-
-                    if (ncItemPropVal.DetectIsJson())
-                    {
-                        // Parse the nested JSON (complex editor)
-                        var complexEditorJson = JToken.Parse(ncItemPropVal);
-
-                        // Verify the complex editor is nested content (Will have one or more ncContentTypeAlias)
-                        // One for each NC item/row
-                        var hasNestedContentJsonProp = complexEditorJson.SelectTokens($"$..['{NestedContentPropertyEditor.ContentTypeAliasPropertyKey}']", false);
-                        if (hasNestedContentJsonProp.Count() > 0)
-                        {
-                            // Recurse & update this JSON property
-                            ncItemProp.Value = CreateNestedContentKeys(ncItemPropVal, onlyMissingKeys);
-                        }
+                        // recurse
+                        var parsed = JToken.Parse(propVal);
+                        UpdateNestedContentKeysRecursively(parsed, onlyMissingKeys, createGuid);
+                        // set the value to the updated one
+                        prop.Value = parsed.ToString();
                     }
                 }
             }
-
-            return ncJson.ToString();
         }
+
     }
 }
