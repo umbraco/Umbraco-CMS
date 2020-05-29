@@ -71,7 +71,6 @@ namespace Umbraco.Web.Runtime
             composition.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
                 .Add(composition.TypeLoader.GetSurfaceControllers());
 
-
             // add all known factories, devs can then modify this list on application
             // startup either by binding to events or in their own global.asax
             composition.FilteredControllerFactory()

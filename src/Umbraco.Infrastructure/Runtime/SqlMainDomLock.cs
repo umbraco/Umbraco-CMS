@@ -3,9 +3,12 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core.Configuration;
+using System.Web;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -17,9 +20,10 @@ namespace Umbraco.Core.Runtime
     public class SqlMainDomLock : IMainDomLock
     {
         private string _lockId;
-        private const string MainDomKey = "Umbraco.Core.Runtime.SqlMainDom";
+        private const string MainDomKeyPrefix = "Umbraco.Core.Runtime.SqlMainDom";
         private const string UpdatedSuffix = "_updated";
         private readonly ILogger _logger;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private IUmbracoDatabase _db;
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private SqlServerSyntaxProvider _sqlServerSyntax = new SqlServerSyntaxProvider();
@@ -28,17 +32,20 @@ namespace Umbraco.Core.Runtime
         private bool _hasError;
         private object _locker = new object();
 
-        public SqlMainDomLock(ILogger logger, IGlobalSettings globalSettings, IConnectionStrings connectionStrings, IDbProviderFactoryCreator dbProviderFactoryCreator)
+        public SqlMainDomLock(ILogger logger, IGlobalSettings globalSettings, IConnectionStrings connectionStrings, IDbProviderFactoryCreator dbProviderFactoryCreator, IHostingEnvironment hostingEnvironment)
         {
             // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
             _lockId = Guid.NewGuid().ToString();
             _logger = logger;
+            _hostingEnvironment = hostingEnvironment;
             _dbFactory = new UmbracoDatabaseFactory(_logger,
                globalSettings,
                connectionStrings,
                Constants.System.UmbracoConnectionName,
                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())),
                dbProviderFactoryCreator);
+
+            MainDomKey = MainDomKeyPrefix + "-" + (NetworkHelper.MachineName + MainDom.GetMainDomId(_hostingEnvironment)).GenerateHash<SHA1>();
         }
 
         public async Task<bool> AcquireLockAsync(int millisecondsTimeout)
@@ -127,6 +134,16 @@ namespace Umbraco.Core.Runtime
             return Task.Factory.StartNew(ListeningLoop, _cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
         }
+
+        /// <summary>
+        /// Returns the keyvalue table key for the current server/app
+        /// </summary>
+        /// <remarks>
+        /// The key is the the normal MainDomId which takes into account the AppDomainAppId and the physical file path of the app and this is
+        /// combined with the current machine name. The machine name is required because the default semaphore lock is machine wide so it implicitly
+        /// takes into account machine name whereas this needs to be explicitly per machine.
+        /// </remarks>
+        private string MainDomKey { get; }
 
         private void ListeningLoop()
         {

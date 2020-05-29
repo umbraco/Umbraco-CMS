@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 
@@ -50,14 +51,17 @@ namespace Umbraco.Web.Models.Trees
             var item = _actionCollection.GetAction<T>();
             if (item == null) return null;
 
+            var values = textService.GetAllStoredValues(Thread.CurrentThread.CurrentUICulture);
+            values.TryGetValue($"visuallyHiddenTexts/{item.Alias}Description", out var textDescription);
+
             var menuItem = new MenuItem(item, textService.Localize($"actions/{item.Alias}"))
             {
                 SeparatorBefore = hasSeparator,
-                OpensDialog = opensDialog
+                OpensDialog = opensDialog,
+                TextDescription = textDescription,
             };
 
             return menuItem;
         }
-
     }
 }
