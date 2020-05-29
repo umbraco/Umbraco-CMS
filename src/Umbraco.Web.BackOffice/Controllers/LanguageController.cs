@@ -78,7 +78,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Deletes a language with a given ID
         /// </summary>
-        [TypeFilter(typeof(UmbracoTreeAuthorizeAttribute), Arguments = new object[]{new string[]{ Constants.Trees.Languages} })]
+        [UmbracoTreeAuthorizeAttribute(Constants.Trees.Languages)]
         [HttpDelete]
         [HttpPost]
         public IActionResult DeleteLanguage(int id)
@@ -107,7 +107,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Creates or saves a language
         /// </summary>
-        [TypeFilter(typeof(UmbracoTreeAuthorizeAttribute), Arguments = new object[]{new string[]{ Constants.Trees.Languages} })]
+        [UmbracoTreeAuthorizeAttribute(Constants.Trees.Languages)]
         [HttpPost]
         public Language SaveLanguage(Language language)
         {

@@ -18,7 +18,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.BackOffice.Controllers
 {
     [PluginController("UmbracoApi")]
-    [TypeFilter(typeof(UmbracoApplicationAuthorizeAttribute), Arguments = new object[]{new string[]{Constants.Applications.Content} })]
+    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
     public class RelationController : UmbracoAuthorizedJsonController
     {
         private readonly UmbracoMapper _umbracoMapper;

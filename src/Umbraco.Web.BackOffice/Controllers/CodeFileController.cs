@@ -30,7 +30,7 @@ using Umbraco.Web.Editors;
     // ref: https://www.exceptionnotfound.net/the-asp-net-web-api-exception-handling-pipeline-a-guided-tour/
     [PluginController("UmbracoApi")]
     //[PrefixlessBodyModelValidator]
-    [TypeFilter(typeof(UmbracoApplicationAuthorizeAttribute), Arguments = new object[]{new string []{Constants.Applications.Settings}})]
+    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Settings)]
     public class CodeFileController : BackOfficeNotificationsController
     {
         private readonly IIOHelper _ioHelper;

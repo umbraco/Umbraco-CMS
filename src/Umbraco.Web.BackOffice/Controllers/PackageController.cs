@@ -24,7 +24,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// A controller used for managing packages in the back office
     /// </summary>
     [PluginController("UmbracoApi")]
-    [TypeFilter(typeof(UmbracoApplicationAuthorizeAttribute), Arguments = new object[]{new string[]{Constants.Applications.Packages}})]
+    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Packages)]
     public class PackageController : UmbracoAuthorizedJsonController
     {
         private readonly IHostingEnvironment _hostingEnvironment;

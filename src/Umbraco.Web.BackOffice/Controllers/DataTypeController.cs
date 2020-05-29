@@ -28,7 +28,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// Content Types, Member Types or Media Types ... and of course to Data Types
     /// </remarks>
     [PluginController("UmbracoApi")]
-    [TypeFilter(typeof(UmbracoTreeAuthorizeAttribute), Arguments = new object[]{new string[]{Constants.Trees.DataTypes, Constants.Trees.DocumentTypes, Constants.Trees.MediaTypes, Constants.Trees.MemberTypes}})]
+    [UmbracoTreeAuthorizeAttribute(Constants.Trees.DataTypes, Constants.Trees.DocumentTypes, Constants.Trees.MediaTypes, Constants.Trees.MemberTypes)]
     public class DataTypeController : BackOfficeNotificationsController
     {
         private readonly PropertyEditorCollection _propertyEditors;
@@ -408,8 +408,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
-        [TypeFilter(typeof(UmbracoApplicationAuthorizeAttribute), Arguments = new object[]{new string []{Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
-            Constants.Applications.Settings, Constants.Applications.Packages}})]
+        [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+            Constants.Applications.Settings, Constants.Applications.Packages)]
         public IEnumerable<DataTypeBasic> GetAll()
         {
             return _dataTypeService
@@ -424,8 +424,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
-        [TypeFilter(typeof(UmbracoTreeAuthorizeAttribute), Arguments = new object[]{new string[]{Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
-            Constants.Applications.Settings, Constants.Applications.Packages}})]
+        [UmbracoTreeAuthorizeAttribute(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+            Constants.Applications.Settings, Constants.Applications.Packages)]
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedDataTypes()
         {
             var dataTypes = _dataTypeService
@@ -456,8 +456,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
-        [TypeFilter(typeof(UmbracoTreeAuthorizeAttribute), Arguments = new object[]{new string[]{Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
-            Constants.Applications.Settings, Constants.Applications.Packages}})]
+        [UmbracoTreeAuthorizeAttribute(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+            Constants.Applications.Settings, Constants.Applications.Packages)]
 
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedPropertyEditors()
         {
@@ -489,8 +489,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
-        [TypeFilter(typeof(UmbracoTreeAuthorizeAttribute), Arguments = new object[]{new string[]{Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
-            Constants.Applications.Settings, Constants.Applications.Packages}})]
+        [UmbracoTreeAuthorizeAttribute(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+            Constants.Applications.Settings, Constants.Applications.Packages)]
 
         public IEnumerable<PropertyEditorBasic> GetAllPropertyEditors()
         {

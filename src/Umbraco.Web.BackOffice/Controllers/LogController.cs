@@ -58,7 +58,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _sqlContext = sqlContext ?? throw new ArgumentNullException(nameof(sqlContext));
          }
 
-        [TypeFilter(typeof(UmbracoApplicationAuthorizeAttribute), Arguments = new object[]{new string[]{ Constants.Applications.Content, Constants.Applications.Media } })]
+        [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content, Constants.Applications.Media)]
         public PagedResult<AuditLog> GetPagedEntityLog(int id,
             int pageNumber = 1,
             int pageSize = 10,

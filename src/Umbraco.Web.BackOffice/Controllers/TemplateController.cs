@@ -17,7 +17,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Editors
 {
     [PluginController("UmbracoApi")]
-    [TypeFilter(typeof(UmbracoTreeAuthorizeAttribute), Arguments = new object[]{new string[]{Constants.Trees.Templates} })]
+    [UmbracoTreeAuthorizeAttribute(Constants.Trees.Templates)]
     public class TemplateController : BackOfficeNotificationsController
     {
         private readonly IFileService _fileService;

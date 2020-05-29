@@ -30,7 +30,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// A controller used for installing packages and managing all of the data in the packages section in the back office
     /// </summary>
     [PluginController("UmbracoApi")]
-    [TypeFilter(typeof(UmbracoApplicationAuthorizeAttribute), Arguments = new object[]{new string[]{Constants.Applications.Packages} })]
+    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Packages)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
 

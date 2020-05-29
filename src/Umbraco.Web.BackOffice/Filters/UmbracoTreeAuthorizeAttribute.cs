@@ -6,13 +6,24 @@ using Umbraco.Web.Services;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
-    /// <summary>
+
+    public class UmbracoTreeAuthorizeAttribute : TypeFilterAttribute
+    {
+        public UmbracoTreeAuthorizeAttribute(params string[] treeAliases) : base(typeof(UmbracoTreeAuthorizeFilter))
+        {
+            base.Arguments = new object[]
+            {
+                treeAliases
+            };
+        }
+
+         /// <summary>
     /// Ensures that the current user has access to the application for which the specified tree(s) belongs
     /// </summary>
     /// <remarks>
     /// This would allow a tree to be moved between sections
     /// </remarks>
-    public sealed class UmbracoTreeAuthorizeAttribute : IAuthorizationFilter
+    private sealed class UmbracoTreeAuthorizeFilter : IAuthorizationFilter
     {
         /// <summary>
         /// Can be used by unit tests to enable/disable this filter
@@ -32,7 +43,7 @@ namespace Umbraco.Web.BackOffice.Filters
         /// Multiple trees may be specified.
         /// </param>
         /// <param name="treeService"></param>
-        public UmbracoTreeAuthorizeAttribute(ITreeService treeService, IUmbracoContextAccessor umbracoContextAccessor, params string[] treeAliases)
+        public UmbracoTreeAuthorizeFilter(ITreeService treeService, IUmbracoContextAccessor umbracoContextAccessor, params string[] treeAliases)
         {
             _treeService = treeService;
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -68,4 +79,7 @@ namespace Umbraco.Web.BackOffice.Filters
             }
         }
     }
+    }
+
+
 }

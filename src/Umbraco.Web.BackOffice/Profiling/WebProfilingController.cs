@@ -10,8 +10,8 @@ namespace Umbraco.Web.BackOffice.Profiling
     /// <summary>
     /// The API controller used to display the state of the web profiler
     /// </summary>
-    [TypeFilter(typeof(UmbracoApplicationAuthorizeAttribute), Arguments = new object[]{new string []{Constants.Applications.Settings}})]
-    public class WebProfilingController : UmbracoAuthorizedJsonController
+    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Settings)]
+     public class WebProfilingController : UmbracoAuthorizedJsonController
     {
         private readonly IHostingEnvironment _hosting;
 
