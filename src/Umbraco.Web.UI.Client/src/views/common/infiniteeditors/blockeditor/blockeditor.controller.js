@@ -19,12 +19,13 @@ angular.module("umbraco")
 
             // replace view of content app.
             var contentApp = apps.find(entry => entry.alias === "umbContent");
-            contentApp.view = "views/common/infiniteeditors/elementeditor/elementeditor.content.html";
-            
-            if($scope.model.hideContent) {
-                apps.splice(apps.indexOf(contentApp), 1);
-            } else if ($scope.model.openSettings !== true) {
-                contentApp.active = true;
+            if(contentApp) {
+                contentApp.view = "views/common/infiniteeditors/elementeditor/elementeditor.content.html";
+                if($scope.model.hideContent) {
+                    apps.splice(apps.indexOf(contentApp), 1);
+                } else if ($scope.model.openSettings !== true) {
+                    contentApp.active = true;
+                }
             }
 
             // remove info app:
