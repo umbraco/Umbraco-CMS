@@ -87,7 +87,7 @@
 
 
         function getBlockLabel(blockModel) {
-            if(blockModel.labelInterpolator) {
+            if(blockModel.labelInterpolator !== undefined) {
                 // We are just using the data model, since its a key/value object that is live synced. (if we need to add additional vars, we could make a shallow copy and apply those.)
                 return blockModel.labelInterpolator(blockModel.data);
             }
@@ -118,6 +118,10 @@
                     blockModel.watchers.push(isolatedScope.$watch("blockModels._" + blockModel.key + "." + field + ".variants[0].tabs[" + t + "].properties[" + p + "].value", watcherCreator(blockModel, prop)));
                 }
             }
+            if (blockModel.watchers.length === 0) {
+                // If no watcher where created, it means we have no properties to watch. This means that nothing will activate our generate the label, since its only triggered by watchers.
+                blockModel.updateLabel();
+            }
         }
 
         /**
@@ -128,9 +132,7 @@
                 // sync data:
                 blockModel.data[prop.alias] = prop.value;
 
-                // regenerate label.
-                // TODO: could use a debounce.
-                blockModel.label = getBlockLabel(blockModel);
+                blockModel.updateLabel();
             }
         }
 
@@ -283,9 +285,12 @@
                 var blockModel = {};
                 blockModel.key = String.CreateGuid().replace(/-/g, "");
                 blockModel.config = angular.copy(blockConfiguration);
-                if (blockModel.config.label) {
+                if (blockModel.config.label && blockModel.config.label !== "") {
                     blockModel.labelInterpolator = $interpolate(blockModel.config.label);
                 }
+                blockModel.updateLabel = _.debounce(function() {
+                    this.label = getBlockLabel(this);
+                }, 100);
 
                 var contentScaffold = this.getScaffoldFor(blockConfiguration.contentTypeAlias);
                 if(contentScaffold === null) {
