@@ -108,7 +108,6 @@ namespace Umbraco.Web.Runtime
             composition.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
                 .Add(umbracoApiControllerTypes);
 
-
             // add all known factories, devs can then modify this list on application
             // startup either by binding to events or in their own global.asax
             composition.FilteredControllerFactory()

@@ -39,18 +39,22 @@ function fileManager($rootScope) {
                 args.culture = null;
             }
 
+            if (!args.segment) {
+                args.segment = null;
+            }
+
             var metaData = [];
             if (Utilities.isArray(args.metaData)) {
                 metaData = args.metaData;
             }
 
-            //this will clear the files for the current property/culture and then add the new ones for the current property
+            //this will clear the files for the current property/culture/segment and then add the new ones for the current property
             fileCollection = _.reject(fileCollection, function (item) {
-                return item.alias === args.propertyAlias && (!args.culture || args.culture === item.culture);
+                return item.alias === args.propertyAlias && (!args.culture || args.culture === item.culture) && (!args.segment || args.segment === item.segment);
             });
             for (var i = 0; i < args.files.length; i++) {
                 //save the file object to the files collection
-                fileCollection.push({ alias: args.propertyAlias, file: args.files[i], culture: args.culture, metaData: metaData });
+                fileCollection.push({ alias: args.propertyAlias, file: args.files[i], culture: args.culture, segment: args.segment, metaData: metaData });
             }
         },
 

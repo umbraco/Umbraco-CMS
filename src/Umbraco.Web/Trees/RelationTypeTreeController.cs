@@ -11,6 +11,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Routing;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Trees
 {
@@ -40,8 +41,6 @@ namespace Umbraco.Web.Trees
 
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
-            //TODO: Do not allow deleting built in types
-
             var menu = _menuItemCollectionFactory.Create();
 
             if (id == Constants.System.RootString)
@@ -58,7 +57,10 @@ namespace Umbraco.Web.Trees
             var relationType = Services.RelationService.GetRelationTypeById(int.Parse(id));
             if (relationType == null) return menu;
 
-            menu.Items.Add<ActionDelete>(Services.TextService);
+            if (relationType.IsSystemRelationType() == false)
+            {
+                menu.Items.Add<ActionDelete>(Services.TextService);
+            }
 
             return menu;
         }
