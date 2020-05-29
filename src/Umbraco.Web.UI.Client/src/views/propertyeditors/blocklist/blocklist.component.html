@@ -11,10 +11,10 @@
                     type="button"
                     class="btn-reset umb-block-list__block--create-button"
                     ng-click="vm.showCreateDialog($index, $event)"
-                    ng-controller="Umbraco.PropertyEditors.BlockListPropertyEditor.CreateButtonController as vm"
-                    ng-mousemove="vm.onMouseMove($event)"
+                    ng-controller="Umbraco.PropertyEditors.BlockListPropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
+                    ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)"
                 >
-                    <div class="__plus" ng-style="{'left':vm.plusPosX}">+</div>
+                    <div class="__plus" ng-style="{'left':inlineCreateButtonCtrl.plusPosX}">+</div>
                 </button>
 
                 <div class="umb-block-list__block" ng-class="{'--open':block.isOpen}">

@@ -270,7 +270,7 @@
                 var dataModel = this._getDataByUdi(udi);
 
                 if (dataModel === null) {
-                    console.error("Couldnt find content model of "+udi)
+                    console.error("Couldnt find content model of " + udi)
                     return null;
                 }
 
