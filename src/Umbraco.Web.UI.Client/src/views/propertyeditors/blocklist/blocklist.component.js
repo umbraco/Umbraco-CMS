@@ -139,7 +139,7 @@
             if (block === null) return null;
 
             // Lets apply fallback views, and make the view available directly on the blockModel.
-            block.view = (block.config.view ? "/" + block.config.view : (inlineEditing ? "views/blockelements/inlineblock/inlineblock.editor.html" : "views/blockelements/labelblock/labelblock.editor.html"));
+            block.view = (block.config.view ? "/" + block.config.view : (inlineEditing ? "views/propertyeditors/blocklist/blocklistentryeditors/inlineblock/inlineblock.editor.html" : "views/propertyeditors/blocklist/blocklistentryeditors/labelblock/labelblock.editor.html"));
 
             block.showSettings = block.config.settingsElementTypeAlias != null;
 
