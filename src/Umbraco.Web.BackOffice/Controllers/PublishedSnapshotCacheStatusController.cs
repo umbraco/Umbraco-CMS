@@ -1,19 +1,24 @@
 ﻿using System;
-using System.Web.Http;
+using System.Reflection.Metadata;
+using Microsoft.AspNetCore.Mvc;
+using Umbraco.Core;
 using Umbraco.Web.Cache;
-using Umbraco.Web.Composing;
+using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.WebApi;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
+    [IsBackOffice]
     public class PublishedSnapshotCacheStatusController : UmbracoAuthorizedApiController
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
+        private readonly DistributedCache _distributedCache;
 
-        public PublishedSnapshotCacheStatusController(IPublishedSnapshotService publishedSnapshotService)
+        public PublishedSnapshotCacheStatusController(IPublishedSnapshotService publishedSnapshotService, DistributedCache distributedCache)
         {
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
+            _distributedCache = distributedCache;
         }
 
         [HttpPost]
@@ -40,7 +45,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public void ReloadCache()
         {
-            Current.DistributedCache.RefreshAllPublishedSnapshot();
+            _distributedCache.RefreshAllPublishedSnapshot();
         }
     }
 }

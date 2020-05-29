@@ -3,32 +3,23 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Net;
-using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi;
-using Umbraco.Web.WebApi.Filters;
-using System.Net.Http;
 using System.Text;
-using Umbraco.Core.Cache;
-using Umbraco.Web.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Mapping;
-using System.Web.Http.Controllers;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Web.Routing;
+using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Exceptions;
+using Umbraco.Web.Editors;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
-
     /// <summary>
     /// The API controller used for editing data types
     /// </summary>
@@ -37,45 +28,43 @@ namespace Umbraco.Web.Editors
     /// Content Types, Member Types or Media Types ... and of course to Data Types
     /// </remarks>
     [PluginController("UmbracoApi")]
-    [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.DocumentTypes, Constants.Trees.MediaTypes, Constants.Trees.MemberTypes)]
-    [EnableOverrideAuthorization]
-    [DataTypeControllerConfiguration]
+    [UmbracoTreeAuthorizeAttribute(Constants.Trees.DataTypes, Constants.Trees.DocumentTypes, Constants.Trees.MediaTypes, Constants.Trees.MemberTypes)]
     public class DataTypeController : BackOfficeNotificationsController
     {
         private readonly PropertyEditorCollection _propertyEditors;
+        private readonly IDataTypeService _dataTypeService;
         private readonly IContentSettings _contentSettings;
+        private readonly UmbracoMapper _umbracoMapper;
+        private readonly PropertyEditorCollection _propertyEditorCollection;
+        private readonly IContentTypeService _contentTypeService;
+        private readonly IMediaTypeService _mediaTypeService;
+        private readonly IMemberTypeService _memberTypeService;
+        private readonly ILocalizedTextService _localizedTextService;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
         public DataTypeController(
             PropertyEditorCollection propertyEditors,
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger logger,
-            IRuntimeState runtimeState,
-            IShortStringHelper shortStringHelper,
-            UmbracoMapper umbracoMapper,
+            IDataTypeService dataTypeService,
             IContentSettings contentSettings,
-            IPublishedUrlProvider publishedUrlProvider)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
-        {
-            _propertyEditors = propertyEditors;
+            UmbracoMapper umbracoMapper,
+            PropertyEditorCollection propertyEditorCollection,
+            IContentTypeService contentTypeService,
+            IMediaTypeService mediaTypeService,
+            IMemberTypeService memberTypeService,
+            ILocalizedTextService localizedTextService,
+            IUmbracoContextAccessor umbracoContextAccessor)
+         {
+            _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
+            _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
-        }
-
-        /// <summary>
-        /// Configures this controller with a custom action selector
-        /// </summary>
-        private class DataTypeControllerConfigurationAttribute : Attribute, IControllerConfiguration
-        {
-            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
-            {
-                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))
-                ));
-            }
-        }
+            _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
+            _propertyEditorCollection = propertyEditorCollection ?? throw new ArgumentNullException(nameof(propertyEditorCollection));
+            _contentTypeService = contentTypeService ?? throw new ArgumentNullException(nameof(contentTypeService));
+            _mediaTypeService = mediaTypeService ?? throw new ArgumentNullException(nameof(mediaTypeService));
+            _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
+            _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+         }
 
         /// <summary>
         /// Gets data type by name
@@ -84,8 +73,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public DataTypeDisplay GetByName(string name)
         {
-            var dataType = Services.DataTypeService.GetDataType(name);
-            return dataType == null ? null : Mapper.Map<IDataType, DataTypeDisplay>(dataType);
+            var dataType = _dataTypeService.GetDataType(name);
+            return dataType == null ? null : _umbracoMapper.Map<IDataType, DataTypeDisplay>(dataType);
         }
 
         /// <summary>
@@ -93,14 +82,15 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
         public DataTypeDisplay GetById(int id)
         {
-            var dataType = Services.DataTypeService.GetDataType(id);
+            var dataType = _dataTypeService.GetDataType(id);
             if (dataType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-            return Mapper.Map<IDataType, DataTypeDisplay>(dataType);
+            return _umbracoMapper.Map<IDataType, DataTypeDisplay>(dataType);
         }
 
         /// <summary>
@@ -108,14 +98,15 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
         public DataTypeDisplay GetById(Guid id)
         {
-            var dataType = Services.DataTypeService.GetDataType(id);
+            var dataType = _dataTypeService.GetDataType(id);
             if (dataType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-            return Mapper.Map<IDataType, DataTypeDisplay>(dataType);
+            return _umbracoMapper.Map<IDataType, DataTypeDisplay>(dataType);
         }
 
         /// <summary>
@@ -123,18 +114,19 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
         public DataTypeDisplay GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var dataType = Services.DataTypeService.GetDataType(guidUdi.Guid);
+            var dataType = _dataTypeService.GetDataType(guidUdi.Guid);
             if (dataType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-            return Mapper.Map<IDataType, DataTypeDisplay>(dataType);
+            return _umbracoMapper.Map<IDataType, DataTypeDisplay>(dataType);
         }
 
         /// <summary>
@@ -144,17 +136,17 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [HttpDelete]
         [HttpPost]
-        public HttpResponseMessage DeleteById(int id)
+        public IActionResult DeleteById(int id)
         {
-            var foundType = Services.DataTypeService.GetDataType(id);
+            var foundType = _dataTypeService.GetDataType(id);
             if (foundType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
+            var currentUser = _umbracoContextAccessor.GetRequiredUmbracoContext().Security.CurrentUser;
+            _dataTypeService.Delete(foundType, currentUser.Id);
 
-            Services.DataTypeService.Delete(foundType, Security.CurrentUser.Id);
-
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return Ok();
         }
 
         public DataTypeDisplay GetEmpty(int parentId)
@@ -162,7 +154,7 @@ namespace Umbraco.Web.Editors
             // cannot create an "empty" data type, so use something by default.
             var editor = _propertyEditors[Constants.PropertyEditors.Aliases.Label];
             var dt = new DataType(editor, parentId);
-            return Mapper.Map<IDataType, DataTypeDisplay>(dt);
+            return _umbracoMapper.Map<IDataType, DataTypeDisplay>(dt);
         }
 
         /// <summary>
@@ -172,13 +164,13 @@ namespace Umbraco.Web.Editors
         /// <returns>a DataTypeDisplay</returns>
         public DataTypeDisplay GetCustomListView(string contentTypeAlias)
         {
-            var dt = Services.DataTypeService.GetDataType(Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias);
+            var dt = _dataTypeService.GetDataType(Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias);
             if (dt == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            return Mapper.Map<IDataType, DataTypeDisplay>(dt);
+            return _umbracoMapper.Map<IDataType, DataTypeDisplay>(dt);
         }
 
         /// <summary>
@@ -188,17 +180,17 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public DataTypeDisplay PostCreateCustomListView(string contentTypeAlias)
         {
-            var dt = Services.DataTypeService.GetDataType(Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias);
+            var dt = _dataTypeService.GetDataType(Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias);
 
             //if it doesn't exist yet, we will create it.
             if (dt == null)
             {
                 var editor = _propertyEditors[Constants.PropertyEditors.Aliases.ListView];
                 dt = new DataType(editor) { Name = Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias };
-                Services.DataTypeService.Save(dt);
+                _dataTypeService.Save(dt);
             }
 
-            return Mapper.Map<IDataType, DataTypeDisplay>(dt);
+            return _umbracoMapper.Map<IDataType, DataTypeDisplay>(dt);
         }
 
         /// <summary>
@@ -218,11 +210,11 @@ namespace Umbraco.Web.Editors
             if (dataTypeId == -1)
             {
                 //this is a new data type, so just return the field editors with default values
-                return Mapper.Map<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(propEd);
+                return _umbracoMapper.Map<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(propEd);
             }
 
             //we have a data type associated
-            var dataType = Services.DataTypeService.GetDataType(dataTypeId);
+            var dataType = _dataTypeService.GetDataType(dataTypeId);
             if (dataType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -234,11 +226,11 @@ namespace Umbraco.Web.Editors
             if (dataType.EditorAlias == editorAlias)
             {
                 //this is the currently assigned pre-value editor, return with values.
-                return Mapper.Map<IDataType, IEnumerable<DataTypeConfigurationFieldDisplay>>(dataType);
+                return _umbracoMapper.Map<IDataType, IEnumerable<DataTypeConfigurationFieldDisplay>>(dataType);
             }
 
             //these are new pre-values, so just return the field editors with default values
-            return Mapper.Map<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(propEd);
+            return _umbracoMapper.Map<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(propEd);
         }
 
         /// <summary>
@@ -248,20 +240,23 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [HttpDelete]
         [HttpPost]
-        public HttpResponseMessage DeleteContainer(int id)
+        public IActionResult DeleteContainer(int id)
         {
-            Services.DataTypeService.DeleteContainer(id, Security.CurrentUser.Id);
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+            var currentUser = _umbracoContextAccessor.GetRequiredUmbracoContext().Security.CurrentUser;
+            _dataTypeService.DeleteContainer(id, currentUser.Id);
+
+            return Ok();
         }
 
-        public HttpResponseMessage PostCreateContainer(int parentId, string name)
+        public IActionResult PostCreateContainer(int parentId, string name)
         {
-            var result = Services.DataTypeService.CreateContainer(parentId, name, Security.CurrentUser.Id);
+            var currentUser = _umbracoContextAccessor.GetRequiredUmbracoContext().Security.CurrentUser;
+            var result = _dataTypeService.CreateContainer(parentId, name, currentUser.Id);
 
             return result
-                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
-                : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
+                ? Ok(result.Result) //return the id
+                : throw HttpResponseException.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
         /// <summary>
@@ -269,8 +264,8 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="dataType"></param>
         /// <returns></returns>
-        [DataTypeValidate]
-        public DataTypeDisplay PostSave(DataTypeSave dataType)
+        [TypeFilter(typeof(DataTypeValidateAttribute))]
+        public ActionResult<DataTypeDisplay> PostSave(DataTypeSave dataType)
         {
             //If we've made it here, then everything has been wired up and validated by the attribute
 
@@ -286,20 +281,22 @@ namespace Umbraco.Web.Editors
 
             dataType.PersistedDataType.Configuration = configuration;
 
+            var currentUser = _umbracoContextAccessor.GetRequiredUmbracoContext().Security.CurrentUser;
             // save the data type
             try
             {
-                Services.DataTypeService.Save(dataType.PersistedDataType, Security.CurrentUser.Id);
+
+                _dataTypeService.Save(dataType.PersistedDataType, currentUser.Id);
             }
             catch (DuplicateNameException ex)
             {
                 ModelState.AddModelError("Name", ex.Message);
-                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+                throw HttpResponseException.CreateValidationErrorResponse(ModelState);
             }
 
             // map back to display model, and return
-            var display = Mapper.Map<IDataType, DataTypeDisplay>(dataType.PersistedDataType);
-            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/dataTypeSaved"), "");
+            var display = _umbracoMapper.Map<IDataType, DataTypeDisplay>(dataType.PersistedDataType);
+            display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles/dataTypeSaved"), "");
             return display;
         }
 
@@ -308,46 +305,45 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="move"></param>
         /// <returns></returns>
-        public HttpResponseMessage PostMove(MoveOrCopy move)
+        public IActionResult PostMove(MoveOrCopy move)
         {
-            var toMove = Services.DataTypeService.GetDataType(move.Id);
+            var toMove = _dataTypeService.GetDataType(move.Id);
             if (toMove == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
-            var result = Services.DataTypeService.Move(toMove, move.ParentId);
+            var result = _dataTypeService.Move(toMove, move.ParentId);
             if (result.Success)
             {
-                var response = Request.CreateResponse(HttpStatusCode.OK);
-                response.Content = new StringContent(toMove.Path, Encoding.UTF8, "text/plain");
-                return response;
+                return Content(toMove.Path,"text/plain", Encoding.UTF8);
             }
 
             switch (result.Result.Result)
             {
                 case MoveOperationStatusType.FailedParentNotFound:
-                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                    return NotFound();
                 case MoveOperationStatusType.FailedCancelledByEvent:
                     //returning an object of INotificationModel will ensure that any pending
                     // notification messages are added to the response.
-                    return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
+                    throw HttpResponseException.CreateValidationErrorResponse(new SimpleNotificationModel());
                 case MoveOperationStatusType.FailedNotAllowedByPath:
                     var notificationModel = new SimpleNotificationModel();
-                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy/notAllowedByPath"), "");
-                    return Request.CreateValidationErrorResponse(notificationModel);
+                    notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy/notAllowedByPath"), "");
+                    throw HttpResponseException.CreateValidationErrorResponse(notificationModel);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        public HttpResponseMessage PostRenameContainer(int id, string name)
+        public IActionResult PostRenameContainer(int id, string name)
         {
-            var result = Services.DataTypeService.RenameContainer(id, name, Security.CurrentUser.Id);
+            var currentUser = _umbracoContextAccessor.GetRequiredUmbracoContext().Security.CurrentUser;
+            var result = _dataTypeService.RenameContainer(id, name, currentUser.Id);
 
             return result
-                ? Request.CreateResponse(HttpStatusCode.OK, result.Result)
-                : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
+                ? Ok(result.Result)
+                : throw HttpResponseException.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
         /// <summary>
@@ -358,7 +354,7 @@ namespace Umbraco.Web.Editors
         public DataTypeReferences GetReferences(int id)
         {
             var result = new DataTypeReferences();
-            var usages = Services.DataTypeService.GetReferences(id);
+            var usages = _dataTypeService.GetReferences(id);
 
             foreach(var groupOfEntityType in usages.GroupBy(x => x.Key.EntityType))
             {
@@ -366,11 +362,11 @@ namespace Umbraco.Web.Editors
                 var guidsAndPropertyAliases = groupOfEntityType.ToDictionary(i => ((GuidUdi)i.Key).Guid, i => i.Value);
 
                 if (groupOfEntityType.Key == ObjectTypes.GetUdiType(UmbracoObjectTypes.DocumentType))
-                    result.DocumentTypes = GetContentTypeUsages(Services.ContentTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases);
+                    result.DocumentTypes = GetContentTypeUsages(_contentTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases);
                 else if (groupOfEntityType.Key == ObjectTypes.GetUdiType(UmbracoObjectTypes.MediaType))
-                    result.MediaTypes = GetContentTypeUsages(Services.MediaTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases);
+                    result.MediaTypes = GetContentTypeUsages(_mediaTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases);
                 else if (groupOfEntityType.Key == ObjectTypes.GetUdiType(UmbracoObjectTypes.MemberType))
-                    result.MemberTypes = GetContentTypeUsages(Services.MemberTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases);
+                    result.MemberTypes = GetContentTypeUsages(_memberTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases);
             }
 
             return result;
@@ -412,14 +408,13 @@ namespace Umbraco.Web.Editors
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
-        [UmbracoApplicationAuthorize(
-            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+        [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
             Constants.Applications.Settings, Constants.Applications.Packages)]
         public IEnumerable<DataTypeBasic> GetAll()
         {
-            return Services.DataTypeService
+            return _dataTypeService
                      .GetAll()
-                     .Select(Mapper.Map<IDataType, DataTypeBasic>).Where(x => x.IsSystemDataType == false);
+                     .Select(_umbracoMapper.Map<IDataType, DataTypeBasic>).Where(x => x.IsSystemDataType == false);
         }
 
         /// <summary>
@@ -429,17 +424,16 @@ namespace Umbraco.Web.Editors
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
-        [UmbracoTreeAuthorize(
-            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+        [UmbracoTreeAuthorizeAttribute(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
             Constants.Applications.Settings, Constants.Applications.Packages)]
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedDataTypes()
         {
-            var dataTypes = Services.DataTypeService
+            var dataTypes = _dataTypeService
                      .GetAll()
-                     .Select(Mapper.Map<IDataType, DataTypeBasic>)
+                     .Select(_umbracoMapper.Map<IDataType, DataTypeBasic>)
                      .ToArray();
 
-            var propertyEditors = Current.PropertyEditors.ToArray();
+            var propertyEditors =_propertyEditorCollection.ToArray();
 
             foreach (var dataType in dataTypes)
             {
@@ -462,20 +456,20 @@ namespace Umbraco.Web.Editors
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
-        [UmbracoTreeAuthorize(
-            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+        [UmbracoTreeAuthorizeAttribute(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
             Constants.Applications.Settings, Constants.Applications.Packages)]
+
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedPropertyEditors()
         {
             var datatypes = new List<DataTypeBasic>();
             var showDeprecatedPropertyEditors = _contentSettings.ShowDeprecatedPropertyEditors;
 
-            var propertyEditors = Current.PropertyEditors
+            var propertyEditors =_propertyEditorCollection
                 .Where(x=>x.IsDeprecated == false || showDeprecatedPropertyEditors);
             foreach (var propertyEditor in propertyEditors)
             {
                 var hasPrevalues = propertyEditor.GetConfigurationEditor().Fields.Any();
-                var basic = Mapper.Map<DataTypeBasic>(propertyEditor);
+                var basic = _umbracoMapper.Map<DataTypeBasic>(propertyEditor);
                 basic.HasPrevalues = hasPrevalues;
                 datatypes.Add(basic);
             }
@@ -495,14 +489,14 @@ namespace Umbraco.Web.Editors
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
-        [UmbracoTreeAuthorize(
-            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+        [UmbracoTreeAuthorizeAttribute(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
             Constants.Applications.Settings, Constants.Applications.Packages)]
+
         public IEnumerable<PropertyEditorBasic> GetAllPropertyEditors()
         {
-            return Current.PropertyEditors
+            return _propertyEditorCollection
                 .OrderBy(x => x.Name)
-                .Select(Mapper.Map<PropertyEditorBasic>);
+                .Select(_umbracoMapper.Map<PropertyEditorBasic>);
         }
         #endregion
     }

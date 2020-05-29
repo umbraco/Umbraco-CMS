@@ -9,10 +9,8 @@ namespace Umbraco.Web.Models
     /// A model that represents uploading a local package
     /// </summary>
     [DataContract(Name = "localPackageInstallModel")]
-    public class LocalPackageInstallModel : PackageInstallModel, IHaveUploadedFiles, INotificationModel
+    public class LocalPackageInstallModel : PackageInstallModel,  INotificationModel
     {
-        public List<ContentPropertyFile> UploadedFiles { get; } = new List<ContentPropertyFile>();
-
         [DataMember(Name = "notifications")]
         public List<BackOfficeNotification> Notifications { get; } = new List<BackOfficeNotification>();
 

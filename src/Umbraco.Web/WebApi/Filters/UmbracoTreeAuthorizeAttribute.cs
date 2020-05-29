@@ -5,6 +5,7 @@ using System.Web.Http.Filters;
 using Umbraco.Core;
 using Umbraco.Web.Composing;
 
+//MOVED to netcore
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>

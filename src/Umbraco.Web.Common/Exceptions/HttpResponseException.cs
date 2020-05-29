@@ -4,6 +4,7 @@ using System.Net;
 using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Common.Exceptions
 {
@@ -68,5 +69,16 @@ namespace Umbraco.Web.Common.Exceptions
                 }
             };
         }
+
+        public static HttpResponseException CreateNotificationValidationErrorResponse(string errorMessage)
+        {
+            var notificationModel = new SimpleNotificationModel
+            {
+                Message = errorMessage
+            };
+            notificationModel.AddErrorNotification(errorMessage, string.Empty);
+            return CreateValidationErrorResponse(notificationModel);
+        }
+
     }
 }
