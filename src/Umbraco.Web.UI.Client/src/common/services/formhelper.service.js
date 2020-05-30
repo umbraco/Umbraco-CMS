@@ -72,12 +72,6 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                     firstErrorEl.focus();
                 }
             }
-
-            // var firstErrorEl = invalidElements.find(el => el.type !== "hidden" && nodeNamesToCheck.includes(el.nodeName));
-            // console.log(firstErrorEl);
-            // if(firstErrorEl !== undefined) {
-            //     firstErrorEl.focus();
-            // }
         },
 
         /**
