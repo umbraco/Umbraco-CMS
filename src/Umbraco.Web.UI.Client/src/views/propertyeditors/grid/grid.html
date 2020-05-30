@@ -153,9 +153,10 @@
                                                       </div>
 
                                                       <div class="cell-tools" ng-if="(area === active || area === currentCellWithActiveChild) && !sortMode">
-                                                         <div class="cell-tool" ng-click="editGridItemSettings(area, 'cell')">
-                                                            <i class="icon-settings"></i>
-                                                         </div>
+                                                         <button type="button" aria-haspopup="true" class="btn-reset cell-tool" ng-click="editGridItemSettings(area, 'cell')">
+                                                            <i class="icon-settings" aria-hidden></i>
+                                                            <span class="sr-only">Open column settings</span>
+                                                         </button>
                                                       </div>
 
                                                       <div class="umb-cell-inner" ui-sortable="sortableOptionsCell" umb-grid-hack-scope ng-model="area.controls">
