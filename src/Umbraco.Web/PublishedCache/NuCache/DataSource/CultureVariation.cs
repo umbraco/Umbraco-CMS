@@ -8,16 +8,28 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     /// </summary>
     internal class CultureVariation
     {
-        [JsonProperty("name")]
+        [JsonProperty("nm")]
         public string Name { get; set; }
 
-        [JsonProperty("urlSegment")]
+        [JsonProperty("us")]
         public string UrlSegment { get; set; }
 
-        [JsonProperty("date")]
+        [JsonProperty("dt")]
         public DateTime Date { get; set; }
 
-        [JsonProperty("isDraft")]
+        [JsonProperty("isd")]
         public bool IsDraft { get; set; }
+
+        [JsonProperty("name")]
+        private string LegacyName { set { Name = value; } }
+
+        [JsonProperty("urlSegment")]
+        private string LegacyUrlSegment { set { UrlSegment = value; } }
+
+        [JsonProperty("date")]
+        private DateTime LegacyDate { set { Date = value; } }
+
+        [JsonProperty("isDraft")]
+        private bool LegacyIsDraft { set { IsDraft = value; } }
     }
 }
