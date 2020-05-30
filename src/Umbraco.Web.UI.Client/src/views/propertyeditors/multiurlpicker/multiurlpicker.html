@@ -17,13 +17,12 @@
             </umb-node-preview>
         </div>
 
-        <a ng-show="!model.config.maxNumber || renderModel.length < model.config.maxNumber"
-           class="umb-node-preview-add"
-           href
+        <button ng-show="!model.config.maxNumber || renderModel.length < model.config.maxNumber"
+           class="umb-node-preview-add btn-reset"
            ng-click="openLinkPicker()"
-           prevent-default>
+           type="button">
             <localize key="general_add">Add</localize>
-        </a>
+        </button>
 
         <div class="umb-contentpicker__min-max-help">
 
