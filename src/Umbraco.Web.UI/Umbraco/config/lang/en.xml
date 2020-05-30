@@ -2035,7 +2035,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="validationRegExpMessage">Enter a custom validation error message (optional)</key>
     <key alias="minCount">You need to add at least</key>
     <key alias="maxCount">You can only have</key>
+    <key alias="addUpTo">Add up to</key>
     <key alias="items">items</key>
+    <key alias="urls">url(s)</key>
+    <key alias="urlsSelected">url(s) selected</key>
     <key alias="itemsSelected">items selected</key>
     <key alias="invalidDate">Invalid date</key>
     <key alias="invalidNumber">Not a number</key>
