@@ -120,7 +120,6 @@ namespace Umbraco.Web.PropertyEditors
 
                 return editorJson?.ToString(); // unchanged
             }
-
             // process the file
             var filepath = editorJson == null ? null : ProcessFile(editorValue, file, currentPath, cuid, puid);
 
@@ -147,7 +146,7 @@ namespace Umbraco.Web.PropertyEditors
 
             // get the filepath
             // in case we are using the old path scheme, try to re-use numbers (bah...)
-            var filepath = _mediaFileSystem.GetMediaPath(file.FileName, currentPath, cuid, puid); // fs-relative path
+            var filepath = _mediaFileSystem.GetMediaPath(file.FileName, currentPath, cuid, puid, file.Culture); // fs-relative path
 
             using (var filestream = File.OpenRead(file.TempFilePath))
             {

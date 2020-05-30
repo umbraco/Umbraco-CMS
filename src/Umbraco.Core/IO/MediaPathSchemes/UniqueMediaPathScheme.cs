@@ -14,12 +14,12 @@ namespace Umbraco.Core.IO.MediaPathSchemes
         private const int DirectoryLength = 8;
 
         /// <inheritdoc />
-        public string GetFilePath(IMediaFileSystem fileSystem, Guid itemGuid, Guid propertyGuid, string filename, string previous = null)
+        public string GetFilePath(IMediaFileSystem fileSystem, Guid itemGuid, Guid propertyGuid, string filename, string previous = null, string culture = null)
         {
             var combinedGuid = GuidUtils.Combine(itemGuid, propertyGuid);
             var directory = GuidUtils.ToBase32String(combinedGuid, DirectoryLength);
 
-            return Path.Combine(directory, filename).Replace('\\', '/');
+            return Path.Combine(directory, culture ?? "", filename).Replace('\\', '/');
         }
 
         /// <inheritdoc />

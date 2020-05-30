@@ -168,7 +168,7 @@ namespace Umbraco.Web.PropertyEditors
                     var src = GetFileSrcFromPropertyValue(propVal, out var jo);
                     if (src == null) continue;
                     var sourcePath = _mediaFileSystem.GetRelativePath(src);
-                    var copyPath = _mediaFileSystem.CopyFile(args.Copy, property.PropertyType, sourcePath);
+                    var copyPath = _mediaFileSystem.CopyFile(args.Copy, property.PropertyType, sourcePath, propertyValue.Culture);
                     jo["src"] = _mediaFileSystem.GetUrl(copyPath);
                     args.Copy.SetValue(property.Alias, jo.ToString(), propertyValue.Culture, propertyValue.Segment);
                     isUpdated = true;

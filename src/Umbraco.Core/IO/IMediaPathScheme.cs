@@ -15,8 +15,9 @@ namespace Umbraco.Core.IO
         /// <param name="propertyGuid">The property type unique identifier.</param>
         /// <param name="filename">The file name.</param>
         /// <param name="previous">A previous filename.</param>
+        /// <param name="culture">The culture to include in the path..</param>
         /// <returns>The filesystem-relative complete file path.</returns>
-        string GetFilePath(IMediaFileSystem fileSystem, Guid itemGuid, Guid propertyGuid, string filename, string previous = null);
+        string GetFilePath(IMediaFileSystem fileSystem, Guid itemGuid, Guid propertyGuid, string filename, string previous = null, string culture = null);
 
         /// <summary>
         /// Gets the directory that can be deleted when the file is deleted.

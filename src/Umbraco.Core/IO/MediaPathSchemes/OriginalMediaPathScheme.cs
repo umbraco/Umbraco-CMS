@@ -22,7 +22,7 @@ namespace Umbraco.Core.IO.MediaPathSchemes
         private bool _folderCounterInitialized;
 
         /// <inheritdoc />
-        public string GetFilePath(IMediaFileSystem fileSystem, Guid itemGuid, Guid propertyGuid, string filename, string previous = null)
+        public string GetFilePath(IMediaFileSystem fileSystem, Guid itemGuid, Guid propertyGuid, string filename, string previous = null, string culture = null)
         {
             string directory;
             if (previous != null)
@@ -45,7 +45,7 @@ namespace Umbraco.Core.IO.MediaPathSchemes
             if (directory == null)
                 throw new InvalidOperationException("Cannot use a null directory.");
 
-            return Path.Combine(directory, filename).Replace('\\', '/');
+            return Path.Combine(directory, culture ?? "", filename).Replace('\\', '/');
         }
 
         /// <inheritdoc />
