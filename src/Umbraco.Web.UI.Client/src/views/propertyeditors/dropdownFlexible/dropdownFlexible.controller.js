@@ -18,7 +18,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleCo
         
         //ensure when form is saved that we don't store [] or [null] as string values in the database when no items are selected
         $scope.$on("formSubmitting", function () {
-            if ($scope.model.value.length === 0 || $scope.model.value[0] === null) {
+            if ($scope.model.value !== null && ($scope.model.value.length === 0 || $scope.model.value[0] === null)) {
                 $scope.model.value = null;
             }
         });
