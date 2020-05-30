@@ -61,6 +61,17 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             return true;
         },
 
+         /**
+         * @ngdoc function
+         * @name umbraco.services.formHelper#focusOnFirstError
+         * @methodOf umbraco.services.formHelper
+         * @function
+         *
+         * @description
+         * Called by submitForm when a form has been submitted, it will fire a focus on the first found invalid umb-property it finds in the form..
+         * 
+         * @param {object} form Pass in a form object.
+         */
         focusOnFirstError: function(form) {
             var invalidNgForms = form.$$element.find(`.umb-property ng-form.ng-invalid, .umb-property-editor ng-form.ng-invalid-required`);
             var firstInvalidNgForm = invalidNgForms.first();
