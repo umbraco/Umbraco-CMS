@@ -16,20 +16,20 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly ContentNode _contentNode;
         private readonly string _urlSegment;
-
+        private readonly IPublishedCachePropertyKeyMapper _publishedCachePropertyKeyMapper;
         #region Constructors
 
         public PublishedContent(
             ContentNode contentNode,
             ContentData contentData,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            IVariationContextAccessor variationContextAccessor)
+            IVariationContextAccessor variationContextAccessor, IPublishedCachePropertyKeyMapper publishedCachePropertyKeyMapper)
         {
             _contentNode = contentNode ?? throw new ArgumentNullException(nameof(contentNode));
             ContentData = contentData ?? throw new ArgumentNullException(nameof(contentData));
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
             VariationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
-
+            _publishedCachePropertyKeyMapper = publishedCachePropertyKeyMapper ?? throw new ArgumentNullException(nameof(publishedCachePropertyKeyMapper));
             _urlSegment = ContentData.UrlSegment;
             IsPreviewing = ContentData.Published == false;
 
@@ -38,7 +38,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 // add one property per property type - this is required, for the indexing to work
                 // if contentData supplies pdatas, use them, else use null
-                contentData.Properties.TryGetValue(propertyType.Alias, out var pdatas); // else will be null
+                contentData.Properties.TryGetValue(_publishedCachePropertyKeyMapper.ToCacheAlias(propertyType), out var pdatas); // else will be null
                 properties.Add(new Property(propertyType, this, pdatas, _publishedSnapshotAccessor));
             }
             PropertiesArray = properties.ToArray();

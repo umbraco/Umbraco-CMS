@@ -35,6 +35,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IPublishedCachePropertyKeyMapper _publishedCachePropertyKeyMapper;
         private readonly ConcurrentDictionary<int, LinkedNode<ContentNode>> _contentNodes;
         private LinkedNode<ContentNode> _root;
         private readonly ConcurrentDictionary<int, LinkedNode<IPublishedContentType>> _contentTypesById;
@@ -61,12 +62,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public ContentStore(
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IVariationContextAccessor variationContextAccessor,
-            ILogger logger,
+            ILogger logger,IPublishedCachePropertyKeyMapper publishedCachePropertyKeyMapper,
             BPlusTree<int, ContentNodeKit> localDb = null)
         {
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _variationContextAccessor = variationContextAccessor;
             _logger = logger;
+            _publishedCachePropertyKeyMapper = publishedCachePropertyKeyMapper;
             _localDb = localDb;
 
             _contentNodes = new ConcurrentDictionary<int, LinkedNode<ContentNode>>();
@@ -547,7 +549,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var canBePublished = ParentPublishedLocked(kit);
 
             // and use
-            kit.Build(link.Value, _publishedSnapshotAccessor, _variationContextAccessor, canBePublished);
+            kit.Build(link.Value, _publishedSnapshotAccessor, _variationContextAccessor, _publishedCachePropertyKeyMapper, canBePublished);
 
             return true;
         }

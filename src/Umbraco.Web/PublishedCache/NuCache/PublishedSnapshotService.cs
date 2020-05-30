@@ -48,6 +48,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
+        private readonly IPublishedCachePropertyKeyMapper _publishedCachePropertyKeyMapper;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -81,7 +82,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IDataSource dataSource, IGlobalSettings globalSettings,
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
-            UrlSegmentProviderCollection urlSegmentProviders)
+            UrlSegmentProviderCollection urlSegmentProviders, IPublishedCachePropertyKeyMapper publishedCachePropertyKeyMapper)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -98,6 +99,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
             _urlSegmentProviders = urlSegmentProviders;
+            _publishedCachePropertyKeyMapper = publishedCachePropertyKeyMapper;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -132,16 +134,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // figure out whether it can read the databases or it should populate them from sql
 
                     _logger.Info<PublishedSnapshotService>("Creating the content store, localContentDbExists? {LocalContentDbExists}", _localContentDbExists);
-                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localContentDb);
+                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, publishedCachePropertyKeyMapper, _localContentDb);
                     _logger.Info<PublishedSnapshotService>("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _localMediaDbExists);
-                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localMediaDb);
+                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, publishedCachePropertyKeyMapper, _localMediaDb);
                 }
                 else
                 {
                     _logger.Info<PublishedSnapshotService>("Creating the content store (local db ignored)");
-                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger);
+                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, publishedCachePropertyKeyMapper);
                     _logger.Info<PublishedSnapshotService>("Creating the media store (local db ignored)");
-                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger);
+                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, publishedCachePropertyKeyMapper);
                 }
 
                 _domainStore = new SnapDictionary<int, Domain>();
@@ -1226,7 +1228,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, domainCache, _globalSettings, VariationContextAccessor),
                 MediaCache = new MediaCache(previewDefault, mediaSnap, VariationContextAccessor),
-                MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, memberTypeCache, PublishedSnapshotAccessor, VariationContextAccessor, _entitySerializer),
+                MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, memberTypeCache, PublishedSnapshotAccessor, VariationContextAccessor, _entitySerializer, _publishedCachePropertyKeyMapper),
                 DomainCache = domainCache,
                 SnapshotCache = snapshotCache,
                 ElementsCache = elementsCache
@@ -1326,13 +1328,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var dto = GetDto(content, published);
             db.InsertOrUpdate(dto,
-                "SET data=@data, rv=rv+1,archived=@archived WHERE nodeId=@id AND published=@published",
+                "SET data=@data, rv=rv+1 WHERE nodeId=@id AND published=@published",
                 new
                 {
                     data = dto.Data,
                     id = dto.NodeId,
-                    published = dto.Published,
-                    archived = dto.Archived
+                    published = dto.Published
                 });
         }
 
@@ -1421,7 +1422,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     //        value = e.ValueEditor.ConvertDbToString(prop, prop.PropertyType, dataTypeService);
                     //}
                 }
-                propertyData[prop.Alias] = pdatas.ToArray();
+                propertyData[_publishedCachePropertyKeyMapper.ToCacheAlias(prop)] = pdatas.ToArray();
             }
 
             var cultureData = new Dictionary<string, CultureVariation>();
@@ -1461,7 +1462,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 NodeId = content.Id,
                 Published = published,
-                Archived = content.HasProperty("isArchived") ? content.GetValue<bool>("isArchived") : false,
 
                 // note that numeric values (which are Int32) are serialized without their
                 // type (eg "value":1234) and JsonConvert by default deserializes them as Int64

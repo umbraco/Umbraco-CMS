@@ -18,6 +18,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             composition.Register(factory => new PublishedSnapshotServiceOptions());
             composition.SetPublishedSnapshotService<PublishedSnapshotService>();
 
+          
+            composition.Register<IPublishedCachePropertyKeyMapper, DefaultPublishedCachePropertyKeyMapper>(Lifetime.Singleton);
+
             // add the NuCache health check (hidden from type finder)
             // TODO: no NuCache health check yet
             //composition.HealthChecks().Add<NuCacheIntegrityHealthCheck>();

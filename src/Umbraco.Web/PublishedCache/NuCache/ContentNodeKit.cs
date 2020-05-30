@@ -21,6 +21,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IPublishedContentType contentType,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IVariationContextAccessor variationContextAccessor,
+            IPublishedCachePropertyKeyMapper publishedCachePropertyKeyMapper,
             bool canBePublished)
         {
             var draftData = DraftData;
@@ -34,7 +35,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (draftData == null && !canBePublished)
                 draftData = PublishedData;
 
-            Node.SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor);
+            Node.SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor, publishedCachePropertyKeyMapper);
         }
 
         public ContentNodeKit Clone()

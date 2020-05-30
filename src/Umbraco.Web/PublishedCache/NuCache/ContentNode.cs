@@ -43,10 +43,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             DateTime createDate, int creatorId,
             ContentData draftData, ContentData publishedData,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            IVariationContextAccessor variationContextAccessor)
+            IVariationContextAccessor variationContextAccessor, IPublishedCachePropertyKeyMapper publishedCachePropertyKeyMapper)
             : this(id, uid, level, path, sortOrder, parentContentId, createDate, creatorId)
         {
-            SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor);
+            SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor, publishedCachePropertyKeyMapper);
         }
 
         // 2-phases ctor, phase 1
@@ -70,7 +70,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // two-phase ctor, phase 2
-        public void SetContentTypeAndData(IPublishedContentType contentType, ContentData draftData, ContentData publishedData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor)
+        public void SetContentTypeAndData(IPublishedContentType contentType, ContentData draftData, ContentData publishedData,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IPublishedCachePropertyKeyMapper publishedCachePropertyKeyMapper)
         {
             ContentType = contentType;
 
@@ -79,6 +80,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _variationContextAccessor = variationContextAccessor;
+            _publishedCachePropertyKeyMapper = publishedCachePropertyKeyMapper;
 
             _draftData = draftData;
             _publishedData = publishedData;
@@ -105,6 +107,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _publishedData = origin._publishedData;
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
             _variationContextAccessor = origin._variationContextAccessor;
+            _publishedCachePropertyKeyMapper = origin._publishedCachePropertyKeyMapper;
         }
 
         // everything that is common to both draft and published versions
@@ -133,6 +136,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private ContentData _publishedData;
         private IVariationContextAccessor _variationContextAccessor;
         private IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+        private IPublishedCachePropertyKeyMapper _publishedCachePropertyKeyMapper;
 
         public bool HasPublished => _publishedData != null;
         public bool HasPublishedCulture(string culture) => _publishedData != null && _publishedData.CultureInfos.ContainsKey(culture);
@@ -151,7 +155,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // more than 1 instance, but the lock below ensures we only ever return
             // 1 unique instance - and locking is a nice explicit way to ensure this
 
-            var m = new PublishedContent(this, contentData, _publishedSnapshotAccessor, _variationContextAccessor).CreateModel();
+            var m = new PublishedContent(this, contentData, _publishedSnapshotAccessor, _variationContextAccessor, _publishedCachePropertyKeyMapper).CreateModel();
 
             // locking 'this' is not a best-practice but ContentNode is internal and
             // we know what we do, so it is fine here and avoids allocating an object

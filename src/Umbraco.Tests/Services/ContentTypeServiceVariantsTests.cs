@@ -52,6 +52,7 @@ namespace Umbraco.Tests.Services
             var documentRepository = Factory.GetInstance<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
+            var publishedCachePropertyMapper = new DefaultPublishedCachePropertyKeyMapper();
 
             return new PublishedSnapshotService(
                 options,
@@ -70,7 +71,7 @@ namespace Umbraco.Tests.Services
                 Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }));
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), publishedCachePropertyMapper);
         }
 
         public class LocalServerMessenger : ServerMessengerBase

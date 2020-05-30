@@ -134,7 +134,7 @@ namespace Umbraco.Tests.PublishedContent
 
             // create a data source for NuCache
             _source = new TestDataSource(kits());
-
+            var publishedCachePropertyMapper = new DefaultPublishedCachePropertyKeyMapper();
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             _snapshotService = new PublishedSnapshotService(options,
@@ -155,7 +155,7 @@ namespace Umbraco.Tests.PublishedContent
                 globalSettings,
                 Mock.Of<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }));
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), publishedCachePropertyMapper);
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
