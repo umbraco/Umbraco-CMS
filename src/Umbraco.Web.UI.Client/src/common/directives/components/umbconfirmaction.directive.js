@@ -98,7 +98,7 @@ The prompt can be opened in four direction up, down, left or right.</p>
       scope: {
         direction: "@",
         show: "<",
-        onDelete: "&",
+        onDelete: "&?",
         onConfirm: "&",
         onCancel: "&"
       },
