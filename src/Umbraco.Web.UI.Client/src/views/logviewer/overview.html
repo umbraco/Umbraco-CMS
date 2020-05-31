@@ -7,7 +7,8 @@
             name-locked="true"
             hide-icon="true"
             hide-description="true"
-            hide-alias="true">
+            hide-alias="true"
+            setPageTitle="true">
         </umb-editor-header>
 
         <umb-editor-container>
@@ -31,17 +32,19 @@
                             <umb-box-header title="Saved Searches"></umb-box-header>
                             <umb-box-content>
                                 <table>
-                                    <tr>
-                                        <td>
-                                            <a ng-click="vm.searchLogQuery()" title="View all Logs" class="btn btn-link">All Logs <i class="icon-search"></i></a>
-                                        </td>
-                                    </tr>
-                                    <!-- Fetch saved searches  -->
-                                    <tr ng-repeat="search in vm.searches">
-                                        <td>
-                                            <a ng-click="vm.searchLogQuery(search.query)" title="{{search.name}}" class="btn btn-link">{{search.name}} <i class="icon-search"></i></a>
-                                        </td>
-                                    </tr>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <button type="button" ng-click="vm.searchLogQuery()" title="View all Logs" class="btn btn-link">All Logs</button>
+                                            </td>
+                                        </tr>
+                                        <!-- Fetch saved searches  -->
+                                        <tr ng-repeat="search in vm.searches">
+                                            <td>
+                                                <button ng-click="vm.searchLogQuery(search.query)" title="{{search.name}}" class="btn btn-link">{{search.name}} <i class="icon-search"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </umb-box-content>
                         </umb-box>
