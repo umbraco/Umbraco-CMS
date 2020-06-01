@@ -141,6 +141,7 @@
     <key alias="saveToPublish">Save and send for approval</key>
     <key alias="saveListView">Save list view</key>
     <key alias="schedulePublish">Schedule</key>
+    <key alias="showPage">Preview</key>
     <key alias="saveAndPreview">Save and preview</key>
     <key alias="showPageDisabled">Preview is disabled because there's no template assigned</key>
     <key alias="styleChoose">Choose style</key>
@@ -168,6 +169,7 @@
     <key alias="sendtopublish">Content sent for publishing</key>
     <key alias="sendtopublishvariant">Content sent for publishing for languages: %0%</key>
     <key alias="sort">Sort child items performed by user</key>
+    <key alias="custom">%0%</key>
     <key alias="smallCopy">Copy</key>
     <key alias="smallPublish">Publish</key>
     <key alias="smallPublishVariant">Publish</key>
@@ -180,6 +182,7 @@
     <key alias="smallSendToPublish">Send To Publish</key>
     <key alias="smallSendToPublishVariant">Send To Publish</key>
     <key alias="smallSort">Sort</key>
+    <key alias="smallCustom">Custom</key>
     <key alias="historyIncludingVariants">History (all variants)</key>
   </area>
   <area alias="changeDocType">
@@ -684,6 +687,7 @@
     <key alias="icon">Icon</key>
     <key alias="id">Id</key>
     <key alias="import">Import</key>
+    <key alias="includeFromsubFolders">Include subfolders in search</key>
     <key alias="excludeFromSubFolders">Search only this folder</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Inner margin</key>
@@ -2226,6 +2230,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="openBackofficeSearch">Open backoffice search</key>
     <key alias="openCloseBackofficeHelp">Open/Close backoffice help</key>
     <key alias="openCloseBackofficeProfileOptions">Open/Close your profile options</key>
+    <key alias="assignDomainDescription">Setup Culture and Hostnames for %0%</key>
+    <key alias="createDescription">Create new node under %0%</key>
+    <key alias="protectDescription">Setup Public access on %0%</key>
+    <key alias="rightsDescription">Setup Permissions on %0%</key>
+    <key alias="sortDescription">Change sort order for %0%</key>
+    <key alias="createblueprintDescription">Create Content Template based on %0%</key>
     <key alias="openContextMenu">Open context menu for</key>
     <key alias="currentLanguage">Current language</key>
     <key alias="switchLanguage">Switch language to</key>
@@ -2241,7 +2251,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="create">Create</key>
     <key alias="edit">Edit</key>
     <key alias="name">Name</key>
-    <key alias="addNewRow">Add new row</key>    
+    <key alias="addNewRow">Add new row</key>
     <key alias="tabExpand">View more options</key>
   </area>
   <area alias="references">
@@ -2412,5 +2422,22 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="formsDashboard">
     <key alias="formsHeadline">Umbraco Forms</key>
     <key alias="formsDescription">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</key>
+  </area>
+  <area alias="contentTemplatesDashboard">
+    <key alias="whatHeadline">What are Content Templates?</key>
+    <key alias="whatDescription">Content Templates are pre-defined content that can be selected when creating a new content node.</key>
+    <key alias="createHeadline">How do I create a Content Template?</key>
+    <key alias="createDescription">
+        <![CDATA[
+            <p>There are two ways to create a Content Template:</p>
+            <ul>
+                <li>Right-click a content node and select "Create Content Template" to create a new Content Template.</li>
+                <li>Right-click the Content Templates tree in the Settings section and select the Document Type you want to create a Content Template for.</li>
+            </ul>
+            <p>Once given a name, editors can start using the Content Template as a foundation for their new page.</p>
+        ]]>
+    </key>
+    <key alias="manageHeadline">How do I manage Content Templates?</key>
+    <key alias="manageDescription">You can edit and delete Content Templates from the "Content Templates" tree in the Settings section. Expand the Document Type which the Content Template is based on and click it to edit or delete it.</key>
   </area>
 </language>

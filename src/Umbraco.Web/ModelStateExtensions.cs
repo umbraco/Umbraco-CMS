@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Web
 {
+    //Migrated to .NET Core except the Merge method
     internal static class ModelStateExtensions
     {
 
@@ -40,7 +38,7 @@ namespace Umbraco.Web
         {
             return state.Where(v => v.Key.StartsWith(prefix + ".")).All(v => !v.Value.Errors.Any());
         }
-        
+
         /// <summary>
         /// Adds the error to model state correctly for a property so we can use it on the client side.
         /// </summary>
@@ -101,7 +99,7 @@ namespace Umbraco.Web
                     var culture = x.culture == "invariant" ? cultureForInvariantErrors : x.culture;
                     var segment = x.segment == "null" ? null : x.segment;
                     return (culture, segment);
-                })                
+                })
                 .Distinct()
                 .ToList();
 
@@ -124,7 +122,7 @@ namespace Umbraco.Web
             //now check the other special variant errors that are
             var genericVariantErrors = modelState.Keys
                 .Where(x => x.StartsWith("_content_variant_") && x.EndsWith("_"))
-                .Select(x => x.TrimStart("_content_variant_").TrimEnd("_"))                
+                .Select(x => x.TrimStart("_content_variant_").TrimEnd("_"))
                 .Select(x =>
                 {
                     // Format "<culture>_<segment>"
@@ -145,7 +143,7 @@ namespace Umbraco.Web
 
             return propertyVariantErrors.Union(genericVariantErrors).Distinct().ToList();
         }
-        
+
         /// <summary>
         /// Adds the error to model state correctly for a property so we can use it on the client side.
         /// </summary>
@@ -173,7 +171,7 @@ namespace Umbraco.Web
             {
                 modelState.TryAddModelError($"{delimitedParts}", result.ErrorMessage);
             }
-                
+
         }
 
         /// <summary>

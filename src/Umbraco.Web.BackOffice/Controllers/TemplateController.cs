@@ -2,43 +2,36 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Web.Http;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.Routing;
-using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
     [PluginController("UmbracoApi")]
-    [UmbracoTreeAuthorize(Constants.Trees.Templates)]
+    [UmbracoTreeAuthorizeAttribute(Constants.Trees.Templates)]
     public class TemplateController : BackOfficeNotificationsController
     {
+        private readonly IFileService _fileService;
+        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IShortStringHelper _shortStringHelper;
+
         public TemplateController(
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger logger,
-            IRuntimeState runtimeState,
-            IShortStringHelper shortStringHelper,
+            IFileService fileService,
             UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
+            IShortStringHelper shortStringHelper)
         {
+            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+            _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
+            _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
         }
 
         /// <summary>
@@ -48,8 +41,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public TemplateDisplay GetByAlias(string alias)
         {
-            var template = Services.FileService.GetTemplate(alias);
-            return template == null ? null : Mapper.Map<ITemplate, TemplateDisplay>(template);
+            var template = _fileService.GetTemplate(alias);
+            return template == null ? null : _umbracoMapper.Map<ITemplate, TemplateDisplay>(template);
         }
 
         /// <summary>
@@ -58,7 +51,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IEnumerable<EntityBasic> GetAll()
         {
-            return Services.FileService.GetTemplates().Select(Mapper.Map<ITemplate, EntityBasic>);
+            return _fileService.GetTemplates().Select(_umbracoMapper.Map<ITemplate, EntityBasic>);
         }
 
         /// <summary>
@@ -68,11 +61,11 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public TemplateDisplay GetById(int id)
         {
-            var template = Services.FileService.GetTemplate(id);
+            var template = _fileService.GetTemplate(id);
             if (template == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            return Mapper.Map<ITemplate, TemplateDisplay>(template);
+            return _umbracoMapper.Map<ITemplate, TemplateDisplay>(template);
         }
 
         /// <summary>
@@ -82,25 +75,25 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [HttpDelete]
         [HttpPost]
-        public HttpResponseMessage DeleteById(int id)
+        public IActionResult DeleteById(int id)
         {
-            var template = Services.FileService.GetTemplate(id);
+            var template = _fileService.GetTemplate(id);
             if (template == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            Services.FileService.DeleteTemplate(template.Alias);
-            return Request.CreateResponse(HttpStatusCode.OK);
+            _fileService.DeleteTemplate(template.Alias);
+            return Ok();
         }
 
         public TemplateDisplay GetScaffold(int id)
         {
             //empty default
-            var dt = new Template(ShortStringHelper, string.Empty, string.Empty);
+            var dt = new Template(_shortStringHelper, string.Empty, string.Empty);
             dt.Path = "-1";
 
             if (id > 0)
             {
-                var master = Services.FileService.GetTemplate(id);
+                var master = _fileService.GetTemplate(id);
                 if(master != null)
                 {
                     dt.SetMasterTemplate(master);
@@ -108,7 +101,7 @@ namespace Umbraco.Web.Editors
             }
 
             var content = ViewHelper.GetDefaultFileContent( layoutPageAlias: dt.MasterTemplateAlias );
-            var scaffold = Mapper.Map<ITemplate, TemplateDisplay>(dt);
+            var scaffold = _umbracoMapper.Map<ITemplate, TemplateDisplay>(dt);
 
             scaffold.Content =  content + "\r\n\r\n@* the fun starts here *@\r\n\r\n";
             return scaffold;
@@ -119,33 +112,33 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="display"></param>
         /// <returns></returns>
-        public TemplateDisplay PostSave(TemplateDisplay display)
+        public ActionResult<TemplateDisplay> PostSave(TemplateDisplay display)
         {
 
             //Checking the submitted is valid with the Required attributes decorated on the ViewModel
             if (ModelState.IsValid == false)
             {
-                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+                return ValidationProblem(ModelState);
             }
 
             if (display.Id > 0)
             {
                 // update
-                var template = Services.FileService.GetTemplate(display.Id);
+                var template = _fileService.GetTemplate(display.Id);
                 if (template == null)
                     throw new HttpResponseException(HttpStatusCode.NotFound);
 
                 var changeMaster = template.MasterTemplateAlias != display.MasterTemplateAlias;
                 var changeAlias = template.Alias != display.Alias;
 
-                Mapper.Map(display, template);
+                _umbracoMapper.Map(display, template);
 
                 if (changeMaster)
                 {
                     if (string.IsNullOrEmpty(display.MasterTemplateAlias) == false)
                     {
 
-                        var master = Services.FileService.GetTemplate(display.MasterTemplateAlias);
+                        var master = _fileService.GetTemplate(display.MasterTemplateAlias);
                         if(master == null || master.Id == display.Id)
                         {
                             template.SetMasterTemplate(null);
@@ -154,7 +147,7 @@ namespace Umbraco.Web.Editors
                             template.SetMasterTemplate(master);
 
                             //After updating the master - ensure we update the path property if it has any children already assigned
-                            var templateHasChildren = Services.FileService.GetTemplateDescendants(display.Id);
+                            var templateHasChildren = _fileService.GetTemplateDescendants(display.Id);
 
                             foreach (var childTemplate in templateHasChildren)
                             {
@@ -177,7 +170,7 @@ namespace Umbraco.Web.Editors
                                 childTemplate.Path = master.Path + "," + display.Id + "," + childTemplatePath;
 
                                 //Save the children with the updated path
-                                Services.FileService.SaveTemplate(childTemplate);
+                                _fileService.SaveTemplate(childTemplate);
                             }
                         }
                     }
@@ -188,14 +181,14 @@ namespace Umbraco.Web.Editors
                     }
                 }
 
-                Services.FileService.SaveTemplate(template);
+                _fileService.SaveTemplate(template);
 
                 if (changeAlias)
                 {
-                    template = Services.FileService.GetTemplate(template.Id);
+                    template = _fileService.GetTemplate(template.Id);
                 }
 
-                Mapper.Map(template, display);
+                _umbracoMapper.Map(template, display);
             }
             else
             {
@@ -203,15 +196,15 @@ namespace Umbraco.Web.Editors
                 ITemplate master = null;
                 if (string.IsNullOrEmpty(display.MasterTemplateAlias) == false)
                 {
-                    master = Services.FileService.GetTemplate(display.MasterTemplateAlias);
+                    master = _fileService.GetTemplate(display.MasterTemplateAlias);
                     if (master == null)
                         throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
 
                 // we need to pass the template name as alias to keep the template file casing consistent with templates created with content
                 // - see comment in FileService.CreateTemplateForContentType for additional details
-                var template = Services.FileService.CreateTemplateWithIdentity(display.Name, display.Name, display.Content, master);
-                Mapper.Map(template, display);
+                var template = _fileService.CreateTemplateWithIdentity(display.Name, display.Name, display.Content, master);
+                _umbracoMapper.Map(template, display);
             }
 
             return display;
