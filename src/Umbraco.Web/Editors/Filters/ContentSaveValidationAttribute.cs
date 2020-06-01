@@ -215,7 +215,7 @@ namespace Umbraco.Web.Editors.Filters
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
             if (accessResult != ContentPermissionsHelper.ContentAccess.Granted)
-                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+                throw new HttpResponseException(actionContext.Request.CreateUserNoAccessResponse());
 
             return accessResult == ContentPermissionsHelper.ContentAccess.Granted;
         }
