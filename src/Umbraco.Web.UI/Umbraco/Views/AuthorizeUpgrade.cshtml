@@ -20,7 +20,7 @@
 
     <title>Umbraco</title>
 
-    @Html.Raw(runtimeMinifier.RenderCssHere(BackOfficeWebAssets.UmbracoUpgradeCssBundleName));
+    @Html.Raw(runtimeMinifier.RenderCssHereAsync(BackOfficeWebAssets.UmbracoUpgradeCssBundleName).Result);
 
     @*Because we're lazy loading angular js, the embedded cloak style will not be loaded initially, but we need it*@
     <style>

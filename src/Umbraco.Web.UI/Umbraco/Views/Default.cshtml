@@ -35,7 +35,7 @@
 
     <title ng-bind="$root.locationTitle">Umbraco</title>
 
-    @Html.Raw(runtimeMinifier.RenderCssHere(BackOfficeWebAssets.UmbracoInitCssBundleName))
+    @Html.Raw(runtimeMinifier.RenderCssHereAsync(BackOfficeWebAssets.UmbracoInitCssBundleName).Result)
 
 </head>
 <body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show, 'umb-tour-is-visible': tour.show, 'tabbing-active':tabbingActive}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">

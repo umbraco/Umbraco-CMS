@@ -15,6 +15,7 @@ using Umbraco.Web.Actions;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors.Filters
 {
