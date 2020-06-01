@@ -324,7 +324,7 @@ namespace Umbraco.Tests.Web.Controllers
             };
 
             var currentUser = MockedUser.GetUserMock();
-            currentUser.Setup(x => x.StartContentIds).Returns(new[] { 9876 });
+            currentUser.Setup(x => x.StartMediaIds).Returns(new[] { 9876 });
             var savingUser = MockedUser.GetUserMock();
 
             var contentService = new Mock<IContentService>();
@@ -363,9 +363,9 @@ namespace Umbraco.Tests.Web.Controllers
             };
 
             var currentUser = MockedUser.GetUserMock();
-            currentUser.Setup(x => x.StartContentIds).Returns(new[] { 9876 });
+            currentUser.Setup(x => x.StartMediaIds).Returns(new[] { 9876 });
             var savingUser = MockedUser.GetUserMock();
-            savingUser.Setup(x => x.StartContentIds).Returns(new[] { 1234 });
+            savingUser.Setup(x => x.StartMediaIds).Returns(new[] { 1234 });
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -403,9 +403,9 @@ namespace Umbraco.Tests.Web.Controllers
             };
 
             var currentUser = MockedUser.GetUserMock();
-            currentUser.Setup(x => x.StartContentIds).Returns(new[] { 9876 });
+            currentUser.Setup(x => x.StartMediaIds).Returns(new[] { 9876 });
             var savingUser = MockedUser.GetUserMock();
-            savingUser.Setup(x => x.StartContentIds).Returns(new[] { 1234, 4567 });
+            savingUser.Setup(x => x.StartMediaIds).Returns(new[] { 1234, 4567 });
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
