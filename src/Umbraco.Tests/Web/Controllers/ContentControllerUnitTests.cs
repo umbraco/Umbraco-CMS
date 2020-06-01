@@ -7,18 +7,20 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Editors;
 
 namespace Umbraco.Tests.Web.Controllers
 {
     [TestFixture]
     public class ContentControllerUnitTests
-    {
+    {        
+
         [Test]
         public void Access_Allowed_By_Path()
         {
             //arrange
-            var userMock = new Mock<IUser>();
+            var userMock = MockedUser.GetUserMock();
             userMock.Setup(u => u.Id).Returns(9);
             userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
             var user = userMock.Object;
@@ -44,7 +46,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void No_Content_Found()
         {
             //arrange
-            var userMock = new Mock<IUser>();
+            var userMock = MockedUser.GetUserMock();
             userMock.Setup(u => u.Id).Returns(9);
             var user = userMock.Object;
             var contentMock = new Mock<IContent>();
@@ -72,7 +74,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void No_Access_By_Path()
         {
             //arrange
-            var userMock = new Mock<IUser>();
+            var userMock = MockedUser.GetUserMock();
             userMock.Setup(u => u.Id).Returns(9);
             userMock.Setup(u => u.StartContentIds).Returns(new[] { 9876 });
             var user = userMock.Object;
@@ -103,7 +105,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void No_Access_By_Permission()
         {
             //arrange
-            var userMock = new Mock<IUser>();
+            var userMock = MockedUser.GetUserMock();
             userMock.Setup(u => u.Id).Returns(9);
             var user = userMock.Object;
             var contentMock = new Mock<IContent>();
@@ -134,7 +136,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Access_Allowed_By_Permission()
         {
             //arrange
-            var userMock = new Mock<IUser>();
+            var userMock = MockedUser.GetUserMock();
             userMock.Setup(u => u.Id).Returns(9);
             userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
             var user = userMock.Object;
@@ -166,7 +168,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Access_To_Root_By_Path()
         {
             //arrange
-            var userMock = new Mock<IUser>();
+            var userMock = MockedUser.GetUserMock();
             userMock.Setup(u => u.Id).Returns(0);
             userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
             var user = userMock.Object;
@@ -188,7 +190,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Access_To_Recycle_Bin_By_Path()
         {
             //arrange
-            var userMock = new Mock<IUser>();
+            var userMock = MockedUser.GetUserMock();
             userMock.Setup(u => u.Id).Returns(0);
             userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
             var user = userMock.Object;
@@ -210,7 +212,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void No_Access_To_Recycle_Bin_By_Path()
         {
             //arrange
-            var userMock = new Mock<IUser>();
+            var userMock = MockedUser.GetUserMock();
             userMock.Setup(u => u.Id).Returns(0);
             userMock.Setup(u => u.StartContentIds).Returns(new[] { 1234 });
             var user = userMock.Object;
@@ -234,7 +236,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void No_Access_To_Root_By_Path()
         {
             //arrange
-            var userMock = new Mock<IUser>();
+            var userMock = MockedUser.GetUserMock();
             userMock.Setup(u => u.Id).Returns(0);
             userMock.Setup(u => u.StartContentIds).Returns(new[] { 1234 });
             var user = userMock.Object;
@@ -258,7 +260,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Access_To_Root_By_Permission()
         {
             //arrange
-            var userMock = new Mock<IUser>();
+            var userMock = MockedUser.GetUserMock();
             userMock.Setup(u => u.Id).Returns(0);
             userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
             var user = userMock.Object;
@@ -288,7 +290,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void No_Access_To_Root_By_Permission()
         {
             //arrange
-            var userMock = new Mock<IUser>();
+            var userMock = MockedUser.GetUserMock();
             userMock.Setup(u => u.Id).Returns(0);
             var user = userMock.Object;
 
@@ -316,7 +318,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Access_To_Recycle_Bin_By_Permission()
         {
             //arrange
-            var userMock = new Mock<IUser>();
+            var userMock = MockedUser.GetUserMock();
             userMock.Setup(u => u.Id).Returns(0);
             userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
             var user = userMock.Object;
@@ -346,7 +348,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void No_Access_To_Recycle_Bin_By_Permission()
         {
             //arrange
-            var userMock = new Mock<IUser>();
+            var userMock = MockedUser.GetUserMock();
             userMock.Setup(u => u.Id).Returns(0);
             var user = userMock.Object;
 

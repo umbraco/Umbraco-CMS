@@ -367,8 +367,8 @@ namespace Umbraco.Core.Models.Membership
         {
             lock (_additionalDataLock)
             {
-                return AdditionalData.TryGetValue(cacheKey, out var allContentStartNodes)
-                    ? allContentStartNodes as T
+                return AdditionalData.TryGetValue(cacheKey, out var data)
+                    ? data as T
                     : null;
             }
         }

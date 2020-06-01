@@ -10,6 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi.Filters;
 
@@ -85,7 +86,7 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public void Filter_On_Start_Node()
         {
-            var userMock = new Mock<IUser>();
+            var userMock = MockedUser.GetUserMock();
             userMock.Setup(u => u.Id).Returns(9);
             userMock.Setup(u => u.StartContentIds).Returns(new[] { 5 });
             var user = userMock.Object;
@@ -125,7 +126,7 @@ namespace Umbraco.Tests.Web.Controllers
             }
             var ids = list.Select(x => (int)x.Id).ToArray();
 
-            var userMock = new Mock<IUser>();
+            var userMock = MockedUser.GetUserMock();
             userMock.Setup(u => u.Id).Returns(9);
             userMock.Setup(u => u.StartContentIds).Returns(new int[0]);
             var user = userMock.Object;

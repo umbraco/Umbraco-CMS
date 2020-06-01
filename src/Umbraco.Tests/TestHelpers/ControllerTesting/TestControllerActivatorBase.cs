@@ -27,6 +27,7 @@ using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Security.Providers;
 using Umbraco.Tests.Strings;
 using Umbraco.Tests.Common;
+using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting
 {
@@ -113,18 +114,20 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 var role = backofficeIdentity.Roles[index];
                 groups.Add(new ReadOnlyUserGroup(index + 1, role, "icon-user", null, null, role, new string[0], new string[0]));
             }
+            var mockUser = MockedUser.GetUserMock();
+            mockUser.Setup(x => x.IsApproved).Returns(true);
+            mockUser.Setup(x => x.IsLockedOut).Returns(false);
+            mockUser.Setup(x => x.AllowedSections).Returns(backofficeIdentity.AllowedApplications);
+            mockUser.Setup(x => x.Groups).Returns(groups);
+            mockUser.Setup(x => x.Email).Returns("admin@admin.com");
+            mockUser.Setup(x => x.Id).Returns((int)backofficeIdentity.Id);
+            mockUser.Setup(x => x.Language).Returns("en");
+            mockUser.Setup(x => x.Name).Returns(backofficeIdentity.RealName);
+            mockUser.Setup(x => x.StartContentIds).Returns(backofficeIdentity.StartContentNodes);
+            mockUser.Setup(x => x.StartMediaIds).Returns(backofficeIdentity.StartMediaNodes);
+            mockUser.Setup(x => x.Username).Returns(backofficeIdentity.Username);
             webSecurity.Setup(x => x.CurrentUser)
-                .Returns(Mock.Of<IUser>(u => u.IsApproved == true
-                                             && u.IsLockedOut == false
-                                             && u.AllowedSections == backofficeIdentity.AllowedApplications
-                                             && u.Groups == groups
-                                             && u.Email == "admin@admin.com"
-                                             && u.Id == (int) backofficeIdentity.Id
-                                             && u.Language == "en"
-                                             && u.Name == backofficeIdentity.RealName
-                                             && u.StartContentIds == backofficeIdentity.StartContentNodes
-                                             && u.StartMediaIds == backofficeIdentity.StartMediaNodes
-                                             && u.Username == backofficeIdentity.Username));
+                .Returns(mockUser.Object);
 
             //mock Validate
             webSecurity.Setup(x => x.ValidateCurrentUser())
