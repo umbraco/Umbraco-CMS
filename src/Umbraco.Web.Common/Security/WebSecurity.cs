@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security;
-using System.Text;
 using Microsoft.AspNetCore.Http;
-using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
@@ -11,10 +8,10 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Web.Security;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Common.Security
 {
-    // TODO: need to implement this
 
     public class WebSecurity : IWebSecurity
     {
@@ -37,10 +34,7 @@ namespace Umbraco.Web.Common.Security
 
         private IUser _currentUser;
 
-        /// <summary>
-        /// Gets the current user.
-        /// </summary>
-        /// <value>The current user.</value>
+        /// <inheritdoc />
         public IUser CurrentUser
         {
             get
@@ -56,6 +50,7 @@ namespace Umbraco.Web.Common.Security
             }
         }
 
+        /// <inheritdoc />
         public ValidateRequestAttempt AuthorizeRequest(bool throwExceptions = false)
         {
             // check for secure connection
@@ -67,27 +62,33 @@ namespace Umbraco.Web.Common.Security
             return ValidateCurrentUser(throwExceptions);
         }
 
+        /// <inheritdoc />
         public Attempt<int> GetUserId()
         {
-            return Attempt.Succeed(-1);
+            var identity = _httpContextAccessor.GetRequiredHttpContext().GetCurrentIdentity();
+            return identity == null ? Attempt.Fail<int>() : Attempt.Succeed(identity.Id);
         }
 
+        /// <inheritdoc />
         public bool IsAuthenticated()
         {
             var httpContext = _httpContextAccessor.HttpContext;
             return httpContext?.User != null && httpContext.User.Identity.IsAuthenticated && httpContext.GetCurrentIdentity() != null;
         }
 
+        /// <inheritdoc />
         public bool UserHasSectionAccess(string section, IUser user)
         {
-            return true;
+            return user.HasSectionAccess(section);
         }
 
+        /// <inheritdoc />
         public bool ValidateCurrentUser()
         {
-            return true;
+            return ValidateCurrentUser(false, true) == ValidateRequestAttempt.Success;
         }
 
+        /// <inheritdoc />
         public ValidateRequestAttempt ValidateCurrentUser(bool throwExceptions, bool requiresApproval = true)
         {
             //This will first check if the current user is already authenticated - which should be the case in nearly all circumstances
