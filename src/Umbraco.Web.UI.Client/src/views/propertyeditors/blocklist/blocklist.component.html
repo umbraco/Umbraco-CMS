@@ -1,9 +1,10 @@
 <div class="umb-block-list">
 
+    <umb-load-indicator style="margin-bottom:20px;" ng-if="vm.loading"></umb-load-indicator>
 
     <div class="umb-block-list__wrapper" ng-style="vm.listWrapperStyles">
 
-        <div ui-sortable="vm.sortableOptions" ng-model="vm.blocks">
+        <div ui-sortable="vm.sortableOptions" ng-model="vm.blocks" ng-if="vm.loading !== true">
 
             <div ng-repeat="block in vm.blocks track by block.key">
 
@@ -50,6 +51,7 @@
         </div>
 
         <button
+            ng-if="vm.loading !== true"
             type="button"
             class="btn-reset umb-block-list__create-button umb-outline"
             ng-class="{ '--disabled': vm.availableBlockTypes.length === 0 }"

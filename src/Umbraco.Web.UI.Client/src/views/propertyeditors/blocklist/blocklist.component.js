@@ -39,6 +39,7 @@
 
         var vm = this;
 
+        vm.loading = true;
         vm.moveFocusToBlock = null;
         vm.showCopy = clipboardService.isSupported();
 
@@ -128,6 +129,8 @@
             vm.availableContentTypes = modelObject.getAvailableAliasesForBlockContent();
             vm.availableBlockTypes = modelObject.getAvailableBlocksForBlockPicker();
 
+            vm.loading = false;
+            
             $scope.$evalAsync();
 
         }
