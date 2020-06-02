@@ -162,7 +162,7 @@
 
             localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [vm.getElementTypeByAlias(block.contentTypeAlias).name]).then(function (data) {
 
-                var clonedBlockData = angular.copy(block);
+                var clonedBlockData = Utilities.copy(block);
                 vm.openBlock = block;
 
                 var overlayModel = {

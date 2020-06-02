@@ -203,11 +203,11 @@
         function editBlock(blockModel, openSettings) {
 
             // make a clone to avoid editing model directly.
-            var blockContentClone = angular.copy(blockModel.content);
+            var blockContentClone = Utilities.copy(blockModel.content);
             var blockSettingsClone = null;
 
             if (blockModel.config.settingsElementTypeAlias) {
-                blockSettingsClone = angular.copy(blockModel.settings);
+                blockSettingsClone = Utilities.copy(blockModel.settings);
             }
 
             var hideContent = (openSettings === true && inlineEditing === true);

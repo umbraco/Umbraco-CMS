@@ -284,13 +284,14 @@
 
                 var blockModel = {};
                 blockModel.key = String.CreateGuid().replace(/-/g, "");
-                blockModel.config = angular.copy(blockConfiguration);
+                blockModel.config = Utilities.copy(blockConfiguration);
                 if (blockModel.config.label && blockModel.config.label !== "") {
                     blockModel.labelInterpolator = $interpolate(blockModel.config.label);
                 }
-                blockModel.updateLabel = _.debounce(function() {
+                blockModel.__scope = this.isolatedScope;
+                blockModel.updateLabel = _.debounce(function () {this.__scope.$evalAsync(function() {
                     this.label = getBlockLabel(this);
-                }, 100);
+                }.bind(this))}.bind(blockModel), 10);
 
                 var contentScaffold = this.getScaffoldFor(blockConfiguration.contentTypeAlias);
                 if(contentScaffold === null) {
@@ -298,7 +299,7 @@
                 }
 
                 // make basics from scaffold
-                blockModel.content = angular.copy(contentScaffold);
+                blockModel.content = Utilities.copy(contentScaffold);
                 blockModel.content.udi = udi;
 
                 mapToElementModel(blockModel.content, dataModel);
@@ -314,7 +315,7 @@
                     }
 
                     // make basics from scaffold
-                    blockModel.settings = angular.copy(settingsScaffold);
+                    blockModel.settings = Utilities.copy(settingsScaffold);
                     layoutEntry.settings = layoutEntry.settings || { key: String.CreateGuid(), contentTypeAlias: blockConfiguration.settingsElementTypeAlias };
                     if (!layoutEntry.settings.key) { layoutEntry.settings.key = String.CreateGuid(); }
                     if (!layoutEntry.settings.contentTypeAlias) { layoutEntry.settings.contentTypeAlias = blockConfiguration.settingsElementTypeAlias; }
@@ -340,9 +341,7 @@
             destroyBlockModel: function(blockModel) {
 
                 // remove property value watchers:
-                for (const w of blockModel.watchers) {
-                    w();
-                }
+                blockModel.watchers.forEach(w => { w(); });
                 
                 // remove model from isolatedScope.
                 delete this.isolatedScope.blockModels[blockModel.key];
@@ -405,7 +404,7 @@
              */
             createFromElementType: function(elementTypeDataModel) {
 
-                elementTypeDataModel = angular.copy(elementTypeDataModel);
+                elementTypeDataModel = Utilities.copy(elementTypeDataModel);
 
                 var contentTypeAlias = elementTypeDataModel.contentTypeAlias;
 
@@ -457,6 +456,7 @@
                 delete this.blockConfigurations;
                 delete this.scaffolds;
                 delete this.watchers;
+                this.isolatedScope.$destroy();
                 delete this.isolatedScope;
             }
         }
