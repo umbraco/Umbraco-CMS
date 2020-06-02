@@ -10,12 +10,12 @@ namespace Umbraco.Web.BackOffice.Security
     /// Custom secure format that ensures the Identity in the ticket is <see cref="UmbracoBackOfficeIdentity"/> and not just a ClaimsIdentity
     /// </summary>
     // TODO: Unsure if we really need this, there's no real reason why we have a custom Identity instead of just a ClaimsIdentity
-    internal class UmbracoSecureDataFormat : ISecureDataFormat<AuthenticationTicket>
+    internal class BackOfficeSecureDataFormat : ISecureDataFormat<AuthenticationTicket>
     {
         private readonly int _loginTimeoutMinutes;
         private readonly ISecureDataFormat<AuthenticationTicket> _ticketDataFormat;
 
-        public UmbracoSecureDataFormat(int loginTimeoutMinutes, ISecureDataFormat<AuthenticationTicket> ticketDataFormat)
+        public BackOfficeSecureDataFormat(int loginTimeoutMinutes, ISecureDataFormat<AuthenticationTicket> ticketDataFormat)
         {
             _loginTimeoutMinutes = loginTimeoutMinutes;
             _ticketDataFormat = ticketDataFormat ?? throw new ArgumentNullException(nameof(ticketDataFormat));

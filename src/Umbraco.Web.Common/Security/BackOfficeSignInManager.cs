@@ -11,8 +11,12 @@ using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Web.Common.Security
 {
+    using Constants = Umbraco.Core.Constants;
+
+    // TODO: There's potential to extract an interface for this for only what we use and put that in Core without aspnetcore refs, but we need to wait till were done with it since there's a bit to implement
+
     public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser>
     {
         private readonly BackOfficeUserManager _userManager;
@@ -28,6 +32,17 @@ namespace Umbraco.Web.BackOffice.Security
             : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
         {
             _userManager = userManager;
+        }
+
+        // TODO: Implement these, this is what the security stamp thingy calls
+        public override Task<bool> ValidateSecurityStampAsync(BackOfficeIdentityUser user, string securityStamp)
+        {
+            return base.ValidateSecurityStampAsync(user, securityStamp);
+        }
+        // TODO: Implement these, this is what the security stamp thingy calls
+        public override Task<BackOfficeIdentityUser> ValidateSecurityStampAsync(ClaimsPrincipal principal)
+        {
+            return base.ValidateSecurityStampAsync(principal);
         }
 
         // TODO: Need to migrate more from Umbraco.Web.Security.BackOfficeSignInManager
@@ -132,21 +147,13 @@ namespace Umbraco.Web.BackOffice.Security
                     _userManager.RaiseLoginSuccessEvent(user, user.Id);
             }
             else if (result.IsLockedOut)
-            {
                 Logger.LogInformation("Login attempt failed for username {UserName} from IP address {IpAddress}, the user is locked", username, Context.Connection.RemoteIpAddress);
-            }
             else if (result.RequiresTwoFactor)
-            {
                 Logger.LogInformation("Login attempt requires verification for username {UserName} from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
-            }
             else if (!result.Succeeded || result.IsNotAllowed)
-            {
                 Logger.LogInformation("Login attempt failed for username {UserName} from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
-            }
             else
-            {
                 throw new ArgumentOutOfRangeException();
-            }
 
             return result;
         }

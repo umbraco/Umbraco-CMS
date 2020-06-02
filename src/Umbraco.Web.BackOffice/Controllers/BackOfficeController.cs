@@ -16,9 +16,9 @@ using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
@@ -50,8 +50,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IGridConfig gridConfig,
             BackOfficeServerVariables backOfficeServerVariables,
             AppCaches appCaches,
-            BackOfficeSignInManager signInManager // TODO: Review this, do we want it/need it or create our own?
-            )
+            BackOfficeSignInManager signInManager)
         {
             _userManager = userManager;
             _runtimeMinifier = runtimeMinifier;

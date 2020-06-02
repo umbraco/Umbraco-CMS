@@ -11,11 +11,11 @@ namespace Umbraco.Web.BackOffice.Security
     /// <summary>
     /// Used to configure <see cref="BackOfficeIdentityOptions"/> for the Umbraco Back office
     /// </summary>
-    public class ConfigureUmbracoBackOfficeIdentityOptions : IConfigureOptions<BackOfficeIdentityOptions>
+    public class ConfigureBackOfficeIdentityOptions : IConfigureOptions<BackOfficeIdentityOptions>
     {
         private readonly IUserPasswordConfiguration _userPasswordConfiguration;
 
-        public ConfigureUmbracoBackOfficeIdentityOptions(IUserPasswordConfiguration userPasswordConfiguration)
+        public ConfigureBackOfficeIdentityOptions(IUserPasswordConfiguration userPasswordConfiguration)
         {
             _userPasswordConfiguration = userPasswordConfiguration;
         }

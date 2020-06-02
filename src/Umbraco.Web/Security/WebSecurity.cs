@@ -74,41 +74,13 @@ namespace Umbraco.Web.Security
         protected BackOfficeOwinUserManager UserManager
             => _userManager ?? (_userManager = _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().GetBackOfficeUserManager());
 
-        [Obsolete("This needs to be removed, ASP.NET Identity should always be used for this operation, this is currently only used in the installer which needs to be updated")]
-        public double PerformLogin(int userId)
-        {
-            var httpContext = _httpContextAccessor.GetRequiredHttpContext();
-            var owinCtx = httpContext.GetOwinContext();
-            //ensure it's done for owin too
-            owinCtx.Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
-
-            var user = UserManager.FindByIdAsync(userId.ToString()).Result;
-
-            SignInManager.SignInAsync(user, isPersistent: true, rememberBrowser: false).Wait();
-
-            httpContext.SetPrincipalForRequest(owinCtx.Request.User);
-
-            return TimeSpan.FromMinutes(_globalSettings.TimeOutInMinutes).TotalSeconds;
-        }
-
-        [Obsolete("This needs to be removed, ASP.NET Identity should always be used for this operation, this is currently only used in the installer which needs to be updated")]
-        public void ClearCurrentLogin()
-        {
-            var httpContext = _httpContextAccessor.GetRequiredHttpContext();
-            httpContext.UmbracoLogout();
-            httpContext.GetOwinContext().Authentication.SignOut(
-                Core.Constants.Security.BackOfficeAuthenticationType,
-                Core.Constants.Security.BackOfficeExternalAuthenticationType);
-        }
-
-
         /// <summary>
         /// Gets the current user's id.
         /// </summary>
         /// <returns></returns>
         public Attempt<int> GetUserId()
         {
-            var identity = _httpContextAccessor.GetRequiredHttpContext().GetCurrentIdentity(false);
+            var identity = _httpContextAccessor.GetRequiredHttpContext().GetCurrentIdentity();
             return identity == null ? Attempt.Fail<int>() : Attempt.Succeed(Convert.ToInt32(identity.Id));
         }
 
@@ -191,7 +163,7 @@ namespace Umbraco.Web.Security
         public bool IsAuthenticated()
         {
             var httpContext = _httpContextAccessor.HttpContext;
-            return httpContext?.User != null && httpContext.User.Identity.IsAuthenticated && httpContext.GetCurrentIdentity(false) != null;
+            return httpContext?.User != null && httpContext.User.Identity.IsAuthenticated && httpContext.GetCurrentIdentity() != null;
         }
 
     }

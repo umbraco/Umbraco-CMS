@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Common.Profiler
 {
@@ -70,7 +71,7 @@ namespace Umbraco.Web.Common.Profiler
 
         private static bool ShouldProfile(HttpRequest request)
         {
-            if (new Uri(request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsClientSideRequest()) return false;
+            if (request.IsClientSideRequest()) return false;
             if (bool.TryParse(request.Query["umbDebug"], out var umbDebug)) return umbDebug;
             if (bool.TryParse(request.Headers["X-UMB-DEBUG"], out var xUmbDebug)) return xUmbDebug;
             if (bool.TryParse(request.Cookies["UMB-DEBUG"], out var cUmbDebug)) return cUmbDebug;

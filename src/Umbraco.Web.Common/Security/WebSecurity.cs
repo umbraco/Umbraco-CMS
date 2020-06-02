@@ -23,7 +23,11 @@ namespace Umbraco.Web.Common.Security
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public WebSecurity(IUserService userService, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IHttpContextAccessor httpContextAccessor)
+        public WebSecurity(
+            IUserService userService,
+            IGlobalSettings globalSettings,
+            IHostingEnvironment hostingEnvironment,
+            IHttpContextAccessor httpContextAccessor)
         {
             _userService = userService;
             _globalSettings = globalSettings;
@@ -63,11 +67,6 @@ namespace Umbraco.Web.Common.Security
             return ValidateCurrentUser(throwExceptions);
         }
 
-        public void ClearCurrentLogin()
-        {
-            //throw new NotImplementedException();
-        }
-
         public Attempt<int> GetUserId()
         {
             return Attempt.Succeed(-1);
@@ -77,11 +76,6 @@ namespace Umbraco.Web.Common.Security
         {
             var httpContext = _httpContextAccessor.HttpContext;
             return httpContext?.User != null && httpContext.User.Identity.IsAuthenticated && httpContext.GetCurrentIdentity() != null;
-        }
-
-        public double PerformLogin(int userId)
-        {
-            return 100;
         }
 
         public bool UserHasSectionAccess(string section, IUser user)
