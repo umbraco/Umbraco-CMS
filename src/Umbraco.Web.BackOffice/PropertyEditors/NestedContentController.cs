@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core.Services;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Editors;
+using Umbraco.Web.BackOffice.Controllers;
 
 namespace Umbraco.Web.BackOffice.PropertyEditors
 {

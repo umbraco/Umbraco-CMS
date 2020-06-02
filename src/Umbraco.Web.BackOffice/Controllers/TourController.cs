@@ -5,13 +5,12 @@ using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models;
 using Umbraco.Web.Tour;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
     [PluginController("UmbracoApi")]
     public class TourController : UmbracoAuthorizedJsonController

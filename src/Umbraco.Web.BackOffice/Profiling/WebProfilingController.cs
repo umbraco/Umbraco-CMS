@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.Editors;
+using Umbraco.Web.BackOffice.Controllers;
 
 
 namespace Umbraco.Web.BackOffice.Profiling
