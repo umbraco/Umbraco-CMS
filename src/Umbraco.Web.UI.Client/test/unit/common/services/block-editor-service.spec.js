@@ -71,9 +71,9 @@
             var modelObject = blockEditorService.createModelObject({}, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope);
             
             modelObject.loadScaffolding().then(() => {
-                var itemPickerOptions = modelObject.getAvailableBlocksForItemPicker();
+                var itemPickerOptions = modelObject.getAvailableBlocksForBlockPicker();
                 expect(itemPickerOptions.length).toBe(1);
-                expect(itemPickerOptions[0].alias).toBe(blockConfigurationMock.contentTypeAlias);
+                expect(itemPickerOptions[0].blockConfigModel.contentTypeAlias).toBe(blockConfigurationMock.contentTypeAlias);
                 done();
             });
             
