@@ -127,8 +127,7 @@
                         "query": "Has(Duration)"
                     },
                     {
-                        "name":
-                            "Find all logs that have the property 'Duration' and the duration is greater than 1000ms",
+                        "name": "Find all logs that have the property 'Duration' and the duration is greater than 1000ms",
                         "query": "Has(Duration) and Duration > 1000"
                     },
                     {
