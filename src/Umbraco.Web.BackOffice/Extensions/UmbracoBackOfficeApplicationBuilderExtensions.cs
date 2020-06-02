@@ -20,8 +20,6 @@ namespace Umbraco.Extensions
                 backOfficeRoutes.CreateRoutes(endpoints);
             });
 
-            app.UseAuthentication();
-
             app.UseUmbracoRuntimeMinification();
 
             // Important we handle image manipulations before the static files, otherwise the querystring is just ignored.

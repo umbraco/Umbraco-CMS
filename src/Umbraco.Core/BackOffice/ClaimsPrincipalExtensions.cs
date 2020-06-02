@@ -34,8 +34,9 @@ namespace Umbraco.Extensions
                     return UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);
                 }
                 catch (InvalidOperationException)
-                {
-                    // TODO: Look into this? Why did we do this, see git history and add some notes
+                {                    
+                    // We catch this error because it's what we throw when the required claims are not in the identity.
+                    // when that happens something strange is going on, we'll swallow this exception and return null.
                 }
             }
 

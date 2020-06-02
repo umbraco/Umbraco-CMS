@@ -178,7 +178,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// otherwise process the external login info.
         /// </summary>
         /// <returns></returns>
-        private async Task<IActionResult> RenderDefaultOrProcessExternalLoginAsync(
+        private Task<IActionResult> RenderDefaultOrProcessExternalLoginAsync(
             Func<IActionResult> defaultResponse,
             Func<IActionResult> externalSignInResponse)
         {
@@ -190,9 +190,9 @@ namespace Umbraco.Web.BackOffice.Controllers
             //check if there is the TempData with the any token name specified, if so, assign to view bag and render the view
             if (ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||
                 ViewData.FromTempData(TempData, ViewDataExtensions.TokenPasswordResetCode))
-                return defaultResponse();
+                return Task.FromResult(defaultResponse());
 
-            return defaultResponse();
+            return Task.FromResult(defaultResponse());
 
             //First check if there's external login info, if there's not proceed as normal
             // TODO: Review this, not sure if this will work as expected until we integrate OAuth

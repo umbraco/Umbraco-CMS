@@ -114,25 +114,32 @@ namespace Umbraco.Web.BackOffice.Security
 
                     await _securityStampValidator.ValidateAsync(ctx);
                 },
-                OnSignedIn = ctx =>
+                OnSigningIn = ctx =>
                 {
-                    // When we are signed in with the cookie, assign the principal to the current HttpContext
-                    ctx.HttpContext.User = ctx.Principal;
+                    // occurs when sign in is successful but before the ticket is written to the outbound cookie
 
                     if (ctx.Principal.Identity is UmbracoBackOfficeIdentity backOfficeIdentity)
                     {
                         //generate a session id and assign it
                         //create a session token - if we are configured and not in an upgrade state then use the db, otherwise just generate one
-
                         var session = _runtimeState.Level == RuntimeLevel.Run
                             ? _userService.CreateLoginSession(backOfficeIdentity.Id, _ipResolver.GetCurrentRequestIpAddress())
                             : Guid.NewGuid();
 
-                        backOfficeIdentity.SessionId = session.ToString();
-
+                        //add our session claim
+                        backOfficeIdentity.AddClaim(new Claim(Constants.Security.SessionIdClaimType, session.ToString(), ClaimValueTypes.String, UmbracoBackOfficeIdentity.Issuer, UmbracoBackOfficeIdentity.Issuer, backOfficeIdentity));
                         //since it is a cookie-based authentication add that claim
                         backOfficeIdentity.AddClaim(new Claim(ClaimTypes.CookiePath, "/", ClaimValueTypes.String, UmbracoBackOfficeIdentity.Issuer, UmbracoBackOfficeIdentity.Issuer, backOfficeIdentity));
                     }
+
+                    return Task.CompletedTask;
+                },
+                OnSignedIn = ctx =>
+                {
+                    // occurs when sign in is successful and after the ticket is written to the outbound cookie
+
+                    // When we are signed in with the cookie, assign the principal to the current HttpContext
+                    ctx.HttpContext.User = ctx.Principal;                    
 
                     return Task.CompletedTask;
                 },

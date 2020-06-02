@@ -53,6 +53,11 @@
             public const string AllowedApplicationsClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/allowedapp";
             public const string SessionIdClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/sessionid";
 
+            /// <summary>
+            /// The claim type for the ASP.NET Identity security stamp
+            /// </summary>
+            public const string SecurityStampClaimType = "AspNet.Identity.SecurityStamp";
+
             public const string AspNetCoreV3PasswordHashAlgorithmName = "PBKDF2.ASPNETCORE.V3";
             public const string AspNetCoreV2PasswordHashAlgorithmName = "PBKDF2.ASPNETCORE.V2";
             public const string AspNetUmbraco8PasswordHashAlgorithmName = "HMACSHA256";

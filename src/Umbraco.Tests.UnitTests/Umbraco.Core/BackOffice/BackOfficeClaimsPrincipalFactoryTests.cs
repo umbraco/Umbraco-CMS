@@ -110,7 +110,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
         [Test]
         public async Task CreateAsync_When_SecurityStamp_Supported_Expect_SecurityStamp_Claim()
         {
-            const string expectedClaimType = Constants.Web.SecurityStampClaimType;
+            const string expectedClaimType = Constants.Security.SecurityStampClaimType;
             var expectedClaimValue = _testUser.SecurityStamp;
 
             _mockUserManager.Setup(x => x.SupportsUserSecurityStamp).Returns(true);

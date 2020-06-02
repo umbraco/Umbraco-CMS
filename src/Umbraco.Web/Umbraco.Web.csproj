@@ -227,7 +227,6 @@
     <Compile Include="Mvc\ContainerControllerFactory.cs" />
     <Compile Include="OwinExtensions.cs" />
     <Compile Include="Security\BackOfficeCookieAuthenticationProvider.cs" />
-    <Compile Include="Security\SessionIdValidator.cs" />
     <Compile Include="SignalR\PreviewHubComposer.cs" />
     <Compile Include="Trees\FilesTreeController.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyConfiguration.cs" />

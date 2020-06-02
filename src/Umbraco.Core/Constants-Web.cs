@@ -41,11 +41,6 @@
             public const string NoContentRouteName = "umbraco-no-content";
 
             /// <summary>
-            /// The claim type for the ASP.NET Identity security stamp
-            /// </summary>
-            public const string SecurityStampClaimType = "AspNet.Identity.SecurityStamp";
-
-            /// <summary>
             /// The default authentication type used for remembering that 2FA is not needed on next login
             /// </summary>
             public const string TwoFactorRememberBrowserCookie = "TwoFactorRememberBrowser";

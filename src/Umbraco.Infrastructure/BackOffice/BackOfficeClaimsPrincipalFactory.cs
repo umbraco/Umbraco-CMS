@@ -4,16 +4,12 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.BackOffice;
 
 namespace Umbraco.Core.BackOffice
 {
     public class BackOfficeClaimsPrincipalFactory<TUser> : UserClaimsPrincipalFactory<TUser>
         where TUser : BackOfficeIdentityUser
     {
-        private const string _identityProviderClaimType = "http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider";
-        private const string _identityProviderClaimValue = "ASP.NET Identity";
-
         public BackOfficeClaimsPrincipalFactory(UserManager<TUser> userManager, IOptions<BackOfficeIdentityOptions> optionsAccessor)
             : base(userManager, optionsAccessor)
         {
@@ -25,9 +21,6 @@ namespace Umbraco.Core.BackOffice
 
             var baseIdentity = await base.GenerateClaimsAsync(user);
 
-            // Required by ASP.NET 4.x anti-forgery implementation
-            baseIdentity.AddClaim(new Claim(_identityProviderClaimType, _identityProviderClaimValue));
-            
             var umbracoIdentity = new UmbracoBackOfficeIdentity(
                 baseIdentity,
                 user.Id,
@@ -36,8 +29,6 @@ namespace Umbraco.Core.BackOffice
                 user.CalculatedContentStartNodeIds,
                 user.CalculatedMediaStartNodeIds,
                 user.Culture,
-                //NOTE - there is no session id assigned here, this is just creating the identity, a session id will be generated when the cookie is written
-                Guid.NewGuid().ToString(),
                 user.SecurityStamp,
                 user.AllowedSections,
                 user.Roles.Select(x => x.RoleId).ToArray());

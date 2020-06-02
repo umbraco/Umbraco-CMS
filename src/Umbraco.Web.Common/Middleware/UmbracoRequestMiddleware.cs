@@ -15,6 +15,9 @@ namespace Umbraco.Web.Common.Middleware
     /// <summary>
     /// Manages Umbraco request objects and their lifetime
     /// </summary>
+    /// <remarks>
+    /// This is responsible for creating and assigning an <see cref="IUmbracoContext"/>
+    /// </remarks>
     public class UmbracoRequestMiddleware : IMiddleware
     {
         private readonly ILogger _logger;

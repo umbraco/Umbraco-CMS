@@ -90,20 +90,6 @@ namespace Umbraco.Web.Editors
 
         protected IAuthenticationManager AuthenticationManager => OwinContext.Authentication;
 
-        /// <summary>
-        /// Render the default view
-        /// </summary>
-        /// <returns></returns>
-        public async Task<ActionResult> Default()
-        {
-            return await RenderDefaultOrProcessExternalLoginAsync(
-                () =>
-                    View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _hostingEnvironment, _runtimeSettings, _securitySettings)),
-                () =>
-                    View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _hostingEnvironment, _runtimeSettings, _securitySettings))
-                    );
-        }
-
         [HttpGet]
         public async Task<ActionResult> VerifyInvite(string invite)
         {
@@ -181,28 +167,6 @@ namespace Umbraco.Web.Editors
                 () => View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _hostingEnvironment, _runtimeSettings, _securitySettings)),
                 //The ActionResult to perform if external login is successful
                 () => Redirect("/"));
-        }
-
-
-        /// <summary>
-        /// Returns the JavaScript object representing the static server variables javascript object
-        /// </summary>
-        /// <returns></returns>
-        [UmbracoAuthorize(Order = 0)]
-        [MinifyJavaScriptResult(Order = 1)]
-        public JavaScriptResult ServerVariables()
-        {
-            var serverVars = new BackOfficeServerVariables(Url, _runtimeState, _features, GlobalSettings, _umbracoVersion, _contentSettings, _treeCollection, _hostingEnvironment, _runtimeSettings, _securitySettings, _runtimeMinifier);
-
-            //cache the result if debugging is disabled
-            var result = _hostingEnvironment.IsDebugMode
-                ? ServerVariablesParser.Parse(serverVars.GetServerVariables())
-                : AppCaches.RuntimeCache.GetCacheItem<string>(
-                    typeof(BackOfficeController) + "ServerVariables",
-                    () => ServerVariablesParser.Parse(serverVars.GetServerVariables()),
-                    new TimeSpan(0, 10, 0));
-
-            return JavaScript(result);
         }
 
 
