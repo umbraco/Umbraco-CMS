@@ -87,7 +87,7 @@ namespace Umbraco.Web.Common.Install
 
             ViewData.SetUmbracoVersion(_umbracoVersion.SemanticVersion);
 
-            await _installHelper.InstallStatus(false, "");
+            await _installHelper.SetInstallStatusAsync(false, "");
 
             return View();
         }
