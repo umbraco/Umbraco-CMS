@@ -1,3 +1,69 @@
+/**
+ @ngdoc service
+ * @name umbraco.services.blockEditorService
+ *
+ * @description
+ * Block Editor Service provides the basic features for a block editor.
+ * The main feature is the ability to create a Model Object which takes care of your data for your Block Editor.
+ * 
+ * 
+ * ##Samples
+ *
+ * ####Instantiate a Model Object for your property editor:
+ * 
+ * <pre>
+ *     modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, $scope);
+ *     modelObject.loadScaffolding().then(onLoaded);
+ * </pre>
+ *
+ * ####Use the Model Object to retrive Content Models for the blocks you want to edit. Content Models contains all the data about the properties of that content and as well handles syncroniztion so your data is always up-to-date.
+ *
+ * <pre>
+ *     // Store a reference to the layout model, because we need to maintain this model.
+ *     var layout = modelObject.getLayout();
+ * 
+ *     // maps layout entries to editor friendly models aka. BlockModels.
+ *     layout.forEach(entry => {
+ *         var block = modelObject.getBlockModel(entry);
+ *         // If this entry was not supported by our property-editor it would return 'null'.
+ *         if(block !== null) {
+ *             // store this block in an array we use in our view.
+ *             vm.myViewModelOfBlocks.push(block);
+ *         }
+ *     });
+ *
+ * </pre>
+ * 
+ * ####Use the Model Object to retrive Content Models for the blocks you want to edit. Content Models contains all the data about the properties of that content and as well handles syncroniztion so your data is always up-to-date.
+ * 
+ * <pre>
+ * function addNewBlock(index, contentTypeAlias) {
+ * 
+ *     // Create layout entry. (not added to property model jet.)
+ *     var layoutEntry = modelObject.create(contentTypeAlias);
+ *     if (layoutEntry === null) {
+ *         return false;
+ *     }
+ * 
+ *     // make block model
+ *     var blockModel = getBlockModel(layoutEntry);
+ *     if (blockModel === null) {
+ *         return false;
+ *     }
+ *     
+ *     // If we reach this line, we are good to add the layoutEntry and blockModel to layout model and view model.
+ *     // add layout entry at the decired location in layout, depending on your layout structure.
+ *     layout.splice(index, 0, layoutEntry);
+ * 
+ *     // apply block model at decired location in our model used for the view.
+ *     vm.myViewModelOfBlocks.splice(index, 0, blockModel);
+ *     
+ *     // at this stage we know everything went well.
+ *     return true;
+ * }
+ * </pre>
+ * 
+ */
 (function () {
     'use strict';
 

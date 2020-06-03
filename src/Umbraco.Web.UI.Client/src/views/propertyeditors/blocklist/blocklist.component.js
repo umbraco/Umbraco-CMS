@@ -121,6 +121,7 @@
             // maps layout entries to editor friendly models aka. BlockModels.
             layout.forEach(entry => {
                 var block = getBlockModel(entry);
+                // If this entry was not supported by our property-editor it would return 'null'.
                 if(block !== null) {
                     vm.blocks.push(block);
                 }
