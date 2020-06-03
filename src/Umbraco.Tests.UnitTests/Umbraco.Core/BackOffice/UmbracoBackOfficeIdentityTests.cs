@@ -48,7 +48,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             Assert.AreEqual("en-us", backofficeIdentity.Culture);
             Assert.IsTrue(new[] { "admin" }.SequenceEqual(backofficeIdentity.Roles));
 
-            Assert.AreEqual(12, backofficeIdentity.Claims.Count());
+            Assert.AreEqual(11, backofficeIdentity.Claims.Count());
         }
 
         [Test]

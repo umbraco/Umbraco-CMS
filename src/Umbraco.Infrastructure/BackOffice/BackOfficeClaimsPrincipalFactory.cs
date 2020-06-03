@@ -35,5 +35,18 @@ namespace Umbraco.Core.BackOffice
 
             return new ClaimsPrincipal(umbracoIdentity);
         }
+
+        protected override async Task<ClaimsIdentity> GenerateClaimsAsync(TUser user)
+        {
+            // TODO: Have a look at the base implementation https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Extensions.Core/src/UserClaimsPrincipalFactory.cs#L79
+            // since it's setting an authentication type that is probably not what we want.
+            // also, this is the method that we should be returning our UmbracoBackOfficeIdentity from , not the method above,
+            // the method above just returns a principal that wraps the identity and we dont use a custom principal,
+            // see https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Extensions.Core/src/UserClaimsPrincipalFactory.cs#L66
+
+            var identity = await base.GenerateClaimsAsync(user);
+
+            return identity;
+        }
     }
 }
