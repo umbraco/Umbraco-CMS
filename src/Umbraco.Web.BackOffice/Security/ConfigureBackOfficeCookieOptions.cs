@@ -113,26 +113,14 @@ namespace Umbraco.Web.BackOffice.Security
 
             options.Events = new CookieAuthenticationEvents
             {
-                OnRedirectToReturnUrl = ctx =>
-                {
-                    return Task.CompletedTask;
-                },
-                OnRedirectToLogout = ctx =>
-                {
-                    return Task.CompletedTask;
-                },
-                OnRedirectToLogin = ctx =>
-                {
-                    return Task.CompletedTask;
-                },
-                OnRedirectToAccessDenied = ctx =>
-                {
-                    // TODO: Need to deal with this so the right response is returned since we are overriding this and it's not doing its normal check
-                    // we can copy how they check for an ajax request and basically just do what they are doing so we don't have to add yet another header
+                // IMPORTANT! If you set any of OnRedirectToLogin, OnRedirectToAccessDenied, OnRedirectToLogout, OnRedirectToReturnUrl
+                // you need to be aware that this will bypass the default behavior of returning the correct status codes for ajax requests and
+                // not redirecting for non-ajax requests. This is because the default behavior is baked into this class here:
+                // https://github.com/dotnet/aspnetcore/blob/master/src/Security/Authentication/Cookies/src/CookieAuthenticationEvents.cs#L58
+                // It would be possible to re-use the default behavior if any of these need to be set but that must be taken into account else
+                // our back office requests will not function correctly. For now we don't need to set/configure any of these callbacks because
+                // the defaults work fine with our setup.
 
-
-                    return Task.CompletedTask;
-                },
                 OnValidatePrincipal = async ctx =>
                 {
                     //ensure the thread culture is set
