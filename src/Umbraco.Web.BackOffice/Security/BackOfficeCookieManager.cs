@@ -23,7 +23,7 @@ namespace Umbraco.Web.BackOffice.Security
     /// Umbraco's back office cookie needs to be read on two paths: /umbraco and /install and /base therefore we cannot just set the cookie path to be /umbraco,
     /// instead we'll specify our own cookie manager and return null if the request isn't for an acceptable path.
     /// </remarks>
-    internal class BackOfficeCookieManager : ChunkingCookieManager, ICookieManager
+    public class BackOfficeCookieManager : ChunkingCookieManager, ICookieManager
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IRuntimeState _runtime;
@@ -74,7 +74,7 @@ namespace Umbraco.Web.BackOffice.Security
         /// * it is a /base request
         /// * it is a preview request
         /// </remarks>
-        internal bool ShouldAuthenticateRequest(Uri requestUri, bool checkForceAuthTokens = true)
+        public bool ShouldAuthenticateRequest(Uri requestUri, bool checkForceAuthTokens = true)
         {
             // Do not authenticate the request if we are not running (don't have a db, are not configured) - since we will never need
             // to know a current user in this scenario - we treat it as a new install. Without this we can have some issues

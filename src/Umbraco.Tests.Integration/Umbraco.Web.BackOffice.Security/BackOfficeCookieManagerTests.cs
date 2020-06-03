@@ -1,7 +1,15 @@
 ﻿
 
+using Microsoft.AspNetCore.Routing;
+using Moq;
 using NUnit.Framework;
+using System;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Hosting;
 using Umbraco.Tests.Integration.Implementations;
+using Umbraco.Web;
+using Umbraco.Web.BackOffice.Security;
 
 namespace Umbraco.Tests.Security
 {
@@ -13,26 +21,19 @@ namespace Umbraco.Tests.Security
         {
             var testHelper = new TestHelper();
 
-            //should force app ctx to show not-configured
-            ConfigurationManager.AppSettings.Set(Constants.AppSettings.ConfigurationStatus, "");
-
             var httpContextAccessor = testHelper.GetHttpContextAccessor();
-            var globalSettings = testHelper.SettingsForTests.GetDefaultGlobalSettings();
-            var umbracoContext = new UmbracoContext(
-                httpContextAccessor,
-                Mock.Of<IPublishedSnapshotService>(),
-                Mock.Of<IWebSecurity>(),
-                globalSettings,
-                HostingEnvironment,
-                new TestVariationContextAccessor(),
-                UriUtility,
-                new AspNetCookieManager(httpContextAccessor));
-
+            var globalSettings = testHelper.SettingsForTests.GenerateMockGlobalSettings();
+            
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Install);
             var mgr = new BackOfficeCookieManager(
-                Mock.Of<IUmbracoContextAccessor>(accessor => accessor.UmbracoContext == umbracoContext), runtime, HostingEnvironment, globalSettings, AppCaches.RequestCache);
+                Mock.Of<IUmbracoContextAccessor>(),
+                runtime,
+                Mock.Of<IHostingEnvironment>(),
+                globalSettings,
+                Mock.Of<IRequestCache>(),
+                Mock.Of<LinkGenerator>());
 
-            var result = mgr.ShouldAuthenticateRequest(Mock.Of<IOwinContext>(), new Uri("http://localhost/umbraco"));
+            var result = mgr.ShouldAuthenticateRequest(new Uri("http://localhost/umbraco"));
 
             Assert.IsFalse(result);
         }
@@ -40,27 +41,24 @@ namespace Umbraco.Tests.Security
         [Test]
         public void ShouldAuthenticateRequest_When_Configured()
         {
-            var httpContextAccessor = TestHelper.GetHttpContextAccessor();
-            var globalSettings = TestObjects.GetGlobalSettings();
-            var umbCtx = new UmbracoContext(
-                httpContextAccessor,
-                Mock.Of<IPublishedSnapshotService>(),
-                Mock.Of<IWebSecurity>(),
-                globalSettings,
-                HostingEnvironment,
-                new TestVariationContextAccessor(),
-                UriUtility,
-                new AspNetCookieManager(httpContextAccessor));
+            var testHelper = new TestHelper();
 
+
+            //hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath);
+
+            var httpContextAccessor = testHelper.GetHttpContextAccessor();
+            var globalSettings = testHelper.SettingsForTests.GenerateMockGlobalSettings();
+            
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
-            var mgr = new BackOfficeCookieManager(Mock.Of<IUmbracoContextAccessor>(accessor => accessor.UmbracoContext == umbCtx), runtime, HostingEnvironment, globalSettings, AppCaches.RequestCache);
+            var mgr = new BackOfficeCookieManager(
+                Mock.Of<IUmbracoContextAccessor>(),
+                runtime,
+                Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco"),
+                globalSettings,
+                Mock.Of<IRequestCache>(),
+                Mock.Of<LinkGenerator>());
 
-            var request = new Mock<OwinRequest>();
-            request.Setup(owinRequest => owinRequest.Uri).Returns(new Uri("http://localhost/umbraco"));
-
-            var result = mgr.ShouldAuthenticateRequest(
-                Mock.Of<IOwinContext>(context => context.Request == request.Object),
-                new Uri("http://localhost/umbraco"));
+            var result = mgr.ShouldAuthenticateRequest(new Uri("http://localhost/umbraco"));
 
             Assert.IsTrue(result);
         }
