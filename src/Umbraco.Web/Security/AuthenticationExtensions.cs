@@ -126,11 +126,7 @@ namespace Umbraco.Web.Security
             return true;
         }
 
-        /// <summary>
-        /// returns the number of seconds the user has until their auth session times out
-        /// </summary>
-        /// <param name="http"></param>
-        /// <returns></returns>
+        // NOTE: Migrated to netcore (though in a different way)
         public static double GetRemainingAuthSeconds(this HttpContextBase http)
         {
             if (http == null) throw new ArgumentNullException(nameof(http));
@@ -138,11 +134,7 @@ namespace Umbraco.Web.Security
             return ticket.GetRemainingAuthSeconds();
         }
 
-        /// <summary>
-        /// returns the number of seconds the user has until their auth session times out
-        /// </summary>
-        /// <param name="ticket"></param>
-        /// <returns></returns>
+        // NOTE: Migrated to netcore (though in a different way)
         public static double GetRemainingAuthSeconds(this AuthenticationTicket ticket)
         {
             var utcExpired = ticket?.Properties.ExpiresUtc;

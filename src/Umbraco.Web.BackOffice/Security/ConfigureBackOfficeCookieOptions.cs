@@ -15,7 +15,9 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Services;
 using Umbraco.Net;
 using Umbraco.Core.Security;
-using Umbraco.Web;
+using Umbraco.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Web.BackOffice.Security
 {
@@ -34,7 +36,6 @@ namespace Umbraco.Web.BackOffice.Security
         private readonly IUserService _userService;
         private readonly IIpResolver _ipResolver;
         private readonly BackOfficeSessionIdValidator _sessionIdValidator;
-        private readonly BackOfficeSecurityStampValidator _securityStampValidator;
 
         public ConfigureBackOfficeCookieOptions(
             IUmbracoContextAccessor umbracoContextAccessor,
@@ -46,8 +47,7 @@ namespace Umbraco.Web.BackOffice.Security
             IRequestCache requestCache,
             IUserService userService,
             IIpResolver ipResolver,
-            BackOfficeSessionIdValidator sessionIdValidator,
-            BackOfficeSecurityStampValidator securityStampValidator)
+            BackOfficeSessionIdValidator sessionIdValidator)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _securitySettings = securitySettings;
@@ -59,7 +59,6 @@ namespace Umbraco.Web.BackOffice.Security
             _userService = userService;
             _ipResolver = ipResolver;
             _sessionIdValidator = sessionIdValidator;
-            _securityStampValidator = securityStampValidator;
         }
 
         public void Configure(string name, CookieAuthenticationOptions options)
@@ -123,24 +122,40 @@ namespace Umbraco.Web.BackOffice.Security
 
                 OnValidatePrincipal = async ctx =>
                 {
-                    //ensure the thread culture is set
-                    ctx.Principal?.Identity?.EnsureCulture();
+                    // We need to resolve the BackOfficeSecurityStampValidator per request as a requirement (even in aspnetcore they do this)
+                    var securityStampValidator = ctx.HttpContext.RequestServices.GetRequiredService<BackOfficeSecurityStampValidator>();
+                    // Same goes for the signinmanager
+                    var signInManager = ctx.HttpContext.RequestServices.GetRequiredService<BackOfficeSignInManager>();
 
-                    await EnsureValidSessionId(ctx);
-
-                    if (ctx.Principal?.Identity == null)
+                    var backOfficeIdentity = ctx.Principal.GetUmbracoIdentity();
+                    if (backOfficeIdentity == null)
                     {
-                        await ctx.HttpContext.SignOutAsync(Constants.Security.BackOfficeAuthenticationType);
-                        return;
+                        ctx.RejectPrincipal();
+                        await signInManager.SignOutAsync();
                     }
 
-                    await _securityStampValidator.ValidateAsync(ctx);
+                    //ensure the thread culture is set
+                    backOfficeIdentity.EnsureCulture();
+
+                    await EnsureValidSessionId(ctx);
+                    await securityStampValidator.ValidateAsync(ctx);
+
+                    // add a claim to track when the cookie expires, we use this to track time remaining
+                    backOfficeIdentity.AddClaim(new Claim(
+                        Constants.Security.TicketExpiresClaimType,
+                        ctx.Properties.ExpiresUtc.Value.ToString("o"),
+                        ClaimValueTypes.DateTime,
+                        UmbracoBackOfficeIdentity.Issuer,
+                        UmbracoBackOfficeIdentity.Issuer,
+                        backOfficeIdentity));
+                    
                 },
                 OnSigningIn = ctx =>
                 {
                     // occurs when sign in is successful but before the ticket is written to the outbound cookie
 
-                    if (ctx.Principal.Identity is UmbracoBackOfficeIdentity backOfficeIdentity)
+                    var backOfficeIdentity = ctx.Principal.GetUmbracoIdentity();
+                    if (backOfficeIdentity != null)
                     {
                         //generate a session id and assign it
                         //create a session token - if we are configured and not in an upgrade state then use the db, otherwise just generate one
@@ -168,6 +183,7 @@ namespace Umbraco.Web.BackOffice.Security
                 OnSigningOut = ctx =>
                 {
                     //Clear the user's session on sign out
+                    // TODO: We need to test this once we have signout functionality, not sure if the httpcontext.user.identity will still be set here
                     if (ctx.HttpContext?.User?.Identity != null)
                     {
                         var claimsIdentity = ctx.HttpContext.User.Identity as ClaimsIdentity;

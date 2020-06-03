@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Common.Security
 {
@@ -32,17 +33,6 @@ namespace Umbraco.Web.Common.Security
             : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
         {
             _userManager = userManager;
-        }
-
-        // TODO: Implement these, this is what the security stamp thingy calls
-        public override Task<bool> ValidateSecurityStampAsync(BackOfficeIdentityUser user, string securityStamp)
-        {
-            return base.ValidateSecurityStampAsync(user, securityStamp);
-        }
-        // TODO: Implement these, this is what the security stamp thingy calls
-        public override Task<BackOfficeIdentityUser> ValidateSecurityStampAsync(ClaimsPrincipal principal)
-        {
-            return base.ValidateSecurityStampAsync(principal);
         }
 
         // TODO: Need to migrate more from Umbraco.Web.Security.BackOfficeSignInManager

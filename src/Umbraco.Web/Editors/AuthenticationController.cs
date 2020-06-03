@@ -158,34 +158,6 @@ namespace Umbraco.Web.Editors
 
 
         /// <summary>
-        /// Returns the currently logged in Umbraco user
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// We have the attribute [SetAngularAntiForgeryTokens] applied because this method is called initially to determine if the user
-        /// is valid before the login screen is displayed. The Auth cookie can be persisted for up to a day but the csrf cookies are only session
-        /// cookies which means that the auth cookie could be valid but the csrf cookies are no longer there, in that case we need to re-set the csrf cookies.
-        /// </remarks>
-        [WebApi.UmbracoAuthorize]
-        [SetAngularAntiForgeryTokens]
-        [CheckIfUserTicketDataIsStale]
-        public UserDetail GetCurrentUser()
-        {
-            // TODO: We need to migrate this next
-
-            var user = UmbracoContext.Security.CurrentUser;
-            var result = Mapper.Map<UserDetail>(user);
-            var httpContextAttempt = TryGetHttpContext();
-            if (httpContextAttempt.Success)
-            {
-                //set their remaining seconds
-                result.SecondsUntilTimeout = httpContextAttempt.Result.GetRemainingAuthSeconds();
-            }
-
-            return result;
-        }
-
-        /// <summary>
         /// When a user is invited they are not approved but we need to resolve the partially logged on (non approved)
         /// user.
         /// </summary>
