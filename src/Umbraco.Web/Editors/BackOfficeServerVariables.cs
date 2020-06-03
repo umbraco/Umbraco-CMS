@@ -192,11 +192,7 @@ namespace Umbraco.Web.Editors
                             "macroRenderingApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MacroRenderingController>(
                                 controller => controller.GetMacroParameters(0))
                         },
-                        {
-                            "macroApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MacrosController>(
-                                controller => controller.Create(null))
-                        },
-                        
+
                         {
                             "currentUserApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
                                 controller => controller.PostChangePassword(null))

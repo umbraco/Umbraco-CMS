@@ -204,10 +204,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                         //     "macroRenderingApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MacroRenderingController>(
                         //         controller => controller.GetMacroParameters(0))
                         // },
-                        // {
-                        //     "macroApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MacrosController>(
-                        //         controller => controller.Create(null))
-                        // },
+                        {
+                            "macroApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MacrosController>(
+                                controller => controller.Create(null))
+                        },
                         {
                             "authenticationApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<AuthenticationController>(
                                 controller => controller.PostLogin(null))
