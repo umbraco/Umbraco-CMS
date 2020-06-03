@@ -88,9 +88,10 @@
                     //the user has a password if they are not states: Invited, NoCredentials
                     vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
 
-                  vm.changePasswordModel.config.disableToggle = true;
-                    
-                  vm.loading = false;
+                    vm.changePasswordModel.config.disableToggle = true;
+
+                    $scope.$emit("$setAccessibleHeader", false, "general_user", false, vm.user.name, "", true);
+                    vm.loading = false;
                 });
             });
         }

@@ -137,10 +137,10 @@ namespace Umbraco.Web.Editors
                         {
                             "packagesRestApiBaseUrl", Constants.PackageRepository.RestApiBaseUrl
                         },
-                        {
-                            "redirectUrlManagementApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RedirectUrlManagementController>(
-                                controller => controller.GetEnableState())
-                        },
+                        // {
+                        //     "redirectUrlManagementApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RedirectUrlManagementController>(
+                        //         controller => controller.GetEnableState())
+                        // },
                         //TODO reintroduce
                         // {
                         //     "tourApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TourController>(
@@ -205,43 +205,43 @@ namespace Umbraco.Web.Editors
                             "entityApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<EntityController>(
                                 controller => controller.GetById(0, UmbracoEntityTypes.Media))
                         },
-                        {
-                            "dataTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DataTypeController>(
-                                controller => controller.GetById(0))
-                        },
+                        // {
+                        //     "dataTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DataTypeController>(
+                        //         controller => controller.GetById(0))
+                        // },
                         //TODO Reintroduce
                         // {
                         //     "dashboardApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DashboardController>(
                         //         controller => controller.GetDashboard(null))
                         // },
-                        {
-                            "logApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogController>(
-                                controller => controller.GetPagedEntityLog(0, 0, 0, Direction.Ascending, null))
-                        },
+                        // {
+                        //     "logApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogController>(
+                        //         controller => controller.GetPagedEntityLog(0, 0, 0, Direction.Ascending, null))
+                        // },
                         {
                             "memberApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberController>(
                                 controller => controller.GetByKey(Guid.Empty))
                         },
-                        {
-                            "packageInstallApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageInstallController>(
-                                controller => controller.Fetch(string.Empty))
-                        },
-                        {
-                            "packageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageController>(
-                                controller => controller.GetCreatedPackages())
-                        },
-                        {
-                            "relationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationController>(
-                                controller => controller.GetById(0))
-                        },
+                        // {
+                        //     "packageInstallApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageInstallController>(
+                        //         controller => controller.Fetch(string.Empty))
+                        // },
+                        // {
+                        //     "packageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageController>(
+                        //         controller => controller.GetCreatedPackages())
+                        // },
+                        // {
+                        //     "relationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationController>(
+                        //         controller => controller.GetById(0))
+                        // },
                         // {
                         //     "rteApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>(
                         //         controller => controller.GetConfiguration())
                         // },
-                        {
-                            "stylesheetApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<StylesheetController>(
-                                controller => controller.GetAll())
-                        },
+                        // {
+                        //     "stylesheetApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<StylesheetController>(
+                        //         controller => controller.GetAll())
+                        // },
                         {
                             "memberTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberTypeController>(
                                 controller => controller.GetAllTypes())
@@ -254,10 +254,10 @@ namespace Umbraco.Web.Editors
                             "updateCheckApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<UpdateCheckController>(
                                 controller => controller.GetCheck())
                         },
-                        {
-                            "templateApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TemplateController>(
-                                controller => controller.GetById(0))
-                        },
+                        // {
+                        //     "templateApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TemplateController>(
+                        //         controller => controller.GetById(0))
+                        // },
                         {
                             "memberTreeBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberTreeController>(
                                 controller => controller.GetNodes("-1", null))
@@ -292,18 +292,18 @@ namespace Umbraco.Web.Editors
                         //     "codeFileApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<CodeFileController>(
                         //         controller => controller.GetByPath("", ""))
                         // },
-                        {
-                            "publishedStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedStatusController>(
-                                controller => controller.GetPublishedStatusUrl())
-                        },
+                        // {
+                        //     "publishedStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedStatusController>(
+                        //         controller => controller.GetPublishedStatusUrl())
+                        // },
                         {
                             "dictionaryApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DictionaryController>(
                                 controller => controller.DeleteById(int.MaxValue))
 						},
-                        {
-                            "publishedSnapshotCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedSnapshotCacheStatusController>(
-                                controller => controller.GetStatus())
-                        },
+                        // {
+                        //     "publishedSnapshotCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedSnapshotCacheStatusController>(
+                        //         controller => controller.GetStatus())
+                        // },
                         //TODO Reintroduce
                         // {
                         //     "helpApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HelpController>(
@@ -314,18 +314,18 @@ namespace Umbraco.Web.Editors
                         //     "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
                         //         controller => controller.GetSupportedLocales())
                         // },
-                        {
-                            "languageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LanguageController>(
-                                controller => controller.GetAllLanguages())
-                        },
-                        {
-						    "relationTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationTypeController>(
-                                controller => controller.GetById(1))
-                        },
-						{
-                            "logViewerApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogViewerController>(
-                                controller => controller.GetNumberOfErrors(null, null))
-                        },
+                        // {
+                        //     "languageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LanguageController>(
+                        //         controller => controller.GetAllLanguages())
+                        // },
+          //               {
+						    // "relationTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationTypeController>(
+          //                       controller => controller.GetById(1))
+          //               },
+						// {
+      //                       "logViewerApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogViewerController>(
+      //                           controller => controller.GetNumberOfErrors(null, null))
+      //                   },
                         // {
                         //     "webProfilingBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<WebProfilingController>(
                         //         controller => controller.GetStatus())

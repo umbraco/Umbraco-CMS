@@ -1,30 +1,42 @@
 ﻿using System;
-using System.Web.Http;
 using System.Xml;
-using System.Linq;
 using System.Security;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi;
-using File = System.IO.File;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
+using Umbraco.Core.Mapping;
+using Umbraco.Core.Services;
+using Umbraco.Web.Common.Attributes;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
     [PluginController("UmbracoApi")]
     public class RedirectUrlManagementController : UmbracoAuthorizedApiController
     {
         private readonly ILogger _logger;
         private readonly IWebRoutingSettings _webRoutingSettings;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IRedirectUrlService _redirectUrlService;
+        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public RedirectUrlManagementController(ILogger logger, IWebRoutingSettings webRoutingSettings)
+        public RedirectUrlManagementController(ILogger logger,
+            IWebRoutingSettings webRoutingSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IRedirectUrlService redirectUrlService,
+            UmbracoMapper umbracoMapper,
+            IHostingEnvironment hostingEnvironment)
         {
-            _logger = logger;
-            _webRoutingSettings = webRoutingSettings;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _webRoutingSettings = webRoutingSettings ?? throw new ArgumentNullException(nameof(webRoutingSettings));
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _redirectUrlService = redirectUrlService ?? throw new ArgumentNullException(nameof(redirectUrlService));
+            _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
+            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
         }
 
         /// <summary>
@@ -32,10 +44,11 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IHttpActionResult GetEnableState()
+        public IActionResult GetEnableState()
         {
             var enabled = _webRoutingSettings.DisableRedirectUrlTracking == false;
-            var userIsAdmin = UmbracoContext.Security.CurrentUser.IsAdmin();
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            var userIsAdmin = umbracoContext.Security.CurrentUser.IsAdmin();
             return Ok(new { enabled, userIsAdmin });
         }
 
@@ -44,14 +57,13 @@ namespace Umbraco.Web.Editors
         public RedirectUrlSearchResult SearchRedirectUrls(string searchTerm, int page = 0, int pageSize = 10)
         {
             var searchResult = new RedirectUrlSearchResult();
-            var redirectUrlService = Services.RedirectUrlService;
             long resultCount;
 
             var redirects = string.IsNullOrWhiteSpace(searchTerm)
-                ? redirectUrlService.GetAllRedirectUrls(page, pageSize, out resultCount)
-                : redirectUrlService.SearchRedirectUrls(searchTerm, page, pageSize, out resultCount);
+                ? _redirectUrlService.GetAllRedirectUrls(page, pageSize, out resultCount)
+                : _redirectUrlService.SearchRedirectUrls(searchTerm, page, pageSize, out resultCount);
 
-            searchResult.SearchResults = Mapper.MapEnumerable<IRedirectUrl, ContentRedirectUrl>(redirects);
+            searchResult.SearchResults = _umbracoMapper.MapEnumerable<IRedirectUrl, ContentRedirectUrl>(redirects);
             searchResult.TotalCount = resultCount;
             searchResult.CurrentPage = page;
             searchResult.PageCount = ((int)resultCount + pageSize - 1) / pageSize;
@@ -71,43 +83,40 @@ namespace Umbraco.Web.Editors
             var redirectsResult = new RedirectUrlSearchResult();
             if (UdiParser.TryParse(contentUdi, out GuidUdi guidIdi))
             {
-                var redirectUrlService = Services.RedirectUrlService;
-                var redirects = redirectUrlService.GetContentRedirectUrls(guidIdi.Guid);
-                var mapped = Mapper.MapEnumerable<IRedirectUrl, ContentRedirectUrl>(redirects);
+
+                var redirects = _redirectUrlService.GetContentRedirectUrls(guidIdi.Guid);
+                var mapped = _umbracoMapper.MapEnumerable<IRedirectUrl, ContentRedirectUrl>(redirects);
                 redirectsResult.SearchResults = mapped;
                 //not doing paging 'yet'
-                redirectsResult.TotalCount = mapped.Count();
+                redirectsResult.TotalCount = mapped.Count;
                 redirectsResult.CurrentPage = 1;
                 redirectsResult.PageCount = 1;
             }
             return redirectsResult;
         }
         [HttpPost]
-        public IHttpActionResult DeleteRedirectUrl(Guid id)
+        public IActionResult DeleteRedirectUrl(Guid id)
         {
-            var redirectUrlService = Services.RedirectUrlService;
-            redirectUrlService.Delete(id);
+            _redirectUrlService.Delete(id);
             return Ok();
         }
 
         [HttpPost]
-        public IHttpActionResult ToggleUrlTracker(bool disable)
+        public IActionResult ToggleUrlTracker(bool disable)
         {
-            var userIsAdmin = UmbracoContext.Security.CurrentUser.IsAdmin();
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            var userIsAdmin = umbracoContext.Security.CurrentUser.IsAdmin();
             if (userIsAdmin == false)
             {
                 var errorMessage = "User is not a member of the administrators group and so is not allowed to toggle the URL tracker";
                 _logger.Debug<RedirectUrlManagementController>(errorMessage);
                 throw new SecurityException(errorMessage);
             }
-
-            var httpContext = TryGetHttpContext();
-            if (httpContext.Success == false) throw new InvalidOperationException("Cannot acquire HttpContext");
-            var configFilePath = httpContext.Result.Server.MapPath("~/config/umbracoSettings.config");
+            var configFilePath =_hostingEnvironment.MapPathContentRoot("~/config/umbracoSettings.config");
 
             var action = disable ? "disable" : "enable";
 
-            if (File.Exists(configFilePath) == false)
+            if (System.IO.File.Exists(configFilePath) == false)
                 return BadRequest($"Couldn't {action} URL Tracker, the umbracoSettings.config file does not exist.");
 
             var umbracoConfig = new XmlDocument { PreserveWhitespace = true };

@@ -1,69 +1,66 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Semver;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Net;
 using Umbraco.Core.Packaging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 using Umbraco.Core.WebAssets;
+using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Exceptions;
+using Umbraco.Web.Editors;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.Routing;
-using Umbraco.Web.WebApi;
-using Umbraco.Web.WebApi.Filters;
-using File = System.IO.File;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
     /// <summary>
     /// A controller used for installing packages and managing all of the data in the packages section in the back office
     /// </summary>
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
+    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Packages)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
 
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
         private readonly IRuntimeMinifier _runtimeMinifier;
+        private readonly IPackagingService _packagingService;
+        private readonly ILogger _logger;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly ILocalizedTextService _localizedTextService;
 
         public PackageInstallController(
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger logger,
-            IRuntimeState runtimeState,
-            IShortStringHelper shortStringHelper,
             IUmbracoVersion umbracoVersion,
-            UmbracoMapper umbracoMapper,
-            IIOHelper ioHelper,
-            IPublishedUrlProvider publishedUrlProvider,
+            IHostingEnvironment hostingEnvironment,
             IUmbracoApplicationLifetime umbracoApplicationLifetime,
-            IRuntimeMinifier runtimeMinifier)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
+            IRuntimeMinifier runtimeMinifier,
+            IPackagingService packagingService,
+            ILogger logger,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ILocalizedTextService localizedTextService)
         {
-            _umbracoVersion = umbracoVersion;
-            _ioHelper = ioHelper;
-            _umbracoApplicationLifetime = umbracoApplicationLifetime;
-            _runtimeMinifier = runtimeMinifier;
+            _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
+            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+            _umbracoApplicationLifetime = umbracoApplicationLifetime ?? throw new ArgumentNullException(nameof(umbracoApplicationLifetime));
+            _runtimeMinifier = runtimeMinifier ?? throw new ArgumentNullException(nameof(runtimeMinifier));
+            _packagingService = packagingService ?? throw new ArgumentNullException(nameof(packagingService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         }
 
         /// <summary>
@@ -73,9 +70,9 @@ namespace Umbraco.Web.Editors
         /// <param name="version"></param>
         /// <returns></returns>
         [HttpPost]
-        public IHttpActionResult ValidateInstalled(string name, string version)
+        public IActionResult ValidateInstalled(string name, string version)
         {
-            var installType = Services.PackagingService.GetPackageInstallType(name, SemVersion.Parse(version), out _);
+            var installType = _packagingService.GetPackageInstallType(name, SemVersion.Parse(version), out _);
 
             if (installType == PackageInstallType.AlreadyInstalled)
                 return BadRequest();
@@ -84,26 +81,28 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpPost]
-        public IHttpActionResult Uninstall(int packageId)
+        public IActionResult Uninstall(int packageId)
         {
             try
             {
-                var package = Services.PackagingService.GetInstalledPackageById(packageId);
+
+                var package = _packagingService.GetInstalledPackageById(packageId);
                 if (package == null) return NotFound();
 
-                var summary = Services.PackagingService.UninstallPackage(package.Name, Security.GetUserId().ResultOr(0));
+                var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+                var summary = _packagingService.UninstallPackage(package.Name, umbracoContext.Security.GetUserId().ResultOr(0));
 
                 //now get all other packages by this name since we'll uninstall all versions
-                foreach (var installed in Services.PackagingService.GetAllInstalledPackages()
+                foreach (var installed in _packagingService.GetAllInstalledPackages()
                     .Where(x => x.Name == package.Name && x.Id != package.Id))
                 {
                     //remove from the xml
-                    Services.PackagingService.DeleteInstalledPackage(installed.Id, Security.GetUserId().ResultOr(0));
+                    _packagingService.DeleteInstalledPackage(installed.Id, umbracoContext.Security.GetUserId().ResultOr(0));
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error<PackageInstallController>(ex, "Failed to uninstall.");
+                _logger.Error<PackageInstallController>(ex, "Failed to uninstall.");
                 throw;
             }
 
@@ -114,9 +113,9 @@ namespace Umbraco.Web.Editors
 
         private void PopulateFromPackageData(LocalPackageInstallModel model)
         {
-            var zipFile = new FileInfo(Path.Combine(_ioHelper.MapPath(Core.Constants.SystemDirectories.Packages), model.ZipFileName));
+            var zipFile = new FileInfo(Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Packages), model.ZipFileName));
 
-            var ins = Services.PackagingService.GetCompiledPackageInfo(zipFile);
+            var ins = _packagingService.GetCompiledPackageInfo(zipFile);
 
             model.Name = ins.Name;
             model.Author = ins.Author;
@@ -150,22 +149,11 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpPost]
-        [FileUploadCleanupFilter(false)]
-        public async Task<LocalPackageInstallModel> UploadLocalPackage()
+        public async Task<ActionResult<LocalPackageInstallModel>> UploadLocalPackage(List<IFormFile> file)
         {
-            if (Request.Content.IsMimeMultipartContent() == false)
-                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
-
-            var root = _ioHelper.MapPath(Core.Constants.SystemDirectories.TempFileUploads);
-            //ensure it exists
-            Directory.CreateDirectory(root);
-            var provider = new MultipartFormDataStreamProvider(root);
-
-            var result = await Request.Content.ReadAsMultipartAsync(provider);
-
             //must have a file
-            if (result.FileData.Count == 0)
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            if (file.Count == 0)
+                return NotFound();
 
             var model = new LocalPackageInstallModel
             {
@@ -174,38 +162,36 @@ namespace Umbraco.Web.Editors
             };
 
             //get the files
-            foreach (var file in result.FileData)
+            foreach (var formFile in file)
             {
-                var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
+                var fileName = formFile.FileName.Trim('\"');
                 var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
 
                 if (ext.InvariantEquals("zip") || ext.InvariantEquals("umb"))
                 {
                     //we always save package files to /App_Data/packages/package-guid.umb for processing as a standard so lets copy.
 
-                    var packagesFolder = _ioHelper.MapPath(Core.Constants.SystemDirectories.Packages);
+                    var packagesFolder = _hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.Packages);
                     Directory.CreateDirectory(packagesFolder);
                     var packageFile = Path.Combine(packagesFolder, model.PackageGuid + ".umb");
-                    File.Copy(file.LocalFileName, packageFile);
+
+                    using (var stream = System.IO.File.Create(packageFile))
+                    {
+                        await formFile.CopyToAsync(stream);
+                    }
 
                     model.ZipFileName = Path.GetFileName(packageFile);
-
-                    //add to the outgoing model so that all temp files are cleaned up
-                    model.UploadedFiles.Add(new ContentPropertyFile
-                    {
-                        TempFilePath = file.LocalFileName
-                    });
 
                     //Populate the model from the metadata in the package file (zip file)
                     PopulateFromPackageData(model);
 
-                    var installType = Services.PackagingService.GetPackageInstallType(model.Name, SemVersion.Parse(model.Version), out var alreadyInstalled);
+                    var installType = _packagingService.GetPackageInstallType(model.Name, SemVersion.Parse(model.Version), out var alreadyInstalled);
 
                     if (installType == PackageInstallType.AlreadyInstalled)
                     {
                         //this package is already installed
-                        throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
-                            Services.TextService.Localize("packager/packageAlreadyInstalled")));
+                        throw HttpResponseException.CreateNotificationValidationErrorResponse(
+                            _localizedTextService.Localize("packager/packageAlreadyInstalled"));
                     }
 
                     model.OriginalVersion = installType == PackageInstallType.Upgrade ? alreadyInstalled.Version : null;
@@ -214,8 +200,8 @@ namespace Umbraco.Web.Editors
                 else
                 {
                     model.Notifications.Add(new BackOfficeNotification(
-                        Services.TextService.Localize("speechBubbles/operationFailedHeader"),
-                        Services.TextService.Localize("media/disallowedFileType"),
+                        _localizedTextService.Localize("speechBubbles/operationFailedHeader"),
+                        _localizedTextService.Localize("media/disallowedFileType"),
                         NotificationStyle.Warning));
                 }
 
@@ -235,12 +221,13 @@ namespace Umbraco.Web.Editors
         {
             //Default path
             string fileName = packageGuid + ".umb";
-            if (File.Exists(Path.Combine(_ioHelper.MapPath(Core.Constants.SystemDirectories.Packages), fileName)) == false)
+            if (System.IO.File.Exists(Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Packages), fileName)) == false)
             {
-                var packageFile = await Services.PackagingService.FetchPackageFileAsync(
+                var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+                var packageFile = await _packagingService.FetchPackageFileAsync(
                     Guid.Parse(packageGuid),
                     _umbracoVersion.Current,
-                    Security.GetUserId().ResultOr(0));
+                    umbracoContext.Security.GetUserId().ResultOr(0));
 
                 fileName = packageFile.Name;
             }
@@ -254,12 +241,12 @@ namespace Umbraco.Web.Editors
             //Populate the model from the metadata in the package file (zip file)
             PopulateFromPackageData(model);
 
-            var installType = Services.PackagingService.GetPackageInstallType(model.Name, SemVersion.Parse(model.Version), out var alreadyInstalled);
+            var installType = _packagingService.GetPackageInstallType(model.Name, SemVersion.Parse(model.Version), out var alreadyInstalled);
 
             if (installType == PackageInstallType.AlreadyInstalled)
             {
-                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
-                    Services.TextService.Localize("packager/packageAlreadyInstalled")));
+                throw HttpResponseException.CreateNotificationValidationErrorResponse(
+                    _localizedTextService.Localize("packager/packageAlreadyInstalled"));
             }
 
             model.OriginalVersion = installType == PackageInstallType.Upgrade ? alreadyInstalled.Version : null;
@@ -275,20 +262,20 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel Import(PackageInstallModel model)
         {
-            var zipFile = new FileInfo(Path.Combine(_ioHelper.MapPath(Core.Constants.SystemDirectories.Packages), model.ZipFileName));
+            var zipFile = new FileInfo(Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Packages), model.ZipFileName));
 
-            var packageInfo = Services.PackagingService.GetCompiledPackageInfo(zipFile);
+            var packageInfo = _packagingService.GetCompiledPackageInfo(zipFile);
 
             //now we need to check for version comparison
             if (packageInfo.UmbracoVersionRequirementsType == RequirementsType.Strict)
             {
                 var packageMinVersion = packageInfo.UmbracoVersion;
                 if (_umbracoVersion.Current < packageMinVersion)
-                    throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
-                        Services.TextService.Localize("packager/targetVersionMismatch", new[] {packageMinVersion.ToString()})));
+                    throw HttpResponseException.CreateNotificationValidationErrorResponse(
+                        _localizedTextService.Localize("packager/targetVersionMismatch", new[] {packageMinVersion.ToString()}));
             }
 
-            var installType = Services.PackagingService.GetPackageInstallType(packageInfo.Name, SemVersion.Parse(packageInfo.Version), out var alreadyInstalled);
+            var installType = _packagingService.GetPackageInstallType(packageInfo.Name, SemVersion.Parse(packageInfo.Version), out var alreadyInstalled);
 
             var packageDefinition = PackageDefinition.FromCompiledPackage(packageInfo);
             packageDefinition.PackagePath = zipFile.FullName;
@@ -302,8 +289,8 @@ namespace Umbraco.Web.Editors
                 case PackageInstallType.Upgrade:
 
                     //save to the installedPackages.config, this will create a new entry with a new Id
-                    if (!Services.PackagingService.SaveInstalledPackage(packageDefinition))
-                        throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Could not save the package"));
+                    if (!_packagingService.SaveInstalledPackage(packageDefinition))
+                        throw HttpResponseException.CreateNotificationValidationErrorResponse("Could not save the package");
 
                     model.Id = packageDefinition.Id;
                     break;
@@ -323,12 +310,12 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel InstallFiles(PackageInstallModel model)
         {
-            var definition = Services.PackagingService.GetInstalledPackageById(model.Id);
+            var definition = _packagingService.GetInstalledPackageById(model.Id);
             if (definition == null) throw new InvalidOperationException("Not package definition found with id " + model.Id);
 
             var zipFile = new FileInfo(definition.PackagePath);
-
-            var installedFiles = Services.PackagingService.InstallCompiledPackageFiles(definition, zipFile, Security.GetUserId().ResultOr(0));
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            var installedFiles = _packagingService.InstallCompiledPackageFiles(definition, zipFile, umbracoContext.Security.GetUserId().ResultOr(0));
 
             //set a restarting marker and reset the app pool
             _umbracoApplicationLifetime.Restart();
@@ -356,12 +343,12 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel InstallData(PackageInstallModel model)
         {
-            var definition = Services.PackagingService.GetInstalledPackageById(model.Id);
+            var definition = _packagingService.GetInstalledPackageById(model.Id);
             if (definition == null) throw new InvalidOperationException("Not package definition found with id " + model.Id);
 
             var zipFile = new FileInfo(definition.PackagePath);
-
-            var installSummary = Services.PackagingService.InstallCompiledPackageData(definition, zipFile, Security.GetUserId().ResultOr(0));
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            var installSummary = _packagingService.InstallCompiledPackageData(definition, zipFile, umbracoContext.Security.GetUserId().ResultOr(0));
 
             return model;
         }
@@ -374,12 +361,12 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallResult CleanUp(PackageInstallModel model)
         {
-            var definition = Services.PackagingService.GetInstalledPackageById(model.Id);
+            var definition = _packagingService.GetInstalledPackageById(model.Id);
             if (definition == null) throw new InvalidOperationException("Not package definition found with id " + model.Id);
 
             var zipFile = new FileInfo(definition.PackagePath);
 
-            var packageInfo = Services.PackagingService.GetCompiledPackageInfo(zipFile);
+            var packageInfo = _packagingService.GetCompiledPackageInfo(zipFile);
 
             zipFile.Delete();
 

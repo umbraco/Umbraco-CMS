@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Services;
+using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Mvc;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
     /// <summary>
     /// The API controller used for retrieving available stylesheets
@@ -12,9 +14,16 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class StylesheetController : UmbracoAuthorizedJsonController
     {
+        private readonly IFileService _fileService;
+
+        public StylesheetController(IFileService fileService)
+        {
+            _fileService = fileService;
+        }
+
         public IEnumerable<Stylesheet> GetAll()
         {
-            return Services.FileService.GetStylesheets()
+            return _fileService.GetStylesheets()
                 .Select(x =>
                     new Stylesheet() {
                         Name = x.Alias,
@@ -24,7 +33,7 @@ namespace Umbraco.Web.Editors
 
         public IEnumerable<StylesheetRule> GetRulesByName(string name)
         {
-            var css = Services.FileService.GetStylesheetByName(name.EnsureEndsWith(".css"));
+            var css = _fileService.GetStylesheetByName(name.EnsureEndsWith(".css"));
             if (css == null)
                 return Enumerable.Empty<StylesheetRule>();
 

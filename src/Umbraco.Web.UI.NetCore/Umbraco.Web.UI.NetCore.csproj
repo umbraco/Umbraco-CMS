@@ -60,6 +60,7 @@
         <Content Update="Config\umbracoSettings.config">
           <SubType>Designer</SubType>
         </Content>
+        <Content Remove="wwwroot\Web.config" />
     </ItemGroup>
 
     <ItemGroup>
