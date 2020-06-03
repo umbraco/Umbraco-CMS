@@ -9,7 +9,7 @@ using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
     /// <summary>
     /// The API controller used for getting URLs for images with parameters

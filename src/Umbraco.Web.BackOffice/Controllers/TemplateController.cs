@@ -14,7 +14,7 @@ using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
 using Constants = Umbraco.Core.Constants;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorizeAttribute(Constants.Trees.Templates)]

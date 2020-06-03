@@ -158,7 +158,6 @@
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
     <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
     <Compile Include="Editors\MacrosController.cs" />
-    <Compile Include="Editors\TinyMceController.cs" />
     <Compile Include="HttpContextAccessorExtensions.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
@@ -232,7 +231,6 @@
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />
     <Compile Include="WebApi\SerializeVersionAttribute.cs" />
     <Compile Include="WebApi\TrimModelBinder.cs" />
-    <Compile Include="Editors\DictionaryController.cs" />
     <Compile Include="Editors\Filters\MemberSaveModelValidator.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
     <Compile Include="Editors\Filters\IsCurrentUserModelFilterAttribute.cs" />
@@ -331,7 +329,6 @@
     <Compile Include="Mvc\UmbracoViewPage.cs" />
     <Compile Include="Editors\MacroRenderingController.cs" />
     <Compile Include="Editors\MemberTypeController.cs" />
-    <Compile Include="Editors\UpdateCheckController.cs" />
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Editors\MemberController.cs" />
     <Compile Include="Editors\CurrentUserController.cs" />

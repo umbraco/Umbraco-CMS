@@ -8,7 +8,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Common.Attributes;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
     [PluginController("UmbracoApi")]
     public class BackOfficeAssetsController : UmbracoAuthorizedJsonController
