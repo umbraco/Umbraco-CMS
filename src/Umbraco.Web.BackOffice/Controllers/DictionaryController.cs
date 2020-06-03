@@ -49,7 +49,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
-            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(_globalSettings));
+            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
         }
