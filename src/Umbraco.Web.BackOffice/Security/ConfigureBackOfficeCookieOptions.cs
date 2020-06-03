@@ -18,6 +18,7 @@ using Umbraco.Core.Security;
 using Umbraco.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Web.Common.Security;
+using Microsoft.AspNetCore.Routing;
 
 namespace Umbraco.Web.BackOffice.Security
 {
@@ -36,6 +37,7 @@ namespace Umbraco.Web.BackOffice.Security
         private readonly IUserService _userService;
         private readonly IIpResolver _ipResolver;
         private readonly BackOfficeSessionIdValidator _sessionIdValidator;
+        private readonly LinkGenerator _linkGenerator;
 
         public ConfigureBackOfficeCookieOptions(
             IUmbracoContextAccessor umbracoContextAccessor,
@@ -47,7 +49,8 @@ namespace Umbraco.Web.BackOffice.Security
             IRequestCache requestCache,
             IUserService userService,
             IIpResolver ipResolver,
-            BackOfficeSessionIdValidator sessionIdValidator)
+            BackOfficeSessionIdValidator sessionIdValidator,
+            LinkGenerator linkGenerator)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _securitySettings = securitySettings;
@@ -59,6 +62,7 @@ namespace Umbraco.Web.BackOffice.Security
             _userService = userService;
             _ipResolver = ipResolver;
             _sessionIdValidator = sessionIdValidator;
+            _linkGenerator = linkGenerator;
         }
 
         public void Configure(string name, CookieAuthenticationOptions options)
@@ -98,7 +102,8 @@ namespace Umbraco.Web.BackOffice.Security
                 _runtimeState,
                 _hostingEnvironment,
                 _globalSettings,
-                _requestCache);
+                _requestCache,
+                _linkGenerator);
             // _explicitPaths); TODO: Implement this once we do OAuth somehow
 
 

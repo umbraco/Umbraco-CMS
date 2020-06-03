@@ -339,7 +339,6 @@
     <Compile Include="Security\AppBuilderExtensions.cs" />
     <Compile Include="Security\AuthenticationOptionsExtensions.cs" />
     <Compile Include="Security\AuthenticationManagerExtensions.cs" />
-    <Compile Include="Security\BackOfficeCookieManager.cs" />
     <Compile Include="Security\UmbracoBackOfficeCookieAuthOptions.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
     <Compile Include="Trees\FileSystemTreeController.cs" />

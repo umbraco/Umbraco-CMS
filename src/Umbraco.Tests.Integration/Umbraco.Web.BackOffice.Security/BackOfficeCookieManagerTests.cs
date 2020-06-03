@@ -1,36 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Web;
-using Microsoft.Owin;
-using Moq;
+﻿
+
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.Composing;
-using Umbraco.Tests.Testing;
-using Umbraco.Tests.Testing.Objects.Accessors;
-using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
-using Umbraco.Tests.Common;
+using Umbraco.Tests.Integration.Implementations;
 
 namespace Umbraco.Tests.Security
 {
     [TestFixture]
-    [UmbracoTest(WithApplication = true)]
-    public class BackOfficeCookieManagerTests : UmbracoTestBase
+    public class BackOfficeCookieManagerTests 
     {
         [Test]
         public void ShouldAuthenticateRequest_When_Not_Configured()
         {
+            var testHelper = new TestHelper();
+
             //should force app ctx to show not-configured
             ConfigurationManager.AppSettings.Set(Constants.AppSettings.ConfigurationStatus, "");
 
-            var httpContextAccessor = TestHelper.GetHttpContextAccessor();
-            var globalSettings = TestObjects.GetGlobalSettings();
+            var httpContextAccessor = testHelper.GetHttpContextAccessor();
+            var globalSettings = testHelper.SettingsForTests.GetDefaultGlobalSettings();
             var umbracoContext = new UmbracoContext(
                 httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),

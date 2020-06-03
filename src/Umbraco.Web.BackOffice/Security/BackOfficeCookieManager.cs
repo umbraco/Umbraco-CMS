@@ -1,13 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Routing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Extensions;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
+using Umbraco.Web.BackOffice.Controllers;
 
 namespace Umbraco.Web.BackOffice.Security
 {
@@ -30,11 +33,24 @@ namespace Umbraco.Web.BackOffice.Security
         private readonly string[] _explicitPaths;
         private readonly string _getRemainingSecondsPath;
 
-        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtime, IHostingEnvironment hostingEnvironment, IGlobalSettings globalSettings, IRequestCache requestCache)
-            : this(umbracoContextAccessor, runtime, hostingEnvironment, globalSettings, requestCache, null)
+        public BackOfficeCookieManager(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IRuntimeState runtime,
+            IHostingEnvironment hostingEnvironment,
+            IGlobalSettings globalSettings,
+            IRequestCache requestCache,
+            LinkGenerator linkGenerator)
+            : this(umbracoContextAccessor, runtime, hostingEnvironment, globalSettings, requestCache, linkGenerator, null)
         { }
 
-        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtime, IHostingEnvironment hostingEnvironment, IGlobalSettings globalSettings, IRequestCache requestCache, IEnumerable<string> explicitPaths)
+        public BackOfficeCookieManager(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IRuntimeState runtime,
+            IHostingEnvironment hostingEnvironment,
+            IGlobalSettings globalSettings,
+            IRequestCache requestCache,
+            LinkGenerator linkGenerator,
+            IEnumerable<string> explicitPaths)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _runtime = runtime;
@@ -42,9 +58,7 @@ namespace Umbraco.Web.BackOffice.Security
             _globalSettings = globalSettings;
             _requestCache = requestCache;
             _explicitPaths = explicitPaths?.ToArray();
-            var backOfficePath = _globalSettings.GetBackOfficePath(_hostingEnvironment);
-            // TODO: We shouldn't hard code this path
-            _getRemainingSecondsPath = $"{backOfficePath}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds";
+            _getRemainingSecondsPath = linkGenerator.GetUmbracoApiService<AuthenticationController>(x => x.GetRemainingTimeoutSeconds());
         }
 
         /// <summary>
