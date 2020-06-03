@@ -9,16 +9,34 @@ namespace Umbraco.Core.BackOffice
     /// <summary>
     /// A custom user identity for the Umbraco backoffice
     /// </summary>
-    /// <remarks>
-    /// This inherits from FormsIdentity for backwards compatibility reasons since we still support the forms auth cookie, in v8 we can
-    /// change over to 'pure' asp.net identity and just inherit from ClaimsIdentity.
-    /// </remarks>
     [Serializable]
     public class UmbracoBackOfficeIdentity : ClaimsIdentity
     {
-        public static UmbracoBackOfficeIdentity FromClaimsIdentity(ClaimsIdentity identity)
+        public static bool FromClaimsIdentity(ClaimsIdentity identity, out UmbracoBackOfficeIdentity backOfficeIdentity)
         {
-            return new UmbracoBackOfficeIdentity(identity);
+            //validate that all claims exist
+            foreach (var t in RequiredBackOfficeIdentityClaimTypes)
+            {
+                //if the identity doesn't have the claim, or the claim value is null
+                if (identity.HasClaim(x => x.Type == t) == false || identity.HasClaim(x => x.Type == t && x.Value.IsNullOrWhiteSpace()))
+                {
+                    backOfficeIdentity = null;
+                    return false;
+                }
+            }
+
+            backOfficeIdentity = new UmbracoBackOfficeIdentity(identity);
+            return true;
+        }
+
+        /// <summary>
+        /// Create a back office identity based on an existing claims identity
+        /// </summary>
+        /// <param name="identity"></param>
+        private UmbracoBackOfficeIdentity(ClaimsIdentity identity)
+            : base(identity.Claims, Constants.Security.BackOfficeAuthenticationType)
+        {
+            Actor = identity;
         }
 
         /// <summary>
@@ -30,22 +48,20 @@ namespace Umbraco.Core.BackOffice
         /// <param name="startContentNodes"></param>
         /// <param name="startMediaNodes"></param>
         /// <param name="culture"></param>
-        /// <param name="sessionId"></param>
         /// <param name="securityStamp"></param>
         /// <param name="allowedApps"></param>
         /// <param name="roles"></param>
         public UmbracoBackOfficeIdentity(int userId, string username, string realName,
             IEnumerable<int> startContentNodes, IEnumerable<int> startMediaNodes, string culture,
-            string sessionId, string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
+            string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
             : base(Enumerable.Empty<Claim>(), Constants.Security.BackOfficeAuthenticationType) //this ctor is used to ensure the IsAuthenticated property is true
         {
             if (allowedApps == null) throw new ArgumentNullException(nameof(allowedApps));
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
             if (string.IsNullOrWhiteSpace(realName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(realName));
             if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
-            if (string.IsNullOrWhiteSpace(sessionId)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(sessionId));
             if (string.IsNullOrWhiteSpace(securityStamp)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(securityStamp));
-            AddRequiredClaims(userId, username, realName, startContentNodes, startMediaNodes, culture, sessionId, securityStamp, allowedApps, roles);
+            AddRequiredClaims(userId, username, realName, startContentNodes, startMediaNodes, culture, securityStamp, allowedApps, roles);
         }
 
         /// <summary>
@@ -60,43 +76,21 @@ namespace Umbraco.Core.BackOffice
         /// <param name="startContentNodes"></param>
         /// <param name="startMediaNodes"></param>
         /// <param name="culture"></param>
-        /// <param name="sessionId"></param>
         /// <param name="securityStamp"></param>
         /// <param name="allowedApps"></param>
         /// <param name="roles"></param>
         public UmbracoBackOfficeIdentity(ClaimsIdentity childIdentity,
             int userId, string username, string realName,
             IEnumerable<int> startContentNodes, IEnumerable<int> startMediaNodes, string culture,
-            string sessionId, string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
+            string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
         : base(childIdentity.Claims, Constants.Security.BackOfficeAuthenticationType)
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
             if (string.IsNullOrWhiteSpace(realName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(realName));
             if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
-            if (string.IsNullOrWhiteSpace(sessionId)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(sessionId));
             if (string.IsNullOrWhiteSpace(securityStamp)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(securityStamp));
             Actor = childIdentity;
-            AddRequiredClaims(userId, username, realName, startContentNodes, startMediaNodes, culture, sessionId, securityStamp, allowedApps, roles);
-        }
-
-        /// <summary>
-        /// Create a back office identity based on an existing claims identity
-        /// </summary>
-        /// <param name="identity"></param>
-        private UmbracoBackOfficeIdentity(ClaimsIdentity identity)
-            : base(identity.Claims, Constants.Security.BackOfficeAuthenticationType)
-        {
-            Actor = identity;
-
-            //validate that all claims exist
-            foreach (var t in RequiredBackOfficeIdentityClaimTypes)
-            {
-                //if the identity doesn't have the claim, or the claim value is null
-                if (identity.HasClaim(x => x.Type == t) == false || identity.HasClaim(x => x.Type == t && x.Value.IsNullOrWhiteSpace()))
-                {
-                    throw new InvalidOperationException("Cannot create a " + typeof(UmbracoBackOfficeIdentity) + " from " + typeof(ClaimsIdentity) + " since the required claim " + t + " is missing");
-                }
-            }
+            AddRequiredClaims(userId, username, realName, startContentNodes, startMediaNodes, culture, securityStamp, allowedApps, roles);
         }
 
         public const string Issuer = Constants.Security.BackOfficeAuthenticationType;
@@ -115,8 +109,7 @@ namespace Umbraco.Core.BackOffice
             Constants.Security.StartContentNodeIdClaimType,
             Constants.Security.StartMediaNodeIdClaimType,
             ClaimTypes.Locality,
-            Constants.Security.SessionIdClaimType,
-            Constants.Web.SecurityStampClaimType
+            Constants.Security.SecurityStampClaimType
         };
 
         /// <summary>
@@ -124,7 +117,7 @@ namespace Umbraco.Core.BackOffice
         /// </summary>
         private void AddRequiredClaims(int userId, string username, string realName,
             IEnumerable<int> startContentNodes, IEnumerable<int> startMediaNodes, string culture,
-            string sessionId, string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
+            string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
         {
             //This is the id that 'identity' uses to check for the user id
             if (HasClaim(x => x.Type == ClaimTypes.NameIdentifier) == false)
@@ -155,13 +148,9 @@ namespace Umbraco.Core.BackOffice
             if (HasClaim(x => x.Type == ClaimTypes.Locality) == false)
                 AddClaim(new Claim(ClaimTypes.Locality, culture, ClaimValueTypes.String, Issuer, Issuer, this));
 
-            if (HasClaim(x => x.Type == Constants.Security.SessionIdClaimType) == false && SessionId.IsNullOrWhiteSpace() == false)
-                AddClaim(new Claim(Constants.Security.SessionIdClaimType, sessionId, ClaimValueTypes.String, Issuer, Issuer, this));
-
-            //The security stamp claim is also required... this is because this claim type is hard coded
-            // by the SecurityStampValidator, see: https://katanaproject.codeplex.com/workitem/444
-            if (HasClaim(x => x.Type == Constants.Web.SecurityStampClaimType) == false)
-                AddClaim(new Claim(Constants.Web.SecurityStampClaimType, securityStamp, ClaimValueTypes.String, Issuer, Issuer, this));
+            //The security stamp claim is also required
+            if (HasClaim(x => x.Type == Constants.Security.SecurityStampClaimType) == false)
+                AddClaim(new Claim(Constants.Security.SecurityStampClaimType, securityStamp, ClaimValueTypes.String, Issuer, Issuer, this));
 
             //Add each app as a separate claim
             if (HasClaim(x => x.Type == Constants.Security.AllowedApplicationsClaimType) == false && allowedApps != null)
@@ -211,19 +200,7 @@ namespace Umbraco.Core.BackOffice
 
         public string Culture => this.FindFirstValue(ClaimTypes.Locality);
 
-        public string SessionId
-        {
-            get => this.FindFirstValue(Constants.Security.SessionIdClaimType);
-            set
-            {
-                var existing = FindFirst(Constants.Security.SessionIdClaimType);
-                if (existing != null)
-                    TryRemoveClaim(existing);
-                AddClaim(new Claim(Constants.Security.SessionIdClaimType, value, ClaimValueTypes.String, Issuer, Issuer, this));
-            }
-        }
-
-        public string SecurityStamp => this.FindFirstValue(Constants.Web.SecurityStampClaimType);
+        public string SecurityStamp => this.FindFirstValue(Constants.Security.SecurityStampClaimType);
 
         public string[] Roles => this.FindAll(x => x.Type == DefaultRoleClaimType).Select(role => role.Value).ToArray();
 

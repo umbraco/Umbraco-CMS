@@ -53,10 +53,11 @@ namespace Umbraco.Core.BackOffice
         }
 
         #region What we do not currently support
-        // TODO: We could support this - but a user claims will mostly just be what is in the auth cookie
+
+        // We don't support an IUserClaimStore and don't need to (at least currently)
         public override bool SupportsUserClaim => false;
         
-        // TODO: Support this
+        // It would be nice to support this but we don't need to currently and that would require IQueryable support for our user service/repository
         public override bool SupportsQueryableUsers => false;
 
         /// <summary>
@@ -64,8 +65,9 @@ namespace Umbraco.Core.BackOffice
         /// </summary>
         public override bool SupportsUserTwoFactor => false;
 
-        // TODO: Support this
+        // We haven't needed to support this yet, though might be necessary for 2FA
         public override bool SupportsUserPhoneNumber => false;
+
         #endregion
 
         /// <summary>

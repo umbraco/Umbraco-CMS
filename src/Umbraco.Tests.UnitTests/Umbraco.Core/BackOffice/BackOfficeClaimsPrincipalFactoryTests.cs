@@ -17,6 +17,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
     [TestFixture]
     public class BackOfficeClaimsPrincipalFactoryTests
     {
+        private const int _testUserId = 2;
+        private const string _testUserName = "bob";
+        private const string _testUserGivenName = "Bob";
+        private const string _testUserCulture = "en-US";
+        private const string _testUserSecurityStamp = "B6937738-9C17-4C7D-A25A-628A875F5177";
         private BackOfficeIdentityUser _testUser;
         private Mock<UserManager<BackOfficeIdentityUser>> _mockUserManager;
 
@@ -65,52 +70,22 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             Assert.IsNotNull(umbracoBackOfficeIdentity);
         }
 
-        [Test]
-        public async Task CreateAsync_Should_Create_NameId()
+        [TestCase(ClaimTypes.NameIdentifier, _testUserId)]
+        [TestCase(ClaimTypes.Name, _testUserName)]        
+        public async Task CreateAsync_Should_Include_Claim(string expectedClaimType, object expectedClaimValue)
         {
-            const string expectedClaimType = ClaimTypes.NameIdentifier;
-            var expectedClaimValue = _testUser.Id.ToString();
-
             var sut = CreateSut();
 
             var claimsPrincipal = await sut.CreateAsync(_testUser);
 
-            Assert.True(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue));
-            Assert.True(claimsPrincipal.GetUmbracoIdentity().Actor.HasClaim(expectedClaimType, expectedClaimValue));
-        }
-
-        [Test]
-        public async Task CreateAsync_Should_Create_Name()
-        {
-            const string expectedClaimType = ClaimTypes.Name;
-            var expectedClaimValue = _testUser.UserName;
-
-            var sut = CreateSut();
-
-            var claimsPrincipal = await sut.CreateAsync(_testUser);
-
-            Assert.True(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue));
-            Assert.True(claimsPrincipal.GetUmbracoIdentity().Actor.HasClaim(expectedClaimType, expectedClaimValue));
-        }
-
-        [Test]
-        public async Task CreateAsync_Should_Create_IdentityProvider()
-        {
-            const string expectedClaimType = "http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider";
-            const string expectedClaimValue = "ASP.NET Identity";
-
-            var sut = CreateSut();
-
-            var claimsPrincipal = await sut.CreateAsync(_testUser);
-
-            Assert.True(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue));
-            Assert.True(claimsPrincipal.GetUmbracoIdentity().Actor.HasClaim(expectedClaimType, expectedClaimValue));
+            Assert.True(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue.ToString()));
+            Assert.True(claimsPrincipal.GetUmbracoIdentity().Actor.HasClaim(expectedClaimType, expectedClaimValue.ToString()));
         }
 
         [Test]
         public async Task CreateAsync_When_SecurityStamp_Supported_Expect_SecurityStamp_Claim()
         {
-            const string expectedClaimType = Constants.Web.SecurityStampClaimType;
+            const string expectedClaimType = Constants.Security.SecurityStampClaimType;
             var expectedClaimValue = _testUser.SecurityStamp;
 
             _mockUserManager.Setup(x => x.SupportsUserSecurityStamp).Returns(true);
@@ -165,12 +140,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             var mockGlobalSettings = new Mock<IGlobalSettings>();
             mockGlobalSettings.Setup(x => x.DefaultUILanguage).Returns("test");
 
-            _testUser = new BackOfficeIdentityUser(mockGlobalSettings.Object, 2, new List<IReadOnlyUserGroup>())
+            _testUser = new BackOfficeIdentityUser(mockGlobalSettings.Object, _testUserId, new List<IReadOnlyUserGroup>())
             {
-                UserName = "bob",
-                Name = "Bob",
+                UserName = _testUserName,
+                Name = _testUserGivenName,
                 Email = "bob@umbraco.test",
-                SecurityStamp = "B6937738-9C17-4C7D-A25A-628A875F5177"
+                SecurityStamp = _testUserSecurityStamp,
+                Culture = _testUserCulture
             };
 
             _mockUserManager = new Mock<UserManager<BackOfficeIdentityUser>>(new Mock<IUserStore<BackOfficeIdentityUser>>().Object,

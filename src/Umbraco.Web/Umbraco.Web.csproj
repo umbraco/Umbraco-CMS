@@ -151,6 +151,7 @@
     <Compile Include="Macros\PartialViewMacroEngine.cs" />
     <Compile Include="Mvc\UmbracoViewPageOfTModel.cs" />
     <Compile Include="Security\IdentityFactoryMiddleware.cs" />
+    <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="WebApi\Filters\UmbracoTreeAuthorizeAttribute.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyRuntimeMinifier.cs" />
     <Compile Include="Models\NoNodesViewModel.cs" />
@@ -196,7 +197,6 @@
     <Compile Include="Security\OwinDataProtectorTokenProvider.cs" />
     <Compile Include="Security\PublicAccessChecker.cs" />
     <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
-    <Compile Include="Security\UmbracoSecurityStampValidator.cs" />
     <Compile Include="Security\UserAwarePasswordHasher.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="Trees\ITreeNodeController.cs" />
@@ -221,7 +221,6 @@
     <Compile Include="Mvc\ContainerControllerFactory.cs" />
     <Compile Include="OwinExtensions.cs" />
     <Compile Include="Security\BackOfficeCookieAuthenticationProvider.cs" />
-    <Compile Include="Security\SessionIdValidator.cs" />
     <Compile Include="SignalR\PreviewHubComposer.cs" />
     <Compile Include="Trees\FilesTreeController.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyConfiguration.cs" />
@@ -400,7 +399,6 @@
     <Compile Include="Mvc\ControllerFactoryExtensions.cs" />
     <Compile Include="Mvc\IRenderMvcController.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
-    <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="CdfLogger.cs" />
     <Compile Include="Controllers\UmbLoginController.cs" />
     <Compile Include="UrlHelperExtensions.cs" />

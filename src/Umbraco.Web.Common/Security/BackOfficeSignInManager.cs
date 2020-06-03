@@ -10,9 +10,14 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Web.Common.Security
 {
+    using Constants = Umbraco.Core.Constants;
+
+    // TODO: There's potential to extract an interface for this for only what we use and put that in Core without aspnetcore refs, but we need to wait till were done with it since there's a bit to implement
+
     public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser>
     {
         private readonly BackOfficeUserManager _userManager;
@@ -132,21 +137,13 @@ namespace Umbraco.Web.BackOffice.Security
                     _userManager.RaiseLoginSuccessEvent(user, user.Id);
             }
             else if (result.IsLockedOut)
-            {
                 Logger.LogInformation("Login attempt failed for username {UserName} from IP address {IpAddress}, the user is locked", username, Context.Connection.RemoteIpAddress);
-            }
             else if (result.RequiresTwoFactor)
-            {
                 Logger.LogInformation("Login attempt requires verification for username {UserName} from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
-            }
             else if (!result.Succeeded || result.IsNotAllowed)
-            {
                 Logger.LogInformation("Login attempt failed for username {UserName} from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
-            }
             else
-            {
                 throw new ArgumentOutOfRangeException();
-            }
 
             return result;
         }

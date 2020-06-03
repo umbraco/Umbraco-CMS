@@ -16,6 +16,8 @@ namespace Umbraco.Web.BackOffice.Runtime
         {
             composition.RegisterUnique<BackOfficeAreaRoutes>();
             composition.RegisterUnique<BackOfficeServerVariables>();
+            composition.Register<BackOfficeSessionIdValidator>(Lifetime.Request);
+            composition.Register<BackOfficeSecurityStampValidator>(Lifetime.Request);
 
             composition.RegisterUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
         }
