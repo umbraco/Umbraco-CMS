@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Owin;
 using Umbraco.Core;
@@ -59,7 +60,10 @@ namespace Umbraco.Web.Security
                             //Ok, we've got a real ticket, now we can add this ticket's identity to the current
                             // Principal, this means we'll have 2 identities assigned to the principal which we can
                             // use to authorize the preview and allow for a back office User.
-                            claimsPrincipal.AddIdentity(UmbracoBackOfficeIdentity.FromClaimsIdentity(unprotected.Identity));
+                            if (!UmbracoBackOfficeIdentity.FromClaimsIdentity(unprotected.Identity, out var umbracoIdentity))
+                                throw new InvalidOperationException("Cannot convert identity");
+
+                            claimsPrincipal.AddIdentity(umbracoIdentity);
                         }
                     }
                 }

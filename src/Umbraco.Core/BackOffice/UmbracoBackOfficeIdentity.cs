@@ -12,9 +12,31 @@ namespace Umbraco.Core.BackOffice
     [Serializable]
     public class UmbracoBackOfficeIdentity : ClaimsIdentity
     {
-        public static UmbracoBackOfficeIdentity FromClaimsIdentity(ClaimsIdentity identity)
+        public static bool FromClaimsIdentity(ClaimsIdentity identity, out UmbracoBackOfficeIdentity backOfficeIdentity)
         {
-            return new UmbracoBackOfficeIdentity(identity);
+            //validate that all claims exist
+            foreach (var t in RequiredBackOfficeIdentityClaimTypes)
+            {
+                //if the identity doesn't have the claim, or the claim value is null
+                if (identity.HasClaim(x => x.Type == t) == false || identity.HasClaim(x => x.Type == t && x.Value.IsNullOrWhiteSpace()))
+                {
+                    backOfficeIdentity = null;
+                    return false;
+                }
+            }
+
+            backOfficeIdentity = new UmbracoBackOfficeIdentity(identity);
+            return true;
+        }
+
+        /// <summary>
+        /// Create a back office identity based on an existing claims identity
+        /// </summary>
+        /// <param name="identity"></param>
+        private UmbracoBackOfficeIdentity(ClaimsIdentity identity)
+            : base(identity.Claims, Constants.Security.BackOfficeAuthenticationType)
+        {
+            Actor = identity;
         }
 
         /// <summary>
@@ -69,26 +91,6 @@ namespace Umbraco.Core.BackOffice
             if (string.IsNullOrWhiteSpace(securityStamp)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(securityStamp));
             Actor = childIdentity;
             AddRequiredClaims(userId, username, realName, startContentNodes, startMediaNodes, culture, securityStamp, allowedApps, roles);
-        }
-
-        /// <summary>
-        /// Create a back office identity based on an existing claims identity
-        /// </summary>
-        /// <param name="identity"></param>
-        private UmbracoBackOfficeIdentity(ClaimsIdentity identity)
-            : base(identity.Claims, Constants.Security.BackOfficeAuthenticationType)
-        {
-            Actor = identity;
-
-            //validate that all claims exist
-            foreach (var t in RequiredBackOfficeIdentityClaimTypes)
-            {
-                //if the identity doesn't have the claim, or the claim value is null
-                if (identity.HasClaim(x => x.Type == t) == false || identity.HasClaim(x => x.Type == t && x.Value.IsNullOrWhiteSpace()))
-                {
-                    throw new InvalidOperationException("Cannot create a " + typeof(UmbracoBackOfficeIdentity) + " from " + typeof(ClaimsIdentity) + " since the required claim " + t + " is missing");
-                }
-            }
         }
 
         public const string Issuer = Constants.Security.BackOfficeAuthenticationType;

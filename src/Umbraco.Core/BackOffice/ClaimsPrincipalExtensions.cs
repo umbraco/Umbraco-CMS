@@ -27,18 +27,12 @@ namespace Umbraco.Extensions
                 if (backOfficeIdentity != null) return backOfficeIdentity;
             }
 
-            //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd and has the back office session
-            if (user.Identity is ClaimsIdentity claimsIdentity && claimsIdentity.IsAuthenticated && claimsIdentity.HasClaim(x => x.Type == Constants.Security.SessionIdClaimType))
+            //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd
+            if (user.Identity is ClaimsIdentity claimsIdentity
+                && claimsIdentity.IsAuthenticated
+                && UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out var umbracoIdentity))
             {
-                try
-                {
-                    return UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);
-                }
-                catch (InvalidOperationException)
-                {                    
-                    // We catch this error because it's what we throw when the required claims are not in the identity.
-                    // when that happens something strange is going on, we'll swallow this exception and return null.
-                }
+                return umbracoIdentity;
             }
 
             return null;
