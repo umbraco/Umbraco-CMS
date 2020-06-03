@@ -22,7 +22,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("useLegacyEncoding", DefaultValue = "false")]
         public bool UseLegacyEncoding => (bool)base["useLegacyEncoding"];
 
-        [ConfigurationProperty("hashAlgorithmType", DefaultValue = "HMACSHA256")]
+        [ConfigurationProperty("hashAlgorithmType", DefaultValue = Constants.Security.AspNetCoreV3PasswordHashAlgorithmName)]
         public string HashAlgorithmType => (string)base["hashAlgorithmType"];
 
         [ConfigurationProperty("maxFailedAccessAttemptsBeforeLockout", DefaultValue = "5")]

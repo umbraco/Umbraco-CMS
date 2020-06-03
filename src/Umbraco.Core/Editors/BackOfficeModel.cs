@@ -11,7 +11,7 @@ namespace Umbraco.Web.Editors
     public class BackOfficeModel
     {
         public BackOfficeModel(UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion,
-            IContentSettings contentSettings, TreeCollection treeCollection,
+            IContentSettings contentSettings, 
             IHostingEnvironment hostingEnvironment,
             IRuntimeSettings runtimeSettings, ISecuritySettings securitySettings)
         {
@@ -19,7 +19,6 @@ namespace Umbraco.Web.Editors
             GlobalSettings = globalSettings;
             UmbracoVersion = umbracoVersion;
             ContentSettings = contentSettings;
-            TreeCollection = treeCollection;
             HostingEnvironment = hostingEnvironment;
             RuntimeSettings = runtimeSettings;
             SecuritySettings = securitySettings;
@@ -30,7 +29,6 @@ namespace Umbraco.Web.Editors
         public IGlobalSettings GlobalSettings { get; }
         public IUmbracoVersion UmbracoVersion { get; }
         public IContentSettings ContentSettings { get; }
-        public TreeCollection TreeCollection { get; }
         public IHostingEnvironment HostingEnvironment { get; }
         public IRuntimeSettings RuntimeSettings { get; set; }
         public ISecuritySettings SecuritySettings { get; set; }

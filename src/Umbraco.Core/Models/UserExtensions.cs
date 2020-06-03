@@ -149,13 +149,13 @@ namespace Umbraco.Core.Models
         {
             const string cacheKey = "AllContentStartNodes";
             //try to look them up from cache so we don't recalculate
-            var valuesInUserCache = FromUserCache<int[]>(user, cacheKey);
+            var valuesInUserCache = user.FromUserCache<int[]>(cacheKey);
             if (valuesInUserCache != null) return valuesInUserCache;
 
             var gsn = user.Groups.Where(x => x.StartContentId.HasValue).Select(x => x.StartContentId.Value).Distinct().ToArray();
             var usn = user.StartContentIds;
             var vals = CombineStartNodes(UmbracoObjectTypes.Document, gsn, usn, entityService);
-            ToUserCache(user, cacheKey, vals);
+            user.ToUserCache(cacheKey, vals);
             return vals;
         }
 
@@ -164,13 +164,13 @@ namespace Umbraco.Core.Models
         {
             const string cacheKey = "AllMediaStartNodes";
             //try to look them up from cache so we don't recalculate
-            var valuesInUserCache = FromUserCache<int[]>(user, cacheKey);
+            var valuesInUserCache = user.FromUserCache<int[]>(cacheKey);
             if (valuesInUserCache != null) return valuesInUserCache;
 
             var gsn = user.Groups.Where(x => x.StartMediaId.HasValue).Select(x => x.StartMediaId.Value).Distinct().ToArray();
             var usn = user.StartMediaIds;
             var vals = CombineStartNodes(UmbracoObjectTypes.Media, gsn, usn, entityService);
-            ToUserCache(user, cacheKey, vals);
+            user.ToUserCache(cacheKey, vals);
             return vals;
         }
 
@@ -178,12 +178,12 @@ namespace Umbraco.Core.Models
         {
             const string cacheKey = "MediaStartNodePaths";
             //try to look them up from cache so we don't recalculate
-            var valuesInUserCache = FromUserCache<string[]>(user, cacheKey);
+            var valuesInUserCache = user.FromUserCache<string[]>(cacheKey);
             if (valuesInUserCache != null) return valuesInUserCache;
 
             var startNodeIds = user.CalculateMediaStartNodeIds(entityService);
             var vals = entityService.GetAllPaths(UmbracoObjectTypes.Media, startNodeIds).Select(x => x.Path).ToArray();
-            ToUserCache(user, cacheKey, vals);
+            user.ToUserCache(cacheKey, vals);
             return vals;
         }
 
@@ -191,37 +191,13 @@ namespace Umbraco.Core.Models
         {
             const string cacheKey = "ContentStartNodePaths";
             //try to look them up from cache so we don't recalculate
-            var valuesInUserCache = FromUserCache<string[]>(user, cacheKey);
+            var valuesInUserCache = user.FromUserCache<string[]>(cacheKey);
             if (valuesInUserCache != null) return valuesInUserCache;
 
             var startNodeIds = user.CalculateContentStartNodeIds(entityService);
             var vals = entityService.GetAllPaths(UmbracoObjectTypes.Document, startNodeIds).Select(x => x.Path).ToArray();
-            ToUserCache(user, cacheKey, vals);
+            user.ToUserCache(cacheKey, vals);
             return vals;
-        }
-
-        private static T FromUserCache<T>(IUser user, string cacheKey)
-            where T: class
-        {
-            if (!(user is User entityUser)) return null;
-
-            lock (entityUser.AdditionalDataLock)
-            {
-                return entityUser.AdditionalData.TryGetValue(cacheKey, out var allContentStartNodes)
-                    ? allContentStartNodes as T
-                    : null;
-            }
-        }
-
-        private static void ToUserCache<T>(IUser user, string cacheKey, T vals)
-            where T: class
-        {
-            if (!(user is User entityUser)) return;
-
-            lock (entityUser.AdditionalDataLock)
-            {
-                entityUser.AdditionalData[cacheKey] = vals;
-            }
         }
 
         private static bool StartsWithPath(string test, string path)

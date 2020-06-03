@@ -302,7 +302,10 @@ namespace Umbraco.Tests.Models.Mapping
             // setup the mocks to return the data we want to test against...
 
             var memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.MemberTypePropertyTypes[memberType.PropertyTypes.Last().Alias] = new MemberTypePropertyProfileAccess(true, true, true);
+            var alias = memberType.PropertyTypes.Last().Alias;
+            memberType.SetIsSensitiveProperty(alias, true);
+            memberType.SetMemberCanEditProperty(alias, true);
+            memberType.SetMemberCanViewProperty(alias, true);
 
             MockedContentTypes.EnsureAllIds(memberType, 8888);
 

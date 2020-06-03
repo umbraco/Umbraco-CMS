@@ -1,52 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Security
 {
+
     /// <summary>
-    /// Handles password hashing and formatting
+    /// Handles password hashing and formatting for legacy hashing algorithms
     /// </summary>
-    public class PasswordSecurity
+    public class LegacyPasswordSecurity
     {
-        public IPasswordConfiguration PasswordConfiguration { get; }
-        public PasswordGenerator _generator;
-        public ConfiguredPasswordValidator _validator;
+        // TODO: This class no longer has the logic available to verify the old old old password format, we should
+        // include this ability so that upgrades for very old versions/data can work and then auto-migrate to the new password format.
+
+        private readonly IPasswordConfiguration _passwordConfiguration;
+        private readonly PasswordGenerator _generator;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="passwordConfiguration"></param>
-        public PasswordSecurity(IPasswordConfiguration passwordConfiguration)
+        public LegacyPasswordSecurity(IPasswordConfiguration passwordConfiguration)
         {
-            PasswordConfiguration = passwordConfiguration;
+            _passwordConfiguration = passwordConfiguration;
+            _generator = new PasswordGenerator(passwordConfiguration);
         }
 
-        /// <summary>
-        /// Checks if the password passes validation rules
-        /// </summary>
-        /// <param name="password"></param>
-        /// <returns></returns>
-        public async Task<Attempt<IEnumerable<string>>> IsValidPasswordAsync(string password)
-        {
-            if (_validator == null)
-                _validator = new ConfiguredPasswordValidator(PasswordConfiguration);
-            var result = await _validator.ValidateAsync(password);
-            if (result.Succeeded)
-                return Attempt<IEnumerable<string>>.Succeed();
-
-            return Attempt<IEnumerable<string>>.Fail(result.Errors);
-        }
-
-        public string GeneratePassword()
-        {
-            if (_generator == null)
-                _generator = new PasswordGenerator(PasswordConfiguration);
-            return _generator.GeneratePassword();
-        }
+        public string GeneratePassword() => _generator.GeneratePassword();
 
         /// <summary>
         /// Returns a hashed password value used to store in a data store
@@ -89,7 +70,7 @@ namespace Umbraco.Core.Security
             var saltBytes = Convert.FromBase64String(salt);
             byte[] inArray;
 
-            var hashAlgorithm = GetHashAlgorithm(pass);
+            var hashAlgorithm = GetCurrentHashAlgorithm();
             var algorithm = hashAlgorithm as KeyedHashAlgorithm;
             if (algorithm != null)
             {
@@ -185,37 +166,30 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// Return the hash algorithm to use
+        /// Return the hash algorithm to use based on the <see cref="IPasswordConfiguration"/>
         /// </summary>
         /// <param name="password"></param>
         /// <returns></returns>
-        public HashAlgorithm GetHashAlgorithm(string password)
+        private HashAlgorithm GetCurrentHashAlgorithm()
         {
-            if (PasswordConfiguration.HashAlgorithmType.IsNullOrWhiteSpace())
+            if (_passwordConfiguration.HashAlgorithmType.IsNullOrWhiteSpace())
                 throw new InvalidOperationException("No hash algorithm type specified");
 
-            var alg = HashAlgorithm.Create(PasswordConfiguration.HashAlgorithmType);
+            var alg = HashAlgorithm.Create(_passwordConfiguration.HashAlgorithmType);
             if (alg == null)
-                throw new InvalidOperationException($"The hash algorithm specified {PasswordConfiguration.HashAlgorithmType} cannot be resolved");
+                throw new InvalidOperationException($"The hash algorithm specified {_passwordConfiguration.HashAlgorithmType} cannot be resolved");
 
             return alg;
         }
 
-        /// <summary>
-        /// Encodes the password.
-        /// </summary>
-        /// <param name="password">The password.</param>
-        /// <returns>The encoded password.</returns>
-        private string LegacyEncodePassword(string password)
+        public bool SupportHashAlgorithm(string algorithm)
         {
-            var hashAlgorith = GetHashAlgorithm(password);
-            var encodedPassword = Convert.ToBase64String(hashAlgorith.ComputeHash(Encoding.Unicode.GetBytes(password)));
-            return encodedPassword;
+            if (algorithm.InvariantEquals(typeof(HMACSHA256).Name))
+                return true;
+
+            // TODO: Need to add the old old old format in here too which was just HMACSHA1 IIRC but had a custom key implementation as the password itself
+            return false;
         }
-
-
-
-
 
     }
 }

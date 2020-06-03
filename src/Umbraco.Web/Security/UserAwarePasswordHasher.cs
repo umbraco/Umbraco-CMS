@@ -7,9 +7,9 @@ namespace Umbraco.Web.Security
     public class UserAwarePasswordHasher<T> : IPasswordHasher<T>
         where T : BackOfficeIdentityUser
     {
-        private readonly PasswordSecurity _passwordSecurity;
+        private readonly LegacyPasswordSecurity _passwordSecurity;
 
-        public UserAwarePasswordHasher(PasswordSecurity passwordSecurity)
+        public UserAwarePasswordHasher(LegacyPasswordSecurity passwordSecurity)
         {
             _passwordSecurity = passwordSecurity;
         }

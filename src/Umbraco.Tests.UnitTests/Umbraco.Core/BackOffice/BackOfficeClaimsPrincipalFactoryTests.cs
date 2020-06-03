@@ -25,7 +25,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
         {
             Assert.Throws<ArgumentNullException>(() => new BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>(
                 null,
-                new OptionsWrapper<IdentityOptions>(new IdentityOptions())));
+                new OptionsWrapper<BackOfficeIdentityOptions>(new BackOfficeIdentityOptions())));
         }
 
         [Test]
@@ -43,7 +43,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             Assert.Throws<ArgumentNullException>(() => new BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>(
                 new Mock<UserManager<BackOfficeIdentityUser>>(new Mock<IUserStore<BackOfficeIdentityUser>>().Object,
                     null, null, null, null, null, null, null, null).Object,
-                new OptionsWrapper<IdentityOptions>(null)));
+                new OptionsWrapper<BackOfficeIdentityOptions>(null)));
         }
 
         [Test]
@@ -185,7 +185,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
         private BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser> CreateSut()
         {
             return new BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>(_mockUserManager.Object,
-                new OptionsWrapper<IdentityOptions>(new IdentityOptions()));
+                new OptionsWrapper<BackOfficeIdentityOptions>(new BackOfficeIdentityOptions()));
         }
     }
 }

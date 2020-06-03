@@ -58,48 +58,11 @@ namespace Umbraco.Web.Security
 
             return new BackOfficeSignInManager(
                 userManager,
-                new BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>(userManager, new OptionsWrapper<IdentityOptions>(userManager.Options)),
+                new BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>(userManager, new OptionsWrapper<BackOfficeIdentityOptions>(userManager.Options)),
                 context.Authentication,
                 logger,
                 globalSettings,
                 context.Request);
-        }
-
-        /// <summary>
-        /// Sign in the user in using the user name and password
-        /// </summary>
-        /// <param name="userName"/><param name="password"/><param name="isPersistent"/><param name="shouldLockout"/>
-        /// <returns/>
-        public async Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent, bool shouldLockout)
-        {
-            var result = await PasswordSignInAsyncImpl(userName, password, isPersistent, shouldLockout);
-
-            if (result.Succeeded)
-            {
-                _logger.WriteCore(TraceEventType.Information, 0,
-                    $"User: {userName} logged in from IP address {_request.RemoteIpAddress}", null, null);
-            }
-            else if (result.IsLockedOut)
-            {
-                _logger.WriteCore(TraceEventType.Information, 0,
-                    $"Login attempt failed for username {userName} from IP address {_request.RemoteIpAddress}, the user is locked", null, null);
-            }
-            else if (result.RequiresTwoFactor)
-            {
-                _logger.WriteCore(TraceEventType.Information, 0,
-                    $"Login attempt requires verification for username {userName} from IP address {_request.RemoteIpAddress}", null, null);
-            }
-            else if (!result.Succeeded || result.IsNotAllowed)
-            {
-                _logger.WriteCore(TraceEventType.Information, 0,
-                    $"Login attempt failed for username {userName} from IP address {_request.RemoteIpAddress}", null, null);
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException();
-            }
-
-            return result;
         }
 
         /// <summary>
@@ -159,7 +122,7 @@ namespace Umbraco.Web.Security
                     if (requestContext != null)
                     {
                         var backofficeUserManager = requestContext.GetBackOfficeUserManager();
-                        if (backofficeUserManager != null) backofficeUserManager.RaiseAccountLockedEvent(user.Id);
+                        if (backofficeUserManager != null) backofficeUserManager.RaiseAccountLockedEvent(_request.User, user.Id);
                     }
 
                     return SignInResult.LockedOut;
@@ -170,7 +133,7 @@ namespace Umbraco.Web.Security
             {
                 var backofficeUserManager = requestContext.GetBackOfficeUserManager();
                 if (backofficeUserManager != null)
-                    backofficeUserManager.RaiseInvalidLoginAttemptEvent(userName);
+                    backofficeUserManager.RaiseInvalidLoginAttemptEvent(_request.User, userName);
             }
 
             return SignInResult.Failed;

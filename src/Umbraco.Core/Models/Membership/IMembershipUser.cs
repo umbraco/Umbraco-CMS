@@ -16,6 +16,11 @@ namespace Umbraco.Core.Models.Membership
         /// </summary>
         string RawPasswordValue { get; set; }
 
+        /// <summary>
+        /// The user's specific password config (i.e. algorithm type, etc...)
+        /// </summary>
+        string PasswordConfiguration { get; set; }
+
         string Comments { get; set; }
         bool IsApproved { get; set; }
         bool IsLockedOut { get; set; }

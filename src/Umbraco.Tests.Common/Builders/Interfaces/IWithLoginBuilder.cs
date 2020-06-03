@@ -5,5 +5,7 @@
         string Username { get; set; }
 
         string RawPasswordValue { get; set; }
+
+        string PasswordConfig { get; set; }
     }
 }

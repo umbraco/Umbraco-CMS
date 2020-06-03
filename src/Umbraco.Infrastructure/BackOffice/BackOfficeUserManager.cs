@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -7,13 +8,24 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Security;
+using Umbraco.Extensions;
 using Umbraco.Net;
 
 namespace Umbraco.Core.BackOffice
 {
     public class BackOfficeUserManager : BackOfficeUserManager<BackOfficeIdentityUser>
     {
-        public BackOfficeUserManager(IIpResolver ipResolver, IUserStore<BackOfficeIdentityUser> store, IOptions<IdentityOptions> optionsAccessor, IPasswordHasher<BackOfficeIdentityUser> passwordHasher, IEnumerable<IUserValidator<BackOfficeIdentityUser>> userValidators, IEnumerable<IPasswordValidator<BackOfficeIdentityUser>> passwordValidators, ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors, IServiceProvider services, ILogger<UserManager<BackOfficeIdentityUser>> logger)
+        public BackOfficeUserManager(
+            IIpResolver ipResolver,
+            IUserStore<BackOfficeIdentityUser> store,
+            IOptions<BackOfficeIdentityOptions> optionsAccessor,
+            IPasswordHasher<BackOfficeIdentityUser> passwordHasher,
+            IEnumerable<IUserValidator<BackOfficeIdentityUser>> userValidators,
+            IEnumerable<IPasswordValidator<BackOfficeIdentityUser>> passwordValidators,
+            BackOfficeLookupNormalizer keyNormalizer,
+            BackOfficeIdentityErrorDescriber errors,
+            IServiceProvider services,
+            ILogger<UserManager<BackOfficeIdentityUser>> logger)
             : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
         {
         }
@@ -27,12 +39,12 @@ namespace Umbraco.Core.BackOffice
         public BackOfficeUserManager(
             IIpResolver ipResolver,
             IUserStore<T> store,
-            IOptions<IdentityOptions> optionsAccessor,
+            IOptions<BackOfficeIdentityOptions> optionsAccessor,
             IPasswordHasher<T> passwordHasher,
             IEnumerable<IUserValidator<T>> userValidators,
             IEnumerable<IPasswordValidator<T>> passwordValidators,
-            ILookupNormalizer keyNormalizer,
-            IdentityErrorDescriber errors,
+            BackOfficeLookupNormalizer keyNormalizer,
+            BackOfficeIdentityErrorDescriber errors,
             IServiceProvider services,
             ILogger<UserManager<T>> logger)
             : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
@@ -55,6 +67,15 @@ namespace Umbraco.Core.BackOffice
         // TODO: Support this
         public override bool SupportsUserPhoneNumber => false;
         #endregion
+
+        /// <summary>
+        /// Replace the underlying options property with our own strongly typed version
+        /// </summary>
+        public new BackOfficeIdentityOptions Options
+        {
+            get => (BackOfficeIdentityOptions)base.Options;
+            set => base.Options = value;
+        }
 
         /// <summary>
         /// Used to validate a user's session
@@ -181,14 +202,16 @@ namespace Umbraco.Core.BackOffice
             if (user == null) throw new InvalidOperationException("Could not find user");
 
             var result = await base.ResetPasswordAsync(user, token, newPassword);
-            if (result.Succeeded) RaisePasswordChangedEvent(userId);
+            if (result.Succeeded)
+                RaisePasswordChangedEvent(null, userId); // TODO: How can we get the current user? we have not HttpContext (netstandard), we can make our own IPrincipalAccessor?
             return result;
         }
 
         public override async Task<IdentityResult> ChangePasswordAsync(T user, string currentPassword, string newPassword)
         {
             var result = await base.ChangePasswordAsync(user, currentPassword, newPassword);
-            if (result.Succeeded) RaisePasswordChangedEvent(user.Id);
+            if (result.Succeeded)
+                RaisePasswordChangedEvent(null, user.Id); // TODO: How can we get the current user? we have not HttpContext (netstandard), we can make our own IPrincipalAccessor?
             return result;
         }
         
@@ -266,11 +289,11 @@ namespace Umbraco.Core.BackOffice
             // The way we unlock is by setting the lockoutEnd date to the current datetime
             if (result.Succeeded && lockoutEnd >= DateTimeOffset.UtcNow)
             {
-                RaiseAccountLockedEvent(user.Id);
+                RaiseAccountLockedEvent(null, user.Id); // TODO: How can we get the current user? we have not HttpContext (netstandard), we can make our own IPrincipalAccessor?
             }
             else
             {
-                RaiseAccountUnlockedEvent(user.Id);
+                RaiseAccountUnlockedEvent(null, user.Id); // TODO: How can we get the current user? we have not HttpContext (netstandard), we can make our own IPrincipalAccessor?
                 //Resets the login attempt fails back to 0 when unlock is clicked
                 await ResetAccessFailedCountAsync(user);
             }
@@ -290,7 +313,7 @@ namespace Umbraco.Core.BackOffice
 
             await lockoutStore.ResetAccessFailedCountAsync(user, CancellationToken.None);
             //raise the event now that it's reset
-            RaiseResetAccessFailedCountEvent(user.Id);
+            RaiseResetAccessFailedCountEvent(null, user.Id); // TODO: How can we get the current user? we have not HttpContext (netstandard), we can make our own IPrincipalAccessor?
             return await UpdateAsync(user);
         }
 
@@ -324,65 +347,52 @@ namespace Umbraco.Core.BackOffice
             var result = await UpdateAsync(user);
 
             //Slightly confusing: this will return a Success if we successfully update the AccessFailed count
-            if (result.Succeeded) RaiseLoginFailedEvent(user.Id);
+            if (result.Succeeded)
+            {
+                // TODO: This may no longer be the case in netcore, we'll need to see about that
+                RaiseLoginFailedEvent(null, user.Id); // TODO: How can we get the current user? we have not HttpContext (netstandard), we can make our own IPrincipalAccessor?
+            }
 
             return result;
         }
 
-        public void RaiseAccountLockedEvent(int userId)
+        private IdentityAuditEventArgs CreateArgs(AuditEvent auditEvent, IPrincipal currentUser, int affectedUserId, string affectedUsername)
         {
-            OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
+            var umbIdentity = currentUser?.GetUmbracoIdentity();
+            var currentUserId = umbIdentity?.GetUserId<int?>() ?? Constants.Security.SuperUserId;            
+            var ip = IpResolver.GetCurrentRequestIpAddress();
+            return new IdentityAuditEventArgs(auditEvent, ip, currentUserId, string.Empty, affectedUserId, affectedUsername);
+        }
+        private IdentityAuditEventArgs CreateArgs(AuditEvent auditEvent, BackOfficeIdentityUser currentUser, int affectedUserId, string affectedUsername)
+        {
+            var currentUserId = currentUser.Id;
+            var ip = IpResolver.GetCurrentRequestIpAddress();
+            return new IdentityAuditEventArgs(auditEvent, ip, currentUserId, string.Empty, affectedUserId, affectedUsername);
         }
 
-        public void RaiseAccountUnlockedEvent(int userId)
-        {
-            OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
-        }
+        // TODO: Review where these are raised and see if they can be simplified and either done in the this usermanager or the signin manager, lastly we'll resort to the authenticaiton controller
+        // In some cases it will be nicer/easier to not pass in IPrincipal
+        public void RaiseAccountLockedEvent(IPrincipal currentUser, int userId) => OnAccountLocked(CreateArgs(AuditEvent.AccountLocked, currentUser, userId, string.Empty));
 
-        public void RaiseForgotPasswordRequestedEvent(int userId)
-        {
-            OnForgotPasswordRequested(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordRequested, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
-        }
+        public void RaiseAccountUnlockedEvent(IPrincipal currentUser, int userId) => OnAccountUnlocked(CreateArgs(AuditEvent.AccountUnlocked, currentUser, userId, string.Empty));
 
-        public void RaiseForgotPasswordChangedSuccessEvent(int userId)
-        {
-            OnForgotPasswordChangedSuccess(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordChangedSuccess, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
-        }
+        public void RaiseForgotPasswordRequestedEvent(IPrincipal currentUser, int userId) => OnForgotPasswordRequested(CreateArgs(AuditEvent.ForgotPasswordRequested, currentUser, userId, string.Empty));
 
-        public void RaiseLoginFailedEvent(int userId)
-        {
-            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
-        }
+        public void RaiseForgotPasswordChangedSuccessEvent(IPrincipal currentUser, int userId) => OnForgotPasswordChangedSuccess(CreateArgs(AuditEvent.ForgotPasswordChangedSuccess, currentUser, userId, string.Empty));
 
-        public void RaiseInvalidLoginAttemptEvent(string username)
-        {
-            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed, IpResolver.GetCurrentRequestIpAddress(), username, string.Format("Attempted login for username '{0}' failed", username)));
-        }
+        public void RaiseLoginFailedEvent(IPrincipal currentUser, int userId) => OnLoginFailed(CreateArgs(AuditEvent.LoginFailed, currentUser, userId, string.Empty));
 
-        public void RaiseLoginRequiresVerificationEvent(int userId)
-        {
-            OnLoginRequiresVerification(new IdentityAuditEventArgs(AuditEvent.LoginRequiresVerification, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
-        }
+        public void RaiseInvalidLoginAttemptEvent(IPrincipal currentUser, string username) => OnLoginFailed(CreateArgs(AuditEvent.LoginFailed, currentUser, Constants.Security.SuperUserId, username));
 
-        public void RaiseLoginSuccessEvent(int userId)
-        {
-            OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
-        }
+        public void RaiseLoginRequiresVerificationEvent(IPrincipal currentUser, int userId) => OnLoginRequiresVerification(CreateArgs(AuditEvent.LoginRequiresVerification, currentUser, userId, string.Empty));
 
-        public void RaiseLogoutSuccessEvent(int userId)
-        {
-            OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
-        }
+        public void RaiseLoginSuccessEvent(BackOfficeIdentityUser currentUser, int userId) => OnLoginSuccess(CreateArgs(AuditEvent.LoginSucces, currentUser, userId, string.Empty));
 
-        public void RaisePasswordChangedEvent(int userId)
-        {
-            OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
-        }
+        public void RaiseLogoutSuccessEvent(IPrincipal currentUser, int userId) => OnLogoutSuccess(CreateArgs(AuditEvent.LogoutSuccess, currentUser, userId, string.Empty));
 
-        public void RaiseResetAccessFailedCountEvent(int userId)
-        {
-            OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
-        }
+        public void RaisePasswordChangedEvent(IPrincipal currentUser, int userId) => OnPasswordChanged(CreateArgs(AuditEvent.LogoutSuccess, currentUser, userId, string.Empty));
+
+        public void RaiseResetAccessFailedCountEvent(IPrincipal currentUser, int userId) => OnResetAccessFailedCount(CreateArgs(AuditEvent.ResetAccessFailedCount, currentUser, userId, string.Empty));
 
         public static event EventHandler AccountLocked;
         public static event EventHandler AccountUnlocked;
@@ -396,59 +406,26 @@ namespace Umbraco.Core.BackOffice
         public static event EventHandler PasswordReset;
         public static event EventHandler ResetAccessFailedCount;
 
-        protected virtual void OnAccountLocked(IdentityAuditEventArgs e)
-        {
-            if (AccountLocked != null) AccountLocked(this, e);
-        }
+        protected virtual void OnAccountLocked(IdentityAuditEventArgs e) => AccountLocked?.Invoke(this, e);
 
-        protected virtual void OnAccountUnlocked(IdentityAuditEventArgs e)
-        {
-            if (AccountUnlocked != null) AccountUnlocked(this, e);
-        }
+        protected virtual void OnAccountUnlocked(IdentityAuditEventArgs e) => AccountUnlocked?.Invoke(this, e);
 
-        protected virtual void OnForgotPasswordRequested(IdentityAuditEventArgs e)
-        {
-            if (ForgotPasswordRequested != null) ForgotPasswordRequested(this, e);
-        }
+        protected virtual void OnForgotPasswordRequested(IdentityAuditEventArgs e) => ForgotPasswordRequested?.Invoke(this, e);
 
-        protected virtual void OnForgotPasswordChangedSuccess(IdentityAuditEventArgs e)
-        {
-            if (ForgotPasswordChangedSuccess != null) ForgotPasswordChangedSuccess(this, e);
-        }
+        protected virtual void OnForgotPasswordChangedSuccess(IdentityAuditEventArgs e) => ForgotPasswordChangedSuccess?.Invoke(this, e);
 
-        protected virtual void OnLoginFailed(IdentityAuditEventArgs e)
-        {
-            if (LoginFailed != null) LoginFailed(this, e);
-        }
+        protected virtual void OnLoginFailed(IdentityAuditEventArgs e) => LoginFailed?.Invoke(this, e);
 
-        protected virtual void OnLoginRequiresVerification(IdentityAuditEventArgs e)
-        {
-            if (LoginRequiresVerification != null) LoginRequiresVerification(this, e);
-        }
+        protected virtual void OnLoginRequiresVerification(IdentityAuditEventArgs e) => LoginRequiresVerification?.Invoke(this, e);
 
-        protected virtual void OnLoginSuccess(IdentityAuditEventArgs e)
-        {
-            if (LoginSuccess != null) LoginSuccess(this, e);
-        }
+        protected virtual void OnLoginSuccess(IdentityAuditEventArgs e) => LoginSuccess?.Invoke(this, e);
 
-        protected virtual void OnLogoutSuccess(IdentityAuditEventArgs e)
-        {
-            if (LogoutSuccess != null) LogoutSuccess(this, e);
-        }
+        protected virtual void OnLogoutSuccess(IdentityAuditEventArgs e) => LogoutSuccess?.Invoke(this, e);
 
-        protected virtual void OnPasswordChanged(IdentityAuditEventArgs e)
-        {
-            if (PasswordChanged != null) PasswordChanged(this, e);
-        }
+        protected virtual void OnPasswordChanged(IdentityAuditEventArgs e) => PasswordChanged?.Invoke(this, e);
 
-        protected virtual void OnPasswordReset(IdentityAuditEventArgs e)
-        {
-            if (PasswordReset != null) PasswordReset(this, e);
-        }
+        protected virtual void OnPasswordReset(IdentityAuditEventArgs e) => PasswordReset?.Invoke(this, e);
 
-        protected virtual void OnResetAccessFailedCount(IdentityAuditEventArgs e)
-        {
-            if (ResetAccessFailedCount != null) ResetAccessFailedCount(this, e);
-        }
+        protected virtual void OnResetAccessFailedCount(IdentityAuditEventArgs e) => ResetAccessFailedCount?.Invoke(this, e);
     }
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using Newtonsoft.Json;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -15,6 +14,7 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -26,6 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IMapperCollection _mapperCollection;
         private readonly IGlobalSettings _globalSettings;
         private readonly IUserPasswordConfiguration _passwordConfiguration;
+        private readonly IJsonSerializer _jsonSerializer;
         private string _passwordConfigJson;
         private bool _passwordConfigInitialized;
 
@@ -39,26 +40,31 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// A dictionary specifying the configuration for user passwords. If this is null then no password configuration will be persisted or read.
         /// </param>
         /// <param name="globalSettings"></param>
-        public UserRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IMapperCollection mapperCollection, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration)
+        public UserRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IMapperCollection mapperCollection, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration, IJsonSerializer jsonSerializer)
             : base(scopeAccessor, appCaches, logger)
         {
             _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            _jsonSerializer = jsonSerializer;
         }
 
         /// <summary>
         /// Returns a serialized dictionary of the password configuration that is stored against the user in the database
         /// </summary>
-        private string PasswordConfigJson
+        private string DefaultPasswordConfigJson
         {
             get
             {
                 if (_passwordConfigInitialized)
                     return _passwordConfigJson;
 
-                var passwordConfig = new Dictionary<string, string> { { "hashAlgorithm", _passwordConfiguration.HashAlgorithmType } };
-                _passwordConfigJson = passwordConfig == null ? null : JsonConvert.SerializeObject(passwordConfig);
+                var passwordConfig = new UserPasswordSettings
+                {
+                    HashAlgorithm = _passwordConfiguration.HashAlgorithmType
+                };
+
+                _passwordConfigJson = passwordConfig == null ? null : _jsonSerializer.Serialize(passwordConfig);
                 _passwordConfigInitialized = true;
                 return _passwordConfigJson;
             }
@@ -424,7 +430,7 @@ ORDER BY colName";
             // as new, as we do not want to create a new user - instead, persist
             // it as updated
             // see also: UserFactory.BuildEntity
-            if (((User) entity).AdditionalData.ContainsKey("IS_V7_ZERO"))
+            if (entity.FromUserCache<string>("IS_V7_ZERO") != null)
             {
                 PersistUpdatedItem(entity);
                 return;
@@ -438,10 +444,8 @@ ORDER BY colName";
 
             var userDto = UserFactory.BuildDto(entity);
 
-            // check if we have a known config, we only want to store config for hashing
-            // TODO: This logic will need to be updated when we do http://issues.umbraco.org/issue/U4-10089
-            if (PasswordConfigJson != null)
-                userDto.PasswordConfig = PasswordConfigJson;
+            // check if we have a user config else use the default
+            userDto.PasswordConfig = entity.PasswordConfiguration ?? DefaultPasswordConfigJson;
 
             var id = Convert.ToInt32(Database.Insert(userDto));
             entity.Id = id;
@@ -534,13 +538,9 @@ ORDER BY colName";
                     changedCols.Add("securityStampToken");
                 }
 
-                // check if we have a known config, we only want to store config for hashing
-                // TODO: This logic will need to be updated when we do http://issues.umbraco.org/issue/U4-10089
-                if (PasswordConfigJson != null)
-                {
-                    userDto.PasswordConfig = PasswordConfigJson;
-                    changedCols.Add("passwordConfig");
-                }
+                // check if we have a user config else use the default
+                userDto.PasswordConfig = entity.PasswordConfiguration ?? DefaultPasswordConfigJson;
+                changedCols.Add("passwordConfig");
             }
 
             // If userlogin or the email has changed then need to reset security stamp

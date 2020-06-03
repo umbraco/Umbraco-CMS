@@ -1,57 +1,81 @@
-﻿using System;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
-using Umbraco.Core.Mapping;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Security;
+using Umbraco.Core.Serialization;
 using Umbraco.Net;
+using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.AspNetCore;
 
 namespace Umbraco.Extensions
 {
     public static class UmbracoBackOfficeServiceCollectionExtensions
     {
+        /// <summary>
+        /// Adds the services required for running the Umbraco back office
+        /// </summary>
+        /// <param name="services"></param>
+        public static void AddUmbracoBackOffice(this IServiceCollection services)
+        {
+            services.AddAntiforgery();
+
+            services
+                .AddAuthentication(Constants.Security.BackOfficeAuthenticationType)
+                .AddCookie(Constants.Security.BackOfficeAuthenticationType);
+
+            services.ConfigureOptions<ConfigureUmbracoBackOfficeCookieOptions>();
+        }
+
+        /// <summary>
+        /// Adds the services required for using Umbraco back office Identity
+        /// </summary>
+        /// <param name="services"></param>        
         public static void AddUmbracoBackOfficeIdentity(this IServiceCollection services)
         {
             services.AddDataProtection();
 
-            // UmbracoMapper - hack?
-            services.TryAddSingleton<IdentityMapDefinition>();
-            services.TryAddSingleton(s => new MapDefinitionCollection(new[] {s.GetService<IdentityMapDefinition>()}));
-            services.TryAddSingleton<UmbracoMapper>();
-
             services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
 
-            services.AddIdentityCore<BackOfficeIdentityUser>(options =>
-                {
-                    options.User.RequireUniqueEmail = true;
-
-                    // TODO: Configure password configuration
-                    /*options.Password.RequiredLength = passwordConfiguration.RequiredLength;
-                    options.Password.RequireNonAlphanumeric = passwordConfiguration.RequireNonLetterOrDigit;
-                    options.Password.RequireDigit = passwordConfiguration.RequireDigit;
-                    options.Password.RequireLowercase = passwordConfiguration.RequireLowercase;
-                    options.Password.RequireUppercase = passwordConfiguration.RequireUppercase;
-                    options.Lockout.MaxFailedAccessAttempts = passwordConfiguration.MaxFailedAccessAttemptsBeforeLockout;*/
-
-                    options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
-                    options.ClaimsIdentity.UserNameClaimType = ClaimTypes.Name;
-                    options.ClaimsIdentity.RoleClaimType = ClaimTypes.Role;
-                    options.ClaimsIdentity.SecurityStampClaimType = Constants.Web.SecurityStampClaimType;
-
-                    options.Lockout.AllowedForNewUsers = true;
-                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(30);
-                })
+            services.BuildUmbracoBackOfficeIdentity()
                 .AddDefaultTokenProviders()
                 .AddUserStore<BackOfficeUserStore>()
                 .AddUserManager<BackOfficeUserManager>()
+                .AddSignInManager<BackOfficeSignInManager>()
                 .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>>();
 
-            services.AddScoped<ILookupNormalizer, NopLookupNormalizer>();
-            services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<BackOfficeIdentityUser>>();
+            // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
+            services.ConfigureOptions<ConfigureUmbracoBackOfficeIdentityOptions>();
+            //services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<BackOfficeIdentityUser>>();            
+        }
 
+        private static IdentityBuilder BuildUmbracoBackOfficeIdentity(this IServiceCollection services)
+        {
+            // Borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Extensions.Core/src/IdentityServiceCollectionExtensions.cs#L33
+            // The reason we need our own is because the Identity system doesn't cater easily for multiple identity systems and particularly being
+            // able to configure IdentityOptions to a specific provider since there is no named options. So we have strongly typed options
+            // and strongly typed ILookupNormalizer and IdentityErrorDescriber since those are 'global' and we need to be unintrusive. 
+
+            // TODO: Could move all of this to BackOfficeComposer?
+
+            // Services used by identity
+            services.TryAddScoped<IUserValidator<BackOfficeIdentityUser>, UserValidator<BackOfficeIdentityUser>>();
+            services.TryAddScoped<IPasswordValidator<BackOfficeIdentityUser>, PasswordValidator<BackOfficeIdentityUser>>();
+            services.TryAddScoped<IPasswordHasher<BackOfficeIdentityUser>>(
+                services => new BackOfficePasswordHasher(
+                    new LegacyPasswordSecurity(services.GetRequiredService<IUserPasswordConfiguration>()),
+                    services.GetRequiredService<IJsonSerializer>()));
+            services.TryAddScoped<IUserConfirmation<BackOfficeIdentityUser>, DefaultUserConfirmation<BackOfficeIdentityUser>>();
+            services.TryAddScoped<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>, UserClaimsPrincipalFactory<BackOfficeIdentityUser>>();
+            services.TryAddScoped<UserManager<BackOfficeIdentityUser>>();
+
+            // CUSTOM:            
+            services.TryAddScoped<BackOfficeLookupNormalizer>();
+            services.TryAddScoped<BackOfficeIdentityErrorDescriber>();
+
+            return new IdentityBuilder(typeof(BackOfficeIdentityUser), services);
         }
     }
 }

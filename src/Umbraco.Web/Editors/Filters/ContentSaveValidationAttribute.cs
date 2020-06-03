@@ -15,6 +15,7 @@ using Umbraco.Web.Actions;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors.Filters
 {
@@ -47,7 +48,7 @@ namespace Umbraco.Web.Editors.Filters
         {
             var model = (ContentItemSave)actionContext.ActionArguments["contentItem"];
             var contentItemValidator = new ContentSaveModelValidator(_logger, _umbracoContextAccessor, _textService);
-
+            
             if (!ValidateAtLeastOneVariantIsBeingSaved(model, actionContext)) return;
             if (!contentItemValidator.ValidateExistingContent(model, actionContext)) return;
             if (!ValidateUserAccess(model, actionContext, _umbracoContextAccessor.UmbracoContext.Security)) return;
@@ -86,9 +87,9 @@ namespace Umbraco.Web.Editors.Filters
         private bool ValidateUserAccess(ContentItemSave contentItem, HttpActionContext actionContext, IWebSecurity webSecurity)
         {
 
-            //We now need to validate that the user is allowed to be doing what they are doing.
-            //Based on the action we need to check different permissions.
-            //Then if it is new, we need to lookup those permissions on the parent!
+            // We now need to validate that the user is allowed to be doing what they are doing.
+            // Based on the action we need to check different permissions.
+            // Then if it is new, we need to lookup those permissions on the parent!
 
             var permissionToCheck = new List<char>();
             IContent contentToCheck = null;
@@ -213,6 +214,9 @@ namespace Umbraco.Web.Editors.Filters
 
             if (accessResult == ContentPermissionsHelper.ContentAccess.NotFound)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            if (accessResult != ContentPermissionsHelper.ContentAccess.Granted)
+                throw new HttpResponseException(actionContext.Request.CreateUserNoAccessResponse());
 
             return accessResult == ContentPermissionsHelper.ContentAccess.Granted;
         }

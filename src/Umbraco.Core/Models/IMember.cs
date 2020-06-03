@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Models.Entities;
+﻿using System;
+using System.ComponentModel;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Models
@@ -9,5 +11,54 @@ namespace Umbraco.Core.Models
         /// String alias of the default ContentType
         /// </summary>
         string ContentTypeAlias { get; }
+
+        /// <summary>
+        /// Internal/Experimental - only used for mapping queries. 
+        /// </summary>
+        /// <remarks>
+        /// Adding these to have first level properties instead of the Properties collection.
+        /// </remarks>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        string LongStringPropertyValue { get; set; }
+        /// <summary>
+        /// Internal/Experimental - only used for mapping queries. 
+        /// </summary>
+        /// <remarks>
+        /// Adding these to have first level properties instead of the Properties collection.
+        /// </remarks>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        string ShortStringPropertyValue { get; set; }
+        /// <summary>
+        /// Internal/Experimental - only used for mapping queries. 
+        /// </summary>
+        /// <remarks>
+        /// Adding these to have first level properties instead of the Properties collection.
+        /// </remarks>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        int IntegerPropertyValue { get; set; }
+        /// <summary>
+        /// Internal/Experimental - only used for mapping queries. 
+        /// </summary>
+        /// <remarks>
+        /// Adding these to have first level properties instead of the Properties collection.
+        /// </remarks>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        bool BoolPropertyValue { get; set; }
+        /// <summary>
+        /// Internal/Experimental - only used for mapping queries. 
+        /// </summary>
+        /// <remarks>
+        /// Adding these to have first level properties instead of the Properties collection.
+        /// </remarks>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        DateTime DateTimePropertyValue { get; set; }
+        /// <summary>
+        /// Internal/Experimental - only used for mapping queries. 
+        /// </summary>
+        /// <remarks>
+        /// Adding these to have first level properties instead of the Properties collection.
+        /// </remarks>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        string PropertyTypeAlias { get; set; }
     }
 }

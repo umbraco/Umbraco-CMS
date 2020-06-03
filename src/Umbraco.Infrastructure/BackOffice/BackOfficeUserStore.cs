@@ -45,7 +45,6 @@ namespace Umbraco.Core.BackOffice
             if (userService == null) throw new ArgumentNullException("userService");
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
             _mapper = mapper;
-
             _userService = userService;
             _externalLoginService = externalLoginService;
         }
@@ -820,6 +819,7 @@ namespace Umbraco.Core.BackOffice
             {
                 anythingChanged = true;
                 user.RawPasswordValue = identityUser.PasswordHash;
+                user.PasswordConfiguration = identityUser.PasswordConfig;
             }
 
             if (identityUser.IsPropertyDirty("Culture")

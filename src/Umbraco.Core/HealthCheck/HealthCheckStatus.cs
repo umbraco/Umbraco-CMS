@@ -8,7 +8,7 @@ namespace Umbraco.Web.HealthCheck
     /// The status returned for a health check when it performs it check
     /// TODO: This model will be used in the WebApi result so needs attributes for JSON usage
     /// </summary>
-    [DataContract(Name = "healtCheckStatus", Namespace = "")]
+    [DataContract(Name = "healthCheckStatus", Namespace = "")]
     public class HealthCheckStatus
     {
         public HealthCheckStatus(string message)

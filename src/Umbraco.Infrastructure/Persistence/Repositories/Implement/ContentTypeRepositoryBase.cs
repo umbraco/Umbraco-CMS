@@ -259,9 +259,7 @@ AND umbracoNode.id <> @id",
             // 1. Find content based on the current ContentType: entity.Id
             // 2. Find all PropertyTypes on the ContentType that was removed - tracked id (key)
             // 3. Remove properties based on property types from the removed content type where the content ids correspond to those found in step one
-            if (entity is ContentTypeCompositionBase compositionBase &&
-                compositionBase.RemovedContentTypeKeyTracker != null &&
-                compositionBase.RemovedContentTypeKeyTracker.Any())
+            if (entity.RemovedContentTypes.Any())
             {
                 // TODO: Could we do the below with bulk SQL statements instead of looking everything up and then manipulating?
 
@@ -275,7 +273,7 @@ AND umbracoNode.id <> @id",
                 var contentDtos = Database.Fetch<ContentDto>(sql);
 
                 // loop through all tracked keys, which corresponds to the ContentTypes that has been removed from the composition
-                foreach (var key in compositionBase.RemovedContentTypeKeyTracker)
+                foreach (var key in entity.RemovedContentTypes)
                 {
                     // find PropertyTypes for the removed ContentType
                     var propertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new { Id = key });
@@ -442,7 +440,7 @@ AND umbracoNode.id <> @id",
 
                 propertyTypeVariationChanges = propertyTypeVariationChanges ?? new Dictionary<int, (ContentVariation, ContentVariation)>();
 
-                foreach (var composedPropertyType in ((ContentTypeCompositionBase)entity).RawComposedPropertyTypes)
+                foreach (var composedPropertyType in entity.GetOriginalComposedPropertyTypes())
                 {
                     if (composedPropertyType.Variations == ContentVariation.Nothing) continue;
 

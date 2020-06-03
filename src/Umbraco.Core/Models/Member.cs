@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 using Umbraco.Composing;
 using Umbraco.Core.Logging;
@@ -17,6 +18,7 @@ namespace Umbraco.Core.Models
         private string _username;
         private string _email;
         private string _rawPasswordValue;
+        private string _passwordConfig;
 
         /// <summary>
         /// Constructor for creating an empty Member object
@@ -156,6 +158,13 @@ namespace Umbraco.Core.Models
                     SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, nameof(RawPasswordValue));
                 }
             }
+        }
+
+        [IgnoreDataMember]
+        public string PasswordConfiguration
+        {
+            get => _passwordConfig;
+            set => SetPropertyValueAndDetectChanges(value, ref _passwordConfig, nameof(PasswordConfiguration));
         }
 
         /// <summary>
@@ -404,21 +413,60 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual string ContentTypeAlias => ContentType.Alias;
 
-        /* Internal experiment - only used for mapping queries.
-         * Adding these to have first level properties instead of the Properties collection.
-         */
+        /// <summary>
+        /// Internal/Experimental - only used for mapping queries. 
+        /// </summary>
+        /// <remarks>
+        /// Adding these to have first level properties instead of the Properties collection.
+        /// </remarks>
         [IgnoreDataMember]
-        internal string LongStringPropertyValue { get; set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public string LongStringPropertyValue { get; set; }
+        /// <summary>
+        /// Internal/Experimental - only used for mapping queries. 
+        /// </summary>
+        /// <remarks>
+        /// Adding these to have first level properties instead of the Properties collection.
+        /// </remarks>
         [IgnoreDataMember]
-        internal string ShortStringPropertyValue { get; set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public string ShortStringPropertyValue { get; set; }
+        /// <summary>
+        /// Internal/Experimental - only used for mapping queries. 
+        /// </summary>
+        /// <remarks>
+        /// Adding these to have first level properties instead of the Properties collection.
+        /// </remarks>
         [IgnoreDataMember]
-        internal int IntegerPropertyValue { get; set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public int IntegerPropertyValue { get; set; }
+        /// <summary>
+        /// Internal/Experimental - only used for mapping queries. 
+        /// </summary>
+        /// <remarks>
+        /// Adding these to have first level properties instead of the Properties collection.
+        /// </remarks>
         [IgnoreDataMember]
-        internal bool BoolPropertyValue { get; set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool BoolPropertyValue { get; set; }
+        /// <summary>
+        /// Internal/Experimental - only used for mapping queries. 
+        /// </summary>
+        /// <remarks>
+        /// Adding these to have first level properties instead of the Properties collection.
+        /// </remarks>
         [IgnoreDataMember]
-        internal DateTime DateTimePropertyValue { get; set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public DateTime DateTimePropertyValue { get; set; }
+        /// <summary>
+        /// Internal/Experimental - only used for mapping queries. 
+        /// </summary>
+        /// <remarks>
+        /// Adding these to have first level properties instead of the Properties collection.
+        /// </remarks>
         [IgnoreDataMember]
-        internal string PropertyTypeAlias { get; set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public string PropertyTypeAlias { get; set; }
 
         private Attempt<T> WarnIfPropertyTypeNotFoundOnGet<T>(string propertyAlias, string propertyName, T defaultVal)
         {
@@ -476,6 +524,6 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public bool HasAdditionalData => _additionalData != null;
+        public bool HasAdditionalData => _additionalData != null;        
     }
 }

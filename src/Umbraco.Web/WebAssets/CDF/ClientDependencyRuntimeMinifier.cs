@@ -50,11 +50,11 @@ namespace Umbraco.Web.WebAssets.CDF
                 filePaths.Select(x => new CssFile(x)).ToArray());
         }
 
-        public string RenderCssHere(string bundleName)
+        public Task<string> RenderCssHereAsync(string bundleName)
         {
             var bundleFiles = GetCssBundleFiles(bundleName);
-            if (bundleFiles == null) return string.Empty;
-            return RenderOutput(bundleFiles, AssetType.Css);
+            if (bundleFiles == null) return Task.FromResult(string.Empty);
+            return Task.FromResult(RenderOutput(bundleFiles, AssetType.Css));
         }
 
         public void CreateJsBundle(string bundleName, params string[] filePaths)
@@ -67,11 +67,11 @@ namespace Umbraco.Web.WebAssets.CDF
                 filePaths.Select(x => new JavascriptFile(x)).ToArray());
         }
 
-        public string RenderJsHere(string bundleName)
+        public Task<string> RenderJsHereAsync(string bundleName)
         {
             var bundleFiles = GetJsBundleFiles(bundleName);
-            if (bundleFiles == null) return string.Empty;
-            return RenderOutput(bundleFiles, AssetType.Javascript);
+            if (bundleFiles == null) return Task.FromResult(string.Empty);
+            return Task.FromResult(RenderOutput(bundleFiles, AssetType.Javascript));
         }
 
         public Task<IEnumerable<string>> GetAssetPathsAsync(string bundleName)

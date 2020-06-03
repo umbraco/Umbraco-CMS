@@ -20,7 +20,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Returns true if the template is used as a layout for other templates (i.e. it has 'children')
         /// </summary>
-        bool IsMasterTemplate { get; }
+        bool IsMasterTemplate { get; set; }
 
         /// <summary>
         /// returns the master template alias

@@ -8,6 +8,8 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models
 {
+    // TODO: This should exist within Umbraco.Core not infrastructure however there's a dependency on Newtonsoft here, how can we refactor that requirement?
+
     /// <summary>
     /// Implements <see cref="IDataType"/>.
     /// </summary>

@@ -18,10 +18,10 @@ namespace Umbraco.Core.Models
         private Lazy<int> _masterTemplateId;
 
         public Template(IShortStringHelper shortStringHelper, string name, string alias)
-            : this(shortStringHelper, name, alias, (Func<File, string>) null)
+            : this(shortStringHelper, name, alias, null)
         { }
 
-        internal Template(IShortStringHelper shortStringHelper, string name, string alias, Func<File, string> getFileContent)
+        public Template(IShortStringHelper shortStringHelper, string name, string alias, Func<File, string> getFileContent)
             : base(string.Empty, getFileContent)
         {
             _shortStringHelper = shortStringHelper;
@@ -60,7 +60,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Returns true if the template is used as a layout for other templates (i.e. it has 'children')
         /// </summary>
-        public bool IsMasterTemplate { get; internal set; }
+        public bool IsMasterTemplate { get; set; }
 
         public void SetMasterTemplate(ITemplate masterTemplate)
         {

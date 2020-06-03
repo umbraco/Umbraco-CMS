@@ -79,7 +79,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>Set <paramref name="forceValueStorageType"/> to true to force the value storage type. Values assigned to
         /// the property, eg from the underlying datatype, will be ignored.</remarks>
-        internal PropertyType(IShortStringHelper shortStringHelper, string propertyEditorAlias, ValueStorageType valueStorageType, bool forceValueStorageType, string propertyTypeAlias = null)
+        public PropertyType(IShortStringHelper shortStringHelper, string propertyEditorAlias, ValueStorageType valueStorageType, bool forceValueStorageType, string propertyTypeAlias = null)
         {
             _shortStringHelper = shortStringHelper;
             _propertyEditorAlias = propertyEditorAlias;

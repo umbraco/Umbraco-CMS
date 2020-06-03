@@ -109,7 +109,7 @@ namespace Umbraco.Core
         /// <param name="url"></param>
         /// <param name="hostingEnvironment"></param>
         /// <returns></returns>
-        internal static bool IsInstallerRequest(this Uri url, IHostingEnvironment hostingEnvironment)
+        public static bool IsInstallerRequest(this Uri url, IHostingEnvironment hostingEnvironment)
         {
             var authority = url.GetLeftPart(UriPartial.Authority);
             var afterAuthority = url.GetLeftPart(UriPartial.Query)

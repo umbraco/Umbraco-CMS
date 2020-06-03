@@ -35,6 +35,7 @@ namespace Umbraco.Extensions
                 }
                 catch (InvalidOperationException)
                 {
+                    // TODO: Look into this? Why did we do this, see git history and add some notes
                 }
             }
 

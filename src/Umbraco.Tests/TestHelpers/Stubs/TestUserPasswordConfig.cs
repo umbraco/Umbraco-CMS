@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core.Configuration;
+using Umbraco.Core;
 
 namespace Umbraco.Tests.TestHelpers.Stubs
 {
@@ -16,7 +17,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
 
         public bool UseLegacyEncoding => false;
 
-        public string HashAlgorithmType => "HMACSHA256";
+        public string HashAlgorithmType => Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName;
 
         public int MaxFailedAccessAttemptsBeforeLockout => 5;
     }

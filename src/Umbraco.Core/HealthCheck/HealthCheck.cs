@@ -9,7 +9,7 @@ namespace Umbraco.Web.HealthCheck
     /// <summary>
     /// Provides a base class for health checks.
     /// </summary>
-    [DataContract(Name = "healtCheck", Namespace = "")]
+    [DataContract(Name = "healthCheck", Namespace = "")]
     public abstract class HealthCheck : IDiscoverable
     {
         protected HealthCheck()

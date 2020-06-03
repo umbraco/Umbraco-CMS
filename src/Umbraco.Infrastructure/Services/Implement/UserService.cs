@@ -275,18 +275,6 @@ namespace Umbraco.Core.Services.Implement
                 if (string.IsNullOrWhiteSpace(entity.Name))
                     throw new ArgumentException("Empty name.", nameof(entity));
 
-                //Now we have to check for backwards compat hacks, we'll need to process any groups
-                //to save first before we update the user since these groups might be new groups.
-
-                var explicitUser = entity as User;
-                if (explicitUser != null && explicitUser.GroupsToSave.Count > 0)
-                {
-                    foreach (var userGroup in explicitUser.GroupsToSave)
-                    {
-                        _userGroupRepository.Save(userGroup);
-                    }
-                }
-
                 try
                 {
                     _userRepository.Save(entity);
@@ -340,15 +328,6 @@ namespace Umbraco.Core.Services.Implement
 
                     _userRepository.Save(user);
 
-                    //Now we have to check for backwards compat hacks
-                    var explicitUser = user as User;
-                    if (explicitUser != null && explicitUser.GroupsToSave.Count > 0)
-                    {
-                        foreach (var userGroup in explicitUser.GroupsToSave)
-                        {
-                            _userGroupRepository.Save(userGroup);
-                        }
-                    }
                 }
 
                 if (raiseEvents)

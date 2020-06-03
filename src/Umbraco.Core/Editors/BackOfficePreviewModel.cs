@@ -14,8 +14,8 @@ namespace Umbraco.Web.Editors
         private readonly UmbracoFeatures _features;
         public IEnumerable<ILanguage> Languages { get; }
 
-        public BackOfficePreviewModel(UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IEnumerable<ILanguage> languages, IContentSettings contentSettings, TreeCollection treeCollection, IHostingEnvironment hostingEnvironment, IRuntimeSettings runtimeSettings, ISecuritySettings securitySettings)
-            : base(features, globalSettings, umbracoVersion, contentSettings, treeCollection, hostingEnvironment, runtimeSettings, securitySettings)
+        public BackOfficePreviewModel(UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IEnumerable<ILanguage> languages, IContentSettings contentSettings, IHostingEnvironment hostingEnvironment, IRuntimeSettings runtimeSettings, ISecuritySettings securitySettings)
+            : base(features, globalSettings, umbracoVersion, contentSettings, hostingEnvironment, runtimeSettings, securitySettings)
         {
             _features = features;
             Languages = languages;

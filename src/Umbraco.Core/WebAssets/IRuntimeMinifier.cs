@@ -34,7 +34,7 @@ namespace Umbraco.Core.WebAssets
         /// <returns>
         /// An html encoded string
         /// </returns>
-        string RenderCssHere(string bundleName);
+        Task<string> RenderCssHereAsync(string bundleName);
 
         /// <summary>
         /// Creates a JS bundle
@@ -56,7 +56,7 @@ namespace Umbraco.Core.WebAssets
         /// <returns>
         /// An html encoded string
         /// </returns>
-        string RenderJsHere(string bundleName);
+        Task<string> RenderJsHereAsync(string bundleName);
 
         /// <summary>
         /// Returns the asset paths for the bundle name

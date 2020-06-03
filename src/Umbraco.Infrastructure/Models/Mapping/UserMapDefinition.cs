@@ -17,6 +17,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Services;
 using Umbraco.Core.Media;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -444,6 +445,6 @@ namespace Umbraco.Web.Models.Mapping
                 Trashed = false,
                 ParentId = -1
             };
-        }
+        }       
     }
 }

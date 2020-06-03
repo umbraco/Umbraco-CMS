@@ -23,11 +23,11 @@ namespace Umbraco.Web.Security
             IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
             IUserStore<BackOfficeIdentityUser> store,
-            IOptions<IdentityOptions> optionsAccessor,
+            IOptions<BackOfficeIdentityOptions> optionsAccessor,
             IEnumerable<IUserValidator<BackOfficeIdentityUser>> userValidators,
             IEnumerable<IPasswordValidator<BackOfficeIdentityUser>> passwordValidators,
-            ILookupNormalizer keyNormalizer,
-            IdentityErrorDescriber errors,
+            BackOfficeLookupNormalizer keyNormalizer,
+            BackOfficeIdentityErrorDescriber errors,
             IDataProtectionProvider dataProtectionProvider,
             ILogger<UserManager<BackOfficeIdentityUser>> logger)
             : base(ipResolver, store, optionsAccessor, null, userValidators, passwordValidators, keyNormalizer, errors, null, logger)
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Security
             UmbracoMapper mapper,
             IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
-            IdentityErrorDescriber errors,
+            BackOfficeIdentityErrorDescriber errors,
             IDataProtectionProvider dataProtectionProvider,
             ILogger<UserManager<BackOfficeIdentityUser>> logger)
         {
@@ -71,11 +71,11 @@ namespace Umbraco.Web.Security
             IPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
             IUserStore<BackOfficeIdentityUser> customUserStore,
-            IdentityErrorDescriber errors,
+            BackOfficeIdentityErrorDescriber errors,
             IDataProtectionProvider dataProtectionProvider,
             ILogger<UserManager<BackOfficeIdentityUser>> logger)
         {
-            var options = new IdentityOptions();
+            var options = new BackOfficeIdentityOptions();
 
             // Configure validation logic for usernames
             var userValidators = new List<UserValidator<BackOfficeIdentityUser>> { new BackOfficeUserValidator<BackOfficeIdentityUser>() };
@@ -106,10 +106,10 @@ namespace Umbraco.Web.Security
                 passwordConfiguration,
                 ipResolver,
                 customUserStore,
-                new OptionsWrapper<IdentityOptions>(options),
+                new OptionsWrapper<BackOfficeIdentityOptions>(options),
                 userValidators,
                 passwordValidators,
-                new NopLookupNormalizer(), 
+                new BackOfficeLookupNormalizer(), 
                 errors,
                 dataProtectionProvider,
                 logger);
@@ -119,7 +119,7 @@ namespace Umbraco.Web.Security
 
         protected override IPasswordHasher<BackOfficeIdentityUser> GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration)
         {
-            return new UserAwarePasswordHasher<BackOfficeIdentityUser>(new PasswordSecurity(passwordConfiguration));
+            return new UserAwarePasswordHasher<BackOfficeIdentityUser>(new LegacyPasswordSecurity(passwordConfiguration));
         }
 
         protected void InitUserManager(BackOfficeOwinUserManager manager, IDataProtectionProvider dataProtectionProvider)

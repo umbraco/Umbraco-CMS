@@ -13,7 +13,6 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Core;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.PropertyEditors

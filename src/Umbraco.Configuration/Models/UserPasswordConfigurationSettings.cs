@@ -28,7 +28,7 @@ namespace Umbraco.Configuration.Models
             _configuration.GetValue(Prefix + "RequireUppercase", false);
 
         public string HashAlgorithmType =>
-            _configuration.GetValue(Prefix + "HashAlgorithmType", "HMACSHA256");
+            _configuration.GetValue(Prefix + "HashAlgorithmType", Constants.Security.AspNetCoreV3PasswordHashAlgorithmName);
 
         public int MaxFailedAccessAttemptsBeforeLockout =>
             _configuration.GetValue(Prefix + "MaxFailedAccessAttemptsBeforeLockout", 5);

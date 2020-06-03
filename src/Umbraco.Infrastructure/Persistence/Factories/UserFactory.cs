@@ -3,7 +3,6 @@ using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Factories
 {
@@ -13,8 +12,8 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var guidId = dto.Id.ToGuid();
 
-            var user = new User(globalSettings, dto.Id, dto.UserName, dto.Email, dto.Login,dto.Password,
-                dto.UserGroupDtos.Select(x => x.ToReadOnlyGroup()).ToArray(),
+            var user = new User(globalSettings, dto.Id, dto.UserName, dto.Email, dto.Login, dto.Password, dto.PasswordConfig,
+                dto.UserGroupDtos.Select(x => ToReadOnlyGroup(x)).ToArray(),
                 dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Content).Select(x => x.StartNode).ToArray(),
                 dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Media).Select(x => x.StartNode).ToArray());
 
@@ -43,7 +42,7 @@ namespace Umbraco.Core.Persistence.Factories
                 // save it back to database (as that would create a *new* user)
                 // see also: UserRepository.PersistNewItem
                 if (dto.Id == 0)
-                    user.AdditionalData["IS_V7_ZERO"] = true;
+                    user.ToUserCache<string>("IS_V7_ZERO", "true");
 
                 // reset dirty initial properties (U4-1946)
                 user.ResetDirtyProperties(false);
@@ -65,6 +64,7 @@ namespace Umbraco.Core.Persistence.Factories
                 Login = entity.Username,
                 NoConsole = entity.IsLockedOut,
                 Password = entity.RawPasswordValue,
+                PasswordConfig = entity.PasswordConfiguration,                
                 UserLanguage = entity.Language,
                 UserName = entity.Name,
                 SecurityStampToken = entity.SecurityStamp,
@@ -106,6 +106,14 @@ namespace Umbraco.Core.Persistence.Factories
             }
 
             return dto;
+        }
+
+        private static IReadOnlyUserGroup ToReadOnlyGroup(UserGroupDto group)
+        {
+            return new ReadOnlyUserGroup(group.Id, group.Name, group.Icon,
+                group.StartContentId, group.StartMediaId, group.Alias,
+                group.UserGroup2AppDtos.Select(x => x.AppAlias).ToArray(),
+                group.DefaultPermissions == null ? Enumerable.Empty<string>() : group.DefaultPermissions.ToCharArray().Select(x => x.ToString()));
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace Umbraco.Web.HealthCheck
 {
-    [DataContract(Name = "healtCheckAction", Namespace = "")]
+    [DataContract(Name = "healthCheckAction", Namespace = "")]
     public class HealthCheckAction
     {
         /// <summary>

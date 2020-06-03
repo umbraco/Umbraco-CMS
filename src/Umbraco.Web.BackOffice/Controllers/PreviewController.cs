@@ -32,7 +32,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ILocalizationService _localizationService;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IContentSettings _contentSettings;
-        private readonly TreeCollection _treeCollection;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
@@ -49,7 +48,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             ILocalizationService localizationService,
             IUmbracoVersion umbracoVersion,
             IContentSettings contentSettings,
-            TreeCollection treeCollection,
             IHttpContextAccessor httpContextAccessor,
             IHostingEnvironment hostingEnvironment,
             ICookieManager cookieManager,
@@ -65,7 +63,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             _localizationService = localizationService;
             _umbracoVersion = umbracoVersion;
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
-            _treeCollection = treeCollection;
             _httpContextAccessor = httpContextAccessor;
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
@@ -81,7 +78,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var availableLanguages = _localizationService.GetAllLanguages();
 
-            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _contentSettings, _treeCollection, _hostingEnvironment, _runtimeSettings, _securitySettings);
+            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _contentSettings, _hostingEnvironment, _runtimeSettings, _securitySettings);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {

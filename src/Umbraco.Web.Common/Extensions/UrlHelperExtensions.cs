@@ -6,12 +6,19 @@ using Umbraco.Core;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.Common.Install;
+using Microsoft.AspNetCore.Routing;
+using Umbraco.Core.Hosting;
+using System.Globalization;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.WebAssets;
 
 namespace Umbraco.Extensions
 {
 
     public static class UrlHelperExtensions
     {
+
+        
 
         /// <summary>
         /// Return the back office url if the back office is installed
@@ -174,6 +181,41 @@ namespace Umbraco.Extensions
                 throw new MissingMethodException("Could not find the method " + methodSelector + " on type " + typeof(T) + " or the result ");
             }
             return url.GetUmbracoApiService<T>(umbracoApiControllerTypeCollection, method.Name).TrimEnd(method.Name);
+        }
+
+        /// <summary>
+        /// Return the Url for an action with a cache-busting hash appended
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="actionName"></param>
+        /// <param name="controllerName"></param>
+        /// <param name="routeVals"></param>
+        /// <returns></returns>
+        public static string GetUrlWithCacheBust(this IUrlHelper url, string actionName, string controllerName, RouteValueDictionary routeVals,
+            IHostingEnvironment hostingEnvironment, IUmbracoVersion umbracoVersion, IRuntimeMinifier runtimeMinifier)
+        {
+            var applicationJs = url.Action(actionName, controllerName, routeVals);
+            applicationJs = applicationJs + "?umb__rnd=" + GetCacheBustHash(hostingEnvironment, umbracoVersion, runtimeMinifier);
+            return applicationJs;
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        public static string GetCacheBustHash(IHostingEnvironment hostingEnvironment, IUmbracoVersion umbracoVersion, IRuntimeMinifier runtimeMinifier)
+        {
+            //make a hash of umbraco and client dependency version
+            //in case the user bypasses the installer and just bumps the web.config or client dependency config
+
+            //if in debug mode, always burst the cache
+            if (hostingEnvironment.IsDebugMode)
+            {
+                return DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture).GenerateHash();
+            }
+
+            var version = umbracoVersion.SemanticVersion.ToSemanticString();
+            return $"{version}.{runtimeMinifier.CacheBuster}".GenerateHash();
         }
     }
 }
