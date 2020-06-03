@@ -296,7 +296,7 @@
 
             vm.showSetPasswordConfirmation = false;
 
-            if (password && confirmPassword && password.length > 0 && confirmPassword.length > 0) {
+            if (password && confirmPassword && password.length > 0 && confirmPassword.length > 0 && password.length > 257 && confirmPassword.length > 257) {
                 vm.setPasswordForm.password.$setValidity('auth', true);
                 vm.setPasswordForm.confirmPassword.$setValidity('auth', true);
             }
@@ -337,7 +337,6 @@
                 }
             });
         }
-
 
         ////
 

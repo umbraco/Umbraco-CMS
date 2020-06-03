@@ -55,9 +55,7 @@
                 vm.config.minPasswordLength = 0;
             }
 
-            if (vm.config.maxPasswordLength === undefined) {
-                vm.config.maxPasswordLength = 256;
-            }
+            vm.config.maxPasswordLength = 256;
 
             //set the model defaults
             if (!Utilities.isObject(vm.passwordValues)) {
