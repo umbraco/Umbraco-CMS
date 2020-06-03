@@ -78,6 +78,20 @@ namespace Umbraco.Web.BackOffice.Security
             options.Cookie.SecurePolicy = _globalSettings.UseHttps ? CookieSecurePolicy.Always : CookieSecurePolicy.SameAsRequest;
             options.Cookie.Path = "/";
 
+            // TODO: Review these, we shouldn't really be redirecting at all, need to check the source to see if we can prevent any redirects.
+            // I think we can do that by setting these to null in the events below, we cannot set them null here else they'll be replaced with defaults.
+            // OK ... so figured it out, we need to have certain headers in the request to ensure that aspnetcore knows it's an ajax request,
+            // see: https://github.com/dotnet/aspnetcore/blob/master/src/Security/Authentication/Cookies/src/CookieAuthenticationEvents.cs#L43
+            // and https://github.com/dotnet/aspnetcore/blob/master/src/Security/Authentication/Cookies/src/CookieAuthenticationEvents.cs#L104
+            // when those headers are set then it will respond with the correct status codes.
+            // OR we override `CookieAuthenticationEvents` with our own and do
+            // options.Events = new BackOfficeCookieAuthenticationEvents(); ... maybe that will give us more control anyways instead of using callbacks below?
+            // Those methods like OnRedirectToLogin  are get/set so we can replace their logic, though actually looking at the code, if we replace these callbacks like
+            // we are doing below then no redirections should occur but we may need to deal with the status code, we'll need to see
+            options.AccessDeniedPath = _globalSettings.GetBackOfficePath(_hostingEnvironment);
+            options.LoginPath = _globalSettings.GetBackOfficePath(_hostingEnvironment);
+            options.LogoutPath = _globalSettings.GetBackOfficePath(_hostingEnvironment);
+
             options.DataProtectionProvider = _dataProtection;
 
             // NOTE: This is borrowed directly from aspnetcore source
@@ -99,6 +113,26 @@ namespace Umbraco.Web.BackOffice.Security
 
             options.Events = new CookieAuthenticationEvents
             {
+                OnRedirectToReturnUrl = ctx =>
+                {
+                    return Task.CompletedTask;
+                },
+                OnRedirectToLogout = ctx =>
+                {
+                    return Task.CompletedTask;
+                },
+                OnRedirectToLogin = ctx =>
+                {
+                    return Task.CompletedTask;
+                },
+                OnRedirectToAccessDenied = ctx =>
+                {
+                    // TODO: Need to deal with this so the right response is returned since we are overriding this and it's not doing its normal check
+                    // we can copy how they check for an ajax request and basically just do what they are doing so we don't have to add yet another header
+
+
+                    return Task.CompletedTask;
+                },
                 OnValidatePrincipal = async ctx =>
                 {
                     //ensure the thread culture is set

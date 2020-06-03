@@ -171,6 +171,8 @@ namespace Umbraco.Web.Editors
         [CheckIfUserTicketDataIsStale]
         public UserDetail GetCurrentUser()
         {
+            // TODO: We need to migrate this next
+
             var user = UmbracoContext.Security.CurrentUser;
             var result = Mapper.Map<UserDetail>(user);
             var httpContextAttempt = TryGetHttpContext();
