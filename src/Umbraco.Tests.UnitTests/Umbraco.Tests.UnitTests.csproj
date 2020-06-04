@@ -20,4 +20,12 @@
       <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Umbraco.Core\Extensions" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Umbraco.Core\Extensions\ClaimsPrincipalExtensionsTests.cs" />
+    </ItemGroup>
+
 </Project>

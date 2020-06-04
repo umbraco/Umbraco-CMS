@@ -21,8 +21,11 @@ using Umbraco.Web.Common.Controllers;
 using System;
 using Umbraco.Web.Common.Middleware;
 using Umbraco.Web.Common.ModelBinding;
+using Umbraco.Web.Common.Routing;
+using Umbraco.Web.Common.Templates;
 using Umbraco.Web.Search;
 using Umbraco.Web.Security;
+using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Common.Runtime
@@ -99,7 +102,8 @@ namespace Umbraco.Web.Common.Runtime
 
             composition.RegisterUnique<UmbracoJsonModelBinder>();
 
-
+            composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
+            composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
 
 
         }

@@ -31,5 +31,10 @@
             <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Security\BackOfficeSignInManager.cs" />
+      <Compile Remove="Macros\UmbracoMacroResult.cs" />
+    </ItemGroup>
     
 </Project>

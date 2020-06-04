@@ -61,6 +61,14 @@
           <SubType>Designer</SubType>
         </Content>
         <Content Remove="wwwroot\Web.config" />
+        <Content Update="Views\MacroPartials\Gallery.cshtml">
+          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+          <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+        <Content Update="Views\Root.cshtml">
+          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+          <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>

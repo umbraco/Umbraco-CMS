@@ -304,7 +304,6 @@
     <Compile Include="WebAssets\CDF\UmbracoClientDependencyLoader.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="HtmlStringUtilities.cs" />
-    <Compile Include="IUmbracoComponentRenderer.cs" />
     <Compile Include="Mvc\ProfilingView.cs" />
     <Compile Include="Mvc\ProfilingViewEngine.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
@@ -326,7 +325,6 @@
     <Compile Include="Mvc\MinifyJavaScriptResultAttribute.cs" />
     <Compile Include="Mvc\EnsurePublishedContentRequestAttribute.cs" />
     <Compile Include="Mvc\UmbracoViewPage.cs" />
-    <Compile Include="Editors\MacroRenderingController.cs" />
     <Compile Include="Editors\MemberTypeController.cs" />
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Editors\MemberController.cs" />
@@ -346,7 +344,6 @@
     <Compile Include="Trees\TemplatesTreeController.cs" />
     <Compile Include="Trees\TreeControllerBase.cs" />
     <Compile Include="WebAssets\CDF\DependencyPathRenderer.cs" />
-    <Compile Include="UmbracoComponentRenderer.cs" />
     <Compile Include="WebApi\AngularJsonMediaTypeFormatter.cs" />
     <Compile Include="WebApi\AngularJsonOnlyConfigurationAttribute.cs" />
     <Compile Include="Editors\Binders\MemberBinder.cs" />

@@ -51,6 +51,7 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>Resources.resx</DependentUpon>
       </Compile>
+      <Compile Remove="Install\InstallSteps\CompleteInstallStep.cs" />
     </ItemGroup>
 
     <ItemGroup>
