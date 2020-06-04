@@ -1,6 +1,19 @@
 function booleanEditorController($scope, angularHelper) {
 
+    // setup the default config
+    var config = {
+        truevalue: "1",
+        falsevalue: "0"
+    };
+
+    // map the user config
+    angular.extend(config, $scope.model.config);
+
+    // map back to the model
+    $scope.model.config = config;
+
     function setupViewModel() {
+
         $scope.renderModel = {
             value: false
         };
@@ -16,8 +29,8 @@ function booleanEditorController($scope, angularHelper) {
 
     setupViewModel();
 
-    if( $scope.model && !$scope.model.value ) {
-        $scope.model.value = ($scope.renderModel.value === true) ? '1' : '0';
+    if ($scope.model && !$scope.model.value) {
+        $scope.model.value = ($scope.renderModel.value === true) ? $scope.model.config.truevalue : $scope.model.config.falsevalue;
     }
 
     //here we declare a special method which will be called whenever the value has changed from the server
@@ -31,12 +44,12 @@ function booleanEditorController($scope, angularHelper) {
     $scope.toggle = function(){
         angularHelper.getCurrentForm($scope).$setDirty();
         if($scope.renderModel.value){
-            $scope.model.value = "0";
+            $scope.model.value = $scope.model.config.falsevalue;
             setupViewModel();
             return;
         }
 
-        $scope.model.value = "1";
+        $scope.model.value = $scope.model.config.truevalue;
         setupViewModel();
     };
 
