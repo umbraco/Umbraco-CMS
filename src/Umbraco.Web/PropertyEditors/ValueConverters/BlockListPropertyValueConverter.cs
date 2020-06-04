@@ -81,7 +81,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 // parse the data elements
                 foreach (var data in jsonData.Cast<JObject>())
                 {
-                    var element = _blockConverter.ConvertToElement(data, BlockEditorPropertyEditor.contentTypeKeyPropertyKey, referenceCacheLevel, preview);
+                    var element = _blockConverter.ConvertToElement(data, BlockEditorPropertyEditor.ContentTypeKeyPropertyKey, referenceCacheLevel, preview);
                     if (element == null) continue;
                     elements[element.Key] = element;
                 }
@@ -93,7 +93,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 {
                     var settingsJson = blockListLayout["settings"] as JObject;
                     // the result of this can be null, that's ok
-                    var element = settingsJson != null ? _blockConverter.ConvertToElement(settingsJson, BlockEditorPropertyEditor.contentTypeKeyPropertyKey, referenceCacheLevel, preview) : null;
+                    var element = settingsJson != null ? _blockConverter.ConvertToElement(settingsJson, BlockEditorPropertyEditor.ContentTypeKeyPropertyKey, referenceCacheLevel, preview) : null;
 
                     if (!Udi.TryParse(blockListLayout.Value<string>("udi"), out var udi) || !(udi is GuidUdi guidUdi))
                         continue;
@@ -102,7 +102,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     if (!elements.TryGetValue(guidUdi.Guid, out var data))
                         continue;
 
-                    if (!contentTypeMap.TryGetValue(data.ContentType.Key, out var blockConfig))
+                    // TODO: make this work with key, not Alias.
+                    if (!contentTypeMap.TryGetValue(data.ContentType.Alias, out var blockConfig))
                         continue;
 
                     // this can happen if they have a settings type, save content, remove the settings type, and display the front-end page before saving the content again
