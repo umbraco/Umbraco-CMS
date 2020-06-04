@@ -1,9 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
@@ -24,18 +22,19 @@ namespace Umbraco.Web.BackOffice.Filters
             /// </summary>
             internal static bool Enable = true;
 
-            private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+            private readonly IWebSecurity _webSecurity;
             private readonly string[] _appNames;
 
             /// <summary>
             /// Constructor to set any number of applications that the user needs access to be authorized
             /// </summary>
+            /// <param name="webSecurity"></param>
             /// <param name="appName">
             /// If the user has access to any of the specified apps, they will be authorized.
             /// </param>
-            public UmbracoApplicationAuthorizeFilter(IUmbracoContextAccessor umbracoContextAccessor, params string[] appName)
+            public UmbracoApplicationAuthorizeFilter(IWebSecurity webSecurity, params string[] appName)
             {
-                _umbracoContextAccessor = umbracoContextAccessor;
+                _webSecurity = webSecurity;
                 _appNames = appName;
             }
 
@@ -55,10 +54,9 @@ namespace Umbraco.Web.BackOffice.Filters
                     return true;
                 }
 
-                var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-                var authorized = umbracoContext.Security.CurrentUser != null
-                                 && _appNames.Any(app => umbracoContext.Security.UserHasSectionAccess(
-                                     app, umbracoContext.Security.CurrentUser));
+                var authorized = _webSecurity.CurrentUser != null
+                                 && _appNames.Any(app => _webSecurity.UserHasSectionAccess(
+                                     app, _webSecurity.CurrentUser));
 
                 return authorized;
             }
