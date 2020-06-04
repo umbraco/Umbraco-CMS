@@ -127,7 +127,7 @@
                 }
             });
 
-            vm.availableContentTypes = modelObject.getAvailableAliasesForBlockContent();
+            vm.availableContentTypesAliases = modelObject.getAvailableAliasForBlockContent();
             vm.availableBlockTypes = modelObject.getAvailableBlocksForBlockPicker();
 
             vm.loading = false;
@@ -145,16 +145,16 @@
             // Lets apply fallback views, and make the view available directly on the blockModel.
             block.view = (block.config.view ? "/" + block.config.view : (inlineEditing ? "views/propertyeditors/blocklist/blocklistentryeditors/inlineblock/inlineblock.editor.html" : "views/propertyeditors/blocklist/blocklistentryeditors/labelblock/labelblock.editor.html"));
 
-            block.showSettings = block.config.settingsElementTypeAlias != null;
+            block.showSettings = block.config.settingsElementTypeKey != null;
 
             return block;
         }
 
 
-        function addNewBlock(index, contentTypeAlias) {
+        function addNewBlock(index, contentTypeKey) {
 
             // Create layout entry. (not added to property model jet.)
-            var layoutEntry = modelObject.create(contentTypeAlias);
+            var layoutEntry = modelObject.create(contentTypeKey);
             if (layoutEntry === null) {
                 return false;
             }
@@ -210,7 +210,7 @@
             var blockContentClone = Utilities.copy(blockModel.content);
             var blockSettingsClone = null;
 
-            if (blockModel.config.settingsElementTypeAlias) {
+            if (blockModel.config.settingsElementTypeKey) {
                 blockSettingsClone = Utilities.copy(blockModel.settings);
             }
 
@@ -229,7 +229,7 @@
                     if (blockEditorModel.content !== null) {
                         blockEditorService.mapElementValues(blockEditorModel.content, blockModel.content)
                     }
-                    if (blockModel.config.settingsElementTypeAlias !== null) {
+                    if (blockModel.config.settingsElementTypeKey !== null) {
                         blockEditorService.mapElementValues(blockEditorModel.settings, blockModel.settings)
                     }
                     editorService.close();
@@ -280,7 +280,7 @@
                 submit: function(blockPickerModel, mouseEvent) {
                     var added = false;
                     if (blockPickerModel && blockPickerModel.selectedItem) {
-                        added = addNewBlock(createIndex, blockPickerModel.selectedItem.blockConfigModel.contentTypeAlias);
+                        added = addNewBlock(createIndex, blockPickerModel.selectedItem.blockConfigModel.contentTypeKey);
                     }
                     
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
@@ -296,19 +296,19 @@
             };
 
             blockPickerModel.clickClearClipboard = function ($event) {
-                clipboardService.clearEntriesOfType("elementType", vm.availableContentTypes);
-                clipboardService.clearEntriesOfType("elementTypeArray", vm.availableContentTypes);
+                clipboardService.clearEntriesOfType("elementType", vm.availableContentTypesAliases);
+                clipboardService.clearEntriesOfType("elementTypeArray", vm.availableContentTypesAliases);
             };
 
             blockPickerModel.clipboardItems = [];
 
-            var singleEntriesForPaste = clipboardService.retriveEntriesOfType("elementType", vm.availableContentTypes);
+            var singleEntriesForPaste = clipboardService.retriveEntriesOfType("elementType", vm.availableContentTypesAliases);
             singleEntriesForPaste.forEach(function (entry) {
                 blockPickerModel.clipboardItems.push(
                     {
                         type: "elementType",
                         pasteData: entry.data,
-                        blockConfigModel: modelObject.getScaffoldFor(entry.alias),
+                        blockConfigModel: modelObject.getScaffoldFor(entry.key),
                         elementTypeModel: {
                             name: entry.label,
                             icon: entry.icon
@@ -317,7 +317,7 @@
                 );
             });
             
-            var arrayEntriesForPaste = clipboardService.retriveEntriesOfType("elementTypeArray", vm.availableContentTypes);
+            var arrayEntriesForPaste = clipboardService.retriveEntriesOfType("elementTypeArray", vm.availableContentTypesAliases);
             arrayEntriesForPaste.forEach(function (entry) {
                 blockPickerModel.clipboardItems.push(
                     {

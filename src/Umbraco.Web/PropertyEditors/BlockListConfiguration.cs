@@ -38,11 +38,11 @@ namespace Umbraco.Web.PropertyEditors
             [JsonProperty("thumbnail")]
             public string Thumbnail { get; set; }
 
-            [JsonProperty("contentTypeAlias")]
-            public string Alias { get; set; }
+            [JsonProperty("contentTypeKey")]
+            public string Key { get; set; }
 
-            [JsonProperty("settingsElementTypeAlias")]
-            public string SettingsElementTypeAlias { get; set; }
+            [JsonProperty("settingsElementTypeKey")]
+            public string SettingsElementTypeKey { get; set; }
 
             [JsonProperty("view")]
             public string View { get; set; }

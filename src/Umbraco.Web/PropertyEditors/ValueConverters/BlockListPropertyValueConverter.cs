@@ -53,9 +53,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             {
                 var configuration = propertyType.DataType.ConfigurationAs<BlockListConfiguration>();
                 var contentTypes = configuration.Blocks;
-                var contentTypeMap = contentTypes.ToDictionary(x => x.Alias);
+                var contentTypeMap = contentTypes.ToDictionary(x => x.Key);
                 var elements = (contentTypes.Length == 1
-                    ? (IList<IPublishedElement>)_publishedModelFactory.CreateModelList(contentTypes[0].Alias)
+                    // TODO: make this work with key
+                    ? (IList<IPublishedElement>)_publishedModelFactory.CreateModelList(contentTypes[0].Key)
                     : new List<IPublishedElement>())
                     .ToDictionary(x => x.Key, x => x);
 
@@ -80,7 +81,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 // parse the data elements
                 foreach (var data in jsonData.Cast<JObject>())
                 {
-                    var element = _blockConverter.ConvertToElement(data, BlockEditorPropertyEditor.ContentTypeAliasPropertyKey, referenceCacheLevel, preview);
+                    var element = _blockConverter.ConvertToElement(data, BlockEditorPropertyEditor.contentTypeKeyPropertyKey, referenceCacheLevel, preview);
                     if (element == null) continue;
                     elements[element.Key] = element;
                 }
@@ -92,7 +93,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 {
                     var settingsJson = blockListLayout["settings"] as JObject;
                     // the result of this can be null, that's ok
-                    var element = settingsJson != null ? _blockConverter.ConvertToElement(settingsJson, BlockEditorPropertyEditor.ContentTypeAliasPropertyKey, referenceCacheLevel, preview) : null;
+                    var element = settingsJson != null ? _blockConverter.ConvertToElement(settingsJson, BlockEditorPropertyEditor.contentTypeKeyPropertyKey, referenceCacheLevel, preview) : null;
 
                     if (!Udi.TryParse(blockListLayout.Value<string>("udi"), out var udi) || !(udi is GuidUdi guidUdi))
                         continue;
@@ -101,11 +102,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     if (!elements.TryGetValue(guidUdi.Guid, out var data))
                         continue;
 
-                    if (!contentTypeMap.TryGetValue(data.ContentType.Alias, out var blockConfig))
+                    if (!contentTypeMap.TryGetValue(data.ContentType.Key, out var blockConfig))
                         continue;
 
                     // this can happen if they have a settings type, save content, remove the settings type, and display the front-end page before saving the content again
-                    if (element != null && string.IsNullOrWhiteSpace(blockConfig.SettingsElementTypeAlias))
+                    if (element != null && string.IsNullOrWhiteSpace(blockConfig.SettingsElementTypeKey))
                         element = null;
 
                     var layoutRef = new BlockListLayoutReference(udi, data, element);

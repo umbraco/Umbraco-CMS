@@ -23,14 +23,14 @@
             });
         }
 
-        vm.getElementTypeByAlias = function(alias) {
+        vm.getElementTypeByKey = function(key) {
             return _.find(vm.elementTypes, function (type) {
-                return type.alias === alias;
+                return type.key === key;
             });
         };
 
-        vm.openElementType = function(elementTypeAlias) {
-            var elementTypeId = vm.getElementTypeByAlias(elementTypeAlias).id;
+        vm.openElementType = function(elementTypeKey) {
+            var elementTypeId = vm.getElementTypeByKey(elementTypeKey).id;
             const editor = {
                 id: elementTypeId,
                 submit: function (model) {
@@ -78,14 +78,14 @@
 
             });
         };
-        vm.applySettingsToBlock = function(block, alias) {
-            block.settingsElementTypeAlias = alias;
+        vm.applySettingsToBlock = function(block, key) {
+            block.settingsElementTypeKey = key;
         };
 
         vm.requestRemoveSettingsForBlock = function(block) {
             localizationService.localizeMany(["general_remove", "defaultdialogs_confirmremoveusageof"]).then(function (data) {
 
-                var settingsElementType = vm.getElementTypeByAlias(entry.settingsElementTypeAlias);
+                var settingsElementType = vm.getElementTypeByAlias(entry.settingsElementTypeKey);
 
                 overlayService.confirmRemove({
                     title: data[0],
@@ -101,7 +101,7 @@
             });
         };
         vm.removeSettingsForEntry = function(entry) {
-            entry.settingsElementTypeAlias = null;
+            entry.settingsElementTypeKey = null;
         };
 
 

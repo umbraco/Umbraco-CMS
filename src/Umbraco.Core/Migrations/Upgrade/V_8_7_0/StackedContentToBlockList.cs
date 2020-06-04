@@ -197,11 +197,11 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
                 [JsonProperty("thumbnail")]
                 public string Thumbnail { get; set; }
 
-                [JsonProperty("contentTypeAlias")]
-                public string Alias { get; set; }
+                [JsonProperty("contentTypeKey")]
+                public string Key { get; set; }
 
-                [JsonProperty("settingsElementTypeAlias")]
-                public string SettingsElementTypeAlias { get; set; }
+                [JsonProperty("settingsElementTypeKey")]
+                public string settingsElementTypeKey { get; set; }
 
                 [JsonProperty("view")]
                 public string View { get; set; }
@@ -256,7 +256,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
 
                 var udi = new GuidUdi(Constants.UdiEntityType.Element, key).ToString();
                 obj["udi"] = udi;
-                obj["contentTypeAlias"] = ct.Alias;
+                // TODO: retrive the key for the content type.
+                //obj["contentTypeAlias"] = ct.Alias;
 
                 if (ct.StringToRawProperties != null && ct.StringToRawProperties.Length > 0)
                 {

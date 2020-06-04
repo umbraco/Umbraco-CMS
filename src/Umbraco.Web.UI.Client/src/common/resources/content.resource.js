@@ -508,6 +508,51 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
                 });
         },
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.contentResource#getScaffoldByID
+         * @methodOf umbraco.resources.contentResource
+         *
+         * @description
+         * Returns a scaffold of an empty content item, given the id of the content item to place it underneath and the content type alias.
+          *
+         * - Parent Id must be provided so umbraco knows where to store the content
+          * - Content Type Id must be provided so umbraco knows which properties to put on the content scaffold
+          *
+         * The scaffold is used to build editors for content that has not yet been populated with data.
+          *
+         * ##usage
+         * <pre>
+         * contentResource.getScaffoldById(1234, '...')
+         *    .then(function(scaffold) {
+         *        var myDoc = scaffold;
+          *        myDoc.name = "My new document";
+         *
+         *        contentResource.publish(myDoc, true)
+         *            .then(function(content){
+         *                alert("Retrieved, updated and published again");
+         *            });
+         *    });
+          * </pre>
+          *
+         * @param {Int} parentId id of content item to return
+          * @param {String} contentTypeGuid contenttype guid to base the scaffold on
+         * @returns {Promise} resourcePromise object containing the content scaffold.
+         *
+         */
+        getScaffoldByKey: function (parentId, contentTypeKey) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetEmptyByKey",
+                        [{ contentTypeKey: contentTypeKey }, { parentId: parentId }])),
+                'Failed to retrieve data for empty content item id ' + contentTypeId)
+                .then(function (result) {
+                    return $q.when(umbDataFormatter.formatContentGetData(result));
+                });
+        },
 
         getBlueprintScaffold: function (parentId, blueprintId) {
 

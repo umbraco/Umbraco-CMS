@@ -40,7 +40,7 @@
 
         vm.requestRemoveBlockByIndex = function (index) {
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "blockEditor_confirmDeleteBlockNotice"]).then(function (data) {
-                var contentElementType = vm.getElementTypeByAlias($scope.model.value[index].contentTypeAlias);
+                var contentElementType = vm.getElementTypeByKey($scope.model.value[index].contentTypeKey);
                 overlayService.confirmDelete({
                     title: data[0],
                     content: localizationService.tokenReplace(data[1], [contentElementType.name]),
@@ -71,22 +71,22 @@
         vm.getAvailableElementTypes = function () {
             return vm.elementTypes.filter(function (type) {
                 return !$scope.model.value.find(function (entry) {
-                    return type.alias === entry.contentTypeAlias;
+                    return type.key === entry.contentTypeKey;
                 });
             });
         };
 
-        vm.getElementTypeByAlias = function(alias) {
+        vm.getElementTypeByKey = function(key) {
             return _.find(vm.elementTypes, function (type) {
-                return type.alias === alias;
+                return type.key === key;
             });
         };
 
         vm.openAddDialog = function ($event, entry) {
 
-            //we have to add the alias to the objects (they are stored as contentTypeAlias)
-            var selectedItems = _.each($scope.model.value, function (obj) {
-                obj.alias = obj.contentTypeAlias;
+            //we have to add the 'alias' property to the objects, to make the data match the requirements of itempicker.
+            var selectedItems = _.each(Utilities.copy($scope.model.value), function (obj) {
+                obj.alias = vm.getElementTypeByKey(obj.contentTypeKey).alias;
                 return obj;
             });
 
@@ -102,7 +102,7 @@
                     createNewItem: {
                         action: function() {
                             overlayService.close();
-                            vm.createElementTypeAndAdd(vm.addBlockFromElementTypeAlias);
+                            vm.createElementTypeAndAdd(vm.addBlockFromElementTypeKey);
                         },
                         icon: "icon-add",
                         name: localized[1]
@@ -111,7 +111,7 @@
                     event: $event,
                     size: availableItems.length < 7 ? "small" : "medium",
                     submit: function (overlay) {
-                        vm.addBlockFromElementTypeAlias(overlay.selectedItem.alias);
+                        vm.addBlockFromElementTypeKey(overlay.selectedItem.key);
                         overlayService.close();
                     },
                     close: function () {
@@ -131,7 +131,7 @@
                 isElement: true,
                 submit: function (model) {
                     loadElementTypes().then( function () {
-                        callback(model.documentTypeAlias);
+                        callback(model.documentTypeKey);
                     });
                     editorService.close();
                 },
@@ -142,13 +142,13 @@
             editorService.documentTypeEditor(editor);
         }
 
-        vm.addBlockFromElementTypeAlias = function(alias) {
+        vm.addBlockFromElementTypeKey = function(key) {
 
             var entry = {
-                "contentTypeAlias": alias,
+                "contentTypeKey": key,
                 "view": null,
                 "labelTemplate": "",
-                "settingsElementTypeAlias": null
+                "settingsElementTypeKey": null
             };
 
             $scope.model.value.push(entry);
@@ -160,7 +160,7 @@
 
         vm.openBlockOverlay = function (block) {
 
-            localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [vm.getElementTypeByAlias(block.contentTypeAlias).name]).then(function (data) {
+            localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [vm.getElementTypeByKey(block.contentTypeKey).name]).then(function (data) {
 
                 var clonedBlockData = Utilities.copy(block);
                 vm.openBlock = block;

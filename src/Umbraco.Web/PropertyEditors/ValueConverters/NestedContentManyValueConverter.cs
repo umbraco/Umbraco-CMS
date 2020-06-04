@@ -60,7 +60,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 var configuration = propertyType.DataType.ConfigurationAs<NestedContentConfiguration>();
                 var contentTypes = configuration.ContentTypes;
                 var elements = contentTypes.Length == 1
-                    ? PublishedModelFactory.CreateModelList(contentTypes[0].Alias)
+                    ? PublishedModelFactory.CreateModelList(contentTypes[0].Key)
                     : new List<IPublishedElement>();
 
                 var value = (string)inter;

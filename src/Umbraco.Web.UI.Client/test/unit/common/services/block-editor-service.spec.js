@@ -26,7 +26,7 @@
     }));
 
 
-    var blockConfigurationMock = {contentTypeAlias: "testAlias", label:"Test label", settingsElementTypeAlias: null, view: "testview.html"};
+    var blockConfigurationMock = {contentTypeKey: "testKey", label:"Test label", settingsElementTypeKey: null, view: "testview.html"};
 
     var propertyModelMock = {
         layout: {
@@ -39,7 +39,7 @@
         data: [
             {
                 udi: 1234,
-                contentTypeAlias: "testAlias",
+                contentTypeKey: "testKey",
                 testproperty: "myTestValue"
             }
         ]
@@ -64,7 +64,7 @@
         it('getBlockConfiguration provide the requested block configurtion', function () {
             var modelObject = blockEditorService.createModelObject({}, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope);
             
-            expect(modelObject.getBlockConfiguration(blockConfigurationMock.contentTypeAlias).label).toBe(blockConfigurationMock.label);
+            expect(modelObject.getBlockConfiguration(blockConfigurationMock.contentTypeKey).label).toBe(blockConfigurationMock.label);
         });
         
         it('loadScaffolding provides data for itemPicker', function (done) {
@@ -73,7 +73,7 @@
             modelObject.loadScaffolding().then(() => {
                 var itemPickerOptions = modelObject.getAvailableBlocksForBlockPicker();
                 expect(itemPickerOptions.length).toBe(1);
-                expect(itemPickerOptions[0].blockConfigModel.contentTypeAlias).toBe(blockConfigurationMock.contentTypeAlias);
+                expect(itemPickerOptions[0].blockConfigModel.contentTypeKey).toBe(blockConfigurationMock.contentTypeKey);
                 done();
             });
             

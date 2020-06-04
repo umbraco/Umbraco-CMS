@@ -20,15 +20,16 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         }
 
         public IPublishedElement ConvertToElement(
-            JObject sourceObject, string contentTypeAliasPropertyKey,
+            JObject sourceObject, string contentTypeKeyPropertyKey,
             PropertyCacheLevel referenceCacheLevel, bool preview)
         {
-            var elementTypeAlias = sourceObject[contentTypeAliasPropertyKey]?.ToObject<string>();
-            if (string.IsNullOrEmpty(elementTypeAlias))
+            var elementTypeKey = sourceObject[contentTypeKeyPropertyKey]?.ToObject<string>();
+            if (string.IsNullOrEmpty(elementTypeKey))
                 return null;
 
             // only convert element types - content types will cause an exception when PublishedModelFactory creates the model
-            var publishedContentType = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetContentType(elementTypeAlias);
+            // TODO: make this work with keys.
+            var publishedContentType = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetContentType(elementTypeKey);
             if (publishedContentType == null || publishedContentType.IsElement == false)
                 return null;
 

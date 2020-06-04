@@ -37,10 +37,10 @@
  * ####Use the Model Object to retrive Content Models for the blocks you want to edit. Content Models contains all the data about the properties of that content and as well handles syncroniztion so your data is always up-to-date.
  * 
  * <pre>
- * function addNewBlock(index, contentTypeAlias) {
+ * function addNewBlock(index, contentTypeKey) {
  * 
  *     // Create layout entry. (not added to property model jet.)
- *     var layoutEntry = modelObject.create(contentTypeAlias);
+ *     var layoutEntry = modelObject.create(contentTypeKey);
  *     if (layoutEntry === null) {
  *         return false;
  *     }
@@ -267,27 +267,27 @@
         
         BlockEditorModelObject.prototype = {
 
-            getBlockConfiguration: function(alias) {
-                return this.blockConfigurations.find(bc => bc.contentTypeAlias === alias);
+            getBlockConfiguration: function(key) {
+                return this.blockConfigurations.find(bc => bc.contentTypeKey === key);
             },
 
             loadScaffolding: function() {
                 var tasks = [];
 
-                var scaffoldAliases = [];
+                var scaffoldKeys = [];
 
                 this.blockConfigurations.forEach(blockConfiguration => {
-                    scaffoldAliases.push(blockConfiguration.contentTypeAlias);
-                    if (blockConfiguration.settingsElementTypeAlias != null) {
-                        scaffoldAliases.push(blockConfiguration.settingsElementTypeAlias);
+                    scaffoldKeys.push(blockConfiguration.contentTypeKey);
+                    if (blockConfiguration.settingsElementTypeKey != null) {
+                        scaffoldKeys.push(blockConfiguration.settingsElementTypeKey);
                     }
                 });
 
                 // removing dublicates.
-                scaffoldAliases = scaffoldAliases.filter((value, index, self) => self.indexOf(value) === index);
+                scaffoldKeys = scaffoldKeys.filter((value, index, self) => self.indexOf(value) === index);
 
-                scaffoldAliases.forEach((elementTypeAlias => {
-                    tasks.push(contentResource.getScaffold(-20, elementTypeAlias).then(scaffold => {
+                scaffoldKeys.forEach((contentTypeKey => {
+                    tasks.push(contentResource.getScaffoldByKey(-20, contentTypeKey).then(scaffold => {
                         this.scaffolds.push(replaceUnsupportedProperties(scaffold));
                     }));
                 }));
@@ -300,7 +300,7 @@
              * @return {Array} array of strings representing alias.
              */
             getAvailableAliasesForBlockContent: function() {
-                return this.blockConfigurations.map(blockConfiguration => blockConfiguration.contentTypeAlias);
+                return this.blockConfigurations.map(blockConfiguration => getScaffoldFor(blockConfiguration.contentTypeKey).contentTypeAlias);
             },
 
             getAvailableBlocksForBlockPicker: function() {
@@ -308,7 +308,7 @@
                 var blocks = [];
 
                 this.blockConfigurations.forEach(blockConfiguration => {
-                    var scaffold = this.getScaffoldFor(blockConfiguration.contentTypeAlias);
+                    var scaffold = this.getScaffoldFor(blockConfiguration.contentTypeKey);
                     if(scaffold) {
                         blocks.push({
                             blockConfigModel: blockConfiguration,
@@ -320,8 +320,8 @@
                 return blocks;
             },
 
-            getScaffoldFor: function(contentTypeAlias) {
-                return this.scaffolds.find(o => o.contentTypeAlias === contentTypeAlias);
+            getScaffoldFor: function(contentTypeKey) {
+                return this.scaffolds.find(o => o.contentTypeKey === contentTypeKey);
             },
 
             /**
@@ -340,10 +340,10 @@
                     return null;
                 }
 
-                var blockConfiguration = this.getBlockConfiguration(dataModel.contentTypeAlias);
+                var blockConfiguration = this.getBlockConfiguration(dataModel.contentTypeKey);
 
                 if (blockConfiguration === null) {
-                    console.error("The block entry of "+udi+" is not begin initialized cause its contentTypeAlias is not allowed for this PropertyEditor")
+                    console.error("The block entry of "+udi+" is not begin initialized cause its contentTypeKey is not allowed for this PropertyEditor")
                     // This is not an allowed block type, therefor we return null;
                     return null;
                 }
@@ -374,17 +374,17 @@
                 blockModel.layout = layoutEntry;
                 blockModel.watchers = [];
 
-                if (blockConfiguration.settingsElementTypeAlias) {
-                    var settingsScaffold = this.getScaffoldFor(blockConfiguration.settingsElementTypeAlias);
+                if (blockConfiguration.settingsElementTypeKey) {
+                    var settingsScaffold = this.getScaffoldFor(blockConfiguration.settingsElementTypeKey);
                     if (settingsScaffold === null) {
                         return null;
                     }
 
                     // make basics from scaffold
                     blockModel.settings = Utilities.copy(settingsScaffold);
-                    layoutEntry.settings = layoutEntry.settings || { key: String.CreateGuid(), contentTypeAlias: blockConfiguration.settingsElementTypeAlias };
+                    layoutEntry.settings = layoutEntry.settings || {};
                     if (!layoutEntry.settings.key) { layoutEntry.settings.key = String.CreateGuid(); }
-                    if (!layoutEntry.settings.contentTypeAlias) { layoutEntry.settings.contentTypeAlias = blockConfiguration.settingsElementTypeAlias; }
+                    if (!layoutEntry.settings.contentTypeAlias) { layoutEntry.settings.contentTypeKey = blockConfiguration.settingsElementTypeKey; }
                     mapToElementModel(blockModel.settings, layoutEntry.settings);
                 } else {
                     layoutEntry.settings = null;
@@ -446,19 +446,19 @@
              * @param {Object} blockConfiguration
              * @return {Object} Layout entry object, to be inserted at a decired location in the layout object.
              */
-            create: function(contentTypeAlias) {
+            create: function(contentTypeKey) {
                 
-                var blockConfiguration = this.getBlockConfiguration(contentTypeAlias);
+                var blockConfiguration = this.getBlockConfiguration(contentTypeKey);
                 if(blockConfiguration === null) {
                     return null;
                 }
 
                 var entry = {
-                    udi: this._createDataEntry(contentTypeAlias)
+                    udi: this._createDataEntry(contentTypeKey)
                 }
 
-                if (blockConfiguration.settingsElementTypeAlias != null) {
-                    entry.settings = { key: String.CreateGuid(), contentTypeAlias: blockConfiguration.settingsElementTypeAlias };
+                if (blockConfiguration.settingsElementTypeKey != null) {
+                    entry.settings = { key: String.CreateGuid(), contentTypeKey: blockConfiguration.settingsElementTypeKey };
                 }
                 
                 return entry;
@@ -472,9 +472,9 @@
 
                 elementTypeDataModel = Utilities.copy(elementTypeDataModel);
 
-                var contentTypeAlias = elementTypeDataModel.contentTypeAlias;
+                var contentTypeKey = elementTypeDataModel.contentTypeKey;
 
-                var layoutEntry = this.create(contentTypeAlias);
+                var layoutEntry = this.create(contentTypeKey);
                 if(layoutEntry === null) {
                     return null;
                 }
@@ -491,9 +491,9 @@
             },
 
             // private
-            _createDataEntry: function(elementTypeAlias) {
+            _createDataEntry: function(elementTypeKey) {
                 var content = {
-                    contentTypeAlias: elementTypeAlias,
+                    contentTypeKey: elementTypeKey,
                     udi: udiService.create("element")
                 };
                 this.value.data.push(content);

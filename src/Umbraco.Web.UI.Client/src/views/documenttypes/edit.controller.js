@@ -390,6 +390,7 @@
                     vm.page.saveButtonState = "success";
 
                     if(infiniteMode && $scope.model.submit) {
+                        $scope.model.documentTypeKey = vm.contentType.key;
                         $scope.model.documentTypeAlias = vm.contentType.alias;
                         $scope.model.submit($scope.model);
                     }

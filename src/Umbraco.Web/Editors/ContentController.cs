@@ -369,6 +369,38 @@ namespace Umbraco.Web.Editors
             return mapped;
         }
 
+
+        /// <summary>
+        /// Gets an empty content item for the document type.
+        /// </summary>
+        /// <param name="contentTypeKey"></param>
+        /// <param name="parentId"></param>
+        [OutgoingEditorModelEvent]
+        public ContentItemDisplay GetEmptyByKey(string contentTypeKey, int parentId)
+        {
+
+            Guid.TryParse(contentTypeKey, out Guid contentTypeGuid);
+
+            var contentType = Services.ContentTypeService.Get(contentTypeGuid);
+            if (contentType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var emptyContent = Services.ContentService.Create("", parentId, contentType.Alias, Security.GetUserId().ResultOr(0));
+            var mapped = MapToDisplay(emptyContent);
+            // translate the content type name if applicable
+            mapped.ContentTypeName = Services.TextService.UmbracoDictionaryTranslate(mapped.ContentTypeName);
+            // if your user type doesn't have access to the Settings section it would not get this property mapped
+            if (mapped.DocumentType != null)
+                mapped.DocumentType.Name = Services.TextService.UmbracoDictionaryTranslate(mapped.DocumentType.Name);
+
+            //remove the listview app if it exists
+            mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
+
+            return mapped;
+        }
+
         [OutgoingEditorModelEvent]
         public ContentItemDisplay GetEmpty(int blueprintId, int parentId)
         {
@@ -821,7 +853,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         /// <remarks>
         /// For invariant, the variants collection count will be 1 and this will check if that invariant item has the critical values for persistence (i.e. Name)
-        /// 
+        ///
         /// For variant, each variant will be checked for critical data for persistence and if it's not there then it's flags will be reset and it will not
         /// be persisted. However, we also need to deal with the case where all variants don't pass this check and then there is nothing to save. This also deals
         /// with removing the Name validation keys based on data annotations validation for items that haven't been marked to be saved.
@@ -908,8 +940,8 @@ namespace Umbraco.Web.Editors
 
                     var savedWithoutErrors = contentItem.Variants
                         .Where(x => x.Save && !variantErrors.Contains((x.Culture, x.Segment)))
-                        .Select(x => (culture: x.Culture, segment: x.Segment));                       
-              
+                        .Select(x => (culture: x.Culture, segment: x.Segment));
+
                     foreach (var (culture, segment) in savedWithoutErrors)
                     {
                         var variantName = GetVariantName(culture, segment);
@@ -1258,7 +1290,7 @@ namespace Umbraco.Web.Editors
             //Now check if there are validation errors on each variant.
             //If validation errors are detected on a variant and it's state is set to 'publish', then we
             //need to change it to 'save'.
-            //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.            
+            //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.
             foreach (var variant in contentItem.Variants)
             {
                 if (variantErrors.Contains((variant.Culture, variant.Segment)))
@@ -1389,7 +1421,7 @@ namespace Umbraco.Web.Editors
         /// <param name="segment">Segment to assign the error to</param>
         /// <param name="localizationKey"></param>
         /// <param name="cultureToken">
-        /// The culture used in the localization message, null by default which means <see cref="culture"/> will be used. 
+        /// The culture used in the localization message, null by default which means <see cref="culture"/> will be used.
         /// </param>
         private void AddVariantValidationError(string culture, string segment, string localizationKey, string cultureToken = null)
         {
@@ -1402,7 +1434,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Creates the human readable variant name based on culture and segment                
+        /// Creates the human readable variant name based on culture and segment
         /// </summary>
         /// <param name="culture">Culture</param>
         /// <param name="segment">Segment</param>
