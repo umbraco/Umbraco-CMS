@@ -109,9 +109,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
             {
                 Blocks = old.ContentTypes?.Select(t => new BlockListConfiguration.BlockConfiguration
                 {
-                    Alias = knownDocumentTypes.TryGetValue(t.IcContentTypeGuid, out var ct) ? ct.Alias : null,
+                    Key = knownDocumentTypes.TryGetValue(t.IcContentTypeGuid, out var ct) ? ct.Key : Guid.Empty,
                     Label = t.NameTemplate
-                }).Where(c => c.Alias != null).ToArray(),
+                }).Where(c => c.Key != null).ToArray(),
                 UseInlineEditingAsDefault = old.SingleItemMode == "1" || old.SingleItemMode == bool.TrueString
             };
 
@@ -198,7 +198,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
                 public string Thumbnail { get; set; }
 
                 [JsonProperty("contentTypeKey")]
-                public string Key { get; set; }
+                public Guid Key { get; set; }
 
                 [JsonProperty("settingsElementTypeKey")]
                 public string settingsElementTypeKey { get; set; }
@@ -249,7 +249,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
             {
                 if (!Guid.TryParse(obj["key"].ToString(), out var key)) key = Guid.NewGuid();
                 if (!Guid.TryParse(obj["icContentTypeGuid"].ToString(), out var ctGuid)) ctGuid = Guid.Empty;
-                if (!knownDocumentTypes.TryGetValue(ctGuid, out var ct)) ct = new KnownContentType { Alias = ctGuid.ToString() };
+                if (!knownDocumentTypes.TryGetValue(ctGuid, out var ct)) ct = new KnownContentType { Key = ctGuid };
 
                 obj.Remove("key");
                 obj.Remove("icContentTypeGuid");
@@ -292,6 +292,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
         private class KnownContentType
         {
             public string Alias { get; set; }
+            public Guid Key { get; set; }
             public string[] StringToRawProperties { get; set; }
         }
     }
