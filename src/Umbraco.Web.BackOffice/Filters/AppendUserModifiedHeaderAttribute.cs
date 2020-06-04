@@ -44,7 +44,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 }
 
                 var webSecurity = context.HttpContext.RequestServices.GetService<IWebSecurity>();
-                var user = webSecurity.CurrentUser;
+                var user = webSecurity?.CurrentUser;
                 if (user == null)
                 {
                     return;
