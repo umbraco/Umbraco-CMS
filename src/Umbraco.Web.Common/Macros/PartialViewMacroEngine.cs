@@ -2,13 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Encodings.Web;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Extensions;
@@ -25,8 +29,10 @@ namespace Umbraco.Web.Common.Macros
         private readonly IIOHelper _ioHelper;
         private readonly Func<IUmbracoContext> _getUmbracoContext;
 
-        public PartialViewMacroEngine(IUmbracoContextAccessor umbracoContextAccessor,
-            IHttpContextAccessor httpContextAccessor, IIOHelper ioHelper)
+        public PartialViewMacroEngine(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IHttpContextAccessor httpContextAccessor,
+            IIOHelper ioHelper)
         {
             _httpContextAccessor = httpContextAccessor;
             _ioHelper = ioHelper;
@@ -72,8 +78,18 @@ namespace Umbraco.Web.Common.Macros
             routeVals.Values.Add("action", "Index");
             routeVals.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx); //required for UmbracoViewPage
 
-            //lets render this controller as a child action
-            var viewContext = new ViewContext();
+            var modelMetadataProvider = httpContext.RequestServices.GetRequiredService<IModelMetadataProvider>();
+            var tempDataProvider = httpContext.RequestServices.GetRequiredService<ITempDataProvider>();
+
+            var viewContext = new ViewContext(
+                new ActionContext(httpContext, httpContext.GetRouteData(), new ControllerActionDescriptor()),
+                new FakeView(),
+                new ViewDataDictionary(modelMetadataProvider, new ModelStateDictionary()),
+                new TempDataDictionary(httpContext, tempDataProvider),
+                TextWriter.Null,
+                new HtmlHelperOptions()
+            );
+
 
             routeVals.DataTokens.Add("ParentActionViewContext", viewContext);
 
@@ -93,7 +109,17 @@ namespace Umbraco.Web.Common.Macros
 
             return new MacroContent { Text = output };
         }
+        private class FakeView : IView
+        {
+            /// <inheritdoc />
+            public Task RenderAsync(ViewContext context)
+            {
+                return Task.CompletedTask;
+            }
 
+            /// <inheritdoc />
+            public string Path { get; } = "View";
+        }
         private string GetVirtualPathFromPhysicalPath(string physicalPath)
         {
             var rootpath = _ioHelper.MapPath("~/");

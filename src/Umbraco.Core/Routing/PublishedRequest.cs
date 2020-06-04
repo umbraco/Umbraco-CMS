@@ -33,7 +33,7 @@ namespace Umbraco.Web.Routing
         /// <param name="publishedRouter">The published router.</param>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="uri">The request <c>Uri</c>.</param>
-        internal PublishedRequest(IPublishedRouter publishedRouter, IUmbracoContext umbracoContext, IWebRoutingSettings webRoutingSettings, Uri uri = null)
+        public PublishedRequest(IPublishedRouter publishedRouter, IUmbracoContext umbracoContext, IWebRoutingSettings webRoutingSettings, Uri uri = null)
         {
             UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));

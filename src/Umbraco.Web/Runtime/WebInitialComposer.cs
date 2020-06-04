@@ -4,6 +4,7 @@ using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Net;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -42,7 +43,6 @@ namespace Umbraco.Web.Runtime
 
             composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
 
-            composition.RegisterUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 
             // register the umbraco helper - this is Transient! very important!
             // also, if not level.Run, we cannot really use the helper (during upgrade...)

@@ -188,10 +188,6 @@ namespace Umbraco.Web.Editors
                             "mediaTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MediaTypeController>(
                                 controller => controller.GetAllowedChildren(0))
                         },
-                        {
-                            "macroRenderingApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MacroRenderingController>(
-                                controller => controller.GetMacroParameters(0))
-                        },
 
                         {
                             "currentUserApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<CurrentUserController>(

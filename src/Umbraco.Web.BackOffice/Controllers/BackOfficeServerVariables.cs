@@ -200,10 +200,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                         //     "mediaTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaTypeController>(
                         //         controller => controller.GetAllowedChildren(0))
                         // },
-                        // {
-                        //     "macroRenderingApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MacroRenderingController>(
-                        //         controller => controller.GetMacroParameters(0))
-                        // },
+                        {
+                            "macroRenderingApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MacroRenderingController>(
+                                controller => controller.GetMacroParameters(0))
+                        },
                         {
                             "macroApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MacrosController>(
                                 controller => controller.Create(null))
