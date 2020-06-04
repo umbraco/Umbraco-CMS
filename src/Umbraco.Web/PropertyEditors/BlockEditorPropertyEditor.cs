@@ -161,17 +161,17 @@ namespace Umbraco.Web.PropertyEditors
         internal class BlockEditorValues
         {
             private readonly IBlockEditorDataHelper _dataHelper;
-            private readonly Lazy<Dictionary<string, IContentType>> _contentTypes;
+            private readonly Lazy<Dictionary<Guid, IContentType>> _contentTypes;
 
             public BlockEditorValues(IBlockEditorDataHelper dataHelper, IContentTypeService contentTypeService)
             {
                 _dataHelper = dataHelper;
-                _contentTypes = new Lazy<Dictionary<string, IContentType>>(() => contentTypeService.GetAll().ToDictionary(c => c.Key));
+                _contentTypes = new Lazy<Dictionary<Guid, IContentType>>(() => contentTypeService.GetAll().ToDictionary(c => c.Key));
             }
 
             private IContentType GetElementType(JObject item)
             {
-                var contentTypeKey = item[ContentTypeKeyPropertyKey]?.ToObject<string>() ?? string.Empty;
+                Guid contentTypeKey = item[ContentTypeKeyPropertyKey]?.ToObject<Guid>() ?? Guid.Empty;
                 _contentTypes.Value.TryGetValue(contentTypeKey, out var contentType);
                 return contentType;
             }

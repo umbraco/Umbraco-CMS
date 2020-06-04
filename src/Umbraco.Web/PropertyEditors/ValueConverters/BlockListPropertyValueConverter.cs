@@ -102,8 +102,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     if (!elements.TryGetValue(guidUdi.Guid, out var data))
                         continue;
 
-                    // TODO: make this work with key, not Alias.
-                    if (!contentTypeMap.TryGetValue(data.ContentType.Alias, out var blockConfig))
+                    // Make this work with Key, not alias, since contentTypeMap is now  a dctionary with contentTypeKey as the dictionary key.
+                    if (!contentTypeMap.TryGetValue(data.ContentType.Key, out var blockConfig))
                         continue;
 
                     // this can happen if they have a settings type, save content, remove the settings type, and display the front-end page before saving the content again
