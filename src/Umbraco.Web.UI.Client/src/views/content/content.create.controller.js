@@ -34,7 +34,7 @@ function contentCreateController($scope,
             
                 $scope.allowedTypes = iconHelper.formatContentTypeIcons(types);                
             
-                if (currentUser.allowedSections.includes('settings')) {
+                if (currentUser.allowedSections.indexOf('settings') !== -1) {
                     $scope.hasSettingsAccess = true;
 
                     if ($scope.allowedTypes.length === 0) {
