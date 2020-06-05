@@ -150,7 +150,7 @@ namespace Umbraco.Web.Common.Templates
 
             var viewData = new ViewDataDictionary(modelMetadataProvider, new ModelStateDictionary())
             {
-                Model = new ContentModel(request.PublishedContent)
+                Model = request.PublishedContent
             };
 
             var writer = new StringWriter();
