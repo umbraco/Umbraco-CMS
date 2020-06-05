@@ -144,6 +144,7 @@
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
+    <Compile Include="Compose\NestedContentPropertyComponent.cs" />
     <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Security\IdentityFactoryMiddleware.cs" />
@@ -195,6 +196,7 @@
     <Compile Include="AspNet\AspNetIpResolver.cs" />
     <Compile Include="AspNet\AspNetPasswordHasher.cs" />
     <Compile Include="Profiling\WebProfilingController.cs" />
+    <Compile Include="Compose\NestedContentPropertyComposer.cs" />
     <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
     <Compile Include="Security\BackOfficeClaimsPrincipalFactory.cs" />
