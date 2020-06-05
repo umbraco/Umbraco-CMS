@@ -22,33 +22,32 @@ function contentCreateController($scope,
     function initialize() {
         $scope.loading = true;
         $scope.allowedTypes = null;
-        
-        var getAllowedTypes = contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function (data) {
-            $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
-            if ($scope.allowedTypes.length === 0) {
-                contentTypeResource.getCount().then(function(count) {
-                    $scope.countTypes = count;
-                });
-            }
-        });
-        var getCurrentUser = authResource.getCurrentUser().then(function (currentUser) {
-            if (currentUser.allowedSections.indexOf("settings") > -1) {
-                $scope.hasSettingsAccess = true;
-                if ($scope.currentNode.id > -1) {
-                    contentResource.getById($scope.currentNode.id).then(function (data) {
-                        $scope.contentTypeId = data.contentTypeId;
-                    });
-                }
-            }
-        });
-
-        $q.all([getAllowedTypes, getCurrentUser]).then(function() {
-            $scope.loading = false;
-        });
-
         $scope.selectContentType = true;
         $scope.selectBlueprint = false;
         $scope.allowBlank = blueprintConfig.allowBlank;
+        
+        $q.all([contentTypeResource.getAllowedTypes($scope.currentNode.id), authResource.getCurrentUser()])
+            .then(resolvedPromises => {
+                [let types, let currentUser] = resolvedPromises;
+            
+                $scope.allowedTypes = iconHelper.formatContentTypeIcons(types);                
+            
+                if (currentUser.allowedSections.includes('settings')) {
+                    $scope.hasSettingsAccess = true;
+
+                    if ($scope.allowedTypes.length === 0) {
+                        contentTypeResource.getCount()
+                            .then(count => $scope.countTypes = count);                
+                    }
+                    
+                    if ($scope.currentNode.id > -1) {
+                        contentResource.getById($scope.currentNode.id)
+                            .then(data => $scope.contentTypeId = data.contentTypeId);
+                    }                
+                }
+
+                $scope.loading = false;
+            });
     }
 
     function close() {
@@ -73,25 +72,24 @@ function contentCreateController($scope,
     }
 
     function createOrSelectBlueprintIfAny(docType) {
-        // map the blueprints into a collection that's sortable in the view
-        var blueprints = _.map(_.pairs(docType.blueprints || {}), function (pair) {
-            return {
-                id: pair[0],
-                name: pair[1]
-            };
-        });
         $scope.docType = docType;
-        if (blueprints.length) {
-            if (blueprintConfig.skipSelect) {
-                createFromBlueprint(blueprints[0].id);
-            } else {
-                $scope.selectContentType = false;
-                $scope.selectBlueprint = true;
-                $scope.selectableBlueprints = blueprints;
-            }
-        } else {
+
+        const keys = Object.keys(docType.blueprints);
+        if (keys.length === 0) {
             createBlank(docType);
+            return;
         }
+                
+        // map the blueprints into a collection that's sortable in the view
+        const blueprints = keys.map(k => ({ id: k, name: docType.blueprints[k] }));
+        
+        if (blueprintConfig.skipSelect) {
+            createFromBlueprint(blueprints[0].id);
+        } else {
+            $scope.selectContentType = false;
+            $scope.selectBlueprint = true;
+            $scope.selectableBlueprints = blueprints;
+        }       
     }
 
     function createFromBlueprint(blueprintId) {
