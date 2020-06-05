@@ -47,9 +47,6 @@ namespace Umbraco.Web.UI.BackOffice
             services.AddUmbracoRuntimeMinifier(_config);
             services.AddUmbracoBackOffice();
             services.AddUmbracoBackOfficeIdentity();
-
-            services.AddMvc();
-
             services.AddMiniProfiler(options =>
             {
                 options.ShouldProfile = request => false; // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile

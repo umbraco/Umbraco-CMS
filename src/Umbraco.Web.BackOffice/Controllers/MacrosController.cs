@@ -26,7 +26,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// The API controller used for editing dictionary items
     /// </summary>
     [PluginController("UmbracoApi")]
-   // [UmbracoTreeAuthorize(Constants.Trees.Macros)]
+    [UmbracoTreeAuthorize(Constants.Trees.Macros)]
     public class MacrosController : BackOfficeNotificationsController
     {
         private readonly ParameterEditorCollection _parameterEditorCollection;

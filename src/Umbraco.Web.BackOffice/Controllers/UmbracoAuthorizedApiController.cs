@@ -15,7 +15,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// </remarks>
     [IsBackOffice]
     //[UmbracoUserTimeoutFilter] //TODO reintroduce
-    //[UmbracoAuthorize]
+    [UmbracoAuthorize]
     [DisableBrowserCache]
     [UmbracoWebApiRequireHttps]
     //[CheckIfUserTicketDataIsStale] //TODO reintroduce

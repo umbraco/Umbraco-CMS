@@ -22,6 +22,10 @@ namespace Umbraco.Extensions
         {
             services.AddAntiforgery();
 
+            //We need to have runtime compilation of views when using backoffice. We could consider having only this when a specific config is set.
+            //But as far as I can see, there are still precompiled views, even when this is activated, so maybe it is okay.
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
+
             services
                 .AddAuthentication(Constants.Security.BackOfficeAuthenticationType)
                 .AddCookie(Constants.Security.BackOfficeAuthenticationType);
@@ -32,7 +36,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Adds the services required for using Umbraco back office Identity
         /// </summary>
-        /// <param name="services"></param>        
+        /// <param name="services"></param>
         public static void AddUmbracoBackOfficeIdentity(this IServiceCollection services)
         {
             services.AddDataProtection();
@@ -48,7 +52,7 @@ namespace Umbraco.Extensions
 
             // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
             services.ConfigureOptions<ConfigureUmbracoBackOfficeIdentityOptions>();
-            //services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<BackOfficeIdentityUser>>();            
+            //services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<BackOfficeIdentityUser>>();
         }
 
         private static IdentityBuilder BuildUmbracoBackOfficeIdentity(this IServiceCollection services)
@@ -56,7 +60,7 @@ namespace Umbraco.Extensions
             // Borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Extensions.Core/src/IdentityServiceCollectionExtensions.cs#L33
             // The reason we need our own is because the Identity system doesn't cater easily for multiple identity systems and particularly being
             // able to configure IdentityOptions to a specific provider since there is no named options. So we have strongly typed options
-            // and strongly typed ILookupNormalizer and IdentityErrorDescriber since those are 'global' and we need to be unintrusive. 
+            // and strongly typed ILookupNormalizer and IdentityErrorDescriber since those are 'global' and we need to be unintrusive.
 
             // TODO: Could move all of this to BackOfficeComposer?
 
@@ -71,7 +75,7 @@ namespace Umbraco.Extensions
             services.TryAddScoped<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>, UserClaimsPrincipalFactory<BackOfficeIdentityUser>>();
             services.TryAddScoped<UserManager<BackOfficeIdentityUser>>();
 
-            // CUSTOM:            
+            // CUSTOM:
             services.TryAddScoped<BackOfficeLookupNormalizer>();
             services.TryAddScoped<BackOfficeIdentityErrorDescriber>();
 
