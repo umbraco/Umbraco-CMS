@@ -28,7 +28,9 @@ function contentCreateController($scope,
         
         $q.all([contentTypeResource.getAllowedTypes($scope.currentNode.id), authResource.getCurrentUser()])
             .then(resolvedPromises => {
-                [let types, let currentUser] = resolvedPromises;
+                let types;
+                let currentUser;
+                [types, currentUser] = resolvedPromises;
             
                 $scope.allowedTypes = iconHelper.formatContentTypeIcons(types);                
             
