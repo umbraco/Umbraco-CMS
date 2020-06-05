@@ -2,6 +2,7 @@
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Editors.Filters
 {
@@ -10,7 +11,7 @@ namespace Umbraco.Web.Editors.Filters
     /// </summary>
     internal class ContentSaveModelValidator : ContentModelValidator<IContent, ContentItemSave, ContentVariantSave>
     {
-        public ContentSaveModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService) : base(logger, umbracoContextAccessor, textService)
+        public ContentSaveModelValidator(ILogger logger, IWebSecurity webSecurity, ILocalizedTextService textService) : base(logger, webSecurity, textService)
         {
         }
     }

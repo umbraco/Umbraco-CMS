@@ -10,13 +10,12 @@ using Microsoft.Net.Http.Headers;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Editors;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -29,16 +28,16 @@ namespace Umbraco.Web.BackOffice.Controllers
     {
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IPackagingService _packagingService;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IWebSecurity _webSecurity;
 
         public PackageController(
             IHostingEnvironment hostingEnvironment,
             IPackagingService packagingService,
-            IUmbracoContextAccessor umbracoContextAccessor)
+            IWebSecurity webSecurity)
         {
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _packagingService = packagingService ?? throw new ArgumentNullException(nameof(packagingService));
-            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
         }
 
         public IEnumerable<PackageDefinition> GetCreatedPackages()
@@ -92,8 +91,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpDelete]
         public IActionResult DeleteCreatedPackage(int packageId)
         {
-            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            _packagingService.DeleteCreatedPackage(packageId, umbracoContext.Security.GetUserId().ResultOr(0));
+            _packagingService.DeleteCreatedPackage(packageId, _webSecurity.GetUserId().ResultOr(0));
 
             return Ok();
         }

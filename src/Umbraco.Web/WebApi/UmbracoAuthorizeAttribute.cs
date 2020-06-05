@@ -19,24 +19,22 @@ namespace Umbraco.Web.WebApi
         internal static bool Enable = true;
 
         // TODO: inject!
-        private readonly IUmbracoContext _umbracoContext;
+        private readonly IWebSecurity _webSecurity;
         private readonly IRuntimeState _runtimeState;
 
         private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
 
-        private IUmbracoContext UmbracoContext => _umbracoContext ?? Current.UmbracoContext;
+        private IWebSecurity WebSecurity => _webSecurity ?? Current.UmbracoContext.Security;
 
         /// <summary>
         /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
         /// </summary>
-        /// <param name="umbracoContext"></param>
+        /// <param name="webSecurity"></param>
         /// <param name="runtimeState"></param>
-        public UmbracoAuthorizeAttribute(IUmbracoContext umbracoContext, IRuntimeState runtimeState)
+        public UmbracoAuthorizeAttribute(IWebSecurity webSecurity, IRuntimeState runtimeState)
         {
-            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
-            if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));
-            _umbracoContext = umbracoContext;
-            _runtimeState = runtimeState;
+            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
         }
 
         public UmbracoAuthorizeAttribute() : this(true)
@@ -60,7 +58,7 @@ namespace Umbraco.Web.WebApi
                 // otherwise we need to ensure that a user is logged in
                 return RuntimeState.Level == RuntimeLevel.Install
                     || RuntimeState.Level == RuntimeLevel.Upgrade
-                    || UmbracoContext.Security.ValidateCurrentUser(false, _requireApproval) == ValidateRequestAttempt.Success;
+                    || WebSecurity.ValidateCurrentUser(false, _requireApproval) == ValidateRequestAttempt.Success;
             }
             catch (Exception)
             {

@@ -10,6 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Editors.Filters
 {
@@ -18,13 +19,13 @@ namespace Umbraco.Web.Editors.Filters
     /// </summary>
     internal abstract class ContentModelValidator
     {
-        protected IUmbracoContextAccessor UmbracoContextAccessor { get; }
+        protected IWebSecurity WebSecurity { get; }
         protected ILogger Logger { get; }
 
-        protected ContentModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor)
+        protected ContentModelValidator(ILogger logger, IWebSecurity webSecurity)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            UmbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            WebSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
         }
     }
 
@@ -45,7 +46,7 @@ namespace Umbraco.Web.Editors.Filters
     {
         private readonly ILocalizedTextService _textService;
 
-        protected ContentModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService) : base(logger, umbracoContextAccessor)
+        protected ContentModelValidator(ILogger logger, IWebSecurity webSecurity, ILocalizedTextService textService) : base(logger, webSecurity)
         {
             _textService = textService ?? throw new ArgumentNullException(nameof(textService));
         }

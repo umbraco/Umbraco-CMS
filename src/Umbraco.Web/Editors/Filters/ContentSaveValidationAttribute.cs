@@ -25,19 +25,19 @@ namespace Umbraco.Web.Editors.Filters
     internal sealed class ContentSaveValidationAttribute : ActionFilterAttribute
     {
         private readonly ILogger _logger;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IWebSecurity _webSecurity;
         private readonly ILocalizedTextService _textService;
         private readonly IContentService _contentService;
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
 
-        public ContentSaveValidationAttribute(): this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.TextService, Current.Services.ContentService, Current.Services.UserService, Current.Services.EntityService)
+        public ContentSaveValidationAttribute(): this(Current.Logger, Current.UmbracoContextAccessor.UmbracoContext.Security, Current.Services.TextService, Current.Services.ContentService, Current.Services.UserService, Current.Services.EntityService)
         { }
 
-        public ContentSaveValidationAttribute(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService, IContentService contentService, IUserService userService, IEntityService entityService)
+        public ContentSaveValidationAttribute(ILogger logger, IWebSecurity webSecurity, ILocalizedTextService textService, IContentService contentService, IUserService userService, IEntityService entityService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
             _textService = textService ?? throw new ArgumentNullException(nameof(textService));
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
@@ -47,11 +47,11 @@ namespace Umbraco.Web.Editors.Filters
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             var model = (ContentItemSave)actionContext.ActionArguments["contentItem"];
-            var contentItemValidator = new ContentSaveModelValidator(_logger, _umbracoContextAccessor, _textService);
+            var contentItemValidator = new ContentSaveModelValidator(_logger, _webSecurity, _textService);
             
             if (!ValidateAtLeastOneVariantIsBeingSaved(model, actionContext)) return;
             if (!contentItemValidator.ValidateExistingContent(model, actionContext)) return;
-            if (!ValidateUserAccess(model, actionContext, _umbracoContextAccessor.UmbracoContext.Security)) return;
+            if (!ValidateUserAccess(model, actionContext, _webSecurity)) return;
 
             //validate for each variant that is being updated
             foreach (var variant in model.Variants.Where(x => x.Save))

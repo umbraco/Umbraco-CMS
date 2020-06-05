@@ -8,6 +8,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Services;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models;
+using Umbraco.Web.Security;
 using Umbraco.Web.Tour;
 
 namespace Umbraco.Web.BackOffice.Controllers
@@ -18,21 +19,21 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly TourFilterCollection _filters;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ITourSettings _tourSettings;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IWebSecurity _webSecurity;
         private readonly IContentTypeService _contentTypeService;
 
         public TourController(
             TourFilterCollection filters,
             IHostingEnvironment hostingEnvironment,
             ITourSettings tourSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
+            IWebSecurity webSecurity,
             IContentTypeService contentTypeService)
         {
             _filters = filters;
             _hostingEnvironment = hostingEnvironment;
 
             _tourSettings = tourSettings;
-            _umbracoContextAccessor = umbracoContextAccessor;
+            _webSecurity = webSecurity;
             _contentTypeService = contentTypeService;
         }
 
@@ -43,7 +44,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (_tourSettings.EnableTours == false)
                 return result;
 
-            var user = _umbracoContextAccessor.UmbracoContext.Security.CurrentUser;
+            var user = _webSecurity.CurrentUser;
             if (user == null)
                 return result;
 
@@ -185,7 +186,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var backOfficeTours = tours.Where(x =>
                     aliasFilters.Count == 0 || aliasFilters.All(filter => filter.IsMatch(x.Alias)) == false);
 
-                var user = _umbracoContextAccessor.UmbracoContext.Security.CurrentUser;
+                var user = _webSecurity.CurrentUser;
 
                 var localizedTours = backOfficeTours.Where(x =>
                     string.IsNullOrWhiteSpace(x.Culture) || x.Culture.Equals(user.Language,

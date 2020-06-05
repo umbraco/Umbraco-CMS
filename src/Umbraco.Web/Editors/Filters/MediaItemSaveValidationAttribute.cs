@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors.Filters
@@ -19,19 +20,19 @@ namespace Umbraco.Web.Editors.Filters
     internal class MediaItemSaveValidationAttribute : ActionFilterAttribute
     {
         private readonly ILogger _logger;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IWebSecurity _webSecurity;
         private readonly ILocalizedTextService _textService;
         private readonly IMediaService _mediaService;
         private readonly IEntityService _entityService;
 
-        public MediaItemSaveValidationAttribute() : this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.TextService, Current.Services.MediaService, Current.Services.EntityService)
+        public MediaItemSaveValidationAttribute() : this(Current.Logger, Current.UmbracoContextAccessor.UmbracoContext.Security, Current.Services.TextService, Current.Services.MediaService, Current.Services.EntityService)
         {
         }
 
-        public MediaItemSaveValidationAttribute(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService, IMediaService mediaService, IEntityService entityService)
+        public MediaItemSaveValidationAttribute(ILogger logger, IWebSecurity webSecurity, ILocalizedTextService textService, IMediaService mediaService, IEntityService entityService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
             _textService = textService ?? throw new ArgumentNullException(nameof(textService));
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
@@ -40,7 +41,7 @@ namespace Umbraco.Web.Editors.Filters
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             var model = (MediaItemSave)actionContext.ActionArguments["contentItem"];
-            var contentItemValidator = new MediaSaveModelValidator(_logger, _umbracoContextAccessor, _textService);
+            var contentItemValidator = new MediaSaveModelValidator(_logger, _webSecurity, _textService);
 
             if (ValidateUserAccess(model, actionContext))
             {
@@ -90,7 +91,7 @@ namespace Umbraco.Web.Editors.Filters
 
             if (MediaController.CheckPermissions(
                     actionContext.Request.Properties,
-                    _umbracoContextAccessor.UmbracoContext.Security.CurrentUser,
+                    _webSecurity.CurrentUser,
                     _mediaService, _entityService,
                     contentIdToCheck, contentToCheck) == false)
             {
