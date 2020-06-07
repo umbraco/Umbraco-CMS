@@ -1,25 +1,20 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
-using System.Net.Http.Formatting;
-using System.Web.Http.ModelBinding;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Services;
+using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.Common.Filters;
+using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.Models.Trees;
+using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
-using Umbraco.Web.WebApi.Filters;
-using Umbraco.Core.Services;
-using Umbraco.Core.Mapping;
-using Umbraco.Web.Routing;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.BackOffice.Trees
 {
     /// <summary>
     /// A base controller reference for non-attributed trees (un-registered).
@@ -27,25 +22,14 @@ namespace Umbraco.Web.Trees
     /// <remarks>
     /// Developers should generally inherit from TreeController.
     /// </remarks>
-    /// Migrated to .NET Core
-    [AngularJsonOnlyConfiguration]
+    [TypeFilter(typeof(AngularJsonOnlyConfigurationAttribute))]
     public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     {
-        protected TreeControllerBase()
-        {
-        }
+        // TODO: Need to set this, but from where?
+        //       Presumably not injecting as this will be a base controller for package/solution developers.
+        private readonly UmbracoApiControllerTypeCollection _apiControllers;
 
-        protected TreeControllerBase(
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger logger,
-            IRuntimeState runtimeState,
-            UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
+        protected TreeControllerBase()
         {
         }
 
@@ -60,7 +44,7 @@ namespace Umbraco.Web.Trees
         /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
-        protected abstract TreeNodeCollection GetTreeNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings);
+        protected abstract TreeNodeCollection GetTreeNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings);
 
         /// <summary>
         /// Returns the menu structure for the node
@@ -68,7 +52,7 @@ namespace Umbraco.Web.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        protected abstract MenuItemCollection GetMenuForNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings);
+        protected abstract MenuItemCollection GetMenuForNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings);
 
         /// <summary>
         /// The name to display on the root node
@@ -101,9 +85,9 @@ namespace Umbraco.Web.Trees
         /// </summary>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        public TreeNode GetRootNode([ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings)
+        public TreeNode GetRootNode([ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
-            if (queryStrings == null) queryStrings = new FormDataCollection("");
+            if (queryStrings == null) queryStrings = FormCollection.Empty;
             var node = CreateRootNode(queryStrings);
 
             //add the tree alias to the root
@@ -113,15 +97,11 @@ namespace Umbraco.Web.Trees
 
             //check if the tree is searchable and add that to the meta data as well
             if (this is ISearchableTree)
-            {
                 node.AdditionalData.Add("searchable", "true");
-            }
 
             //now update all data based on some of the query strings, like if we are running in dialog mode
             if (IsDialog(queryStrings))
-            {
                 node.RoutePath = "#";
-            }
 
             OnRootNodeRendering(this, new TreeNodeRenderingEventArgs(node, queryStrings));
 
@@ -140,24 +120,18 @@ namespace Umbraco.Web.Trees
         /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
-        public TreeNodeCollection GetNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings)
+        public TreeNodeCollection GetNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
-            if (queryStrings == null) queryStrings = new FormDataCollection("");
+            if (queryStrings == null) queryStrings = FormCollection.Empty;
             var nodes = GetTreeNodes(id, queryStrings);
 
             foreach (var node in nodes)
-            {
                 AddQueryStringsToAdditionalData(node, queryStrings);
-            }
 
             //now update all data based on some of the query strings, like if we are running in dialog mode
-            if (IsDialog((queryStrings)))
-            {
+            if (IsDialog(queryStrings))
                 foreach (var node in nodes)
-                {
                     node.RoutePath = "#";
-                }
-            }
 
             //raise the event
             OnTreeNodesRendering(this, new TreeNodesRenderingEventArgs(nodes, queryStrings));
@@ -171,9 +145,9 @@ namespace Umbraco.Web.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        public MenuItemCollection GetMenu(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings)
+        public MenuItemCollection GetMenu(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
-            if (queryStrings == null) queryStrings = new FormDataCollection("");
+            if (queryStrings == null) queryStrings = FormCollection.Empty;
             var menu = GetMenuForNode(id, queryStrings);
             //raise the event
             OnMenuRendering(this, new MenuRenderingEventArgs(id, menu, queryStrings));
@@ -184,21 +158,21 @@ namespace Umbraco.Web.Trees
         /// Helper method to create a root model for a tree
         /// </summary>
         /// <returns></returns>
-        protected virtual TreeNode CreateRootNode(FormDataCollection queryStrings)
+        protected virtual TreeNode CreateRootNode(FormCollection queryStrings)
         {
             var rootNodeAsString = Constants.System.RootString;
-            var currApp = queryStrings.GetValue<string>(TreeQueryStringParameters.Application);
+            queryStrings.TryGetValue(TreeQueryStringParameters.Application, out var currApp);
 
             var node = new TreeNode(
                 rootNodeAsString,
                 null, //this is a root node, there is no parent
-                Url.GetTreeUrl(GetType(), rootNodeAsString, queryStrings),
-                Url.GetMenuUrl(GetType(), rootNodeAsString, queryStrings))
-                {
-                    HasChildren = true,
-                    RoutePath = currApp,
-                    Name = RootNodeDisplayName
-                };
+                Url.GetTreeUrl(_apiControllers, GetType(), rootNodeAsString, queryStrings),
+                Url.GetMenuUrl(_apiControllers, GetType(), rootNodeAsString, queryStrings))
+            {
+                HasChildren = true,
+                RoutePath = currApp,
+                Name = RootNodeDisplayName
+            };
 
             return node;
         }
@@ -213,10 +187,10 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings"></param>
         /// <param name="title"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, string parentId, FormDataCollection queryStrings, string title)
+        public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string title)
         {
-            var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
-            var menuUrl = Url.GetMenuUrl(GetType(), id, queryStrings);
+            var jsonUrl = Url.GetTreeUrl(_apiControllers, GetType(), id, queryStrings);
+            var menuUrl = Url.GetMenuUrl(_apiControllers, GetType(), id, queryStrings);
             var node = new TreeNode(id, parentId, jsonUrl, menuUrl) { Name = title };
             return node;
         }
@@ -230,10 +204,10 @@ namespace Umbraco.Web.Trees
         /// <param name="title"></param>
         /// <param name="icon"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, string parentId, FormDataCollection queryStrings, string title, string icon)
+        public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string title, string icon)
         {
-            var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
-            var menuUrl = Url.GetMenuUrl(GetType(), id, queryStrings);
+            var jsonUrl = Url.GetTreeUrl(_apiControllers, GetType(), id, queryStrings);
+            var menuUrl = Url.GetMenuUrl(_apiControllers, GetType(), id, queryStrings);
             var node = new TreeNode(id, parentId, jsonUrl, menuUrl)
             {
                 Name = title,
@@ -253,10 +227,10 @@ namespace Umbraco.Web.Trees
         /// <param name="routePath"></param>
         /// <param name="icon"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, string parentId, FormDataCollection queryStrings, string title, string icon, string routePath)
+        public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string title, string icon, string routePath)
         {
-            var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
-            var menuUrl = Url.GetMenuUrl(GetType(), id, queryStrings);
+            var jsonUrl = Url.GetTreeUrl(_apiControllers, GetType(), id, queryStrings);
+            var menuUrl = Url.GetMenuUrl(_apiControllers, GetType(), id, queryStrings);
             var node = new TreeNode(id, parentId, jsonUrl, menuUrl) { Name = title, RoutePath = routePath, Icon = icon };
             return node;
         }
@@ -270,7 +244,7 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings"></param>
         /// <param name="hasChildren"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(IEntitySlim entity, Guid entityObjectType, string parentId, FormDataCollection queryStrings, bool hasChildren)
+        public TreeNode CreateTreeNode(IEntitySlim entity, Guid entityObjectType, string parentId, FormCollection queryStrings, bool hasChildren)
         {
             var contentTypeIcon = entity is IContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
             var treeNode = CreateTreeNode(entity.Id.ToInvariantString(), parentId, queryStrings, entity.Name, contentTypeIcon);
@@ -291,7 +265,7 @@ namespace Umbraco.Web.Trees
         /// <param name="icon"></param>
         /// <param name="hasChildren"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(IUmbracoEntity entity, Guid entityObjectType, string parentId, FormDataCollection queryStrings, string icon, bool hasChildren)
+        public TreeNode CreateTreeNode(IUmbracoEntity entity, Guid entityObjectType, string parentId, FormCollection queryStrings, string icon, bool hasChildren)
         {
             var treeNode = CreateTreeNode(entity.Id.ToInvariantString(), parentId, queryStrings, entity.Name, icon);
             treeNode.Udi = Udi.Create(ObjectTypes.GetUdiType(entityObjectType), entity.Key);
@@ -310,7 +284,7 @@ namespace Umbraco.Web.Trees
         /// <param name="icon"></param>
         /// <param name="hasChildren"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, string parentId, FormDataCollection queryStrings, string title, string icon, bool hasChildren)
+        public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string title, string icon, bool hasChildren)
         {
             var treeNode = CreateTreeNode(id, parentId, queryStrings, title, icon);
             treeNode.HasChildren = hasChildren;
@@ -328,7 +302,7 @@ namespace Umbraco.Web.Trees
         /// <param name="hasChildren"></param>
         /// <param name="icon"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, string parentId, FormDataCollection queryStrings, string title, string icon, bool hasChildren, string routePath)
+        public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string title, string icon, bool hasChildren, string routePath)
         {
             var treeNode = CreateTreeNode(id, parentId, queryStrings, title, icon);
             treeNode.HasChildren = hasChildren;
@@ -348,7 +322,7 @@ namespace Umbraco.Web.Trees
         /// <param name="icon"></param>
         /// <param name="udi"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, string parentId, FormDataCollection queryStrings, string title, string icon, bool hasChildren, string routePath, Udi udi)
+        public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string title, string icon, bool hasChildren, string routePath, Udi udi)
         {
             var treeNode = CreateTreeNode(id, parentId, queryStrings, title, icon);
             treeNode.HasChildren = hasChildren;
@@ -365,12 +339,10 @@ namespace Umbraco.Web.Trees
         /// </summary>
         /// <param name="node"></param>
         /// <param name="queryStrings"></param>
-        protected void AddQueryStringsToAdditionalData(TreeNode node, FormDataCollection queryStrings)
+        protected void AddQueryStringsToAdditionalData(TreeNode node, FormCollection queryStrings)
         {
             foreach (var q in queryStrings.Where(x => node.AdditionalData.ContainsKey(x.Key) == false))
-            {
                 node.AdditionalData.Add(q.Key, q.Value);
-            }
         }
 
         /// <summary>
@@ -378,9 +350,10 @@ namespace Umbraco.Web.Trees
         /// </summary>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        protected bool IsDialog(FormDataCollection queryStrings)
+        protected bool IsDialog(FormCollection queryStrings)
         {
-            return queryStrings.GetValue<string>(TreeQueryStringParameters.Use) == "dialog";
+            queryStrings.TryGetValue(TreeQueryStringParameters.Use, out var use);
+            return use == "dialog";
         }
 
         /// <summary>

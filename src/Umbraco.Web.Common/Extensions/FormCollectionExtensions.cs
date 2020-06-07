@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Formatting;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
+using Umbraco.Web.Common.Extensions;
 
-namespace Umbraco.Web
+namespace Umbraco.Web.Common.Extensions
 {
-    // Migrated to .NET Core (as FormCollectionExtensions)
-    public static class FormDataCollectionExtensions
+    public static class FormCollectionExtensions
     {
         /// <summary>
         /// Converts a dictionary object to a query string representation such as:
@@ -17,16 +17,14 @@ namespace Umbraco.Web
         /// <param name="items"></param>
         /// <param name="keysToIgnore">Any keys found in this collection will be removed from the output</param>
         /// <returns></returns>
-        public static string ToQueryString(this FormDataCollection items, params string[] keysToIgnore)
+        public static string ToQueryString(this FormCollection items, params string[] keysToIgnore)
         {
             if (items == null) return "";
             if (items.Any() == false) return "";
 
             var builder = new StringBuilder();
             foreach (var i in items.Where(i => keysToIgnore.InvariantContains(i.Key) == false))
-            {
                 builder.Append(string.Format("{0}={1}&", i.Key, i.Value));
-            }
             return builder.ToString().TrimEnd('&');
         }
 
@@ -35,7 +33,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>
-        public static IDictionary<string, object> ToDictionary(this FormDataCollection items)
+        public static IDictionary<string, object> ToDictionary(this FormCollection items)
         {
             return items.ToDictionary(x => x.Key, x => (object)x.Value);
         }
@@ -46,7 +44,7 @@ namespace Umbraco.Web
         /// <param name="items"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static string GetRequiredString(this FormDataCollection items, string key)
+        public static string GetRequiredString(this FormCollection items, string key)
         {
             if (items.HasKey(key) == false)
                 throw new ArgumentNullException("The " + key + " query string parameter was not found but is required");
@@ -59,7 +57,7 @@ namespace Umbraco.Web
         /// <param name="items"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static bool HasKey(this FormDataCollection items, string key)
+        public static bool HasKey(this FormCollection items, string key)
         {
             return items.Any(x => x.Key.InvariantEquals(key));
         }
@@ -71,15 +69,17 @@ namespace Umbraco.Web
         /// <param name="items"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static T GetValue<T>(this FormDataCollection items, string key)
+        public static T GetValue<T>(this FormCollection items, string key)
         {
-            var val = items.Get(key);
-            if (string.IsNullOrEmpty(val)) return default(T);
+            if (items.TryGetValue(key, out var val) == false || string.IsNullOrEmpty(val))
+            {
+                return default;
+            }
 
             var converted = val.TryConvertTo<T>();
             return converted.Success
                 ? converted.Result
-                : default(T);
+                : default;
         }
 
         /// <summary>
@@ -89,11 +89,12 @@ namespace Umbraco.Web
         /// <param name="items"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static T GetRequiredValue<T>(this FormDataCollection items, string key)
+        public static T GetRequiredValue<T>(this FormCollection items, string key)
         {
-            var val = items.Get(key);
-            if (string.IsNullOrEmpty(val))
+            if (items.TryGetValue(key, out var val) == false || string.IsNullOrEmpty(val))
+            {
                 throw new InvalidOperationException($"The required query string parameter {key} is missing");
+            }
 
             var converted = val.TryConvertTo<T>();
             return converted.Success
