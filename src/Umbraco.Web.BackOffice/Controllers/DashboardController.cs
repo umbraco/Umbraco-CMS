@@ -27,7 +27,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     //we need to fire up the controller like this to enable loading of remote css directly from this controller
     [PluginController("UmbracoApi")]
     [ValidationFilter]
-    [TypeFilter(typeof(AngularJsonOnlyConfigurationAttribute))] // TODO: This could be applied with our Application Model conventions
+    [AngularJsonOnlyConfiguration] // TODO: This could be applied with our Application Model conventions
     [IsBackOffice]
     [UmbracoAuthorize]
     public class DashboardController : UmbracoApiController
