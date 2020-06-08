@@ -170,16 +170,6 @@ namespace Umbraco.Web.Runtime
             composition.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
                 .Add(umbracoApiControllerTypes);
 
-            // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
-            // discovered when CoreBootManager configures the converters. We HAVE to remove one of them
-            // here because there cannot be two converters for one property editor - and we want the full
-            // RteMacroRenderingValueConverter that converts macros, etc. So remove TinyMceValueConverter.
-            // (the limited one, defined in Core, is there for tests) - same for others
-            composition.PropertyValueConverters()
-                .Remove<TinyMceValueConverter>()
-                .Remove<TextStringValueConverter>()
-                .Remove<MarkdownEditorValueConverter>();
-
             // add all known factories, devs can then modify this list on application
             // startup either by binding to events or in their own global.asax
             composition.FilteredControllerFactory()

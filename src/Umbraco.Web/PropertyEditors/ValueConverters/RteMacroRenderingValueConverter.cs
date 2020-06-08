@@ -1,17 +1,13 @@
-﻿using System.Text;
-using Umbraco.Core;
-using Umbraco.Core.Macros;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Web.Templates;
-using System.Linq;
-using HtmlAgilityPack;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
-using Umbraco.Web.Macros;
+﻿using System.Linq;
+using System.Text;
 using System.Web;
+using HtmlAgilityPack;
+using Umbraco.Core;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Web.Macros;
+using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -19,7 +15,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// A value converter for TinyMCE that will ensure any macro content is rendered properly even when
     /// used dynamically.
     /// </summary>
-    [DefaultPropertyValueConverter]
+    [DefaultPropertyValueConverter(typeof(TinyMceValueConverter))]
     public class RteMacroRenderingValueConverter : TinyMceValueConverter
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
