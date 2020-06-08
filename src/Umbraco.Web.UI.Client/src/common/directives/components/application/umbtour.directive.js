@@ -260,15 +260,18 @@ In the following example you see how to run some custom logic before a step goes
                 // make sure we don't go too far
                 if (scope.model.currentStepIndex !== scope.model.steps.length) {
 
+                    var upcomingStep = scope.model.steps[scope.model.currentStepIndex];
+
                     // If the currentStep JSON object has 'skipStepIfVisible'
                     // It's a DOM selector - if we find it then we ship over this step
-                    if(scope.model.currentStep.skipStepIfVisible){
-                        let tryFindDomEl = $(scope.model.currentStep.element);
-                        if(tryFindDomEl.length > 0) {
-                            // Found a DOM item so we can skip a step
-                            // Example - Skip a tour step saying to open a tree
-                            // if it's already open - no need to tell people to do that
-                            nextStep();
+                    if(upcomingStep.skipStepIfVisible) {
+                        let tryFindDomEl = document.querySelector(upcomingStep.element);
+                        if(tryFindDomEl) {
+                            // check if element is visible:
+                            if( tryFindDomEl.offsetWidth || tryFindDomEl.offsetHeight || tryFindDomEl.getClientRects().length ) {
+                                // if it was visible then we skip the step.
+                                nextStep();
+                            }
                         }
                     }
 
