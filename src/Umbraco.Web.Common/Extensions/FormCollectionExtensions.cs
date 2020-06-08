@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
-using Umbraco.Web.Common.Extensions;
 
-namespace Umbraco.Web.Common.Extensions
+namespace Umbraco.Extensions
 {
     public static class FormCollectionExtensions
     {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Web.BackOffice.Trees;
 
 namespace Umbraco.Web.Trees
 {

@@ -7,6 +7,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
+using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.ModelBinders;
@@ -22,15 +23,16 @@ namespace Umbraco.Web.BackOffice.Trees
     /// <remarks>
     /// Developers should generally inherit from TreeController.
     /// </remarks>
-    [TypeFilter(typeof(AngularJsonOnlyConfigurationAttribute))]
+    [AngularJsonOnlyConfiguration]
     public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     {
         // TODO: Need to set this, but from where?
         //       Presumably not injecting as this will be a base controller for package/solution developers.
         private readonly UmbracoApiControllerTypeCollection _apiControllers;
 
-        protected TreeControllerBase()
+        protected TreeControllerBase(UmbracoApiControllerTypeCollection apiControllers)
         {
+            _apiControllers = apiControllers;
         }
 
         /// <summary>

@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web.Trees;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.BackOffice.Trees
 {
@@ -18,14 +19,8 @@ namespace Umbraco.Web.BackOffice.Trees
 
         private readonly ILocalizedTextService _textService;
 
-        protected TreeController()
-        {
-            var serviceProvider = HttpContext.RequestServices;
-            _textService = serviceProvider.GetService<ILocalizedTextService>();
-            _treeAttribute = GetTreeAttribute();
-        }
-
-        protected TreeController(ILocalizedTextService textService)
+        protected TreeController(ILocalizedTextService textService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection)
+            : base(umbracoApiControllerTypeCollection)
         {
             _textService = textService ?? throw new ArgumentNullException(nameof(textService));
             _treeAttribute = GetTreeAttribute();
