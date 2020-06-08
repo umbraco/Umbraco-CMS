@@ -63,7 +63,7 @@
 
                             <div class="editor clearfix" ng-if="model.property.editor">
 
-                                <button class="btn-reset editor-info" ng-click="vm.openDataTypeSettings(model.property)">
+                                <button type="button" class="btn-reset editor-info" ng-click="vm.openDataTypeSettings(model.property)">
                                     <div class="editor-icon-wrapper">
                                         <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}"></i>
                                     </div>
@@ -75,7 +75,7 @@
 
                                 </button>
 
-                                <button class="editor-remove-icon btn-reset pull-right"
+                                <button type="button" class="editor-remove-icon btn-reset pull-right"
                                     ng-click="vm.openDataTypePicker(model.property)"
                                     hotkey="alt+shift+d"
                                     localize="title"
