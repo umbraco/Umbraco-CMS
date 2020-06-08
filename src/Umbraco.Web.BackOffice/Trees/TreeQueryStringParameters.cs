@@ -1,16 +1,13 @@
-﻿namespace Umbraco.Web.Trees
+﻿namespace Umbraco.Web.BackOffice.Trees
 {
     /// <summary>
     /// Common query string parameters used for tree query strings
     /// </summary>
-    /// Migrated to .NET Core
     internal struct TreeQueryStringParameters
     {
         public const string Use = "use";
         public const string Application = "application";
         public const string StartNodeId = "startNodeId";
         public const string DataTypeKey = "dataTypeKey";
-        //public const string OnNodeClick = "OnNodeClick";
-        //public const string RenderParent = "RenderParent";
     }
 }

@@ -1,48 +1,33 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
-using Umbraco.Web.Routing;
+using Umbraco.Web.Trees;
+using Umbraco.Web.WebApi;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.BackOffice.Trees
 {
     /// <summary>
     /// The base controller for all tree requests
     /// </summary>
-    /// // Migrated to .NET Core
     public abstract class TreeController : TreeControllerBase
     {
-        private static readonly ConcurrentDictionary<Type, TreeAttribute> TreeAttributeCache = new ConcurrentDictionary<Type, TreeAttribute>();
+        private static readonly ConcurrentDictionary<Type, TreeAttribute> _treeAttributeCache = new ConcurrentDictionary<Type, TreeAttribute>();
 
         private readonly TreeAttribute _treeAttribute;
 
-        protected TreeController(
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger logger,
-            IRuntimeState runtimeState,
-            UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
-        {
-            _treeAttribute = GetTreeAttribute();
-        }
+        private readonly ILocalizedTextService _textService;
 
-        protected TreeController()
+        protected TreeController(ILocalizedTextService textService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection)
+            : base(umbracoApiControllerTypeCollection)
         {
+            _textService = textService ?? throw new ArgumentNullException(nameof(textService));
             _treeAttribute = GetTreeAttribute();
         }
 
         /// <inheritdoc />
-        public override string RootNodeDisplayName => Tree.GetRootNodeDisplayName(this, Services.TextService);
+        public override string RootNodeDisplayName => Tree.GetRootNodeDisplayName(this, _textService);
 
         /// <inheritdoc />
         public override string TreeGroup => _treeAttribute.TreeGroup;
@@ -67,7 +52,7 @@ namespace Umbraco.Web.Trees
 
         private TreeAttribute GetTreeAttribute()
         {
-            return TreeAttributeCache.GetOrAdd(GetType(), type =>
+            return _treeAttributeCache.GetOrAdd(GetType(), type =>
             {
                 var treeAttribute = type.GetCustomAttribute<TreeAttribute>(false);
                 if (treeAttribute == null)

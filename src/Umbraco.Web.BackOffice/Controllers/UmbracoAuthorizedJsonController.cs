@@ -13,7 +13,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// methods that are not called by Angular or don't contain a valid csrf header will NOT work.
     /// </remarks>
     [TypeFilter(typeof(ValidateAngularAntiForgeryTokenAttribute))]
-    [TypeFilter(typeof(AngularJsonOnlyConfigurationAttribute))] // TODO: This could be applied with our Application Model conventions
+    [AngularJsonOnlyConfiguration] // TODO: This could be applied with our Application Model conventions
     public abstract class UmbracoAuthorizedJsonController : UmbracoAuthorizedApiController
     {
 

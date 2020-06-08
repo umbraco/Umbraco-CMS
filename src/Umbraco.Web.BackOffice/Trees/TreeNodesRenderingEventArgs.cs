@@ -1,14 +1,13 @@
-﻿using System.Net.Http.Formatting;
+﻿using Microsoft.AspNetCore.Http;
 using Umbraco.Web.Models.Trees;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.BackOffice.Trees
 {
-    // Migrated to .NET Core
     public class TreeNodesRenderingEventArgs : TreeRenderingEventArgs
     {
         public TreeNodeCollection Nodes { get; private set; }
 
-        public TreeNodesRenderingEventArgs(TreeNodeCollection nodes, FormDataCollection queryStrings)
+        public TreeNodesRenderingEventArgs(TreeNodeCollection nodes, FormCollection queryStrings)
             : base(queryStrings)
         {
             Nodes = nodes;

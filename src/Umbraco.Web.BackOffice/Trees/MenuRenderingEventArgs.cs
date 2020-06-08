@@ -1,9 +1,8 @@
-﻿using System.Net.Http.Formatting;
+﻿using Microsoft.AspNetCore.Http;
 using Umbraco.Web.Models.Trees;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.BackOffice.Trees
 {
-    // Migrated to .NET Core
     public class MenuRenderingEventArgs : TreeRenderingEventArgs
     {
         /// <summary>
@@ -16,7 +15,7 @@ namespace Umbraco.Web.Trees
         /// </summary>
         public MenuItemCollection Menu { get; private set; }
 
-        public MenuRenderingEventArgs(string nodeId, MenuItemCollection menu, FormDataCollection queryStrings)
+        public MenuRenderingEventArgs(string nodeId, MenuItemCollection menu, FormCollection queryStrings)
             : base(queryStrings)
         {
             NodeId = nodeId;

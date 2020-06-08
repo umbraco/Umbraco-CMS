@@ -22,7 +22,7 @@ namespace Umbraco.Web.Common.Install
 
     [UmbracoApiController]
     [TypeFilter(typeof(HttpResponseExceptionFilter))]
-    [TypeFilter(typeof(AngularJsonOnlyConfigurationAttribute))]
+    [AngularJsonOnlyConfiguration]
     [InstallAuthorize]
     [Area(Umbraco.Core.Constants.Web.Mvc.InstallArea)]
     public class InstallApiController : ControllerBase
@@ -95,7 +95,7 @@ namespace Umbraco.Web.Common.Install
 
         /// <summary>
         ///     Installs.
-        /// </summary>        
+        /// </summary>
         public async Task<InstallProgressResultModel> PostPerformInstall(InstallInstructions installModel)
         {
             if (installModel == null) throw new ArgumentNullException(nameof(installModel));
