@@ -260,11 +260,23 @@ namespace Umbraco.Web
         /// <param name="html"></param>
         /// <param name="action"></param>
         /// <param name="controllerName"></param>
-        /// <param name="method"></param>
+        /// <returns></returns>
+        public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName)
+        {
+            return html.BeginUmbracoForm(action, controllerName, null, null);
+        }
+
+        /// <summary>
+        /// Helper method to create a new form to execute in the Umbraco request pipeline against a locally declared controller.
+        /// </summary>
+        /// <param name="html">The HTML helper.</param>
+        /// <param name="action">Name of the action.</param>
+        /// <param name="controllerName">Name of the controller.</param>
+        /// <param name="method">The method.</param>
         /// <returns></returns>
         public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName, FormMethod method)
         {
-            return html.BeginUmbracoForm(action, controllerName, null, new Dictionary<string, object>(), method);
+            return html.BeginUmbracoForm(action, controllerName, null, null, method);
         }
 
         /// <summary>
@@ -273,10 +285,11 @@ namespace Umbraco.Web
         /// <param name="html"></param>
         /// <param name="action"></param>
         /// <param name="controllerName"></param>
+        /// <param name="additionalRouteVals"></param>
         /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName)
+        public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName, object additionalRouteVals)
         {
-            return html.BeginUmbracoForm(action, controllerName, null, new Dictionary<string, object>());
+            return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, null);
         }
 
         /// <summary>
@@ -290,38 +303,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName, object additionalRouteVals, FormMethod method)
         {
-            return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, new Dictionary<string, object>(), method);
-        }
-
-        /// <summary>
-        /// Helper method to create a new form to execute in the Umbraco request pipeline against a locally declared controller
-        /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="controllerName"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName, object additionalRouteVals)
-        {
-            return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, new Dictionary<string, object>());
-        }
-
-        /// <summary>
-        /// Helper method to create a new form to execute in the Umbraco request pipeline against a locally declared controller
-        /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="controllerName"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <param name="htmlAttributes"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName,
-                                               object additionalRouteVals,
-                                               object htmlAttributes,
-                                               FormMethod method)
-        {
-            return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes), method);
+            return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, null, method);
         }
 
         /// <summary>
@@ -333,9 +315,7 @@ namespace Umbraco.Web
         /// <param name="additionalRouteVals"></param>
         /// <param name="htmlAttributes"></param>
         /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName,
-                                               object additionalRouteVals,
-                                               object htmlAttributes)
+        public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName, object additionalRouteVals, object htmlAttributes)
         {
             return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
         }
@@ -350,15 +330,9 @@ namespace Umbraco.Web
         /// <param name="htmlAttributes"></param>
         /// <param name="method"></param>
         /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName,
-                                               object additionalRouteVals,
-                                               IDictionary<string, object> htmlAttributes,
-                                               FormMethod method)
+        public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName, object additionalRouteVals, object htmlAttributes, FormMethod method)
         {
-            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentNullOrEmptyException(nameof(action));
-            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
-
-            return html.BeginUmbracoForm(action, controllerName, "", additionalRouteVals, htmlAttributes, method);
+            return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes), method);
         }
 
         /// <summary>
@@ -370,9 +344,7 @@ namespace Umbraco.Web
         /// <param name="additionalRouteVals"></param>
         /// <param name="htmlAttributes"></param>
         /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName,
-                                               object additionalRouteVals,
-                                               IDictionary<string, object> htmlAttributes)
+        public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName, object additionalRouteVals, IDictionary<string, object> htmlAttributes)
         {
             if (string.IsNullOrWhiteSpace(action)) throw new ArgumentNullOrEmptyException(nameof(action));
             if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
@@ -381,16 +353,21 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
+        /// Helper method to create a new form to execute in the Umbraco request pipeline against a locally declared controller
         /// </summary>
         /// <param name="html"></param>
         /// <param name="action"></param>
-        /// <param name="surfaceType">The surface controller to route to</param>
+        /// <param name="controllerName"></param>
+        /// <param name="additionalRouteVals"></param>
+        /// <param name="htmlAttributes"></param>
         /// <param name="method"></param>
         /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, Type surfaceType, FormMethod method)
+        public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName, object additionalRouteVals, IDictionary<string, object> htmlAttributes, FormMethod method)
         {
-            return html.BeginUmbracoForm(action, surfaceType, null, new Dictionary<string, object>(), method);
+            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentNullOrEmptyException(nameof(action));
+            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+
+            return html.BeginUmbracoForm(action, controllerName, "", additionalRouteVals, htmlAttributes, method);
         }
 
         /// <summary>
@@ -417,6 +394,19 @@ namespace Umbraco.Web
             where T : SurfaceController
         {
             return html.BeginUmbracoForm(action, typeof(T), method);
+        }
+
+        /// <summary>
+        /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
+        /// </summary>
+        /// <param name="html"></param>
+        /// <param name="action"></param>
+        /// <param name="surfaceType">The surface controller to route to</param>
+        /// <param name="method"></param>
+        /// <returns></returns>
+        public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, Type surfaceType, FormMethod method)
+        {
+            return html.BeginUmbracoForm(action, surfaceType, null, new Dictionary<string, object>(), method);
         }
 
         /// <summary>
