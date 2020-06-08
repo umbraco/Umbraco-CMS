@@ -65,23 +65,21 @@
 
                                 <button type="button" class="btn-reset editor-info" ng-click="vm.openDataTypeSettings(model.property)">
                                     <div class="editor-icon-wrapper">
-                                        <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}"></i>
+                                        <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}" aria-hidden="true"></i>
                                     </div>
 
                                     <div class="editor-details">
                                         <span class="editor-name">{{ model.property.dataTypeName }}</span>
                                         <span class="editor-editor">{{ model.property.editor }}</span>
                                     </div>
-
                                 </button>
 
                                 <button type="button" class="editor-remove-icon btn-reset pull-right"
                                     ng-click="vm.openDataTypePicker(model.property)"
                                     hotkey="alt+shift+d"
                                     localize="title"
-                                    title="@actions_changeDataType"
-                                >
-                                    <i class="icon icon-wrong"></i>
+                                    title="@actions_changeDataType">
+                                    <i class="icon icon-wrong" aria-hidden="true"></i>
                                 </button>
                             </div>
 
