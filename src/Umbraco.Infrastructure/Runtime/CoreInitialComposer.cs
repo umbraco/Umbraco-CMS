@@ -18,6 +18,7 @@ using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Net;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
@@ -356,6 +357,8 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
 
             composition.Register<IFilePermissionHelper, FilePermissionHelper>(Lifetime.Singleton);
+
+            composition.RegisterUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 
 
         }

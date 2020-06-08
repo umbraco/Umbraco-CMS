@@ -30,7 +30,7 @@ namespace Umbraco.Web.Install
                 // a.OfType<StarterKitInstallStep>().First(),
                 // a.OfType<StarterKitCleanupStep>().First(),
 
-                a.OfType<SetUmbracoVersionStep>().First(),
+                a.OfType<CompleteInstallStep>().First(),
             };
         }
 

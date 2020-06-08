@@ -27,9 +27,9 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
         {
             protected override Task<AuthenticationTicket> AuthenticateCoreAsync()
             {
-                var sessionId = Guid.NewGuid().ToString();
+                var securityStamp = Guid.NewGuid().ToString();
                 var identity = new UmbracoBackOfficeIdentity(
-                    -1, "admin", "Admin", new []{-1}, new[] { -1 }, "en-US", sessionId, sessionId, new[] { "content", "media", "members" }, new[] { "admin" });
+                    -1, "admin", "Admin", new []{-1}, new[] { -1 }, "en-US", securityStamp, new[] { "content", "media", "members" }, new[] { "admin" });
 
                 return Task.FromResult(new AuthenticationTicket(identity,
                     new AuthenticationProperties()

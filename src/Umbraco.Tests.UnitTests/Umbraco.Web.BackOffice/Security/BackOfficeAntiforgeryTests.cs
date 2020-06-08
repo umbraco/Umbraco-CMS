@@ -26,7 +26,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Security
             var httpContext = new DefaultHttpContext()
             {
                 User = new ClaimsPrincipal(new UmbracoBackOfficeIdentity(-1, "test", "test", Enumerable.Empty<int>(), Enumerable.Empty<int>(), "en-US",
-                    Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), Enumerable.Empty<string>(), Enumerable.Empty<string>()))
+                    Guid.NewGuid().ToString(), Enumerable.Empty<string>(), Enumerable.Empty<string>()))
             };
             httpContext.Request.IsHttps = true;
             return httpContext;

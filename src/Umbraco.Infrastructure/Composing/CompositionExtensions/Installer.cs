@@ -24,7 +24,7 @@ namespace Umbraco.Web.Composing.CompositionExtensions
             // composition.Register<StarterKitInstallStep>(Lifetime.Scope);
             // composition.Register<StarterKitCleanupStep>(Lifetime.Scope);
 
-            composition.Register<SetUmbracoVersionStep>(Lifetime.Scope);
+            composition.Register<CompleteInstallStep>(Lifetime.Scope);
 
             composition.Register<InstallStepCollection>();
             composition.Register<InstallHelper>();

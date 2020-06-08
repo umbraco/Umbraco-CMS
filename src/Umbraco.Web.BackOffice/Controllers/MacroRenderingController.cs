@@ -6,23 +6,20 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
-using System.Web.Http;
-using System.Web.SessionState;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Persistence;
+using Umbraco.Core.Net;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Routing;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
     /// <summary>
     /// API controller to deal with Macro data
@@ -33,42 +30,34 @@ namespace Umbraco.Web.Editors
     /// Session, we don't want it to throw null reference exceptions.
     /// </remarks>
     [PluginController("UmbracoApi")]
-    public class MacroRenderingController : UmbracoAuthorizedJsonController, IRequiresSessionState
+    public class MacroRenderingController : UmbracoAuthorizedJsonController
     {
         private readonly IMacroService _macroService;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IShortStringHelper _shortStringHelper;
+        private readonly ISiteDomainHelper _siteDomainHelper;
+        private readonly UmbracoMapper _umbracoMapper;
         private readonly IUmbracoComponentRenderer _componentRenderer;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
 
         public MacroRenderingController(
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger logger,
-            IRuntimeState runtimeState,
-            IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
             IUmbracoComponentRenderer componentRenderer,
             IVariationContextAccessor variationContextAccessor,
             IMacroService macroService,
-            IPublishedUrlProvider publishedUrlProvider)
-            : base(
-                globalSettings,
-                umbracoContextAccessor,
-                sqlContext,
-                services,
-                appCaches,
-                logger,
-                runtimeState,
-                shortStringHelper,
-                umbracoMapper,
-                publishedUrlProvider)
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IShortStringHelper shortStringHelper,
+            ISiteDomainHelper siteDomainHelper)
+
         {
-            _componentRenderer = componentRenderer;
-            _variationContextAccessor = variationContextAccessor;
-            _macroService = macroService;
+            _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
+            _componentRenderer = componentRenderer ?? throw new ArgumentNullException(nameof(componentRenderer));
+            _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
+            _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
+            _siteDomainHelper = siteDomainHelper ?? throw new ArgumentNullException(nameof(siteDomainHelper));
         }
 
         /// <summary>
@@ -87,7 +76,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            return Mapper.Map<IEnumerable<MacroParameter>>(macro).OrderBy(x => x.SortOrder);
+            return _umbracoMapper.Map<IEnumerable<MacroParameter>>(macro).OrderBy(x => x.SortOrder);
         }
 
         /// <summary>
@@ -103,7 +92,7 @@ namespace Umbraco.Web.Editors
         /// </param>
         /// <returns></returns>
         [HttpGet]
-        public HttpResponseMessage GetMacroResultAsHtmlForEditor(string macroAlias, int pageId, [FromUri] IDictionary<string, object> macroParams)
+        public IActionResult GetMacroResultAsHtmlForEditor(string macroAlias, int pageId, [FromQuery] IDictionary<string, object> macroParams)
         {
             return GetMacroResultAsHtml(macroAlias, pageId, macroParams);
         }
@@ -116,7 +105,7 @@ namespace Umbraco.Web.Editors
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public HttpResponseMessage GetMacroResultAsHtmlForEditor(MacroParameterModel model)
+        public IActionResult GetMacroResultAsHtmlForEditor(MacroParameterModel model)
         {
             return GetMacroResultAsHtml(model.MacroAlias, model.PageId, model.MacroParams);
         }
@@ -128,24 +117,22 @@ namespace Umbraco.Web.Editors
             public IDictionary<string, object> MacroParams { get; set; }
         }
 
-        private HttpResponseMessage GetMacroResultAsHtml(string macroAlias, int pageId, IDictionary<string, object> macroParams)
+        private IActionResult GetMacroResultAsHtml(string macroAlias, int pageId, IDictionary<string, object> macroParams)
         {
             var m = _macroService.GetByAlias(macroAlias);
             if (m == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var publishedContent = UmbracoContext.Content.GetById(true, pageId);
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            var publishedContent = umbracoContext.Content.GetById(true, pageId);
 
             //if it isn't supposed to be rendered in the editor then return an empty string
             //currently we cannot render a macro if the page doesn't yet exist
             if (pageId == -1 || publishedContent == null || m.DontRender)
             {
-                var response = Request.CreateResponse();
                 //need to create a specific content result formatted as HTML since this controller has been configured
                 //with only json formatters.
-                response.Content = new StringContent(string.Empty, Encoding.UTF8, "text/html");
-
-                return response;
+                return Content(string.Empty, "text/html", Encoding.UTF8);
             }
 
 
@@ -157,7 +144,7 @@ namespace Umbraco.Web.Editors
             // in a 1:1 situation we do not handle the language being edited
             // so the macro renders in the wrong language
 
-            var culture = publishedContent.GetCultureFromDomains();
+            var culture = DomainUtilities.GetCultureFromDomains(publishedContent.Id, publishedContent.Path, null, umbracoContext, _siteDomainHelper);
 
             if (culture != null)
                 Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(culture);
@@ -165,18 +152,12 @@ namespace Umbraco.Web.Editors
             // must have an active variation context!
             _variationContextAccessor.VariationContext = new VariationContext(culture);
 
-            using (UmbracoContext.ForcedPreview(true))
+            using (umbracoContext.ForcedPreview(true))
             {
-
-                var result = Request.CreateResponse();
                 //need to create a specific content result formatted as HTML since this controller has been configured
                 //with only json formatters.
-                result.Content = new StringContent(
-                    _componentRenderer.RenderMacro(pageId, m.Alias, macroParams).ToString(),
-                    Encoding.UTF8,
-                    "text/html");
-
-                return result;
+                return Content(_componentRenderer.RenderMacro(pageId, m.Alias, macroParams).ToString(), "text/html",
+                    Encoding.UTF8);
             }
         }
 
@@ -189,9 +170,9 @@ namespace Umbraco.Web.Editors
 
             var macroName = model.Filename.TrimEnd(".cshtml");
 
-            var macro = new Macro(ShortStringHelper)
+            var macro = new Macro(_shortStringHelper)
             {
-                Alias = macroName.ToSafeAlias(ShortStringHelper),
+                Alias = macroName.ToSafeAlias(_shortStringHelper),
                 Name = macroName,
                 MacroSource = model.VirtualPath.EnsureStartsWith("~")
             };

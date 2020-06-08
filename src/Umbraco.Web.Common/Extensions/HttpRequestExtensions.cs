@@ -1,10 +1,25 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 
-namespace Umbraco.Web.Common.Extensions
+namespace Umbraco.Extensions
 {
     public static class HttpRequestExtensions
     {
+        public static bool IsBackOfficeRequest(this HttpRequest request, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        {
+            return new Uri(request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsBackOfficeRequest(globalSettings, hostingEnvironment);
+        }
+
+        public static bool IsClientSideRequest(this HttpRequest request)
+        {
+            return new Uri(request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsClientSideRequest();
+        }
+
         internal static string ClientCulture(this HttpRequest request)
         {
             return request.Headers.TryGetValue("X-UMB-CULTURE", out var values) ? values[0] : null;

@@ -68,7 +68,7 @@ namespace Umbraco.Web.Security
                     if (ex is FormatException || ex is JsonReaderException)
                     {
                         // this will occur if the cookie data is invalid
-                        http.UmbracoLogout();
+                       
                     }
                     else
                     {
@@ -86,15 +86,10 @@ namespace Umbraco.Web.Security
         /// This will return the current back office identity.
         /// </summary>
         /// <param name="http"></param>
-        /// <param name="authenticateRequestIfNotFound">
-        /// If set to true and a back office identity is not found and not authenticated, this will attempt to authenticate the
-        /// request just as is done in the Umbraco module and then set the current identity if it is valid.
-        /// Just like in the UmbracoModule, if this is true then the user's culture will be assigned to the request.
-        /// </param>
         /// <returns>
         /// Returns the current back office identity if an admin is authenticated otherwise null
         /// </returns>
-        public static UmbracoBackOfficeIdentity GetCurrentIdentity(this HttpContextBase http, bool authenticateRequestIfNotFound)
+        public static UmbracoBackOfficeIdentity GetCurrentIdentity(this HttpContextBase http)
         {
             if (http == null) throw new ArgumentNullException(nameof(http));
             if (http.User == null) return null; //there's no user at all so no identity
@@ -103,59 +98,20 @@ namespace Umbraco.Web.Security
             var backOfficeIdentity = http.User.GetUmbracoIdentity();
             if (backOfficeIdentity != null) return backOfficeIdentity;
 
-            if (authenticateRequestIfNotFound == false) return null;
-
-            // even if authenticateRequestIfNotFound is true we cannot continue if the request is actually authenticated
-            // which would mean something strange is going on that it is not an umbraco identity.
-            if (http.User.Identity.IsAuthenticated) return null;
-
-            // So the user is not authed but we've been asked to do the auth if authenticateRequestIfNotFound = true,
-            // which might occur in old webforms style things or for routes that aren't included as a back office request.
-            // in this case, we are just reverting to authing using the cookie.
-
-            // TODO: Even though this is in theory legacy, we have legacy bits laying around and we'd need to do the auth based on
-            // how the Module will eventually do it (by calling in to any registered authenticators).
-
-            var ticket = http.GetUmbracoAuthTicket();
-            if (http.AuthenticateCurrentRequest(ticket, true))
-            {
-                //now we 'should have an umbraco identity
-                return http.User.Identity as UmbracoBackOfficeIdentity;
-            }
             return null;
         }
 
         /// <summary>
         /// This will return the current back office identity.
         /// </summary>
-        /// <param name="http"></param>
-        /// <param name="authenticateRequestIfNotFound">
-        /// If set to true and a back office identity is not found and not authenticated, this will attempt to authenticate the
-        /// request just as is done in the Umbraco module and then set the current identity if it is valid
-        /// </param>
+        /// <param name="http"></param>      
         /// <returns>
         /// Returns the current back office identity if an admin is authenticated otherwise null
         /// </returns>
-        internal static UmbracoBackOfficeIdentity GetCurrentIdentity(this HttpContext http, bool authenticateRequestIfNotFound)
+        internal static UmbracoBackOfficeIdentity GetCurrentIdentity(this HttpContext http)
         {
             if (http == null) throw new ArgumentNullException("http");
-            return new HttpContextWrapper(http).GetCurrentIdentity(authenticateRequestIfNotFound);
-        }
-
-        public static void UmbracoLogout(this HttpContextBase http)
-        {
-            if (http == null) throw new ArgumentNullException("http");
-            Logout(http, Current.Configs.Security().AuthCookieName);
-        }
-
-        /// <summary>
-        /// This clears the forms authentication cookie
-        /// </summary>
-        /// <param name="http"></param>
-        internal static void UmbracoLogout(this HttpContext http)
-        {
-            if (http == null) throw new ArgumentNullException("http");
-            new HttpContextWrapper(http).UmbracoLogout();
+            return new HttpContextWrapper(http).GetCurrentIdentity();
         }
 
         /// <summary>
@@ -170,11 +126,7 @@ namespace Umbraco.Web.Security
             return true;
         }
 
-        /// <summary>
-        /// returns the number of seconds the user has until their auth session times out
-        /// </summary>
-        /// <param name="http"></param>
-        /// <returns></returns>
+        // NOTE: Migrated to netcore (though in a different way)
         public static double GetRemainingAuthSeconds(this HttpContextBase http)
         {
             if (http == null) throw new ArgumentNullException(nameof(http));
@@ -182,11 +134,7 @@ namespace Umbraco.Web.Security
             return ticket.GetRemainingAuthSeconds();
         }
 
-        /// <summary>
-        /// returns the number of seconds the user has until their auth session times out
-        /// </summary>
-        /// <param name="ticket"></param>
-        /// <returns></returns>
+        // NOTE: Migrated to netcore (though in a different way)
         public static double GetRemainingAuthSeconds(this AuthenticationTicket ticket)
         {
             var utcExpired = ticket?.Properties.ExpiresUtc;
@@ -216,52 +164,6 @@ namespace Umbraco.Web.Security
         {
             if (ctx == null) throw new ArgumentNullException(nameof(ctx));
             return GetAuthTicket(ctx, Current.Configs.Security().AuthCookieName);
-        }
-
-        /// <summary>
-        /// This clears the forms authentication cookie
-        /// </summary>
-        /// <param name="http"></param>
-        /// <param name="cookieName"></param>
-        private static void Logout(this HttpContextBase http, string cookieName)
-        {
-            // We need to clear the sessionId from the database. This is legacy code to do any logging out and shouldn't really be used at all but in any case
-            // we need to make sure the session is cleared. Due to the legacy nature of this it means we need to use singletons
-            if (http.User != null)
-            {
-                var claimsIdentity = http.User.Identity as ClaimsIdentity;
-                if (claimsIdentity != null)
-                {
-                    var sessionId = claimsIdentity.FindFirstValue(Constants.Security.SessionIdClaimType);
-                    Guid guidSession;
-                    if (sessionId.IsNullOrWhiteSpace() == false && Guid.TryParse(sessionId, out guidSession))
-                    {
-                        Current.Services.UserService.ClearLoginSession(guidSession);
-                    }
-                }
-            }
-
-            if (http == null) throw new ArgumentNullException("http");
-            // clear the preview cookie and external login
-            var cookies = new[] { cookieName, Constants.Web.PreviewCookieName, Constants.Security.BackOfficeExternalCookieName };
-            foreach (var c in cookies)
-            {
-                // remove from the request
-                http.Request.Cookies.Remove(c);
-
-                // expire from the response
-                var formsCookie = http.Response.Cookies[c];
-                if (formsCookie != null)
-                {
-                    // this will expire immediately and be removed from the browser
-                    formsCookie.Expires = DateTime.Now.AddYears(-1);
-                }
-                else
-                {
-                    // ensure there's def an expired cookie
-                    http.Response.Cookies.Add(new HttpCookie(c) { Expires = DateTime.Now.AddYears(-1) });
-                }
-            }
         }
 
         private static AuthenticationTicket GetAuthTicket(this IOwinContext owinCtx, string cookieName)
@@ -313,7 +215,7 @@ namespace Umbraco.Web.Security
             catch (Exception)
             {
                 // occurs when decryption fails
-                http.Logout(cookieName);
+                
                 return null;
             }
         }
@@ -334,23 +236,6 @@ namespace Umbraco.Web.Security
             return secureDataFormat.Unprotect(formsCookie);
         }
 
-        /// <summary>
-        /// Ensures that the thread culture is set based on the back office user's culture
-        /// </summary>
-        /// <param name="identity"></param>
-        public static void EnsureCulture(this IIdentity identity)
-        {
-            if (identity is UmbracoBackOfficeIdentity umbIdentity && umbIdentity.IsAuthenticated)
-            {
-                Thread.CurrentThread.CurrentUICulture =
-                    Thread.CurrentThread.CurrentCulture = UserCultures.GetOrAdd(umbIdentity.Culture, s => new CultureInfo(s));
-            }
-        }
-
-
-        /// <summary>
-        /// Used so that we aren't creating a new CultureInfo object for every single request
-        /// </summary>
-        private static readonly ConcurrentDictionary<string, CultureInfo> UserCultures = new ConcurrentDictionary<string, CultureInfo>();
+        
     }
 }

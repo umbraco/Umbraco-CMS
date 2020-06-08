@@ -21,7 +21,6 @@ namespace Umbraco.Web.Install
         private static HttpClient _httpClient;
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly ILogger _logger;
-        private readonly IGlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IConnectionStrings _connectionStrings;
         private readonly IInstallationService _installationService;
@@ -33,7 +32,6 @@ namespace Umbraco.Web.Install
 
         public InstallHelper(DatabaseBuilder databaseBuilder,
             ILogger logger,
-            IGlobalSettings globalSettings,
             IUmbracoVersion umbracoVersion,
             IConnectionStrings connectionStrings,
             IInstallationService installationService,
@@ -43,7 +41,6 @@ namespace Umbraco.Web.Install
             IJsonSerializer jsonSerializer)
         {
             _logger = logger;
-            _globalSettings = globalSettings;
             _umbracoVersion = umbracoVersion;
             _databaseBuilder = databaseBuilder;
             _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
@@ -59,7 +56,7 @@ namespace Umbraco.Web.Install
             return _installationType ?? (_installationType = IsBrandNewInstall ? InstallationType.NewInstall : InstallationType.Upgrade).Value;
         }
 
-        public async Task InstallStatus(bool isCompleted, string errorMsg)
+        public async Task SetInstallStatusAsync(bool isCompleted, string errorMsg)
         {
             try
             {

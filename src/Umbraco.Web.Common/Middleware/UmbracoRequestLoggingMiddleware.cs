@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Serilog.Context;
 using Umbraco.Core;
 using Umbraco.Core.Logging.Serilog.Enrichers;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Common.Middleware
 {
@@ -30,7 +31,7 @@ namespace Umbraco.Web.Common.Middleware
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             // do not process if client-side request
-            if (new Uri(context.Request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsClientSideRequest())
+            if (context.Request.IsClientSideRequest())
             {
                 await next(context);
                 return;

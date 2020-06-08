@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Linq;
-using System.Collections;
 using System.IO;
 using System.Web;
-using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Web.Templates;
 using System.Collections.Generic;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
+using Umbraco.Core.Strings;
+using Umbraco.Web;
 using Umbraco.Web.Macros;
 
-namespace Umbraco.Web
+namespace Umbraco.Core.Net
 {
 
     /// <summary>
@@ -22,19 +19,18 @@ namespace Umbraco.Web
     /// <remarks>
     /// Used by UmbracoHelper
     /// </remarks>
-    internal class UmbracoComponentRenderer : IUmbracoComponentRenderer
+    // Migrated to .NET Core
+    public class UmbracoComponentRenderer : IUmbracoComponentRenderer
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IMacroRenderer _macroRenderer;
         private readonly ITemplateRenderer _templateRenderer;
-        private readonly HtmlLocalLinkParser _linkParser;
 
-        public UmbracoComponentRenderer(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer, ITemplateRenderer templateRenderer, HtmlLocalLinkParser linkParser)
+        public UmbracoComponentRenderer(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer, ITemplateRenderer templateRenderer)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _macroRenderer = macroRenderer;
             _templateRenderer = templateRenderer ?? throw new ArgumentNullException(nameof(templateRenderer));
-            _linkParser = linkParser;
         }
 
         /// <summary>
@@ -43,7 +39,7 @@ namespace Umbraco.Web
         /// <param name="contentId"></param>
         /// <param name="altTemplateId">If not specified, will use the template assigned to the node</param>
         /// <returns></returns>
-        public IHtmlString RenderTemplate(int contentId, int? altTemplateId = null)
+        public IHtmlEncodedString RenderTemplate(int contentId, int? altTemplateId = null)
         {
             using (var sw = new StringWriter())
             {
@@ -55,7 +51,7 @@ namespace Umbraco.Web
                 {
                     sw.Write("<!-- Error rendering template with id {0}: '{1}' -->", contentId, ex);
                 }
-                return new HtmlString(sw.ToString());
+                return new HtmlEncodedString(sw.ToString());
             }
         }
 
@@ -65,7 +61,7 @@ namespace Umbraco.Web
         /// <param name="contentId"></param>
         /// <param name="alias">The alias.</param>
         /// <returns></returns>
-        public IHtmlString RenderMacro(int contentId, string alias)
+        public IHtmlEncodedString RenderMacro(int contentId, string alias)
         {
             return RenderMacro(contentId, alias, new { });
         }
@@ -77,7 +73,7 @@ namespace Umbraco.Web
         /// <param name="alias">The alias.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        public IHtmlString RenderMacro(int contentId, string alias, object parameters)
+        public IHtmlEncodedString RenderMacro(int contentId, string alias, object parameters)
         {
             return RenderMacro(contentId, alias, parameters?.ToDictionary<object>());
         }
@@ -89,7 +85,7 @@ namespace Umbraco.Web
         /// <param name="alias">The alias.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        public IHtmlString RenderMacro(int contentId, string alias, IDictionary<string, object> parameters)
+        public IHtmlEncodedString RenderMacro(int contentId, string alias, IDictionary<string, object> parameters)
         {
             if (contentId == default)
                 throw new ArgumentException("Invalid content id " + contentId);
@@ -109,7 +105,7 @@ namespace Umbraco.Web
         /// <param name="parameters">The parameters.</param>
         /// <param name="content">The content used for macro rendering</param>
         /// <returns></returns>
-        private IHtmlString RenderMacro(IPublishedContent content, string alias, IDictionary<string, object> parameters)
+        private IHtmlEncodedString RenderMacro(IPublishedContent content, string alias, IDictionary<string, object> parameters)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
 
@@ -121,7 +117,7 @@ namespace Umbraco.Web
 
             var html = _macroRenderer.Render(alias, content, macroProps).Text;
 
-            return new HtmlString(html);
+            return new HtmlEncodedString(html);
         }
     }
 }

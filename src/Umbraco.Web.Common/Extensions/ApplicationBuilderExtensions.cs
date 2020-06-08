@@ -72,6 +72,11 @@ namespace Umbraco.Extensions
             {
                 app.UseMiddleware<UmbracoRequestMiddleware>();
                 app.UseMiddleware<MiniProfilerMiddleware>();
+
+                // TODO: Both of these need to be done before any endpoints but after UmbracoRequestMiddleware
+                // because they rely on an UmbracoContext. But should they be here?
+                app.UseAuthentication();
+                app.UseAuthorization();
             }
 
             return app;

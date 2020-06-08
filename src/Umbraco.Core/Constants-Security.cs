@@ -52,6 +52,12 @@
             public const string StartMediaNodeIdClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/startmedianode";
             public const string AllowedApplicationsClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/allowedapp";
             public const string SessionIdClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/sessionid";
+            public const string TicketExpiresClaimType = "http://umbraco.org/2020/06/identity/claims/backoffice/ticketexpires";
+
+            /// <summary>
+            /// The claim type for the ASP.NET Identity security stamp
+            /// </summary>
+            public const string SecurityStampClaimType = "AspNet.Identity.SecurityStamp";
 
             public const string AspNetCoreV3PasswordHashAlgorithmName = "PBKDF2.ASPNETCORE.V3";
             public const string AspNetCoreV2PasswordHashAlgorithmName = "PBKDF2.ASPNETCORE.V2";
