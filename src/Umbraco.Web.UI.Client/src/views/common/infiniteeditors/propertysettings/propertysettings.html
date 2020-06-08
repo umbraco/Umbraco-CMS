@@ -54,12 +54,12 @@
 
                         <div class="editor-wrapper umb-control-group control-group" ng-model="model.property.editor" val-require-component ng-if="!model.property.locked">
 
-                            <a data-element="editor-add" href="" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openDataTypePicker(model.property)">
+                            <button type="button" class="btn-reset editor-placeholder" data-element="editor-add" ng-if="!model.property.editor" hotkey="alt+shift+e" ng-click="vm.openDataTypePicker(model.property)">
                                 <localize key="defaultdialogs_selectEditor"></localize>
                                 <div ng-messages="model.property.editor" show-validation-on-submit>
                                     <span class="umb-validation-label" ng-message="required">Required editor</span>
                                 </div>
-                            </a>
+                            </button>
 
                             <div class="editor clearfix" ng-if="model.property.editor">
 
@@ -141,8 +141,7 @@
                             <h5><localize key="contentTypeEditor_cultureVariantHeading" /></h5>
                             <umb-toggle data-element="permissions-allow-culture-variant"
                                         checked="model.property.allowCultureVariant"
-                                        on-click="vm.toggleAllowCultureVariants()"
-                            >
+                                        on-click="vm.toggleAllowCultureVariants()">
                             </umb-toggle>
 
                         </div>
@@ -152,8 +151,7 @@
 
                             <umb-toggle data-element="permissions-allow-segment-variant"
                                         checked="model.property.allowSegmentVariant"
-                                        on-click="vm.toggleAllowSegmentVariants()"
-                            >
+                                        on-click="vm.toggleAllowSegmentVariants()">
                             </umb-toggle>
 
                         </div>
@@ -191,7 +189,6 @@
                                         checked="model.property.isSensitiveData"
                                         on-click="vm.toggleIsSensitiveData()">
                             </umb-toggle>
-
 
                         </div>
                     </div>
