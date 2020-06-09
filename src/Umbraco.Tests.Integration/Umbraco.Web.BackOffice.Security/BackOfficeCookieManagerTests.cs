@@ -132,15 +132,41 @@ namespace Umbraco.Tests.Security
             Assert.IsTrue(result);
         }
 
+        [Test]
+        public void ShouldAuthenticateRequest_Not_Back_Office()
+        {
+            var testHelper = new TestHelper();
+
+            var httpContextAccessor = testHelper.GetHttpContextAccessor();
+            var globalSettings = testHelper.SettingsForTests.GenerateMockGlobalSettings();
+
+            var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
+
+            var mgr = new BackOfficeCookieManager(
+                Mock.Of<IUmbracoContextAccessor>(),
+                runtime,
+                Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install"),
+                globalSettings,
+                Mock.Of<IRequestCache>(),
+                GetMockLinkGenerator(out var remainingTimeoutSecondsPath, out var isAuthPath));
+
+            var result = mgr.ShouldAuthenticateRequest(new Uri($"http://localhost/notbackoffice"));
+            Assert.IsFalse(result);
+            result = mgr.ShouldAuthenticateRequest(new Uri($"http://localhost/umbraco/api/notbackoffice"));
+            Assert.IsFalse(result);
+            result = mgr.ShouldAuthenticateRequest(new Uri($"http://localhost/umbraco/surface/notbackoffice"));
+            Assert.IsFalse(result);
+        }
+
         private LinkGenerator GetMockLinkGenerator(out string remainingTimeoutSecondsPath, out string isAuthPath)
         {
             var controllerName = ControllerExtensions.GetControllerName<AuthenticationController>();
 
             // this path is not a back office request even though it's in the same controller - it's a 'special' endpoint
-            var rPath = remainingTimeoutSecondsPath = $"/umbraco/umbracoapi/{controllerName.ToLower()}/{nameof(AuthenticationController.GetRemainingTimeoutSeconds).ToLower()}";
+            var rPath = remainingTimeoutSecondsPath = $"/umbraco/{Constants.Web.Mvc.BackOfficePathSegment}/{Constants.Web.Mvc.BackOfficeApiArea}/{controllerName}/{nameof(AuthenticationController.GetRemainingTimeoutSeconds)}".ToLower();
 
             // this is on the same controller but is considered a back office request
-            var aPath = isAuthPath = $"/umbraco/umbracoapi/{controllerName.ToLower()}/{nameof(AuthenticationController.IsAuthenticated).ToLower()}";
+            var aPath = isAuthPath = $"/umbraco/{Constants.Web.Mvc.BackOfficePathSegment}/{Constants.Web.Mvc.BackOfficeApiArea}/{controllerName}/{nameof(AuthenticationController.IsAuthenticated)}".ToLower();
 
             var linkGenerator = new Mock<LinkGenerator>();
             linkGenerator.Setup(x => x.GetPathByAddress(

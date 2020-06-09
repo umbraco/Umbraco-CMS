@@ -128,7 +128,7 @@ namespace Umbraco.Web.Common.Routing
             object constraints = null)
             => endpoints.MapUmbracoRoute(controllerType, rootSegment, areaName,
                 isBackOffice
-                    ? (areaName.IsNullOrWhiteSpace() ? "BackOffice/Api" : $"BackOffice/{areaName}")
+                    ? (areaName.IsNullOrWhiteSpace() ? $"{Core.Constants.Web.Mvc.BackOfficePathSegment}/Api" : $"{Core.Constants.Web.Mvc.BackOfficePathSegment}/{areaName}")
                     : (areaName.IsNullOrWhiteSpace() ? "Api" : areaName),
                 defaultAction, true, constraints);
     }

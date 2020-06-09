@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Umbraco.Core;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Web.Common.Attributes;
@@ -22,7 +23,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// building to generate correct URLs
     /// </para>
     /// </remarks>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class ImageUrlGeneratorController : UmbracoAuthorizedJsonController
     {
         private readonly IImageUrlGenerator _imageUrlGenerator;

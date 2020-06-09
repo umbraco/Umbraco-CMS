@@ -76,7 +76,7 @@ namespace Umbraco.Core
             }
 
             //check for special back office paths
-            if (urlPath.InvariantStartsWith("/" + mvcArea + "/" + Constants.Web.Mvc.BackOfficeApiArea + "/"))
+            if (urlPath.InvariantStartsWith("/" + mvcArea + "/" + Constants.Web.Mvc.BackOfficePathSegment + "/"))
             {
                 return true;
             }

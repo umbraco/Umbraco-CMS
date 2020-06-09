@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
@@ -13,7 +14,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// <summary>
     /// A controller used to return images for media
     /// </summary>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class ImagesController : UmbracoAuthorizedApiController
     {
         private readonly IMediaFileSystem _mediaFileSystem;

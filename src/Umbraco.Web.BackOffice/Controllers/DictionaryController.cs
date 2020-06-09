@@ -26,7 +26,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// The security for this controller is defined to allow full CRUD access to dictionary if the user has access to either:
     /// Dictionary
     /// </remarks>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
     public class DictionaryController : BackOfficeNotificationsController
     {
