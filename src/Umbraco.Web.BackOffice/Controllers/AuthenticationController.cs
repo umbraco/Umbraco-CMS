@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Net;
-using System.Security.Claims;
-using System.Security.Principal;
 using System.Threading.Tasks;
-using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
@@ -28,11 +25,11 @@ namespace Umbraco.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]  // TODO: Maybe this could be applied with our Application Model conventions
     //[ValidationFilter] // TODO: I don't actually think this is required with our custom Application Model conventions applied
-    [TypeFilter(typeof(AngularJsonOnlyConfigurationAttribute))] // TODO: This could be applied with our Application Model conventions
+    [AngularJsonOnlyConfiguration] // TODO: This could be applied with our Application Model conventions
     [IsBackOffice] // TODO: This could be applied with our Application Model conventions
     public class AuthenticationController : UmbracoApiControllerBase
     {
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IWebSecurity _webSecurity;
         private readonly BackOfficeUserManager _userManager;
         private readonly BackOfficeSignInManager _signInManager;
         private readonly IUserService _userService;
@@ -45,7 +42,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
 
         public AuthenticationController(
-            IUmbracoContextAccessor umbracoContextAccessor,
+            IWebSecurity webSecurity,
             BackOfficeUserManager backOfficeUserManager,
             BackOfficeSignInManager signInManager,
             IUserService userService,
@@ -53,7 +50,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IGlobalSettings globalSettings,
             ILogger logger, IIpResolver ipResolver)
         {
-            _umbracoContextAccessor = umbracoContextAccessor;
+            _webSecurity = webSecurity;
             _userManager = backOfficeUserManager;
             _signInManager = signInManager;
             _userService = userService;
@@ -89,8 +86,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         public bool IsAuthenticated()
         {
-            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            var attempt = umbracoContext.Security.AuthorizeRequest();
+            var attempt = _webSecurity.AuthorizeRequest();
             if (attempt == ValidateRequestAttempt.Success)
             {
                 return true;

@@ -5,6 +5,7 @@ namespace Umbraco.Web.Trees
     /// <summary>
     /// Identifies a section tree.
     /// </summary>
+    /// // Migrated to .NET Core
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class TreeAttribute : Attribute, ITree
     {

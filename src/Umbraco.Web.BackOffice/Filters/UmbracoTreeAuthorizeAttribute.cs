@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Core;
+using Umbraco.Web.Security;
 using Umbraco.Web.Services;
 
 namespace Umbraco.Web.BackOffice.Filters
@@ -31,22 +33,22 @@ namespace Umbraco.Web.BackOffice.Filters
         internal static bool Enable = true;
 
         private readonly ITreeService _treeService;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IWebSecurity _webSecurity;
         private readonly string[] _treeAliases;
 
         /// <summary>
         /// Constructor to set authorization to be based on a tree alias for which application security will be applied
         /// </summary>
-        /// <param name="umbracoContextAccessor"></param>
+        /// <param name="webSecurity"></param>
         /// <param name="treeAliases">
         /// If the user has access to the application that the treeAlias is specified in, they will be authorized.
         /// Multiple trees may be specified.
         /// </param>
         /// <param name="treeService"></param>
-        public UmbracoTreeAuthorizeFilter(ITreeService treeService, IUmbracoContextAccessor umbracoContextAccessor, params string[] treeAliases)
+        public UmbracoTreeAuthorizeFilter(ITreeService treeService, IWebSecurity webSecurity, params string[] treeAliases)
         {
-            _treeService = treeService;
-            _umbracoContextAccessor = umbracoContextAccessor;
+            _treeService = treeService ?? throw new ArgumentNullException(nameof(treeService));
+            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
             _treeAliases = treeAliases;
         }
 
@@ -64,10 +66,9 @@ namespace Umbraco.Web.BackOffice.Filters
                 .Distinct()
                 .ToArray();
 
-            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            return umbracoContext.Security.CurrentUser != null
-                   && apps.Any(app => umbracoContext.Security.UserHasSectionAccess(
-                       app, umbracoContext.Security.CurrentUser));
+            return _webSecurity.CurrentUser != null
+                   && apps.Any(app => _webSecurity.UserHasSectionAccess(
+                       app, _webSecurity.CurrentUser));
         }
 
         public void OnAuthorization(AuthorizationFilterContext context)

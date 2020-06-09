@@ -4,11 +4,11 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Editors;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.HealthCheck;
 
-namespace Umbraco.Web.HealthCheck
+namespace Umbraco.Web.BackOffice.Controllers
 {
     /// <summary>
     /// The API controller used to display the health check info and execute any actions
@@ -81,7 +81,7 @@ namespace Umbraco.Web.HealthCheck
             return check.ExecuteAction(action);
         }
 
-        private HealthCheck GetCheckById(Guid id)
+        private HealthCheck.HealthCheck GetCheckById(Guid id)
         {
             var check = _checks
                 .Where(x => _disabledCheckIds.Contains(x.Id) == false)

@@ -3,25 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Formatting;
+using System.Reflection;
 using System.Threading.Tasks;
-using System.Web.Http;
-using System.Web.Http.Controllers;
-using System.Web.Http.Routing;
-using System.Web.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Primitives;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Extensions;
+using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Exceptions;
+using Umbraco.Web.Common.Filters;
+using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Services;
-using Umbraco.Web.WebApi;
-using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -35,15 +35,21 @@ namespace Umbraco.Web.Trees
     {
         private readonly ITreeService _treeService;
         private readonly ISectionService _sectionService;
+        private readonly ILocalizedTextService _localizedTextService;
+        private readonly IControllerFactory _controllerFactory;
 
-        public ApplicationTreeController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger,
-            IRuntimeState runtimeState, ITreeService treeService, ISectionService sectionService, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
-        {
+        public ApplicationTreeController(
+            ITreeService treeService,
+            ISectionService sectionService,
+            ILocalizedTextService localizedTextService,
+            IControllerFactory controllerFactory
+            )
+              {
             _treeService = treeService;
             _sectionService = sectionService;
-        }
+            _localizedTextService = localizedTextService;
+            _controllerFactory = controllerFactory;
+              }
 
         /// <summary>
         /// Returns the tree nodes for an application
@@ -53,7 +59,7 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings"></param>
         /// <param name="use">Tree use.</param>
         /// <returns></returns>
-        public async Task<TreeRootNode> GetApplicationTrees(string application, string tree, [System.Web.Http.ModelBinding.ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings, TreeUse use = TreeUse.Main)
+        public async Task<TreeRootNode> GetApplicationTrees(string application, string tree, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings, TreeUse use = TreeUse.Main)
         {
             application = application.CleanForXss();
 
@@ -72,7 +78,7 @@ namespace Umbraco.Web.Trees
             {
                 //if there are no trees defined for this section but the section is defined then we can have a simple
                 //full screen section without trees
-                var name = Services.TextService.Localize("sections/" + application);
+                var name = _localizedTextService.Localize("sections/" + application);
                 return TreeRootNode.CreateSingleTreeRoot(Constants.System.RootString, null, null, name, TreeNodeCollection.Empty, true);
             }
 
@@ -105,7 +111,7 @@ namespace Umbraco.Web.Trees
                         nodes.Add(node);
                 }
 
-                var name = Services.TextService.Localize("sections/" + application);
+                var name = _localizedTextService.Localize("sections/" + application);
 
                 if (nodes.Count > 0)
                 {
@@ -140,7 +146,7 @@ namespace Umbraco.Web.Trees
                 var name = groupName.IsNullOrWhiteSpace() ? "thirdPartyGroup" : groupName;
 
                 var groupRootNode = TreeRootNode.CreateGroupNode(nodes, application);
-                groupRootNode.Name = Services.TextService.Localize("treeHeaders/" + name);
+                groupRootNode.Name = _localizedTextService.Localize("treeHeaders/" + name);
                 treeRootNodes.Add(groupRootNode);
             }
 
@@ -154,7 +160,7 @@ namespace Umbraco.Web.Trees
         /// <para>Returns null if the root node could not be obtained due to an HttpResponseException,
         /// which probably indicates that the user isn't authorized to view that tree.</para>
         /// </remarks>
-        private async Task<TreeNode> TryGetRootNode(Tree tree, FormDataCollection querystring)
+        private async Task<TreeNode> TryGetRootNode(Tree tree, FormCollection querystring)
         {
             if (tree == null) throw new ArgumentNullException(nameof(tree));
 
@@ -174,7 +180,7 @@ namespace Umbraco.Web.Trees
         /// <summary>
         /// Get the tree root node of a tree.
         /// </summary>
-        private async Task<TreeRootNode> GetTreeRootNode(Tree tree, int id, FormDataCollection querystring)
+        private async Task<TreeRootNode> GetTreeRootNode(Tree tree, int id, FormCollection querystring)
         {
             if (tree == null) throw new ArgumentNullException(nameof(tree));
 
@@ -203,7 +209,7 @@ namespace Umbraco.Web.Trees
         /// <summary>
         /// Gets the root node of a tree.
         /// </summary>
-        private async Task<TreeNode> GetRootNode(Tree tree, FormDataCollection querystring)
+        private async Task<TreeNode> GetRootNode(Tree tree, FormCollection querystring)
         {
             if (tree == null) throw new ArgumentNullException(nameof(tree));
 
@@ -217,16 +223,16 @@ namespace Umbraco.Web.Trees
         /// <summary>
         /// Get the child nodes of a tree node.
         /// </summary>
-        private async Task<TreeNodeCollection> GetChildren(Tree tree, int id, FormDataCollection querystring)
+        private async Task<TreeNodeCollection> GetChildren(Tree tree, int id, FormCollection querystring)
         {
             if (tree == null) throw new ArgumentNullException(nameof(tree));
 
             // the method we proxy has an 'id' parameter which is *not* in the querystring,
             // we need to add it for the proxy to work (else, it does not find the method,
             // when trying to run auth filters etc).
-            var d = querystring?.ToDictionary(x => x.Key, x => x.Value) ?? new Dictionary<string, string>();
-            d["id"] = null;
-            var proxyQuerystring = new FormDataCollection(d);
+            var d = querystring?.ToDictionary(x => x.Key, x => x.Value) ?? new Dictionary<string, StringValues>();
+            d["id"] = StringValues.Empty;
+            var proxyQuerystring = new FormCollection(d);
 
             var controller = (TreeController) await GetApiControllerProxy(tree.TreeControllerType, "GetNodes", proxyQuerystring);
             return controller.GetNodes(id.ToInvariantString(), querystring);
@@ -244,49 +250,74 @@ namespace Umbraco.Web.Trees
         /// and context etc. so it can execute the specified <paramref name="action"/>. Runs the authorization
         /// filters for that action, to ensure that the user has permission to execute it.</para>
         /// </remarks>
-        private async Task<object> GetApiControllerProxy(Type controllerType, string action, FormDataCollection querystring)
+        private async Task<object> GetApiControllerProxy(Type controllerType, string action, FormCollection querystring)
         {
             // note: this is all required in order to execute the auth-filters for the sub request, we
             // need to "trick" web-api into thinking that it is actually executing the proxied controller.
 
-            var context = ControllerContext;
-
-            // get the controller
-            var controller = (ApiController) DependencyResolver.Current.GetService(controllerType)
-                             ?? throw new Exception($"Failed to create controller of type {controllerType.FullName}.");
-
-            // create the proxy URL for the controller action
-            var proxyUrl = context.Request.RequestUri.GetLeftPart(UriPartial.Authority)
-                      + context.Request.GetUrlHelper().GetUmbracoApiService(action, controllerType)
-                      + "?" + querystring.ToQueryString();
 
             // create proxy route data specifying the action & controller to execute
-            var proxyRoute = new HttpRouteData(
-                context.RouteData.Route,
-                new HttpRouteValueDictionary(new { action, controller = ControllerExtensions.GetControllerName(controllerType) }));
-
-            // create a proxy request
-            var proxyRequest = new HttpRequestMessage(HttpMethod.Get, proxyUrl);
-
-            // create a proxy controller context
-            var proxyContext = new HttpControllerContext(context.Configuration, proxyRoute, proxyRequest)
+            var routeData = new RouteData(new RouteValueDictionary()
             {
-                ControllerDescriptor = new HttpControllerDescriptor(context.ControllerDescriptor.Configuration, ControllerExtensions.GetControllerName(controllerType), controllerType),
-                RequestContext = context.RequestContext,
-                Controller = controller
-            };
+                ["action"] = action,
+                ["controller"] = controllerType.Name.Substring(0,controllerType.Name.Length-10) // remove controller part of name;
 
-            // wire everything
-            controller.ControllerContext = proxyContext;
-            controller.Request = proxyContext.Request;
-            controller.RequestContext.RouteData = proxyRoute;
+            });
 
-            // auth
-            var authResult = await controller.ControllerContext.InvokeAuthorizationFiltersForRequest();
-            if (authResult != null)
-                throw new HttpResponseException(authResult);
+
+            var controllerContext = new ControllerContext(
+                new ActionContext(
+                    HttpContext,
+                    routeData,
+                    new ControllerActionDescriptor()
+                    {
+                        ControllerTypeInfo = controllerType.GetTypeInfo()
+                    }
+                ));
+
+            var controller = (TreeController) _controllerFactory.CreateController(controllerContext);
+
+
+            //TODO Refactor trees or reimplement this hacks to check authentication.
+            //https://dev.azure.com/umbraco/D-Team%20Tracker/_workitems/edit/3694
+
+            // var context = ControllerContext;
+            //
+            // // get the controller
+            // var controller = (TreeController) DependencyResolver.Current.GetService(controllerType)
+            //                  ?? throw new Exception($"Failed to create controller of type {controllerType.FullName}.");
+            //
+            // // create the proxy URL for the controller action
+            // var proxyUrl = HttpContext.Request.RequestUri.GetLeftPart(UriPartial.Authority)
+            //           + HttpContext.Request.GetUrlHelper().GetUmbracoApiService(action, controllerType)
+            //           + "?" + querystring.ToQueryString();
+            //
+            //
+            //
+            // // create a proxy request
+            // var proxyRequest = new HttpRequestMessage(HttpMethod.Get, proxyUrl);
+            //
+            // // create a proxy controller context
+            // var proxyContext = new HttpControllerContext(context.Configuration, proxyRoute, proxyRequest)
+            // {
+            //     ControllerDescriptor = new HttpControllerDescriptor(context.ControllerDescriptor.Configuration, ControllerExtensions.GetControllerName(controllerType), controllerType),
+            //     RequestContext = context.RequestContext,
+            //     Controller = controller
+            // };
+            //
+            // // wire everything
+            // controller.ControllerContext = proxyContext;
+            // controller.Request = proxyContext.Request;
+            // controller.RequestContext.RouteData = proxyRoute;
+            //
+            // // auth
+            // var authResult = await controller.ControllerContext.InvokeAuthorizationFiltersForRequest();
+            // if (authResult != null)
+            //     throw new HttpResponseException(authResult);
 
             return controller;
         }
+
+
     }
 }

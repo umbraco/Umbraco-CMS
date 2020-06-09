@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using Examine;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
@@ -19,7 +16,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using SearchResult = Umbraco.Web.Models.ContentEditing.SearchResult;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
     [PluginController("UmbracoApi")]
     public class ExamineManagementController : UmbracoAuthorizedJsonController

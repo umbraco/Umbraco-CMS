@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Editors;
-using Umbraco.Web.Mvc;
+using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Core.Media;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Media.EmbedProviders;

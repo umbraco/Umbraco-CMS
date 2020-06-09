@@ -7,7 +7,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Web
 {
-
+    // Migrated to .NET Core (as FormCollectionExtensions)
     public static class FormDataCollectionExtensions
     {
         /// <summary>

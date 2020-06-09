@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Umbraco.Net;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -14,13 +15,13 @@ namespace Umbraco.Web.Install.InstallSteps
     internal class StarterKitInstallStep : InstallSetupStep<object>
     {
         private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IWebSecurity _webSecurity;
         private readonly IPackagingService _packagingService;
 
-        public StarterKitInstallStep(IUmbracoApplicationLifetime umbracoApplicationLifetime, IUmbracoContextAccessor umbracoContextAccessor, IPackagingService packagingService)
+        public StarterKitInstallStep(IUmbracoApplicationLifetime umbracoApplicationLifetime, IWebSecurity webSecurity, IPackagingService packagingService)
         {
             _umbracoApplicationLifetime = umbracoApplicationLifetime;
-            _umbracoContextAccessor = umbracoContextAccessor;
+            _webSecurity = webSecurity;
             _packagingService = packagingService;
         }
 
@@ -47,7 +48,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             var packageFile = new FileInfo(definition.PackagePath);
 
-            _packagingService.InstallCompiledPackageData(definition, packageFile, _umbracoContextAccessor.UmbracoContext.Security.GetUserId().ResultOr(-1));
+            _packagingService.InstallCompiledPackageData(definition, packageFile, _webSecurity.GetUserId().ResultOr(-1));
         }
 
         public override bool RequiresExecution(object model)

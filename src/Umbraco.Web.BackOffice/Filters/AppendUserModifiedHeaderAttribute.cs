@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
@@ -42,8 +43,8 @@ namespace Umbraco.Web.BackOffice.Filters
                     throw new InvalidOperationException($"No argument found for the current action with the name: {_userIdParameter}");
                 }
 
-                var umbracoContextAccessor = context.HttpContext.RequestServices.GetService<IUmbracoContextAccessor>();
-                var user = umbracoContextAccessor.UmbracoContext.Security.CurrentUser;
+                var webSecurity = context.HttpContext.RequestServices.GetService<IWebSecurity>();
+                var user = webSecurity.CurrentUser;
                 if (user == null)
                 {
                     return;
