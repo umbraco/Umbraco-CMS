@@ -24,6 +24,8 @@ namespace Umbraco.Web.BackOffice.Filters
     /// </remarks>
     public sealed class ValidateAngularAntiForgeryTokenAttribute : ActionFilterAttribute
     {
+        // TODO: Either make this inherit from TypeFilter or make this just a normal IActionFilter
+
         private readonly ILogger _logger;
         private readonly IBackOfficeAntiforgery _antiforgery;
         private readonly ICookieManager _cookieManager;

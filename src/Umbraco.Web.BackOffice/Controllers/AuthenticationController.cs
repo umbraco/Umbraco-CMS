@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
@@ -180,6 +182,22 @@ namespace Umbraco.Web.BackOffice.Controllers
             // authorized and we don't want to return a 403 because angular will show a warning message indicating
             // that the user doesn't have access to perform this function, we just want to return a normal invalid message.
             throw new HttpResponseException(HttpStatusCode.BadRequest);
+        }
+
+        /// <summary>
+        /// Logs the current user out
+        /// </summary>
+        /// <returns></returns>
+        [TypeFilter(typeof(ValidateAngularAntiForgeryTokenAttribute))]
+        public IActionResult PostLogout()
+        {
+            HttpContext.SignOutAsync(Core.Constants.Security.BackOfficeAuthenticationType);
+
+            _logger.Info<AuthenticationController>("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
+
+            _userManager.RaiseLogoutSuccessEvent(User, int.Parse(User.Identity.GetUserId()));
+
+            return Ok();
         }
 
         /// <summary>

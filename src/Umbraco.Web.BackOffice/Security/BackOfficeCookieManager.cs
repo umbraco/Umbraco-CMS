@@ -89,9 +89,6 @@ namespace Umbraco.Web.BackOffice.Security
             if (_explicitPaths != null)
                 return _explicitPaths.Any(x => x.InvariantEquals(requestUri.AbsolutePath));
 
-            //check user seconds path
-            if (requestUri.AbsolutePath.InvariantEquals(_getRemainingSecondsPath)) return false;
-
             if (//check the explicit flag
                 checkForceAuthTokens && _requestCache.IsAvailable && _requestCache.Get(Constants.Security.ForceReAuthFlag) != null
                 //check back office
