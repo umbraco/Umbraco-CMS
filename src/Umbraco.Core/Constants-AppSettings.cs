@@ -9,6 +9,8 @@ namespace Umbraco.Core
         /// </summary>
         public static class AppSettings
         {
+            // TODO: Are these all obsolete in netcore now?
+
             public const string MainDomLock = "Umbraco.Core.MainDom.Lock";
 
             // TODO: Kill me - still used in Umbraco.Core.IO.SystemFiles:27

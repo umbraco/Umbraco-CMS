@@ -150,10 +150,6 @@ namespace Umbraco.Web.BackOffice.Security
                         UmbracoBackOfficeIdentity.Issuer,
                         backOfficeIdentity));
 
-                    if (_securitySettings.KeepUserLoggedIn)
-                    {
-
-                    }
                 },
                 OnSigningIn = ctx =>
                 {

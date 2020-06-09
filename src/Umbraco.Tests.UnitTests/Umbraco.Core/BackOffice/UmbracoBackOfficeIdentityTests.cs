@@ -37,6 +37,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             if (!UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out var backofficeIdentity))
                 Assert.Fail();
 
+            Assert.IsNull(backofficeIdentity.Actor);
             Assert.AreEqual(1234, backofficeIdentity.Id);
             //Assert.AreEqual(sessionId, backofficeIdentity.SessionId);
             Assert.AreEqual(securityStamp, backofficeIdentity.SecurityStamp);
@@ -60,7 +61,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
                 new Claim(ClaimTypes.Name, "testing", ClaimValueTypes.String, TestIssuer, TestIssuer),
             });
 
-            if (UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out var backofficeIdentity))
+            if (UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out _))
                 Assert.Fail();
 
             Assert.Pass();
@@ -83,7 +84,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
                 new Claim(ClaimsIdentity.DefaultRoleClaimType, "admin", ClaimValueTypes.String, TestIssuer, TestIssuer),
             });
 
-            if (UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out var backofficeIdentity))
+            if (UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out _))
                 Assert.Fail();
 
             Assert.Pass();
@@ -105,6 +106,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
                 1234, "testing", "hello world", new[] { 654 }, new[] { 654 }, "en-us", securityStamp, new[] { "content", "media" }, new[] { "admin" });
 
             Assert.AreEqual(12, identity.Claims.Count());
+            Assert.IsNull(identity.Actor);
         }
 
 
@@ -116,7 +118,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             var identity = new UmbracoBackOfficeIdentity(
                 1234, "testing", "hello world", new[] { 654 }, new[] { 654 }, "en-us", securityStamp, new[] { "content", "media" }, new[] { "admin" });
 
+            // this will be filtered out during cloning
+            identity.AddClaim(new Claim(Constants.Security.TicketExpiresClaimType, "test"));
+
             var cloned = identity.Clone();
+            Assert.IsNull(cloned.Actor);
 
             Assert.AreEqual(10, cloned.Claims.Count());
         }

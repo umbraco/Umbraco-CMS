@@ -31,7 +31,6 @@ namespace Umbraco.Web.BackOffice.Security
         private readonly IGlobalSettings _globalSettings;
         private readonly IRequestCache _requestCache;
         private readonly string[] _explicitPaths;
-        private readonly string _getRemainingSecondsPath;
 
         public BackOfficeCookieManager(
             IUmbracoContextAccessor umbracoContextAccessor,
@@ -58,7 +57,6 @@ namespace Umbraco.Web.BackOffice.Security
             _globalSettings = globalSettings;
             _requestCache = requestCache;
             _explicitPaths = explicitPaths?.ToArray();
-            _getRemainingSecondsPath = linkGenerator.GetUmbracoApiService<AuthenticationController>(x => x.GetRemainingTimeoutSeconds());
         }
 
         /// <summary>
