@@ -96,11 +96,11 @@ namespace Umbraco.Web.Routing
 
         private void StoreOldRoute(IContent entity, OldRoutesDictionary oldRoutes)
         {
-            var contentCache = _publishedSnapshotAccessor.PublishedSnapshot.Content;
-            var entityContent = contentCache.GetById(entity.Id);
-            if (entityContent == null) return;            
+            var contentCache = _publishedSnapshotAccessor.PublishedSnapshot?.Content;
+            var entityContent = contentCache?.GetById(entity.Id);
+            if (entityContent == null) return;
 
-            // get the default affected cultures by going up the tree until we find the first culture variant entity (default to no cultures) 
+            // get the default affected cultures by going up the tree until we find the first culture variant entity (default to no cultures)
             var defaultCultures = entityContent.AncestorsOrSelf()?.FirstOrDefault(a => a.Cultures.Any())?.Cultures.Keys.ToArray()
                 ?? new[] { (string)null };
             foreach (var x in entityContent.DescendantsOrSelf())
