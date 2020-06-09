@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System;
+using System.Web;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -61,6 +62,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsFirst(string valueIfTrue)
         {
             return IsFirst(valueIfTrue, string.Empty);
@@ -74,6 +76,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsFirst(string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(HttpUtility.HtmlEncode(IsFirst() ? valueIfTrue : valueIfFalse));
@@ -85,6 +88,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         ///   <c>true</c> if this item is not the first; otherwise, <c>false</c>.
         /// </returns>
+        [Obsolete("Use the negated value of IsFirst() instead.")]
         public bool IsNotFirst()
         {
             return IsFirst() == false;
@@ -97,6 +101,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsNotFirst(string valueIfTrue)
         {
             return IsNotFirst(valueIfTrue, string.Empty);
@@ -110,6 +115,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsNotFirst(string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(HttpUtility.HtmlEncode(IsNotFirst() ? valueIfTrue : valueIfFalse));
@@ -135,6 +141,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsIndex(int index, string valueIfTrue)
         {
             return IsIndex(index, valueIfTrue, string.Empty);
@@ -149,6 +156,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsIndex(int index, string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(HttpUtility.HtmlEncode(IsIndex(index) ? valueIfTrue : valueIfFalse));
@@ -174,6 +182,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsModZero(int modulus, string valueIfTrue)
         {
             return IsModZero(modulus, valueIfTrue, string.Empty);
@@ -188,6 +197,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsModZero(int modulus, string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(HttpUtility.HtmlEncode(IsModZero(modulus) ? valueIfTrue : valueIfFalse));
@@ -200,6 +210,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         ///   <c>true</c> if this item is not at an index that can be divided by the specified <paramref name="modulus" />; otherwise, <c>false</c>.
         /// </returns>
+        [Obsolete("Use the negated value of IsModZero() instead.")]
         public bool IsNotModZero(int modulus)
         {
             return IsModZero(modulus) == false;
@@ -213,6 +224,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsNotModZero(int modulus, string valueIfTrue)
         {
             return IsNotModZero(modulus, valueIfTrue, string.Empty);
@@ -227,6 +239,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsNotModZero(int modulus, string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(HttpUtility.HtmlEncode(IsNotModZero(modulus) ? valueIfTrue : valueIfFalse));
@@ -239,6 +252,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         ///   <c>true</c> if this item is not at the specified <paramref name="index" />; otherwise, <c>false</c>.
         /// </returns>
+        [Obsolete("Use the negated value of IsIndex() instead.")]
         public bool IsNotIndex(int index)
         {
             return IsIndex(index) == false;
@@ -252,6 +266,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsNotIndex(int index, string valueIfTrue)
         {
             return IsNotIndex(index, valueIfTrue, string.Empty);
@@ -266,6 +281,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsNotIndex(int index, string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(HttpUtility.HtmlEncode(IsNotIndex(index) ? valueIfTrue : valueIfFalse));
@@ -289,6 +305,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsLast(string valueIfTrue)
         {
             return IsLast(valueIfTrue, string.Empty);
@@ -302,6 +319,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsLast(string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(HttpUtility.HtmlEncode(IsLast() ? valueIfTrue : valueIfFalse));
@@ -313,6 +331,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         ///   <c>true</c> if this item is not the last; otherwise, <c>false</c>.
         /// </returns>
+        [Obsolete("Use the negated value of IsLast() instead.")]
         public bool IsNotLast()
         {
             return IsLast() == false;
@@ -325,6 +344,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsNotLast(string valueIfTrue)
         {
             return IsNotLast(valueIfTrue, string.Empty);
@@ -338,6 +358,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsNotLast(string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(HttpUtility.HtmlEncode(IsNotLast() ? valueIfTrue : valueIfFalse));
@@ -361,6 +382,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsEven(string valueIfTrue)
         {
             return IsEven(valueIfTrue, string.Empty);
@@ -374,6 +396,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsEven(string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(HttpUtility.HtmlEncode(IsEven() ? valueIfTrue : valueIfFalse));
@@ -397,6 +420,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsOdd(string valueIfTrue)
         {
             return IsOdd(valueIfTrue, string.Empty);
@@ -410,6 +434,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
+        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
         public HtmlString IsOdd(string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(HttpUtility.HtmlEncode(IsOdd() ? valueIfTrue : valueIfFalse));
