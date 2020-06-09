@@ -31,6 +31,9 @@ namespace Umbraco.Web.BackOffice.Runtime
             var umbracoApiControllerTypes = composition.TypeLoader.GetUmbracoApiControllers().ToList();
             composition.Trees()
                 .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
+
+
+            composition.ComposeWebMappingProfiles();
         }
     }
 }

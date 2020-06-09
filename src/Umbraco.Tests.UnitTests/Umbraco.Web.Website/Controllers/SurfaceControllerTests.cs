@@ -15,6 +15,7 @@ using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 using Umbraco.Web.Website;
 using Umbraco.Web.Website.Controllers;
 
@@ -50,7 +51,8 @@ namespace Umbraco.Tests.Integration
                 new UriUtility(hostingEnvironment),
                 httpContextAccessor,
                 Mock.Of<ICookieManager>(),
-                Mock.Of<IRequestAccessor>());
+                Mock.Of<IRequestAccessor>(),
+                Mock.Of<IWebSecurity>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbracoContext = umbracoContextReference.UmbracoContext;
@@ -82,7 +84,8 @@ namespace Umbraco.Tests.Integration
                 new UriUtility(hostingEnvironment),
                 httpContextAccessor,
                 Mock.Of<ICookieManager>(),
-                Mock.Of<IRequestAccessor>());
+                Mock.Of<IRequestAccessor>(),
+                Mock.Of<IWebSecurity>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbCtx = umbracoContextReference.UmbracoContext;
@@ -118,7 +121,8 @@ namespace Umbraco.Tests.Integration
                 new UriUtility(hostingEnvironment),
                 httpContextAccessor,
                 Mock.Of<ICookieManager>(),
-                Mock.Of<IRequestAccessor>());
+                Mock.Of<IRequestAccessor>(),
+                Mock.Of<IWebSecurity>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbracoContext = umbracoContextReference.UmbracoContext;
@@ -154,7 +158,8 @@ namespace Umbraco.Tests.Integration
                 new UriUtility(hostingEnvironment),
                 httpContextAccessor,
                 Mock.Of<ICookieManager>(),
-                Mock.Of<IRequestAccessor>());
+                Mock.Of<IRequestAccessor>(),
+                Mock.Of<IWebSecurity>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbracoContext = umbracoContextReference.UmbracoContext;
