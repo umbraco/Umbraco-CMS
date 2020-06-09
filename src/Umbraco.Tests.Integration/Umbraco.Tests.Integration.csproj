@@ -15,6 +15,7 @@
 
     <ItemGroup>
         <PackageReference Include="LightInject.Microsoft.DependencyInjection" Version="3.3.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.4" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
         <PackageReference Include="Moq" Version="4.13.1" />
         <PackageReference Include="nunit" Version="3.12.0" />
@@ -30,6 +31,7 @@
       <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
       <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
       <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
+      <ProjectReference Include="..\Umbraco.Web.UI.NetCore\Umbraco.Web.UI.NetCore.csproj" />
       <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
     </ItemGroup>
 

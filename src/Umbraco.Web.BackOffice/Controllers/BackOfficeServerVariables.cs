@@ -172,10 +172,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                         //     "userGroupsApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<UserGroupsController>(
                         //         controller => controller.PostSaveUserGroup(null))
                         // },
-                        // {
-                        //     "contentApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ContentController>(
-                        //         controller => controller.PostSave(null))
-                        // },
+                        {
+                            "contentApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ContentController>(
+                                controller => controller.PostSave(null))
+                        },
                         // {
                         //     "mediaApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaController>(
                         //         controller => controller.GetRootMedia())

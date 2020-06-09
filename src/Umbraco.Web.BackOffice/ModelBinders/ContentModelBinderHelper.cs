@@ -1,15 +1,14 @@
-﻿using System.Net;
-using System.Net.Http;
-using System.Web.Http;
-using System.Web.Http.Controllers;
+﻿using System;
+using System.IO;
+using System.Net;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Net.Http.Headers;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
+using Umbraco.Extensions;
+using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.WebApi;
-using ModelBindingContext = System.Web.Http.ModelBinding.ModelBindingContext;
 
 namespace Umbraco.Web.Editors.Binders
 {
@@ -18,7 +17,8 @@ namespace Umbraco.Web.Editors.Binders
     /// </summary>
     internal class ContentModelBinderHelper
     {
-        public TModelSave BindModelFromMultipartRequest<TModelSave>(HttpActionContext actionContext, ModelBindingContext bindingContext)
+        public TModelSave BindModelFromMultipartRequest<TModelSave>(ActionContext actionContext,
+            ModelBindingContext bindingContext)
             where TModelSave : IHaveUploadedFiles
         {
             var result = actionContext.ReadAsMultipart(Constants.SystemDirectories.TempFileUploads);
@@ -33,10 +33,11 @@ namespace Umbraco.Web.Editors.Binders
                 var parts = file.Headers.ContentDisposition.Name.Trim('\"').Split('_');
                 if (parts.Length < 2)
                 {
-                    var response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest);
-                    response.ReasonPhrase = "The request was not formatted correctly the file name's must be underscore delimited";
-                    throw new HttpResponseException(response);
+                    bindingContext.HttpContext.SetReasonPhrase(
+                        "The request was not formatted correctly the file name's must be underscore delimited");
+                    throw new HttpResponseException(HttpStatusCode.BadRequest);
                 }
+
                 var propAlias = parts[1];
 
                 //if there are 3 parts part 3 is always culture
@@ -87,7 +88,8 @@ namespace Umbraco.Web.Editors.Binders
         /// </summary>
         /// <param name="saveModel"></param>
         /// <param name="dto"></param>
-        public void MapPropertyValuesFromSaved(IContentProperties<ContentPropertyBasic> saveModel, ContentPropertyCollectionDto dto)
+        public void MapPropertyValuesFromSaved(IContentProperties<ContentPropertyBasic> saveModel,
+            ContentPropertyCollectionDto dto)
         {
             //NOTE: Don't convert this to linq, this is much quicker
             foreach (var p in saveModel.Properties)
@@ -100,5 +102,7 @@ namespace Umbraco.Web.Editors.Binders
                 }
             }
         }
+
+
     }
 }

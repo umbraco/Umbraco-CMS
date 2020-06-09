@@ -32,7 +32,6 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 using Umbraco.Web.ContentApps;
-using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
@@ -201,7 +200,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))]
+        //[FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))] // TODO introduce when moved to .NET Core
         public IEnumerable<MediaItemDisplay> GetByIds([FromUri]int[] ids)
         {
             var foundMedia = Services.MediaService.GetByIds(ids);
@@ -245,7 +244,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Returns the root media objects
         /// </summary>
-        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>))]
+        //[FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>))] // TODO introduce when moved to .NET Core
         public IEnumerable<ContentItemBasic<ContentPropertyBasic>> GetRootMedia()
         {
             // TODO: Add permissions check!
@@ -269,7 +268,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Returns the child media objects - using the entity INT id
         /// </summary>
-        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
+        //[FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")] // TODO introduce when moved to .NET Core
         public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(int id,
             int pageNumber = 0,
             int pageSize = 0,
@@ -346,7 +345,7 @@ namespace Umbraco.Web.Editors
         /// <param name="orderBySystemField"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
+        //[FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")] // TODO introduce when moved to .NET Core
         public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(Guid id,
            int pageNumber = 0,
            int pageSize = 0,
@@ -374,7 +373,7 @@ namespace Umbraco.Web.Editors
         /// <param name="orderBySystemField"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
+        //[FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")] // TODO introduce when moved to .NET Core
         public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(Udi id,
            int pageNumber = 0,
            int pageSize = 0,

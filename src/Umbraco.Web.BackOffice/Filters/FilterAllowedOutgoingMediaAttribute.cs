@@ -2,14 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Web.Http.Filters;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
-using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Core.Services;
+using Umbraco.Web.Security;
+
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -17,42 +19,48 @@ namespace Umbraco.Web.WebApi.Filters
     /// This inspects the result of the action that returns a collection of content and removes
     /// any item that the current user doesn't have access to
     /// </summary>
-    internal class FilterAllowedOutgoingMediaAttribute : ActionFilterAttribute
+    internal class FilterAllowedOutgoingMediaAttribute : TypeFilterAttribute
+    {
+        public FilterAllowedOutgoingMediaAttribute(Type outgoingType, string propertyName = null)
+            : base(typeof(FilterAllowedOutgoingMediaFilter))
+        {
+            Arguments = new object[]
+            {
+                outgoingType, propertyName
+            };
+        }
+    }
+    internal class FilterAllowedOutgoingMediaFilter : IActionFilter
     {
         private readonly Type _outgoingType;
+        private readonly IEntityService _entityService;
+        private readonly IWebSecurity _webSecurity;
         private readonly string _propertyName;
 
-        public FilterAllowedOutgoingMediaAttribute(Type outgoingType)
+        public FilterAllowedOutgoingMediaFilter(IEntityService entityService, IWebSecurity webSecurity, Type outgoingType, string propertyName)
         {
+            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+
+            _propertyName = propertyName;
             _outgoingType = outgoingType;
         }
 
-        public FilterAllowedOutgoingMediaAttribute(Type outgoingType, string propertyName)
-            : this(outgoingType)
-        {
-            _propertyName = propertyName;
-        }
-
-        /// <summary>
-        /// Returns true so that other filters can execute along with this one
-        /// </summary>
-        public override bool AllowMultiple => true;
-
         protected virtual int[] GetUserStartNodes(IUser user)
         {
-            return user.CalculateMediaStartNodeIds(Current.Services.EntityService);
+            return user.CalculateMediaStartNodeIds(_entityService);
         }
 
         protected virtual int RecycleBinId => Constants.System.RecycleBinMedia;
 
-        public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
+        public void OnActionExecuted(ActionExecutedContext context)
         {
-            if (actionExecutedContext.Response == null) return;
+            if (context.Result == null) return;
 
-            var user = Composing.Current.UmbracoContext.Security.CurrentUser;
+            var user = _webSecurity.CurrentUser;
             if (user == null) return;
 
-            var objectContent = actionExecutedContext.Response.Content as ObjectContent;
+            var objectContent = context.Result as ObjectResult;
             if (objectContent != null)
             {
                 var collection = GetValueFromResponse(objectContent);
@@ -67,8 +75,6 @@ namespace Umbraco.Web.WebApi.Filters
                     SetValueForResponse(objectContent, items);
                 }
             }
-
-            base.OnActionExecuted(actionExecutedContext);
         }
 
         protected virtual void FilterItems(IUser user, IList items)
@@ -94,7 +100,7 @@ namespace Umbraco.Web.WebApi.Filters
             }
         }
 
-        private void SetValueForResponse(ObjectContent objectContent, dynamic newVal)
+        private void SetValueForResponse(ObjectResult objectContent, dynamic newVal)
         {
             if (TypeHelper.IsTypeAssignableFrom(_outgoingType, objectContent.Value.GetType()))
             {
@@ -112,7 +118,7 @@ namespace Umbraco.Web.WebApi.Filters
 
         }
 
-        internal dynamic GetValueFromResponse(ObjectContent objectContent)
+        internal dynamic GetValueFromResponse(ObjectResult objectContent)
         {
             if (TypeHelper.IsTypeAssignableFrom(_outgoingType, objectContent.Value.GetType()))
             {
@@ -134,6 +140,12 @@ namespace Umbraco.Web.WebApi.Filters
             }
 
             return null;
+        }
+
+
+        public void OnActionExecuting(ActionExecutingContext context)
+        {
+
         }
     }
 }

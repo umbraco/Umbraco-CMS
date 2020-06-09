@@ -159,11 +159,7 @@ namespace Umbraco.Web.Editors
                             "userGroupsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<UserGroupsController>(
                                 controller => controller.PostSaveUserGroup(null))
                         },
-                        {
-                            "contentApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentController>(
-                                controller => controller.PostSave(null))
-                        },
-                        {
+                       {
                             "mediaApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MediaController>(
                                 controller => controller.GetRootMedia())
                         },

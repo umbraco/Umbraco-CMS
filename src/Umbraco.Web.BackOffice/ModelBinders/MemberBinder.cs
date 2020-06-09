@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web.Http.Controllers;
-using System.Web.Http.ModelBinding;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
 using System.Linq;
-using Umbraco.Web.Composing;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Umbraco.Core.Mapping;
 
 namespace Umbraco.Web.Editors.Binders
 {
@@ -19,16 +19,21 @@ namespace Umbraco.Web.Editors.Binders
     {
         private readonly ContentModelBinderHelper _modelBinderHelper;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly ServiceContext _services;
+        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IMemberService _memberService;
+        private readonly IMemberTypeService _memberTypeService;
 
-        public MemberBinder() : this(Current.Services, Current.ShortStringHelper)
+        public MemberBinder(
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            IMemberService memberService,
+            IMemberTypeService memberTypeService)
         {
-        }
 
-        public MemberBinder(ServiceContext services, IShortStringHelper shortStringHelper)
-        {
-            _services = services ?? throw new ArgumentNullException(nameof(services));
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
+            _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
+            _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
+            _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
             _modelBinderHelper = new ContentModelBinderHelper();
         }
 
@@ -38,24 +43,30 @@ namespace Umbraco.Web.Editors.Binders
         /// <param name="actionContext"></param>
         /// <param name="bindingContext"></param>
         /// <returns></returns>
-        public bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
+        public Task BindModelAsync(ModelBindingContext bindingContext)
         {
+            var actionContext = bindingContext.ActionContext;
             var model = _modelBinderHelper.BindModelFromMultipartRequest<MemberSave>(actionContext, bindingContext);
-            if (model == null) return false;
+            if (model == null)
+            {
+                bindingContext.Result = ModelBindingResult.Failed();
+                return Task.CompletedTask;
+            }
 
             model.PersistedContent = ContentControllerBase.IsCreatingAction(model.Action) ? CreateNew(model) : GetExisting(model);
 
             //create the dto from the persisted model
             if (model.PersistedContent != null)
             {
-                model.PropertyCollectionDto = Current.Mapper.Map<IMember, ContentPropertyCollectionDto>(model.PersistedContent);
+                model.PropertyCollectionDto = _umbracoMapper.Map<IMember, ContentPropertyCollectionDto>(model.PersistedContent);
                 //now map all of the saved values to the dto
                 _modelBinderHelper.MapPropertyValuesFromSaved(model, model.PropertyCollectionDto);
             }
 
             model.Name = model.Name.Trim();
 
-            return true;
+            bindingContext.Result = ModelBindingResult.Success(model);
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -70,7 +81,7 @@ namespace Umbraco.Web.Editors.Binders
 
         private IMember GetExisting(Guid key)
         {
-            var member = _services.MemberService.GetByKey(key);
+            var member = _memberService.GetByKey(key);
             if (member == null)
             {
                 throw new InvalidOperationException("Could not find member with key " + key);
@@ -89,7 +100,7 @@ namespace Umbraco.Web.Editors.Binders
         /// </remarks>
         private IMember CreateNew(MemberSave model)
         {
-            var contentType = _services.MemberTypeService.Get(model.ContentTypeAlias);
+            var contentType = _memberTypeService.Get(model.ContentTypeAlias);
             if (contentType == null)
             {
                 throw new InvalidOperationException("No member type found with alias " + model.ContentTypeAlias);
@@ -127,6 +138,7 @@ namespace Umbraco.Web.Editors.Binders
                 }
             }
         }
+
 
     }
 }

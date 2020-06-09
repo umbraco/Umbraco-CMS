@@ -2,58 +2,57 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
+using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.Composing;
+using Umbraco.Extensions;
+using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Routing;
-using Umbraco.Web.WebApi;
-using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {
     /// <summary>
     /// An abstract base controller used for media/content/members to try to reduce code replication.
     /// </summary>
-    [JsonDateTimeFormatAttribute]
+    //[JsonDateTimeFormatAttribute] //TODO Reintroduce
     public abstract class ContentControllerBase : BackOfficeNotificationsController
     {
         protected ICultureDictionary CultureDictionary { get; }
+        protected ILogger Logger { get; }
+        protected IShortStringHelper ShortStringHelper { get; }
+        protected EventMessages EventMessages { get; }
+        protected ILocalizedTextService LocalizedTextService { get; }
 
         protected ContentControllerBase(
             ICultureDictionary cultureDictionary,
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger logger,
-            IRuntimeState runtimeState,
+            ILogger logger,
             IShortStringHelper shortStringHelper,
-            UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider)
-            :base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
+            EventMessages eventMessages,
+            ILocalizedTextService localizedTextService)
         {
             CultureDictionary = cultureDictionary;
+            Logger = logger;
+            ShortStringHelper = shortStringHelper;
+            EventMessages = eventMessages;
+            LocalizedTextService = localizedTextService;
         }
 
-        protected HttpResponseMessage HandleContentNotFound(object id, bool throwException = true)
+        protected NotFoundObjectResult HandleContentNotFound(object id, bool throwException = true)
         {
             ModelState.AddModelError("id", $"content with id: {id} was not found");
-            var errorResponse = Request.CreateErrorResponse(
-                HttpStatusCode.NotFound,
-                ModelState);
+            var errorResponse = NotFound(ModelState);
             if (throwException)
             {
                 throw new HttpResponseException(errorResponse);
@@ -130,7 +129,7 @@ namespace Umbraco.Web.Editors
             if (!ModelState.IsValid)
             {
                 display.Errors = ModelState.ToErrorDictionary();
-                throw new HttpResponseException(Request.CreateValidationErrorResponse(display));
+                throw HttpResponseException.CreateValidationErrorResponse(display);
             }
         }
 
@@ -149,8 +148,8 @@ namespace Umbraco.Web.Editors
         {
             //checks if the request contains the key and the item is not null, if that is the case, return it from the request, otherwise return
             // it from the callback
-            return Request.Properties.ContainsKey(typeof(TPersisted).ToString()) && Request.Properties[typeof(TPersisted).ToString()] != null
-                ? (TPersisted) Request.Properties[typeof (TPersisted).ToString()]
+            return HttpContext.Items.ContainsKey(typeof(TPersisted).ToString()) && HttpContext.Items[typeof(TPersisted).ToString()] != null
+                ? (TPersisted) HttpContext.Items[typeof (TPersisted).ToString()]
                 : getFromService();
         }
 
@@ -173,13 +172,12 @@ namespace Umbraco.Web.Editors
             string[] messageParams = null)
         {
             //if there's already a default event message, don't add our default one
-            // TODO: inject
-            var msgs = Current.EventMessages;
+            var msgs = EventMessages;
             if (msgs != null && msgs.GetAll().Any(x => x.IsDefaultEventMessage)) return;
 
             display.AddWarningNotification(
-                localizeHeader ? Services.TextService.Localize(header, headerParams) : header,
-                localizeMessage ? Services.TextService.Localize(message, messageParams): message);
+                localizeHeader ? LocalizedTextService.Localize(header, headerParams) : header,
+                localizeMessage ? LocalizedTextService.Localize(message, messageParams): message);
         }
     }
 }

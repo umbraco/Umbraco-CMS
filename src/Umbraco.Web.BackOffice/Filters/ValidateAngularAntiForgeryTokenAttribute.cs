@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Security;
 
 namespace Umbraco.Web.BackOffice.Filters
@@ -54,14 +55,7 @@ namespace Umbraco.Web.BackOffice.Filters
             var validateResult = await ValidateHeaders(httpContext, cookieToken);
             if (validateResult.Item1 == false)
             {
-                //TODO we should update this behavior, as HTTP2 do not have ReasonPhrase. Could as well be returned in body
-                // https://github.com/aspnet/HttpAbstractions/issues/395
-                var httpResponseFeature = httpContext.Features.Get<IHttpResponseFeature>();
-                if (!(httpResponseFeature is null))
-                {
-                    httpResponseFeature.ReasonPhrase = validateResult.Item2;
-                }
-
+                httpContext.SetReasonPhrase(validateResult.Item2);
                 context.Result = new StatusCodeResult((int)HttpStatusCode.ExpectationFailed);
                 return;
             }
