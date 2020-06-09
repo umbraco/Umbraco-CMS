@@ -67,7 +67,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
 
     var prepareEntryForStorage = function(entryData, firstLevelClearupMethod) {
 
-        var cloneData = Utilities.copy(entryData);
+        var cloneData = angular.copy(entryData);
         if (firstLevelClearupMethod != undefined) {
             firstLevelClearupMethod(cloneData);
         }
