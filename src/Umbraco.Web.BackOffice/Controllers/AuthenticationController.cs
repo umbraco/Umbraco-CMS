@@ -108,9 +108,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         //[CheckIfUserTicketDataIsStale] // TODO: Migrate this, though it will need to be done differently at the cookie auth level
         public UserDetail GetCurrentUser()
         {
-            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-
-            var user = umbracoContext.Security.CurrentUser;
+            var user = _webSecurity.CurrentUser;
             var result = _umbracoMapper.Map<UserDetail>(user);
 
             //set their remaining seconds
