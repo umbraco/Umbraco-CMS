@@ -4,19 +4,21 @@ namespace Umbraco.Web.PublishedCache
 {
     public class UmbracoContextPublishedSnapshotAccessor : IPublishedSnapshotAccessor
     {
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IUmbracoContextFactory _umbracoContextFactory;
 
-        public UmbracoContextPublishedSnapshotAccessor(IUmbracoContextAccessor umbracoContextAccessor)
+        public UmbracoContextPublishedSnapshotAccessor(IUmbracoContextFactory umbracoContextFactory)
         {
-            _umbracoContextAccessor = umbracoContextAccessor;
+            _umbracoContextFactory = umbracoContextFactory;
         }
 
         public IPublishedSnapshot PublishedSnapshot
         {
             get
             {
-                var umbracoContext = _umbracoContextAccessor.UmbracoContext;
-                return umbracoContext?.PublishedSnapshot;
+                using (var context = _umbracoContextFactory.EnsureUmbracoContext())
+                {
+                    return context.UmbracoContext?.PublishedSnapshot;
+                }
             }
 
             set => throw new NotSupportedException(); // not ok to set
