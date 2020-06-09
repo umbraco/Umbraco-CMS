@@ -17,6 +17,10 @@ namespace Umbraco.Core.PropertyEditors
             {
                 case PropertyValueLevel.Source:
                     return value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false);
+                case PropertyValueLevel.Inter:
+                    return null;
+                case PropertyValueLevel.Object:
+                    return null;
                 default:
                     throw new NotSupportedException($"Invalid level: {level}.");
             }
