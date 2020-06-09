@@ -1,6 +1,9 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
+using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Trees
 {
@@ -10,17 +13,22 @@ namespace Umbraco.Web.Trees
     {
         private readonly IIOHelper _ioHelper;
         private readonly ILogger _logger;
-        private readonly IFileSystem _fileSystem;
 
-        protected override IFileSystem FileSystem => _fileSystem;
+        protected override IFileSystem FileSystem { get; }
 
         private static readonly string[] ExtensionsStatic = { "*" };
 
-        public FilesTreeController(IIOHelper ioHelper, ILogger logger)
+        public FilesTreeController(
+            ILocalizedTextService localizedTextService,
+            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+            IMenuItemCollectionFactory menuItemCollectionFactory,
+            IIOHelper ioHelper,
+            ILogger logger)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory)
         {
             _ioHelper = ioHelper;
             _logger = logger;
-            _fileSystem = new PhysicalFileSystem(_ioHelper, _logger, "~/");
+            FileSystem =  new PhysicalFileSystem(_ioHelper, _logger, "~/");
         }
 
         protected override string[] Extensions => ExtensionsStatic;

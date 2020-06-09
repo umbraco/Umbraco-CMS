@@ -9,7 +9,7 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Routing
 {
-    internal static class UrlProviderExtensions
+    public static class UrlProviderExtensions
     {
         /// <summary>
         /// Gets the Urls of the content item.

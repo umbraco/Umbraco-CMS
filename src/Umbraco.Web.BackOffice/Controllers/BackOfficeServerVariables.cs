@@ -37,7 +37,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IGlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IContentSettings _contentSettings;
-        //private readonly TreeCollection _treeCollection;
+        private readonly TreeCollection _treeCollection;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeSettings _settings;
@@ -53,7 +53,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IUmbracoVersion umbracoVersion,
             IContentSettings contentSettings,
             IHttpContextAccessor httpContextAccessor,
-            //TreeCollection treeCollection, // TODO: If we need this we need to migrate trees
+            TreeCollection treeCollection,
             IHostingEnvironment hostingEnvironment,
             IRuntimeSettings settings,
             ISecuritySettings securitySettings,
@@ -67,7 +67,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _umbracoVersion = umbracoVersion;
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _httpContextAccessor = httpContextAccessor;
-            //_treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));
+            _treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));
             _hostingEnvironment = hostingEnvironment;
             _settings = settings;
             _securitySettings = securitySettings;
@@ -272,18 +272,18 @@ namespace Umbraco.Web.BackOffice.Controllers
                             "templateApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TemplateController>(
                                 controller => controller.GetById(0))
                         },
-                        // {
-                        //     "memberTreeBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberTreeController>(
-                        //         controller => controller.GetNodes("-1", null))
-                        // },
-                        // {
-                        //     "mediaTreeBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaTreeController>(
-                        //         controller => controller.GetNodes("-1", null))
-                        // },
-                        // {
-                        //     "contentTreeBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ContentTreeController>(
-                        //         controller => controller.GetNodes("-1", null))
-                        // },
+                        {
+                            "memberTreeBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberTreeController>(
+                                controller => controller.GetNodes("-1", null))
+                        },
+                        {
+                            "mediaTreeBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaTreeController>(
+                                controller => controller.GetNodes("-1", null))
+                        },
+                        {
+                            "contentTreeBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ContentTreeController>(
+                                controller => controller.GetNodes("-1", null))
+                        },
                         {
                             "tagsDataBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TagsDataController>(
                                 controller => controller.GetTags("", "", null))
@@ -447,8 +447,6 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         private IEnumerable<PluginTree> GetPluginTrees()
         {
-            // TODO: Use the code below once we migrate trees
-            return Enumerable.Empty<PluginTree>();
 
             // used to be (cached)
             //var treeTypes = Current.TypeLoader.GetAttributedTreeControllers();
@@ -458,20 +456,20 @@ namespace Umbraco.Web.BackOffice.Controllers
             // do this instead
             // inheriting from TreeControllerBase and marked with TreeAttribute
 
-            //foreach (var tree in _treeCollection)
-            //{
-            //    var treeType = tree.TreeControllerType;
+            foreach (var tree in _treeCollection)
+            {
+                var treeType = tree.TreeControllerType;
 
-            //    // exclude anything marked with CoreTreeAttribute
-            //    var coreTree = treeType.GetCustomAttribute<CoreTreeAttribute>(false);
-            //    if (coreTree != null) continue;
+                // exclude anything marked with CoreTreeAttribute
+                var coreTree = treeType.GetCustomAttribute<CoreTreeAttribute>(false);
+                if (coreTree != null) continue;
 
-            //    // exclude anything not marked with PluginControllerAttribute
-            //    var pluginController = treeType.GetCustomAttribute<PluginControllerAttribute>(false);
-            //    if (pluginController == null) continue;
+                // exclude anything not marked with PluginControllerAttribute
+                var pluginController = treeType.GetCustomAttribute<PluginControllerAttribute>(false);
+                if (pluginController == null) continue;
 
-            //    yield return new PluginTree { Alias = tree.TreeAlias, PackageFolder = pluginController.AreaName };
-            //}
+                yield return new PluginTree { Alias = tree.TreeAlias, PackageFolder = pluginController.AreaName };
+            }
         }
 
         /// <summary>

@@ -243,18 +243,18 @@ namespace Umbraco.Web.Editors
                         //     "templateApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TemplateController>(
                         //         controller => controller.GetById(0))
                         // },
-                        {
-                            "memberTreeBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberTreeController>(
-                                controller => controller.GetNodes("-1", null))
-                        },
-                        {
-                            "mediaTreeBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MediaTreeController>(
-                                controller => controller.GetNodes("-1", null))
-                        },
-                        {
-                            "contentTreeBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentTreeController>(
-                                controller => controller.GetNodes("-1", null))
-                        },
+                        // {
+                        //     "memberTreeBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberTreeController>(
+                        //         controller => controller.GetNodes("-1", null))
+                        // },
+                        // {
+                        //     "mediaTreeBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MediaTreeController>(
+                        //         controller => controller.GetNodes("-1", null))
+                        // },
+                        // {
+                        //     "contentTreeBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentTreeController>(
+                        //         controller => controller.GetNodes("-1", null))
+                        // },
                         // {
                         //     "tagsDataBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TagsDataController>(
                         //         controller => controller.GetTags("", "", null))

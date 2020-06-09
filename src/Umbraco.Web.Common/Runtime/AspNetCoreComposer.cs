@@ -20,6 +20,8 @@ using System.Linq;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Middleware;
 using Umbraco.Web.Common.ModelBinding;
+using Umbraco.Web.Common.Routing;
+using Umbraco.Web.Common.Security;
 using Umbraco.Web.Security;
 using Umbraco.Web.Templates;
 using Umbraco.Web.Common.Templates;
@@ -71,7 +73,7 @@ namespace Umbraco.Web.Common.Runtime
 
             // register the umbraco context factory
             composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
-            composition.RegisterUnique<IWebSecurity>(factory => factory.GetInstance<IUmbracoContextAccessor>().GetRequiredUmbracoContext().Security);
+            composition.RegisterUnique<IWebSecurity, WebSecurity>();
 
             //register the install components
             //NOTE: i tried to not have these registered if we weren't installing or upgrading but post install when the site restarts

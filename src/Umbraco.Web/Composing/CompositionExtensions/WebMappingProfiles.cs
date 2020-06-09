@@ -16,15 +16,15 @@ namespace Umbraco.Web.Composing.CompositionExtensions
             composition.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
                 .Add<AuditMapDefinition>()
                 .Add<CodeFileMapDefinition>()
-                .Add<ContentMapDefinition>()
+                //.Add<ContentMapDefinition>()
                 .Add<ContentPropertyMapDefinition>()
                 .Add<ContentTypeMapDefinition>()
                 .Add<DataTypeMapDefinition>()
                 .Add<EntityMapDefinition>()
                 .Add<DictionaryMapDefinition>()
                 .Add<MacroMapDefinition>()
-                .Add<MediaMapDefinition>()
-                .Add<MemberMapDefinition>()
+                //.Add<MediaMapDefinition>()
+                //.Add<MemberMapDefinition>()
                 .Add<RedirectUrlMapDefinition>()
                 .Add<RelationMapDefinition>()
                 .Add<SectionMapDefinition>()
@@ -35,7 +35,7 @@ namespace Umbraco.Web.Composing.CompositionExtensions
                 .Add<IdentityMapDefinition>();
 
             composition.Register<CommonMapper>();
-            composition.Register<CommonTreeNodeMapper>();
+            //.Register<CommonTreeNodeMapper>();
             composition.Register<MemberTabsAndPropertiesMapper>();
 
             return composition;

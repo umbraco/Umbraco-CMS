@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Web.BackOffice.Trees;
-using Umbraco.Web.Common.Extensions;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Extensions

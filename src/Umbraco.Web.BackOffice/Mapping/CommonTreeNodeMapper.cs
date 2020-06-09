@@ -1,18 +1,24 @@
-﻿using System.Web.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Routing;
 using Umbraco.Core.Models;
+using Umbraco.Extensions;
+using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Trees;
-using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Models.Mapping
 {
     public class CommonTreeNodeMapper
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly LinkGenerator _linkGenerator;
 
 
-        public CommonTreeNodeMapper(IHttpContextAccessor httpContextAccessor)
+        public CommonTreeNodeMapper(IHttpContextAccessor httpContextAccessor, LinkGenerator linkGenerator)
         {
             _httpContextAccessor = httpContextAccessor;
+            _linkGenerator = linkGenerator;
         }
 
 
@@ -22,8 +28,8 @@ namespace Umbraco.Web.Models.Mapping
             var httpContext = _httpContextAccessor.HttpContext;
             if (httpContext == null) return null;
 
-            var urlHelper = new UrlHelper(httpContext.Request.RequestContext);
-            return urlHelper.GetUmbracoApiService<TController>(controller => controller.GetTreeNode(source.Key.ToString("N"), null));
+
+            return _linkGenerator.GetUmbracoApiService<TController>(controller => controller.GetTreeNode(source.Key.ToString("N"), null));
         }
 
     }

@@ -7,9 +7,10 @@ namespace Umbraco.Tests.Common.Builders
 {
     public class ContentTypeBuilder
         : ContentTypeBaseBuilder<ContentBuilder, IContentType>,
-            IWithPropertyTypeIdsIncrementingFrom
+            IWithPropertyTypeIdsIncrementingFrom, IBuildPropertyTypes
     {
         private List<PropertyGroupBuilder<ContentTypeBuilder>> _propertyGroupBuilders = new List<PropertyGroupBuilder<ContentTypeBuilder>>();
+        private List<PropertyTypeBuilder<ContentTypeBuilder>> _noGroupPropertyTypeBuilders = new List<PropertyTypeBuilder<ContentTypeBuilder>>();
         private List<TemplateBuilder> _templateBuilders = new List<TemplateBuilder>();
         private List<ContentTypeSortBuilder> _allowedContentTypeBuilders = new List<ContentTypeSortBuilder>();
 
@@ -34,6 +35,13 @@ namespace Umbraco.Tests.Common.Builders
         {
             var builder = new PropertyGroupBuilder<ContentTypeBuilder>(this);
             _propertyGroupBuilders.Add(builder);
+            return builder;
+        }
+
+        public PropertyTypeBuilder<ContentTypeBuilder> AddPropertyType()
+        {
+            var builder = new PropertyTypeBuilder<ContentTypeBuilder>(this);
+            _noGroupPropertyTypeBuilders.Add(builder);
             return builder;
         }
 
@@ -72,6 +80,7 @@ namespace Umbraco.Tests.Common.Builders
                 IsContainer = GetIsContainer(),
             };
 
+            contentType.NoGroupPropertyTypes =  _noGroupPropertyTypeBuilders.Select(x => x.Build());
             BuildPropertyGroups(contentType, _propertyGroupBuilders.Select(x => x.Build()));
             BuildPropertyTypeIds(contentType, _propertyTypeIdsIncrementingFrom);
 
@@ -83,6 +92,7 @@ namespace Umbraco.Tests.Common.Builders
                 contentType.SetDefaultTemplate(contentType.AllowedTemplates
                     .SingleOrDefault(x => x.Id == _defaultTemplateId.Value));
             }
+
 
             contentType.ResetDirtyProperties(false);
 

@@ -2,25 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http.Formatting;
-using System.Web.Http;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Mapping;
-using Umbraco.Web.Routing;
+using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Exceptions;
+using Umbraco.Web.Security;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Trees
 {
@@ -43,41 +42,59 @@ namespace Umbraco.Web.Trees
         private readonly ActionCollection _actions;
         private readonly IGlobalSettings _globalSettings;
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
+        private readonly IWebSecurity _webSecurity;
+        private readonly IContentService _contentService;
+        private readonly IEntityService _entityService;
+        private readonly IPublicAccessService _publicAccessService;
+        private readonly IUserService _userService;
+        private readonly ILocalizationService _localizationService;
 
-        protected override int RecycleBinId => Constants.System.RecycleBinContent;
-
-        protected override bool RecycleBinSmells => Services.ContentService.RecycleBinSmells();
-
-        private int[] _userStartNodes;
-
-        protected override int[] UserStartNodes
-            => _userStartNodes ?? (_userStartNodes = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService));
 
         public ContentTreeController(
+            ILocalizedTextService localizedTextService,
+            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+            IMenuItemCollectionFactory menuItemCollectionFactory,
+            IEntityService entityService,
+            IWebSecurity webSecurity,
+            ILogger logger,
+            ActionCollection actionCollection,
+            IUserService userService,
+            IDataTypeService dataTypeService,
             UmbracoTreeSearcher treeSearcher,
             ActionCollection actions,
             IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger logger,
-            IRuntimeState runtimeState,
-            UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider,
-            IMenuItemCollectionFactory menuItemCollectionFactory)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider, menuItemCollectionFactory)
+            IContentService contentService,
+            IPublicAccessService publicAccessService,
+            ILocalizationService localizationService)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, entityService, webSecurity, logger, actionCollection, userService, dataTypeService)
         {
             _treeSearcher = treeSearcher;
             _actions = actions;
             _globalSettings = globalSettings;
             _menuItemCollectionFactory = menuItemCollectionFactory;
+            _webSecurity = webSecurity;
+            _contentService = contentService;
+            _entityService = entityService;
+            _publicAccessService = publicAccessService;
+            _userService = userService;
+            _localizationService = localizationService;
         }
 
+        protected override int RecycleBinId => Constants.System.RecycleBinContent;
+
+        protected override bool RecycleBinSmells => _contentService.RecycleBinSmells();
+
+        private int[] _userStartNodes;
+
+        protected override int[] UserStartNodes
+            => _userStartNodes ?? (_userStartNodes = _webSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService));
+
+
+
         /// <inheritdoc />
-        protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormDataCollection queryStrings)
+        protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormCollection queryStrings)
         {
-            var culture = queryStrings?["culture"];
+            var culture = queryStrings?["culture"].ToString();
 
             var allowedUserOptions = GetAllowedUserMenuItemsForNode(entity);
             if (CanUserAccessNode(entity, allowedUserOptions, culture))
@@ -122,7 +139,7 @@ namespace Umbraco.Web.Trees
                 node.AdditionalData.Add("variesByCulture", documentEntity.Variations.VariesByCulture());
                 node.AdditionalData.Add("contentType", documentEntity.ContentTypeAlias);
 
-                if (Services.PublicAccessService.IsProtected(entity.Path))
+                if (_publicAccessService.IsProtected(entity.Path))
                     node.SetProtectedStyle();
 
                 return node;
@@ -131,7 +148,7 @@ namespace Umbraco.Web.Trees
             return null;
         }
 
-        protected override MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings)
+        protected override MenuItemCollection PerformGetMenuForNode(string id, FormCollection queryStrings)
         {
             if (id == Constants.System.RootString)
             {
@@ -140,7 +157,7 @@ namespace Umbraco.Web.Trees
                 // if the user's start node is not the root then the only menu item to display is refresh
                 if (UserStartNodes.Contains(Constants.System.Root) == false)
                 {
-                    menu.Items.Add(new RefreshNode(Services.TextService, true));
+                    menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                     return menu;
                 }
 
@@ -148,13 +165,13 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // we need to get the default permissions as you can't set permissions on the very root node
-                var permission = Services.UserService.GetPermissions(Security.CurrentUser, Constants.System.Root).First();
+                var permission = _userService.GetPermissions(_webSecurity.CurrentUser, Constants.System.Root).First();
                 var nodeActions = _actions.FromEntityPermission(permission)
                     .Select(x => new MenuItem(x));
 
                 //these two are the standard items
-                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
-                menu.Items.Add<ActionSort>(Services.TextService, true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add<ActionSort>(LocalizedTextService, true);
 
                 //filter the standard items
                 FilterUserAllowedMenuItems(menu, nodeActions);
@@ -165,7 +182,7 @@ namespace Umbraco.Web.Trees
                 }
 
                 // add default actions for *all* users
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
                 return menu;
             }
@@ -177,17 +194,17 @@ namespace Umbraco.Web.Trees
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-            var item = Services.EntityService.Get(iid, UmbracoObjectTypes.Document);
+            var item = _entityService.Get(iid, UmbracoObjectTypes.Document);
             if (item == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
             //if the user has no path access for this node, all they can do is refresh
-            if (!Security.CurrentUser.HasContentPathAccess(item, Services.EntityService))
+            if (!_webSecurity.CurrentUser.HasContentPathAccess(item, _entityService))
             {
                 var menu = _menuItemCollectionFactory.Create();
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                 return menu;
             }
 
@@ -219,19 +236,19 @@ namespace Umbraco.Web.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        protected override bool HasPathAccess(string id, FormDataCollection queryStrings)
+        protected override bool HasPathAccess(string id, FormCollection queryStrings)
         {
             var entity = GetEntityFromId(id);
             return HasPathAccess(entity, queryStrings);
         }
 
-        protected override IEnumerable<IEntitySlim> GetChildEntities(string id, FormDataCollection queryStrings)
+        protected override IEnumerable<IEntitySlim> GetChildEntities(string id, FormCollection queryStrings)
         {
             var result = base.GetChildEntities(id, queryStrings);
             var culture = queryStrings["culture"].TryConvertTo<string>();
 
             //if this is null we'll set it to the default.
-            var cultureVal = (culture.Success ? culture.Result : null) ?? Services.LocalizationService.GetDefaultLanguageIsoCode();
+            var cultureVal = (culture.Success ? culture.Result : null) ?? _localizationService.GetDefaultLanguageIsoCode();
 
             // set names according to variations
             foreach (var entity in result)
@@ -261,7 +278,7 @@ namespace Umbraco.Web.Trees
 
             if (EmailSender.CanSendRequiredEmail(_globalSettings))
             {
-	            menu.Items.Add(new MenuItem("notify", Services.TextService)
+	            menu.Items.Add(new MenuItem("notify", LocalizedTextService)
 	            {
 	                Icon = "megaphone",
 	                SeparatorBefore = true,
@@ -271,7 +288,7 @@ namespace Umbraco.Web.Trees
 
             if((item is DocumentEntitySlim documentEntity && documentEntity.IsContainer) == false)
             {
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
             }
 
             return menu;
@@ -285,11 +302,11 @@ namespace Umbraco.Web.Trees
         protected MenuItemCollection GetNodeMenuItemsForDeletedContent(IUmbracoEntity item)
         {
             var menu = _menuItemCollectionFactory.Create();
-            menu.Items.Add<ActionRestore>(Services.TextService, opensDialog: true);
-            menu.Items.Add<ActionMove>(Services.TextService, opensDialog: true);
-            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionRestore>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionMove>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
 
-            menu.Items.Add(new RefreshNode(Services.TextService, true));
+            menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
             return menu;
         }
@@ -342,7 +359,7 @@ namespace Umbraco.Web.Trees
         private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool opensDialog = false)
             where TAction : IAction
         {
-            var menuItem = menu.Items.Add<TAction>(Services.TextService, hasSeparator, opensDialog);
+            var menuItem = menu.Items.Add<TAction>(LocalizedTextService, hasSeparator, opensDialog);
         }
 
         public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)

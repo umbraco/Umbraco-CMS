@@ -57,7 +57,8 @@ namespace Umbraco.Web.Models.Trees
         #endregion
 
         #region Properties
-        internal IAction Action { get; set; }
+        [IgnoreDataMember]
+        public IAction Action { get; set; }
 
         /// <summary>
         /// A dictionary to support any additional meta data that should be rendered for the node which is
