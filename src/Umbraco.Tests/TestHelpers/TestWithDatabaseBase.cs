@@ -256,8 +256,17 @@ namespace Umbraco.Tests.TestHelpers
                 Logger);
 
             // testing=true so XmlStore will not use the file nor the database
-
-            var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
+            var umbracoContextFactory = new UmbracoContextFactory(
+                new TestUmbracoContextAccessor(),
+                Mock.Of<IPublishedSnapshotService>(),
+                new TestVariationContextAccessor(),
+                new TestDefaultCultureAccessor(),
+                TestObjects.GetUmbracoSettings(),
+                TestObjects.GetGlobalSettings(),
+                new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
+                new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
+                Mock.Of<IUserService>());
+            var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(umbracoContextFactory);
             var variationContextAccessor = new TestVariationContextAccessor();
             var service = new XmlPublishedSnapshotService(
                 ServiceContext,
