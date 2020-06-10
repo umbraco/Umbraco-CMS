@@ -136,9 +136,7 @@
     var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
         
         // Filter to items with values
-        var filtered = $scope.model.value.filter(el => el.value.trim() !== "");
-
-        $scope.model.value = filtered;
+        $scope.model.value = $scope.model.value.filter(el => el.value.trim() !== "") || [];
     });
 
     // When the scope is destroyed we need to unsubscribe
