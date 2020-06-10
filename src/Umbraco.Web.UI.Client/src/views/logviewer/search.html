@@ -24,11 +24,11 @@
 
                         <!-- Log Level filter -->
                         <div class="flex log-viewer-filter" style="position: relative;">
-                            <button 
-                                type="button" 
-                                class="btn-link dropdown-toggle flex mb2 filter-toggle" 
+                            <button
+                                type="button"
+                                class="btn-link dropdown-toggle flex mb2 filter-toggle"
                                 ng-click="vm.page.showLevelFilter = !vm.page.showLevelFilter"
-                                aria-haspopup="true" 
+                                aria-haspopup="true"
                                 aria-expanded="{{vm.page.showLevelFilter === undefined ? false : vm.page.showLevelFilter}}"
                                 >
                                 <span>
@@ -55,10 +55,10 @@
                                 <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" placeholder="Search logs..." />
 
                                 <!-- Save Search & Clear Search icon buttons -->
-                                <button class="btn-reset icon-rate" ng-show="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()" aria-describedby="saveSearch"><p class="sr-only" id="saveSearch">Save Search</p>&nbsp;</button>
-                                <button class="btn-reset icon-wrong" ng-show="vm.logOptions.filterExpression" ng-click="vm.resetSearch()" aria-describedby="resetSearch"><p class="sr-only" id="resetSearch">Reset Search</p>&nbsp;</button>
+                                <button type="button" class="btn-reset icon-rate" ng-show="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()" aria-describedby="saveSearch"><p class="sr-only" id="saveSearch">Save Search</p>&nbsp;</button>
+                                <button type="button" class="btn-reset icon-wrong" ng-show="vm.logOptions.filterExpression" ng-click="vm.resetSearch()" aria-describedby="resetSearch"><p class="sr-only" id="resetSearch">Reset Search</p>&nbsp;</button>
                                 <!-- Saved Searches -->
-                                <button class="umb-variant-switcher__toggle ng-scope" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen">
+                                <button type="button" class="umb-variant-switcher__toggle ng-scope" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen">
                                     <span class="ng-binding">
                                         <localize key="logViewer_savedSearches">Saved Searches</localize>
                                     </span>
@@ -89,7 +89,7 @@
                 </umb-editor-sub-header>
             </form>
 
-            <div ng-if="!vm.loading" class="log-items">               
+            <div ng-if="!vm.loading" class="log-items">
 
                     <!-- Loader for the main logs content when paging -->
                     <umb-load-indicator ng-if="vm.logsLoading"></umb-load-indicator>
@@ -151,10 +151,10 @@
                                                 <tr ng-repeat="(key, val) in log.Properties">
                                                     <th scope="row">{{key}}</th>
                                                     <td ng-switch on="key">
-                                                        <button class="btn-reset" ng-switch-when="HttpRequestNumber" ng-click="vm.findItem(key, val.Value)" localize="title" title="@logViewer_findLogsWithRequestId" aria-describedby="{{key}}">{{val.Value}} <i class="icon-search" aria-hidden="true"></i><p class="sr-only" id="{{key}}"><localize key="logViewer_findLogsWithRequestId"></localize>&nbsp;{{val.Value}}</p> </button>
-                                                        <button class="btn-reset" ng-switch-when="SourceContext" ng-click="vm.findItem(key, val.Value)" localize="title" title="@logViewer_findLogsWithNamespace" aria-describedby="{{key}}">{{val.Value}} <i class="icon-search" aria-hidden="true"></i><p class="sr-only" id="{{key}}"><localize key="logViewer_findLogsWithNamespace"></localize>&nbsp;{{val.Value}}</p></button>
-                                                        <button class="btn-reset" ng-switch-when="MachineName" ng-click="vm.findItem(key, val.Value)" localize="title" title="@logViewer_findLogsWithMachineName" aria-describedby="{{key}}">{{val.Value}} <i class="icon-search" aria-hidden="true"></i><p class="sr-only" id="{{key}}"><localize key="logViewer_findLogsWithMachineName"></localize>&nbsp;{{val.Value}}</p></button>
-                                                        <button class="btn-reset" ng-switch-when="RequestUrl" href="{{val.Value}}" target="_blank" rel="noopener" localize="title" title="@logViewer_Open" aria-describedby="{{key}}">{{val.Value}} <i class="icon-link" aria-hidden="true"></i><p class="sr-only" id="{{key}}"><localize key="logViewer_Open"></localize>&nbsp;{{val.Value}}</p></button>
+                                                        <button type="button" class="btn-reset" ng-switch-when="HttpRequestNumber" ng-click="vm.findItem(key, val.Value)" localize="title" title="@logViewer_findLogsWithRequestId" aria-describedby="{{key}}">{{val.Value}} <i class="icon-search" aria-hidden="true"></i><p class="sr-only" id="{{key}}"><localize key="logViewer_findLogsWithRequestId"></localize>&nbsp;{{val.Value}}</p> </button>
+                                                        <button type="button" class="btn-reset" ng-switch-when="SourceContext" ng-click="vm.findItem(key, val.Value)" localize="title" title="@logViewer_findLogsWithNamespace" aria-describedby="{{key}}">{{val.Value}} <i class="icon-search" aria-hidden="true"></i><p class="sr-only" id="{{key}}"><localize key="logViewer_findLogsWithNamespace"></localize>&nbsp;{{val.Value}}</p></button>
+                                                        <button type="button" class="btn-reset" ng-switch-when="MachineName" ng-click="vm.findItem(key, val.Value)" localize="title" title="@logViewer_findLogsWithMachineName" aria-describedby="{{key}}">{{val.Value}} <i class="icon-search" aria-hidden="true"></i><p class="sr-only" id="{{key}}"><localize key="logViewer_findLogsWithMachineName"></localize>&nbsp;{{val.Value}}</p></button>
+                                                        <a ng-switch-when="RequestUrl" href="{{val.Value}}" target="_blank" rel="noopener" localize="title" title="@logViewer_Open">{{val.Value}} <i class="icon-link" aria-hidden="true"></i></a>
                                                         <span ng-switch-default>{{val.Value}}</span>
                                                     </td>
                                                 </tr>
@@ -230,7 +230,7 @@
 
                         </umb-box-content>
                     </umb-box>
-                
+
             </div>
 
         </umb-editor-container>
