@@ -14,28 +14,13 @@ namespace Umbraco.Web.Composing.CompositionExtensions
             // definitions to be moved to core
 
             composition.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
-                .Add<AuditMapDefinition>()
-                .Add<CodeFileMapDefinition>()
-                //.Add<ContentMapDefinition>()
-                .Add<ContentPropertyMapDefinition>()
-                .Add<ContentTypeMapDefinition>()
-                .Add<DataTypeMapDefinition>()
-                .Add<EntityMapDefinition>()
-                .Add<DictionaryMapDefinition>()
-                .Add<MacroMapDefinition>()
-                //.Add<MediaMapDefinition>()
-                //.Add<MemberMapDefinition>()
-                .Add<RedirectUrlMapDefinition>()
-                .Add<RelationMapDefinition>()
-                .Add<SectionMapDefinition>()
-                .Add<TagMapDefinition>()
-                .Add<TemplateMapDefinition>()
-                .Add<UserMapDefinition>()
-                .Add<LanguageMapDefinition>()
-                .Add<IdentityMapDefinition>();
+                .Add<ContentMapDefinition>()
+                .Add<MediaMapDefinition>()
+                .Add<MemberMapDefinition>()
+                ;
 
             composition.Register<CommonMapper>();
-            //.Register<CommonTreeNodeMapper>();
+            composition.Register<CommonTreeNodeMapper>();
             composition.Register<MemberTabsAndPropertiesMapper>();
 
             return composition;

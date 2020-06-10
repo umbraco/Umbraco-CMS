@@ -367,7 +367,7 @@ namespace Umbraco.Tests.Testing
 
             Composition
                 .ComposeCoreMappingProfiles()
-                //.ComposeWebMappingProfiles()
+                .ComposeWebMappingProfiles()
                 ;
         }
 
