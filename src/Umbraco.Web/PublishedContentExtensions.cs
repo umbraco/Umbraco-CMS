@@ -304,6 +304,7 @@ namespace Umbraco.Web
             return new HtmlString(HttpUtility.HtmlEncode(content.IsEqual(other) ? valueIfTrue : valueIfFalse));
         }
 
+        [Obsolete("Use the negated value of IsEqual() instead.")]
         public static bool IsNotEqual(this IPublishedContent content, IPublishedContent other)
         {
             return content.IsEqual(other) == false;
