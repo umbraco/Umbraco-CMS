@@ -174,7 +174,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Returns the ICultureDictionary for access to dictionary items
         /// </summary>
-        public ICultureDictionary CultureDictionary => _cultureDictionary ??= _cultureDictionaryFactory.CreateDictionary();
+        public ICultureDictionary CultureDictionary => _cultureDictionary = _cultureDictionary ?? _cultureDictionaryFactory.CreateDictionary();
 
         #endregion
 

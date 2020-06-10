@@ -68,7 +68,7 @@ namespace Umbraco.Web.AspNet
             {
                 _applicationUrls.Add(url);
 
-                _currentApplicationUrl ??= new Uri(url);
+                _currentApplicationUrl = _currentApplicationUrl ?? new Uri(url);
             }
 
             return _currentApplicationUrl;
