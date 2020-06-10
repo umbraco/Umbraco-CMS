@@ -18,7 +18,7 @@ namespace Umbraco.Core.PropertyEditors
                 case PropertyValueLevel.Source:
                     // the default implementation uses the old magic null & string comparisons,
                     // other implementations may be more clever, and/or test the final converted object values
-                    return value != null && (!(value is string) || string.IsNullOrWhiteSpace((string)value) == false);
+                    return value != null && (!(value is string stringValue) || !string.IsNullOrWhiteSpace(stringValue));
                 case PropertyValueLevel.Inter:
                     return null;
                 case PropertyValueLevel.Object:
@@ -32,7 +32,7 @@ namespace Umbraco.Core.PropertyEditors
         public virtual bool HasValue(IPublishedProperty property, string culture, string segment)
         {
             var value = property.GetSourceValue(culture, segment);
-            return value != null && (!(value is string) || string.IsNullOrWhiteSpace((string)value) == false);
+            return value != null && (!(value is string stringValue) || !string.IsNullOrWhiteSpace(stringValue));
         }
 
         public virtual Type GetPropertyValueType(IPublishedPropertyType propertyType)
