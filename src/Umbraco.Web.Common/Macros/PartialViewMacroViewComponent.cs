@@ -40,32 +40,6 @@ namespace Umbraco.Web.Macros
 
             return result;
         }
-
-        private class MacroViewEngine : ICompositeViewEngine
-        {
-            private readonly ICompositeViewEngine _compositeViewEngine;
-            private readonly IWebHostEnvironment _webHostEnvironment;
-
-            public MacroViewEngine(ICompositeViewEngine compositeViewEngine, IWebHostEnvironment webHostEnvironment)
-            {
-                _compositeViewEngine = compositeViewEngine;
-                _webHostEnvironment = webHostEnvironment;
-            }
-
-            public ViewEngineResult FindView(ActionContext context, string viewName, bool isMainPage)
-            {
-                var result = _compositeViewEngine.FindView(context, viewName, isMainPage);
-                return result;
-            }
-
-            public ViewEngineResult GetView(string executingFilePath, string viewPath, bool isMainPage)
-            {
-                var result = _compositeViewEngine.GetView(executingFilePath, viewPath, isMainPage);
-                return result;
-            }
-
-            public IReadOnlyList<IViewEngine> ViewEngines => _compositeViewEngine.ViewEngines;
-        }
     }
 
 
