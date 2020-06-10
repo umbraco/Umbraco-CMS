@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Scoping
 
             _testObjects = new TestObjects(register);
 
-            composition.RegisterUnique(factory => new FileSystems(factory, factory.TryGetInstance<ILogger>(), TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings()));
+            composition.RegisterUnique(factory => new FileSystems(factory, factory.TryGetInstance<ILogger>(), TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings(), TestHelper.GetHostingEnvironment()));
             composition.WithCollectionBuilder<MapperCollectionBuilder>();
 
             composition.Configs.Add(() => SettingsForTests.DefaultGlobalSettings);

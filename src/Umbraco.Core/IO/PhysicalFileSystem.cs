@@ -5,6 +5,7 @@ using System.Linq;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Composing;
 using System.Threading;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
@@ -12,6 +13,7 @@ namespace Umbraco.Core.IO
     public class PhysicalFileSystem : IFileSystem
     {
         private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILogger _logger;
 
         // the rooted, filesystem path, using directory separator chars, NOT ending with a separator
@@ -29,16 +31,17 @@ namespace Umbraco.Core.IO
 
         // virtualRoot should be "~/path/to/root" eg "~/Views"
         // the "~/" is mandatory.
-        public PhysicalFileSystem(IIOHelper ioHelper, ILogger logger, string virtualRoot)
+        public PhysicalFileSystem(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger logger, string virtualRoot)
         {
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             if (virtualRoot == null) throw new ArgumentNullException("virtualRoot");
             if (virtualRoot.StartsWith("~/") == false)
                 throw new ArgumentException("The virtualRoot argument must be a virtual path and start with '~/'");
 
-            _rootPath = EnsureDirectorySeparatorChar(_ioHelper.MapPath(virtualRoot)).TrimEnd(Path.DirectorySeparatorChar);
+            _rootPath = EnsureDirectorySeparatorChar(_hostingEnvironment.MapPathContentRoot(virtualRoot)).TrimEnd(Path.DirectorySeparatorChar);
             _rootPathFwd = EnsureUrlSeparatorChar(_rootPath);
             _rootUrl = EnsureUrlSeparatorChar(_ioHelper.ResolveUrl(virtualRoot)).TrimEnd('/');
         }

@@ -3,10 +3,10 @@ using System.Text;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
@@ -27,6 +27,7 @@ namespace Umbraco.Web.Common.AspNetCore
         private IGlobalSettings GlobalSettings => Context.RequestServices.GetRequiredService<IGlobalSettings>();
         private IContentSettings ContentSettings => Context.RequestServices.GetRequiredService<IContentSettings>();
         private IProfilerHtml ProfilerHtml => Context.RequestServices.GetRequiredService<IProfilerHtml>();
+        private IIOHelper IOHelper => Context.RequestServices.GetRequiredService<IIOHelper>();
 
         protected IUmbracoContext UmbracoContext => _umbracoContext ??= UmbracoContextAccessor.UmbracoContext;
 
@@ -62,7 +63,7 @@ namespace Umbraco.Web.Common.AspNetCore
                             // creating previewBadge markup
                             markupToInject =
                                 string.Format(ContentSettings.PreviewBadge,
-                                    Current.IOHelper.ResolveUrl(GlobalSettings.UmbracoPath),
+                                    IOHelper.ResolveUrl(GlobalSettings.UmbracoPath),
                                     Context.Request.GetEncodedUrl(),
                                     UmbracoContext.PublishedRequest.PublishedContent.Id);
                         }

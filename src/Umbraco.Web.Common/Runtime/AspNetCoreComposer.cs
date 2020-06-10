@@ -22,9 +22,9 @@ using Umbraco.Web.Common.Middleware;
 using Umbraco.Web.Common.ModelBinding;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Common.Security;
+using Umbraco.Web.Common.Templates;
 using Umbraco.Web.Security;
 using Umbraco.Web.Templates;
-using Umbraco.Web.Common.Templates;
 
 namespace Umbraco.Web.Common.Runtime
 {
