@@ -18,21 +18,28 @@ namespace Umbraco.Tests.PropertyEditors
     [TestFixture]
     public class BlockListPropertyValueConverterTests
     {
+        private readonly Guid Key1 = Guid.NewGuid();
+        private readonly Guid Key2 = Guid.NewGuid();
+        private readonly string Alias1 = "Test1";
+        private readonly string Alias2 = "Test2";
+
         /// <summary>
         /// Setup mocks for IPublishedSnapshotAccessor
         /// </summary>
         /// <returns></returns>
         private IPublishedSnapshotAccessor GetPublishedSnapshotAccessor()
         {
-            var test1ContentType = Mock.Of<IPublishedContentType>(x =>
+            var test1ContentType = Mock.Of<IPublishedContentType2>(x =>
                 x.IsElement == true
-                && x.Alias == "Test1");
-            var test2ContentType = Mock.Of<IPublishedContentType>(x =>
+                && x.Key == Key1
+                && x.Alias == Alias1);
+            var test2ContentType = Mock.Of<IPublishedContentType2>(x =>
                 x.IsElement == true
-                && x.Alias == "Test2");
-            var contentCache = new Mock<IPublishedContentCache>();
-            contentCache.Setup(x => x.GetContentType("Test1")).Returns(test1ContentType);
-            contentCache.Setup(x => x.GetContentType("Test2")).Returns(test2ContentType);
+                && x.Key == Key2
+                && x.Alias == Alias2);
+            var contentCache = new Mock<IPublishedContentCache2>();
+            contentCache.Setup(x => x.GetContentType(Key1)).Returns(test1ContentType);
+            contentCache.Setup(x => x.GetContentType(Key2)).Returns(test2ContentType);
             var publishedSnapshot = Mock.Of<IPublishedSnapshot>(x => x.Content == contentCache.Object);
             var publishedSnapshotAccessor = Mock.Of<IPublishedSnapshotAccessor>(x => x.PublishedSnapshot == publishedSnapshot);
             return publishedSnapshotAccessor;
@@ -44,7 +51,6 @@ namespace Umbraco.Tests.PropertyEditors
             var publishedModelFactory = new NoopPublishedModelFactory();
             var editor = new BlockListPropertyValueConverter(
                 Mock.Of<IProfilingLogger>(),
-                publishedModelFactory,
                 new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory));
             return editor;
         }
@@ -54,11 +60,11 @@ namespace Umbraco.Tests.PropertyEditors
             Blocks = new[] {
                     new BlockListConfiguration.BlockConfiguration
                     {
-                        Alias = "Test1"
+                        Key = Key1
                     },
                     new BlockListConfiguration.BlockConfiguration
                     {
-                        Alias = "Test2"
+                        Key = Key2
                     }
                 }
         };
@@ -68,7 +74,7 @@ namespace Umbraco.Tests.PropertyEditors
             Blocks = new[] {
                     new BlockListConfiguration.BlockConfiguration
                     {
-                        Alias = "Test1"
+                        Key = Key1
                     }
                 }
         };
@@ -101,7 +107,8 @@ namespace Umbraco.Tests.PropertyEditors
 
             var valueType = editor.GetPropertyValueType(propType);
 
-            Assert.AreEqual(typeof(IEnumerable<IPublishedElement>), valueType);
+            // the result is always block list model
+            Assert.AreEqual(typeof(BlockListModel), valueType);
         }
 
         [Test]
@@ -115,10 +122,8 @@ namespace Umbraco.Tests.PropertyEditors
 
             var valueType = editor.GetPropertyValueType(propType);
 
-            var modelType = typeof(IEnumerable<>).MakeGenericType(ModelType.For(config.Blocks[0].Alias));
-
-            // we can't compare the exact match of types because ModelType.For generates a new/different type even if the same alias is used
-            Assert.AreEqual(modelType.FullName, valueType.FullName);
+            // the result is always block list model
+            Assert.AreEqual(typeof(BlockListModel), valueType);
         }
 
         [Test]
@@ -225,7 +230,7 @@ data: []}";
     },
         data: [
         {
-            'contentTypeAlias': 'home',
+            'contentTypeKey': '" + Key1 + @"',
             'key': '1304E1DD-0000-4396-84FE-8A399231CB3D'
         }
     ]
@@ -258,7 +263,7 @@ data: []}";
     },
         data: [
         {
-            'contentTypeAlias': 'Test1',
+            'contentTypeKey': '" + Key1 + @"',
             'udi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D'
         }
     ]
@@ -300,15 +305,15 @@ data: []}";
     },
         data: [
         {
-            'contentTypeAlias': 'Test1',
+            'contentTypeKey': '" + Key1 + @"',
             'udi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D'
         },
         {
-            'contentTypeAlias': 'Test2',
+            'contentTypeKey': '" + Key2 + @"',
             'udi': 'umb://element/E05A034704424AB3A520E048E6197E79'
         },
         {
-            'contentTypeAlias': 'Test2',
+            'contentTypeKey': '" + Key2 + @"',
             'udi': 'umb://element/0A4A416E547D464FABCC6F345C17809A'
         }
     ]

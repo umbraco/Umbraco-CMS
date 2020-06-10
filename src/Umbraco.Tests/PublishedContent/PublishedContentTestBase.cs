@@ -13,6 +13,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.Templates;
 using Umbraco.Web.Models;
+using System;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -56,7 +57,7 @@ namespace Umbraco.Tests.PublishedContent
                 yield return publishedContentTypeFactory.CreatePropertyType(contentType, "content", 1);
             }
 
-            var type = new AutoPublishedContentType(0, "anything", CreatePropertyTypes);
+            var type = new AutoPublishedContentType(Guid.NewGuid(), 0, "anything", CreatePropertyTypes);
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
 
             var umbracoContext = GetUmbracoContext("/test");

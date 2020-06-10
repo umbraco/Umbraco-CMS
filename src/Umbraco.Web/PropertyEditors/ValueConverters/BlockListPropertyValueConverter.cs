@@ -17,13 +17,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     public class BlockListPropertyValueConverter : PropertyValueConverterBase
     {
         private readonly IProfilingLogger _proflog;
-        private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly BlockEditorConverter _blockConverter;
 
-        public BlockListPropertyValueConverter(IProfilingLogger proflog, IPublishedModelFactory publishedModelFactory, BlockEditorConverter blockConverter)
+        public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter)
         {
             _proflog = proflog;
-            _publishedModelFactory = publishedModelFactory;
             _blockConverter = blockConverter;
         }
 
@@ -54,11 +52,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 var configuration = propertyType.DataType.ConfigurationAs<BlockListConfiguration>();
                 var contentTypes = configuration.Blocks;
                 var contentTypeMap = contentTypes.ToDictionary(x => x.Key);
-                var elements = (contentTypes.Length == 1
-                    // TODO: make this work with key
-                    ? (IList<IPublishedElement>)_publishedModelFactory.CreateModelList(contentTypes[0].Key)
-                    : new List<IPublishedElement>())
-                    .ToDictionary(x => x.Key, x => x);
+
+                var elements = new Dictionary<Guid, IPublishedElement>();
 
                 var layout = new List<BlockListLayoutReference>();
                 var model = new BlockListModel(elements.Values, layout);
@@ -102,8 +97,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     if (!elements.TryGetValue(guidUdi.Guid, out var data))
                         continue;
 
-                    // Make this work with Key, not alias, since contentTypeMap is now  a dctionary with contentTypeKey as the dictionary key.
-                    if (!contentTypeMap.TryGetValue(data.ContentType.Key, out var blockConfig))
+                    if (!data.ContentType.TryGetKey(out var contentTypeKey))
+                        throw new InvalidOperationException("The content type was not of type " + typeof(IPublishedContentType2));
+
+                    if (!contentTypeMap.TryGetValue(contentTypeKey, out var blockConfig))
                         continue;
 
                     // this can happen if they have a settings type, save content, remove the settings type, and display the front-end page before saving the content again

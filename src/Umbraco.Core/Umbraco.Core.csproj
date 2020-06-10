@@ -139,6 +139,7 @@
     <Compile Include="Models\ContentDataIntegrityReportEntry.cs" />
     <Compile Include="Models\ContentDataIntegrityReportOptions.cs" />
     <Compile Include="Models\InstallLog.cs" />
+    <Compile Include="Models\PublishedContent\PublishedContentTypeExtensions.cs" />
     <Compile Include="Models\RelationTypeExtensions.cs" />
     <Compile Include="Persistence\Repositories\IInstallationRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\InstallationRepository.cs" />

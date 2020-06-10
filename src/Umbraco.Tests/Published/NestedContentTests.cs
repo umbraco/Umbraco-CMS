@@ -144,9 +144,9 @@ namespace Umbraco.Tests.Published
                 yield return factory.CreatePropertyType(contentType, "propertyN1", 3);
             }
 
-            var contentType1 = factory.CreateContentType(1, "content1", CreatePropertyTypes1);
-            var contentType2 = factory.CreateContentType(2, "content2", CreatePropertyTypes2);
-            var contentTypeN1 = factory.CreateContentType(2, "contentN1", CreatePropertyTypesN1, isElement: true);
+            var contentType1 = factory.CreateContentType(Guid.NewGuid(), 1, "content1", CreatePropertyTypes1);
+            var contentType2 = factory.CreateContentType(Guid.NewGuid(), 2, "content2", CreatePropertyTypes2);
+            var contentTypeN1 = factory.CreateContentType(Guid.NewGuid(), 2, "contentN1", CreatePropertyTypesN1, isElement: true);
 
             // mocked content cache returns content types
             contentCache

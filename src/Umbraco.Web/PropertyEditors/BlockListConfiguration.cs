@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -39,7 +40,7 @@ namespace Umbraco.Web.PropertyEditors
             public string Thumbnail { get; set; }
 
             [JsonProperty("contentTypeKey")]
-            public string Key { get; set; }
+            public Guid Key { get; set; }
 
             [JsonProperty("settingsElementTypeKey")]
             public string SettingsElementTypeKey { get; set; }
