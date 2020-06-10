@@ -52,11 +52,11 @@ namespace Umbraco.Web
             _defaultCultureAccessor = defaultCultureAccessor ?? throw new ArgumentNullException(nameof(defaultCultureAccessor));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-            _hostingEnvironment = hostingEnvironment;
-            _uriUtility = uriUtility;
-            _httpContextAccessor = httpContextAccessor;
-            _cookieManager = cookieManager;
-            _requestAccessor = requestAccessor;
+            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+            _uriUtility = uriUtility ?? throw new ArgumentNullException(nameof(uriUtility));
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            _cookieManager = cookieManager ?? throw new ArgumentNullException(nameof(cookieManager));
+            _requestAccessor = requestAccessor ?? throw new ArgumentNullException(nameof(requestAccessor));
         }
 
         private IUmbracoContext CreateUmbracoContext()

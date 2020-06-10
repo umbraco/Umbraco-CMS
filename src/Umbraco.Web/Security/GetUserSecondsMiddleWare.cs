@@ -110,8 +110,9 @@ namespace Umbraco.Web.Security
                                 }
                             }
 
-                            //We also need to re-validate the user's session if we are relying on this ping to keep their session alive
-                            await SessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context, _authOptions.CookieManager, _authOptions.SystemClock, issuedUtc, ticket.Identity, _globalSettings);
+                            // NOTE: SessionIdValidator has been moved to netcore
+                            ////We also need to re-validate the user's session if we are relying on this ping to keep their session alive
+                            //await SessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context, _authOptions.CookieManager, _authOptions.SystemClock, issuedUtc, ticket.Identity, _globalSettings);
                         }
                         else if (remainingSeconds <= 30)
                         {

@@ -8,6 +8,9 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
         $.ajaxSetup({
             beforeSend: function (xhr) {
                 xhr.setRequestHeader("X-UMB-XSRF-TOKEN", $cookies["UMB-XSRF-TOKEN"]);
+                // This is a standard header that should be sent for all ajax requests and is required for 
+                // how the server handles auth rejections, etc... see https://github.com/dotnet/aspnetcore/blob/a2568cbe1e8dd92d8a7976469100e564362f778e/src/Security/Authentication/Cookies/src/CookieAuthenticationEvents.cs#L106-L107
+                xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
                 var queryStrings = urlHelper.getQueryStringParams();
                 if (queryStrings.umbDebug === "true" || queryStrings.umbdebug === "true") {
                     xhr.setRequestHeader("X-UMB-DEBUG", "true");

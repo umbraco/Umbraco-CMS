@@ -12,12 +12,6 @@ namespace Umbraco.Web.Security
         /// <value>The current user.</value>
         IUser CurrentUser { get; }
 
-        [Obsolete("This needs to be removed, ASP.NET Identity should always be used for this operation, this is currently only used in the installer which needs to be updated")]
-        double PerformLogin(int userId);
-
-        [Obsolete("This needs to be removed, ASP.NET Identity should always be used for this operation, this is currently only used in the installer which needs to be updated")]
-        void ClearCurrentLogin();
-
         /// <summary>
         /// Gets the current user's id.
         /// </summary>

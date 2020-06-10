@@ -11,11 +11,11 @@ namespace Umbraco.Web.BackOffice.Security
     /// <summary>
     /// Used to configure <see cref="BackOfficeIdentityOptions"/> for the Umbraco Back office
     /// </summary>
-    public class ConfigureUmbracoBackOfficeIdentityOptions : IConfigureOptions<BackOfficeIdentityOptions>
+    public class ConfigureBackOfficeIdentityOptions : IConfigureOptions<BackOfficeIdentityOptions>
     {
         private readonly IUserPasswordConfiguration _userPasswordConfiguration;
 
-        public ConfigureUmbracoBackOfficeIdentityOptions(IUserPasswordConfiguration userPasswordConfiguration)
+        public ConfigureBackOfficeIdentityOptions(IUserPasswordConfiguration userPasswordConfiguration)
         {
             _userPasswordConfiguration = userPasswordConfiguration;
         }
@@ -26,7 +26,7 @@ namespace Umbraco.Web.BackOffice.Security
             options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
             options.ClaimsIdentity.UserNameClaimType = ClaimTypes.Name;
             options.ClaimsIdentity.RoleClaimType = ClaimTypes.Role;
-            options.ClaimsIdentity.SecurityStampClaimType = Constants.Web.SecurityStampClaimType;
+            options.ClaimsIdentity.SecurityStampClaimType = Constants.Security.SecurityStampClaimType;
             options.Lockout.AllowedForNewUsers = true;
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(30);
 

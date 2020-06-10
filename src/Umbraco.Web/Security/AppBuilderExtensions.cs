@@ -147,19 +147,6 @@ namespace Umbraco.Web.Security
             //Create the default options and provider
             var authOptions = app.CreateUmbracoCookieAuthOptions(umbracoContextAccessor, globalSettings, runtimeState, securitySettings, hostingEnvironment, requestCache);
 
-            authOptions.Provider = new BackOfficeCookieAuthenticationProvider(userService, runtimeState, globalSettings, hostingEnvironment, securitySettings)
-            {
-                // Enables the application to validate the security stamp when the user
-                // logs in. This is a security feature which is used when you
-                // change a password or add an external login to your account.
-                OnValidateIdentity = UmbracoSecurityStampValidator
-                    .OnValidateIdentity<BackOfficeSignInManager, BackOfficeOwinUserManager, BackOfficeIdentityUser>(
-                        TimeSpan.FromMinutes(30),
-                        (signInManager, manager, user) => signInManager.CreateUserIdentityAsync(user),
-                        identity => identity.GetUserId()),
-
-            };
-
             return app.UseUmbracoBackOfficeCookieAuthentication(umbracoContextAccessor, runtimeState, globalSettings, securitySettings, hostingEnvironment, requestCache, authOptions, stage);
         }
 

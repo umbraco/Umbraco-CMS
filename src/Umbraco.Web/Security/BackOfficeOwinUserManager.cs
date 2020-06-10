@@ -93,7 +93,7 @@ namespace Umbraco.Web.Security
             options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
             options.ClaimsIdentity.UserNameClaimType = ClaimTypes.Name;
             options.ClaimsIdentity.RoleClaimType = ClaimTypes.Role;
-            options.ClaimsIdentity.SecurityStampClaimType = Constants.Web.SecurityStampClaimType;
+            options.ClaimsIdentity.SecurityStampClaimType = Constants.Security.SecurityStampClaimType;
 
             options.Lockout.AllowedForNewUsers = true;
             options.Lockout.MaxFailedAccessAttempts = passwordConfiguration.MaxFailedAccessAttemptsBeforeLockout;

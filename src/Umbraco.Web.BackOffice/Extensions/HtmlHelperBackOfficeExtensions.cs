@@ -13,7 +13,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.WebAssets;
 using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.BackOffice.Security;
+using Umbraco.Web.Common.Security;
 using Umbraco.Web.Features;
 using Umbraco.Web.Models;
 using Umbraco.Web.WebApi;
