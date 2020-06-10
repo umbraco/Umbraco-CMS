@@ -15,7 +15,7 @@ using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Trees;
+using Umbraco.Web.Security;
 using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
 
@@ -28,7 +28,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly UmbracoFeatures _features;
         private readonly IGlobalSettings _globalSettings;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IWebSecurity _webSecurity;
         private readonly ILocalizationService _localizationService;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IContentSettings _contentSettings;
@@ -44,7 +44,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             UmbracoFeatures features,
             IGlobalSettings globalSettings,
             IPublishedSnapshotService publishedSnapshotService,
-            IUmbracoContextAccessor umbracoContextAccessor,
+            IWebSecurity webSecurity,
             ILocalizationService localizationService,
             IUmbracoVersion umbracoVersion,
             IContentSettings contentSettings,
@@ -59,7 +59,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _features = features;
             _globalSettings = globalSettings;
             _publishedSnapshotService = publishedSnapshotService;
-            _umbracoContextAccessor = umbracoContextAccessor;
+            _webSecurity = webSecurity;
             _localizationService = localizationService;
             _umbracoVersion = umbracoVersion;
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
@@ -112,7 +112,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [UmbracoAuthorize]
         public ActionResult Frame(int id, string culture)
         {
-            var user = _umbracoContextAccessor.UmbracoContext.Security.CurrentUser;
+            var user = _webSecurity.CurrentUser;
 
             var previewToken = _publishedSnapshotService.EnterPreview(user, id);
 

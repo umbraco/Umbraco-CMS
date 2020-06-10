@@ -11,6 +11,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Editors.Filters
 {
@@ -25,12 +26,12 @@ namespace Umbraco.Web.Editors.Filters
 
         public MemberSaveModelValidator(
             ILogger logger,
-            IUmbracoContextAccessor umbracoContextAccessor,
+            IWebSecurity webSecurity,
             ILocalizedTextService textService,
             IMemberTypeService memberTypeService,
             IMemberService memberService,
             IShortStringHelper shortStringHelper)
-            : base(logger, umbracoContextAccessor, textService)
+            : base(logger, webSecurity, textService)
         {
             _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
@@ -101,7 +102,7 @@ namespace Umbraco.Web.Editors.Filters
 
             //if the user doesn't have access to sensitive values, then we need to validate the incoming properties to check
             //if a sensitive value is being submitted.
-            if (UmbracoContextAccessor.UmbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false)
+            if (WebSecurity.CurrentUser.HasAccessToSensitiveData() == false)
             {
                 var contentType = _memberTypeService.Get(model.PersistedContent.ContentTypeId);
                 var sensitiveProperties = contentType

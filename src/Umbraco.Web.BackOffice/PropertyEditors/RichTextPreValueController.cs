@@ -3,7 +3,7 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Web.Editors;
+using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Common.Attributes;
 

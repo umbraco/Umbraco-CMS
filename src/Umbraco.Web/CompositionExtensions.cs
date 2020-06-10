@@ -41,16 +41,6 @@ namespace Umbraco.Web
 
 
 
-
-        /// <summary>
-        /// Gets the back office tree collection builder
-        /// </summary>
-        /// <param name="composition"></param>
-        /// <returns></returns>
-        public static TreeCollectionBuilder Trees(this Composition composition)
-            => composition.WithCollectionBuilder<TreeCollectionBuilder>();
-
-
         #endregion
 
         #region Uniques

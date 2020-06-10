@@ -8,6 +8,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.Trees
 {
+    // Migrated to .NET Core
     public static class UrlHelperExtensions
     {
         public static string GetTreeUrl(this UrlHelper urlHelper, Type treeType, string nodeId, FormDataCollection queryStrings)

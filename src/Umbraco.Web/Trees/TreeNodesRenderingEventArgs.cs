@@ -3,6 +3,7 @@ using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web.Trees
 {
+    // Migrated to .NET Core
     public class TreeNodesRenderingEventArgs : TreeRenderingEventArgs
     {
         public TreeNodeCollection Nodes { get; private set; }

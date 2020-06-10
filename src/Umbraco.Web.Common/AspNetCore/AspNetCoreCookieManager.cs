@@ -33,7 +33,10 @@ namespace Umbraco.Web.Common.AspNetCore
 
         public void SetCookieValue(string cookieName, string value)
         {
-            _httpContextAccessor.HttpContext?.Response.Cookies.Append(cookieName, value);
+            _httpContextAccessor.HttpContext?.Response.Cookies.Append(cookieName, value, new CookieOptions()
+            {
+
+            });
         }
 
         public bool HasCookie(string cookieName)

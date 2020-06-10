@@ -18,10 +18,9 @@ using Umbraco.Web.Common.Install;
 using Umbraco.Extensions;
 using System.Linq;
 using Umbraco.Web.Common.Controllers;
-using System;
 using Umbraco.Web.Common.Middleware;
 using Umbraco.Web.Common.ModelBinding;
-using Umbraco.Web.Search;
+using Umbraco.Web.Security;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Common.Runtime
@@ -71,6 +70,7 @@ namespace Umbraco.Web.Common.Runtime
 
             // register the umbraco context factory
             composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
+            composition.RegisterUnique<IWebSecurity>(factory => factory.GetInstance<IUmbracoContextAccessor>().GetRequiredUmbracoContext().Security);
 
             //register the install components
             //NOTE: i tried to not have these registered if we weren't installing or upgrading but post install when the site restarts
@@ -81,13 +81,6 @@ namespace Umbraco.Web.Common.Runtime
             composition.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
                 .Add(umbracoApiControllerTypes);
 
-            // register back office trees
-            // the collection builder only accepts types inheriting from TreeControllerBase
-            // and will filter out those that are not attributed with TreeAttribute
-            // composition.Trees()
-            //     .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
-            composition.RegisterUnique<TreeCollection>(); //TODO replace with collection builder above
-
 
             composition.RegisterUnique<InstallAreaRoutes>();
 
@@ -96,10 +89,6 @@ namespace Umbraco.Web.Common.Runtime
             composition.RegisterUnique<BootFailedMiddleware>();
 
             composition.RegisterUnique<UmbracoJsonModelBinder>();
-
-
-
-
         }
     }
 }

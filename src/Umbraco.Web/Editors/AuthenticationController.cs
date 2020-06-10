@@ -88,7 +88,7 @@ namespace Umbraco.Web.Editors
         [WebApi.UmbracoAuthorize(requireApproval: false)]
         public IDictionary<string, object> GetPasswordConfig(int userId)
         {
-            return _passwordConfiguration.GetConfiguration(userId != UmbracoContext.Security.CurrentUser.Id);
+            return _passwordConfiguration.GetConfiguration(userId != Security.CurrentUser.Id);
         }
 
         /// <summary>
@@ -169,7 +169,7 @@ namespace Umbraco.Web.Editors
         [SetAngularAntiForgeryTokens]
         public UserDetail GetCurrentInvitedUser()
         {
-            var user = UmbracoContext.Security.CurrentUser;
+            var user = Security.CurrentUser;
 
             if (user.IsApproved)
             {
@@ -193,7 +193,7 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
         {
-            var identityUser = await UserManager.FindByIdAsync(UmbracoContext.Security.GetUserId().ResultOr(0).ToString());
+            var identityUser = await UserManager.FindByIdAsync(Security.GetUserId().ResultOr(0).ToString());
             return identityUser.Logins.ToDictionary(x => x.LoginProvider, x => x.ProviderKey);
         }
 
