@@ -73,11 +73,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
             var propLk = props.ToLookup(p => p.ContentTypeId, p => p.Alias);
 
             var knownMap = new Dictionary<Guid, KnownContentType>(types.Count);
-            types.ForEach(t => knownMap[t.NodeDto.UniqueId] = new KnownContentType
-            {
-                Alias = t.Alias,
-                StringToRawProperties = propLk[t.NodeId].Union(joinLk[t.NodeId].SelectMany(r => propLk[r])).ToArray()
-            });
+            types.ForEach(t => knownMap[t.NodeDto.UniqueId] = new KnownContentType(t.Alias, t.NodeDto.UniqueId, propLk[t.NodeId].Union(joinLk[t.NodeId].SelectMany(r => propLk[r])).ToArray()));
             return knownMap;
         }
 
@@ -249,15 +245,14 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
             {
                 if (!Guid.TryParse(obj["key"].ToString(), out var key)) key = Guid.NewGuid();
                 if (!Guid.TryParse(obj["icContentTypeGuid"].ToString(), out var ctGuid)) ctGuid = Guid.Empty;
-                if (!knownDocumentTypes.TryGetValue(ctGuid, out var ct)) ct = new KnownContentType { Key = ctGuid };
+                if (!knownDocumentTypes.TryGetValue(ctGuid, out var ct)) ct = new KnownContentType(null, ctGuid, null);
 
                 obj.Remove("key");
                 obj.Remove("icContentTypeGuid");
 
                 var udi = new GuidUdi(Constants.UdiEntityType.Element, key).ToString();
-                obj["udi"] = udi;
-                // TODO: retrive the key for the content type.
-                //obj["contentTypeAlias"] = ct.Alias;
+                obj["udi"] = udi;                
+                obj["contentTypeKey"] = ct.Key;
 
                 if (ct.StringToRawProperties != null && ct.StringToRawProperties.Length > 0)
                 {
@@ -291,9 +286,16 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
 
         private class KnownContentType
         {
-            public string Alias { get; set; }
-            public Guid Key { get; set; }
-            public string[] StringToRawProperties { get; set; }
+            public KnownContentType(string alias, Guid key, string[] stringToRawProperties)
+            {
+                Alias = alias ?? throw new ArgumentNullException(nameof(alias));
+                Key = key;
+                StringToRawProperties = stringToRawProperties ?? throw new ArgumentNullException(nameof(stringToRawProperties));
+            }
+
+            public string Alias { get; }
+            public Guid Key { get;  }
+            public string[] StringToRawProperties { get;  }
         }
     }
 }

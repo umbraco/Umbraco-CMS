@@ -22,8 +22,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// <summary>
         /// Initializes a new instance of the <see cref="NestedContentSingleValueConverter"/> class.
         /// </summary>
-        public NestedContentSingleValueConverter(BlockEditorConverter blockEditorConverter, IPublishedModelFactory publishedModelFactory, IProfilingLogger proflog)
-            : base(blockEditorConverter, publishedModelFactory)
+        public NestedContentSingleValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor, IPublishedModelFactory publishedModelFactory, IProfilingLogger proflog)
+            : base(publishedSnapshotAccessor, publishedModelFactory)
         {
             _proflog = proflog;
         }
@@ -56,7 +56,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             using (_proflog.DebugDuration<NestedContentSingleValueConverter>($"ConvertPropertyToNestedContent ({propertyType.DataType.Id})"))
             {
-                var value = (string) inter;
+                var value = (string)inter;
                 if (string.IsNullOrWhiteSpace(value)) return null;
 
                 var objects = JsonConvert.DeserializeObject<List<JObject>>(value);
@@ -65,7 +65,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 if (objects.Count > 1)
                     throw new InvalidOperationException();
 
-                return BlockEditorConverter.ConvertToElement(objects[0], NestedContentPropertyEditor.ContentTypeAliasPropertyKey, referenceCacheLevel, preview);
+                return ConvertToElement(objects[0], referenceCacheLevel, preview);
             }
         }
     }

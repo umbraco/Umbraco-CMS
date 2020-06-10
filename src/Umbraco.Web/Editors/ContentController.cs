@@ -355,18 +355,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var emptyContent = Services.ContentService.Create("", parentId, contentType.Alias, Security.GetUserId().ResultOr(0));
-            var mapped = MapToDisplay(emptyContent);
-            // translate the content type name if applicable
-            mapped.ContentTypeName = Services.TextService.UmbracoDictionaryTranslate(mapped.ContentTypeName);
-            // if your user type doesn't have access to the Settings section it would not get this property mapped
-            if (mapped.DocumentType != null)
-                mapped.DocumentType.Name = Services.TextService.UmbracoDictionaryTranslate(mapped.DocumentType.Name);
-
-            //remove the listview app if it exists
-            mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
-
-            return mapped;
+            return GetEmpty(contentType, parentId);
         }
 
 
@@ -376,17 +365,19 @@ namespace Umbraco.Web.Editors
         /// <param name="contentTypeKey"></param>
         /// <param name="parentId"></param>
         [OutgoingEditorModelEvent]
-        public ContentItemDisplay GetEmptyByKey(string contentTypeKey, int parentId)
+        public ContentItemDisplay GetEmptyByKey(Guid contentTypeKey, int parentId)
         {
-
-            Guid.TryParse(contentTypeKey, out Guid contentTypeGuid);
-
-            var contentType = Services.ContentTypeService.Get(contentTypeGuid);
+            var contentType = Services.ContentTypeService.Get(contentTypeKey);
             if (contentType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
+            return GetEmpty(contentType, parentId);
+        }
+
+        private ContentItemDisplay GetEmpty(IContentType contentType, int parentId)
+        {
             var emptyContent = Services.ContentService.Create("", parentId, contentType.Alias, Security.GetUserId().ResultOr(0));
             var mapped = MapToDisplay(emptyContent);
             // translate the content type name if applicable

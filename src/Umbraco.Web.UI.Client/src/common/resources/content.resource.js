@@ -388,7 +388,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
                         "GetBlueprintById",
-                        [{ id: id }])),
+                        { id: id })),
                 'Failed to retrieve data for content id ' + id)
                 .then(function (result) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
@@ -401,7 +401,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
                         "GetNotificationOptions",
-                        [{ contentId: id }])),
+                        { contentId: id })),
                 'Failed to retrieve data for content id ' + id);
         },
 
@@ -502,7 +502,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
                         "GetEmpty",
-                        [{ contentTypeAlias: alias }, { parentId: parentId }])),
+                        { contentTypeAlias: alias, parentId: parentId })),
                 'Failed to retrieve data for empty content item type ' + alias)
                 .then(function (result) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
@@ -510,7 +510,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         },
         /**
          * @ngdoc method
-         * @name umbraco.resources.contentResource#getScaffoldByID
+         * @name umbraco.resources.contentResource#getScaffoldByKey
          * @methodOf umbraco.resources.contentResource
          *
          * @description
@@ -523,7 +523,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
          * ##usage
          * <pre>
-         * contentResource.getScaffoldById(1234, '...')
+         * contentResource.getScaffoldByKey(1234, '...')
          *    .then(function(scaffold) {
          *        var myDoc = scaffold;
           *        myDoc.name = "My new document";
@@ -547,7 +547,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
                         "GetEmptyByKey",
-                        [{ contentTypeKey: contentTypeKey }, { parentId: parentId }])),
+                        { contentTypeKey: contentTypeKey, parentId: parentId })),
                 'Failed to retrieve data for empty content item id ' + contentTypeId)
                 .then(function (result) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
@@ -561,7 +561,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
                         "GetEmpty",
-                        [{ blueprintId: blueprintId }, { parentId: parentId }])),
+                        { blueprintId: blueprintId, parentId: parentId })),
                 'Failed to retrieve blueprint for id ' + blueprintId)
                 .then(function (result) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));

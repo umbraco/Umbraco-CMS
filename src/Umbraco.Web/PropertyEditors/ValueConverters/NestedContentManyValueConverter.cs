@@ -23,8 +23,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// <summary>
         /// Initializes a new instance of the <see cref="NestedContentManyValueConverter"/> class.
         /// </summary>
-        public NestedContentManyValueConverter(BlockEditorConverter blockEditorConverter, IPublishedModelFactory publishedModelFactory, IProfilingLogger proflog)
-            : base(blockEditorConverter, publishedModelFactory)
+        public NestedContentManyValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor, IPublishedModelFactory publishedModelFactory, IProfilingLogger proflog)
+            : base(publishedSnapshotAccessor, publishedModelFactory)
         {
             _proflog = proflog;
         }
@@ -38,8 +38,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             var contentTypes = propertyType.DataType.ConfigurationAs<NestedContentConfiguration>().ContentTypes;
             return contentTypes.Length == 1
-                ? typeof (IEnumerable<>).MakeGenericType(ModelType.For(contentTypes[0].Alias))
-                : typeof (IEnumerable<IPublishedElement>);
+                ? typeof(IEnumerable<>).MakeGenericType(ModelType.For(contentTypes[0].Alias))
+                : typeof(IEnumerable<IPublishedElement>);
         }
 
         /// <inheritdoc />
@@ -71,7 +71,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
                 foreach (var sourceObject in objects)
                 {
-                    var element = BlockEditorConverter.ConvertToElement(sourceObject, NestedContentPropertyEditor.ContentTypeAliasPropertyKey, referenceCacheLevel, preview);
+                    var element = ConvertToElement(sourceObject, referenceCacheLevel, preview);
                     if (element != null)
                         elements.Add(element);
                 }

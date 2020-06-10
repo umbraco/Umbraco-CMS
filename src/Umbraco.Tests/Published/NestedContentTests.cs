@@ -100,8 +100,8 @@ namespace Umbraco.Tests.Published
                 .Returns((string alias) =>
                 {
                     return alias == "contentN1"
-                        ? (IList) new List<TestElementModel>()
-                        : (IList) new List<IPublishedElement>();
+                        ? (IList)new List<TestElementModel>()
+                        : (IList)new List<IPublishedElement>();
                 });
 
             var contentCache = new Mock<IPublishedContentCache>();
@@ -119,12 +119,10 @@ namespace Umbraco.Tests.Published
                 .Setup(x => x.PublishedSnapshot)
                 .Returns(publishedSnapshot.Object);
 
-            var blockEditorConverter = new BlockEditorConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object);
-
             var converters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
             {
-                new NestedContentSingleValueConverter(blockEditorConverter, publishedModelFactory.Object, proflog),
-                new NestedContentManyValueConverter(blockEditorConverter, publishedModelFactory.Object, proflog),
+                new NestedContentSingleValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog),
+                new NestedContentManyValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog),
             });
 
             var factory = new PublishedContentTypeFactory(publishedModelFactory.Object, converters, dataTypeService);
@@ -166,7 +164,7 @@ namespace Umbraco.Tests.Published
             (var contentType1, _) = CreateContentTypes();
 
             // nested single converter returns the proper value clr type TestModel, and cache level
-            Assert.AreEqual(typeof (TestElementModel), contentType1.GetPropertyType("property1").ClrType);
+            Assert.AreEqual(typeof(TestElementModel), contentType1.GetPropertyType("property1").ClrType);
             Assert.AreEqual(PropertyCacheLevel.Element, contentType1.GetPropertyType("property1").CacheLevel);
 
             var key = Guid.NewGuid();
@@ -174,7 +172,7 @@ namespace Umbraco.Tests.Published
             var content = new SolidPublishedContent(contentType1)
             {
                 Key = key,
-                Properties = new []
+                Properties = new[]
                 {
                     new TestPublishedProperty(contentType1.GetPropertyType("property1"), $@"[
                     {{ ""key"": ""{keyA}"", ""propertyN1"": ""foo"", ""ncContentTypeAlias"": ""contentN1"" }}
@@ -185,7 +183,7 @@ namespace Umbraco.Tests.Published
 
             // nested single converter returns proper TestModel value
             Assert.IsInstanceOf<TestElementModel>(value);
-            var valueM = (TestElementModel) value;
+            var valueM = (TestElementModel)value;
             Assert.AreEqual("foo", valueM.PropValue);
             Assert.AreEqual(keyA, valueM.Key);
         }
@@ -196,7 +194,7 @@ namespace Umbraco.Tests.Published
             (_, var contentType2) = CreateContentTypes();
 
             // nested many converter returns the proper value clr type IEnumerable<TestModel>, and cache level
-            Assert.AreEqual(typeof (IEnumerable<TestElementModel>), contentType2.GetPropertyType("property2").ClrType);
+            Assert.AreEqual(typeof(IEnumerable<TestElementModel>), contentType2.GetPropertyType("property2").ClrType);
             Assert.AreEqual(PropertyCacheLevel.Element, contentType2.GetPropertyType("property2").CacheLevel);
 
             var key = Guid.NewGuid();
@@ -218,7 +216,7 @@ namespace Umbraco.Tests.Published
             // nested many converter returns proper IEnumerable<TestModel> value
             Assert.IsInstanceOf<IEnumerable<IPublishedElement>>(value);
             Assert.IsInstanceOf<IEnumerable<TestElementModel>>(value);
-            var valueM = ((IEnumerable<TestElementModel>) value).ToArray();
+            var valueM = ((IEnumerable<TestElementModel>)value).ToArray();
             Assert.AreEqual("foo", valueM[0].PropValue);
             Assert.AreEqual(keyA, valueM[0].Key);
             Assert.AreEqual("bar", valueM[1].PropValue);
