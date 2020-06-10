@@ -34,7 +34,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
                 SqlFormatter = new SqlServerFormatter(),
                 StackMaxLength = 5000,
             });
-            
+
             MiniProfiler.StartNew();
         }
 
