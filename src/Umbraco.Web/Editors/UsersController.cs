@@ -92,7 +92,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public string[] GetCurrentUserAvatarUrls()
         {
-            var urls = UmbracoContext.Security.CurrentUser.GetUserAvatarUrls(AppCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator);
+            var urls = Security.CurrentUser.GetUserAvatarUrls(AppCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator);
             if (urls == null)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Could not access Gravatar endpoint"));
 

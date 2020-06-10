@@ -45,7 +45,7 @@ namespace Umbraco.Web.Trees
         /// </summary>
         public Type TreeControllerType { get; }
 
-        internal static string GetRootNodeDisplayName(ITree tree, ILocalizedTextService textService)
+        public static string GetRootNodeDisplayName(ITree tree, ILocalizedTextService textService)
         {
             var label = $"[{tree.TreeAlias}]";
 

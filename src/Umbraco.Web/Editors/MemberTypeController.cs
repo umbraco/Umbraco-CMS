@@ -136,7 +136,7 @@ namespace Umbraco.Web.Editors
             var ctId = Convert.ToInt32(contentTypeSave.Id);
             var ct = ctId > 0 ? Services.MemberTypeService.Get(ctId) : null;
 
-            if (UmbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false)
+            if (Security.CurrentUser.HasAccessToSensitiveData() == false)
             {
                 //We need to validate if any properties on the contentTypeSave have had their IsSensitiveValue changed,
                 //and if so, we need to check if the current user has access to sensitive values. If not, we have to return an error

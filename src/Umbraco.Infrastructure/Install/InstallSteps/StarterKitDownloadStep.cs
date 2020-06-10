@@ -7,6 +7,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Net;
 using Umbraco.Web.Install.Models;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -16,16 +17,16 @@ namespace Umbraco.Web.Install.InstallSteps
     internal class StarterKitDownloadStep : InstallSetupStep<Guid?>
     {
         private readonly InstallHelper _installHelper;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IWebSecurity _webSecurity;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
         private readonly IContentService _contentService;
         private readonly IPackagingService _packageService;
 
-        public StarterKitDownloadStep(IContentService contentService, IPackagingService packageService, InstallHelper installHelper, IUmbracoContextAccessor umbracoContextAccessor, IUmbracoVersion umbracoVersion, IUmbracoApplicationLifetime umbracoApplicationLifetime)
+        public StarterKitDownloadStep(IContentService contentService, IPackagingService packageService, InstallHelper installHelper, IWebSecurity webSecurity, IUmbracoVersion umbracoVersion, IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
             _installHelper = installHelper;
-            _umbracoContextAccessor = umbracoContextAccessor;
+            _webSecurity = webSecurity;
             _umbracoVersion = umbracoVersion;
             _umbracoApplicationLifetime = umbracoApplicationLifetime;
             _contentService = contentService;
@@ -66,7 +67,7 @@ namespace Umbraco.Web.Install.InstallSteps
         private async Task<(string packageFile, int packageId)> DownloadPackageFilesAsync(Guid kitGuid)
         {
             //Go get the package file from the package repo
-            var packageFile = await _packageService.FetchPackageFileAsync(kitGuid, _umbracoVersion.Current, _umbracoContextAccessor.UmbracoContext.Security.GetUserId().ResultOr(0));
+            var packageFile = await _packageService.FetchPackageFileAsync(kitGuid, _umbracoVersion.Current, _webSecurity.GetUserId().ResultOr(0));
             if (packageFile == null) throw new InvalidOperationException("Could not fetch package file " + kitGuid);
 
             //add an entry to the installedPackages.config
@@ -76,7 +77,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             _packageService.SaveInstalledPackage(packageDefinition);
 
-            _packageService.InstallCompiledPackageFiles(packageDefinition, packageFile, _umbracoContextAccessor.UmbracoContext.Security.GetUserId().ResultOr(-1));
+            _packageService.InstallCompiledPackageFiles(packageDefinition, packageFile, _webSecurity.GetUserId().ResultOr(-1));
 
             return (compiledPackage.PackageFile.Name, packageDefinition.Id);
         }

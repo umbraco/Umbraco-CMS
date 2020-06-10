@@ -1,11 +1,11 @@
 ﻿using System;
+using Umbraco.Web.Trees;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.BackOffice.Trees
 {
     /// <summary>
     /// Identifies a section tree.
     /// </summary>
-    /// // Migrated to .NET Core
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class TreeAttribute : Attribute, ITree
     {
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Trees
         /// Gets the usage of the tree.
         /// </summary>
         public TreeUse TreeUse { get; set; } = TreeUse.Main | TreeUse.Dialog;
-        
+
         /// <summary>
         /// Gets or sets the tree sort order.
         /// </summary>

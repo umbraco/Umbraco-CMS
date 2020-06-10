@@ -96,20 +96,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
                 .SetupGet(x => x.CurrentUser)
                 .Returns(currentUserMock.Object);
 
-            var umbracoContextMock = new Mock<IUmbracoContext>();
-            umbracoContextMock
-                .SetupGet(x => x.Security)
-                .Returns(webSecurityMock.Object);
-
-            var umbracoContextAccessorMock = new Mock<IUmbracoContextAccessor>();
-            umbracoContextAccessorMock
-                .SetupGet(x => x.UmbracoContext)
-                .Returns(umbracoContextMock.Object);
 
             var serviceProviderMock = new Mock<IServiceProvider>();
             serviceProviderMock
-                .Setup(x => x.GetService(typeof(IUmbracoContextAccessor)))
-                .Returns(umbracoContextAccessorMock.Object);
+                .Setup(x => x.GetService(typeof(IWebSecurity)))
+                .Returns(webSecurityMock.Object);
 
             httpContext.RequestServices = serviceProviderMock.Object;
 

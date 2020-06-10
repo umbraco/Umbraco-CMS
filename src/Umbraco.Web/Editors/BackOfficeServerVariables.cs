@@ -172,14 +172,7 @@ namespace Umbraco.Web.Editors
                         //     "imagesApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImagesController>(
                         //         controller => controller.GetBigThumbnail(""))
                         // },
-                        {
-                            "sectionApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<SectionController>(
-                                controller => controller.GetSections())
-                        },
-                        {
-                            "treeApplicationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
-                                controller => controller.GetApplicationTrees(null, null, null, TreeUse.None))
-                        },
+
                         {
                             "contentTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
                                 controller => controller.GetAllowedChildren(0))
