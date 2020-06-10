@@ -28,8 +28,4 @@
             <_Parameter1>Umbraco.Tests.Benchmarks</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="Security\AuthenticationExtensions.cs" />
-    </ItemGroup>
 </Project>

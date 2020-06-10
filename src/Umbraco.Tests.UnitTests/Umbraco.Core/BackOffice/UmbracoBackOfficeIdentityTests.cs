@@ -16,7 +16,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
         [Test]
         public void Create_From_Claims_Identity()
         {
-            var sessionId = Guid.NewGuid().ToString();
             var securityStamp = Guid.NewGuid().ToString();
             var claimsIdentity = new ClaimsIdentity(new[]
             {
@@ -31,15 +30,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
                 new Claim(Constants.Security.AllowedApplicationsClaimType, "content", ClaimValueTypes.String, TestIssuer, TestIssuer),
                 new Claim(Constants.Security.AllowedApplicationsClaimType, "media", ClaimValueTypes.String, TestIssuer, TestIssuer),
                 new Claim(ClaimTypes.Locality, "en-us", ClaimValueTypes.String, TestIssuer, TestIssuer),
-                new Claim(Constants.Security.SessionIdClaimType, sessionId, Constants.Security.SessionIdClaimType, TestIssuer, TestIssuer),
                 new Claim(ClaimsIdentity.DefaultRoleClaimType, "admin", ClaimValueTypes.String, TestIssuer, TestIssuer),
-                new Claim(Constants.Web.SecurityStampClaimType, securityStamp, ClaimValueTypes.String, TestIssuer, TestIssuer),
+                new Claim(Constants.Security.SecurityStampClaimType, securityStamp, ClaimValueTypes.String, TestIssuer, TestIssuer),
             });
 
-            var backofficeIdentity = UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);
+            if (!UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out var backofficeIdentity))
+                Assert.Fail();
 
             Assert.AreEqual(1234, backofficeIdentity.Id);
-            Assert.AreEqual(sessionId, backofficeIdentity.SessionId);
+            //Assert.AreEqual(sessionId, backofficeIdentity.SessionId);
             Assert.AreEqual(securityStamp, backofficeIdentity.SecurityStamp);
             Assert.AreEqual("testing", backofficeIdentity.Username);
             Assert.AreEqual("hello world", backofficeIdentity.RealName);
@@ -49,7 +48,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             Assert.AreEqual("en-us", backofficeIdentity.Culture);
             Assert.IsTrue(new[] { "admin" }.SequenceEqual(backofficeIdentity.Roles));
 
-            Assert.AreEqual(12, backofficeIdentity.Claims.Count());
+            Assert.AreEqual(11, backofficeIdentity.Claims.Count());
         }
 
         [Test]
@@ -61,13 +60,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
                 new Claim(ClaimTypes.Name, "testing", ClaimValueTypes.String, TestIssuer, TestIssuer),
             });
 
-            Assert.Throws<InvalidOperationException>(() => UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity));
+            if (UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out var backofficeIdentity))
+                Assert.Fail();
+
+            Assert.Pass();
         }
 
         [Test]
         public void Create_From_Claims_Identity_Required_Claim_Null()
         {
-            var sessionId = Guid.NewGuid().ToString();
             var claimsIdentity = new ClaimsIdentity(new[]
             {
                 //null or empty
@@ -79,18 +80,20 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
                 new Claim(Constants.Security.AllowedApplicationsClaimType, "content", ClaimValueTypes.String, TestIssuer, TestIssuer),
                 new Claim(Constants.Security.AllowedApplicationsClaimType, "media", ClaimValueTypes.String, TestIssuer, TestIssuer),
                 new Claim(ClaimTypes.Locality, "en-us", ClaimValueTypes.String, TestIssuer, TestIssuer),
-                new Claim(Constants.Security.SessionIdClaimType, sessionId, Constants.Security.SessionIdClaimType, TestIssuer, TestIssuer),
                 new Claim(ClaimsIdentity.DefaultRoleClaimType, "admin", ClaimValueTypes.String, TestIssuer, TestIssuer),
             });
 
-            Assert.Throws<InvalidOperationException>(() => UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity));
+            if (UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out var backofficeIdentity))
+                Assert.Fail();
+
+            Assert.Pass();
         }
 
 
         [Test]
         public void Create_With_Claims_And_User_Data()
         {
-            var sessionId = Guid.NewGuid().ToString();
+            var securityStamp = Guid.NewGuid().ToString();
 
             var claimsIdentity = new ClaimsIdentity(new[]
             {
@@ -99,7 +102,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             });
 
             var identity = new UmbracoBackOfficeIdentity(claimsIdentity,
-                1234, "testing", "hello world", new[] { 654 }, new[] { 654 }, "en-us", sessionId, sessionId, new[] { "content", "media" }, new[] { "admin" });
+                1234, "testing", "hello world", new[] { 654 }, new[] { 654 }, "en-us", securityStamp, new[] { "content", "media" }, new[] { "admin" });
 
             Assert.AreEqual(12, identity.Claims.Count());
         }
@@ -108,10 +111,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
         [Test]
         public void Clone()
         {
-            var sessionId = Guid.NewGuid().ToString();
+            var securityStamp = Guid.NewGuid().ToString();
 
             var identity = new UmbracoBackOfficeIdentity(
-                1234, "testing", "hello world", new[] { 654 }, new[] { 654 }, "en-us", sessionId, sessionId, new[] { "content", "media" }, new[] { "admin" });
+                1234, "testing", "hello world", new[] { 654 }, new[] { 654 }, "en-us", securityStamp, new[] { "content", "media" }, new[] { "admin" });
 
             var cloned = identity.Clone();
 

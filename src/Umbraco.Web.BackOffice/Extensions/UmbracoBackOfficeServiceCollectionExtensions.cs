@@ -9,6 +9,7 @@ using Umbraco.Core.Serialization;
 using Umbraco.Net;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.AspNetCore;
+using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Extensions
 {
@@ -29,8 +30,9 @@ namespace Umbraco.Extensions
             services
                 .AddAuthentication(Constants.Security.BackOfficeAuthenticationType)
                 .AddCookie(Constants.Security.BackOfficeAuthenticationType);
+            // TODO: Need to add more cookie options, see https://github.com/dotnet/aspnetcore/blob/3.0/src/Identity/Core/src/IdentityServiceCollectionExtensions.cs#L45
 
-            services.ConfigureOptions<ConfigureUmbracoBackOfficeCookieOptions>();
+            services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
         }
 
         /// <summary>
@@ -51,9 +53,9 @@ namespace Umbraco.Extensions
                 .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>>();
 
             // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
-            services.ConfigureOptions<ConfigureUmbracoBackOfficeIdentityOptions>();
-            //services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<BackOfficeIdentityUser>>();
-        }
+            services.ConfigureOptions<ConfigureBackOfficeIdentityOptions>();
+            services.ConfigureOptions<ConfigureBackOfficeSecurityStampValidatorOptions>();
+          }
 
         private static IdentityBuilder BuildUmbracoBackOfficeIdentity(this IServiceCollection services)
         {

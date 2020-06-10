@@ -55,18 +55,8 @@ namespace Umbraco.Web.Security
                 return null;
             }
 
-            UmbracoBackOfficeIdentity identity;
-
-            try
-            {
-                identity = UmbracoBackOfficeIdentity.FromClaimsIdentity(decrypt.Identity);
-            }
-            catch (Exception)
-            {
-                //if it cannot be created return null, will be due to serialization errors in user data most likely due to corrupt cookies or cookies
-                //for previous versions of Umbraco
+            if (!UmbracoBackOfficeIdentity.FromClaimsIdentity(decrypt.Identity, out var identity))
                 return null;
-            }
 
             //return the ticket with a UmbracoBackOfficeIdentity
             var ticket = new AuthenticationTicket(identity, decrypt.Properties);

@@ -438,7 +438,7 @@ namespace Umbraco.Tests.Web.Mvc
             var ctx = new UmbracoContext(
                 httpContextAccessor,
                 _service,
-                new WebSecurity(httpContextAccessor, ServiceContext.UserService, globalSettings, HostingEnvironment),
+                Mock.Of<IWebSecurity>(),
                 globalSettings,
                 HostingEnvironment,
                 new TestVariationContextAccessor(),

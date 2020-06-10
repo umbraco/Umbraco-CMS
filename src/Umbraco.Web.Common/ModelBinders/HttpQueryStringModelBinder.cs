@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Core;
-using Umbraco.Web.Common.Extensions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Common.ModelBinders
 {

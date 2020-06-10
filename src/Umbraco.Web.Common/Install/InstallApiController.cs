@@ -14,11 +14,13 @@ using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.ModelBinding;
+using Umbraco.Web.Common.Security;
 using Umbraco.Web.Install;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Common.Install
 {
+    using Constants = Umbraco.Core.Constants;
 
     [UmbracoApiController]
     [TypeFilter(typeof(HttpResponseExceptionFilter))]
@@ -30,19 +32,21 @@ namespace Umbraco.Web.Common.Install
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly InstallStatusTracker _installStatusTracker;
         private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
+        private readonly BackOfficeSignInManager _backOfficeSignInManager;
         private readonly InstallStepCollection _installSteps;
         private readonly ILogger _logger;
         private readonly IProfilingLogger _proflog;
 
         public InstallApiController(DatabaseBuilder databaseBuilder, IProfilingLogger proflog,
             InstallHelper installHelper, InstallStepCollection installSteps, InstallStatusTracker installStatusTracker,
-            IUmbracoApplicationLifetime umbracoApplicationLifetime)
+            IUmbracoApplicationLifetime umbracoApplicationLifetime, BackOfficeSignInManager backOfficeSignInManager)
         {
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
             _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _installSteps = installSteps;
             _installStatusTracker = installStatusTracker;
             _umbracoApplicationLifetime = umbracoApplicationLifetime;
+            _backOfficeSignInManager = backOfficeSignInManager;
             InstallHelper = installHelper;
             _logger = _proflog;
         }
@@ -85,10 +89,17 @@ namespace Umbraco.Web.Common.Install
             return starterKits;
         }
 
-
         [HttpPost]
-        public ActionResult CompleteInstall()
+        public async Task<ActionResult> CompleteInstall()
         {
+            // log the super user in if it's a new install
+            var installType = InstallHelper.GetInstallationType();
+            if (installType == InstallationType.NewInstall)
+            {
+                var user = await _backOfficeSignInManager.UserManager.FindByIdAsync(Constants.Security.SuperUserId.ToString());
+                await _backOfficeSignInManager.SignInAsync(user, false);
+            }
+
             _umbracoApplicationLifetime.Restart();
             return NoContent();
         }

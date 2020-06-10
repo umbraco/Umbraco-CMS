@@ -33,7 +33,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="Security\BackOfficeSignInManager.cs" />
       <Compile Remove="Macros\UmbracoMacroResult.cs" />
     </ItemGroup>
     

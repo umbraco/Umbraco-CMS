@@ -8,11 +8,12 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Security;
+using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
+using Umbraco.Web.Common.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
@@ -65,6 +66,29 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Returns the currently logged in Umbraco user
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// We have the attribute [SetAngularAntiForgeryTokens] applied because this method is called initially to determine if the user
+        /// is valid before the login screen is displayed. The Auth cookie can be persisted for up to a day but the csrf cookies are only session
+        /// cookies which means that the auth cookie could be valid but the csrf cookies are no longer there, in that case we need to re-set the csrf cookies.
+        /// </remarks>
+        [UmbracoAuthorize]
+        [TypeFilter(typeof(SetAngularAntiForgeryTokens))]
+        //[CheckIfUserTicketDataIsStale] // TODO: Migrate this, though it will need to be done differently at the cookie auth level
+        public UserDetail GetCurrentUser()
+        {
+            var user = _webSecurity.CurrentUser;
+            var result = _umbracoMapper.Map<UserDetail>(user);
+
+            //set their remaining seconds
+            result.SecondsUntilTimeout = HttpContext.User.GetRemainingAuthSeconds();
+
+            return result;
         }
 
         /// <summary>

@@ -28,12 +28,4 @@
         <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Compile Remove="Security\ConfigureBackOfficeSecurityStampValidatorOptions.cs" />
-      <Compile Remove="Security\ConfigureBackOfficeIdentityOptions.cs" />
-      <Compile Remove="Security\ConfigureBackOfficeCookieOptions.cs" />
-      <Compile Remove="Security\BackOfficeSessionIdValidator.cs" />
-      <Compile Remove="Security\BackOfficeSecureDataFormat.cs" />
-    </ItemGroup>
-
 </Project>

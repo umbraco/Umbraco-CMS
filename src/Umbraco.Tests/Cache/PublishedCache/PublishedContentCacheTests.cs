@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             _umbracoContext = new UmbracoContext(
                 httpContextAccessor,
                 publishedSnapshotService.Object,
-                new WebSecurity(httpContextAccessor, Mock.Of<IUserService>(), globalSettings, HostingEnvironment),
+                Mock.Of<IWebSecurity>(),
                 globalSettings,
                 HostingEnvironment,
                 new TestVariationContextAccessor(),

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Web.BackOffice.Security;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
@@ -24,10 +25,10 @@ namespace Umbraco.Web.BackOffice.Filters
     public sealed class ValidateAngularAntiForgeryTokenAttribute : ActionFilterAttribute
     {
         private readonly ILogger _logger;
-        private readonly IAntiforgery _antiforgery;
+        private readonly IBackOfficeAntiforgery _antiforgery;
         private readonly ICookieManager _cookieManager;
 
-        public ValidateAngularAntiForgeryTokenAttribute(ILogger logger, IAntiforgery antiforgery, ICookieManager cookieManager)
+        public ValidateAngularAntiForgeryTokenAttribute(ILogger logger, IBackOfficeAntiforgery antiforgery, ICookieManager cookieManager)
         {
             _logger = logger;
             _antiforgery = antiforgery;

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Umbraco.Web.Common.Extensions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
