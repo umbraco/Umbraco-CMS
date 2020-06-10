@@ -3,6 +3,7 @@
     /// <summary>
     /// Common query string parameters used for tree query strings
     /// </summary>
+    /// Migrated to .NET Core
     internal struct TreeQueryStringParameters
     {
         public const string Use = "use";

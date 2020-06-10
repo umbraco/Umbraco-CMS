@@ -14,6 +14,7 @@ namespace Umbraco.Web.Trees
     /// <summary>
     /// The base controller for all tree requests
     /// </summary>
+    /// // Migrated to .NET Core
     public abstract class TreeController : TreeControllerBase
     {
         private static readonly ConcurrentDictionary<Type, TreeAttribute> TreeAttributeCache = new ConcurrentDictionary<Type, TreeAttribute>();

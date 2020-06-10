@@ -2,8 +2,11 @@
 using System.Linq;
 using System.Text;
 using System.Web;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
+using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Extensions
 {
@@ -37,6 +40,29 @@ namespace Umbraco.Extensions
                 }
             }
             return sb.ToString().TrimEnd(",");
+        }
+
+        public static string GetTreeUrl(this IUrlHelper urlHelper, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, Type treeType, string nodeId, FormCollection queryStrings)
+        {
+            var actionUrl = urlHelper.GetUmbracoApiService(umbracoApiControllerTypeCollection, "GetNodes", treeType)
+                .EnsureEndsWith('?');
+
+            //now we need to append the query strings
+            actionUrl += "id=" + nodeId.EnsureEndsWith('&') + queryStrings.ToQueryString("id",
+                //Always ignore the custom start node id when generating URLs for tree nodes since this is a custom once-only parameter
+                // that should only ever be used when requesting a tree to render (root), not a tree node
+                TreeQueryStringParameters.StartNodeId);
+            return actionUrl;
+        }
+
+        public static string GetMenuUrl(this IUrlHelper urlHelper, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, Type treeType, string nodeId, FormCollection queryStrings)
+        {
+            var actionUrl = urlHelper.GetUmbracoApiService(umbracoApiControllerTypeCollection, "GetMenu", treeType)
+                .EnsureEndsWith('?');
+
+            //now we need to append the query strings
+            actionUrl += "id=" + nodeId.EnsureEndsWith('&') + queryStrings.ToQueryString("id");
+            return actionUrl;
         }
     }
 }

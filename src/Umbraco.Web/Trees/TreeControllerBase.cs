@@ -27,6 +27,7 @@ namespace Umbraco.Web.Trees
     /// <remarks>
     /// Developers should generally inherit from TreeController.
     /// </remarks>
+    /// Migrated to .NET Core
     [AngularJsonOnlyConfiguration]
     public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     {

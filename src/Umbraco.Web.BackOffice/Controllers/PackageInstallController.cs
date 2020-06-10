@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +10,6 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Net;
 using Umbraco.Core.Packaging;
@@ -20,9 +18,9 @@ using Umbraco.Core.WebAssets;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Editors;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -40,7 +38,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IPackagingService _packagingService;
         private readonly ILogger _logger;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IWebSecurity _webSecurity;
         private readonly ILocalizedTextService _localizedTextService;
 
         public PackageInstallController(
@@ -50,7 +48,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IRuntimeMinifier runtimeMinifier,
             IPackagingService packagingService,
             ILogger logger,
-            IUmbracoContextAccessor umbracoContextAccessor,
+            IWebSecurity webSecurity,
             ILocalizedTextService localizedTextService)
         {
             _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
@@ -59,7 +57,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _runtimeMinifier = runtimeMinifier ?? throw new ArgumentNullException(nameof(runtimeMinifier));
             _packagingService = packagingService ?? throw new ArgumentNullException(nameof(packagingService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         }
 
@@ -89,15 +87,14 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var package = _packagingService.GetInstalledPackageById(packageId);
                 if (package == null) return NotFound();
 
-                var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-                var summary = _packagingService.UninstallPackage(package.Name, umbracoContext.Security.GetUserId().ResultOr(0));
+                var summary = _packagingService.UninstallPackage(package.Name, _webSecurity.GetUserId().ResultOr(0));
 
                 //now get all other packages by this name since we'll uninstall all versions
                 foreach (var installed in _packagingService.GetAllInstalledPackages()
                     .Where(x => x.Name == package.Name && x.Id != package.Id))
                 {
                     //remove from the xml
-                    _packagingService.DeleteInstalledPackage(installed.Id, umbracoContext.Security.GetUserId().ResultOr(0));
+                    _packagingService.DeleteInstalledPackage(installed.Id, _webSecurity.GetUserId().ResultOr(0));
                 }
             }
             catch (Exception ex)
@@ -223,11 +220,10 @@ namespace Umbraco.Web.BackOffice.Controllers
             string fileName = packageGuid + ".umb";
             if (System.IO.File.Exists(Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Packages), fileName)) == false)
             {
-                var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
                 var packageFile = await _packagingService.FetchPackageFileAsync(
                     Guid.Parse(packageGuid),
                     _umbracoVersion.Current,
-                    umbracoContext.Security.GetUserId().ResultOr(0));
+                    _webSecurity.GetUserId().ResultOr(0));
 
                 fileName = packageFile.Name;
             }
@@ -314,8 +310,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (definition == null) throw new InvalidOperationException("Not package definition found with id " + model.Id);
 
             var zipFile = new FileInfo(definition.PackagePath);
-            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            var installedFiles = _packagingService.InstallCompiledPackageFiles(definition, zipFile, umbracoContext.Security.GetUserId().ResultOr(0));
+            var installedFiles = _packagingService.InstallCompiledPackageFiles(definition, zipFile, _webSecurity.GetUserId().ResultOr(0));
 
             //set a restarting marker and reset the app pool
             _umbracoApplicationLifetime.Restart();
@@ -347,8 +342,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (definition == null) throw new InvalidOperationException("Not package definition found with id " + model.Id);
 
             var zipFile = new FileInfo(definition.PackagePath);
-            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            var installSummary = _packagingService.InstallCompiledPackageData(definition, zipFile, umbracoContext.Security.GetUserId().ResultOr(0));
+            var installSummary = _packagingService.InstallCompiledPackageData(definition, zipFile, _webSecurity.GetUserId().ResultOr(0));
 
             return model;
         }

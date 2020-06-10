@@ -172,14 +172,7 @@ namespace Umbraco.Web.Editors
                         //     "imagesApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImagesController>(
                         //         controller => controller.GetBigThumbnail(""))
                         // },
-                        {
-                            "sectionApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<SectionController>(
-                                controller => controller.GetSections())
-                        },
-                        {
-                            "treeApplicationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
-                                controller => controller.GetApplicationTrees(null, null, null, TreeUse.None))
-                        },
+
                         {
                             "contentTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
                                 controller => controller.GetAllowedChildren(0))
@@ -196,7 +189,7 @@ namespace Umbraco.Web.Editors
                             "macroApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MacrosController>(
                                 controller => controller.Create(null))
                         },
-                        
+
                         {
                             "currentUserApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
                                 controller => controller.PostChangePassword(null))
@@ -250,10 +243,10 @@ namespace Umbraco.Web.Editors
                             "memberGroupApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberGroupController>(
                                 controller => controller.GetAllGroups())
                         },
-                        {
-                            "updateCheckApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<UpdateCheckController>(
-                                controller => controller.GetCheck())
-                        },
+                        // {
+                        //     "updateCheckApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<UpdateCheckController>(
+                        //         controller => controller.GetCheck())
+                        // },
                         // {
                         //     "templateApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TemplateController>(
                         //         controller => controller.GetById(0))
@@ -296,10 +289,10 @@ namespace Umbraco.Web.Editors
                         //     "publishedStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedStatusController>(
                         //         controller => controller.GetPublishedStatusUrl())
                         // },
-                        {
-                            "dictionaryApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DictionaryController>(
-                                controller => controller.DeleteById(int.MaxValue))
-						},
+      //                   {
+      //                       "dictionaryApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DictionaryController>(
+      //                           controller => controller.DeleteById(int.MaxValue))
+						// },
                         // {
                         //     "publishedSnapshotCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedSnapshotCacheStatusController>(
                         //         controller => controller.GetStatus())
@@ -330,10 +323,10 @@ namespace Umbraco.Web.Editors
                         //     "webProfilingBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<WebProfilingController>(
                         //         controller => controller.GetStatus())
                         // },
-                        {
-                            "tinyMceApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TinyMceController>(
-                                controller => controller.UploadImage())
-                        },
+                        // {
+                        //     "tinyMceApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TinyMceController>(
+                        //         controller => controller.UploadImage())
+                        // },
                         //TODO Reintroduce
                         // {
                         //     "imageUrlGeneratorApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImageUrlGeneratorController>(

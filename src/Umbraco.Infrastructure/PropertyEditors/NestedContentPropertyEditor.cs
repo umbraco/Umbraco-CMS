@@ -32,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IContentTypeService _contentTypeService;
         private readonly IIOHelper _ioHelper;
 
-        internal const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
+        public const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
 
         public NestedContentPropertyEditor(
             ILogger logger,
