@@ -29,5 +29,27 @@ jobs:
   - job: buildDocs
     displayName: 'Build static docs site as ZIPs'
     steps:
+    - task: PowerShell@2
+      displayName: 'Build CMS'
+      inputs:
+        filePath: 'build.ps1'
+        workingDirectory: '/build'
 
-      - script: echo hello from YML
+    - task: PowerShell@2
+      displayName: 'Prep build tool for Docs build'
+      inputs:
+        targetType: 'inline'
+        script: '$uenv=./build.ps1 -get -doc'
+        workingDirectory: 'build'
+
+    - task: PowerShell@2
+      displayName: 'Build Angular Docs ZIP'
+      inputs:
+        targetType: 'inline'
+        script: '$uenv.PrepareAngularDocs()'
+
+    - task: PowerShell@2
+      displayName: 'Build C# Docs ZIP'
+      inputs:
+        targetType: 'inline'
+        script: '$uenv.PrepareCSharpDocs()'
