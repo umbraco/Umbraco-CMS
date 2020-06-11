@@ -463,7 +463,6 @@
     <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
     <Compile Include="Composing\TypeFinderTests.cs" />
     <Compile Include="Routing\UmbracoModuleTests.cs" />
-    <Compile Include="CoreThings\VersionExtensionTests.cs" />
     <Compile Include="Web\UrlHelperExtensionTests.cs" />
     <Compile Include="Web\WebExtensionMethodTests.cs" />
     <Compile Include="CoreThings\XmlExtensionsTests.cs" />
