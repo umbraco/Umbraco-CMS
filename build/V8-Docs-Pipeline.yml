@@ -54,3 +54,15 @@ jobs:
           $uenv.RestoreNode()
         errorActionPreference: 'continue'
         workingDirectory: 'build'
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Pipeline.Workspace)\build.out\ui-docs.zip'
+        artifact: 'ui-docs.zip'
+        publishLocation: 'pipeline'
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Pipeline.Workspace)\build.out\csharp-docs.zip'
+        artifact: 'csharp-docs.zip'
+        publishLocation: 'pipeline'
