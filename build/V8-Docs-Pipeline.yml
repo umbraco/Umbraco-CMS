@@ -49,6 +49,7 @@ jobs:
           $uenv=./build.ps1 -get -doc
           $uenv.SandboxNode()
           $uenv.PrepareAngularDocs()
+          $nugetsourceUmbraco = "https://api.nuget.org/v3/index.json"
           $uenv.PrepareCSharpDocs()
           $uenv.RestoreNode()
         errorActionPreference: 'continue'
