@@ -465,7 +465,6 @@
     <Compile Include="Routing\UmbracoModuleTests.cs" />
     <Compile Include="Web\UrlHelperExtensionTests.cs" />
     <Compile Include="Web\WebExtensionMethodTests.cs" />
-    <Compile Include="CoreThings\XmlExtensionsTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\DictionaryPublishedContent.cs" />
     <Compile Include="LegacyXmlPublishedCache\DomainCache.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewContent.cs" />
