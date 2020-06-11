@@ -41,8 +41,6 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
             composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
 
-            composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
-
 
             // register the umbraco helper - this is Transient! very important!
             // also, if not level.Run, we cannot really use the helper (during upgrade...)

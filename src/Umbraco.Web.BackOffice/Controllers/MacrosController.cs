@@ -237,7 +237,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns>
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
-        public List<string> GetPartialViews()
+        public IEnumerable<string> GetPartialViews()
         {
             var views = new List<string>();
 

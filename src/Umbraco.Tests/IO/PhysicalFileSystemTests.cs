@@ -16,7 +16,7 @@ namespace Umbraco.Tests.IO
     public class PhysicalFileSystemTests : AbstractFileSystemTests
     {
         public PhysicalFileSystemTests()
-            : base(new PhysicalFileSystem(TestHelper.IOHelper, Mock.Of<ILogger>(), Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests"), "/Media/"))
+            : base(new PhysicalFileSystem(TestHelper.IOHelper, TestHelper.GetHostingEnvironment(), Mock.Of<ILogger>(), Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests"), "/Media/"))
         { }
 
         [SetUp]
