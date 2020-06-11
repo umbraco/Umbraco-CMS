@@ -39,6 +39,7 @@ namespace Umbraco.Tests.IO
             composition.Register(_ => TestHelper.IOHelper);
             composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
             composition.RegisterUnique(TestHelper.IOHelper);
+            composition.RegisterUnique(TestHelper.GetHostingEnvironment());
 
             composition.Configs.Add(() => SettingsForTests.DefaultGlobalSettings);
             composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);

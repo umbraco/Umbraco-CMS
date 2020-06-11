@@ -7,6 +7,8 @@ using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Templates;
+using Umbraco.Core.Strings;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Mvc;
 
@@ -100,7 +102,7 @@ namespace Umbraco.Web
         /// <param name="contentId"></param>
         /// <param name="altTemplateId">If not specified, will use the template assigned to the node</param>
         /// <returns></returns>
-        public IHtmlString RenderTemplate(int contentId, int? altTemplateId = null)
+        public IHtmlEncodedString RenderTemplate(int contentId, int? altTemplateId = null)
         {
             return _componentRenderer.RenderTemplate(contentId, altTemplateId);
         }
@@ -112,7 +114,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="alias">The alias.</param>
         /// <returns></returns>
-        public IHtmlString RenderMacro(string alias)
+        public IHtmlEncodedString RenderMacro(string alias)
         {
             return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, null);
         }
@@ -123,7 +125,7 @@ namespace Umbraco.Web
         /// <param name="alias">The alias.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        public IHtmlString RenderMacro(string alias, object parameters)
+        public IHtmlEncodedString RenderMacro(string alias, object parameters)
         {
             return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters?.ToDictionary<object>());
         }
@@ -134,7 +136,7 @@ namespace Umbraco.Web
         /// <param name="alias">The alias.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        public IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters)
+        public IHtmlEncodedString RenderMacro(string alias, IDictionary<string, object> parameters)
         {
             return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters);
         }

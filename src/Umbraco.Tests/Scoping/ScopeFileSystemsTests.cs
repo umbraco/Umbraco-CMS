@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Scoping
         [TestCase(false)]
         public void CreateMediaTest(bool complete)
         {
-            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, Mock.Of<ILogger>(), IOHelper.MapPath("media"), "ignore");
+            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, Mock.Of<ILogger>(), IOHelper.MapPath("media"), "ignore");
             var mediaFileSystem = Current.MediaFileSystem;
 
             Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void MultiThread()
         {
-            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, Mock.Of<ILogger>(),IOHelper.MapPath("media"), "ignore");
+            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, Mock.Of<ILogger>(),IOHelper.MapPath("media"), "ignore");
             var mediaFileSystem = Current.MediaFileSystem;
 
             var scopeProvider = ScopeProvider;

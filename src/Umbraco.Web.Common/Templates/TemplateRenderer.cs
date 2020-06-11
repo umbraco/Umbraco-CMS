@@ -2,17 +2,25 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Web.Mvc;
-using System.Web.Routing;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Extensions;
 using Umbraco.Web.Models;
-using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Templates;
 
-namespace Umbraco.Web.Templates
+namespace Umbraco.Web.Common.Templates
 {
     /// <summary>
     /// This is used purely for the RenderTemplate functionality in Umbraco
@@ -29,8 +37,16 @@ namespace Umbraco.Web.Templates
         private readonly IWebRoutingSettings _webRoutingSettings;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICompositeViewEngine _viewEngine;
 
-        public TemplateRenderer(IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, IFileService fileService, ILocalizationService textService, IWebRoutingSettings webRoutingSettings, IShortStringHelper shortStringHelper, IHttpContextAccessor httpContextAccessor)
+        public TemplateRenderer(IUmbracoContextAccessor umbracoContextAccessor,
+            IPublishedRouter publishedRouter,
+            IFileService fileService,
+            ILocalizationService textService,
+            IWebRoutingSettings webRoutingSettings,
+            IShortStringHelper shortStringHelper,
+            IHttpContextAccessor httpContextAccessor,
+            ICompositeViewEngine viewEngine)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
@@ -38,7 +54,8 @@ namespace Umbraco.Web.Templates
             _languageService = textService ?? throw new ArgumentNullException(nameof(textService));
             _webRoutingSettings = webRoutingSettings ?? throw new ArgumentNullException(nameof(webRoutingSettings));
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
-            _httpContextAccessor = httpContextAccessor;
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            _viewEngine = viewEngine ?? throw new ArgumentNullException(nameof(viewEngine));
         }
 
         public void Render(int pageId, int? altTemplateId, StringWriter writer)
@@ -119,57 +136,39 @@ namespace Umbraco.Web.Templates
 
         private void ExecuteTemplateRendering(TextWriter sw, IPublishedRequest request)
         {
-            //NOTE: Before we used to build up the query strings here but this is not necessary because when we do a
-            // Server.Execute in the TemplateRenderer, we pass in a 'true' to 'preserveForm' which automatically preserves all current
-            // query strings so there's no need for this. HOWEVER, once we get MVC involved, we might have to do some fun things,
-            // though this will happen in the TemplateRenderer.
+            var httpContext = _httpContextAccessor.GetRequiredHttpContext();
 
-            //var queryString = _umbracoContext.HttpContext.Request.QueryString.AllKeys
-            //    .ToDictionary(key => key, key => context.Request.QueryString[key]);
+            var viewResult = _viewEngine.GetView(null, $"~/Views/{request.TemplateAlias}.cshtml", false);
 
-            var requestContext = new RequestContext(_httpContextAccessor.GetRequiredHttpContext(), new RouteData()
+            if (viewResult.Success == false)
             {
-                Route = RouteTable.Routes["Umbraco_default"]
-            });
-            var routeHandler = new RenderRouteHandler(_umbracoContextAccessor, ControllerBuilder.Current.GetControllerFactory(), _shortStringHelper);
-            var routeDef = routeHandler.GetUmbracoRouteDefinition(requestContext, request);
-            var renderModel = new ContentModel(request.PublishedContent);
-            //manually add the action/controller, this is required by mvc
-            requestContext.RouteData.Values.Add("action", routeDef.ActionName);
-            requestContext.RouteData.Values.Add("controller", routeDef.ControllerName);
-            //add the rest of the required route data
-            routeHandler.SetupRouteDataForRequest(renderModel, requestContext, request);
+                throw new InvalidOperationException($"A view with the name {request.TemplateAlias} could not be found");
+            }
 
-            var stringOutput = RenderUmbracoRequestToString(requestContext);
+            var modelMetadataProvider = httpContext.RequestServices.GetRequiredService<IModelMetadataProvider>();
+            var tempDataProvider = httpContext.RequestServices.GetRequiredService<ITempDataProvider>();
 
-            sw.Write(stringOutput);
-        }
+            var viewData = new ViewDataDictionary(modelMetadataProvider, new ModelStateDictionary())
+            {
+                Model = request.PublishedContent
+            };
 
-        /// <summary>
-        /// This will execute the UmbracoMvcHandler for the request specified and get the string output.
-        /// </summary>
-        /// <param name="requestContext">
-        /// Assumes the RequestContext is setup specifically to render an Umbraco view.
-        /// </param>
-        /// <returns></returns>
-        /// <remarks>
-        /// To achieve this we temporarily change the output text writer of the current HttpResponse, then
-        ///   execute the controller via the handler which inevitably writes the result to the text writer
-        ///   that has been assigned to the response. Then we change the response textwriter back to the original
-        ///   before continuing .
-        /// </remarks>
-        private string RenderUmbracoRequestToString(RequestContext requestContext)
-        {
-            var currentWriter = requestContext.HttpContext.Response.Output;
-            var newWriter = new StringWriter();
-            requestContext.HttpContext.Response.Output = newWriter;
+            var writer = new StringWriter();
+            var viewContext = new ViewContext(
+                new ActionContext(httpContext, httpContext.GetRouteData(), new ControllerActionDescriptor()),
+                viewResult.View,
+                viewData,
+                new TempDataDictionary(httpContext, tempDataProvider),
+                writer,
+                new HtmlHelperOptions()
+            );
 
-            var handler = new UmbracoMvcHandler(requestContext);
-            handler.ExecuteUmbracoRequest();
 
-            //reset it
-            requestContext.HttpContext.Response.Output = currentWriter;
-            return newWriter.ToString();
+            viewResult.View.RenderAsync(viewContext).GetAwaiter().GetResult();
+
+            var output = writer.GetStringBuilder().ToString();
+
+            sw.Write(output);
         }
 
         private void SetNewItemsOnContextObjects(IPublishedRequest request)

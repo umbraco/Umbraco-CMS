@@ -27,7 +27,7 @@ namespace Umbraco.Web.Routing
         /// one document per culture), and domains, withing the context of a current Uri, assign
         /// a culture to that document.</para>
         /// </remarks>
-        internal static string GetCultureFromDomains(int contentId, string contentPath, Uri current, IUmbracoContext umbracoContext, ISiteDomainHelper siteDomainHelper)
+        public static string GetCultureFromDomains(int contentId, string contentPath, Uri current, IUmbracoContext umbracoContext, ISiteDomainHelper siteDomainHelper)
         {
             if (umbracoContext == null)
                 throw new InvalidOperationException("A current UmbracoContext is required.");
@@ -146,7 +146,7 @@ namespace Umbraco.Web.Routing
         /// the right one, unless it is <c>null</c>, in which case the method returns <c>null</c>.</para>
         /// <para>The filter, if any, will be called only with a non-empty argument, and _must_ return something.</para>
         /// </remarks>
-        internal static DomainAndUri SelectDomain(IEnumerable<Domain> domains, Uri uri, string culture = null, string defaultCulture = null, Func<IReadOnlyCollection<DomainAndUri>, Uri, string, string, DomainAndUri> filter = null)
+        public static DomainAndUri SelectDomain(IEnumerable<Domain> domains, Uri uri, string culture = null, string defaultCulture = null, Func<IReadOnlyCollection<DomainAndUri>, Uri, string, string, DomainAndUri> filter = null)
         {
             // sanitize the list to have proper uris for comparison (scheme, path end with /)
             // we need to end with / because example.com/foo cannot match example.com/foobar

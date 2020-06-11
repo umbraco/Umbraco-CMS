@@ -54,14 +54,15 @@ namespace Umbraco.Tests.IO
         {
             var ioHelper = TestHelper.IOHelper;
             var logger = Mock.Of<ILogger>();
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
 
-            var fs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowTests/", "ignore");
-            var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "ignore");
+            var fs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
             Directory.CreateDirectory(path + "/ShadowTests/d1");
@@ -91,14 +92,15 @@ namespace Umbraco.Tests.IO
         {
             var ioHelper = TestHelper.IOHelper;
             var logger = Mock.Of<ILogger>();
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
 
-            var fs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowTests/", "ignore");
-            var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "ignore");
+            var fs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
             Directory.CreateDirectory(path + "/ShadowTests/sub");
@@ -143,14 +145,15 @@ namespace Umbraco.Tests.IO
         {
             var ioHelper = TestHelper.IOHelper;
             var logger = Mock.Of<ILogger>();
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
 
-            var fs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowTests/", "ignore");
-            var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "ignore");
+            var fs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
             File.WriteAllText(path + "/ShadowTests/f1.txt", "foo");
@@ -185,6 +188,7 @@ namespace Umbraco.Tests.IO
         {
             var ioHelper = TestHelper.IOHelper;
             var logger = Mock.Of<ILogger>();
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
 
@@ -192,8 +196,8 @@ namespace Umbraco.Tests.IO
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
 
-            var fs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowTests/", "ignore");
-            var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "ignore");
+            var fs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
             Directory.CreateDirectory(path + "/ShadowTests/sub");
@@ -244,14 +248,15 @@ namespace Umbraco.Tests.IO
         {
             var ioHelper = TestHelper.IOHelper;
             var logger = Mock.Of<ILogger>();
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
 
-            var fs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowTests/", "ignore");
-            var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "ignore");
+            var fs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
             Assert.Throws<UnauthorizedAccessException>(() =>
@@ -266,14 +271,15 @@ namespace Umbraco.Tests.IO
         {
             var ioHelper = TestHelper.IOHelper;
             var logger = Mock.Of<ILogger>();
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
 
-            var fs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowTests/", "ignore");
-            var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "ignore");
+            var fs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(ioHelper,hostingEnvironment, logger, path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
             File.WriteAllText(path + "/ShadowTests/f2.txt", "foo");
@@ -308,14 +314,15 @@ namespace Umbraco.Tests.IO
         {
             var ioHelper = TestHelper.IOHelper;
             var logger = Mock.Of<ILogger>();
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
 
-            var fs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowTests/", "ignore");
-            var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "ignore");
+            var fs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
@@ -351,14 +358,15 @@ namespace Umbraco.Tests.IO
         {
             var ioHelper = TestHelper.IOHelper;
             var logger = Mock.Of<ILogger>();
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
 
-            var fs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowTests/", "ignore");
-            var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "ignore");
+            var fs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
@@ -376,14 +384,15 @@ namespace Umbraco.Tests.IO
         {
             var ioHelper = TestHelper.IOHelper;
             var logger = Mock.Of<ILogger>();
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
 
-            var fs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowTests/", "ignore");
-            var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "ignore");
+            var fs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
             Directory.CreateDirectory(path + "/ShadowTests/sub/sub");
@@ -415,6 +424,7 @@ namespace Umbraco.Tests.IO
         {
             var logger = Mock.Of<ILogger>();
             var ioHelper = TestHelper.IOHelper;
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             var shadowfs = ioHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
@@ -423,10 +433,10 @@ namespace Umbraco.Tests.IO
 
             var scopedFileSystems = false;
 
-            var phy = new PhysicalFileSystem(ioHelper, logger, path, "ignore");
+            var phy = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path, "ignore");
 
             var container = Mock.Of<IFactory>();
-            var fileSystems = new FileSystems(container, logger, ioHelper, SettingsForTests.GenerateMockGlobalSettings()) { IsScoped = () => scopedFileSystems };
+            var fileSystems = new FileSystems(container, logger, ioHelper, SettingsForTests.GenerateMockGlobalSettings(), TestHelper.GetHostingEnvironment()) { IsScoped = () => scopedFileSystems };
             var fs = fileSystems.GetFileSystem<FS>(phy);
             var sw = (ShadowWrapper) fs.InnerFileSystem;
 
@@ -511,6 +521,7 @@ namespace Umbraco.Tests.IO
         {
             var logger = Mock.Of<ILogger>();
             var ioHelper = TestHelper.IOHelper;
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             var shadowfs = ioHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
@@ -518,10 +529,10 @@ namespace Umbraco.Tests.IO
 
             var scopedFileSystems = false;
 
-            var phy = new PhysicalFileSystem(ioHelper, logger, path, "ignore");
+            var phy = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path, "ignore");
 
             var container = Mock.Of<IFactory>();
-            var fileSystems = new FileSystems(container, logger, ioHelper, SettingsForTests.GenerateMockGlobalSettings()) { IsScoped = () => scopedFileSystems };
+            var fileSystems = new FileSystems(container, logger, ioHelper, SettingsForTests.GenerateMockGlobalSettings(), TestHelper.GetHostingEnvironment()) { IsScoped = () => scopedFileSystems };
             var fs = fileSystems.GetFileSystem<FS>( phy);
             var sw = (ShadowWrapper) fs.InnerFileSystem;
 
@@ -565,6 +576,7 @@ namespace Umbraco.Tests.IO
         {
             var logger = Mock.Of<ILogger>();
             var ioHelper = TestHelper.IOHelper;
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             var shadowfs = ioHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
@@ -572,10 +584,10 @@ namespace Umbraco.Tests.IO
 
             var scopedFileSystems = false;
 
-            var phy = new PhysicalFileSystem(ioHelper, logger, path, "ignore");
+            var phy = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path, "ignore");
 
             var container = Mock.Of<IFactory>();
-            var fileSystems = new FileSystems(container, logger, ioHelper, SettingsForTests.GenerateMockGlobalSettings()) { IsScoped = () => scopedFileSystems };
+            var fileSystems = new FileSystems(container, logger, ioHelper, SettingsForTests.GenerateMockGlobalSettings(), TestHelper.GetHostingEnvironment()) { IsScoped = () => scopedFileSystems };
             var fs = fileSystems.GetFileSystem<FS>( phy);
             var sw = (ShadowWrapper)fs.InnerFileSystem;
 
@@ -683,14 +695,15 @@ namespace Umbraco.Tests.IO
             // Arrange
             var ioHelper = TestHelper.IOHelper;
             var logger = Mock.Of<ILogger>();
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
 
-            var fs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowTests/", "ignore");
-            var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "ignore");
+            var fs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
             // Act
@@ -718,14 +731,15 @@ namespace Umbraco.Tests.IO
             // Arrange
             var ioHelper = TestHelper.IOHelper;
             var logger = Mock.Of<ILogger>();
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
 
-            var fs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowTests/", "ignore");
-            var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "ignore");
+            var fs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
             // Act
@@ -756,14 +770,15 @@ namespace Umbraco.Tests.IO
             // Arrange
             var ioHelper = TestHelper.IOHelper;
             var logger = Mock.Of<ILogger>();
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
 
-            var fs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowTests/", "ignore");
-            var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "ignore");
+            var fs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
             // Act
@@ -791,14 +806,15 @@ namespace Umbraco.Tests.IO
             // Arrange
             var ioHelper = TestHelper.IOHelper;
             var logger = Mock.Of<ILogger>();
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
 
-            var fs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowTests/", "ignore");
-            var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "ignore");
+            var fs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
             // Act
@@ -829,14 +845,15 @@ namespace Umbraco.Tests.IO
             // Arrange
             var ioHelper = TestHelper.IOHelper;
             var logger = Mock.Of<ILogger>();
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
 
-            var fs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowTests/", "ignore");
-            var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "ignore");
+            var fs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
             // Act
@@ -879,14 +896,15 @@ namespace Umbraco.Tests.IO
             // Arrange
             var ioHelper = TestHelper.IOHelper;
             var logger = Mock.Of<ILogger>();
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
 
-            var fs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowTests/", "ignore");
-            var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "ignore");
+            var fs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
             // Act
@@ -916,14 +934,15 @@ namespace Umbraco.Tests.IO
             // Arrange
             var ioHelper = TestHelper.IOHelper;
             var logger = Mock.Of<ILogger>();
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
 
-            var fs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowTests/", "ignore");
-            var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "ignore");
+            var fs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
             // Act
@@ -958,14 +977,15 @@ namespace Umbraco.Tests.IO
             // Arrange
             var ioHelper = TestHelper.IOHelper;
             var logger = Mock.Of<ILogger>();
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var path = ioHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
 
-            var fs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowTests/", "rootUrl");
-            var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "rootUrl");
+            var fs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowTests/", "rootUrl");
+            var sfs = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path + "/ShadowSystem/", "rootUrl");
             var ss = new ShadowFileSystem(fs, sfs);
 
             // Act
