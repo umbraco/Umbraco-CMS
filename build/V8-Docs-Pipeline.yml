@@ -31,19 +31,19 @@ jobs:
     steps:
 
     - task: PowerShell@2
-      displayName: 'List contents in build dir'
-      inputs:
-        targetType: 'inline'
-        script: 'ls'
-        workingDirectory: 'build'
-
-    - task: PowerShell@2
       displayName: 'Build CMS'
       inputs:
         filePath: 'build/build.ps1'
         errorActionPreference: 'continue'
         failOnStderr: true
 
+    - powershell: 'node -v'
+
+    - task: UseNode@1
+      inputs:
+        version: '10.x'
+
+    - powershell: 'node -v'
     - task: PowerShell@2
       displayName: 'Prep build tool, build C# & JS Docs'
       inputs:
