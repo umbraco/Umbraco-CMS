@@ -122,7 +122,6 @@
     <Compile Include="Configurations\GlobalSettingsTests.cs" />
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
-    <Compile Include="CoreThings\HexEncoderTests.cs" />
     <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\ContentXmlDto.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewXmlDto.cs" />
