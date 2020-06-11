@@ -300,7 +300,7 @@
              * @return {Array} array of strings representing alias.
              */
             getAvailableAliasesForBlockContent: function() {
-                return this.blockConfigurations.map(blockConfiguration => getScaffoldFor(blockConfiguration.contentTypeKey).contentTypeKey);
+                return this.blockConfigurations.map(blockConfiguration => this.getScaffoldFor(blockConfiguration.contentTypeKey).contentTypeKey);
             },
 
             getAvailableBlocksForBlockPicker: function() {
