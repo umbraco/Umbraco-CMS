@@ -49,8 +49,7 @@ jobs:
       inputs:
         targetType: 'inline'
         script: |
-          $uenv=./build.ps1 -get -doc
+          $uenv=build/build.ps1 -get -doc
           $uenv.PrepareAngularDocs()
           $uenv.PrepareCSharpDocs()
-        workingDirectory: 'build'
         errorActionPreference: 'continue'
