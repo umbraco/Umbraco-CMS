@@ -59,22 +59,7 @@ namespace Umbraco.Extensions
             return linkGenerator.GetUmbracoApiService(actionName, typeof(T), id);
         }
 
-        public static string GetUmbracoApiService<T>(this LinkGenerator url, Expression<Func<T, object>> methodSelector)
-           where T : UmbracoApiControllerBase
-        {
-            var method = ExpressionHelper.GetMethodInfo(methodSelector);
-            var methodParams = ExpressionHelper.GetMethodParams(methodSelector);
-            if (method == null)
-            {
-                throw new MissingMethodException("Could not find the method " + methodSelector + " on type " + typeof(T) + " or the result ");
-            }
 
-            if (methodParams.Any() == false)
-            {
-                return url.GetUmbracoApiService<T>(method.Name);
-            }
-            return url.GetUmbracoApiService<T>(method.Name, methodParams.Values.First());
-        }
 
         public static string GetUmbracoApiServiceBaseUrl<T>(this LinkGenerator linkGenerator, Expression<Func<T, object>> methodSelector)
             where T : UmbracoApiControllerBase
