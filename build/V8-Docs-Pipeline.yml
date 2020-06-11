@@ -36,11 +36,7 @@ jobs:
         filePath: 'build/build.ps1'
         errorActionPreference: 'continue'
         failOnStderr: true
-
-    - powershell: 'node -v'
-
-    - powershell: 'ls'
-
+        
     - task: PowerShell@2
       displayName: 'Prep build tool, build C# & JS Docs'
       inputs:
@@ -57,14 +53,28 @@ jobs:
 
     - powershell: 'dir env:'
 
-    - task: PublishPipelineArtifact@1
+    - task: CopyFiles@2
+      displayName: 'Copy static site .zips to: $(build.artifactstagingdirectory)'
       inputs:
-        targetPath: '$(Build.Repository.LocalPath)\build.out\ui-docs.zip'
-        artifact: 'ui-docs.zip'
-        publishLocation: 'pipeline'
+          SourceFolder: build.out
+          Contents: |
+            *.zip
+            *.nupkg
+          TargetFolder: '$(build.artifactstagingdirectory)'        
 
-    - task: PublishPipelineArtifact@1
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: drop'
       inputs:
-        targetPath: '$(Build.Repository.LocalPath)\build.out\csharp-docs.zip'
-        artifact: 'csharp-docs.zip'
-        publishLocation: 'pipeline'
+        ArtifactName: drop
+
+    # - task: PublishPipelineArtifact@1
+    #   inputs:
+    #     targetPath: '$(Build.Repository.LocalPath)\build.out\ui-docs.zip'
+    #     artifact: 'ui-docs.zip'
+    #     publishLocation: 'pipeline'
+
+    # - task: PublishPipelineArtifact@1
+    #   inputs:
+    #     targetPath: '$(Build.Repository.LocalPath)\build.out\csharp-docs.zip'
+    #     artifact: 'csharp-docs.zip'
+    #     publishLocation: 'pipeline'
