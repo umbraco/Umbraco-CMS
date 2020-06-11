@@ -4,10 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core.Services;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Core;
 
 namespace Umbraco.Web.BackOffice.PropertyEditors
 {
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class NestedContentController : UmbracoAuthorizedJsonController
     {
         private readonly IContentTypeService _contentTypeService;

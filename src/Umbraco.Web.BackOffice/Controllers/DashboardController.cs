@@ -25,7 +25,7 @@ using Umbraco.Web.WebApi.Filters;
 namespace Umbraco.Web.BackOffice.Controllers
 {
     //we need to fire up the controller like this to enable loading of remote css directly from this controller
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [ValidationFilter]
     [AngularJsonOnlyConfiguration] // TODO: This could be applied with our Application Model conventions
     [IsBackOffice]

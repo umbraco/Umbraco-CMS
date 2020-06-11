@@ -12,7 +12,7 @@ namespace Umbraco.Web.BackOffice.PropertyEditors
     /// <summary>
     /// ApiController to provide RTE configuration with available plugins and commands from the RTE config
     /// </summary>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class RichTextPreValueController : UmbracoAuthorizedJsonController
     {
         private readonly IHostingEnvironment _hostingEnvironment;

@@ -27,7 +27,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// The security for this controller is defined to allow full CRUD access to data types if the user has access to either:
     /// Content Types, Member Types or Media Types ... and of course to Data Types
     /// </remarks>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [UmbracoTreeAuthorizeAttribute(Constants.Trees.DataTypes, Constants.Trees.DocumentTypes, Constants.Trees.MediaTypes, Constants.Trees.MemberTypes)]
     public class DataTypeController : BackOfficeNotificationsController
     {

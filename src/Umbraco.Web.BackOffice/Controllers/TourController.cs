@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Services;
@@ -13,7 +14,7 @@ using Umbraco.Web.Tour;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class TourController : UmbracoAuthorizedJsonController
     {
         private readonly TourFilterCollection _filters;

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -17,7 +18,7 @@ namespace Umbraco.Web.Editors
     /// <summary>
     ///     The API controller used for using the list of sections
     /// </summary>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class SectionController : UmbracoAuthorizedJsonController
     {
         private readonly IControllerFactory _controllerFactory;

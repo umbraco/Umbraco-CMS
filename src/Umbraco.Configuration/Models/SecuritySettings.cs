@@ -14,7 +14,7 @@ namespace Umbraco.Configuration.Models
             _configuration = configuration;
         }
 
-        public bool KeepUserLoggedIn => _configuration.GetValue(Prefix + "KeepUserLoggedIn", true);
+        public bool KeepUserLoggedIn => _configuration.GetValue(Prefix + "KeepUserLoggedIn", false);
 
         public bool HideDisabledUsersInBackoffice =>
             _configuration.GetValue(Prefix + "HideDisabledUsersInBackoffice", false);

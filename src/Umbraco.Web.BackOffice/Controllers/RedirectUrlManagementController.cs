@@ -15,7 +15,7 @@ using Umbraco.Web.Security;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class RedirectUrlManagementController : UmbracoAuthorizedApiController
     {
         private readonly ILogger _logger;

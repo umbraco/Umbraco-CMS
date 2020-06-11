@@ -269,7 +269,6 @@
     <Compile Include="Composing\ComposingTestBase.cs" />
     <Compile Include="Routing\RoutesCacheTests.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
-    <Compile Include="Security\BackOfficeCookieManagerTests.cs" />
     <Compile Include="Services\ContentTypeServiceExtensionsTests.cs" />
     <Compile Include="Services\PublicAccessServiceTests.cs" />
     <Compile Include="StringNewlineExtensions.cs" />

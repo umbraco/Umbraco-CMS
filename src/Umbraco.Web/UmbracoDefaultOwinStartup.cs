@@ -63,7 +63,6 @@ namespace Umbraco.Web
         protected virtual void ConfigureServices(IAppBuilder app, ServiceContext services)
         {
             app.SetUmbracoLoggerFactory();
-            ConfigureUmbracoUserManager(app);
         }
 
         /// <summary>
@@ -82,21 +81,6 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Configure the Identity user manager for use with Umbraco Back office
-        /// </summary>
-        /// <param name="app"></param>
-        protected virtual void ConfigureUmbracoUserManager(IAppBuilder app)
-        {
-            // (EXPERT: an overload accepts a custom BackOfficeUserStore implementation)
-            app.ConfigureUserManagerForUmbracoBackOffice(
-                Services,
-                GlobalSettings,
-                Mapper,
-                UserPasswordConfig,
-                IpResolver);
-        }
-
-        /// <summary>
         /// Configure external/OAuth login providers
         /// </summary>
         /// <param name="app"></param>
@@ -105,7 +89,8 @@ namespace Umbraco.Web
             // Ensure owin is configured for Umbraco back office authentication.
             // Front-end OWIN cookie configuration must be declared after this code.
             app
-                .UseUmbracoBackOfficeCookieAuthentication(UmbracoContextAccessor, RuntimeState, Services.UserService, GlobalSettings, SecuritySettings, HostingEnvironment, RequestCache, PipelineStage.Authenticate)
+                // already moved to netcore
+                //.UseUmbracoBackOfficeCookieAuthentication(UmbracoContextAccessor, RuntimeState, Services.UserService, GlobalSettings, SecuritySettings, HostingEnvironment, RequestCache, PipelineStage.Authenticate)
                 .UseUmbracoBackOfficeExternalCookieAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, HostingEnvironment, RequestCache, PipelineStage.Authenticate)
                 .UseUmbracoPreviewAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, SecuritySettings, HostingEnvironment, RequestCache, PipelineStage.Authorize);
         }

@@ -334,7 +334,6 @@
     <Compile Include="Security\AppBuilderExtensions.cs" />
     <Compile Include="Security\AuthenticationOptionsExtensions.cs" />
     <Compile Include="Security\AuthenticationManagerExtensions.cs" />
-    <Compile Include="Security\BackOfficeCookieManager.cs" />
     <Compile Include="Security\UmbracoBackOfficeCookieAuthOptions.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
     <Compile Include="Trees\FileSystemTreeController.cs" />
@@ -347,7 +346,6 @@
     <Compile Include="WebApi\AngularJsonOnlyConfigurationAttribute.cs" />
     <Compile Include="Editors\Binders\MemberBinder.cs" />
     <Compile Include="WebApi\Filters\AngularAntiForgeryHelper.cs" />
-    <Compile Include="WebApi\Filters\ClearAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="WebApi\Filters\DisableBrowserCacheAttribute.cs" />
     <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterGrouping.cs" />

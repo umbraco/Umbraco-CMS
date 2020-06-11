@@ -57,19 +57,19 @@ namespace Umbraco.Web.Security
         protected override Task ApplyResponseGrantAsync()
         {
             if (_umbracoContextAccessor.UmbracoContext == null || Context.Request.Uri.IsClientSideRequest())
-            {
+            {   
                 return Task.FromResult(0);
             }
 
             //Now we need to check if we should force renew this based on a flag in the context and whether this is a request that is not normally renewed by OWIN...
             // which means that it is not a normal URL that is authenticated.
 
-            var normalAuthUrl = ((BackOfficeCookieManager) Options.CookieManager)
-                .ShouldAuthenticateRequest(Context, _umbracoContextAccessor.UmbracoContext.OriginalRequestUrl,
-                    //Pass in false, we want to know if this is a normal auth'd page
-                    checkForceAuthTokens: false);
-            //This is auth'd normally, so OWIN will naturally take care of the cookie renewal
-            if (normalAuthUrl) return Task.FromResult(0);
+            //var normalAuthUrl = ((BackOfficeCookieManager) Options.CookieManager)
+            //    .ShouldAuthenticateRequest(Context, _umbracoContextAccessor.UmbracoContext.OriginalRequestUrl,
+            //        //Pass in false, we want to know if this is a normal auth'd page
+            //        checkForceAuthTokens: false);
+            ////This is auth'd normally, so OWIN will naturally take care of the cookie renewal
+            //if (normalAuthUrl) return Task.FromResult(0);
 
             //check for the special flag in either the owin or http context
             var shouldRenew = Context.Get<bool?>(Constants.Security.ForceReAuthFlag) != null || (_requestCache.IsAvailable && _requestCache.Get(Constants.Security.ForceReAuthFlag) != null);
