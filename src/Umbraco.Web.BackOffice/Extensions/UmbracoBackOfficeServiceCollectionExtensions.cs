@@ -23,10 +23,6 @@ namespace Umbraco.Extensions
         {
             services.AddAntiforgery();
 
-            //We need to have runtime compilation of views when using backoffice. We could consider having only this when a specific config is set.
-            //But as far as I can see, there are still precompiled views, even when this is activated, so maybe it is okay.
-            services.AddControllersWithViews().AddRazorRuntimeCompilation();
-
             services
                 .AddAuthentication(Constants.Security.BackOfficeAuthenticationType)
                 .AddCookie(Constants.Security.BackOfficeAuthenticationType);

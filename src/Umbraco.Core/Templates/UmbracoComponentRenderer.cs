@@ -2,7 +2,6 @@
 using System.Linq;
 using System.IO;
 using System.Web;
-using Umbraco.Core;
 using Umbraco.Web.Templates;
 using System.Collections.Generic;
 using Umbraco.Core.Models.PublishedContent;
@@ -10,7 +9,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.Macros;
 
-namespace Umbraco.Core.Net
+namespace Umbraco.Core.Templates
 {
 
     /// <summary>
@@ -19,7 +18,6 @@ namespace Umbraco.Core.Net
     /// <remarks>
     /// Used by UmbracoHelper
     /// </remarks>
-    // Migrated to .NET Core
     public class UmbracoComponentRenderer : IUmbracoComponentRenderer
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;

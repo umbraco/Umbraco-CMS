@@ -52,6 +52,11 @@ namespace Umbraco.Web.UI.BackOffice
                 options.ShouldProfile = request => false; // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
             });
 
+            //We need to have runtime compilation of views when using umbraco. We could consider having only this when a specific config is set.
+            //But as far as I can see, there are still precompiled views, even when this is activated, so maybe it is okay.
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
+
+
             // If using Kestrel: https://stackoverflow.com/a/55196057
             services.Configure<KestrelServerOptions>(options =>
             {

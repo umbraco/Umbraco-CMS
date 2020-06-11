@@ -4,7 +4,7 @@ using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.Net;
+using Umbraco.Core.Templates;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
