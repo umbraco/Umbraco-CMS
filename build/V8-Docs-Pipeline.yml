@@ -41,6 +41,7 @@ jobs:
       displayName: 'Build CMS'
       inputs:
         filePath: 'build/build.ps1'
+        errorActionPreference: 'continue'
 
     - task: PowerShell@2
       displayName: 'Prep build tool for Docs build'
