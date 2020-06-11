@@ -71,7 +71,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
         }
 
         [TestCase(ClaimTypes.NameIdentifier, _testUserId)]
-        [TestCase(ClaimTypes.Name, _testUserName)]        
+        [TestCase(ClaimTypes.Name, _testUserName)]
         public async Task CreateAsync_Should_Include_Claim(string expectedClaimType, object expectedClaimValue)
         {
             var sut = CreateSut();
@@ -79,7 +79,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             var claimsPrincipal = await sut.CreateAsync(_testUser);
 
             Assert.True(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue.ToString()));
-            Assert.True(claimsPrincipal.GetUmbracoIdentity().Actor.HasClaim(expectedClaimType, expectedClaimValue.ToString()));
+            Assert.True(claimsPrincipal.GetUmbracoIdentity().HasClaim(expectedClaimType, expectedClaimValue.ToString()));
         }
 
         [Test]
@@ -94,9 +94,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             var sut = CreateSut();
 
             var claimsPrincipal = await sut.CreateAsync(_testUser);
-            
+
             Assert.True(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue));
-            Assert.True(claimsPrincipal.GetUmbracoIdentity().Actor.HasClaim(expectedClaimType, expectedClaimValue));
+            Assert.True(claimsPrincipal.GetUmbracoIdentity().HasClaim(expectedClaimType, expectedClaimValue));
         }
 
         [Test]
@@ -112,7 +112,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             var sut = CreateSut();
 
             var claimsPrincipal = await sut.CreateAsync(_testUser);
-            
+
             Assert.True(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue));
         }
 
@@ -131,7 +131,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
 
             var claimsPrincipal = await sut.CreateAsync(_testUser);
 
-            Assert.True(claimsPrincipal.GetUmbracoIdentity().Actor.HasClaim(expectedClaimType, expectedClaimValue));
+            Assert.True(claimsPrincipal.GetUmbracoIdentity().HasClaim(expectedClaimType, expectedClaimValue));
         }
 
         [SetUp]
