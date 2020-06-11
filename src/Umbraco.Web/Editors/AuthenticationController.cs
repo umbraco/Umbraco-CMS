@@ -1,15 +1,15 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Collections.Generic;
+using System.Net.Mail;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
+using Microsoft.AspNetCore.Identity;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
@@ -48,6 +48,7 @@ namespace Umbraco.Web.Editors
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeState _runtimeState;
         private readonly ISecuritySettings _securitySettings;
+        private readonly IEmailSender _emailSender;
 
         public AuthenticationController(
             IUserPasswordConfiguration passwordConfiguration,
@@ -61,13 +62,15 @@ namespace Umbraco.Web.Editors
             IRuntimeState runtimeState,
             UmbracoMapper umbracoMapper,
             ISecuritySettings securitySettings,
-            IPublishedUrlProvider publishedUrlProvider)
+            IPublishedUrlProvider publishedUrlProvider,
+            IEmailSender emailSender)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
             _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
             _securitySettings = securitySettings ?? throw new ArgumentNullException(nameof(securitySettings));
+            _emailSender = emailSender;
         }
 
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager
@@ -105,15 +108,15 @@ namespace Umbraco.Web.Editors
             if (decoded.IsNullOrWhiteSpace())
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
-            var identityUser = await UserManager.FindByIdAsync(id);
+            var identityUser = await UserManager.FindByIdAsync(id.ToString());
             if (identityUser == null)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
-            var result = await UserManager.ConfirmEmailAsync(id, decoded);
+            var result = await UserManager.ConfirmEmailAsync(identityUser, decoded);
 
             if (result.Succeeded == false)
             {
-                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(string.Join(", ", result.Errors)));
+                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(result.Errors.ToErrorMessage()));
             }
 
             Request.TryGetOwinContext().Result.Authentication.SignOut(
@@ -131,13 +134,16 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public async Task<HttpResponseMessage> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)
         {
+            var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            if (user == null) throw new InvalidOperationException("Could not find user");
+
             var result = await UserManager.RemoveLoginAsync(
-                User.Identity.GetUserId<int>(),
-                new UserLoginInfo(unlinkLoginModel.LoginProvider, unlinkLoginModel.ProviderKey));
+                user,
+                unlinkLoginModel.LoginProvider,
+                unlinkLoginModel.ProviderKey);
 
             if (result.Succeeded)
             {
-                var user = await UserManager.FindByIdAsync(User.Identity.GetUserId<int>());
                 await SignInManager.SignInAsync(user, isPersistent: true, rememberBrowser: false);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -225,7 +231,7 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
         {
-            var identityUser = await UserManager.FindByIdAsync(UmbracoContext.Security.GetUserId().ResultOr(0));
+            var identityUser = await UserManager.FindByIdAsync(UmbracoContext.Security.GetUserId().ResultOr(0).ToString());
             return identityUser.Logins.ToDictionary(x => x.LoginProvider, x => x.ProviderKey);
         }
 
@@ -244,61 +250,58 @@ namespace Umbraco.Web.Editors
             var result = await SignInManager.PasswordSignInAsync(
                 loginModel.Username, loginModel.Password, isPersistent: true, shouldLockout: true);
 
-            switch (result)
+            if (result.Succeeded)
             {
-                case SignInStatus.Success:
+                // get the user
+                var user = Services.UserService.GetByUsername(loginModel.Username);
+                UserManager.RaiseLoginSuccessEvent(user.Id);
 
-                    // get the user
-                    var user = Services.UserService.GetByUsername(loginModel.Username);
-                    UserManager.RaiseLoginSuccessEvent(user.Id);
-
-                    return SetPrincipalAndReturnUserDetail(user, owinContext.Request.User);
-                case SignInStatus.RequiresVerification:
-
-                    var twofactorOptions = UserManager as IUmbracoBackOfficeTwoFactorOptions;
-                    if (twofactorOptions == null)
-                    {
-                        throw new HttpResponseException(
-                            Request.CreateErrorResponse(
-                                HttpStatusCode.BadRequest,
-                                "UserManager does not implement " + typeof(IUmbracoBackOfficeTwoFactorOptions)));
-                    }
-
-                    var twofactorView = twofactorOptions.GetTwoFactorView(
-                        owinContext,
-                        UmbracoContext,
-                        loginModel.Username);
-
-                    if (twofactorView.IsNullOrWhiteSpace())
-                    {
-                        throw new HttpResponseException(
-                            Request.CreateErrorResponse(
-                                HttpStatusCode.BadRequest,
-                                typeof(IUmbracoBackOfficeTwoFactorOptions) + ".GetTwoFactorView returned an empty string"));
-                    }
-
-                    var attemptedUser = Services.UserService.GetByUsername(loginModel.Username);
-
-                    // create a with information to display a custom two factor send code view
-                    var verifyResponse = Request.CreateResponse(HttpStatusCode.PaymentRequired, new
-                    {
-                        twoFactorView = twofactorView,
-                        userId = attemptedUser.Id
-                    });
-
-                    UserManager.RaiseLoginRequiresVerificationEvent(attemptedUser.Id);
-
-                    return verifyResponse;
-
-                case SignInStatus.LockedOut:
-                case SignInStatus.Failure:
-                default:
-                    // return BadRequest (400), we don't want to return a 401 because that get's intercepted
-                    // by our angular helper because it thinks that we need to re-perform the request once we are
-                    // authorized and we don't want to return a 403 because angular will show a warning message indicating
-                    // that the user doesn't have access to perform this function, we just want to return a normal invalid message.
-                    throw new HttpResponseException(HttpStatusCode.BadRequest);
+                return SetPrincipalAndReturnUserDetail(user, owinContext.Request.User);
             }
+
+            if (result.RequiresTwoFactor)
+            {
+                var twofactorOptions = UserManager as IUmbracoBackOfficeTwoFactorOptions;
+                if (twofactorOptions == null)
+                {
+                    throw new HttpResponseException(
+                        Request.CreateErrorResponse(
+                            HttpStatusCode.BadRequest,
+                            "UserManager does not implement " + typeof(IUmbracoBackOfficeTwoFactorOptions)));
+                }
+
+                var twofactorView = twofactorOptions.GetTwoFactorView(
+                    owinContext,
+                    UmbracoContext,
+                    loginModel.Username);
+
+                if (twofactorView.IsNullOrWhiteSpace())
+                {
+                    throw new HttpResponseException(
+                        Request.CreateErrorResponse(
+                            HttpStatusCode.BadRequest,
+                            typeof(IUmbracoBackOfficeTwoFactorOptions) + ".GetTwoFactorView returned an empty string"));
+                }
+
+                var attemptedUser = Services.UserService.GetByUsername(loginModel.Username);
+
+                // create a with information to display a custom two factor send code view
+                var verifyResponse = Request.CreateResponse(HttpStatusCode.PaymentRequired, new
+                {
+                    twoFactorView = twofactorView,
+                    userId = attemptedUser.Id
+                });
+
+                UserManager.RaiseLoginRequiresVerificationEvent(attemptedUser.Id);
+
+                return verifyResponse;
+            }
+
+            // return BadRequest (400), we don't want to return a 401 because that get's intercepted
+            // by our angular helper because it thinks that we need to re-perform the request once we are
+            // authorized and we don't want to return a 403 because angular will show a warning message indicating
+            // that the user doesn't have access to perform this function, we just want to return a normal invalid message.
+            throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
 
         /// <summary>
@@ -315,13 +318,13 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
-            var identityUser = await SignInManager.UserManager.FindByEmailAsync(model.Email);
+            var identityUser = await UserManager.FindByEmailAsync(model.Email);
             if (identityUser != null)
             {
                 var user = Services.UserService.GetByEmail(model.Email);
                 if (user != null)
                 {
-                    var code = await UserManager.GeneratePasswordResetTokenAsync(identityUser.Id);
+                    var code = await UserManager.GeneratePasswordResetTokenAsync(identityUser);
                     var callbackUrl = ConstructCallbackUrl(identityUser.Id, code);
 
                     var message = Services.TextService.Localize("resetPasswordEmailCopyFormat",
@@ -329,11 +332,19 @@ namespace Umbraco.Web.Editors
                         UmbracoUserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings),
                         new[] { identityUser.UserName, callbackUrl });
 
-                    await UserManager.SendEmailAsync(identityUser.Id,
-                        Services.TextService.Localize("login/resetPasswordEmailCopySubject",
-                            // Ensure the culture of the found user is used for the email!
-                            UmbracoUserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings)),
-                        message);
+                    var subject = Services.TextService.Localize("login/resetPasswordEmailCopySubject",
+                        // Ensure the culture of the found user is used for the email!
+                        UmbracoUserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings));
+
+                    var mailMessage = new MailMessage()
+                    {
+                        Subject = subject,
+                        Body = message,
+                        IsBodyHtml = true,
+                        To = { user.Email}
+                    };
+
+                    await _emailSender.SendAsync(mailMessage);
 
                     UserManager.RaiseForgotPasswordRequestedEvent(user.Id);
                 }
@@ -350,12 +361,15 @@ namespace Umbraco.Web.Editors
         public async Task<IEnumerable<string>> Get2FAProviders()
         {
             var userId = await SignInManager.GetVerifiedUserIdAsync();
-            if (userId == int.MinValue)
+            if (string.IsNullOrWhiteSpace(userId))
             {
                 Logger.Warn<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-            var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(userId);
+
+            var user = await UserManager.FindByIdAsync(userId);
+            var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(user);
+
             return userFactors;
         }
 
@@ -366,7 +380,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
             var userId = await SignInManager.GetVerifiedUserIdAsync();
-            if (userId == int.MinValue)
+            if (string.IsNullOrWhiteSpace(userId))
             {
                 Logger.Warn<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -399,18 +413,19 @@ namespace Umbraco.Web.Editors
             var owinContext = TryGetOwinContext().Result;
 
             var user = Services.UserService.GetByUsername(userName);
-            switch (result)
+            if (result.Succeeded)
             {
-                case SignInStatus.Success:
-                    UserManager.RaiseLoginSuccessEvent(user.Id);
-                    return SetPrincipalAndReturnUserDetail(user, owinContext.Request.User);
-                case SignInStatus.LockedOut:
-                    UserManager.RaiseAccountLockedEvent(user.Id);
-                    return Request.CreateValidationErrorResponse("User is locked out");
-                case SignInStatus.Failure:
-                default:
-                    return Request.CreateValidationErrorResponse("Invalid code");
+                UserManager.RaiseLoginSuccessEvent(user.Id);
+                return SetPrincipalAndReturnUserDetail(user, owinContext.Request.User);
             }
+
+            if (result.IsLockedOut)
+            {
+                UserManager.RaiseAccountLockedEvent(user.Id);
+                return Request.CreateValidationErrorResponse("User is locked out");
+            }
+
+            return Request.CreateValidationErrorResponse("Invalid code");
         }
 
         /// <summary>
@@ -420,25 +435,27 @@ namespace Umbraco.Web.Editors
         [SetAngularAntiForgeryTokens]
         public async Task<HttpResponseMessage> PostSetPassword(SetPasswordModel model)
         {
-            var result = await UserManager.ResetPasswordAsync(model.UserId, model.ResetCode, model.Password);
+            var identityUser = await UserManager.FindByIdAsync(model.UserId.ToString());
+
+            var result = await UserManager.ResetPasswordAsync(identityUser, model.ResetCode, model.Password);
             if (result.Succeeded)
             {
-                var lockedOut = await UserManager.IsLockedOutAsync(model.UserId);
+                var lockedOut = await UserManager.IsLockedOutAsync(identityUser);
                 if (lockedOut)
                 {
                     Logger.Info<AuthenticationController>("User {UserId} is currently locked out, unlocking and resetting AccessFailedCount", model.UserId);
 
                     //// var user = await UserManager.FindByIdAsync(model.UserId);
-                    var unlockResult = await UserManager.SetLockoutEndDateAsync(model.UserId, DateTimeOffset.Now);
+                    var unlockResult = await UserManager.SetLockoutEndDateAsync(identityUser, DateTimeOffset.Now);
                     if (unlockResult.Succeeded == false)
                     {
-                        Logger.Warn<AuthenticationController>("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First());
+                        Logger.Warn<AuthenticationController>("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
                     }
 
-                    var resetAccessFailedCountResult = await UserManager.ResetAccessFailedCountAsync(model.UserId);
+                    var resetAccessFailedCountResult = await UserManager.ResetAccessFailedCountAsync(identityUser);
                     if (resetAccessFailedCountResult.Succeeded == false)
                     {
-                        Logger.Warn<AuthenticationController>("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First());
+                        Logger.Warn<AuthenticationController>("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
                     }
                 }
 
@@ -446,13 +463,11 @@ namespace Umbraco.Web.Editors
                 // if user was only invited, then they have not been approved
                 // but a successful forgot password flow (e.g. if their token had expired and they did a forgot password instead of request new invite)
                 // means we have verified their email
-                if (!UserManager.IsEmailConfirmed(model.UserId))
+                if (!await UserManager.IsEmailConfirmedAsync(identityUser))
                 {
-                    await UserManager.ConfirmEmailAsync(model.UserId, model.ResetCode);
+                    await UserManager.ConfirmEmailAsync(identityUser, model.ResetCode);
                 }
 
-                // if the user is invited, enable their account on forgot password
-                var identityUser = await UserManager.FindByIdAsync(model.UserId);
                 // invited is not approved, never logged in, invited date present
                 /*
                 if (LastLoginDate == default && IsApproved == false && InvitedDate != null)
@@ -474,7 +489,7 @@ namespace Umbraco.Web.Editors
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             return Request.CreateValidationErrorResponse(
-                result.Errors.Any() ? result.Errors.First() : "Set password failed");
+                result.Errors.Any() ? result.Errors.First().Description : "Set password failed");
         }
 
 
@@ -561,9 +576,8 @@ namespace Umbraco.Web.Editors
         {
             foreach (var error in result.Errors)
             {
-                ModelState.AddModelError(prefix, error);
+                ModelState.AddModelError(prefix, error.Description);
             }
         }
-
     }
 }

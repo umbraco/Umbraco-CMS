@@ -16,6 +16,7 @@ namespace Umbraco.Web.Mvc
     /// <remarks>
     /// This is only enabled when running PureLive
     /// </remarks>
+    /// Migrated to .NET Core
     internal class ModelBindingExceptionFilter : FilterAttribute, IExceptionFilter
     {
         private static readonly Regex GetPublishedModelsTypesRegex = new Regex("Umbraco.Web.PublishedModels.(\\w+)", RegexOptions.Compiled);

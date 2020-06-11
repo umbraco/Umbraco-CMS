@@ -11,11 +11,9 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.BackOffice.AspNetCore;
-using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Extensions;
 using Umbraco.Web.Website.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
-
 
 namespace Umbraco.Web.UI.BackOffice
 {

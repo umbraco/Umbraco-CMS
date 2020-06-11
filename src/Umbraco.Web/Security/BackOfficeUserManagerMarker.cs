@@ -1,8 +1,5 @@
 ﻿using System;
-using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Security;
 using Umbraco.Web.Models.Identity;
 
 namespace Umbraco.Web.Security

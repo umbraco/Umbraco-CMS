@@ -90,9 +90,8 @@ namespace Umbraco.Web
             // (EXPERT: an overload accepts a custom BackOfficeUserStore implementation)
             app.ConfigureUserManagerForUmbracoBackOffice(
                 Services,
-                Mapper,
-                ContentSettings,
                 GlobalSettings,
+                Mapper,
                 UserPasswordConfig,
                 IpResolver);
         }

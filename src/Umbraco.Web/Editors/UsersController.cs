@@ -4,13 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Mail;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -20,7 +20,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Editors.Filters;
@@ -38,6 +37,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Media;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Editors
 {
@@ -53,6 +53,7 @@ namespace Umbraco.Web.Editors
         private readonly ISqlContext _sqlContext;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly ISecuritySettings _securitySettings;
+        private readonly IEmailSender _emailSender;
 
         public UsersController(
             IGlobalSettings globalSettings,
@@ -69,7 +70,8 @@ namespace Umbraco.Web.Editors
             IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
             IPublishedUrlProvider publishedUrlProvider,
-            ISecuritySettings securitySettings)
+            ISecuritySettings securitySettings,
+            IEmailSender emailSender)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _mediaFileSystem = mediaFileSystem;
@@ -78,6 +80,7 @@ namespace Umbraco.Web.Editors
             _sqlContext = sqlContext;
             _imageUrlGenerator = imageUrlGenerator;
             _securitySettings = securitySettings;
+            _emailSender = emailSender;
         }
 
         /// <summary>
@@ -322,25 +325,20 @@ namespace Umbraco.Web.Editors
             if (created.Succeeded == false)
             {
                 throw new HttpResponseException(
-                    Request.CreateNotificationValidationErrorResponse(string.Join(", ", created.Errors)));
+                    Request.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage()));
             }
 
-            //we need to generate a password, however we can only do that if the user manager has a password validator that
-            //we can read values from
-            var passwordValidator = UserManager.PasswordValidator as PasswordValidator;
-            var resetPassword = string.Empty;
-            if (passwordValidator != null)
+            string resetPassword;
+            var password = UserManager.GeneratePassword();
+
+            var result = await UserManager.AddPasswordAsync(identityUser, password);
+            if (result.Succeeded == false)
             {
-                var password = UserManager.GeneratePassword();
-
-                var result = await UserManager.AddPasswordAsync(identityUser.Id, password);
-                if (result.Succeeded == false)
-                {
-                    throw new HttpResponseException(
-                        Request.CreateNotificationValidationErrorResponse(string.Join(", ", created.Errors)));
-                }
-                resetPassword = password;
+                throw new HttpResponseException(
+                    Request.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage()));
             }
+
+            resetPassword = password;
 
             //now re-look the user back up which will now exist
             var user = Services.UserService.GetByEmail(userSave.Email);
@@ -416,7 +414,7 @@ namespace Umbraco.Web.Editors
                 if (created.Succeeded == false)
                 {
                     throw new HttpResponseException(
-                        Request.CreateNotificationValidationErrorResponse(string.Join(", ", created.Errors)));
+                        Request.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage()));
                 }
 
                 //now re-look the user back up
@@ -476,7 +474,8 @@ namespace Umbraco.Web.Editors
 
         private async Task SendUserInviteEmailAsync(UserBasic userDisplay, string from, string fromEmail, IUser to, string message)
         {
-            var token = await UserManager.GenerateEmailConfirmationTokenAsync((int)userDisplay.Id);
+            var user = await UserManager.FindByIdAsync(((int) userDisplay.Id).ToString());
+            var token = await UserManager.GenerateEmailConfirmationTokenAsync(user);
 
             var inviteToken = string.Format("{0}{1}{2}",
                 (int)userDisplay.Id,
@@ -505,16 +504,15 @@ namespace Umbraco.Web.Editors
                 UmbracoUserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
 
-            await UserManager.EmailService.SendAsync(
-                //send the special UmbracoEmailMessage which configures it's own sender
-                //to allow for events to handle sending the message if no smtp is configured
-                new UmbracoEmailMessage(new EmailSender(GlobalSettings, true))
-                {
-                    Body = emailBody,
-                    Destination = userDisplay.Email,
-                    Subject = emailSubject
-                });
+            var mailMessage = new MailMessage()
+            {
+                Subject = emailSubject,
+                Body = emailBody,
+                IsBodyHtml = true,
+                To = { to.Email}
+            };
 
+            await _emailSender.SendAsync(mailMessage);
         }
 
         /// <summary>
@@ -706,34 +704,29 @@ namespace Umbraco.Web.Editors
         [AdminUsersAuthorize("userIds")]
         public async Task<HttpResponseMessage> PostUnlockUsers([FromUri]int[] userIds)
         {
-            if (userIds.Length <= 0)
-                return Request.CreateResponse(HttpStatusCode.OK);
-
-            if (userIds.Length == 1)
-            {
-                var unlockResult = await UserManager.SetLockoutEndDateAsync(userIds[0], DateTimeOffset.Now);
-                if (unlockResult.Succeeded == false)
-                {
-                    return Request.CreateValidationErrorResponse(
-                        string.Format("Could not unlock for user {0} - error {1}", userIds[0], unlockResult.Errors.First()));
-                }
-                var user = await UserManager.FindByIdAsync(userIds[0]);
-                return Request.CreateNotificationSuccessResponse(
-                    Services.TextService.Localize("speechBubbles/unlockUserSuccess", new[] { user.Name }));
-            }
+            if (userIds.Length <= 0) return Request.CreateResponse(HttpStatusCode.OK);
 
             foreach (var u in userIds)
             {
-                var unlockResult = await UserManager.SetLockoutEndDateAsync(u, DateTimeOffset.Now);
+                var user = await UserManager.FindByIdAsync(u.ToString());
+                if (user == null) throw new InvalidOperationException();
+
+                var unlockResult = await UserManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now);
                 if (unlockResult.Succeeded == false)
                 {
                     return Request.CreateValidationErrorResponse(
-                        string.Format("Could not unlock for user {0} - error {1}", u, unlockResult.Errors.First()));
+                        string.Format("Could not unlock for user {0} - error {1}", u, unlockResult.Errors.ToErrorMessage()));
+                }
+
+                if (userIds.Length == 1)
+                {
+                    return Request.CreateNotificationSuccessResponse(
+                        Services.TextService.Localize("speechBubbles/unlockUserSuccess", new[] {user.Name}));
                 }
             }
 
             return Request.CreateNotificationSuccessResponse(
-                Services.TextService.Localize("speechBubbles/unlockUsersSuccess", new[] { userIds.Length.ToString() }));
+                Services.TextService.Localize("speechBubbles/unlockUsersSuccess", new[] {userIds.Length.ToString()}));
         }
 
         [AdminUsersAuthorize("userIds")]
