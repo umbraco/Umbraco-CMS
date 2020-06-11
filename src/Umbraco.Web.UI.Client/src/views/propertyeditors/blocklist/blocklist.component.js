@@ -127,7 +127,7 @@
                 }
             });
 
-            vm.availableContentTypesAliases = modelObject.getAvailableAliasForBlockContent();
+            vm.availableContentTypesAliases = modelObject.getAvailableAliasesForBlockContent();
             vm.availableBlockTypes = modelObject.getAvailableBlocksForBlockPicker();
 
             vm.loading = false;
