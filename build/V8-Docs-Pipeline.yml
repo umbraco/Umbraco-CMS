@@ -42,6 +42,7 @@ jobs:
       inputs:
         filePath: 'build/build.ps1'
         errorActionPreference: 'continue'
+        failOnStderr: true
 
     - task: PowerShell@2
       displayName: 'Prep build tool, build C# & JS Docs'
@@ -52,3 +53,5 @@ jobs:
           $uenv.PrepareAngularDocs()
           $uenv.PrepareCSharpDocs()
         workingDirectory: 'build'
+        errorActionPreference: 'continue'
+        failOnStderr: true
