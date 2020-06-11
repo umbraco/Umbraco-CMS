@@ -76,13 +76,13 @@ namespace Umbraco.Core
             }
 
             //check for special back office paths
-            if (urlPath.InvariantStartsWith("/" + mvcArea + "/BackOffice/")
-                || urlPath.InvariantStartsWith("/" + mvcArea + "/Preview/"))
+            if (urlPath.InvariantStartsWith("/" + mvcArea + "/" + Constants.Web.Mvc.BackOfficePathSegment + "/"))
             {
                 return true;
             }
 
             //check for special front-end paths
+            // TODO: These should be constants - will need to update when we do front-end routing
             if (urlPath.InvariantStartsWith("/" + mvcArea + "/Surface/")
                 || urlPath.InvariantStartsWith("/" + mvcArea + "/Api/"))
             {

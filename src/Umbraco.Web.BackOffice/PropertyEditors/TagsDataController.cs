@@ -15,7 +15,7 @@ namespace Umbraco.Web.BackOffice.PropertyEditors
     /// DO NOT inherit from UmbracoAuthorizedJsonController since we don't want to use the angularized
     /// json formatter as it causes problems.
     /// </remarks>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class TagsDataController : UmbracoAuthorizedApiController
     {
         private readonly ITagQuery _tagQuery;

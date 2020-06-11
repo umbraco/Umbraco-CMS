@@ -19,7 +19,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// <summary>
     /// Backoffice controller supporting the dashboard for language administration.
     /// </summary>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     //[PrefixlessBodyModelValidator]
     public class LanguageController : UmbracoAuthorizedJsonController
     {

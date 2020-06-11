@@ -18,6 +18,7 @@ using Umbraco.Core.Security;
 using Umbraco.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Web.Common.Security;
+using Microsoft.AspNetCore.Routing;
 
 namespace Umbraco.Web.BackOffice.Security
 {
@@ -35,7 +36,9 @@ namespace Umbraco.Web.BackOffice.Security
         private readonly IRequestCache _requestCache;
         private readonly IUserService _userService;
         private readonly IIpResolver _ipResolver;
+        private readonly ISystemClock _systemClock;
         private readonly BackOfficeSessionIdValidator _sessionIdValidator;
+        private readonly LinkGenerator _linkGenerator;
 
         public ConfigureBackOfficeCookieOptions(
             IUmbracoContextAccessor umbracoContextAccessor,
@@ -47,7 +50,9 @@ namespace Umbraco.Web.BackOffice.Security
             IRequestCache requestCache,
             IUserService userService,
             IIpResolver ipResolver,
-            BackOfficeSessionIdValidator sessionIdValidator)
+            ISystemClock systemClock,
+            BackOfficeSessionIdValidator sessionIdValidator,
+            LinkGenerator linkGenerator)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _securitySettings = securitySettings;
@@ -58,7 +63,9 @@ namespace Umbraco.Web.BackOffice.Security
             _requestCache = requestCache;
             _userService = userService;
             _ipResolver = ipResolver;
+            _systemClock = systemClock;
             _sessionIdValidator = sessionIdValidator;
+            _linkGenerator = linkGenerator;
         }
 
         public void Configure(string name, CookieAuthenticationOptions options)
@@ -98,7 +105,8 @@ namespace Umbraco.Web.BackOffice.Security
                 _runtimeState,
                 _hostingEnvironment,
                 _globalSettings,
-                _requestCache);
+                _requestCache,
+                _linkGenerator);
             // _explicitPaths); TODO: Implement this once we do OAuth somehow
 
 
@@ -111,7 +119,7 @@ namespace Umbraco.Web.BackOffice.Security
                 // It would be possible to re-use the default behavior if any of these need to be set but that must be taken into account else
                 // our back office requests will not function correctly. For now we don't need to set/configure any of these callbacks because
                 // the defaults work fine with our setup.
-
+                
                 OnValidatePrincipal = async ctx =>
                 {
                     // We need to resolve the BackOfficeSecurityStampValidator per request as a requirement (even in aspnetcore they do this)
@@ -131,6 +139,7 @@ namespace Umbraco.Web.BackOffice.Security
 
                     await EnsureValidSessionId(ctx);
                     await securityStampValidator.ValidateAsync(ctx);
+                    EnsureTicketRenewalIfKeepUserLoggedIn(ctx);
 
                     // add a claim to track when the cookie expires, we use this to track time remaining
                     backOfficeIdentity.AddClaim(new Claim(
@@ -140,7 +149,7 @@ namespace Umbraco.Web.BackOffice.Security
                         UmbracoBackOfficeIdentity.Issuer,
                         UmbracoBackOfficeIdentity.Issuer,
                         backOfficeIdentity));
-                    
+
                 },
                 OnSigningIn = ctx =>
                 {
@@ -175,7 +184,6 @@ namespace Umbraco.Web.BackOffice.Security
                 OnSigningOut = ctx =>
                 {
                     //Clear the user's session on sign out
-                    // TODO: We need to test this once we have signout functionality, not sure if the httpcontext.user.identity will still be set here
                     if (ctx.HttpContext?.User?.Identity != null)
                     {
                         var claimsIdentity = ctx.HttpContext.User.Identity as ClaimsIdentity;
@@ -192,7 +200,9 @@ namespace Umbraco.Web.BackOffice.Security
                         BackOfficeSessionIdValidator.CookieName,
                         _securitySettings.AuthCookieName,
                         Constants.Web.PreviewCookieName,
-                        Constants.Security.BackOfficeExternalCookieName
+                        Constants.Security.BackOfficeExternalCookieName,
+                        Constants.Web.AngularCookieName,
+                        Constants.Web.CsrfValidationCookieName,
                     };
                     foreach (var cookie in cookies)
                     {
@@ -217,6 +227,32 @@ namespace Umbraco.Web.BackOffice.Security
         {
             if (_runtimeState.Level == RuntimeLevel.Run)
                 await _sessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context);
+        }
+
+        /// <summary>
+        /// Ensures the ticket is renewed if the <see cref="ISecuritySettings.KeepUserLoggedIn"/> is set to true
+        /// and the current request is for the get user seconds endpoint
+        /// </summary>
+        /// <param name="context"></param>
+        private void EnsureTicketRenewalIfKeepUserLoggedIn(CookieValidatePrincipalContext context)
+        {
+            if (!_securitySettings.KeepUserLoggedIn) return;
+
+            var currentUtc = _systemClock.UtcNow;
+            var issuedUtc = context.Properties.IssuedUtc;
+            var expiresUtc = context.Properties.ExpiresUtc;
+
+            if (expiresUtc.HasValue && issuedUtc.HasValue)
+            {
+                var timeElapsed = currentUtc.Subtract(issuedUtc.Value);
+                var timeRemaining = expiresUtc.Value.Subtract(currentUtc);
+
+                //if it's time to renew, then do it
+                if (timeRemaining < timeElapsed)
+                {
+                    context.ShouldRenew = true;
+                }
+            }
         }
     }
 }

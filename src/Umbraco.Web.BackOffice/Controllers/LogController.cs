@@ -19,7 +19,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// <summary>
     /// The API controller used for getting log history
     /// </summary>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class LogController : UmbracoAuthorizedJsonController
     {
         private readonly IMediaFileSystem _mediaFileSystem;

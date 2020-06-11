@@ -1,13 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
+using Umbraco.Net;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Controllers;
@@ -33,6 +37,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IUserService _userService;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly IGlobalSettings _globalSettings;
+        private readonly ILogger _logger;
+        private readonly IIpResolver _ipResolver;
 
         // TODO: We need to import the logic from Umbraco.Web.Editors.AuthenticationController
         // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
@@ -43,7 +49,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             BackOfficeSignInManager signInManager,
             IUserService userService,
             UmbracoMapper umbracoMapper,
-            IGlobalSettings globalSettings)
+            IGlobalSettings globalSettings,
+            ILogger logger, IIpResolver ipResolver)
         {
             _webSecurity = webSecurity;
             _userManager = backOfficeUserManager;
@@ -51,6 +58,27 @@ namespace Umbraco.Web.BackOffice.Controllers
             _userService = userService;
             _umbracoMapper = umbracoMapper;
             _globalSettings = globalSettings;
+            _logger = logger;
+            _ipResolver = ipResolver;
+        }
+
+        [HttpGet]
+        public double GetRemainingTimeoutSeconds()
+        {
+            var backOfficeIdentity = HttpContext.User.GetUmbracoIdentity();
+            var remainingSeconds = HttpContext.User.GetRemainingAuthSeconds();
+            if (remainingSeconds <= 30 && backOfficeIdentity != null)
+            {
+                //NOTE: We are using 30 seconds because that is what is coded into angular to force logout to give some headway in
+                // the timeout process.
+
+                _logger.Info<AuthenticationController>(
+                    "User logged will be logged out due to timeout: {Username}, IP Address: {IPAddress}",
+                    backOfficeIdentity.Name,
+                    _ipResolver.GetCurrentRequestIpAddress());
+            }
+
+            return remainingSeconds;
         }
 
         /// <summary>
@@ -154,6 +182,22 @@ namespace Umbraco.Web.BackOffice.Controllers
             // authorized and we don't want to return a 403 because angular will show a warning message indicating
             // that the user doesn't have access to perform this function, we just want to return a normal invalid message.
             throw new HttpResponseException(HttpStatusCode.BadRequest);
+        }
+
+        /// <summary>
+        /// Logs the current user out
+        /// </summary>
+        /// <returns></returns>
+        [TypeFilter(typeof(ValidateAngularAntiForgeryTokenAttribute))]
+        public IActionResult PostLogout()
+        {
+            HttpContext.SignOutAsync(Core.Constants.Security.BackOfficeAuthenticationType);
+
+            _logger.Info<AuthenticationController>("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
+
+            _userManager.RaiseLogoutSuccessEvent(User, int.Parse(User.Identity.GetUserId()));
+
+            return Ok();
         }
 
         /// <summary>

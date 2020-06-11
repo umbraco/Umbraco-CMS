@@ -5,13 +5,14 @@ using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Core.Media;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Media.EmbedProviders;
+using Umbraco.Core;
 
 namespace Umbraco.Web.BackOffice.PropertyEditors
 {
     /// <summary>
     /// A controller used for the embed dialog
     /// </summary>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class RteEmbedController : UmbracoAuthorizedJsonController
     {
         private readonly EmbedProvidersCollection _embedCollection;

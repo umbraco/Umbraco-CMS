@@ -23,6 +23,9 @@ namespace Umbraco.Extensions
         {
             services.AddAntiforgery();
 
+            // TODO: We had this check in v8 where we don't enable these unless we can run...
+            //if (runtimeState.Level != RuntimeLevel.Upgrade && runtimeState.Level != RuntimeLevel.Run) return app;
+
             services
                 .AddAuthentication(Constants.Security.BackOfficeAuthenticationType)
                 .AddCookie(Constants.Security.BackOfficeAuthenticationType);

@@ -36,7 +36,6 @@ namespace Umbraco.Core.BackOffice
         private UmbracoBackOfficeIdentity(ClaimsIdentity identity)
             : base(identity.Claims, Constants.Security.BackOfficeAuthenticationType)
         {
-            Actor = identity;
         }
 
         /// <summary>
@@ -89,7 +88,7 @@ namespace Umbraco.Core.BackOffice
             if (string.IsNullOrWhiteSpace(realName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(realName));
             if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
             if (string.IsNullOrWhiteSpace(securityStamp)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(securityStamp));
-            Actor = childIdentity;
+
             AddRequiredClaims(userId, username, realName, startContentNodes, startMediaNodes, culture, securityStamp, allowedApps, roles);
         }
 
@@ -204,5 +203,18 @@ namespace Umbraco.Core.BackOffice
 
         public string[] Roles => this.FindAll(x => x.Type == DefaultRoleClaimType).Select(role => role.Value).ToArray();
 
+        /// <summary>
+        /// Overridden to remove any temporary claims that shouldn't be copied
+        /// </summary>
+        /// <returns></returns>
+        public override ClaimsIdentity Clone()
+        {
+            var clone = base.Clone();
+
+            foreach (var claim in clone.FindAll(x => x.Type == Constants.Security.TicketExpiresClaimType).ToList())
+                clone.RemoveClaim(claim);
+
+            return clone;
+        }
     }
 }
