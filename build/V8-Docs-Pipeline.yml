@@ -30,10 +30,6 @@ jobs:
     displayName: 'Build static docs site as ZIPs'
     steps:
 
-    - task: UseNode@1
-      inputs:
-        version: '10.x'
-
     - task: PowerShell@2
       displayName: 'Build CMS'
       inputs:
@@ -51,6 +47,8 @@ jobs:
         targetType: 'inline'
         script: |
           $uenv=build/build.ps1 -get -doc
+          $uenv.SandboxNode()
           $uenv.PrepareAngularDocs()
           $uenv.PrepareCSharpDocs()
+          $uenv.RestoreNode()
         errorActionPreference: 'continue'
