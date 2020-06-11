@@ -44,20 +44,11 @@ jobs:
         errorActionPreference: 'continue'
 
     - task: PowerShell@2
-      displayName: 'Prep build tool for Docs build'
+      displayName: 'Prep build tool, build C# & JS Docs'
       inputs:
         targetType: 'inline'
-        script: '$uenv=./build.ps1 -get -doc'
+        script: |
+          $uenv=./build.ps1 -get -doc
+          $uenv.PrepareAngularDocs()
+          $uenv.PrepareCSharpDocs()
         workingDirectory: 'build'
-
-    - task: PowerShell@2
-      displayName: 'Build Angular Docs ZIP'
-      inputs:
-        targetType: 'inline'
-        script: '$uenv.PrepareAngularDocs()'
-
-    - task: PowerShell@2
-      displayName: 'Build C# Docs ZIP'
-      inputs:
-        targetType: 'inline'
-        script: '$uenv.PrepareCSharpDocs()'
