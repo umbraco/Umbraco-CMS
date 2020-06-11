@@ -12,7 +12,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Tests.Collections;
+using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Cache;
 
@@ -41,12 +41,12 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void Clones_List()
         {
-            var original = new DeepCloneableList<DeepCloneableListTests.TestClone>(ListCloneBehavior.Always);
-            original.Add(new DeepCloneableListTests.TestClone());
-            original.Add(new DeepCloneableListTests.TestClone());
-            original.Add(new DeepCloneableListTests.TestClone());
+            var original = new DeepCloneableList<TestClone>(ListCloneBehavior.Always);
+            original.Add(new TestClone());
+            original.Add(new TestClone());
+            original.Add(new TestClone());
 
-            var val = _provider.GetCacheItem<DeepCloneableList<DeepCloneableListTests.TestClone>>("test", () => original);
+            var val = _provider.GetCacheItem<DeepCloneableList<TestClone>>("test", () => original);
 
             Assert.AreEqual(original.Count, val.Count);
             foreach (var item in val)
