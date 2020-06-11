@@ -260,10 +260,22 @@ Opens an overlay to show a custom YSOD. </br>
             }
 
             function setView() {
-
                 if (scope.view) {
 
-                    if (scope.view.indexOf(".html") === -1) {
+                    // if the view value has a space, treat it as an inline value
+                    // since setting the view by alias will not have a space
+                    if (scope.view.indexOf(' ') > -1) {
+                        // reuse the existing scoped-view element, and compile our view into it
+                        const element = el.find('.scoped-view');
+                        element.html(scope.view);
+                        element.show();
+                        $compile(element.contents())(scope);
+                        
+                        // ensure the ng-include view isn't rendered 
+                        scope.viewIsLiteral = true;
+                    }
+                    
+                    else if (scope.view.indexOf(".html") === -1) {
                         var viewAlias = scope.view.toLowerCase();
                         scope.view = "views/common/overlays/" + viewAlias + "/" + viewAlias + ".html";
                     }
