@@ -13,7 +13,6 @@ namespace Umbraco.Core.IO
     public class PhysicalFileSystem : IFileSystem
     {
         private readonly IIOHelper _ioHelper;
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILogger _logger;
 
         // the rooted, filesystem path, using directory separator chars, NOT ending with a separator
@@ -34,19 +33,19 @@ namespace Umbraco.Core.IO
         public PhysicalFileSystem(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger logger, string virtualRoot)
         {
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
-            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+            if (hostingEnvironment == null) throw new ArgumentNullException(nameof(hostingEnvironment));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            if (virtualRoot == null) throw new ArgumentNullException("virtualRoot");
+            if (virtualRoot == null) throw new ArgumentNullException(nameof(virtualRoot));
             if (virtualRoot.StartsWith("~/") == false)
                 throw new ArgumentException("The virtualRoot argument must be a virtual path and start with '~/'");
 
-            _rootPath = EnsureDirectorySeparatorChar(_hostingEnvironment.MapPathContentRoot(virtualRoot)).TrimEnd(Path.DirectorySeparatorChar);
+            _rootPath = EnsureDirectorySeparatorChar(hostingEnvironment.MapPathContentRoot(virtualRoot)).TrimEnd(Path.DirectorySeparatorChar);
             _rootPathFwd = EnsureUrlSeparatorChar(_rootPath);
-            _rootUrl = EnsureUrlSeparatorChar(_ioHelper.ResolveUrl(virtualRoot)).TrimEnd('/');
+            _rootUrl = EnsureUrlSeparatorChar(hostingEnvironment.ToAbsolute(virtualRoot)).TrimEnd('/');
         }
 
-        public PhysicalFileSystem(IIOHelper ioHelper, ILogger logger, string rootPath, string rootUrl)
+        public PhysicalFileSystem(IIOHelper ioHelper,IHostingEnvironment hostingEnvironment, ILogger logger, string rootPath, string rootUrl)
         {
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -62,8 +61,7 @@ namespace Umbraco.Core.IO
             if (Path.IsPathRooted(rootPath) == false)
             {
                 // but the test suite App.config cannot really "root" anything so we have to do it here
-                // TODO: This will map to the web content root (www) not the web app root, is that what we want? Else we need to use IHostingEnvironment.ApplicationPhysicalPath
-                var localRoot = _ioHelper.MapPath("~");
+                var localRoot = hostingEnvironment.MapPathContentRoot("~");
                 rootPath = Path.Combine(localRoot, rootPath);
             }
 

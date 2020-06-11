@@ -7,7 +7,7 @@ using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Net;
+using Umbraco.Core.Templates;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Mvc;
