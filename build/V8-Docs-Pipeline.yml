@@ -30,6 +30,10 @@ jobs:
     displayName: 'Build static docs site as ZIPs'
     steps:
 
+    - task: UseNode@1
+      inputs:
+        version: '10.x'
+
     - task: PowerShell@2
       displayName: 'Build CMS'
       inputs:
@@ -39,11 +43,8 @@ jobs:
 
     - powershell: 'node -v'
 
-    - task: UseNode@1
-      inputs:
-        version: '10.x'
+    - powershell: 'ls'
 
-    - powershell: 'node -v'
     - task: PowerShell@2
       displayName: 'Prep build tool, build C# & JS Docs'
       inputs:
