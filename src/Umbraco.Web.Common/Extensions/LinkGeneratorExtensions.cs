@@ -144,7 +144,8 @@ namespace Umbraco.Extensions
             var methodParams = ExpressionHelper.GetMethodParams(methodSelector);
             if (method == null)
             {
-                throw new MissingMethodException("Could not find the method " + methodSelector + " on type " + typeof(T) + " or the result ");
+                throw new MissingMethodException(
+                    $"Could not find the method {methodSelector} on type {typeof(T)} or the result ");
             }
 
             if (methodParams.Any() == false)

@@ -424,9 +424,6 @@
     <Compile Include="Mvc\PluginControllerAttribute.cs" />
     <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
-    <Compile Include="Templates\TemplateRenderer.cs" />
-    <Compile Include="Trees\PartialViewMacrosTreeController.cs" />
-    <Compile Include="Trees\PartialViewsTreeController.cs" />
     <Compile Include="UmbracoHelper.cs" />
     <Compile Include="Mvc\ViewContextExtensions.cs" />
     <Compile Include="Mvc\ViewDataContainerExtensions.cs" />
