@@ -49,6 +49,9 @@ namespace Umbraco.Web.Install
             _userAgentProvider = userAgentProvider;
             _umbracoDatabaseFactory = umbracoDatabaseFactory;
             _jsonSerializer = jsonSerializer;
+
+            //We need to initialize the type already, as we can't detect later, if the connection string is added on the fly.
+            GetInstallationType();
         }
 
         public InstallationType GetInstallationType()

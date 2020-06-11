@@ -20,8 +20,10 @@ using System.Linq;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Middleware;
 using Umbraco.Web.Common.ModelBinding;
+using Umbraco.Web.Common.Routing;
+using Umbraco.Web.Common.Templates;
 using Umbraco.Web.Security;
-using Umbraco.Web.Trees;
+using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.Common.Runtime
 {
@@ -89,6 +91,11 @@ namespace Umbraco.Web.Common.Runtime
             composition.RegisterUnique<BootFailedMiddleware>();
 
             composition.RegisterUnique<UmbracoJsonModelBinder>();
+
+            composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
+            composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
+
+
         }
     }
 }

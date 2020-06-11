@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -8,19 +9,15 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class FilesTreeController : FileSystemTreeController
     {
-        private readonly IIOHelper _ioHelper;
-        private readonly ILogger _logger;
         private readonly IFileSystem _fileSystem;
 
         protected override IFileSystem FileSystem => _fileSystem;
 
         private static readonly string[] ExtensionsStatic = { "*" };
 
-        public FilesTreeController(IIOHelper ioHelper, ILogger logger)
+        public FilesTreeController(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger logger)
         {
-            _ioHelper = ioHelper;
-            _logger = logger;
-            _fileSystem = new PhysicalFileSystem(_ioHelper, _logger, "~/");
+            _fileSystem = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, "~/");
         }
 
         protected override string[] Extensions => ExtensionsStatic;

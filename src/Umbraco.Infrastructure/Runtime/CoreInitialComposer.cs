@@ -18,6 +18,7 @@ using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Templates;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
@@ -30,7 +31,6 @@ using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Examine;
 using Umbraco.Infrastructure.Media;
-using Umbraco.Net;
 using Umbraco.Web;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
@@ -40,7 +40,6 @@ using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.HealthCheck.NotificationMethods;
 using Umbraco.Web.Install;
-using Umbraco.Web.Macros;
 using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Migrations.PostMigrations;
 using Umbraco.Web.Models.PublishedContent;
@@ -356,6 +355,8 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
 
             composition.Register<IFilePermissionHelper, FilePermissionHelper>(Lifetime.Singleton);
+
+            composition.RegisterUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 
 
         }

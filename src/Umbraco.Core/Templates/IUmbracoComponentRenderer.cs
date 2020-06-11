@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Web;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Strings;
 
-namespace Umbraco.Web
+namespace Umbraco.Core.Templates
 {
     /// <summary>
     /// Methods used to render umbraco components as HTML in templates
@@ -15,7 +14,7 @@ namespace Umbraco.Web
         /// <param name="contentId"></param>
         /// <param name="altTemplateId">If not specified, will use the template assigned to the node</param>
         /// <returns></returns>
-        IHtmlString RenderTemplate(int contentId, int? altTemplateId = null);
+        IHtmlEncodedString RenderTemplate(int contentId, int? altTemplateId = null);
 
         /// <summary>
         /// Renders the macro with the specified alias.
@@ -23,7 +22,7 @@ namespace Umbraco.Web
         /// <param name="contentId"></param>
         /// <param name="alias">The alias.</param>
         /// <returns></returns>
-        IHtmlString RenderMacro(int contentId, string alias);
+        IHtmlEncodedString RenderMacro(int contentId, string alias);
 
         /// <summary>
         /// Renders the macro with the specified alias, passing in the specified parameters.
@@ -32,7 +31,7 @@ namespace Umbraco.Web
         /// <param name="alias">The alias.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        IHtmlString RenderMacro(int contentId, string alias, object parameters);
+        IHtmlEncodedString RenderMacro(int contentId, string alias, object parameters);
 
         /// <summary>
         /// Renders the macro with the specified alias, passing in the specified parameters.
@@ -41,6 +40,6 @@ namespace Umbraco.Web
         /// <param name="alias">The alias.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        IHtmlString RenderMacro(int contentId, string alias, IDictionary<string, object> parameters);
+        IHtmlEncodedString RenderMacro(int contentId, string alias, IDictionary<string, object> parameters);
     }
 }
