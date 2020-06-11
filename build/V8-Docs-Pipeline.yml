@@ -55,6 +55,8 @@ jobs:
         errorActionPreference: 'continue'
         workingDirectory: 'build'
 
+    - powershell: 'dir env:'
+
     - task: PublishPipelineArtifact@1
       inputs:
         targetPath: '$(Pipeline.Workspace)\build.out\ui-docs.zip'
