@@ -29,6 +29,14 @@ jobs:
   - job: buildDocs
     displayName: 'Build static docs site as ZIPs'
     steps:
+
+    - task: PowerShell@2
+      displayName: 'List contents in build dir'
+      inputs:
+        targetType: 'inline'
+        script: 'ls'
+        workingDirectory: 'build'
+
     - task: PowerShell@2
       displayName: 'Build CMS'
       inputs:
