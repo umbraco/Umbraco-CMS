@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_1_x
+namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
 {
     public class PopulateMediaVersion : MigrationBase
     {
