@@ -458,7 +458,6 @@
     <Compile Include="Composing\TypeLoaderTests.cs" />
     <Compile Include="TestHelpers\Stubs\TestLastChanceFinder.cs" />
     <Compile Include="TestHelpers\TestHelper.cs" />
-    <Compile Include="CoreThings\EnumerableExtensionsTests.cs" />
     <Compile Include="IO\AbstractFileSystemTests.cs" />
     <Compile Include="IO\FileSystemsTests.cs" />
     <Compile Include="IO\PhysicalFileSystemTests.cs" />
