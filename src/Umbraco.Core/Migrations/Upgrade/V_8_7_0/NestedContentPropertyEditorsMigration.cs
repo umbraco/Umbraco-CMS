@@ -6,12 +6,13 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.PostMigrations;
+using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
 {
     public class NestedContentPropertyEditorsMigration : PropertyEditorsMigrationBase
     {
