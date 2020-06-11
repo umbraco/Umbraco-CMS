@@ -40,8 +40,7 @@ jobs:
     - task: PowerShell@2
       displayName: 'Build CMS'
       inputs:
-        filePath: 'build.ps1'
-        workingDirectory: 'build'
+        filePath: 'build/build.ps1'
 
     - task: PowerShell@2
       displayName: 'Prep build tool for Docs build'
