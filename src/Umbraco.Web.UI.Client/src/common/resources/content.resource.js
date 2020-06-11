@@ -548,7 +548,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         "contentApiBaseUrl",
                         "GetEmptyByKey",
                         { contentTypeKey: contentTypeKey, parentId: parentId })),
-                'Failed to retrieve data for empty content item id ' + contentTypeId)
+                'Failed to retrieve data for empty content item id ' + contentTypeKey)
                 .then(function (result) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
                 });

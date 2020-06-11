@@ -296,6 +296,7 @@ angular.module('umbraco.mocks').
                     path: "-1,1234,2455",
                     allowedActions: ["U", "H", "A"],
                     contentTypeAlias: "testAlias", 
+                    contentTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB", 
                     variants: [
                         {
                             name: "",

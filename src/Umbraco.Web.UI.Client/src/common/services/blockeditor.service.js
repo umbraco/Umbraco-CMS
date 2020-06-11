@@ -300,7 +300,7 @@
              * @return {Array} array of strings representing alias.
              */
             getAvailableAliasesForBlockContent: function() {
-                return this.blockConfigurations.map(blockConfiguration => getScaffoldFor(blockConfiguration.contentTypeKey).contentTypeAlias);
+                return this.blockConfigurations.map(blockConfiguration => getScaffoldFor(blockConfiguration.contentTypeKey).contentTypeKey);
             },
 
             getAvailableBlocksForBlockPicker: function() {
@@ -359,7 +359,7 @@
                     this.label = getBlockLabel(this);
                 }.bind(this))}.bind(blockModel), 10);
 
-                var contentScaffold = this.getScaffoldFor(blockConfiguration.contentTypeAlias);
+                var contentScaffold = this.getScaffoldFor(blockConfiguration.contentTypeKey);
                 if(contentScaffold === null) {
                     return null;
                 }
@@ -384,7 +384,7 @@
                     blockModel.settings = Utilities.copy(settingsScaffold);
                     layoutEntry.settings = layoutEntry.settings || {};
                     if (!layoutEntry.settings.key) { layoutEntry.settings.key = String.CreateGuid(); }
-                    if (!layoutEntry.settings.contentTypeAlias) { layoutEntry.settings.contentTypeKey = blockConfiguration.settingsElementTypeKey; }
+                    if (!layoutEntry.settings.contentTypeKey) { layoutEntry.settings.contentTypeKey = blockConfiguration.settingsElementTypeKey; }
                     mapToElementModel(blockModel.settings, layoutEntry.settings);
                 } else {
                     layoutEntry.settings = null;

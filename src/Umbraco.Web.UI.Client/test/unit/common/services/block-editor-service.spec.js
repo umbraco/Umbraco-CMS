@@ -15,7 +15,7 @@
         $scope = $rootScope.$new();
 
         contentResource = $injector.get("contentResource");
-        spyOn(contentResource, "getScaffold").and.callFake(
+        spyOn(contentResource, "getScaffoldByKey").and.callFake(
             function () {
                 return Promise.resolve(mocksUtils.getMockVariantContent(1234))
             }
@@ -26,7 +26,7 @@
     }));
 
 
-    var blockConfigurationMock = {contentTypeKey: "testKey", label:"Test label", settingsElementTypeKey: null, view: "testview.html"};
+    var blockConfigurationMock = { contentTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB", label:"Test label", settingsElementTypeKey: null, view: "testview.html"};
 
     var propertyModelMock = {
         layout: {
@@ -39,7 +39,7 @@
         data: [
             {
                 udi: 1234,
-                contentTypeKey: "testKey",
+                contentTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB",
                 testproperty: "myTestValue"
             }
         ]
@@ -66,7 +66,7 @@
             
             expect(modelObject.getBlockConfiguration(blockConfigurationMock.contentTypeKey).label).toBe(blockConfigurationMock.label);
         });
-        
+
         it('loadScaffolding provides data for itemPicker', function (done) {
             var modelObject = blockEditorService.createModelObject({}, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope);
             
