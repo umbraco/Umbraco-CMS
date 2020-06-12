@@ -125,8 +125,8 @@
                     var oldProperty = previousVersion.tabs[tabIndex].properties[propertyIndex];
 
                     // copy existing properties, so it doesn't manipulate existing properties on page
-                    oldProperty = angular.copy(oldProperty);
-                    property = angular.copy(property);
+                    oldProperty = Utilities.copy(oldProperty);
+                    property = Utilities.copy(property);
 
                     // we have to make properties storing values as object into strings (Grid, nested content, etc.)
                     if(property.value instanceof Object) {
