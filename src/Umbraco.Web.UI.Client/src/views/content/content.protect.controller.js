@@ -66,9 +66,8 @@
                 vm.hasRoles = roles.length > 0;
                 vm.loading = false;
 
-                vm.allGroups.push();
+                vm.allRoles.push();
 
-                
             }
             else {
                 vm.step = vm.type;
@@ -139,9 +138,9 @@
 
                         model.selectedItems.forEach(function(selectedRole) {
 
-                            var alreadyInGroups = vm.roles.filter(function(role){return role.id === selectedRole.id}).length > 0;
+                            var alreadyInRoles = vm.roles.filter(function(role){return role.id === selectedRole.id}).length > 0;
 
-                            if(!alreadyInGroups)
+                            if(!alreadyInRoles)
                                 vm.roles.push(selectedRole);
                         });
                     }
