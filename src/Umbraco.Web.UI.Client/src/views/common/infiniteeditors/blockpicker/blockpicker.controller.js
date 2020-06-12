@@ -39,6 +39,7 @@ angular.module("umbraco")
 
         vm.clickClearClipboard = function() {
             vm.onNavigationChanged(vm.navigation[0]);
+            vm.navigation[1].disabled = true;// disabled ws determined when creating the navigation, so we need to update it here.
             vm.model.clipboardItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
             vm.model.clickClearClipboard();
         }
