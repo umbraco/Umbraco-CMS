@@ -33,11 +33,11 @@ namespace Umbraco.Web.BackOffice.Controllers
                     }
                     else if (parameterDescriptor.ParameterType == typeof(string))
                     {
-                        canUse = true;
+                        canUse &= true;
                     }
                     else
                     {
-                        canUse = false;
+                        canUse &= true;
                     }
                 }
 

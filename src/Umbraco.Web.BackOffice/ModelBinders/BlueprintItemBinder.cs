@@ -6,7 +6,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Web.Editors.Binders
+namespace Umbraco.Web.BackOffice.ModelBinders
 {
     internal class BlueprintItemBinder : ContentItemBinder
     {

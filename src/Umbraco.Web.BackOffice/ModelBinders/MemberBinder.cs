@@ -11,8 +11,9 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Serialization;
+using Umbraco.Web.BackOffice.Controllers;
 
-namespace Umbraco.Web.Editors.Binders
+namespace Umbraco.Web.BackOffice.ModelBinders
 {
     /// <summary>
     /// The model binder for <see cref="T:Umbraco.Web.Models.ContentEditing.MemberSave" />

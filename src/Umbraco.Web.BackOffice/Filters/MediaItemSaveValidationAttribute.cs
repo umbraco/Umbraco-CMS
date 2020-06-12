@@ -1,0 +1,114 @@
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
+using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Security;
+
+namespace Umbraco.Web.BackOffice.Filters
+{
+    /// <summary>
+    ///     Validates the incoming <see cref="MediaItemSave" /> model
+    /// </summary>
+    internal class MediaItemSaveValidationAttribute : TypeFilterAttribute
+    {
+        public MediaItemSaveValidationAttribute() : base(typeof(MediaItemSaveValidationFilter))
+        {
+        }
+
+        private sealed class MediaItemSaveValidationFilter : IActionFilter
+        {
+            private readonly IEntityService _entityService;
+
+
+            private readonly ILogger _logger;
+            private readonly IMediaService _mediaService;
+            private readonly ILocalizedTextService _textService;
+            private readonly IWebSecurity _webSecurity;
+
+            public MediaItemSaveValidationFilter(ILogger logger, IWebSecurity webSecurity,
+                ILocalizedTextService textService, IMediaService mediaService, IEntityService entityService)
+            {
+                _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+                _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+                _textService = textService ?? throw new ArgumentNullException(nameof(textService));
+                _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
+                _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+            }
+
+            public void OnActionExecuting(ActionExecutingContext context)
+            {
+                var model = (MediaItemSave) context.ActionArguments["contentItem"];
+                var contentItemValidator = new MediaSaveModelValidator(_logger, _webSecurity, _textService);
+
+                if (ValidateUserAccess(model, context))
+                {
+                    //now do each validation step
+                    if (contentItemValidator.ValidateExistingContent(model, context))
+                        if (contentItemValidator.ValidateProperties(model, model, context))
+                            contentItemValidator.ValidatePropertiesData(model, model, model.PropertyCollectionDto,
+                                context.ModelState);
+                }
+            }
+
+            /// <summary>
+            ///     Checks if the user has access to post a content item based on whether it's being created or saved.
+            /// </summary>
+            /// <param name="mediaItem"></param>
+            /// <param name="actionContext"></param>
+            private bool ValidateUserAccess(MediaItemSave mediaItem, ActionExecutingContext actionContext)
+            {
+                //We now need to validate that the user is allowed to be doing what they are doing.
+                //Then if it is new, we need to lookup those permissions on the parent.
+                IMedia contentToCheck;
+                int contentIdToCheck;
+                switch (mediaItem.Action)
+                {
+                    case ContentSaveAction.Save:
+                        contentToCheck = mediaItem.PersistedContent;
+                        contentIdToCheck = contentToCheck.Id;
+                        break;
+                    case ContentSaveAction.SaveNew:
+                        contentToCheck = _mediaService.GetById(mediaItem.ParentId);
+
+                        if (mediaItem.ParentId != Constants.System.Root)
+                        {
+                            contentToCheck = _mediaService.GetById(mediaItem.ParentId);
+                            contentIdToCheck = contentToCheck.Id;
+                        }
+                        else
+                        {
+                            contentIdToCheck = mediaItem.ParentId;
+                        }
+
+                        break;
+                    default:
+                        //we don't support this for media
+                        actionContext.Result = new NotFoundResult();
+                        return false;
+                }
+
+                if (MediaController.CheckPermissions(
+                    actionContext.HttpContext.Items,
+                    _webSecurity.CurrentUser,
+                    _mediaService, _entityService,
+                    contentIdToCheck, contentToCheck) == false)
+                {
+                    actionContext.Result = new ForbidResult();
+                    return false;
+                }
+
+                return true;
+            }
+
+            public void OnActionExecuted(ActionExecutedContext context)
+            {
+
+            }
+        }
+    }
+}

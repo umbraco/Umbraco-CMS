@@ -2,9 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Net.Http.Headers;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.Editors;
@@ -13,7 +11,7 @@ using Umbraco.Extensions;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Web.Editors.Binders
+namespace Umbraco.Web.BackOffice.ModelBinders
 {
     /// <summary>
     /// Helper methods to bind media/member models

@@ -4,9 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -17,6 +20,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Entities;
@@ -30,14 +34,14 @@ using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.ModelBinders;
+using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Security;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
     /// <remarks>
     /// This controller is decorated with the UmbracoApplicationAuthorizeAttribute which means that any user requesting
@@ -47,8 +51,8 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Constants.Applications.Media)]
     public class MediaController : ContentControllerBase
     {
+        private readonly IShortStringHelper _shortStringHelper;
         private readonly IContentSettings _contentSettings;
-        private readonly IIOHelper _ioHelper;
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IMediaService _mediaService;
         private readonly IEntityService _entityService;
@@ -66,7 +70,6 @@ namespace Umbraco.Web.Editors
             IEventMessagesFactory eventMessages,
             ILocalizedTextService localizedTextService,
             IContentSettings contentSettings,
-            IIOHelper ioHelper,
             IMediaTypeService mediaTypeService,
             IMediaService mediaService,
             IEntityService entityService,
@@ -77,11 +80,12 @@ namespace Umbraco.Web.Editors
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
             IRelationService relationService,
             PropertyEditorCollection propertyEditors,
-            IMediaFileSystem mediaFileSystem)
+            IMediaFileSystem mediaFileSystem,
+            IHostingEnvironment hostingEnvironment)
             : base(cultureDictionary, logger, shortStringHelper, eventMessages, localizedTextService)
         {
+            _shortStringHelper = shortStringHelper;
             _contentSettings = contentSettings;
-            _ioHelper = ioHelper;
             _mediaTypeService = mediaTypeService;
             _mediaService = mediaService;
             _entityService = entityService;
@@ -94,6 +98,7 @@ namespace Umbraco.Web.Editors
             _relationService = relationService;
             _propertyEditors = propertyEditors;
             _mediaFileSystem = mediaFileSystem;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         /// <summary>
@@ -268,6 +273,7 @@ namespace Umbraco.Web.Editors
         private int[] _userStartNodes;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
 
         protected int[] UserStartNodes
@@ -278,7 +284,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Returns the child media objects - using the entity INT id
         /// </summary>
-        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")] // TODO introduce when moved to .NET Core//[FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
         [DetermineAmbiguousActionByPassingParameters]
         public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(int id,
             int pageNumber = 0,
@@ -417,7 +423,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [EnsureUserPermissionForMedia("id")]
         [HttpPost]
-        public HttpResponseMessage DeleteById(int id)
+        public IActionResult DeleteById(int id)
         {
             var foundMedia = GetObjectFromRequest(() => _mediaService.GetById(id));
 
@@ -434,7 +440,7 @@ namespace Umbraco.Web.Editors
                 {
                     //returning an object of INotificationModel will ensure that any pending
                     // notification messages are added to the response.
-                    return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
+                    throw HttpResponseException.CreateValidationErrorResponse(new SimpleNotificationModel());
                 }
             }
             else
@@ -444,11 +450,11 @@ namespace Umbraco.Web.Editors
                 {
                     //returning an object of INotificationModel will ensure that any pending
                     // notification messages are added to the response.
-                    return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
+                    throw HttpResponseException.CreateValidationErrorResponse(new SimpleNotificationModel());
                 }
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return Ok();
         }
 
         /// <summary>
@@ -457,7 +463,7 @@ namespace Umbraco.Web.Editors
         /// <param name="move"></param>
         /// <returns></returns>
         [EnsureUserPermissionForMedia("move.Id")]
-        public HttpResponseMessage PostMove(MoveOrCopy move)
+        public IActionResult PostMove(MoveOrCopy move)
         {
             var toMove = ValidateMoveOrCopy(move);
             var destinationParentID = move.ParentId;
@@ -467,17 +473,15 @@ namespace Umbraco.Web.Editors
 
             if (sourceParentID == destinationParentID)
             {
-                return Request.CreateValidationErrorResponse(new SimpleNotificationModel(new BackOfficeNotification("",_localizedTextService.Localize("media/moveToSameFolderFailed"),NotificationStyle.Error)));
+                throw HttpResponseException.CreateValidationErrorResponse(new SimpleNotificationModel(new BackOfficeNotification("",_localizedTextService.Localize("media/moveToSameFolderFailed"),NotificationStyle.Error)));
             }
             if (moveResult == false)
             {
-                return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
+                throw HttpResponseException.CreateValidationErrorResponse(new SimpleNotificationModel());
             }
             else
             {
-                var response = Request.CreateResponse(HttpStatusCode.OK);
-                response.Content = new StringContent(toMove.Path, Encoding.UTF8, "text/plain");
-                return response;
+                return Content(toMove.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
             }
         }
 
@@ -487,7 +491,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [FileUploadCleanupFilter]
         [MediaItemSaveValidation]
-        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
+        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
         public MediaItemDisplay PostSave(
             [ModelBinder(typeof(MediaItemBinder))]
                 MediaItemSave contentItem)
@@ -534,7 +538,7 @@ namespace Umbraco.Web.Editors
                     // add the model state to the outgoing object and throw validation response
                     var forDisplay = _umbracoMapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
-                    throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
+                    throw HttpResponseException.CreateValidationErrorResponse(forDisplay);
                 }
             }
 
@@ -567,7 +571,7 @@ namespace Umbraco.Web.Editors
                         // is no Id to redirect to!
                         if (saveStatus.Result.Result == OperationResultType.FailedCancelledByEvent && IsCreatingAction(contentItem.Action))
                         {
-                            throw new HttpResponseException(Request.CreateValidationErrorResponse(display));
+                            throw HttpResponseException.CreateValidationErrorResponse(display);
                         }
                     }
 
@@ -583,11 +587,11 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [HttpDelete]
         [HttpPost]
-        public HttpResponseMessage EmptyRecycleBin()
+        public IActionResult EmptyRecycleBin()
         {
             _mediaService.EmptyRecycleBin(_webSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
 
-            return Request.CreateNotificationSuccessResponse(_localizedTextService.Localize("defaultdialogs/recycleBinIsEmpty"));
+            return new UmbracoNotificationSuccessResponse(_localizedTextService.Localize("defaultdialogs/recycleBinIsEmpty"));
         }
 
         /// <summary>
@@ -596,17 +600,17 @@ namespace Umbraco.Web.Editors
         /// <param name="sorted"></param>
         /// <returns></returns>
         [EnsureUserPermissionForMedia("sorted.ParentId")]
-        public HttpResponseMessage PostSort(ContentSortOrder sorted)
+        public IActionResult PostSort(ContentSortOrder sorted)
         {
             if (sorted == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             //if there's nothing to sort just return ok
             if (sorted.IdSortOrder.Length == 0)
             {
-                return Request.CreateResponse(HttpStatusCode.OK);
+                return Ok();
             }
 
             var mediaService = _mediaService;
@@ -619,9 +623,9 @@ namespace Umbraco.Web.Editors
                 if (mediaService.Sort(sortedMedia) == false)
                 {
                     Logger.Warn<MediaController>("Media sorting failed, this was probably caused by an event being cancelled");
-                    return Request.CreateValidationErrorResponse("Media sorting failed, this was probably caused by an event being cancelled");
+                    throw HttpResponseException.CreateValidationErrorResponse("Media sorting failed, this was probably caused by an event being cancelled");
                 }
-                return Request.CreateResponse(HttpStatusCode.OK);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -630,13 +634,18 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        public MediaItemDisplay PostAddFolder(PostedFolder folder)
+        public ActionResult<MediaItemDisplay> PostAddFolder(PostedFolder folder)
         {
-            var intParentId = GetParentIdAsInt(folder.ParentId, validatePermissions:true);
+            var parentId = GetParentIdAsInt(folder.ParentId, validatePermissions:true);
+            if (!parentId.HasValue)
+            {
+                return NotFound("The passed id doesn't exist");
+            }
+
 
             var mediaService = _mediaService;
 
-            var f = mediaService.CreateMedia(folder.Name, intParentId, Constants.Conventions.MediaTypes.Folder);
+            var f = mediaService.CreateMedia(folder.Name, parentId.Value, Constants.Conventions.MediaTypes.Folder);
             mediaService.Save(f, _webSecurity.CurrentUser.Id);
 
             return _umbracoMapper.Map<MediaItemDisplay>(f);
@@ -649,39 +658,32 @@ namespace Umbraco.Web.Editors
         /// <remarks>
         /// We cannot validate this request with attributes (nicely) due to the nature of the multi-part for data.
         /// </remarks>
-        [FileUploadCleanupFilter(false)]
-        public async Task<HttpResponseMessage> PostAddFile()
+        public async Task<IActionResult> PostAddFile([FromForm]string path, [FromForm]string currentFolder, [FromForm]string contentTypeAlias, List<IFormFile> file)
         {
-            if (Request.Content.IsMimeMultipartContent() == false)
-            {
-                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
-            }
-
-            var root = _ioHelper.MapPath(Constants.SystemDirectories.TempFileUploads);
+            var root = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
-            var provider = new MultipartFormDataStreamProvider(root);
-
-            var result = await Request.Content.ReadAsMultipartAsync(provider);
 
             //must have a file
-            if (result.FileData.Count == 0)
+            if (file.Count == 0)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             //get the string json from the request
-            string currentFolderId = result.FormData["currentFolder"];
-            int parentId = GetParentIdAsInt(currentFolderId, validatePermissions: true);
-
+            var parentId = GetParentIdAsInt(currentFolder, validatePermissions: true);
+            if (!parentId.HasValue)
+            {
+                return NotFound("The passed id doesn't exist");
+            }
             var tempFiles = new PostedFiles();
             var mediaService = _mediaService;
 
             //in case we pass a path with a folder in it, we will create it and upload media to it.
-            if (result.FormData.ContainsKey("path"))
+            if (!string.IsNullOrEmpty(path))
             {
 
-                var folders = result.FormData["path"].Split('/');
+                var folders = path.Split('/');
 
                 for (int i = 0; i < folders.Length - 1; i++)
                 {
@@ -704,11 +706,11 @@ namespace Umbraco.Web.Editors
                     else
                     {
                         //get current parent
-                        var mediaRoot = mediaService.GetById(parentId);
+                        var mediaRoot = mediaService.GetById(parentId.Value);
 
                         //if the media root is null, something went wrong, we'll abort
                         if (mediaRoot == null)
-                            return Request.CreateErrorResponse(HttpStatusCode.InternalServerError,
+                            return Problem(
                                 "The folder: " + folderName + " could not be used for storing images, its ID: " + parentId +
                                 " returned null");
 
@@ -728,9 +730,9 @@ namespace Umbraco.Web.Editors
             }
 
             //get the files
-            foreach (var file in result.FileData)
+            foreach (var formFile in file)
             {
-                var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' }).TrimEnd();
+                var fileName =  formFile.FileName.Trim(new[] { '\"' }).TrimEnd();
                 var safeFileName = fileName.ToSafeFileName(ShortStringHelper);
                 var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
@@ -738,7 +740,7 @@ namespace Umbraco.Web.Editors
                 {
                     var mediaType = Constants.Conventions.MediaTypes.File;
 
-                    if (result.FormData["contentTypeAlias"] == Constants.Conventions.MediaTypes.AutoSelect)
+                    if (contentTypeAlias == Constants.Conventions.MediaTypes.AutoSelect)
                     {
                         if (_contentSettings.ImageFileTypes.Contains(ext))
                         {
@@ -747,20 +749,19 @@ namespace Umbraco.Web.Editors
                     }
                     else
                     {
-                        mediaType = result.FormData["contentTypeAlias"];
+                        mediaType = contentTypeAlias;
                     }
 
                     var mediaItemName = fileName.ToFriendlyName();
 
-                    var f = mediaService.CreateMedia(mediaItemName, parentId, mediaType, _webSecurity.CurrentUser.Id);
+                    var f = mediaService.CreateMedia(mediaItemName, parentId.Value, mediaType, _webSecurity.CurrentUser.Id);
 
-                    var fileInfo = new FileInfo(file.LocalFileName);
-                    var fs = fileInfo.OpenReadWithRetry();
-                    if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
-                    using (fs)
+
+                    await using (var stream = formFile.OpenReadStream())
                     {
-                        f.SetValue(_mediaFileSystem, ShortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File,fileName, fs);
+                        f.SetValue(_mediaFileSystem,_shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File,fileName, stream);
                     }
+
 
                     var saveResult = mediaService.Save(f, _webSecurity.CurrentUser.Id);
                     if (saveResult == false)
@@ -768,15 +769,7 @@ namespace Umbraco.Web.Editors
                         AddCancelMessage(tempFiles,
                             message: _localizedTextService.Localize("speechBubbles/operationCancelledText") + " -- " + mediaItemName);
                     }
-                    else
-                    {
-                        tempFiles.UploadedFiles.Add(new ContentPropertyFile
-                        {
-                            FileName = fileName,
-                            PropertyAlias = Constants.Conventions.Media.File,
-                            TempFilePath = file.LocalFileName
-                        });
-                    }
+
                 }
                 else
                 {
@@ -788,19 +781,16 @@ namespace Umbraco.Web.Editors
             }
 
             //Different response if this is a 'blueimp' request
-            if (Request.GetQueryNameValuePairs().Any(x => x.Key == "origin"))
+            if (HttpContext.Request.Query.Any(x => x.Key == "origin"))
             {
-                var origin = Request.GetQueryNameValuePairs().First(x => x.Key == "origin");
+                var origin = HttpContext.Request.Query.First(x => x.Key == "origin");
                 if (origin.Value == "blueimp")
                 {
-                    return Request.CreateResponse(HttpStatusCode.OK,
-                        tempFiles,
-                        //Don't output the angular xsrf stuff, blue imp doesn't like that
-                        new JsonMediaTypeFormatter());
+                    return new JsonResult(tempFiles); //Don't output the angular xsrf stuff, blue imp doesn't like that
                 }
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, tempFiles);
+            return Ok();
         }
 
         private IMedia FindInChildren(int mediaId, string nameToFind, string contentTypeAlias)
@@ -827,7 +817,7 @@ namespace Umbraco.Web.Editors
         /// and if that check fails an unauthorized exception will occur
         /// </param>
         /// <returns></returns>
-        private ActionResult<int> GetParentIdAsInt(string parentId, bool validatePermissions)
+        private int? GetParentIdAsInt(string parentId, bool validatePermissions)
         {
             int intParentId;
 
@@ -851,7 +841,7 @@ namespace Umbraco.Web.Editors
                     }
                     else
                     {
-                        return NotFound("The passed id doesn't exist");
+                        return null;
                     }
                 }
                 else

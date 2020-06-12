@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Mime;
 using System.Text;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -30,10 +31,10 @@ using Constants = Umbraco.Core.Constants;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.ModelBinders;
 using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
@@ -395,6 +396,7 @@ namespace Umbraco.Web.Editors
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
         [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [DetermineAmbiguousActionByPassingParameters]
         public ContentItemDisplay GetEmpty(string contentTypeAlias, int parentId)
         {
             var contentType = _contentTypeService.Get(contentTypeAlias);
@@ -418,6 +420,7 @@ namespace Umbraco.Web.Editors
         }
 
         [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [DetermineAmbiguousActionByPassingParameters]
         public ContentItemDisplay GetEmpty(int blueprintId, int parentId)
         {
             var blueprint = _contentService.GetBlueprintById(blueprintId);
@@ -447,7 +450,7 @@ namespace Umbraco.Web.Editors
         public IActionResult GetNiceUrl(int id)
         {
             var url = _publishedUrlProvider.GetUrl(id);
-            return Content(url, "text/plain", Encoding.UTF8);
+            return Content(url, MediaTypeNames.Text.Plain, Encoding.UTF8);
         }
 
         /// <summary>
@@ -459,7 +462,7 @@ namespace Umbraco.Web.Editors
         public IActionResult GetNiceUrl(Guid id)
         {
             var url = _publishedUrlProvider.GetUrl(id);
-            return Content(url, "text/plain", Encoding.UTF8);
+            return Content(url, MediaTypeNames.Text.Plain, Encoding.UTF8);
         }
 
         /// <summary>
@@ -1635,7 +1638,7 @@ namespace Umbraco.Web.Editors
 
             _contentService.Move(toMove, move.ParentId, _webSecurity.GetUserId().ResultOr(0));
 
-            return Content(toMove.Path, "text/plain", Encoding.UTF8);
+            return Content(toMove.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
         }
 
         /// <summary>
@@ -1650,7 +1653,7 @@ namespace Umbraco.Web.Editors
 
             var c = _contentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, _webSecurity.GetUserId().ResultOr(0));
 
-            return Content(c.Path, "text/plain", Encoding.UTF8);
+            return Content(c.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
         }
 
         /// <summary>

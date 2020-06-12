@@ -6,9 +6,10 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
+using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Web.Editors.Binders
+namespace Umbraco.Web.BackOffice.ModelBinders
 {
     /// <summary>
     /// The model binder for <see cref="T:Umbraco.Web.Models.ContentEditing.MediaItemSave" />

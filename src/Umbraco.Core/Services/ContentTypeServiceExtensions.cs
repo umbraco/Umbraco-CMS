@@ -39,7 +39,7 @@ namespace Umbraco.Core.Services
         /// </param>
         /// <param name="isElement">Wether the composite content types should be applicable for an element type</param>
         /// <returns></returns>
-        internal static ContentTypeAvailableCompositionsResults GetAvailableCompositeContentTypes(this IContentTypeService ctService,
+        public static ContentTypeAvailableCompositionsResults GetAvailableCompositeContentTypes(this IContentTypeService ctService,
             IContentTypeComposition source,
             IContentTypeComposition[] allContentTypes,
             string[] filterContentTypes = null,
@@ -63,7 +63,7 @@ namespace Umbraco.Core.Services
                     .Select(c => c.Alias)
                     .Union(filterPropertyTypes)
                     .ToArray();
-            
+
             var sourceId = source?.Id ?? 0;
 
             // find out if any content type uses this content type
@@ -127,7 +127,7 @@ namespace Umbraco.Core.Services
 
             return new ContentTypeAvailableCompositionsResults(ancestors, result);
         }
-        
+
 
         private static IContentTypeComposition[] GetAncestors(IContentTypeComposition ctype, IContentTypeComposition[] allContentTypes)
         {

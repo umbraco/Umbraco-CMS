@@ -176,10 +176,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                             "contentApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ContentController>(
                                 controller => controller.PostSave(null))
                         },
-                        // {
-                        //     "mediaApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaController>(
-                        //         controller => controller.GetRootMedia())
-                        // },
+                        {
+                            "mediaApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaController>(
+                                controller => controller.GetRootMedia())
+                        },
                         {
                             "imagesApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ImagesController>(
                                 controller => controller.GetBigThumbnail(""))
@@ -192,14 +192,14 @@ namespace Umbraco.Web.BackOffice.Controllers
                             "treeApplicationApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
                                 controller => controller.GetApplicationTrees(null, null, null, TreeUse.None))
                         },
-                        // {
-                        //     "contentTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
-                        //         controller => controller.GetAllowedChildren(0))
-                        // },
-                        // {
-                        //     "mediaTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaTypeController>(
-                        //         controller => controller.GetAllowedChildren(0))
-                        // },
+                        {
+                            "contentTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
+                                controller => controller.GetAllowedChildren(0))
+                        },
+                        {
+                            "mediaTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaTypeController>(
+                                controller => controller.GetAllowedChildren(0))
+                        },
                         {
                             "macroRenderingApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MacroRenderingController>(
                                 controller => controller.GetMacroParameters(0))
