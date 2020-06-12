@@ -51,30 +51,14 @@ jobs:
         errorActionPreference: 'continue'
         workingDirectory: 'build'
 
-    - powershell: 'dir env:'
-
-    - task: CopyFiles@2
-      displayName: 'Copy static site .zips to: $(build.artifactstagingdirectory)'
+    - task: PublishPipelineArtifact@1
       inputs:
-          SourceFolder: build.out
-          Contents: |
-            *.zip
-            *.nupkg
-          TargetFolder: '$(build.artifactstagingdirectory)'        
+        targetPath: '$(Build.Repository.LocalPath)\build.out\ui-docs.zip'
+        artifact: 'ui-docs.zip'
+        publishLocation: 'pipeline'
 
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifact: drop'
+    - task: PublishPipelineArtifact@1
       inputs:
-        ArtifactName: drop
-
-    # - task: PublishPipelineArtifact@1
-    #   inputs:
-    #     targetPath: '$(Build.Repository.LocalPath)\build.out\ui-docs.zip'
-    #     artifact: 'ui-docs.zip'
-    #     publishLocation: 'pipeline'
-
-    # - task: PublishPipelineArtifact@1
-    #   inputs:
-    #     targetPath: '$(Build.Repository.LocalPath)\build.out\csharp-docs.zip'
-    #     artifact: 'csharp-docs.zip'
-    #     publishLocation: 'pipeline'
+        targetPath: '$(Build.Repository.LocalPath)\build.out\csharp-docs.zip'
+        artifact: 'csharp-docs.zip'
+        publishLocation: 'pipeline'
