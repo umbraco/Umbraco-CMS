@@ -131,8 +131,6 @@
             vm.availableBlockTypes = modelObject.getAvailableBlocksForBlockPicker();
 
             vm.loading = false;
-            
-            $scope.$evalAsync();
 
         }
 
