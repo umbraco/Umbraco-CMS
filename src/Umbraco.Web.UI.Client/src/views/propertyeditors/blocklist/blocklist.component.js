@@ -489,18 +489,13 @@
 
             // validate limits:
             if (vm.propertyForm) {
-                if (vm.validationLimit.min !== null && vm.blocks.length < vm.validationLimit.min) {
-                    vm.propertyForm.minCount.$setValidity("minCount", false);
-                }
-                else {
-                    vm.propertyForm.minCount.$setValidity("minCount", true);
-                }
-                if (vm.validationLimit.max !== null && vm.blocks.length > vm.validationLimit.max) {
-                    vm.propertyForm.maxCount.$setValidity("maxCount", false);
-                }
-                else {
-                    vm.propertyForm.maxCount.$setValidity("maxCount", true);
-                }
+
+                var isMinRequirementGood = vm.validationLimit.min === null || vm.blocks.length >= vm.validationLimit.min;
+                vm.propertyForm.minCount.$setValidity("minCount", isMinRequirementGood);
+                
+                var isMaxRequirementGood = vm.validationLimit.max === null || vm.blocks.length <= vm.validationLimit.max;
+                vm.propertyForm.maxCount.$setValidity("maxCount", isMaxRequirementGood);
+                
             }
         }
 
