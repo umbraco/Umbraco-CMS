@@ -44,10 +44,10 @@
                             </div>
             
                             <div>
-                                <label>
-                                    <input type="checkbox" ng-model="model.mandatoryRenderSection" /> <localize key="template_sectionMandatory" />
-                                </label>
-            
+                                <div class="flex">
+                                    <umb-checkbox model="model.mandatoryRenderSection" text="{{vm.labels.sectionMandatory}}" />
+                                </div>
+
                                 <div class="umb-insert-code-box__description">
                                     <localize key="template_sectionMandatoryDesc" />
                                 </div>

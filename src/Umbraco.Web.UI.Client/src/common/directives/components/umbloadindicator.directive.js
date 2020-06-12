@@ -39,7 +39,7 @@ Use this directive to generate a loading indicator.
             });
 
         }
-½
+
         angular.module("umbraco").controller("My.Controller", Controller);
     })();
 </pre>

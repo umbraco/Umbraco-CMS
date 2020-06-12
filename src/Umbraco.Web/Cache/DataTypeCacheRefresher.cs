@@ -62,11 +62,9 @@ namespace Umbraco.Web.Cache
             TagsValueConverter.ClearCaches();
             SliderValueConverter.ClearCaches();
 
-            // we have to refresh models before we notify the published snapshot
-            // service of changes, else factories may try to rebuild models while
-            // we are using the database to load content into caches
+            // refresh the models and cache
 
-            _publishedModelFactory.WithSafeLiveFactory(() =>
+            _publishedModelFactory.WithSafeLiveFactoryReset(() =>
                 _publishedSnapshotService.Notify(payloads));
 
             base.Refresh(payloads);

@@ -36,9 +36,9 @@
                              ngf-max-size="{{ maxFileSize }}">
                             - <localize key="packager_orClickHereToUpload">or click here to choose files</localize>
                         </div>
-                        
+
                     </div>
-                    
+
                 </div>
 
                 <h3><strong><localize key="packager_uploadPackage">Upload package</localize></strong></h3>
@@ -54,7 +54,7 @@
 
         <umb-editor-sub-header>
             <umb-editor-sub-header-content-left>
-                <a class="umb-package-details__back-link" href="" ng-click="vm.state = 'upload'">&larr; <localize key="packager_uploadAnother">Upload another package</localize></a>
+                <button type="button" class="umb-package-details__back-action" ng-click="vm.state = 'upload'" prevent-default><span aria-hidden="true">&larr;</span> <localize key="packager_uploadAnother">Upload another package</localize></button>
             </umb-editor-sub-header-content-left>
         </umb-editor-sub-header>
 
@@ -76,7 +76,7 @@
                         <div class="umb-info-local-item text-error mt3" ng-if="vm.zipFile.uploadStatus === 'error'">
                             {{ vm.zipFile.serverErrorMessage }}
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
@@ -89,7 +89,7 @@
 
         <umb-editor-sub-header>
             <umb-editor-sub-header-content-left>
-                <a class="umb-package-details__back-link" href="" ng-click="vm.state = 'upload'">&larr; <localize key="packager_cancelAndUploadAnother">Cancel and upload another package</localize></a>
+                <button type="button" class="umb-package-details__back-action" href="" ng-click="vm.state = 'upload'" prevent-default><span aria-hidden="true">&larr;</span> <localize key="packager_cancelAndUploadAnother">Cancel and upload another package</localize></button>
             </umb-editor-sub-header-content-left>
         </umb-editor-sub-header>
 

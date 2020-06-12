@@ -178,7 +178,7 @@ namespace Umbraco.Tests.TestHelpers
                     new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value,
                         new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger, "installedPackages.config"),
                     new PackageInstallation(
-                        new PackageDataInstallation(logger, fileService.Value, macroService.Value, localizationService.Value, dataTypeService.Value, entityService.Value, contentTypeService.Value, contentService.Value, propertyEditorCollection),
+                        new PackageDataInstallation(logger, fileService.Value, macroService.Value, localizationService.Value, dataTypeService.Value, entityService.Value, contentTypeService.Value, contentService.Value, propertyEditorCollection, scopeProvider),
                         new PackageFileInstallation(compiledPackageXmlParser, new ProfilingLogger(logger, new TestProfiler())),
                         compiledPackageXmlParser, Mock.Of<IPackageActionRunner>(),
                         new DirectoryInfo(IOHelper.GetRootDirectorySafe())));

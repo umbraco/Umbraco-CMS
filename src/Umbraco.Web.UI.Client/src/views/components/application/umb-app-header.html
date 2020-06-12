@@ -2,7 +2,6 @@
 <div>
 
     <div class="umb-app-header">
-
         <umb-sections
             ng-if="authenticated"
             sections="sections">
@@ -11,19 +10,26 @@
         <div class="flex items-center">
             <ul class="umb-app-header__actions">
                 <li data-element="global-search" class="umb-app-header__action">
-                    <button class="umb-app-header__button btn-reset" hotkey="ctrl+space" ng-click="searchClick()" ng-mousedown="rememberFocus()" prevent-default style="font-size: 20px;">
-                        <span class="sr-only">Open/Close backoffice search</span>
-                        <i class="umb-app-header__action-icon icon-search"></i>
+                    <button type="button" class="umb-app-header__button btn-reset" hotkey="ctrl+space" ng-click="searchClick()" ng-mousedown="rememberFocus()">
+                        <span class="sr-only">
+                            <localize key="visuallyHiddenTexts_openBackofficeSearch">Open backoffice search</localize>...
+                        </span>
+                        <i class="umb-app-header__action-icon icon-search" aria-hidden="true"></i>
                     </button>
                 </li>
                 <li data-element="global-help" class="umb-app-header__action">
-                    <button class="umb-app-header__button btn-reset" hotkey="ctrl+shift+h" ng-click="helpClick()" prevent-default>
-                        <span class="sr-only">Open/Close backoffice help window</span>
-                        <i class="umb-app-header__action-icon icon-help-alt"></i>
+                    <button type="button" class="umb-app-header__button btn-reset" hotkey="ctrl+shift+h" ng-click="helpClick()">
+                        <span class="sr-only">
+                            <localize key="visuallyHiddenTexts_openCloseBackofficeHelp">Open/Close backoffice help</localize>...
+                        </span>
+                        <i class="umb-app-header__action-icon icon-help-alt" aria-hidden="true"></i>
                     </button>
                 </li>
                 <li data-element="global-user" class="umb-app-header__action">
-                   <button class="umb-app-header__button btn-reset" ng-click="avatarClick()" hotkey="ctrl+shift+u" title="{{user.name}}" aria-label="Open/Close your profile options window" prevent-default>
+                   <button type="button" class="umb-app-header__button btn-reset" ng-click="avatarClick()" hotkey="ctrl+shift+u" title="{{user.name}}">
+                        <span class="sr-only">
+                            <localize key="visuallyHiddenTexts_openCloseBackofficeProfileOptions">Open/Close your profile options</localize>...
+                        </span>
                         <umb-avatar
                             class="umb-app-header__action-icon"
                             size="xxs"

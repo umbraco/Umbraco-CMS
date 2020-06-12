@@ -26,6 +26,7 @@
             fileManager.setFiles({
                 propertyAlias: vm.propertyAlias,
                 culture: vm.culture,
+                segment: vm.segment,
                 files: []
             });
             //clear the current files
@@ -92,6 +93,11 @@
                 vm.culture = null;
             }
 
+            //normalize segment to null if it's not there
+            if (!vm.segment) {
+                vm.segment = null;
+            }
+
             // TODO: need to figure out what we can do for things like Nested Content
 
             var existingClientFiles = checkPendingClientFiles();
@@ -134,11 +140,16 @@
                 vm.culture = null;
             }
 
+            //normalize segment to null if it's not there
+            if (!vm.segment) {
+                vm.segment = null;
+            }
+
             //check the file manager to see if there's already local files pending for this editor
             var existingClientFiles = _.map(
                 _.filter(fileManager.getFiles(),
                     function (f) {
-                        return f.alias === vm.propertyAlias && f.culture === vm.culture;
+                        return f.alias === vm.propertyAlias && f.culture === vm.culture && f.segment === vm.segment;
                     }),
                 function (f) {
                     return f.file;
@@ -176,6 +187,11 @@
         }
 
         function getThumbnail(file) {
+
+            if (file.extension === 'svg') {
+                return file.fileName;
+            }
+
             if (!file.isImage) {
                 return null;
             }
@@ -259,7 +275,8 @@
                 fileManager.setFiles({
                     propertyAlias: vm.propertyAlias,
                     files: args.files,
-                    culture: vm.culture
+                    culture: vm.culture,
+                    segment: vm.segment
                 });
 
                 updateModelFromSelectedFiles(args.files).then(function(newVal) {
@@ -282,6 +299,7 @@
         templateUrl: 'views/components/upload/umb-property-file-upload.html',
         bindings: {
             culture: "@?",
+            segment: "@?",
             propertyAlias: "@",
             value: "<",
             hideSelection: "<",
@@ -293,7 +311,8 @@
              * Called when the file collection changes (i.e. a new file has been selected but maybe it wasn't this instance that caused the change)
              */
             onFilesChanged: "&",
-            onInit: "&"
+            onInit: "&",
+            required: "="
         },
         transclude: true,
         controllerAs: 'vm',

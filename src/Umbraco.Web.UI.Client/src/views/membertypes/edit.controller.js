@@ -9,18 +9,28 @@
 (function () {
     "use strict";
 
-    function MemberTypesEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService, $q, localizationService, overlayHelper, contentTypeHelper) {
+    function MemberTypesEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService, $q, localizationService, overlayHelper, contentTypeHelper, angularHelper, eventsService) {
 
+        var evts = [];
         var vm = this;
+        var infiniteMode = $scope.model && $scope.model.infiniteMode;
+        var memberTypeId = infiniteMode ? $scope.model.id : $routeParams.id;
+        var create = infiniteMode ? $scope.model.create : $routeParams.create;
 
         vm.save = save;
+        vm.close = close;
 
+        vm.editorfor = "visuallyHiddenTexts_newMember";
+        vm.header = {};
+        vm.header.editorfor = "content_membergroup";
+        vm.header.setPageTitle = true;
         vm.currentNode = null;
         vm.contentType = {};
         vm.page = {};
         vm.page.loading = false;
         vm.page.saveButtonState = "init";
         vm.labels = {};
+        vm.saveButtonKey = infiniteMode ? "buttons_saveAndClose" : "buttons_save";
 
         var labelKeys = [
             "general_design",
@@ -82,7 +92,7 @@
                 vm.page.defaultButton = {
                     hotKey: "ctrl+s",
                     hotKeyWhenHidden: true,
-                    labelKey: "buttons_save",
+                    labelKey: vm.saveButtonKey,
                     letter: "S",
                     type: "submit",
                     handler: function () { vm.save(); }
@@ -90,7 +100,7 @@
                 vm.page.subButtons = [{
                     hotKey: "ctrl+g",
                     hotKeyWhenHidden: true,
-                    labelKey: "buttons_saveAndGenerateModels",
+                    labelKey: infiniteMode ? "buttons_generateModelsAndClose" : "buttons_saveAndGenerateModels",
                     letter: "G",
                     handler: function () {
 
@@ -143,12 +153,12 @@
             }
         });
 
-        if ($routeParams.create) {
+        if (create) {
 
             vm.page.loading = true;
 
             //we are creating so get an empty data type item
-            memberTypeResource.getScaffold($routeParams.id)
+            memberTypeResource.getScaffold(memberTypeId)
 				.then(function (dt) {
 				    init(dt);
 
@@ -159,10 +169,12 @@
 
             vm.page.loading = true;
 
-            memberTypeResource.getById($routeParams.id).then(function (dt) {
+            memberTypeResource.getById(memberTypeId).then(function (dt) {
                 init(dt);
 
-                syncTreeNode(vm.contentType, dt.path, true);
+                if(!infiniteMode) {
+                    syncTreeNode(vm.contentType, dt.path, true);
+                }
 
                 vm.page.loading = false;
             });
@@ -215,9 +227,15 @@
                     }
                 }).then(function (data) {
                     //success
-                    syncTreeNode(vm.contentType, data.path);
+                    if(!infiniteMode) {
+                        syncTreeNode(vm.contentType, data.path);
+                    }
 
                     vm.page.saveButtonState = "success";
+
+                    if(infiniteMode && $scope.model.submit) {
+                        $scope.model.submit();
+                    }
 
                     deferred.resolve(data);
                 }, function (err) {
@@ -303,8 +321,23 @@
             });
 
         }
+        
+        function close() {
+            if(infiniteMode && $scope.model.close) {
+                $scope.model.close();
+            }
+        }
 
+        evts.push(eventsService.on("editors.groupsBuilder.changed", function(name, args) {
+            angularHelper.getCurrentForm($scope).$setDirty();
+        }));
 
+        //ensure to unregister from all events!
+        $scope.$on('$destroy', function () {
+            for (var e in evts) {
+                eventsService.unsubscribe(evts[e]);
+            }
+        });
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.MemberTypes.EditController", MemberTypesEditController);

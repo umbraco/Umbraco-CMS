@@ -73,7 +73,7 @@ Use this directive to generate a list of breadcrumbs.
 
                 var path = scope.pathTo(ancestor);
                 $location.path(path);
-                navigationService.clearSearch(["cculture"]);
+                navigationService.clearSearch(["cculture", "csegment"]);
             }
 
             scope.pathTo = function (ancestor) {
@@ -96,6 +96,7 @@ Use this directive to generate a list of breadcrumbs.
             templateUrl: 'views/components/editor/umb-breadcrumbs.html',
             scope: {
                 ancestors: "=",
+                forNewEntity: "=",
                 entityType: "@",
                 onOpen: "&"
             },

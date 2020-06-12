@@ -8,11 +8,7 @@ using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using System.Web.Routing;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
-using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
 using Current = Umbraco.Web.Composing.Current;
@@ -68,7 +64,8 @@ namespace Umbraco.Web
                 var htmlBadge =
                     String.Format(Current.Configs.Settings().Content.PreviewBadge,
                                   IOHelper.ResolveUrl(SystemDirectories.Umbraco),
-                                  Current.UmbracoContext.HttpContext.Server.UrlEncode(Current.UmbracoContext.HttpContext.Request.Path));
+                                  Current.UmbracoContext.HttpContext.Server.UrlEncode(Current.UmbracoContext.HttpContext.Request.Path),
+                                  Current.UmbracoContext.PublishedRequest.PublishedContent.Id);
                 return new MvcHtmlString(htmlBadge);
             }
             return new MvcHtmlString("");
@@ -169,8 +166,9 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static IHtmlString Action(this HtmlHelper htmlHelper, string actionName, Type surfaceType)
         {
+            if (actionName == null) throw new ArgumentNullException(nameof(actionName));
+            if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(actionName));
             if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
-            if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentNullOrEmptyException(nameof(actionName));
 
             var routeVals = new RouteValueDictionary(new {area = ""});
 
@@ -221,16 +219,8 @@ namespace Umbraco.Web
             {
                 _viewContext = viewContext;
                 _method = method;
-			    _controllerName = controllerName;
+                _controllerName = controllerName;
                 _encryptedString = UrlHelperRenderExtensions.CreateEncryptedRouteString(controllerName, controllerAction, area, additionalRouteVals);
-
-                //For UmbracoForm's we want to add our routing string to the httpcontext items in the case where anti-forgery tokens are used.
-                //In which case our custom UmbracoAntiForgeryAdditionalDataProvider will kick in and validate the values in the request against
-                //the values that will be appended to the token. This essentially means that when anti-forgery tokens are used with UmbracoForm's forms,
-                //that each token is unique to the controller/action/area instead of the default ASP.Net implementation which is that the token is unique
-                //per user.
-                _viewContext.HttpContext.Items["ufprt"] = _encryptedString;
-
             }
 
 
@@ -238,7 +228,7 @@ namespace Umbraco.Web
             private readonly FormMethod _method;
             private bool _disposed;
             private readonly string _encryptedString;
-		    private readonly string _controllerName;
+            private readonly string _controllerName;
 
             protected override void Dispose(bool disposing)
             {
@@ -251,12 +241,12 @@ namespace Umbraco.Web
                     || _controllerName == "UmbProfile"
                     || _controllerName == "UmbLoginStatus"
                     || _controllerName == "UmbLogin")
-			    {
+                {
                     _viewContext.Writer.Write(AntiForgery.GetHtml().ToString());
-			    }
+                }
 
                 //write out the hidden surface form routes
-                _viewContext.Writer.Write("<input name='ufprt' type='hidden' value='" + _encryptedString + "' />");
+                _viewContext.Writer.Write("<input name=\"ufprt\" type=\"hidden\" value=\"" + _encryptedString + "\" />");
 
                 base.Dispose(disposing);
             }
@@ -363,8 +353,10 @@ namespace Umbraco.Web
                                                IDictionary<string, object> htmlAttributes,
                                                FormMethod method)
         {
-            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentNullOrEmptyException(nameof(action));
-            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(action));
+            if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
+            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
 
             return html.BeginUmbracoForm(action, controllerName, "", additionalRouteVals, htmlAttributes, method);
         }
@@ -382,8 +374,10 @@ namespace Umbraco.Web
                                                object additionalRouteVals,
                                                IDictionary<string, object> htmlAttributes)
         {
-            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentNullOrEmptyException(nameof(action));
-            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(action));
+            if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
+            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
 
             return html.BeginUmbracoForm(action, controllerName, "", additionalRouteVals, htmlAttributes);
         }
@@ -583,7 +577,9 @@ namespace Umbraco.Web
                                                IDictionary<string, object> htmlAttributes,
                                                FormMethod method)
         {
-            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentNullOrEmptyException(nameof(action));
+
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(action));
             if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
 
             var area = "";
@@ -695,8 +691,10 @@ namespace Umbraco.Web
                                                IDictionary<string, object> htmlAttributes,
                                                FormMethod method)
         {
-            if (string.IsNullOrEmpty(action)) throw new ArgumentNullOrEmptyException(nameof(action));
-            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            if (string.IsNullOrEmpty(action)) throw new ArgumentException("Value can't be empty.", nameof(action));
+            if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
+            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
 
             var formAction = Current.UmbracoContext.OriginalRequestUrl.PathAndQuery;
             return html.RenderForm(formAction, method, htmlAttributes, controllerName, action, area, additionalRouteVals);

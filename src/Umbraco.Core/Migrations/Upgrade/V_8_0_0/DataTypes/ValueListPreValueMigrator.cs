@@ -9,6 +9,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
         private readonly string[] _editors =
         {
             "Umbraco.RadioButtonList",
+            "Umbraco.CheckBoxList",
             "Umbraco.DropDown",
             "Umbraco.DropdownlistPublishingKeys",
             "Umbraco.DropDownMultiple",

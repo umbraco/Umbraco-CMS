@@ -4,7 +4,6 @@
     function ContentSortController($scope, $filter, $routeParams, contentResource, navigationService) {
 
         var vm = this;
-        var parentId = $scope.currentNode.parentId ? $scope.currentNode.parentId : "-1";
         var id = $scope.currentNode.id;
 
         vm.loading = false;
@@ -42,7 +41,7 @@
             vm.saveButtonState = "busy";
             
             var args = {
-                parentId: parentId,
+                parentId: id,
                 sortedIds: _.map(vm.children, function(child){ return child.id; })
             };
 

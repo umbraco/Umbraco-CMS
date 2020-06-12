@@ -106,8 +106,10 @@ namespace Umbraco.Web.JavaScript
             }
 
             try
-            {
-                var fullPath = currentHttpContext.Server.MapPath(XmlFileMapper.FileMapDefaultFolder);
+            {               
+                var fullPath = XmlFileMapper.FileMapDefaultFolder.StartsWith("~/")
+                    ? currentHttpContext.Server.MapPath(XmlFileMapper.FileMapDefaultFolder)
+                    : XmlFileMapper.FileMapDefaultFolder;
                 if (fullPath != null)
                 {
                     cdfTempDirectories.Add(fullPath);
@@ -122,13 +124,12 @@ namespace Umbraco.Web.JavaScript
             var success = true;
             foreach (var directory in cdfTempDirectories)
             {
-                var directoryInfo = new DirectoryInfo(directory);
-                if (directoryInfo.Exists == false)
-                    continue;
-
                 try
                 {
-                    directoryInfo.Delete(true);
+                    if (!Directory.Exists(directory))
+                        continue;
+
+                    Directory.Delete(directory, true);
                 }
                 catch (Exception ex)
                 {

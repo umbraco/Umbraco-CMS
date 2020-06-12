@@ -121,7 +121,7 @@
     <key alias="saveAndPublish">Zapisz i publikuj</key>
     <key alias="saveToPublish">Zapisz i wyślij do zaakceptowania</key>
     <key alias="saveListView">Zapisz widok listy</key>
-    <key alias="showPage">Podgląd</key>
+    <key alias="saveAndPreview">Podgląd</key>
     <key alias="showPageDisabled">Podgląd jest wyłączony, ponieważ żaden szablon nie został przydzielony</key>
     <key alias="styleChoose">Wybierz styl</key>
     <key alias="styleShow">Pokaż style</key>
@@ -312,7 +312,6 @@
     <key alias="linkinternal">Link wewnętrzny:</key>
     <key alias="linklocaltip">Kiedy używasz odnośników lokalnych, wstaw znak "#" na początku linku</key>
     <key alias="linknewwindow">Otworzyć w nowym oknie?</key>
-    <key alias="macroContainerSettings">Ustawienia Makro</key>
     <key alias="macroDoesNotHaveProperties">To makro nie posiada żadnych właściwości, które można edytować</key>
     <key alias="paste">Wklej</key>
     <key alias="permissionsEdit">Edytuj Uprawnienia dla</key>

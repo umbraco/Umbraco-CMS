@@ -3,7 +3,7 @@
     <umb-editor-view footer="false">
 
         <umb-editor-header
-            name="'Log Overview for Today'"
+            name="vm.dateRangeLabel"
             name-locked="true"
             hide-icon="true"
             hide-description="true"
@@ -53,17 +53,22 @@
                                 <em>Total Unique Message types</em>: {{ vm.commonLogMessages.length }}
                                 <table class="table table-hover">
                                     <tbody>
-                                    <tr ng-repeat="template in vm.commonLogMessages | limitTo:vm.commonLogMessagesCount" ng-click="vm.findMessageTemplate(template)" style="cursor: pointer;">
-                                        <td>
-                                            {{ template.MessageTemplate }}
-                                        </td>
-                                        <td>
-                                            {{ template.Count }}
-                                        </td>
-                                    </tr>
+                                        <tr ng-repeat="template in vm.commonLogMessages | limitTo:vm.commonLogMessagesCount" ng-click="vm.findMessageTemplate(template)" style="cursor: pointer;">
+                                            <td>
+                                                {{ template.MessageTemplate }}
+                                            </td>
+                                            <td>
+                                                {{ template.Count }}
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
-                                <a class="btn btn-primary" ng-if="vm.commonLogMessagesCount < vm.commonLogMessages.length" ng-click="vm.commonLogMessagesCount = vm.commonLogMessagesCount +10">Show More</a>
+                                <umb-button ng-if="vm.commonLogMessagesCount < vm.commonLogMessages.length"
+                                            button-style="action"
+                                            type="button"
+                                            action="vm.showMore()"
+                                            label="Show More">
+                                </umb-button>
                             </umb-box-content>
                         </umb-box>
                     </div>
@@ -74,22 +79,30 @@
                     <umb-box>
                         <umb-box-header title="Time Period"></umb-box-header>
 
-                        <umb-flatpickr
-                            class="datepicker"
-                            ng-model="vm.period"
-                            options="vm.config"
-                            on-close="vm.dateRangeChange(selectedDates, dateStr, instance)">
-                        </umb-flatpickr>
+                        <umb-date-time-picker class="datepicker"
+                                       ng-model="vm.period"
+                                       options="vm.config"
+                                       on-close="vm.dateRangeChange(selectedDates, dateStr, instance)">
+                        </umb-date-time-picker>
                     </umb-box>
 
                     <div ng-show=" vm.canLoadLogs">
-                        <!-- No of Errors -->
-                        <umb-box ng-click="vm.searchLogQuery('Has(@Exception)')" style="cursor:pointer;">
-                            <umb-box-header title="Number of Errors"></umb-box-header>
-                            <umb-box-content class="block-form" style="font-size: 40px; font-weight:900; text-align:center; color:#fe6561;">
-                                {{ vm.numberOfErrors }}
-                            </umb-box-content>
-                        </umb-box>
+                        <div class="umb-box-row">
+                        <!-- No of Errors -->                        
+                            <umb-box ng-click="vm.searchErrors()" style="cursor:pointer;">
+                                <umb-box-header title="Number of Errors"></umb-box-header>
+                                <umb-box-content class="block-form" style="font-size: 40px; font-weight:900; text-align:center; color:#fe6561;">
+                                    {{ vm.numberOfErrors }}
+                                </umb-box-content>
+                            </umb-box>     
+                            
+                            <umb-box>
+                                <umb-box-header title="Log level"></umb-box-header>
+                                <umb-box-content class="block-form" style="font-weight:900; text-align:center; color: {{ vm.logLevelColor }}">
+                                    {{ vm.logLevel }}
+                                </umb-box-content>
+                            </umb-box>                                                                            
+                        </div>
 
                         <!-- Chart of diff log types -->
                         <umb-box>
@@ -104,7 +117,8 @@
                                 </canvas>
 
                             </umb-box-content>
-                        </umb-box>
+                        </umb-box>                        
+                      
                     </div>
                 </div>
             </div>

@@ -4,6 +4,7 @@ using Umbraco.Web;
 
 namespace Umbraco.Tests.Web.Mvc
 {
+
     [TestFixture]
     public class HtmlHelperExtensionMethodsTests
     {

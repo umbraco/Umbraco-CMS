@@ -17,13 +17,17 @@
 
 
         <div class="content" >
-
+            <p>
+                <localize key="media_dragAndDropYourFilesIntoTheArea">Drag and drop your file(s) into the area</localize>
+            </p>
             <!-- Drag and drop illustration -->
             <img class="illustration" src="assets/img/uploader/upload-illustration.svg" alt="" draggable="false" />
 
 
             <!-- Select files -->
-            <div 
+            <button
+                 type="button"
+                 prevent-default
                  data-element="button-uploadMedia"
                  class="file-select"
                  ngf-select
@@ -32,8 +36,8 @@
                  ngf-multiple="true"
                  ngf-pattern="{{ accept }}"
                  ngf-max-size="{{ maxFileSize }}">
-                - <localize key="media_orClickHereToUpload">or click here to choose files</localize>
-            </div>
+                 -&nbsp;<localize key="media_orClickHereToUpload">or click here to choose files</localize>
+            </button>
         </div>
     </div>
 
@@ -104,7 +108,7 @@
 		ng-if="mediatypepickerOverlay.show"
 		model="mediatypepickerOverlay"
         view="mediatypepickerOverlay.view"
-		position="right">        
+		position="right">
 </umb-overlay>
 
 </div>

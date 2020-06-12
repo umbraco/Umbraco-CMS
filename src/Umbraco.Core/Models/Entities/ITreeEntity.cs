@@ -24,7 +24,7 @@
         /// Sets the parent entity.
         /// </summary>
         /// <remarks>Use this method to set the parent entity when the parent entity is known, but has not
-        /// been persistent and does not yet have an identity. The parent identifier will we retrieved
+        /// been persistent and does not yet have an identity. The parent identifier will be retrieved
         /// from the parent entity when needed. If the parent entity still does not have an entity by that
         /// time, an exception will be thrown by <see cref="ParentId"/> getter.</remarks>
         void SetParent(ITreeEntity parent);

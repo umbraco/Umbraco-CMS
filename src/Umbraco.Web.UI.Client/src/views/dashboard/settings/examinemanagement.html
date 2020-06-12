@@ -1,13 +1,5 @@
 <div id="examineManagement" class="examine-management" ng-controller="Umbraco.Dashboard.ExamineManagementController as vm">
 
-    <div ng-if="vm.viewState === 'list'">
-        <umb-box>
-            <umb-box-content>
-                <h3 class="bold">Examine Management</h3>
-            </umb-box-content>
-        </umb-box>
-    </div>
-
     <div ng-show="vm.loading">
         <umb-load-indicator></umb-load-indicator>
     </div>
@@ -31,15 +23,15 @@
                         <div class="umb-panel-group__details-status" ng-repeat="indexer in vm.indexerDetails">
 
                             <div class="umb-panel-group__details-status-icon-container">
-                                <i class="umb-panel-status-icon"
+                                <i class="umb-panel-status-icon" aria-hidden="true"
                                    ng-class="{'icon-check color-green' : indexer.isHealthy, 'icon-delete color-red' : !indexer.isHealthy}"></i>
                             </div>
 
                             <div class="umb-panel-group__details-status-content">
                                 <div class="umb-panel-group__details-status-text">
-                                    <a class="btn-link -underline" href="" ng-click="vm.showIndexInfo(indexer)">
+                                    <button type="button" class="btn-link -underline" ng-click="vm.showIndexInfo(indexer)">
                                         {{indexer.name}}
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
 
@@ -67,14 +59,14 @@
                         <div class="umb-panel-group__details-status" ng-repeat="searcher in vm.searcherDetails">
 
                             <div class="umb-panel-group__details-status-icon-container">
-                                <i class="umb-panel-status-icon icon-info"></i>
+                                <i class="umb-panel-status-icon icon-info" aria-hidden="true"></i>
                             </div>
 
                             <div class="umb-panel-group__details-status-content">
                                 <div class="umb-panel-group__details-status-text">
-                                    <a class="btn-link -underline" href="" ng-click="vm.showSearcherInfo(searcher)">
+                                    <button type="button" class="btn-link -underline" ng-click="vm.showSearcherInfo(searcher)">
                                         {{searcher.name}}
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -89,7 +81,7 @@
 
             <umb-editor-sub-header>
                 <umb-editor-sub-header-content-left>
-                    <a class="umb-panel-back-link" href="" ng-click="vm.setViewState('list');">&larr; Back to overview</a>
+                    <button type="button" class="umb-package-details__back-action" ng-click="vm.setViewState('list');"><span aria-hidden="true">&larr;</span> <localize key="general_backToOverview">Back to overview</localize></button>
                 </umb-editor-sub-header-content-left>
             </umb-editor-sub-header>
 
@@ -108,8 +100,12 @@
                         <div class="umb-panel-group__details-check">
 
                             <div class="umb-panel-group__details-check-title">
-                                <div class="umb-panel-group__details-check-name">Search</div>
-                                <div class="umb-panel-group__details-check-description">Search the index and view the results</div>
+                                <div class="umb-panel-group__details-check-name">
+                                    <localize key="general_search">Search</localize>
+                                </div>
+                                <div class="umb-panel-group__details-check-description">
+                                    <localize key="examineManagement_searchDescription">Search the index and view the results</localize>
+                                </div>
                             </div>
 
                             <div class="umb-panel-group__details-status">
@@ -157,10 +153,9 @@
                                                                 <td>{{result.score}}</td>
                                                                 <td>{{result.id}}</td>
                                                                 <td>
-                                                                    <span>{{result.values['nodeName']}}</span>&nbsp;
-                                                                    <a class="color-green" href="" ng-click="vm.showSearchResultDialog(result.values)">
-                                                                        <em>({{result.fieldCount}} fields)</em>
-                                                                    </a>
+                                                                    <a ng-show="result.editUrl" ng-click="vm.goToResult(result, $event)" ng-href="#{{result.editUrl}}">{{result.values['nodeName']}}</a>
+                                                                    <span ng-hide="result.editUrl">{{result.values['nodeName']}}</span>
+                                                                    <button type="button" class="table__action-overlay color-green" ng-click="vm.showSearchResultDialog(result.values)">({{result.fieldCount}} <localize key="examineManagement_fields">fields</localize>)</button>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -198,7 +193,7 @@
 
             <umb-editor-sub-header>
                 <umb-editor-sub-header-content-left>
-                    <a class="umb-panel-back-link" href="" ng-click="vm.setViewState('list');">&larr; <localize key="general_backToOverview">Back to overview</localize></a>
+                    <button type="button" class="umb-package-details__back-action" ng-click="vm.setViewState('list');"><span aria-hidden="true">&larr;</span> <localize key="general_backToOverview">Back to overview</localize></button>
                 </umb-editor-sub-header-content-left>
             </umb-editor-sub-header>
 
@@ -225,7 +220,7 @@
                             <div class="umb-panel-group__details-status">
 
                                 <div class="umb-panel-group__details-status-icon-container">
-                                    <i class="umb-panel-status-icon"
+                                    <i class="umb-panel-status-icon" aria-hidden="true"
                                        ng-class="{'icon-check color-green' : vm.selectedIndex.isHealthy, 'icon-delete color-red' : !vm.selectedIndex.isHealthy}"></i>
                                 </div>
 
@@ -234,7 +229,7 @@
                                     <div class="umb-panel-group__details-status-text">
                                         <div>{{vm.selectedIndex.healthStatus}}</div>
                                         <div ng-show="!vm.selectedIndex" class="color-red">
-                                            The index cannot be read and will need to be rebuilt
+                                            <localize key="examineManagement_indexCannotRead">The index cannot be read and will need to be rebuilt</localize>
                                         </div>
                                         <!--<div ng-if="status.description" ng-bind-html="status.description"></div>-->
                                     </div>
@@ -298,10 +293,9 @@
                                                                 <td>{{result.score}}</td>
                                                                 <td>{{result.id}}</td>
                                                                 <td>
-                                                                    <span>{{result.values['nodeName']}}</span>&nbsp;
-                                                                    <a class="color-green" href="" ng-click="vm.showSearchResultDialog(result.values)">
-                                                                        <em>({{result.fieldCount}} fields)</em>
-                                                                    </a>
+                                                                    <a ng-show="result.editUrl" ng-click="vm.goToResult(result, $event)" ng-href="#{{result.editUrl}}">{{result.values['nodeName']}}</a>
+                                                                    <span ng-hide="result.editUrl">{{result.values['nodeName']}}</span>
+                                                                    <button type="button" class="table__action-overlay color-green" ng-click="vm.showSearchResultDialog(result.values)">({{result.fieldCount}} <localize key="examineManagement_fields">fields</localize>)</button>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -375,7 +369,7 @@
                                                 <umb-button ng-show="!vm.selectedIndex.isProcessing && (!vm.selectedIndex.processingAttempts || vm.selectedIndex.processingAttempts < 100)"
                                                             disabled="!vm.selectedIndex.canRebuild"
                                                             type="button"
-                                                            button-style="success"
+                                                            button-style="danger"
                                                             action="vm.rebuildIndex(vm.selectedIndex, $event)"
                                                             label="Rebuild index"
                                                             label-key="examineManagement_rebuildIndex">
@@ -387,13 +381,14 @@
                                                 </div>
 
                                                 <div ng-show="vm.selectedIndex.processingAttempts >= 100">
-                                                    The process is taking longer than expected, check the umbraco log to see if there have been any errors during this operation
+                                                    <localize key="examineManagement_processIsTakingLonger">The process is taking longer than expected, check the umbraco log to see if there have been any errors during this operation</localize>
                                                 </div>
 
                                             </ng-form>
 
                                             <div class="umb-panel-group__details-status-action-description" ng-show="!vm.selectedIndex.canRebuild">
-                                                This index cannot be rebuilt because it has no assigned <code>IIndexPopulator</code>
+                                                <localize key="examineManagement_indexCannotRebuild">This index cannot be rebuilt because it has no assigned </localize>
+                                                <code><localize key="examineManagement_iIndexPopulator">IIndexPopulator</localize></code>
                                             </div>
                                         </div>
                                     </div>
@@ -412,11 +407,5 @@
 
         </div>
     </div>
-
-    <umb-overlay ng-if="vm.searchResults.overlay"
-                 position="center"
-                 view="vm.searchResults.overlay.view"
-                 model="vm.searchResults.overlay">
-    </umb-overlay>
 
 </div>

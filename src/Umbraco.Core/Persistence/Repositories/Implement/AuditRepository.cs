@@ -77,7 +77,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public IEnumerable<IAuditItem> Get(AuditType type, IQuery<IAuditItem> query)
         {
             var sqlClause = GetBaseQuery(false)
-                .Where<LogDto>(x => x.Header == type.ToString());
+                .Where("(logHeader=@0)", type.ToString());
+
             var translator = new SqlTranslator<IAuditItem>(sqlClause, query);
             var sql = translator.Translate();
 
@@ -174,7 +175,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             totalRecords = page.TotalItems;
 
             var items = page.Items.Select(
-                dto => new AuditItem(dto.Id, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters)).ToList();
+                dto => new AuditItem(dto.NodeId, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters)).ToList();
 
             // map the DateStamp
             for (var i = 0; i < items.Count; i++)

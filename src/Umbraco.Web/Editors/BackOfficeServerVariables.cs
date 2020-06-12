@@ -309,7 +309,15 @@ namespace Umbraco.Web.Editors
                         {
                             "webProfilingBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<WebProfilingController>(
                                 controller => controller.GetStatus())
-                        }
+                        },
+                        {
+                            "tinyMceApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TinyMceController>(
+                                controller => controller.UploadImage())
+                        },
+                        {
+                            "imageUrlGeneratorApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImageUrlGeneratorController>(
+                                controller => controller.GetCropUrl(null, null, null, null, null))
+                        },
                     }
                 },
                 {
@@ -341,6 +349,7 @@ namespace Umbraco.Web.Editors
                         {"loginBackgroundImage",  Current.Configs.Settings().Content.LoginBackgroundImage},
                         {"showUserInvite", EmailSender.CanSendRequiredEmail},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail},
+                        {"showAllowSegmentationForDocumentTypes", false},
                     }
                 },
                 {

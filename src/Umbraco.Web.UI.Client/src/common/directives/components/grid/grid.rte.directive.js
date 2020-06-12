@@ -14,6 +14,8 @@ angular.module("umbraco.directives")
 
                 // TODO: A lot of the code below should be shared between the grid rte and the normal rte
 
+                scope.isLoading = true;
+
                 var promises = [];
                 
                 //To id the html textarea we need to use the datetime ticks because we can have multiple rte's per a single property alias
@@ -27,7 +29,7 @@ angular.module("umbraco.directives")
                 }
 
                 var editorConfig = scope.configuration ? scope.configuration : null;
-                if (!editorConfig || angular.isString(editorConfig)) {
+                if (!editorConfig || Utilities.isString(editorConfig)) {
                     editorConfig = tinyMceService.defaultPrevalues();
                     //for the grid by default, we don't want to include the macro toolbar
                     editorConfig.toolbar = _.without(editorConfig, "umbmacro");
@@ -91,6 +93,10 @@ angular.module("umbraco.directives")
                         //custom initialization for this editor within the grid
                         editor.on('init', function (e) {
 
+                            // Used this init event - as opposed to property init_instance_callback
+                            // to turn off the loader
+                            scope.isLoading = false;
+
                             //force overflow to hidden to prevent no needed scroll
                             editor.getBody().style.overflow = "hidden";
 
@@ -138,7 +144,6 @@ angular.module("umbraco.directives")
                         //we need to add a timeout here, to force a redraw so TinyMCE can find
                         //the elements needed
                         $timeout(function () {
-                            tinymce.DOM.events.domLoaded = true;
                             tinymce.init(baseLineConfigObj);
                         }, 150, false);
                     }

@@ -33,5 +33,11 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "userCount")]
         public int UserCount { get; set; }
+
+        /// <summary>
+        /// Is the user group a system group e.g. "Administrators", "Sensitive data" or "Translators"
+        /// </summary>
+        [DataMember(Name = "isSystemUserGroup")]
+        public bool IsSystemUserGroup { get; set; }
     }
 }

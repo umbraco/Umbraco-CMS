@@ -75,6 +75,7 @@ namespace Umbraco.Web.Routing
         private UrlMode GetMode(bool absolute) => absolute ? UrlMode.Absolute : Mode;
         private IPublishedContent GetDocument(int id) => _umbracoContext.Content.GetById(id);
         private IPublishedContent GetDocument(Guid id) => _umbracoContext.Content.GetById(id);
+        private IPublishedContent GetMedia(Guid id) => _umbracoContext.Media.GetById(id);
 
         /// <summary>
         /// Gets the url of a published content.
@@ -183,6 +184,18 @@ namespace Umbraco.Web.Routing
         #endregion
 
         #region GetMediaUrl
+
+        /// <summary>
+        /// Gets the url of a media item.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="mode"></param>
+        /// <param name="culture"></param>
+        /// <param name="propertyAlias"></param>
+        /// <param name="current"></param>
+        /// <returns></returns>
+        public string GetMediaUrl(Guid id, UrlMode mode = UrlMode.Default, string culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri current = null)
+            => GetMediaUrl(GetMedia(id), mode, culture, propertyAlias, current);
 
         /// <summary>
         /// Gets the url of a media item.

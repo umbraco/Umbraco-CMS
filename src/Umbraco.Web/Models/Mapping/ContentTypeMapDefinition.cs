@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Services;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -120,6 +121,7 @@ namespace Umbraco.Web.Models.Mapping
             MapTypeToDisplayBase<DocumentTypeDisplay, PropertyTypeDisplay>(source, target);
 
             target.AllowCultureVariant = source.VariesByCulture();
+            target.AllowSegmentVariant = source.VariesBySegment();
 
             //sync templates
             target.AllowedTemplates = context.MapEnumerable<ITemplate, EntityBasic>(source.AllowedTemplates);
@@ -144,6 +146,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //default listview
             target.ListViewEditorName = Constants.Conventions.DataTypes.ListViewPrefix + "Media";
+            target.IsSystemMediaType = source.IsSystemMediaType();
 
             if (string.IsNullOrEmpty(source.Name)) return;
 
@@ -214,15 +217,18 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -CreateDate -DeleteDate -UpdateDate
-        // Umbraco.Code.MapAll -SupportsPublishing -Key -PropertyEditorAlias -ValueStorageType
+        // Umbraco.Code.MapAll -SupportsPublishing -Key -PropertyEditorAlias -ValueStorageType -Variations
         private static void Map(PropertyTypeBasic source, PropertyType target, MapperContext context)
         {
             target.Name = source.Label;
             target.DataTypeId = source.DataTypeId;
             target.DataTypeKey = source.DataTypeKey;
             target.Mandatory = source.Validation.Mandatory;
+            target.MandatoryMessage = source.Validation.MandatoryMessage;
             target.ValidationRegExp = source.Validation.Pattern;
-            target.Variations = source.AllowCultureVariant ? ContentVariation.Culture : ContentVariation.Nothing;
+            target.ValidationRegExpMessage = source.Validation.PatternMessage;
+            target.SetVariesBy(ContentVariation.Culture, source.AllowCultureVariant);
+            target.SetVariesBy(ContentVariation.Segment, source.AllowSegmentVariant);
 
             if (source.Id > 0)
                 target.Id = source.Id;
@@ -334,6 +340,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             target.Alias = source.Alias;
             target.AllowCultureVariant = source.AllowCultureVariant;
+            target.AllowSegmentVariant = source.AllowSegmentVariant;
             target.DataTypeId = source.DataTypeId;
             target.DataTypeKey = source.DataTypeKey;
             target.Description = source.Description;
@@ -350,6 +357,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             target.Alias = source.Alias;
             target.AllowCultureVariant = source.AllowCultureVariant;
+            target.AllowSegmentVariant = source.AllowSegmentVariant;
             target.DataTypeId = source.DataTypeId;
             target.DataTypeKey = source.DataTypeKey;
             target.Description = source.Description;
@@ -364,7 +372,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Validation = source.Validation;
         }
 
-        // Umbraco.Code.MapAll -CreatorId -Level -SortOrder
+        // Umbraco.Code.MapAll -CreatorId -Level -SortOrder -Variations
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
         // Umbraco.Code.MapAll -ContentTypeComposition (done by AfterMapSaveToType)
         private static void MapSaveToTypeBase<TSource, TSourcePropertyType>(TSource source, IContentTypeComposition target, MapperContext context)
@@ -394,9 +402,8 @@ namespace Umbraco.Web.Models.Mapping
 
             if (!(target is IMemberType))
             {
-                target.Variations = ContentVariation.Nothing;
-                if (source.AllowCultureVariant)
-                    target.Variations |= ContentVariation.Culture;
+                target.SetVariesBy(ContentVariation.Culture, source.AllowCultureVariant);
+                target.SetVariesBy(ContentVariation.Segment, source.AllowSegmentVariant);
             }
 
             // handle property groups and property types
@@ -487,7 +494,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Udi = MapContentTypeUdi(source);
             target.UpdateDate = source.UpdateDate;
 
-            target.AllowedContentTypes = source.AllowedContentTypes.Select(x => x.Id.Value);
+            target.AllowedContentTypes = source.AllowedContentTypes.OrderBy(c => c.SortOrder).Select(x => x.Id.Value);
             target.CompositeContentTypes = source.ContentTypeComposition.Select(x => x.Alias);
             target.LockedCompositeContentTypes = MapLockedCompositions(source);
         }
@@ -577,7 +584,7 @@ namespace Umbraco.Web.Models.Mapping
                     udiType = Constants.UdiEntityType.DocumentType;
                     break;
                 default:
-                    throw new Exception("panic");
+                    throw new PanicException($"Source is of type {source.GetType()} which isn't supported here");
             }
 
             return Udi.Create(udiType, source.Key);

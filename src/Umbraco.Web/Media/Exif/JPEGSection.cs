@@ -45,7 +45,7 @@
         public JPEGSection(JPEGMarker marker)
             : this(marker, new byte[0], new byte[0])
         {
-            ;
+
         }
         #endregion
 

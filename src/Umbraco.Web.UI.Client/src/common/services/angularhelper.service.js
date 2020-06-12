@@ -33,7 +33,7 @@ function angularHelper($q) {
             //this is sequential promise chaining, it's not pretty but we need to do it this way.
             //$q.all doesn't execute promises in sequence but that's what we want to do here.
 
-            if (!angular.isArray(promises)) {
+            if (!Utilities.isArray(promises)) {
                 throw "promises must be an array";
             }
 
@@ -178,11 +178,11 @@ function angularHelper($q) {
                 $valid: true,
                 $submitted: false,
                 $pending: undefined,
-                $addControl: angular.noop,
-                $removeControl: angular.noop,
-                $setValidity: angular.noop,
-                $setDirty: angular.noop,
-                $setPristine: angular.noop,
+                $addControl: Utilities.noop,
+                $removeControl: Utilities.noop, 
+                $setValidity: Utilities.noop,
+                $setDirty: Utilities.noop,
+                $setPristine: Utilities.noop,
                 $name: formName
             };
         }

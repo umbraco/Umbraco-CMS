@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function RollbackController($scope, contentResource, localizationService, assetsService) {
+    function RollbackController($scope, contentResource, localizationService, assetsService, dateHelper, userService) {
         
         var vm = this;
 
@@ -96,11 +96,15 @@
             const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
 
             return contentResource.getRollbackVersions(nodeId, culture)
-                .then(function(data){
-                    vm.previousVersions = data.map(version => {
-                        version.displayValue = version.versionDate + " - " + version.versionAuthorName;
-                        return version;
-                    }); 
+                .then(function (data) {
+                    // get current backoffice user and format dates
+                    userService.getCurrentUser().then(function (currentUser) {
+                        vm.previousVersions = data.map(version => {
+                            var timestampFormatted = dateHelper.getLocalDate(version.versionDate, currentUser.locale, 'LLL');
+                            version.displayValue = timestampFormatted + ' - ' + version.versionAuthorName;
+                            return version;
+                        }); 
+                    });
                 });
         }
 
@@ -136,8 +140,8 @@
                     }
 
                     // diff requires a string
-                    property.value = property.value ? property.value : "";
-                    oldProperty.value = oldProperty.value ? oldProperty.value : "";
+                    property.value = property.value ? property.value + "" : "";
+                    oldProperty.value = oldProperty.value ? oldProperty.value + "" : "";
 
                     var diffProperty = {
                         "alias": property.alias,

@@ -5,7 +5,12 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [DataEditor(Constants.PropertyEditors.Aliases.DropDownListFlexible, "Dropdown", "dropdownFlexible", Group = "lists", Icon = "icon-indent")]
+    [DataEditor(
+        Constants.PropertyEditors.Aliases.DropDownListFlexible,
+        "Dropdown",
+        "dropdownFlexible",
+        Group = Constants.PropertyEditors.Groups.Lists,
+        Icon = "icon-indent")]
     public class DropDownFlexiblePropertyEditor : DataEditor
     {
         private readonly ILocalizedTextService _textService;

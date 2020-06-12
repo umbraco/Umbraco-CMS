@@ -62,6 +62,7 @@ namespace Umbraco.Web.Cache
                     // it *was* done for each pathId but really that does not make sense
                     // only need to do it for the current media
                     mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia>(payload.Id));
+                    mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia>(payload.Key));
 
                     // remove those that are in the branch
                     if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
@@ -104,14 +105,15 @@ namespace Umbraco.Web.Cache
 
         public class JsonPayload
         {
-            public JsonPayload(int id, TreeChangeTypes changeTypes)
+            public JsonPayload(int id, Guid? key, TreeChangeTypes changeTypes)
             {
                 Id = id;
+                Key = key;
                 ChangeTypes = changeTypes;
             }
 
             public int Id { get; }
-
+            public Guid? Key { get; }
             public TreeChangeTypes ChangeTypes { get; }
         }
 
