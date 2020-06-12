@@ -111,10 +111,6 @@
             }
         }
 
-        function mapValueToPropertyModel(value, alias, dataModel) {
-            dataModel[alias] = value;
-        }
-
         /**
          * Map property values from an ElementModel to another ElementModel.
          * Used to tricker watchers for synchronization.
