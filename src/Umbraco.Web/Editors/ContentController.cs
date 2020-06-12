@@ -2321,30 +2321,48 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             }
 
+            var defaultMemberGroupIcon = "icon-users-alt";
             var entry = Services.PublicAccessService.GetEntryForContent(content);
 
-            RoleDisplay[] allRoles;
             var rolesProvider = Roles.Provider;
+
+            RoleDisplay[] allRoles;
+
+            // mappings for reuse in different places only in this method.
+            RoleDisplay MapUmbracoRole(IMemberGroup role)
+            {
+                return new RoleDisplay() {Id = role.Id.ToString(), Name = role.Name, Icon = defaultMemberGroupIcon};
+            }
+
+            RoleDisplay MapStandardRoleProviderRole(string role)
+            {
+                return new RoleDisplay() {Id = role, Name = role, Icon = defaultMemberGroupIcon};
+            }
 
             if (rolesProvider is MembersRoleProvider)
             {
+                // Using Umbraco's standard MemberRoleProvider
                 var allGroups = Services.MemberGroupService.GetAll().ToArray();
-                allRoles = allGroups.Select(x => new RoleDisplay() {Id = x.Id.ToString(), Name = x.Name, Icon = "icon-users-alt"}).ToArray();
+                allRoles = allGroups.Select(MapUmbracoRole).ToArray();
+            }
+            else if (rolesProvider is IRoleProviderWithDisplayNames roleProviderDisplayNames)
+            {
+                // A Custom Provider is configured, let's se if it implements the custom interface for friendly names
+                allRoles = roleProviderDisplayNames.GetAllRolesWithDisplayName();
             }
             else
             {
-                // custom provider
+                // A regular ASP.NET role provider
                 var allCustomRoles = rolesProvider.GetAllRoles();
-                allRoles = allCustomRoles.Select(x=> new RoleDisplay(){Id = x, Name = x, Icon = "icon-users-alt"}).ToArray();
+                allRoles = allCustomRoles.Select(MapStandardRoleProviderRole).ToArray();
             }
-
 
             if (entry == null || entry.ProtectedNodeId != content.Id)
             {
+                // If there is no existing protection, let's just return here.
                 return Request.CreateResponse(HttpStatusCode.OK, new PublicAccess
                 {
-                    HasProtection = false,
-                    AllGroups = allRoles
+                    AllRoles = allRoles
                 });
 
             }
@@ -2381,46 +2399,18 @@ namespace Umbraco.Web.Editors
                     break;
             }
 
-
-            RoleDisplay[] roles;
+            // Maps selected roles.
+            RoleDisplay[] roles = entry.Rules
+                .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
+                .Select(rule => allRoles.FirstOrDefault(g => g.Id == rule.RuleValue))
+                .Where(memberGroup => memberGroup != null)
+                .ToArray();
             
-
-            if (rolesProvider is MembersRoleProvider)
-            {
-                var allGroups = Services.MemberGroupService.GetAll().ToArray();
-                var groups = entry.Rules
-                    .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
-                    .Select(rule => allGroups.FirstOrDefault(g => g.Name == rule.RuleValue))
-                    .Where(memberGroup => memberGroup != null)
-                    .Select(x=> new RoleDisplay(){Id = x.Id.ToString(), Name = x.Name, Icon = "icon-users-alt"})
-                    .ToArray();
-
-                roles = groups;
-                allRoles = allGroups.Select(x => new RoleDisplay() {Id = x.Id.ToString(), Name = x.Name, Icon = "icon-icon-users-alt"}).ToArray();
-
-            }
-            else
-            {
-                // custom provider
-
-                var allCustomRoles = rolesProvider.GetAllRoles();
-                    
-                var selectedRoles =  entry.Rules
-                    .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
-                    .Select(rule => allCustomRoles.FirstOrDefault(g => g == rule.RuleValue))
-                    .Where(role => role != null)
-                    .Select(x=> new RoleDisplay(){Id = x, Name = x, Icon = "icon-users-alt"})
-                    .ToArray();
-
-                roles = selectedRoles;
-                allRoles = allCustomRoles.Select(x=> new RoleDisplay(){Id = x, Name = x, Icon = "icon-users-alt"}).ToArray();
-            }
-
             return Request.CreateResponse(HttpStatusCode.OK, new PublicAccess
             {
                 Members = members,
-                Groups = roles,
-                AllGroups = allRoles,
+                Roles = roles,
+                AllRoles = allRoles,
                 LoginPage = loginPageEntity != null ? Mapper.Map<EntityBasic>(loginPageEntity) : null,
                 ErrorPage = errorPageEntity != null ? Mapper.Map<EntityBasic>(errorPageEntity) : null
             });

@@ -28,7 +28,7 @@
                     </div>
 
                     <div class="pa-select-type">
-                        <umb-radiobutton input-id="protectionTypeGroup" name="protectionType" value="group" model="vm.type" />
+                        <umb-radiobutton input-id="protectionTypeGroup" name="protectionType" value="role" model="vm.type" />
 
                         <label for="protectionTypeGroup" class="flex flex-column flex-auto">
                             <strong class="pa-access-header bold"><localize key="publicAccess_paGroups">Group based protection</localize></strong>
@@ -53,20 +53,20 @@
                         </div>
                     </div>
 
-                    <div ng-show="vm.step === 'group' && !vm.hasGroups">
+                    <div ng-show="vm.step === 'role' && !vm.hasRoles">
                         <p><localize key="publicAccess_paGroupsNoGroups">You need to create a member group before you can use group based authentication</localize></p>
                     </div>
 
-                    <div ng-show="vm.step === 'group' && vm.hasGroups">
+                    <div ng-show="vm.step === 'role' && vm.hasRoles">
                         <p><localize key="publicAccess_paSelectGroups" tokens="[currentNode.name]">Select the groups that should have access to this page</localize></p>
                         <div>
-                            <umb-node-preview ng-repeat="group in vm.groups | orderBy:'name'"
+                            <umb-node-preview ng-repeat="role in vm.roles | orderBy:'name'"
                                               icon="'icon-users'"
-                                              name="group.name"
+                                              name="role.name"
                                               allow-remove="true"
-                                              on-remove="vm.removeGroup(group)">
+                                              on-remove="vm.removeRole(role)">
                             </umb-node-preview>
-                            <a href ng-click="vm.pickGroup()" class="umb-node-preview-add" prevent-default>
+                            <a href ng-click="vm.pickRole()" class="umb-node-preview-add" prevent-default>
                                 <localize key="general_add">Add</localize>
                             </a>
                         </div>

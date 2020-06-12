@@ -6,14 +6,11 @@ namespace Umbraco.Web.Models.ContentEditing
     public class PublicAccess
     {
 
-        [DataMember(Name = "groups")]
-        public RoleDisplay[] Groups { get; set; }
+        [DataMember(Name = "roles")]
+        public RoleDisplay[] Roles { get; set; }
 
-        [DataMember(Name = "allGroups")]
-        public RoleDisplay[] AllGroups { get; set; }
-
-        [DataMember(Name = "hasProtection")]
-        public bool HasProtection { get; set; }
+        [DataMember(Name = "allRoles")]
+        public RoleDisplay[] AllRoles { get; set; }
 
         [DataMember(Name = "loginPage")]
         public EntityBasic LoginPage { get; set; }

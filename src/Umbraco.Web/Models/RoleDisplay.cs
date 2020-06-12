@@ -10,6 +10,7 @@ namespace Umbraco.Web.Models
     [DataContract(Name = "roleDisplay", Namespace = "")]
     public class RoleDisplay
     {
+        
         [DataMember(Name = "id", IsRequired = true)]
         public string Id { get; set; }
 
