@@ -22,7 +22,8 @@ angular.module("umbraco")
                     "alias": "clipboard",
                     "name": data[1],
                     "icon": "icon-paste-in",
-                    "view": ""
+                    "view": "",
+                    "disabled": vm.model.clipboardItems.length === 0
                 }];
 
                 vm.activeTab = vm.navigation[0];
