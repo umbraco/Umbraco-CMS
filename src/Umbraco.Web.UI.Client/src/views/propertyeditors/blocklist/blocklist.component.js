@@ -223,10 +223,9 @@
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
                 size: blockModel.config.editorSize || "medium",
                 submit: function(blockEditorModel) {
-
-                    // Now lets syncronize by transfer data back to our blockModel.
-                    blockEditorModel.transferDataTo(blockModel);
-
+                    
+                    blockModel.retriveValuesFrom(blockEditorModel.content, blockEditorModel.settings)
+                    
                     editorService.close();
                 },
                 close: function() {

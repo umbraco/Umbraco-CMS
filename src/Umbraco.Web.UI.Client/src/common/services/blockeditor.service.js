@@ -421,12 +421,12 @@
                     layoutEntry.settings = null;
                 }
 
-                blockModel.transferDataTo = function(otherBlockModel) {
+                blockModel.retriveValuesFrom = function(content, settings) {
                     if (this.content !== null) {
-                        blockEditorService.mapElementValues(this.content, otherBlockModel.content);
+                        mapElementValues(content, this.content);
                     }
                     if (this.config.settingsElementTypeKey !== null) {
-                        blockEditorService.mapElementValues(this.settings, otherBlockModel.settings);
+                        mapElementValues(settings, this.settings);
                     }
                 }
 
