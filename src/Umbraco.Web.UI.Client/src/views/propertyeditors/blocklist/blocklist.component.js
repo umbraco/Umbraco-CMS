@@ -223,13 +223,10 @@
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
                 size: blockModel.config.editorSize || "medium",
                 submit: function(blockEditorModel) {
-                    // To ensure syncronization gets tricked we transfer each property.
-                    if (blockEditorModel.content !== null) {
-                        blockEditorService.mapElementValues(blockEditorModel.content, blockModel.content)
-                    }
-                    if (blockModel.config.settingsElementTypeKey !== null) {
-                        blockEditorService.mapElementValues(blockEditorModel.settings, blockModel.settings)
-                    }
+
+                    // Now lets syncronize by transfer data back to our blockModel.
+                    blockEditorModel.transferDataTo(blockModel);
+
                     editorService.close();
                 },
                 close: function() {

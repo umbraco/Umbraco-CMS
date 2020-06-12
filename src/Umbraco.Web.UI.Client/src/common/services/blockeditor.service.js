@@ -147,7 +147,11 @@
             }
         }
 
-
+        
+        /**
+         * Generate label for Block, uses either the labelInterpolator or falls back to the contentTypeName.
+         * @param {Object} blockModel BlockModel to recive data values from.
+         */
         function getBlockLabel(blockModel) {
             if(blockModel.labelInterpolator !== undefined) {
                 // We are just using the data model, since its a key/value object that is live synced. (if we need to add additional vars, we could make a shallow copy and apply those.)
@@ -263,10 +267,20 @@
         
         BlockEditorModelObject.prototype = {
 
+            /**
+             * Get block configuration object for a given contentTypeKey.
+             * @param {string} key contentTypeKey to recive the configuration model for.
+             * @returns {Object | null} Configuration model for the that specific block. Or ´null´ if the contentTypeKey isnt available in the current block configurations.
+             */
             getBlockConfiguration: function(key) {
                 return this.blockConfigurations.find(bc => bc.contentTypeKey === key);
             },
 
+            /**
+             * Load the scaffolding models for the given configuration, these are needed to provide usefull models for each block.
+             * @param {Object} blockModel BlockModel to recive data values from.
+             * @returns {Promise} A Promise object which resolves when all scaffold models are loaded.
+             */
             loadScaffolding: function() {
                 var tasks = [];
 
@@ -299,6 +313,11 @@
                 return this.blockConfigurations.map(blockConfiguration => this.getScaffoldFor(blockConfiguration.contentTypeKey).contentTypeKey);
             },
 
+            /**
+             * Retrive a list of available blocks, the list containing object with the confirugation model(blockConfigModel) and the element type model(elementTypeModel).
+             * The purpose of this data is to provide it for the Block Picker.
+             * @return {Array} array of objects representing available blocks, each object containing properties blockConfigModel and elementTypeModel.
+             */
             getAvailableBlocksForBlockPicker: function() {
 
                 var blocks = [];
@@ -316,14 +335,30 @@
                 return blocks;
             },
 
+            /**
+             * Get scaffold model for a given contentTypeKey.
+             * @param {string} key contentTypeKey to recive the scaffold model for.
+             * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
+             */
             getScaffoldFor: function(contentTypeKey) {
                 return this.scaffolds.find(o => o.contentTypeKey === contentTypeKey);
             },
 
             /**
              * Retrieve editor friendly model of a block.
-             * @param {Object} layoutEntry the layout entry to build the block model from.
-             * @return {Object} Scaffolded Block Content object.
+             * BlockModel is a class instance which setups live syncronization of content and settings models back to the data of your property editor model.
+             * The returned object, named ´BlockModel´, contains several usefull models to make editing of this block happen.
+             * The ´BlockModel´ contains the following properties:
+             * - key {string}: runtime generated key, usefull for tracking of this object
+             * - content {Object}: Content model, the content type model for content merged with the content data of this block.
+             * - settings {Object}: Settings model, the content type model for settings merged with the settings data of this block.
+             * - config {Object}: A deep copy of the block configuration model.
+             * - label {string}: The label for this block.
+             * - updateLabel {Method}: Method to trigger an update of the label for this block.
+             * - data {Object}: A reference to the data object from your property editor model.
+             * - layout {Object}: A refernce to the layout entry from your property editor model.
+             * @param {Object} layoutEntry the layout entry object to build the block model from.
+             * @return {Object | null} The BlockModel for the given layout entry. Or null if data or configuration wasnt found for this block.
              */
             getBlockModel: function(layoutEntry) {
 
@@ -344,6 +379,11 @@
                     return null;
                 }
 
+                var contentScaffold = this.getScaffoldFor(blockConfiguration.contentTypeKey);
+                if(contentScaffold === null) {
+                    return null;
+                }
+
                 var blockModel = {};
                 blockModel.key = String.CreateGuid().replace(/-/g, "");
                 blockModel.config = Utilities.copy(blockConfiguration);
@@ -354,11 +394,6 @@
                 blockModel.updateLabel = _.debounce(function () {this.__scope.$evalAsync(function() {
                     this.label = getBlockLabel(this);
                 }.bind(this))}.bind(blockModel), 10);
-
-                var contentScaffold = this.getScaffoldFor(blockConfiguration.contentTypeKey);
-                if(contentScaffold === null) {
-                    return null;
-                }
 
                 // make basics from scaffold
                 blockModel.content = Utilities.copy(contentScaffold);
@@ -386,6 +421,15 @@
                     layoutEntry.settings = null;
                 }
 
+                blockModel.transferDataTo = function(otherBlockModel) {
+                    if (this.content !== null) {
+                        blockEditorService.mapElementValues(this.content, otherBlockModel.content);
+                    }
+                    if (this.config.settingsElementTypeKey !== null) {
+                        blockEditorService.mapElementValues(this.settings, otherBlockModel.settings);
+                    }
+                }
+
                 // Add blockModel to our isolated scope to enable watching its values:
                 this.isolatedScope.blockModels["_"+blockModel.key] = blockModel;
                 addWatchers(blockModel, this.isolatedScope);
@@ -395,11 +439,20 @@
 
             },
 
+            /**
+             * Removes the data and destroys the Block Model.
+             * Notive this method does not remove the block from your layout, this will need to be handlede by the Property Editor since this services donst know about your layout structure.
+             * @param {Object} blockModel The BlockModel to be removed and destroyed.
+             */
             removeDataAndDestroyModel: function (blockModel) {
                 this.destroyBlockModel(blockModel);
                 this.removeDataByUdi(blockModel.content.udi);
             },
 
+            /**
+             * Destroys the Block Model, but all data is kept.
+             * @param {Object} blockModel The BlockModel to be destroyed.
+             */
             destroyBlockModel: function(blockModel) {
 
                 // remove property value watchers:
@@ -410,25 +463,9 @@
 
             },
 
-
             /**
-             * Retrieve block model of a layout entry
-             * @return {Object} Scaffolded Block Content object.
-             */
-            setDataFromBlockModel: function(blockModel) {
-
-                var udi = blockModel.content.key;
-
-                mapToPropertyModel(blockModel.content, blockModel.data);
-
-                // TODO: implement settings, sync settings to layout entry.
-                // mapToPropertyModel(blockModel.settings, blockModel.layout.settings)
-
-            },
-
-            /**
-             * Retrieve the layout object for this specific property editor.
-             * @return {Object} Layout object.
+             * Retrieve the layout object from this specific property editor model.
+             * @return {Object} Layout object, structure depends on the model of your property editor.
              */
             getLayout: function() {
                 if (!this.value.layout[this.propertyEditorAlias]) {
@@ -438,9 +475,9 @@
             },
             
             /**
-             * Create a empty layout entry
-             * @param {Object} blockConfiguration
-             * @return {Object} Layout entry object, to be inserted at a decired location in the layout object.
+             * Create a empty layout entry, notice the layout entry is not added to the property editors model layout object, since the layout sturcture depends on the property editor.
+             * @param {string} contentTypeKey, the contentTypeKey of the block you wish to create, if contentTypeKey is not avaiable in the block configuration then ´null´ will be returned.
+             * @return {Object | null} Layout entry object, to be inserted at a decired location in the layout object. Or null if contentTypeKey is unavaiaible.
              */
             create: function(contentTypeKey) {
                 
@@ -462,7 +499,7 @@
 
             /**
              * Insert data from ElementType Model
-             * @return {Object} Layout entry object, to be inserted at a decired location in the layout object.
+             * @return {Object | null} Layout entry object, to be inserted at a decired location in the layout object. Or ´null´ if the given ElementType isnt supported by the block configuration.
              */
             createFromElementType: function(elementTypeDataModel) {
 
@@ -524,11 +561,13 @@
         }
 
         return {
+            /**
+             * Create a new Block Editor Model Object, used to deal with editing of the Block Editor Model.
+             * @return {BlockEditorModelObject} A instance of the BlockEditorModelObject class.
+             */
             createModelObject: function(propertyModelValue, propertyEditorAlias, blockConfigurations, propertyScope) {
                 return new BlockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations, propertyScope);
-            },
-            mapElementValues: mapElementValues, 
-            getBlockLabel: getBlockLabel
+            }
         }
     }
 
