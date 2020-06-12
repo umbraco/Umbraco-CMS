@@ -18,6 +18,7 @@ using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Extensions;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -109,6 +110,12 @@ namespace Umbraco.Tests.Integration.Testing
                     // Add it!
                     services.AddUmbracoConfiguration(hostContext.Configuration);
                     services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly, NoAppCache.Instance, testHelper.GetLoggingConfiguration(), out _);
+                    services.AddUmbracoWebComponents();
+                    services.AddUmbracoRuntimeMinifier(hostContext.Configuration);
+                    services.AddUmbracoBackOffice();
+                    services.AddUmbracoBackOfficeIdentity();
+
+                    services.AddMvc();
 
                     CustomTestSetup(services);
                 });
@@ -117,10 +124,12 @@ namespace Umbraco.Tests.Integration.Testing
             var app = new ApplicationBuilder(host.Services);
             Services = app.ApplicationServices;
 
+            Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
             // This will create a db, install the schema and ensure the app is configured to run
             app.UseTestLocalDb(testHelper.WorkingDirectory, this);
 
             app.UseUmbracoCore();
+
         }
 
         #region Common services

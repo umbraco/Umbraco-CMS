@@ -1,42 +1,26 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Net.Http.Formatting;
 using System.Web;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Routing;
+using Umbraco.Web.Trees;
+using Umbraco.Web.WebApi;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.BackOffice.Trees
 {
     public abstract class FileSystemTreeController : TreeController
     {
-        protected FileSystemTreeController()
-        {
-            MenuItemCollectionFactory = Current.MenuItemCollectionFactory;
-        }
-
         protected FileSystemTreeController(
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger logger,
-            IRuntimeState runtimeState,
-            UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider,
-            IMenuItemCollectionFactory menuItemCollectionFactory)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
+            ILocalizedTextService localizedTextService,
+            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+            IMenuItemCollectionFactory menuItemCollectionFactory
+        )
+            : base(localizedTextService, umbracoApiControllerTypeCollection)
         {
             MenuItemCollectionFactory = menuItemCollectionFactory;
         }
@@ -61,7 +45,7 @@ namespace Umbraco.Web.Trees
             treeNode.AdditionalData["jsClickCallback"] = "javascript:void(0);";
         }
 
-        protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
+        protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
         {
             var path = string.IsNullOrEmpty(id) == false && id != Constants.System.RootString
                 ? HttpUtility.UrlDecode(id).TrimStart("/")
@@ -108,7 +92,7 @@ namespace Umbraco.Web.Trees
             return nodes;
         }
 
-        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        protected override TreeNode CreateRootNode(FormCollection queryStrings)
         {
             var root = base.CreateRootNode(queryStrings);
             //check if there are any children
@@ -116,28 +100,28 @@ namespace Umbraco.Web.Trees
             return root;
         }
 
-        protected virtual MenuItemCollection GetMenuForRootNode(FormDataCollection queryStrings)
+        protected virtual MenuItemCollection GetMenuForRootNode(FormCollection queryStrings)
         {
             var menu = MenuItemCollectionFactory.Create();
 
             //set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
             //create action
-            menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
             //refresh action
-            menu.Items.Add(new RefreshNode(Services.TextService, true));
+            menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
             return menu;
         }
 
-        protected virtual MenuItemCollection GetMenuForFolder(string path, FormDataCollection queryStrings)
+        protected virtual MenuItemCollection GetMenuForFolder(string path, FormCollection queryStrings)
         {
             var menu = MenuItemCollectionFactory.Create();
 
             //set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
             //create action
-            menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
 
             var hasChildren = FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any();
 
@@ -145,26 +129,26 @@ namespace Umbraco.Web.Trees
             if (hasChildren == false)
             {
                 //delete action
-                menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
+                menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true);
             }
 
             //refresh action
-            menu.Items.Add(new RefreshNode(Services.TextService, true));
+            menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
             return menu;
         }
 
-        protected virtual MenuItemCollection GetMenuForFile(string path, FormDataCollection queryStrings)
+        protected virtual MenuItemCollection GetMenuForFile(string path, FormCollection queryStrings)
         {
             var menu = MenuItemCollectionFactory.Create();
 
             //if it's not a directory then we only allow to delete the item
-            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
 
             return menu;
         }
 
-        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        protected override MenuItemCollection GetMenuForNode(string id, FormCollection queryStrings)
         {
             //if root node no need to visit the filesystem so lets just create the menu and return it
             if (id == Constants.System.RootString)

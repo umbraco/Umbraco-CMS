@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Linq;
-using System.Net.Http.Formatting;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
+using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Routing;
-using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Trees
 {
@@ -23,37 +20,28 @@ namespace Umbraco.Web.Trees
         // We are allowed to see the dictionary tree, if we are allowed to manage templates, such that se can use the
         // dictionary items in templates, even when we dont have authorization to manage the dictionary items
         )]
-    [Mvc.PluginController("UmbracoTrees")]
+    [PluginController("UmbracoTrees")]
     [CoreTree]
     [Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, TreeGroup = Constants.Trees.Groups.Settings)]
     public class DictionaryTreeController : TreeController
     {
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
+        private readonly ILocalizationService _localizationService;
 
-        public DictionaryTreeController(
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger logger,
-            IRuntimeState runtimeState,
-            UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider,
-            IMenuItemCollectionFactory menuItemCollectionFactory)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
+        public DictionaryTreeController(ILocalizedTextService localizedTextService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, IMenuItemCollectionFactory menuItemCollectionFactory, ILocalizationService localizationService) : base(localizedTextService, umbracoApiControllerTypeCollection)
         {
             _menuItemCollectionFactory = menuItemCollectionFactory;
+            _localizationService = localizationService;
         }
 
-        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        protected override TreeNode CreateRootNode(FormCollection queryStrings)
         {
             var root = base.CreateRootNode(queryStrings);
 
             // the default section is settings, falling back to this if we can't
             // figure out where we are from the querystring parameters
             var section = Constants.Applications.Translation;
-            if (queryStrings["application"] != null)
+            if (!queryStrings["application"].ToString().IsNullOrWhiteSpace())
                 section = queryStrings["application"];
 
             // this will load in a custom UI instead of the dashboard for the root node
@@ -73,7 +61,7 @@ namespace Umbraco.Web.Trees
         /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
-        protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
+        protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
         {
             var intId = id.TryConvertTo<int>();
             if (intId == false)
@@ -86,30 +74,30 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.RootString)
             {
                 nodes.AddRange(
-                    Services.LocalizationService.GetRootDictionaryItems().OrderBy(ItemSort()).Select(
+                    _localizationService.GetRootDictionaryItems().OrderBy(ItemSort()).Select(
                         x => CreateTreeNode(
                             x.Id.ToInvariantString(),
                             id,
                             queryStrings,
                             x.ItemKey,
                             "icon-book-alt",
-                            Services.LocalizationService.GetDictionaryItemChildren(x.Key).Any())));
+                            _localizationService.GetDictionaryItemChildren(x.Key).Any())));
             }
             else
             {
                 // maybe we should use the guid as url param to avoid the extra call for getting dictionary item
-                var parentDictionary = Services.LocalizationService.GetDictionaryItemById(intId.Result);
+                var parentDictionary = _localizationService.GetDictionaryItemById(intId.Result);
                 if (parentDictionary == null)
                     return nodes;
 
-                nodes.AddRange(Services.LocalizationService.GetDictionaryItemChildren(parentDictionary.Key).ToList().OrderBy(ItemSort()).Select(
+                nodes.AddRange(_localizationService.GetDictionaryItemChildren(parentDictionary.Key).ToList().OrderBy(ItemSort()).Select(
                     x => CreateTreeNode(
                         x.Id.ToInvariantString(),
                         id,
                         queryStrings,
                         x.ItemKey,
                         "icon-book-alt",
-                        Services.LocalizationService.GetDictionaryItemChildren(x.Key).Any())));
+                        _localizationService.GetDictionaryItemChildren(x.Key).Any())));
             }
 
             return nodes;
@@ -123,16 +111,16 @@ namespace Umbraco.Web.Trees
         /// All of the query string parameters passed from jsTree
         /// </param>
         /// <returns></returns>
-        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        protected override MenuItemCollection GetMenuForNode(string id, FormCollection queryStrings)
         {
             var menu = _menuItemCollectionFactory.Create();
 
-            menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
 
             if (id != Constants.System.RootString)
-                menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
+                menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true);
 
-            menu.Items.Add(new RefreshNode(Services.TextService, true));
+            menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
             return menu;
         }

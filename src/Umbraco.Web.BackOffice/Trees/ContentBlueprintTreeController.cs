@@ -1,19 +1,16 @@
-﻿using System.Linq;
-using System.Net.Http.Formatting;
+﻿using System;
+using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
+using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.Routing;
-using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web.WebApi;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -31,24 +28,26 @@ namespace Umbraco.Web.Trees
     public class ContentBlueprintTreeController : TreeController
     {
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
+        private readonly IContentService _contentService;
+        private readonly IContentTypeService _contentTypeService;
+        private readonly IEntityService _entityService;
 
         public ContentBlueprintTreeController(
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger logger,
-            IRuntimeState runtimeState,
-            UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider,
-            IMenuItemCollectionFactory menuItemCollectionFactory)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
+            ILocalizedTextService localizedTextService,
+            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+            IMenuItemCollectionFactory menuItemCollectionFactory,
+            IContentService contentService,
+            IContentTypeService contentTypeService,
+            IEntityService entityService)
+            : base(localizedTextService, umbracoApiControllerTypeCollection)
         {
-            _menuItemCollectionFactory = menuItemCollectionFactory;
+            _menuItemCollectionFactory = menuItemCollectionFactory ?? throw new ArgumentNullException(nameof(menuItemCollectionFactory));
+            _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
+            _contentTypeService = contentTypeService ?? throw new ArgumentNullException(nameof(contentTypeService));
+            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
         }
 
-        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        protected override TreeNode CreateRootNode(FormCollection queryStrings)
         {
             var root = base.CreateRootNode(queryStrings);
 
@@ -56,16 +55,16 @@ namespace Umbraco.Web.Trees
             root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.ContentBlueprints}/intro";
 
             //check if there are any content blueprints
-            root.HasChildren = Services.ContentService.GetBlueprintsForContentTypes().Any();
+            root.HasChildren = _contentService.GetBlueprintsForContentTypes().Any();
 
             return root;
         }
-        protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
+        protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
 
             //get all blueprints
-            var entities = Services.EntityService.GetChildren(Constants.System.Root, UmbracoObjectTypes.DocumentBlueprint).ToArray();
+            var entities = _entityService.GetChildren(Constants.System.Root, UmbracoObjectTypes.DocumentBlueprint).ToArray();
 
             //check if we're rendering the root in which case we'll render the content types that have blueprints
             if (id == Constants.System.RootString)
@@ -73,12 +72,12 @@ namespace Umbraco.Web.Trees
                 //get all blueprint content types
                 var contentTypeAliases = entities.Select(x => ((IContentEntitySlim) x).ContentTypeAlias).Distinct();
                 //get the ids
-                var contentTypeIds = Services.ContentTypeService.GetAllContentTypeIds(contentTypeAliases.ToArray()).ToArray();
+                var contentTypeIds = _contentTypeService.GetAllContentTypeIds(contentTypeAliases.ToArray()).ToArray();
 
                 //now get the entities ... it's a bit round about but still smaller queries than getting all document types
                 var docTypeEntities = contentTypeIds.Length == 0
                     ? new IUmbracoEntity[0]
-                    : Services.EntityService.GetAll(UmbracoObjectTypes.DocumentType, contentTypeIds).ToArray();
+                    : _entityService.GetAll(UmbracoObjectTypes.DocumentType, contentTypeIds).ToArray();
 
                 nodes.AddRange(docTypeEntities
                     .Select(entity =>
@@ -96,7 +95,7 @@ namespace Umbraco.Web.Trees
 
             var intId = id.TryConvertTo<int>();
             //Get the content type
-            var ct = Services.ContentTypeService.Get(intId.Result);
+            var ct = _contentTypeService.Get(intId.Result);
             if (ct == null) return nodes;
 
             var blueprintsForDocType = entities.Where(x => ct.Alias == ((IContentEntitySlim) x).ContentTypeAlias);
@@ -111,31 +110,31 @@ namespace Umbraco.Web.Trees
             return nodes;
         }
 
-        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        protected override MenuItemCollection GetMenuForNode(string id, FormCollection queryStrings)
         {
             var menu = _menuItemCollectionFactory.Create();
 
             if (id == Constants.System.RootString)
             {
                 // root actions
-                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                 return menu;
             }
-            var cte = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.DocumentType);
+            var cte = _entityService.Get(int.Parse(id), UmbracoObjectTypes.DocumentType);
             //only refresh & create if it's a content type
             if (cte != null)
             {
-                var ct = Services.ContentTypeService.Get(cte.Id);
-                var createItem = menu.Items.Add<ActionCreateBlueprintFromContent>(Services.TextService, opensDialog: true);
+                var ct = _contentTypeService.Get(cte.Id);
+                var createItem = menu.Items.Add<ActionCreateBlueprintFromContent>(LocalizedTextService, opensDialog: true);
                 createItem.NavigateToRoute("/settings/contentBlueprints/edit/-1?create=true&doctype=" + ct.Alias);
 
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
                 return menu;
             }
 
-            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
 
             return menu;
         }

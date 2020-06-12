@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 
 namespace Umbraco.Web.Trees
 {
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Trees
         /// Gets the usage of the tree.
         /// </summary>
         public TreeUse TreeUse { get; set; } = TreeUse.Main | TreeUse.Dialog;
-        
+
         /// <summary>
         /// Gets or sets the tree sort order.
         /// </summary>

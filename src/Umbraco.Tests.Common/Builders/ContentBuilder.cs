@@ -33,9 +33,11 @@ namespace Umbraco.Tests.Common.Builders
         private string _path;
         private int? _sortOrder;
         private bool? _trashed;
+        private IContentType _contentType;
 
         public ContentTypeBuilder AddContentType()
         {
+            _contentType = null;
             var builder = new ContentTypeBuilder(this);
             _contentTypeBuilder = builder;
             return builder;
@@ -55,14 +57,14 @@ namespace Umbraco.Tests.Common.Builders
             var sortOrder = _sortOrder ?? 0;
             var trashed = _trashed ?? false;
 
-            if (_contentTypeBuilder == null)
+            if (_contentTypeBuilder is null && _contentType is null)
             {
-                throw new InvalidOperationException("A member cannot be constructed without providing a member type. Use AddContentType().");
+                throw new InvalidOperationException("A member cannot be constructed without providing a member type. Use AddContentType() or WithContentType().");
             }
 
-            var memberType = _contentTypeBuilder.Build();
+            var contentType = _contentType ?? _contentTypeBuilder.Build();
 
-            var member = new Content(name, parentId, memberType)
+            var content = new Content(name, parentId, contentType)
             {
                 Id = id,
                 Key = key,
@@ -80,13 +82,21 @@ namespace Umbraco.Tests.Common.Builders
                 var propertyData = _propertyDataBuilder.Build();
                 foreach (var kvp in propertyData)
                 {
-                    member.SetValue(kvp.Key, kvp.Value);
+                    content.SetValue(kvp.Key, kvp.Value);
                 }
 
-                member.ResetDirtyProperties(false);
+                content.ResetDirtyProperties(false);
             }
 
-            return member;
+            return content;
+        }
+
+        public ContentBuilder WithContentType(IContentType contentType)
+        {
+            _contentTypeBuilder = null;
+            _contentType = contentType;
+
+            return this;
         }
 
         int? IWithIdBuilder.Id
@@ -153,5 +163,7 @@ namespace Umbraco.Tests.Common.Builders
             get => _parentId;
             set => _parentId = value;
         }
+
+
     }
 }

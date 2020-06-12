@@ -13,7 +13,6 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Trees;
 
-//Migrated to .NET CORE
 namespace Umbraco.Web.Models.Mapping
 {
     /// <summary>
@@ -84,7 +83,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties);
         }
 
-        // Umbraco.Code.MapAll -AllowPreview -Errors -PersistedContent -TreeNodeUrl
+        // Umbraco.Code.MapAll -AllowPreview -Errors -PersistedContent
         private void Map(IContent source, ContentItemDisplay target, MapperContext context)
         {
             target.AllowedActions = GetActions(source);
@@ -108,7 +107,7 @@ namespace Umbraco.Web.Models.Mapping
             target.TemplateAlias = GetDefaultTemplate(source);
             target.TemplateId = source.TemplateId ?? default;
             target.Trashed = source.Trashed;
-          //  target.TreeNodeUrl = _commonTreeNodeMapper.GetTreeNodeUrl<ContentTreeController>(source);
+            target.TreeNodeUrl = _commonTreeNodeMapper.GetTreeNodeUrl<ContentTreeController>(source);
             target.Udi = Udi.Create(source.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, source.Key);
             target.UpdateDate = source.UpdateDate;
             target.Updater = _commonMapper.GetCreator(source, context);

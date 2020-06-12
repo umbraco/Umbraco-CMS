@@ -1,24 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Formatting;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Mapping;
-using Umbraco.Web.Routing;
+using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Trees
 {
@@ -30,26 +25,19 @@ namespace Umbraco.Web.Trees
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
+        private readonly IEntityService _entityService;
+        private readonly IDataTypeService _dataTypeService;
 
-        public DataTypeTreeController(
-            UmbracoTreeSearcher treeSearcher,
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger logger,
-            IRuntimeState runtimeState,
-            UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider,
-            IMenuItemCollectionFactory menuItemCollectionFactory)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
+
+        public DataTypeTreeController(ILocalizedTextService localizedTextService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, UmbracoTreeSearcher treeSearcher, IMenuItemCollectionFactory menuItemCollectionFactory, IEntityService entityService, IDataTypeService dataTypeService) : base(localizedTextService, umbracoApiControllerTypeCollection)
         {
             _treeSearcher = treeSearcher;
             _menuItemCollectionFactory = menuItemCollectionFactory;
+            _entityService = entityService;
+            _dataTypeService = dataTypeService;
         }
 
-        protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
+        protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
         {
             var intId = id.TryConvertTo<int>();
             if (intId == false) throw new InvalidOperationException("Id must be an integer");
@@ -58,7 +46,7 @@ namespace Umbraco.Web.Trees
 
             //Folders first
             nodes.AddRange(
-               Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.DataTypeContainer)
+               _entityService.GetChildren(intId.Result, UmbracoObjectTypes.DataTypeContainer)
                    .OrderBy(entity => entity.Name)
                    .Select(dt =>
                    {
@@ -71,13 +59,13 @@ namespace Umbraco.Web.Trees
                    }));
 
             //if the request is for folders only then just return
-            if (queryStrings["foldersonly"].IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1") return nodes;
+            if (queryStrings["foldersonly"].ToString().IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1") return nodes;
 
             //System ListView nodes
             var systemListViewDataTypeIds = GetNonDeletableSystemListViewDataTypeIds();
 
-            var children = Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.DataType).ToArray();
-            var dataTypes = Services.DataTypeService.GetAll(children.Select(c => c.Id).ToArray()).ToDictionary(dt => dt.Id);
+            var children = _entityService.GetChildren(intId.Result, UmbracoObjectTypes.DataType).ToArray();
+            var dataTypes = _dataTypeService.GetAll(children.Select(c => c.Id).ToArray()).ToDictionary(dt => dt.Id);
 
             nodes.AddRange(
                 children
@@ -128,7 +116,7 @@ namespace Umbraco.Web.Trees
             };
         }
 
-        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        protected override MenuItemCollection GetMenuForNode(string id, FormCollection queryStrings)
         {
             var menu = _menuItemCollectionFactory.Create();
 
@@ -138,20 +126,20 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // root actions
-                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                 return menu;
             }
 
-            var container = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.DataTypeContainer);
+            var container = _entityService.Get(int.Parse(id), UmbracoObjectTypes.DataTypeContainer);
             if (container != null)
             {
                 //set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
-                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
 
-                menu.Items.Add(new MenuItem("rename", Services.TextService.Localize("actions/rename"))
+                menu.Items.Add(new MenuItem("rename", LocalizedTextService.Localize("actions/rename"))
                 {
                     Icon = "icon icon-edit"
                 });
@@ -159,18 +147,18 @@ namespace Umbraco.Web.Trees
                 if (container.HasChildren == false)
                 {
                     //can delete data type
-                    menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+                    menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
                 }
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
             }
             else
             {
                 var nonDeletableSystemDataTypeIds = GetNonDeletableSystemDataTypeIds();
 
                 if (nonDeletableSystemDataTypeIds.Contains(int.Parse(id)) == false)
-                    menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+                    menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
 
-                menu.Items.Add<ActionMove>(Services.TextService, hasSeparator: true, opensDialog: true);
+                menu.Items.Add<ActionMove>(LocalizedTextService, hasSeparator: true, opensDialog: true);
             }
 
             return menu;

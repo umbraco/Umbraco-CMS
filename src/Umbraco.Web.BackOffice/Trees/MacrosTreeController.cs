@@ -1,17 +1,12 @@
 ﻿using System.Linq;
-using System.Net.Http.Formatting;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Persistence;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.Actions;
-using Umbraco.Web.Routing;
+using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.WebApi;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -23,38 +18,29 @@ namespace Umbraco.Web.Trees
     public class MacrosTreeController : TreeController
     {
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
+        private readonly IMacroService  _macroService;
 
-        public MacrosTreeController(
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger logger,
-            IRuntimeState runtimeState,
-            UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider,
-            IMenuItemCollectionFactory menuItemCollectionFactory)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
+        public MacrosTreeController(ILocalizedTextService localizedTextService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, IMenuItemCollectionFactory menuItemCollectionFactory, IMacroService macroService) : base(localizedTextService, umbracoApiControllerTypeCollection)
         {
             _menuItemCollectionFactory = menuItemCollectionFactory;
+            _macroService = macroService;
         }
 
-        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        protected override TreeNode CreateRootNode(FormCollection queryStrings)
         {
             var root = base.CreateRootNode(queryStrings);
             //check if there are any macros
-            root.HasChildren = Services.MacroService.GetAll().Any();
+            root.HasChildren = _macroService.GetAll().Any();
             return root;
         }
 
-        protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
+        protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
 
             if (id == Constants.System.RootString)
             {
-                foreach (var macro in Services.MacroService.GetAll().OrderBy(m => m.Name))
+                foreach (var macro in _macroService.GetAll().OrderBy(m => m.Name))
                 {
                     nodes.Add(CreateTreeNode(
                         macro.Id.ToString(),
@@ -69,26 +55,26 @@ namespace Umbraco.Web.Trees
             return nodes;
         }
 
-        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        protected override MenuItemCollection GetMenuForNode(string id, FormCollection queryStrings)
         {
             var menu = _menuItemCollectionFactory.Create();
 
             if (id == Constants.System.RootString)
             {
                 //Create the normal create action
-                menu.Items.Add<ActionNew>(Services.TextService);
+                menu.Items.Add<ActionNew>(LocalizedTextService);
 
                 //refresh action
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
                 return menu;
             }
 
-            var macro = Services.MacroService.GetById(int.Parse(id));
+            var macro = _macroService.GetById(int.Parse(id));
             if (macro == null) return menu;
 
             //add delete option for all macros
-            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
 
             return menu;
         }

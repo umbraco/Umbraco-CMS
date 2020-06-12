@@ -1,9 +1,10 @@
-﻿using Umbraco.Core;
+﻿using Microsoft.AspNetCore.Http;
+using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
-//Migrated to .NET CORE
+
 namespace Umbraco.Web.Models.Mapping
 {
     /// <summary>
@@ -34,7 +35,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -Properties -Errors -Edited -Updater -Alias -IsChildOfListView
-        // Umbraco.Code.MapAll -Trashed -IsContainer -VariesByCulture -TreeNodeUrl
+        // Umbraco.Code.MapAll -Trashed -IsContainer -VariesByCulture
         private void Map(IMember source, MemberDisplay target, MapperContext context)
         {
             target.ContentApps = _commonMapper.GetContentApps(source);
@@ -53,7 +54,7 @@ namespace Umbraco.Web.Models.Mapping
             target.SortOrder = source.SortOrder;
             target.State = null;
             target.Tabs = _tabsAndPropertiesMapper.Map(source, context);
-            //target.TreeNodeUrl = _commonTreeNodeMapper.GetTreeNodeUrl<MemberTreeController>(source);
+            target.TreeNodeUrl = _commonTreeNodeMapper.GetTreeNodeUrl<MemberTreeController>(source);
             target.Udi = Udi.Create(Constants.UdiEntityType.Member, source.Key);
             target.UpdateDate = source.UpdateDate;
             target.Username = source.Username;
