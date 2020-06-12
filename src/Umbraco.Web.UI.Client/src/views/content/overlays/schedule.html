@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.Overlays.ScheduleContentController as vm">
+<div ng-controller="Umbraco.Overlays.ScheduleContentController as vm" class="umb-variant-selector-overlay">
 
     <!-- invariant nodes -->
     <div ng-if="vm.variants.length === 1">
@@ -84,28 +84,39 @@
 
         <div class="umb-list umb-list--condensed">
 
-            <div class="umb-list-item" ng-repeat="variant in vm.variants">
+            <div class="umb-list-item" ng-repeat="variant in vm.displayVariants track by variant.compositeId">
                 <ng-form name="scheduleSelectorForm" style="width:100%;">
-                    <div ng-class="{'umb-list-item--error': scheduleSelectorForm.saveVariantReleaseDate.$invalid}">
+                    <div class="umb-variant-selector-entry" ng-class="{'umb-list-item--error': scheduleSelectorForm.saveVariantReleaseDate.$invalid}">
 
                         <umb-checkbox
-                            input-id="{{'saveVariantSelector_' + variant.language.culture}}"
+                            input-id="{{variant.htmlId}}"
                             name="saveVariantSelector"
                             model="variant.save"
                             on-change="vm.changeSelection(variant)"
-                            text="{{variant.language.name}}"
-                        />
+                            server-validation-field="{{variant.htmlId}}"
+                        >
+                            <span class="umb-variant-selector-entry__title" ng-if="!(variant.segment && variant.language)">
+                                <span ng-bind="variant.displayName"></span>
+                                <strong ng-if="variant.isMandatory" class="umb-control-required">*</strong>
+                            </span>
+                            <span class="umb-variant-selector-entry__title" ng-if="variant.segment && variant.language">
+                                <span ng-bind="variant.segment"></span>
+                                <span class="__secondarytitle"> — {{variant.language.name}}</span>
+                                <strong ng-if="variant.isMandatory" class="umb-control-required">*</strong>
+                            </span>
+                            <span class="umb-variant-selector-entry__description"
+                                ng-if="!scheduleSelectorForm.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                                <umb-variant-state variant="variant"></umb-variant-state>
+                                <span ng-show="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
+                            </span>
+                        </umb-checkbox>
 
                         <div>
 
-                                <span class="db umb-list-item__description umb-list-item__description--checkbox"
-                                      ng-if="!scheduleSelectorForm.$invalid && !(variant.notifications && variant.notifications.length > 0)">
-                                    <umb-variant-state variant="variant"></umb-variant-state>
-                                    <span ng-show="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
-                                </span>
+
 
                             <div class="date-wrapper-mini date-wrapper-mini--checkbox">
-                                <div class="date-wrapper-mini__date" ng-if="vm.dirtyVariantFilter(variant) && (variant.releaseDate || variant.save)">
+                                <div class="date-wrapper-mini__date" ng-if="(variant.releaseDate || variant.save)">
 
                                     <div style="font-size: 13px; margin-right: 5px;">Publish:<em ng-show="!variant.save">&nbsp;&nbsp;{{variant.releaseDateFormatted}}</em></div>
 
@@ -117,7 +128,7 @@
                                                        on-open="vm.datePickerShow(variant, 'publish')"
                                                        on-close="vm.datePickerClose(variant, 'publish')">
                                             <div>
-                                                <button ng-show="variant.releaseDate" class="btn umb-button--xxs" style="outline: none;">
+                                                <button ng-show="variant.releaseDate" class="btn umb-button--xxs btn-outline umb-outline">
                                                     {{variant.releaseDateFormatted}}
                                                 </button>
 
@@ -126,9 +137,9 @@
                                                 </a>
                                             </div>
                                         </umb-date-time-picker>
-                                        <a ng-show="variant.releaseDate" ng-click="vm.clearPublishDate(variant)" class="btn umb-button--xxs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
+                                        <button ng-show="variant.releaseDate" ng-click="vm.clearPublishDate(variant)" class="btn umb-button--xxs dropdown-toggle umb-button-group__toggle btn-outline umb-outline" style="margin-left: -2px;">
                                             <span class="icon icon-wrong"></span>
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
 
@@ -143,7 +154,7 @@
                                                        on-open="vm.datePickerShow(variant, 'unpublish')"
                                                        on-close="vm.datePickerClose(variant, 'unpublish')">
                                             <div>
-                                                <button ng-show="variant.expireDate" class="btn umb-button--xxs" style="outline: none;">
+                                                <button ng-show="variant.expireDate" class="btn umb-button--xxs btn-outline umb-outline">
                                                     {{variant.expireDateFormatted}}
                                                 </button>
 
@@ -152,7 +163,7 @@
                                                 </a>
                                             </div>
                                         </umb-date-time-picker>
-                                        <a ng-show="variant.expireDate" ng-click="vm.clearUnpublishDate(variant)" class="btn umb-button--xxs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
+                                        <a ng-show="variant.expireDate" ng-click="vm.clearUnpublishDate(variant)" class="btn umb-button--xxs dropdown-toggle umb-button-group__toggle btn-outline umb-outline" style="margin-left: -2px;">
                                             <span class="icon icon-wrong"></span>
                                         </a>
                                     </div>

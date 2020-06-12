@@ -189,7 +189,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                     if ($scope.model.filter.startsWith("{")) {
                         $scope.model.filterAdvanced = true;
                         //convert to object
-                        $scope.model.filter = JSON.parse($scope.model.filter);
+                        $scope.model.filter = Utilities.fromJson($scope.model.filter);
                     }
                 }
             }

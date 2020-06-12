@@ -18,8 +18,8 @@
 
                     <div class="content-type-editor-dialog edit-property-settings">
 
-                        <div class="umb-control-group" ng-if="!model.property.locked">
-                            <div class="control-group">
+                        <div class="umb-control-group -no-border" ng-if="!model.property.locked">
+                            <div class="control-group -no-margin">
                                 <textarea class="editor-label"
                                           data-element="property-name"
                                           name="propertyLabel"
@@ -36,12 +36,12 @@
                                     <span class="umb-validation-label" ng-message="required">Required label</span>
                                 </div>
                             </div>
-                            <div class="control-group -no-margin">
+                            <div class="control-group -no-margin" style="margin-top:2px;">
                                 <umb-generate-alias enable-lock="true" alias-from="model.property.label" alias="model.property.alias"></umb-generate-alias>
                             </div>
                         </div>
-                    
-                        <div class="umb-control-group control-group">
+
+                        <div class="umb-control-group control-group -no-border">
                             <textarea data-element="property-description"
                                     class="editor-description"
                                     ng-model="model.property.description"
@@ -51,35 +51,40 @@
                                     umb-auto-resize>
                         </textarea>
                         </div>
-                    
+
                         <div class="editor-wrapper umb-control-group control-group" ng-model="model.property.editor" val-require-component ng-if="!model.property.locked">
-                    
-                            <a data-element="editor-add" href="" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openDataTypePicker(model.property)">
-                                <localize key="shortcuts_addEditor"></localize>
-                            </a>
-                    
-                            <div class="editor clearfix" ng-if="model.property.editor">
-                    
-                                <a href="" class="editor-icon-wrapper" ng-click="vm.openDataTypePicker(model.property)">
-                                    <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}"></i>
-                                </a>
-                    
-                                <div class="editor-details">
-                                    <a href="" class="editor-name" ng-click="vm.openDataTypePicker(model.property)">{{ model.property.dataTypeName }}</a>
-                                    <a href="" class="editor-editor" ng-click="vm.openDataTypePicker(model.property)">{{ model.property.editor }}</a>
+
+                            <button type="button" class="btn-reset editor-placeholder" data-element="editor-add" ng-if="!model.property.editor" hotkey="alt+shift+e" ng-click="vm.openDataTypePicker(model.property)">
+                                <localize key="defaultdialogs_selectEditor"></localize>
+                                <div ng-messages="model.property.editor" show-validation-on-submit>
+                                    <span class="umb-validation-label" ng-message="required">Required editor</span>
                                 </div>
-                    
-                                <a href class="editor-settings-icon pull-right"
-                                ng-click="vm.openDataTypeSettings(model.property)"
-                                hotkey="alt+shift+d"
-                                ng-if="model.property.editor">
-                                    <i class="icon icon-settings"></i>
-                                </a>
-                    
+                            </button>
+
+                            <div class="editor clearfix" ng-if="model.property.editor">
+
+                                <button type="button" class="btn-reset editor-info" ng-click="vm.openDataTypeSettings(model.property)">
+                                    <div class="editor-icon-wrapper">
+                                        <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}" aria-hidden="true"></i>
+                                    </div>
+
+                                    <div class="editor-details">
+                                        <span class="editor-name">{{ model.property.dataTypeName }}</span>
+                                        <span class="editor-editor">{{ model.property.editor }}</span>
+                                    </div>
+                                </button>
+
+                                <button type="button" class="editor-remove-icon btn-reset pull-right"
+                                    ng-click="vm.openDataTypePicker(model.property)"
+                                    hotkey="alt+shift+d"
+                                    localize="title"
+                                    title="@actions_changeDataType">
+                                    <i class="icon icon-wrong" aria-hidden="true"></i>
+                                </button>
                             </div>
-                    
+
                         </div>
-                    
+
                         <div class="umb-control-group clearfix" ng-if="!model.property.locked">
 
                             <h5><localize key="validation_validation"></localize></h5>
@@ -101,8 +106,7 @@
                                    placeholder="@validation_mandatoryMessage"
                                    ng-model="model.property.validation.mandatoryMessage"
                                    ng-if="model.property.validation.mandatory"
-                                   ng-keypress="vm.submitOnEnter($event)">
-                            </input>
+                                   ng-keypress="vm.submitOnEnter($event)" />
 
                             <label class="mt3">
                                 <localize key="validation_customValidation"></localize>
@@ -132,19 +136,27 @@
                                    ng-keypress="vm.submitOnEnter($event)" />
 
                         </div>
-                        <div class="umb-control-group clearfix" ng-if="model.contentType === 'documentType' && model.contentTypeAllowCultureVariant">
-                           
-                                    <h5><localize key="contentTypeEditor_variantsHeading" /></h5>
-                             
-                                    <umb-toggle data-element="permissions-allow-culture-variant"
-                                                checked="model.property.allowCultureVariant"
-                                                on-click="vm.toggleAllowCultureVariants()"
-                                    >
-                                    </umb-toggle>
+                        <div class="umb-control-group clearfix -no-border" ng-if="model.contentType === 'documentType' && model.contentTypeAllowCultureVariant">
+
+                            <h5><localize key="contentTypeEditor_cultureVariantHeading" /></h5>
+                            <umb-toggle data-element="permissions-allow-culture-variant"
+                                        checked="model.property.allowCultureVariant"
+                                        on-click="vm.toggleAllowCultureVariants()">
+                            </umb-toggle>
 
                         </div>
-                    
-                        <div class="umb-control-group clearfix" ng-if="model.contentType === 'memberType'">
+                        <div class="umb-control-group clearfix" ng-if="model.contentType === 'documentType' && model.contentTypeAllowSegmentVariant">
+
+                            <h5><localize key="contentTypeEditor_segmentVariantHeading" /></h5>
+
+                            <umb-toggle data-element="permissions-allow-segment-variant"
+                                        checked="model.property.allowSegmentVariant"
+                                        on-click="vm.toggleAllowSegmentVariants()">
+                            </umb-toggle>
+
+                        </div>
+
+                        <div class="umb-control-group clearfix -no-border" ng-if="model.contentType === 'memberType'">
 
                             <h5><localize key="general_options"></localize></h5>
 
@@ -177,7 +189,6 @@
                                         checked="model.property.isSensitiveData"
                                         on-click="vm.toggleIsSensitiveData()">
                             </umb-toggle>
-                                                      
 
                         </div>
                     </div>
@@ -207,7 +218,7 @@
                     label-key="general_submit"
                     action="vm.submit(model)">
                 </umb-button>
-        
+
             </umb-editor-footer-content-right>
 
         </umb-editor-footer>

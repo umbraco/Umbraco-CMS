@@ -70,8 +70,8 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
                                     //detect if it is a json string
                                     if (val.detectIsJson()) {
                                         try {
-                                            //Parse it to json
-                                            prop.value = JSON.parse(val);
+                                            //Parse it from json
+                                            prop.value = Utilities.fromJson(val);
                                         }
                                         catch (e) {
                                             // not json
