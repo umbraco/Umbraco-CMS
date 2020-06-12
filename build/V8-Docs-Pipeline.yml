@@ -46,12 +46,6 @@ jobs:
 
     - task: PublishPipelineArtifact@1
       inputs:
-        targetPath: '$(Build.Repository.LocalPath)\build.out\ui-docs.zip'
-        artifact: 'ui'
-        publishLocation: 'pipeline'
-
-    - task: PublishPipelineArtifact@1
-      inputs:
-        targetPath: '$(Build.Repository.LocalPath)\build.out\csharp-docs.zip'
-        artifact: 'csharp'
+        targetPath: '$(Build.Repository.LocalPath)\build.out\'
+        artifact: 'docs'
         publishLocation: 'pipeline'
