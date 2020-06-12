@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core;
-using System.Linq;
-using Newtonsoft.Json;
 
-namespace Umbraco.Tests.Clr
+namespace Umbraco.Tests.UnitTests.Umbraco.Core
 {
     [TestFixture]
     public class ReflectionUtilitiesTests
@@ -104,8 +104,6 @@ namespace Umbraco.Tests.Clr
         [Test]
         public void EmitMethodEmitsStaticStatic()
         {
-            // static types cannot be used as type arguments
-            //var method = ReflectionUtilities.EmitMethod<StaticClass1, Action>("Method");
             var method = ReflectionUtilities.EmitMethod<Action>(typeof (StaticClass1), "Method");
             method();
         }
@@ -205,10 +203,6 @@ namespace Umbraco.Tests.Clr
             (var getter3, var setter3) = ReflectionUtilities.EmitPropertyGetterAndSetter<Class1, int>("Value3");
             Assert.AreEqual(42, getter3(class1));
             setter3(class1, 42);
-
-            // this is not supported yet
-            //var getter4 = ReflectionUtilities.EmitPropertyGetter<Class1, object>("Value1", returned: typeof(int));
-            //Assert.AreEqual(42, getter1(class1));
         }
 
         [Test]
@@ -448,7 +442,7 @@ namespace Umbraco.Tests.Clr
             var propInt4 = type4.GetProperty("IntValue");
             Assert.IsNotNull(propInt4);
 
-            // ... if explicitely getting a value type
+            // ... if explicitly getting a value type
             var getterInt4T = ReflectionUtilities.EmitPropertyGetter<Class4, int>(propInt4);
             Assert.IsNotNull(getterInt4T);
             var valueInt4T = getterInt4T(object4);

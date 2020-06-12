@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Collections;
-using Umbraco.Core.Models;
+using Umbraco.Tests.Common;
 
-namespace Umbraco.Tests.Collections
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Collections
 {
     [TestFixture]
     public class DeepCloneableListTests
@@ -85,7 +81,7 @@ namespace Umbraco.Tests.Collections
             list.Add(new TestClone());
             list.Add(new TestClone());
 
-            var cloned = (DeepCloneableList<TestClone>)list.DeepClone();
+            var cloned = (DeepCloneableList<TestClone>) list.DeepClone();
 
             //Test that each item in the sequence is equal - based on the equality comparer of TestClone (i.e. it's ID)
             Assert.IsTrue(list.SequenceEqual(cloned));
@@ -95,78 +91,6 @@ namespace Umbraco.Tests.Collections
             {
                 var clone = cloned.Single(x => x.Id == item.Id);
                 Assert.AreNotSame(item, clone);
-            }
-        }
-
-        public class TestClone : IDeepCloneable, IEquatable<TestClone>
-        {
-            public TestClone(Guid id)
-            {
-                Id = id;
-                IsClone = true;
-            }
-
-            public TestClone()
-            {
-                Id = Guid.NewGuid();
-            }
-
-            public Guid Id { get; private set; }
-            public bool IsClone { get; private set; }
-
-            public object DeepClone()
-            {
-                return new TestClone(Id);
-            }
-
-            /// <summary>
-            /// Indicates whether the current object is equal to another object of the same type.
-            /// </summary>
-            /// <returns>
-            /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
-            /// </returns>
-            /// <param name="other">An object to compare with this object.</param>
-            public bool Equals(TestClone other)
-            {
-                if (ReferenceEquals(null, other)) return false;
-                if (ReferenceEquals(this, other)) return true;
-                return Id.Equals(other.Id);
-            }
-
-            /// <summary>
-            /// Determines whether the specified object is equal to the current object.
-            /// </summary>
-            /// <returns>
-            /// true if the specified object  is equal to the current object; otherwise, false.
-            /// </returns>
-            /// <param name="obj">The object to compare with the current object. </param>
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
-                return Equals((TestClone)obj);
-            }
-
-            /// <summary>
-            /// Serves as the default hash function.
-            /// </summary>
-            /// <returns>
-            /// A hash code for the current object.
-            /// </returns>
-            public override int GetHashCode()
-            {
-                return Id.GetHashCode();
-            }
-
-            public static bool operator ==(TestClone left, TestClone right)
-            {
-                return Equals(left, right);
-            }
-
-            public static bool operator !=(TestClone left, TestClone right)
-            {
-                return Equals(left, right) == false;
             }
         }
     }
