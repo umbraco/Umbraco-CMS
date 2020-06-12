@@ -310,7 +310,7 @@
              * @return {Array} array of strings representing alias.
              */
             getAvailableAliasesForBlockContent: function() {
-                return this.blockConfigurations.map(blockConfiguration => this.getScaffoldFor(blockConfiguration.contentTypeKey).contentTypeKey);
+                return this.blockConfigurations.map(blockConfiguration => this.getScaffoldFromKey(blockConfiguration.contentTypeKey).contentTypeKey);
             },
 
             /**
@@ -323,7 +323,7 @@
                 var blocks = [];
 
                 this.blockConfigurations.forEach(blockConfiguration => {
-                    var scaffold = this.getScaffoldFor(blockConfiguration.contentTypeKey);
+                    var scaffold = this.getScaffoldFromKey(blockConfiguration.contentTypeKey);
                     if(scaffold) {
                         blocks.push({
                             blockConfigModel: blockConfiguration,
@@ -340,8 +340,17 @@
              * @param {string} key contentTypeKey to recive the scaffold model for.
              * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
              */
-            getScaffoldFor: function(contentTypeKey) {
+            getScaffoldFromKey: function(contentTypeKey) {
                 return this.scaffolds.find(o => o.contentTypeKey === contentTypeKey);
+            },
+
+            /**
+             * Get scaffold model for a given contentTypeAlias, used by clipboardService.
+             * @param {string} alias contentTypeAlias to recive the scaffold model for.
+             * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
+             */
+            getScaffoldFromAlias: function(contentTypeAlias) {
+                return this.scaffolds.find(o => o.contentTypeAlias === contentTypeAlias);
             },
 
             /**
@@ -379,7 +388,7 @@
                     return null;
                 }
 
-                var contentScaffold = this.getScaffoldFor(blockConfiguration.contentTypeKey);
+                var contentScaffold = this.getScaffoldFromKey(blockConfiguration.contentTypeKey);
                 if(contentScaffold === null) {
                     return null;
                 }
@@ -406,7 +415,7 @@
                 blockModel.watchers = [];
 
                 if (blockConfiguration.settingsElementTypeKey) {
-                    var settingsScaffold = this.getScaffoldFor(blockConfiguration.settingsElementTypeKey);
+                    var settingsScaffold = this.getScaffoldFromKey(blockConfiguration.settingsElementTypeKey);
                     if (settingsScaffold === null) {
                         return null;
                     }

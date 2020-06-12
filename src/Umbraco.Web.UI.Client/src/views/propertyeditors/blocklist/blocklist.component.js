@@ -132,6 +132,8 @@
 
             vm.loading = false;
 
+            $scope.$evalAsync();
+
         }
 
 
@@ -225,7 +227,7 @@
                 submit: function(blockEditorModel) {
                     
                     blockModel.retriveValuesFrom(blockEditorModel.content, blockEditorModel.settings)
-                    
+
                     editorService.close();
                 },
                 close: function() {
@@ -302,7 +304,7 @@
                     {
                         type: "elementType",
                         pasteData: entry.data,
-                        blockConfigModel: modelObject.getScaffoldFor(entry.key),
+                        blockConfigModel: modelObject.getScaffoldFromAlias(entry.alias),
                         elementTypeModel: {
                             name: entry.label,
                             icon: entry.icon
