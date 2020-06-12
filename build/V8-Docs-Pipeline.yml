@@ -29,14 +29,7 @@ jobs:
   - job: buildDocs
     displayName: 'Build static docs site as ZIPs'
     steps:
-
-    - task: PowerShell@2
-      displayName: 'Build CMS'
-      inputs:
-        filePath: 'build/build.ps1'
-        errorActionPreference: 'continue'
-        failOnStderr: true
-        
+    
     - task: PowerShell@2
       displayName: 'Prep build tool, build C# & JS Docs'
       inputs:
@@ -54,11 +47,11 @@ jobs:
     - task: PublishPipelineArtifact@1
       inputs:
         targetPath: '$(Build.Repository.LocalPath)\build.out\ui-docs.zip'
-        artifact: 'ui-docs.zip'
+        artifact: 'ui'
         publishLocation: 'pipeline'
 
     - task: PublishPipelineArtifact@1
       inputs:
         targetPath: '$(Build.Repository.LocalPath)\build.out\csharp-docs.zip'
-        artifact: 'csharp-docs.zip'
+        artifact: 'csharp'
         publishLocation: 'pipeline'
