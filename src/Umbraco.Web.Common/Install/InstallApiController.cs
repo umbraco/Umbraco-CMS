@@ -23,7 +23,7 @@ namespace Umbraco.Web.Common.Install
     using Constants = Umbraco.Core.Constants;
 
     [UmbracoApiController]
-    [TypeFilter(typeof(HttpResponseExceptionFilter))]
+    [HttpResponseException]
     [AngularJsonOnlyConfiguration]
     [InstallAuthorize]
     [Area(Umbraco.Core.Constants.Web.Mvc.InstallArea)]
