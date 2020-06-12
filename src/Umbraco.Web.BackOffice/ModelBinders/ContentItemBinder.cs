@@ -157,94 +157,13 @@ namespace Umbraco.Web.Editors.Binders
             {
                 throw new ArgumentNullException(nameof(bindingContext));
             }
-            var modelName = bindingContext.ModelName;
 
-            var valueProviderResult = bindingContext.ValueProvider.GetValue(modelName);
+            var model = await _modelBinderHelper.BindModelFromMultipartRequestAsync<ContentItemSave>(_jsonSerializer, _hostingEnvironment, bindingContext);
 
-            if (valueProviderResult == ValueProviderResult.None)
-            {
-                return;
-            }
-            bindingContext.ModelState.SetModelValue(modelName, valueProviderResult);
-
-            var value = valueProviderResult.FirstValue;
-
-            // Check if the argument value is null or empty
-            if (string.IsNullOrEmpty(value))
-            {
-                return;
-            }
-            var model = _jsonSerializer.Deserialize<ContentItemSave>(value);
             if (model is null)
             {
-                // Non-integer arguments result in model state errors
-                bindingContext.ModelState.TryAddModelError(
-                    modelName, $"Cannot deserialize {modelName} as {nameof(ContentItemSave)}.");
-
                 return;
             }
-
-            //Handle file uploads
-            foreach (var formFile in bindingContext.HttpContext.Request.Form.Files)
-            {
-                   //The name that has been assigned in JS has 2 or more parts. The second part indicates the property id
-                // for which the file belongs, the remaining parts are just metadata that can be used by the property editor.
-                var parts = formFile.Name.Trim('\"').Split('_');
-                if (parts.Length < 2)
-                {
-                    bindingContext.HttpContext.SetReasonPhrase( "The request was not formatted correctly the file name's must be underscore delimited");
-                    throw new HttpResponseException(HttpStatusCode.BadRequest);
-                }
-                var propAlias = parts[1];
-
-                //if there are 3 parts part 3 is always culture
-                string culture = null;
-                if (parts.Length > 2)
-                {
-                    culture = parts[2];
-                    //normalize to null if empty
-                    if (culture.IsNullOrWhiteSpace())
-                    {
-                        culture = null;
-                    }
-                }
-
-                //if there are 4 parts part 4 is always segment
-                string segment = null;
-                if (parts.Length > 3)
-                {
-                    segment = parts[3];
-                    //normalize to null if empty
-                    if (segment.IsNullOrWhiteSpace())
-                    {
-                        segment = null;
-                    }
-                }
-
-                // TODO: anything after 4 parts we can put in metadata
-
-                var fileName = formFile.FileName.Trim('\"');
-
-                var tempFileUploadFolder = _hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.TempFileUploads);
-                Directory.CreateDirectory(tempFileUploadFolder);
-                var tempFilePath = Path.Combine(tempFileUploadFolder, Guid.NewGuid().ToString());
-
-                using (var stream = System.IO.File.Create(tempFilePath))
-                {
-                    await formFile.CopyToAsync(stream);
-                }
-
-                model.UploadedFiles.Add(new ContentPropertyFile
-                {
-                    TempFilePath = tempFilePath,
-                    PropertyAlias = propAlias,
-                    Culture = culture,
-                    Segment = segment,
-                    FileName = fileName
-                });
-            }
-
-
 
             model.PersistedContent = ContentControllerBase.IsCreatingAction(model.Action) ? CreateNew(model) : GetExisting(model);
 
@@ -270,5 +189,7 @@ namespace Umbraco.Web.Editors.Binders
 
             bindingContext.Result = ModelBindingResult.Success(model);
         }
+
+
     }
 }
