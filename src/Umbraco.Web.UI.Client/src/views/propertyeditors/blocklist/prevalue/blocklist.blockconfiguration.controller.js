@@ -150,7 +150,7 @@
                 "labelTemplate": "",
                 "view": null,
                 "stylesheet": null,
-                "editorSize": "small",
+                "editorSize": "medium",
                 "iconColor": null,
                 "backgroundColor": null,
                 "thumbnail": null
