@@ -102,7 +102,7 @@
                     createNewItem: {
                         action: function() {
                             overlayService.close();
-                            vm.createElementTypeAndAdd(vm.addBlockFromElementTypeKey);
+                            vm.createElementTypeAndCallback(vm.addBlockFromElementTypeKey);
                         },
                         icon: "icon-add",
                         name: localized[1]
@@ -124,7 +124,7 @@
             });
         };
 
-        vm.createElementTypeAndAdd = function(callback) {
+        vm.createElementTypeAndCallback = function(callback) {
             const editor = {
                 create: true,
                 infiniteMode: true,
@@ -176,6 +176,7 @@
                     view: "views/propertyeditors/blocklist/prevalue/blocklist.blockconfiguration.overlay.html",
                     size: "small",
                     submit: function(overlayModel) {
+                        loadElementTypes()// lets load elementType again, to ensure we are up to date.
                         TransferProperties(overlayModel.block, block);// transfer properties back to block object. (Doing this cause we dont know if block object is added to model jet, therefor we cant use index or replace the object.)
                         overlayModel.close();
                     },
