@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Text;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -31,8 +30,10 @@ using Constants = Umbraco.Core.Constants;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
+using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
@@ -77,7 +78,7 @@ namespace Umbraco.Web.Editors
             ICultureDictionary cultureDictionary,
             ILogger logger,
             IShortStringHelper shortStringHelper,
-            EventMessages eventMessages,
+            IEventMessagesFactory eventMessages,
             ILocalizedTextService localizedTextService,
             PropertyEditorCollection propertyEditors,
             IContentService contentService,
@@ -118,6 +119,9 @@ namespace Umbraco.Web.Editors
             _actionCollection = actionCollection;
             _memberGroupService = memberGroupService;
             _sqlContext = sqlContext;
+
+            _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
+
         }
 
         /// <summary>
@@ -606,32 +610,32 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        /// <summary>
-        /// Saves content
-        /// </summary>
-        /// <returns></returns>
-        [FileUploadCleanupFilter]
-        [ContentSaveValidation]
-        public ContentItemDisplay PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
-        {
-            var contentItemDisplay = PostSaveInternal(contentItem,
-                content =>
-                {
-                    EnsureUniqueName(content.Name, content, "Name");
+         /// <summary>
+         /// Saves content
+         /// </summary>
+         /// <returns></returns>
+         [FileUploadCleanupFilter]
+         [ContentSaveValidation]
+         public ContentItemDisplay PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
+         {
+             var contentItemDisplay = PostSaveInternal(contentItem,
+                 content =>
+                 {
+                     EnsureUniqueName(content.Name, content, "Name");
 
-                    _contentService.SaveBlueprint(contentItem.PersistedContent, _webSecurity.CurrentUser.Id);
-                    //we need to reuse the underlying logic so return the result that it wants
-                    return OperationResult.Succeed(new EventMessages());
-                },
-                content =>
-                {
-                    var display = MapToDisplay(content);
-                    SetupBlueprint(display, content);
-                    return display;
-                });
+                     _contentService.SaveBlueprint(contentItem.PersistedContent, _webSecurity.CurrentUser.Id);
+                     //we need to reuse the underlying logic so return the result that it wants
+                     return OperationResult.Succeed(new EventMessages());
+                 },
+                 content =>
+                 {
+                     var display = MapToDisplay(content);
+                     SetupBlueprint(display, content);
+                     return display;
+                 });
 
-            return contentItemDisplay;
-        }
+             return contentItemDisplay;
+         }
 
         /// <summary>
         /// Saves content
@@ -1571,11 +1575,11 @@ namespace Umbraco.Web.Editors
         [HttpDelete]
         [HttpPost]
         [EnsureUserPermissionForContent(Constants.System.RecycleBinContent, ActionDelete.ActionLetter)]
-        public HttpResponseMessage EmptyRecycleBin()
+        public IActionResult EmptyRecycleBin()
         {
             _contentService.EmptyRecycleBin(_webSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
 
-            return Request.CreateNotificationSuccessResponse(_localizedTextService.Localize("defaultdialogs/recycleBinIsEmpty"));
+            return new UmbracoNotificationSuccessResponse(_localizedTextService.Localize("defaultdialogs/recycleBinIsEmpty"));
         }
 
         /// <summary>
@@ -2512,9 +2516,5 @@ namespace Umbraco.Web.Editors
                 ? (IActionResult) Ok()
                 : Problem();
         }
-    }
-
-    internal class _publishedUrlProvider
-    {
     }
 }

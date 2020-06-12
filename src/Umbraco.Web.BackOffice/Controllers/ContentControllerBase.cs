@@ -32,14 +32,14 @@ namespace Umbraco.Web.Editors
         protected ICultureDictionary CultureDictionary { get; }
         protected ILogger Logger { get; }
         protected IShortStringHelper ShortStringHelper { get; }
-        protected EventMessages EventMessages { get; }
+        protected IEventMessagesFactory EventMessages { get; }
         protected ILocalizedTextService LocalizedTextService { get; }
 
         protected ContentControllerBase(
             ICultureDictionary cultureDictionary,
             ILogger logger,
             IShortStringHelper shortStringHelper,
-            EventMessages eventMessages,
+            IEventMessagesFactory eventMessages,
             ILocalizedTextService localizedTextService)
         {
             CultureDictionary = cultureDictionary;
@@ -173,7 +173,7 @@ namespace Umbraco.Web.Editors
         {
             //if there's already a default event message, don't add our default one
             var msgs = EventMessages;
-            if (msgs != null && msgs.GetAll().Any(x => x.IsDefaultEventMessage)) return;
+            if (msgs != null && msgs.GetOrDefault().GetAll().Any(x => x.IsDefaultEventMessage)) return;
 
             display.AddWarningNotification(
                 localizeHeader ? LocalizedTextService.Localize(header, headerParams) : header,

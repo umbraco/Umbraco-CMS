@@ -31,7 +31,7 @@ namespace Umbraco.Web.BackOffice.Filters
         {
             Arguments = new object[]
             {
-                nodeId, null, null
+                nodeId
             };
         }
 
@@ -41,7 +41,7 @@ namespace Umbraco.Web.BackOffice.Filters
         {
             Arguments = new object[]
             {
-                nodeId, null, permissionToCheck
+                nodeId, permissionToCheck
             };
         }
 
@@ -54,7 +54,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
             Arguments = new object[]
             {
-                null, paramName, ActionBrowse.ActionLetter
+                paramName, ActionBrowse.ActionLetter
             };
         }
 
@@ -68,7 +68,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
             Arguments = new object[]
             {
-                null, paramName, permissionToCheck
+                paramName, permissionToCheck
             };
         }
 
@@ -82,9 +82,52 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly string _paramName;
             private readonly char? _permissionToCheck;
 
+            public EnsureUserPermissionForContentFilter(
+                IWebSecurity webSecurity,
+                IEntityService entityService,
+                IUserService userService,
+                IContentService contentService,
+                string paramName)
+                :this(webSecurity, entityService, userService, contentService, null, paramName, ActionBrowse.ActionLetter)
+            {
 
+            }
 
             public EnsureUserPermissionForContentFilter(
+                IWebSecurity webSecurity,
+                IEntityService entityService,
+                IUserService userService,
+                IContentService contentService,
+                int nodeId,
+                char permissionToCheck)
+                :this(webSecurity, entityService, userService, contentService, nodeId, null, permissionToCheck)
+            {
+
+            }
+
+            public EnsureUserPermissionForContentFilter(
+                IWebSecurity webSecurity,
+                IEntityService entityService,
+                IUserService userService,
+                IContentService contentService,
+                int nodeId)
+                :this(webSecurity, entityService, userService, contentService, nodeId, null, null)
+            {
+
+            }
+            public EnsureUserPermissionForContentFilter(
+                    IWebSecurity webSecurity,
+                    IEntityService entityService,
+                    IUserService userService,
+                    IContentService contentService,
+                    string paramName, char permissionToCheck)
+                :this(webSecurity, entityService, userService, contentService, null, paramName, permissionToCheck)
+            {
+
+            }
+
+
+            private EnsureUserPermissionForContentFilter(
                 IWebSecurity webSecurity,
                 IEntityService entityService,
                 IUserService userService,
