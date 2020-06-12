@@ -146,9 +146,14 @@
 
             var entry = {
                 "contentTypeKey": key,
-                "view": null,
+                "settingsElementTypeKey": null,
                 "labelTemplate": "",
-                "settingsElementTypeKey": null
+                "view": null,
+                "stylesheet": null,
+                "editorSize": "small",
+                "iconColor": null,
+                "backgroundColor": null,
+                "thumbnail": null
             };
 
             $scope.model.value.push(entry);
