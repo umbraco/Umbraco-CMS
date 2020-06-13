@@ -67,7 +67,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private static readonly HttpClient HttpClient = new HttpClient();
 
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
-        [TypeFilter(typeof(ValidateAngularAntiForgeryTokenAttribute))]
+        [ValidateAngularAntiForgeryToken]
         public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
         {
             var user = _umbracoContextAccessor.GetRequiredUmbracoContext().Security.CurrentUser;
@@ -211,7 +211,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         // return IDashboardSlim - we don't need sections nor access rules
-        [TypeFilter(typeof(ValidateAngularAntiForgeryTokenAttribute))]
+        [ValidateAngularAntiForgeryToken]
         [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
         public IEnumerable<Tab<IDashboardSlim>> GetDashboard(string section)
         {

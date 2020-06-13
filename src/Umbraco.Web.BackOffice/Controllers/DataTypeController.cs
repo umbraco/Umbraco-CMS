@@ -264,7 +264,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="dataType"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(DataTypeValidateAttribute))]
+        [DataTypeValidate]
         public ActionResult<DataTypeDisplay> PostSave(DataTypeSave dataType)
         {
             //If we've made it here, then everything has been wired up and validated by the attribute

@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Umbraco.Web.WebApi.Filters;
+﻿using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -8,9 +7,8 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// resulting message is INotificationModel in which case it will append any Event Messages
     /// currently in the request.
     /// </summary>
-    [TypeFilter(typeof(AppendCurrentEventMessagesAttribute))]
+    [AppendCurrentEventMessagesAttribute]
     public abstract class BackOfficeNotificationsController : UmbracoAuthorizedJsonController
     {
-
     }
 }
