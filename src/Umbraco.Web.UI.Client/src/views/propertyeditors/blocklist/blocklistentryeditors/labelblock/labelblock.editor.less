@@ -1,5 +1,6 @@
 .blockelement-labelblock-editor {
 
+    position: relative;
     display: block;
     margin-bottom: 4px;
     margin-top: 4px;
@@ -33,5 +34,11 @@
     &:hover {
         color: @ui-action-discreet-type-hover;
         border-color: @gray-8;
+    }
+
+    &.--active {
+        color: @ui-active-type;
+        border-color: @ui-active;
+        background-color: @ui-active;
     }
 }

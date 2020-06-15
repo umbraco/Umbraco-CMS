@@ -40,7 +40,15 @@
         var vm = this;
 
         vm.loading = true;
-        vm.moveFocusToBlock = null;
+        vm.currentBlockInFocus = null;
+        vm.setBlockFocus = function(block) {
+            console.log("setBlockFocus", block.label)
+            if(vm.currentBlockInFocus !== null) {
+                vm.currentBlockInFocus.focus = false;
+            }
+            vm.currentBlockInFocus = block;
+            block.focus = true;
+        }
         vm.showCopy = clipboardService.isSupported();
 
         var layout = [];// The layout object specific to this Block Editor, will be a direct reference from Property Model.
@@ -174,7 +182,7 @@
             vm.blocks.splice(index, 0, blockModel);
             
             // lets move focus to this new block.
-            vm.moveFocusToBlock = blockModel;
+            vm.setBlockFocus(blockModel);
 
             return true;
 
@@ -206,6 +214,8 @@
 
         function editBlock(blockModel, openSettings) {
 
+            blockModel.active = true;
+
             // make a clone to avoid editing model directly.
             var blockContentClone = Utilities.copy(blockModel.content);
             var blockSettingsClone = null;
@@ -228,9 +238,10 @@
                     
                     blockModel.retriveValuesFrom(blockEditorModel.content, blockEditorModel.settings)
 
-                    editorService.close();
+                    blockEditorModel.close();
                 },
                 close: function() {
+                    blockModel.active = false;
                     editorService.close();
                 }
             };
@@ -280,13 +291,18 @@
                     }
                     
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
-                        blockPickerModel.close();
+                        editorService.close();
                         if (added && vm.model.config.useInlineEditingAsDefault !== true && vm.blocks.length > createIndex) {
                             editBlock(vm.blocks[createIndex]);
                         }
                     }
                 },
                 close: function() {
+                    // if opned by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
+                    if (createIndex < vm.blocks.length) {
+                        vm.setBlockFocus(vm.blocks[Math.max(createIndex-1, 0)]);
+                    }
+
                     editorService.close();
                 }
             };
@@ -382,7 +398,7 @@
             // insert block model at the decired location in blocks.
             vm.blocks.splice(index, 0, blockModel);
             
-            vm.moveFocusToBlock = blockModel;
+            vm.currentBlockInFocus = blockModel;
 
             return true;
 
