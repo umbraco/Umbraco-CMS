@@ -22,7 +22,16 @@ angular.module("umbraco")
         $scope.setImage = function(){
             var startNodeId = $scope.model.config && $scope.model.config.startNodeId ? $scope.model.config.startNodeId : undefined;
             var startNodeIsVirtual = startNodeId ? $scope.model.config.startNodeIsVirtual : undefined;
-
+            var value = $scope.control.value;
+            var target = value
+                ? {
+                    udi: value.udi,
+                    url: value.image,
+                    image: value.image,
+                    focalPoint: value.focalPoint,
+                    coordinates: value.coordinates
+                }
+                : null;
             var mediaPicker = {
                 startNodeId: startNodeId,
                 startNodeIsVirtual: startNodeIsVirtual,
@@ -31,6 +40,7 @@ angular.module("umbraco")
                 disableFolderSelect: true,
                 onlyImages: true,
                 dataTypeKey: $scope.model.dataTypeKey,
+                currentTarget: target,
                 submit: function(model) {
                     var selectedImage = model.selection[0];
                    

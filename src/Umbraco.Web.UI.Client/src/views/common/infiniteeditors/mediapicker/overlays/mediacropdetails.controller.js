@@ -7,11 +7,16 @@
             vm.submit = submit;
             vm.close = close;
 
+            if (!$scope.model.target.coordinates && !$scope.model.target.focalPoint) {
+                $scope.model.target.focalPoint = { left: .5, top: .5 };
+            }
+
             vm.shouldShowUrl = shouldShowUrl;
             vm.focalPointChanged = focalPointChanged;
 
-            console.log("$scope", $scope);
-            console.log("$scope.model", $scope.model);
+            if (!$scope.model.target.image) {
+                $scope.model.target.image = $scope.model.target.url;
+            }
 
             function shouldShowUrl() {
                 if (!$scope.model.target) {

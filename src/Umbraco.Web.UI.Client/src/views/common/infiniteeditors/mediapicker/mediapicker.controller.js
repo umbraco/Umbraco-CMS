@@ -129,6 +129,7 @@ angular.module("umbraco")
                 } else {
                     // if a target is specified, go look it up - generally this target will just contain ids not the actual full
                     // media object so we need to look it up
+                    var originalTarget = $scope.target;
                     var id = $scope.target.udi ? $scope.target.udi : $scope.target.id;
                     var altText = $scope.target.altText;
 
@@ -143,6 +144,8 @@ angular.module("umbraco")
                                     $scope.target.url = mediaHelper.resolveFileFromEntity(node);
                                     $scope.target.thumbnail = mediaHelper.resolveFileFromEntity(node, true);
                                     $scope.target.altText = altText;
+                                    $scope.target.focalPoint = originalTarget.focalPoint;
+                                    $scope.target.coordinates = originalTarget.coordinates;
                                     openDetailsDialog();
                                 }
                             }, gotoStartNode);
