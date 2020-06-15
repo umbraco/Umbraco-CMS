@@ -139,7 +139,8 @@ angular.module("umbraco")
                         entityResource.getById(id, "Media")
                             .then(function (node) {
                                 $scope.target = node;
-                                if (ensureWithinStartNode(node)) {
+                                // Moving directly to existing node's folder
+                                gotoFolder({ id: node.parentId }).then(function() {
                                     selectMedia(node);
                                     $scope.target.url = mediaHelper.resolveFileFromEntity(node);
                                     $scope.target.thumbnail = mediaHelper.resolveFileFromEntity(node, true);
@@ -147,7 +148,7 @@ angular.module("umbraco")
                                     $scope.target.focalPoint = originalTarget.focalPoint;
                                     $scope.target.coordinates = originalTarget.coordinates;
                                     openDetailsDialog();
-                                }
+                                });
                             }, gotoStartNode);
                     } else {
                         // No ID set - then this is going to be a tmpimg that has not been uploaded
