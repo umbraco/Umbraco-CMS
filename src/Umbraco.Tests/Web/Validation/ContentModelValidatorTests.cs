@@ -103,6 +103,8 @@ namespace Umbraco.Tests.Web.Validation
 
             var content = MockedContent.CreateTextpageContent(_contentType, "test", -1);
 
+            // TODO: Ok now test with a 3rd/4th level complex nested editor
+
             const string complexValue = @"[{
 		""key"": ""c8df5136-d606-41f0-9134-dea6ae0c2fd9"",
 		""name"": ""Hello world"",
