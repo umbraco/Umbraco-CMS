@@ -20,6 +20,6 @@ namespace Umbraco.Web.Models
         [DataMember(Name = "tempFileName")]
         public string TempFileName { get; set; }
 
-        public List<ContentPropertyFile> UploadedFiles => new List<ContentPropertyFile>();
+        public List<ContentPropertyFile> UploadedFiles { get; } = new List<ContentPropertyFile>();
     }
 }

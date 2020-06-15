@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Mime;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -36,6 +38,7 @@ using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using ContentType = Umbraco.Core.Models.ContentType;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -549,33 +552,19 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public HttpResponseMessage Export(int id)
+        public IActionResult Export(int id)
         {
             var contentType = _contentTypeService.Get(id);
             if (contentType == null) throw new NullReferenceException("No content type found with id " + id);
 
             var xml = _serializer.Serialize(contentType);
 
-            var response = new HttpResponseMessage
-            {
-                Content = new StringContent(xml.ToDataString())
-                {
-                    Headers =
-                    {
-                        ContentDisposition = new ContentDispositionHeaderValue("attachment")
-                        {
-                            FileName = $"{contentType.Alias}.udt"
-                        },
-                        ContentType =   new MediaTypeHeaderValue( "application/octet-stream")
-
-                    }
-                }
-            };
-
+            var fileName = $"{contentType.Alias}.udt";
             // Set custom header so umbRequestHelper.downloadFile can save the correct filename
-            response.Headers.Add("x-filename", $"{contentType.Alias}.udt");
+            HttpContext.Response.Headers.Add("x-filename", fileName);
 
-            return response;
+            return File( Encoding.UTF8.GetBytes(xml.ToDataString()), MediaTypeNames.Application.Octet, fileName);
+
         }
 
         [HttpPost]
@@ -627,7 +616,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
                 using (var stream = System.IO.File.Create(tempPath))
                 {
-                    await formFile.CopyToAsync(stream);
+                    formFile.CopyToAsync(stream).GetAwaiter().GetResult();
                 }
 
                 if (ext.InvariantEquals("udt"))
