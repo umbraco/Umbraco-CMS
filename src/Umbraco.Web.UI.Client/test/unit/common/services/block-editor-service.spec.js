@@ -58,7 +58,7 @@
             var modelObject = blockEditorService.createModelObject({}, "Umbraco.TestBlockEditor", [], $scope);
 
             expect(modelObject).not.toBeUndefined();
-            expect(modelObject.loadScaffolding).not.toBeUndefined();
+            expect(modelObject.load).not.toBeUndefined();
         });
 
         it('getBlockConfiguration provide the requested block configurtion', function () {
@@ -67,10 +67,10 @@
             expect(modelObject.getBlockConfiguration(blockConfigurationMock.contentTypeKey).label).toBe(blockConfigurationMock.label);
         });
 
-        it('loadScaffolding provides data for itemPicker', function (done) {
+        it('load provides data for itemPicker', function (done) {
             var modelObject = blockEditorService.createModelObject({}, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope);
             
-            modelObject.loadScaffolding().then(() => {
+            modelObject.load().then(() => {
                 var itemPickerOptions = modelObject.getAvailableBlocksForBlockPicker();
                 expect(itemPickerOptions.length).toBe(1);
                 expect(itemPickerOptions[0].blockConfigModel.contentTypeKey).toBe(blockConfigurationMock.contentTypeKey);
@@ -84,7 +84,7 @@
             
             var modelObject = blockEditorService.createModelObject(propertyModelMock, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope);
             
-            modelObject.loadScaffolding().then(() => {
+            modelObject.load().then(() => {
                 
                 var layout = modelObject.getLayout();
 
@@ -98,20 +98,20 @@
             
         });
         
-        it('getBlockModel has values', function (done) {
+        it('getBlockObject has values', function (done) {
 
             
             var modelObject = blockEditorService.createModelObject(propertyModelMock, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope);
             
-            modelObject.loadScaffolding().then(() => {
+            modelObject.load().then(() => {
                 
                 var layout = modelObject.getLayout();
 
-                var blockModel = modelObject.getBlockModel(layout[0]);
+                var blockObject = modelObject.getBlockObject(layout[0]);
 
-                expect(blockModel).not.toBeUndefined();
-                expect(blockModel.data.udi).toBe(propertyModelMock.data[0].udi);
-                expect(blockModel.content.variants[0].tabs[0].properties[0].value).toBe(propertyModelMock.data[0].testproperty);
+                expect(blockObject).not.toBeUndefined();
+                expect(blockObject.data.udi).toBe(propertyModelMock.data[0].udi);
+                expect(blockObject.content.variants[0].tabs[0].properties[0].value).toBe(propertyModelMock.data[0].testproperty);
 
                 done();
             });
@@ -119,24 +119,24 @@
         });
 
         
-        it('getBlockModel syncs primative values', function (done) {
+        it('getBlockObject syncs primative values', function (done) {
 
             var propertyModel = angular.copy(propertyModelMock);
 
             var modelObject = blockEditorService.createModelObject(propertyModel, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope);
             
-            modelObject.loadScaffolding().then(() => {
+            modelObject.load().then(() => {
                 
                 var layout = modelObject.getLayout();
 
-                var blockModel = modelObject.getBlockModel(layout[0]);
+                var blockObject = modelObject.getBlockObject(layout[0]);
 
-                blockModel.content.variants[0].tabs[0].properties[0].value = "anotherTestValue";
+                blockObject.content.variants[0].tabs[0].properties[0].value = "anotherTestValue";
 
                 $rootScope.$digest();// invoke angularJS Store.
 
-                expect(blockModel.data).toBe(propertyModel.data[0]);
-                expect(blockModel.data.testproperty).toBe("anotherTestValue");
+                expect(blockObject.data).toBe(propertyModel.data[0]);
+                expect(blockObject.data.testproperty).toBe("anotherTestValue");
                 expect(propertyModel.data[0].testproperty).toBe("anotherTestValue");
 
                 //
@@ -147,7 +147,7 @@
         });
 
         
-        it('getBlockModel syncs values of object', function (done) {
+        it('getBlockObject syncs values of object', function (done) {
 
             var propertyModel = angular.copy(propertyModelMock);
 
@@ -157,14 +157,14 @@
 
             var modelObject = blockEditorService.createModelObject(propertyModel, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope);
             
-            modelObject.loadScaffolding().then(() => {
+            modelObject.load().then(() => {
                 
                 var layout = modelObject.getLayout();
 
-                var blockModel = modelObject.getBlockModel(layout[0]);
+                var blockObject = modelObject.getBlockObject(layout[0]);
 
-                blockModel.content.variants[0].tabs[0].properties[0].value.list[0] = "AA";
-                blockModel.content.variants[0].tabs[0].properties[0].value.list.push("D");
+                blockObject.content.variants[0].tabs[0].properties[0].value.list[0] = "AA";
+                blockObject.content.variants[0].tabs[0].properties[0].value.list.push("D");
 
                 $rootScope.$digest();// invoke angularJS Store.
 
@@ -182,7 +182,7 @@
 
             var modelObject = blockEditorService.createModelObject(propertyModel, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope);
             
-            modelObject.loadScaffolding().then(() => {
+            modelObject.load().then(() => {
                 
                 var layout = modelObject.getLayout();
 
@@ -203,17 +203,17 @@
 
             var modelObject = blockEditorService.createModelObject(propertyModel, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope);
             
-            modelObject.loadScaffolding().then(() => {
+            modelObject.load().then(() => {
                 
                 var layout = modelObject.getLayout();
 
-                var blockModel = modelObject.getBlockModel(layout[0]);
+                var blockObject = modelObject.getBlockObject(layout[0]);
 
                 // remove from layout;
                 layout.splice(0, 1);
 
                 // remove from data;
-                modelObject.removeDataAndDestroyModel(blockModel);
+                modelObject.removeDataAndDestroyModel(blockObject);
 
                 expect(propertyModel.data.length).toBe(0);
                 expect(propertyModel.data[0]).toBeUndefined();

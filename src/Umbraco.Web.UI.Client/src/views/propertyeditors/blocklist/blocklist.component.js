@@ -85,7 +85,7 @@
             
             // Create Model Object, to manage our data for this Block Editor.
             modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, $scope);
-            modelObject.loadScaffolding().then(onLoaded);
+            modelObject.load().then(onLoaded);
 
             copyAllBlocksAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
@@ -124,11 +124,12 @@
         function onLoaded() {
 
             // Store a reference to the layout model, because we need to maintain this model.
-            layout = modelObject.getLayout();
+            layout = modelObject.getLayout([]);
 
-            // maps layout entries to editor friendly models aka. BlockModels.
+            // maps layout entries to editor friendly models aka. blockObjects.
             layout.forEach(entry => {
-                var block = getBlockModel(entry);
+                var block = getBlockObject(entry);
+ 
                 // If this entry was not supported by our property-editor it would return 'null'.
                 if(block !== null) {
                     vm.blocks.push(block);
@@ -145,12 +146,12 @@
         }
 
 
-        function getBlockModel(entry) {
-            var block = modelObject.getBlockModel(entry);
+        function getBlockObject(entry) {
+            var block = modelObject.getBlockObject(entry);
 
             if (block === null) return null;
 
-            // Lets apply fallback views, and make the view available directly on the blockModel.
+            // Lets apply fallback views, and make the view available directly on the blockObject.
             block.view = (block.config.view ? "/" + block.config.view : (inlineEditing ? "views/propertyeditors/blocklist/blocklistentryeditors/inlineblock/inlineblock.editor.html" : "views/propertyeditors/blocklist/blocklistentryeditors/labelblock/labelblock.editor.html"));
 
             block.showSettings = block.config.settingsElementTypeKey != null;
@@ -168,21 +169,21 @@
             }
 
             // make block model
-            var blockModel = getBlockModel(layoutEntry);
-            if (blockModel === null) {
+            var blockObject = getBlockObject(layoutEntry);
+            if (blockObject === null) {
                 return false;
             }
             
-            // If we reach this line, we are good to add the layoutEntry and blockModel to our models.
+            // If we reach this line, we are good to add the layoutEntry and blockObject to our models.
 
             // add layout entry at the decired location in layout.
             layout.splice(index, 0, layoutEntry);
 
             // apply block model at decired location in blocks.
-            vm.blocks.splice(index, 0, blockModel);
+            vm.blocks.splice(index, 0, blockObject);
             
             // lets move focus to this new block.
-            vm.setBlockFocus(blockModel);
+            vm.setBlockFocus(blockObject);
 
             return true;
 
@@ -212,16 +213,16 @@
             vm.blocks.forEach(deleteBlock);
         }
 
-        function editBlock(blockModel, openSettings) {
+        function editBlock(blockObject, openSettings) {
 
-            blockModel.active = true;
+            blockObject.active = true;
 
             // make a clone to avoid editing model directly.
-            var blockContentClone = Utilities.copy(blockModel.content);
+            var blockContentClone = Utilities.copy(blockObject.content);
             var blockSettingsClone = null;
 
-            if (blockModel.config.settingsElementTypeKey) {
-                blockSettingsClone = Utilities.copy(blockModel.settings);
+            if (blockObject.config.settingsElementTypeKey) {
+                blockSettingsClone = Utilities.copy(blockObject.settings);
             }
 
             var hideContent = (openSettings === true && inlineEditing === true);
@@ -231,17 +232,17 @@
                 hideContent: hideContent,
                 openSettings: openSettings === true,
                 settings: blockSettingsClone,
-                title: blockModel.label,
+                title: blockObject.label,
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
-                size: blockModel.config.editorSize || "medium",
+                size: blockObject.config.editorSize || "medium",
                 submit: function(blockEditorModel) {
                     
-                    blockModel.retriveValuesFrom(blockEditorModel.content, blockEditorModel.settings)
+                    blockObject.retriveValuesFrom(blockEditorModel.content, blockEditorModel.settings)
 
                     blockEditorModel.close();
                 },
                 close: function() {
-                    blockModel.active = false;
+                    blockObject.active = false;
                     editorService.close();
                 }
             };
@@ -387,8 +388,8 @@
             }
 
             // make block model
-            var blockModel = getBlockModel(layoutEntry);
-            if (blockModel === null) {
+            var blockObject = getBlockObject(layoutEntry);
+            if (blockObject === null) {
                 return false;
             }
             
@@ -396,9 +397,9 @@
             layout.splice(index, 0, layoutEntry);
 
             // insert block model at the decired location in blocks.
-            vm.blocks.splice(index, 0, blockModel);
+            vm.blocks.splice(index, 0, blockObject);
             
-            vm.currentBlockInFocus = blockModel;
+            vm.currentBlockInFocus = blockObject;
 
             return true;
 
