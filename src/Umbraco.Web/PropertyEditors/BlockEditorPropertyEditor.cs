@@ -86,75 +86,24 @@ namespace Umbraco.Web.PropertyEditors
             }
         }
 
-        internal class BlockEditorValidator : IValueValidator
+        internal class BlockEditorValidator : ComplexEditorValidator
         {
-            private readonly PropertyEditorCollection _propertyEditors;
-            private readonly IDataTypeService _dataTypeService;
             private readonly BlockEditorValues _blockEditorValues;
 
-            public BlockEditorValidator(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, BlockEditorValues blockEditorValues)
+            public BlockEditorValidator(BlockEditorValues blockEditorValues, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, ILocalizedTextService textService) : base(propertyEditors, dataTypeService, textService)
             {
-                _propertyEditors = propertyEditors;
-                _dataTypeService = dataTypeService;
                 _blockEditorValues = blockEditorValues;
             }
 
-            public IEnumerable<ValidationResult> Validate(object rawValue, string valueType, object dataTypeConfiguration)
+            protected override IEnumerable<ElementTypeValidationModel> GetElementsFromValue(object value)
             {
-                var validationResults = new List<ValidationResult>();
-
-                foreach (var row in _blockEditorValues.GetPropertyValues(rawValue, out _))
+                foreach (var row in _blockEditorValues.GetPropertyValues(value, out _))
                 {
                     if (row.PropType == null) continue;
 
-                    var config = _dataTypeService.GetDataType(row.PropType.DataTypeId).Configuration;
-                    var propertyEditor = _propertyEditors[row.PropType.PropertyEditorAlias];
-                    if (propertyEditor == null) continue;
-
-                    foreach (var validator in propertyEditor.GetValueEditor().Validators)
-                    {
-                        foreach (var result in validator.Validate(row.JsonRowValue[row.PropKey], propertyEditor.GetValueEditor().ValueType, config))
-                        {
-                            result.ErrorMessage = "Item " + (row.RowIndex + 1) + " '" + row.PropType.Name + "' " + result.ErrorMessage;
-                            validationResults.Add(result);
-                        }
-                    }
-
-                    // Check mandatory
-                    if (row.PropType.Mandatory)
-                    {
-                        if (row.JsonRowValue[row.PropKey] == null)
-                        {
-                            var message = string.IsNullOrWhiteSpace(row.PropType.MandatoryMessage)
-                                                      ? $"'{row.PropType.Name}' cannot be null"
-                                                      : row.PropType.MandatoryMessage;
-                            validationResults.Add(new ValidationResult($"Item {(row.RowIndex + 1)}: {message}", new[] { row.PropKey }));
-                        }
-                        else if (row.JsonRowValue[row.PropKey].ToString().IsNullOrWhiteSpace() || (row.JsonRowValue[row.PropKey].Type == JTokenType.Array && !row.JsonRowValue[row.PropKey].HasValues))
-                        {
-                            var message = string.IsNullOrWhiteSpace(row.PropType.MandatoryMessage)
-                                                      ? $"'{row.PropType.Name}' cannot be empty"
-                                                      : row.PropType.MandatoryMessage;
-                            validationResults.Add(new ValidationResult($"Item {(row.RowIndex + 1)}: {message}", new[] { row.PropKey }));
-                        }
-                    }
-
-                    // Check regex
-                    if (!row.PropType.ValidationRegExp.IsNullOrWhiteSpace()
-                        && row.JsonRowValue[row.PropKey] != null && !row.JsonRowValue[row.PropKey].ToString().IsNullOrWhiteSpace())
-                    {
-                        var regex = new Regex(row.PropType.ValidationRegExp);
-                        if (!regex.IsMatch(row.JsonRowValue[row.PropKey].ToString()))
-                        {
-                            var message = string.IsNullOrWhiteSpace(row.PropType.ValidationRegExpMessage)
-                                                      ? $"'{row.PropType.Name}' is invalid, it does not match the correct pattern"
-                                                      : row.PropType.ValidationRegExpMessage;
-                            validationResults.Add(new ValidationResult($"Item {(row.RowIndex + 1)}: {message}", new[] { row.PropKey }));
-                        }
-                    }
+                    var val = row.JsonRowValue[row.PropKey];
+                    yield return new ElementTypeValidationModel(val, row.PropType);
                 }
-
-                return validationResults;
             }
         }
 

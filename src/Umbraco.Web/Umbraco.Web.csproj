@@ -245,8 +245,12 @@
     <Compile Include="PropertyEditors\BlockListConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\BlockListPropertyEditor.cs" />
     <Compile Include="Compose\NestedContentPropertyComposer.cs" />
+    <Compile Include="PropertyEditors\ComplexEditorValidator.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
+    <Compile Include="PropertyEditors\Validation\NestedValidationResults.cs" />
+    <Compile Include="PropertyEditors\Validation\PropertyValidationResult.cs" />
+    <Compile Include="PropertyEditors\Validation\ValidationResultConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\BlockEditorConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\BlockListPropertyValueConverter.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Web.PropertyEditors.Validation;
 
 namespace Umbraco.Web
 {
@@ -51,13 +53,26 @@ namespace Umbraco.Web
         internal static void AddPropertyError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
             ValidationResult result, string propertyAlias, string culture = "", string segment = "")
         {
-            if (culture == null)
-                culture = "";
-            modelState.AddValidationError(result, "_Properties", propertyAlias,
+
+            var propValidationResult = new PropertyValidationResult(result);
+
+            var keyParts = new[]
+            {
+                "_Properties",
+                propertyAlias,
                 //if the culture is null, we'll add the term 'invariant' as part of the key
                 culture.IsNullOrWhiteSpace() ? "invariant" : culture,
                 // if the segment is null, we'll add the term 'null' as part of the key
-                segment.IsNullOrWhiteSpace() ? "null" : segment);
+                segment.IsNullOrWhiteSpace() ? "null" : segment
+            };
+
+            var key = string.Join(".", keyParts);
+
+            modelState.AddModelError(
+                key,
+                JsonConvert.SerializeObject(
+                    propValidationResult,
+                    new ValidationResultConverter()));
         }
 
         /// <summary>
@@ -236,5 +251,6 @@ namespace Umbraco.Web
                 };
         }
 
+       
     }
 }

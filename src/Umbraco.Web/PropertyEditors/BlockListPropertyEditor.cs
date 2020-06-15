@@ -34,6 +34,7 @@ namespace Umbraco.Web.PropertyEditors
 
         #region IBlockEditorDataHelper
 
+        // TODO: Rename this we don't want to use the name "Helper"
         private class DataHelper : IBlockEditorDataHelper
         {
             public IEnumerable<IBlockReference> GetBlockReferences(JObject layout)

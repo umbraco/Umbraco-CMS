@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
@@ -13,9 +14,11 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Web.PropertyEditors.Validation;
 
 namespace Umbraco.Web.PropertyEditors
 {
+
     /// <summary>
     /// Represents a nested content property editor.
     /// </summary>
@@ -31,14 +34,20 @@ namespace Umbraco.Web.PropertyEditors
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
         private readonly IContentTypeService _contentTypeService;
+        private readonly ILocalizedTextService _localizedTextService;
         internal const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
 
+        [Obsolete("Use the constructor specifying all parameters instead")]
         public NestedContentPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService)
+            : this(logger, propertyEditors, dataTypeService, contentTypeService, Current.Services.TextService) { }
+
+        public NestedContentPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService localizedTextService)
             : base (logger)
         {
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
             _contentTypeService = contentTypeService;
+            _localizedTextService = localizedTextService;
         }
 
         // has to be lazy else circular dep in ctor
@@ -52,7 +61,7 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService);
+        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService);
 
         internal class NestedContentPropertyValueEditor : DataValueEditor, IDataValueReference
         {
@@ -60,13 +69,13 @@ namespace Umbraco.Web.PropertyEditors
             private readonly IDataTypeService _dataTypeService;
             private readonly NestedContentValues _nestedContentValues;
             
-            public NestedContentPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService)
+            public NestedContentPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService)
                 : base(attribute)
             {
                 _propertyEditors = propertyEditors;
                 _dataTypeService = dataTypeService;
                 _nestedContentValues = new NestedContentValues(contentTypeService);
-                Validators.Add(new NestedContentValidator(propertyEditors, dataTypeService, _nestedContentValues));
+                Validators.Add(new NestedContentValidator(_nestedContentValues, propertyEditors, dataTypeService, textService));
             }
 
             /// <inheritdoc />
@@ -255,75 +264,25 @@ namespace Umbraco.Web.PropertyEditors
             }
         }
 
-        internal class NestedContentValidator : IValueValidator
+        internal class NestedContentValidator : ComplexEditorValidator
         {
-            private readonly PropertyEditorCollection _propertyEditors;
-            private readonly IDataTypeService _dataTypeService;
             private readonly NestedContentValues _nestedContentValues;
 
-            public NestedContentValidator(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, NestedContentValues nestedContentValues)
+            public NestedContentValidator(NestedContentValues nestedContentValues, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, ILocalizedTextService textService)
+                : base(propertyEditors, dataTypeService, textService)
             {
-                _propertyEditors = propertyEditors;
-                _dataTypeService = dataTypeService;
                 _nestedContentValues = nestedContentValues;
             }
 
-            public IEnumerable<ValidationResult> Validate(object rawValue, string valueType, object dataTypeConfiguration)
+            protected override IEnumerable<ElementTypeValidationModel> GetElementsFromValue(object value)
             {
-                var validationResults = new List<ValidationResult>();
-
-                foreach(var row in _nestedContentValues.GetPropertyValues(rawValue, out _))
+                foreach (var row in _nestedContentValues.GetPropertyValues(value, out _))
                 {
                     if (row.PropType == null) continue;
 
-                    var config = _dataTypeService.GetDataType(row.PropType.DataTypeId).Configuration;
-                    var propertyEditor = _propertyEditors[row.PropType.PropertyEditorAlias];
-                    if (propertyEditor == null) continue;
-
-                    foreach (var validator in propertyEditor.GetValueEditor().Validators)
-                    {
-                        foreach (var result in validator.Validate(row.JsonRowValue[row.PropKey], propertyEditor.GetValueEditor().ValueType, config))
-                        {
-                            result.ErrorMessage = "Item " + (row.RowIndex + 1) + " '" + row.PropType.Name + "' " + result.ErrorMessage;
-                            validationResults.Add(result);
-                        }
-                    }
-
-                    // Check mandatory
-                    if (row.PropType.Mandatory)
-                    {
-                        if (row.JsonRowValue[row.PropKey] == null)
-                        {
-                            var message = string.IsNullOrWhiteSpace(row.PropType.MandatoryMessage)
-                                                      ? $"'{row.PropType.Name}' cannot be null"
-                                                      : row.PropType.MandatoryMessage;
-                            validationResults.Add(new ValidationResult($"Item {(row.RowIndex + 1)}: {message}", new[] { row.PropKey }));
-                        }                            
-                        else if (row.JsonRowValue[row.PropKey].ToString().IsNullOrWhiteSpace() || (row.JsonRowValue[row.PropKey].Type == JTokenType.Array && !row.JsonRowValue[row.PropKey].HasValues))
-                        {
-                            var message = string.IsNullOrWhiteSpace(row.PropType.MandatoryMessage)
-                                                      ? $"'{row.PropType.Name}' cannot be empty"
-                                                      : row.PropType.MandatoryMessage;
-                            validationResults.Add(new ValidationResult($"Item {(row.RowIndex + 1)}: {message}", new[] { row.PropKey }));
-                        }   
-                    }
-
-                    // Check regex
-                    if (!row.PropType.ValidationRegExp.IsNullOrWhiteSpace()
-                        && row.JsonRowValue[row.PropKey] != null && !row.JsonRowValue[row.PropKey].ToString().IsNullOrWhiteSpace())
-                    {
-                        var regex = new Regex(row.PropType.ValidationRegExp);
-                        if (!regex.IsMatch(row.JsonRowValue[row.PropKey].ToString()))
-                        {
-                            var message = string.IsNullOrWhiteSpace(row.PropType.ValidationRegExpMessage)
-                                                      ? $"'{row.PropType.Name}' is invalid, it does not match the correct pattern"
-                                                      : row.PropType.ValidationRegExpMessage;
-                           validationResults.Add(new ValidationResult($"Item {(row.RowIndex + 1)}: {message}", new[] { row.PropKey }));
-                        }
-                    }
+                    var val = row.JsonRowValue[row.PropKey];
+                    yield return new ElementTypeValidationModel(val, row.PropType);
                 }
-
-                return validationResults;
             }
         }
 
