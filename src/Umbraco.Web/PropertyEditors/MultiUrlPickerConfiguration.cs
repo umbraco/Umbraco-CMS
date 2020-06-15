@@ -18,5 +18,9 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("hideAnchor", "Hide anchor/query string input", "boolean",
             Description = "Selecting this hides the anchor/query string input field in the linkpicker overlay.")]
         public bool HideAnchor { get; set; }
+
+        [ConfigurationField("hideTarget", "Hide target", "boolean",
+            Description = "Selecting this hides the checkbox to specify whether the link opens in a new window or tab.")]
+        public bool HideTarget { get; set; }
     }
 }
