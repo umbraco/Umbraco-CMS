@@ -141,7 +141,7 @@ namespace Umbraco.Web.PropertyEditors
                         Target = link.Target,
                         QueryString = link.QueryString,
                         Udi = link.Udi,
-                        Url = link.Udi == null ? link.Url : null // Only save the url for external links
+                        Url = link.Udi == null ? link.Url : null // Only save the URL for external links
                     }),
                     new JsonSerializerSettings
                     {

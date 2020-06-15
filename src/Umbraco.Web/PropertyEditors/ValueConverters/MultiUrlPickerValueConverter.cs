@@ -97,7 +97,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                         Url = url + dto.QueryString
                     });
 
-                    if (maxNumber > 0 && links.Count == maxNumber)
+                    if (maxNumber == 1)
                     {
                         // Stop processing
                         break;
