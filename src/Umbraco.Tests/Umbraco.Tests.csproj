@@ -296,8 +296,6 @@
     <Compile Include="Cache\HttpRequestAppCacheTests.cs" />
     <Compile Include="Cache\RuntimeAppCacheTests.cs" />
     <Compile Include="Web\Controllers\ContentControllerUnitTests.cs" />
-    <Compile Include="Web\Controllers\FilterAllowedOutgoingContentAttributeTests.cs" />
-    <Compile Include="Web\Controllers\MediaControllerUnitTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
     <Compile Include="Macros\MacroParserTests.cs" />
     <Compile Include="Models\ContentExtensionsTests.cs" />
