@@ -1,0 +1,49 @@
+/* contains variables to make available on the :root pseudo element - ie colors, base sizing/padding units 
+   makes package developers happy :)
+*/
+
+:root {
+    --brandPrimary: @blueExtraDark; // brandPrimary-400
+    --brandSecondary: @pinkLight; // brandSecondary-400
+    
+    --brandPrimary-50: @blueLight;
+    --brandPrimary-100: @blue;
+    --brandPrimary-200: @blueMid;
+    --brandPrimary-300: @blueDark;
+    --brandPrimary-400: @blueExtraDark;
+    --brandPrimary-500: @blueNight;
+    
+    --brandSecondary-400: @pinkLight;
+    --brandSecondary-500: @pinkRedLight;
+    --brandSecondary-600: @pink;
+    
+    --brandAccent: @brown;
+    
+    // build the gray palette with a loop
+    // grays are 100 - 1100, light to dark
+    @iterations: 11;
+    .grays(@i: 11, @weight: 100) when (@i > 0) {
+        --gray-@{weight}: ~"@{gray-@{i}}";
+        
+        .grays(@i - 1, @weight + 100);
+    }
+    
+    .grays(@iterations, 100);
+        
+    --error: @red;    
+    --warning: @orange;
+    --success: @green;
+    
+    --paddingMini: @paddingMini;
+    --paddingSmall: @paddingSmall;
+    --paddingLarge: @paddingLarge;
+
+    --fontSizeLarge: @fontSizeLarge;
+    --fontSizeMedium: @fontSizeMedium;
+    --fontSizeSmall: @fontSizeSmall;
+    --fontSizeMini: @fontSizeMini;    
+    
+    --baseFontFamily: @sansFontFamily;
+    --altFontFamily: @serifFontFamily;
+    --monoFontFamily: @monoFontFamily;
+}
