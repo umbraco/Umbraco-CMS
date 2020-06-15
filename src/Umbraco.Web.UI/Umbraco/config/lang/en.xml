@@ -621,7 +621,7 @@
     <key alias="errorMandatoryWithoutTab">%0% is a mandatory field</key>
     <key alias="errorRegExp">%0% at %1% is not in a correct format</key>
     <key alias="errorRegExpWithoutTab">%0% is not in a correct format</key>
-    <key alias="errorPropertyEditorNotSupportedInElementTypes">Property %0% uses editor %1% which is not supported in ElementTypes.</key>
+    <key alias="errorPropertyEditorNotSupportedInElementTypes">Property '%0%' uses editor '%1%' which is not supported in Element Types.</key>
   </area>
   <area alias="errors">
     <key alias="receivedErrorFromServer">Received an error from the server</key>
@@ -2260,7 +2260,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="create">Create</key>
     <key alias="edit">Edit</key>
     <key alias="name">Name</key>
-    <key alias="addNewRow">Add new row</key>    
+    <key alias="addNewRow">Add new row</key>
     <key alias="tabExpand">View more options</key>
   </area>
   <area alias="references">
