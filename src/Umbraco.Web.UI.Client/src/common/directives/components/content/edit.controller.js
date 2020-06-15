@@ -31,14 +31,14 @@
         $scope.page.hideActionsMenu = infiniteMode ? true : false;
         $scope.page.hideChangeVariant = false;
         $scope.allowOpen = true;
-        $scope.app = null;
+        $scope.activeApp = null;
 
         //initializes any watches
         function startWatches(content) {
 
             //watch for changes to isNew, set the page.isNew accordingly and load the breadcrumb if we can
             $scope.$watch('isNew', function (newVal, oldVal) {
-                
+
                 $scope.page.isNew = Object.toBoolean(newVal);
 
                 //We fetch all ancestors of the node to generate the footer breadcrumb navigation
@@ -74,31 +74,23 @@
             var isAppPresent = false;
 
             // on first init, we dont have any apps. but if we are re-initializing, we do, but ...
-            if ($scope.app) {
+            if ($scope.activeApp) {
 
-                // lets check if it still exists as part of our apps array. (if not we have made a change to our docType, even just a re-save of the docType it will turn into new Apps.)
                 _.forEach(content.apps, function (app) {
-                    if (app === $scope.app) {
+                    if (app.alias === $scope.activeApp.alias) {
                         isAppPresent = true;
+                        $scope.appChanged(app);
                     }
                 });
 
-                // if we did reload our DocType, but still have the same app we will try to find it by the alias.
                 if (isAppPresent === false) {
-                    _.forEach(content.apps, function (app) {
-                        if (app.alias === $scope.app.alias) {
-                            isAppPresent = true;
-                            app.active = true;
-                            $scope.appChanged(app);
-                        }
-                    });
+                    // active app does not exist anymore.
+                    $scope.activeApp = null;
                 }
-
             }
 
             // if we still dont have a app, lets show the first one:
-            if (isAppPresent === false && content.apps.length) {
-                content.apps[0].active = true;
+            if ($scope.activeApp === null && content.apps.length) {
                 $scope.appChanged(content.apps[0]);
             }
             // otherwise make sure the save options are up to date with the current content state
@@ -151,8 +143,8 @@
         }
 
         /** Returns true if the content item varies by culture */
-        function isContentCultureVariant() {
-            return $scope.content.variants.length > 1;
+        function hasVariants(content) {
+            return content.variants.length > 1;
         }
 
         function reload() {
@@ -182,37 +174,44 @@
                 }
             }));
 
-            evts.push(eventsService.on("editors.content.reload", function (name, args) {                
+            evts.push(eventsService.on("editors.content.reload", function (name, args) {
                 if (args && args.node && $scope.content.id === args.node.id) {
                     reload();
                     loadBreadcrumb();
                     syncTreeNode($scope.content, $scope.content.path);
                 }
             }));
-            
-            evts.push(eventsService.on("rte.file.uploading", function(){
+
+            evts.push(eventsService.on("rte.file.uploading", function () {
                 $scope.page.saveButtonState = "busy";
                 $scope.page.buttonGroupState = "busy";
 
             }));
 
-            evts.push(eventsService.on("rte.file.uploaded", function(){
+            evts.push(eventsService.on("rte.file.uploaded", function () {
                 $scope.page.saveButtonState = "success";
                 $scope.page.buttonGroupState = "success";
             }));
 
-            evts.push(eventsService.on("rte.shortcut.save", function(){
+            evts.push(eventsService.on("rte.shortcut.save", function () {
                 if ($scope.page.showSaveButton) {
                     $scope.save();
                 }
             }));
 
-            evts.push(eventsService.on("content.saved", function(){
+            evts.push(eventsService.on("content.saved", function () {
                 // Clear out localstorage keys that start with tinymce__
                 // When we save/perist a content node
                 // NOTE: clearAll supports a RegEx pattern of items to remove
                 localStorageService.clearAll(/^tinymce__/);
             }));
+        }
+
+        function appendRuntimeData() {
+            $scope.content.variants.forEach((variant) => {
+                variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
+                variant.htmlId = "_content_variant_" + variant.compositeId + "_";
+            });
         }
 
         /**
@@ -226,6 +225,7 @@
 
                     $scope.content = data;
 
+                    appendRuntimeData();
                     init();
 
                     syncTreeNode($scope.content, $scope.content.path, true);
@@ -251,6 +251,7 @@
 
                     $scope.content = data;
 
+                    appendRuntimeData();
                     init();
                     startWatches($scope.content);
 
@@ -274,7 +275,7 @@
             $scope.page.saveButtonStyle = content.trashed || content.isElement || content.isBlueprint ? "primary" : "info";
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
-            if ($scope.app && $scope.app.alias !== "umbContent" && $scope.app.alias !== "umbInfo" && $scope.app.alias !== "umbListView") {
+            if ($scope.activeApp && $scope.activeApp.alias !== "umbContent" && $scope.activeApp.alias !== "umbInfo" && $scope.activeApp.alias !== "umbListView") {
                 $scope.defaultButton = null;
                 $scope.subButtons = null;
                 $scope.page.showSaveButton = false;
@@ -323,7 +324,7 @@
                     .then(function (syncArgs) {
                         $scope.page.menu.currentNode = syncArgs.node;
                         if (reloadChildren && syncArgs.node.expanded) {
-                            treeService.loadNodeChildren({node: syncArgs.node});
+                            treeService.loadNodeChildren({ node: syncArgs.node });
                         }
                     }, function () {
                         //handle the rejection
@@ -589,7 +590,7 @@
 
         $scope.sendToPublish = function () {
             clearNotifications($scope.content);
-            if (isContentCultureVariant()) {
+            if (hasVariants($scope.content)) {
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
 
@@ -649,7 +650,7 @@
 
         $scope.saveAndPublish = function () {
             clearNotifications($scope.content);
-            if (isContentCultureVariant()) {
+            if (hasVariants($scope.content)) {
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
                     var dialog = {
@@ -711,7 +712,7 @@
         $scope.save = function () {
             clearNotifications($scope.content);
             // TODO: Add "..." to save button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
-            if (isContentCultureVariant()) {
+            if (hasVariants($scope.content)) {
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "openSaveDialog" })) {
 
@@ -776,7 +777,7 @@
             clearNotifications($scope.content);
             //before we launch the dialog we want to execute all client side validations first
             if (formHelper.submitForm({ scope: $scope, action: "schedule" })) {
-                if (!isContentCultureVariant()) {
+                if (!hasVariants($scope.content)) {
                     //ensure the flags are set
                     $scope.content.variants[0].save = true;
                 }
@@ -784,7 +785,7 @@
                 var dialog = {
                     parentScope: $scope,
                     view: "views/content/overlays/schedule.html",
-                    variants:  angular.copy($scope.content.variants), //set a model property for the dialog
+                    variants: Utilities.copy($scope.content.variants), //set a model property for the dialog
                     skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                     submitButtonLabelKey: "buttons_schedulePublish",
                     submit: function (model) {
@@ -813,12 +814,12 @@
                         }, function (err) {
                             clearDirtyState($scope.content.variants);
                             //if this is invariant, show the notification errors, else they'll be shown inline with the variant
-                            if (!isContentCultureVariant()) {
+                            if (!hasVariants($scope.content)) {
                                 formHelper.showNotifications(err.data);
                             }
                             model.submitButtonState = "error";
                             //re-map the dialog model since we've re-bound the properties
-                            dialog.variants = angular.copy($scope.content.variants);
+                            dialog.variants = Utilities.copy($scope.content.variants);
                             //don't reject, we've handled the error
                             return $q.when(err);
                         });
@@ -840,7 +841,7 @@
             //before we launch the dialog we want to execute all client side validations first
             if (formHelper.submitForm({ scope: $scope, action: "publishDescendants" })) {
 
-                if (!isContentCultureVariant()) {
+                if (!hasVariants($scope.content)) {
                     //ensure the flags are set
                     $scope.content.variants[0].save = true;
                     $scope.content.variants[0].publish = true;
@@ -873,7 +874,7 @@
                         }, function (err) {
                             clearDirtyState($scope.content.variants);
                             //if this is invariant, show the notification errors, else they'll be shown inline with the variant
-                            if (!isContentCultureVariant()) {
+                            if (!hasVariants($scope.content)) {
                                 formHelper.showNotifications(err.data);
                             }
                             model.submitButtonState = "error";
@@ -963,11 +964,18 @@
          * Call back when a content app changes
          * @param {any} app
          */
-        $scope.appChanged = function (app) {
+        $scope.appChanged = function (activeApp) {
 
-            $scope.app = app;
+            $scope.activeApp = activeApp;
+            
+            _.forEach($scope.content.apps, function (app) {
+                app.active = false;
+                if (app.alias === $scope.activeApp.alias) {
+                    app.active = true;
+                }
+            });
 
-            $scope.$broadcast("editors.apps.appChanged", { app: app });
+            $scope.$broadcast("editors.apps.appChanged", { app: activeApp });
 
             createButtons($scope.content);
 
@@ -1029,6 +1037,7 @@
                 getMethod: "&",
                 getScaffoldMethod: "&?",
                 culture: "=?",
+                segment: "=?",
                 infiniteModel: "=?"
             }
         };

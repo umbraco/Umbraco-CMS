@@ -30,6 +30,7 @@
         vm.close = close;
 
         vm.toggleAllowCultureVariants = toggleAllowCultureVariants;
+        vm.toggleAllowSegmentVariants = toggleAllowSegmentVariants;
         vm.toggleValidation = toggleValidation;
         vm.toggleShowOnMemberProfile = toggleShowOnMemberProfile;
         vm.toggleMemberCanEdit = toggleMemberCanEdit;
@@ -114,7 +115,7 @@
                 property: $scope.model.property,
                 contentTypeName: $scope.model.contentTypeName,
                 view: "views/common/infiniteeditors/datatypepicker/datatypepicker.html",
-                size: "small",
+                size: "medium",
                 submit: function(model) {
 
                     $scope.model.updateSameDataTypes = model.updateSameDataTypes;
@@ -246,6 +247,10 @@
 
         function toggleAllowCultureVariants() {            
             $scope.model.property.allowCultureVariant = toggleValue($scope.model.property.allowCultureVariant);
+        }
+
+        function toggleAllowSegmentVariants() {            
+            $scope.model.property.allowSegmentVariant = toggleValue($scope.model.property.allowSegmentVariant);
         }
 
         function toggleValidation() {
