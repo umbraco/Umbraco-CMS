@@ -103,7 +103,7 @@
         vm.requestRemoveSettingsForBlock = function(block) {
             localizationService.localizeMany(["general_remove", "defaultdialogs_confirmremoveusageof"]).then(function (data) {
 
-                var settingsElementType = vm.getElementTypeByAlias(entry.settingsElementTypeKey);
+                var settingsElementType = vm.getElementTypeByKey(block.settingsElementTypeKey);
 
                 overlayService.confirmRemove({
                     title: data[0],
@@ -112,14 +112,14 @@
                         overlayService.close();
                     },
                     submit: function () {
-                        vm.removeSettingsForEntry(entry);
+                        vm.removeSettingsForBlock(block);
                         overlayService.close();
                     }
                 });
             });
         };
-        vm.removeSettingsForEntry = function(entry) {
-            entry.settingsElementTypeKey = null;
+        vm.removeSettingsForBlock = function(block) {
+            block.settingsElementTypeKey = null;
         };
 
 
