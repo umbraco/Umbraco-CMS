@@ -14,9 +14,8 @@ namespace Umbraco.Web.PropertyEditors
             Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
         public bool IgnoreUserStartNodes { get; set; }
 
-        // TODO Change this to hideQueryString, as that's the name used in the picker
-        [ConfigurationField("hideAnchor", "Hide anchor/query string input", "boolean",
-            Description = "Selecting this hides the anchor/query string input field in the linkpicker overlay.")]
+        [ConfigurationField("hideAnchor", "Hide anchor/query", "boolean",
+            Description = "Selecting this hides the anchor/query field.")]
         public bool HideAnchor { get; set; }
 
         [ConfigurationField("hideTarget", "Hide target", "boolean",
