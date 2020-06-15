@@ -118,7 +118,9 @@ angular.module("umbraco.directives")
 						image.originalWidth = originalImage.width();
 						image.originalHeight = originalImage.height();
 
-						image.width = image.originalWidth;
+                        var aspect = image.originalWidth / image.originalHeight;
+
+                        image.width = image.originalWidth;
 						image.height = image.originalHeight;
 						image.left = originalImage[0].offsetLeft;
 						image.top = originalImage[0].offsetTop;
@@ -211,7 +213,7 @@ angular.module("umbraco.directives")
 
 
 					//sets scope.crop to the recalculated % based crop
-					var calculateCropBox = function(){
+                    var calculateCropBox = function () {
                         scope.crop = cropperHelper.pixelsToCoordinates(scope.dimensions.image, scope.dimensions.cropper.width, scope.dimensions.cropper.height, scope.dimensions.margin);
                     };
 
@@ -253,6 +255,29 @@ angular.module("umbraco.directives")
                         if (createDefaultCrop) {
                             scope.dimensions.scale.current = scope.dimensions.scale.min;
     						resizeImageToScale(scope.dimensions.scale.min);
+
+                            if (scope.center) {
+                                // Move image to focal point if set
+                                // Repeating a few calls here, but logic is too difficult to follow elsewhere
+                                var x1 = Math.min(
+                                    Math.max(
+                                        scope.center.left * scope.dimensions.image.width - scope.dimensions.cropper.width / 2,
+                                        0
+                                    ),
+                                    scope.dimensions.image.width - scope.dimensions.cropper.width
+                                );
+                                var y1 = Math.min(
+                                    Math.max(
+                                        scope.center.top * scope.dimensions.image.height - scope.dimensions.cropper.height / 2,
+                                        0
+                                    ),
+                                    scope.dimensions.image.height - scope.dimensions.cropper.height
+                                );
+                                scope.dimensions.image.left = x1;
+                                scope.dimensions.image.top = y1;
+                                calculateCropBox();
+                                resizeImageToCrop();
+                            }
                         }
 
 						//sets constaints for the cropper
