@@ -600,10 +600,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpPost]
-        [FileUploadCleanupFilter(false)]
         public async Task<ActionResult<ContentTypeImportModel>> Upload(List<IFormFile> file)
         {
-
             var model = new ContentTypeImportModel();
 
             foreach (var formFile in file)
@@ -622,11 +620,6 @@ namespace Umbraco.Web.BackOffice.Controllers
                 if (ext.InvariantEquals("udt"))
                 {
                     model.TempFileName = Path.Combine(root, fileName);
-
-                    model.UploadedFiles.Add(new ContentPropertyFile
-                    {
-                        TempFilePath = model.TempFileName
-                    });
 
                     var xd = new XmlDocument
                     {

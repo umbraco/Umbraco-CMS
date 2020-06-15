@@ -1,14 +1,24 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Routing;
 using Umbraco.Core;
+using Umbraco.Extensions;
+using Umbraco.Web.BackOffice.ModelBinders;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
     public class DetermineAmbiguousActionByPassingParameters : ActionMethodSelectorAttribute
     {
+        private string _requestBody = null;
+
         public override bool IsValidForRequest(RouteContext routeContext, ActionDescriptor action)
         {
             var parameters = action.Parameters;
@@ -17,27 +27,37 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var canUse = true;
                 foreach (var parameterDescriptor in parameters)
                 {
-                    var value = routeContext.HttpContext.Request.Query[parameterDescriptor.Name];
+                    var values = GetValue(parameterDescriptor, routeContext);
 
-                    if (parameterDescriptor.ParameterType == typeof(Udi))
+                    var type = parameterDescriptor.ParameterType;
+
+                    if(typeof(IEnumerable).IsAssignableFrom(type))
                     {
-                        canUse &= UdiParser.TryParse(value, out _);
+                        type = type.GetElementType();
                     }
-                    else if (parameterDescriptor.ParameterType == typeof(int))
+
+                    foreach (var value in values)
                     {
-                        canUse &= int.TryParse(value, out _);
-                    }
-                    else if (parameterDescriptor.ParameterType == typeof(Guid))
-                    {
-                        canUse &= Guid.TryParse(value, out _);
-                    }
-                    else if (parameterDescriptor.ParameterType == typeof(string))
-                    {
-                        canUse &= true;
-                    }
-                    else
-                    {
-                        canUse &= true;
+                        if (type == typeof(Udi))
+                        {
+                            canUse &= UdiParser.TryParse(value.ToString(), out _);
+                        }
+                        else if (type == typeof(int))
+                        {
+                            canUse &= int.TryParse(value.ToString(), out _);
+                        }
+                        else if (type == typeof(Guid))
+                        {
+                            canUse &= Guid.TryParse(value.ToString(), out _);
+                        }
+                        else if (type == typeof(string))
+                        {
+                            canUse &= true;
+                        }
+                        else
+                        {
+                            canUse &= true;
+                        }
                     }
                 }
 
@@ -47,5 +67,36 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             return true;
         }
+
+        private IEnumerable<string> GetValue(ParameterDescriptor descriptor, RouteContext routeContext)
+        {
+            if (routeContext.HttpContext.Request.Query.ContainsKey(descriptor.Name))
+            {
+                return routeContext.HttpContext.Request.Query[descriptor.Name];
+            }
+
+            if (descriptor.BindingInfo.BinderType == typeof(FromJsonPathAttribute.JsonPathBinder))
+            {
+                // IMPORTANT: Ensure the requestBody can be read multiple times.
+                routeContext.HttpContext.Request.EnableBuffering();
+
+                var body = _requestBody ??= routeContext.HttpContext.Request.GetRawBodyString();
+
+                var jToken = JsonConvert.DeserializeObject<JToken>(body);
+
+                return jToken[descriptor.Name].Values<string>();
+            }
+
+            if (routeContext.HttpContext.Request.Method.InvariantEquals(HttpMethod.Post.ToString()) && routeContext.HttpContext.Request.Form.ContainsKey(descriptor.Name))
+            {
+                return routeContext.HttpContext.Request.Form[descriptor.Name];
+            }
+
+            return null;
+
+        }
     }
+
 }
+
+

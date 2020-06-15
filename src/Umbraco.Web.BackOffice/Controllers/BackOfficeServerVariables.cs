@@ -216,10 +216,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                         //     "currentUserApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
                         //         controller => controller.PostChangePassword(null))
                         // },
-                        // {
-                        //     "entityApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<EntityController>(
-                        //         controller => controller.GetById(0, UmbracoEntityTypes.Media))
-                        // },
+                        {
+                            "entityApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<EntityController>(
+                                controller => controller.GetById(0, UmbracoEntityTypes.Media))
+                        },
                         {
                             "dataTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<DataTypeController>(
                                 controller => controller.GetById(0))

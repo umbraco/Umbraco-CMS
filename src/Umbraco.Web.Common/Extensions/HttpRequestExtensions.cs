@@ -1,5 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Umbraco.Core;
@@ -20,7 +23,7 @@ namespace Umbraco.Extensions
             return new Uri(request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsClientSideRequest();
         }
 
-        internal static string ClientCulture(this HttpRequest request)
+        public static string ClientCulture(this HttpRequest request)
         {
             return request.Headers.TryGetValue("X-UMB-CULTURE", out var values) ? values[0] : null;
         }
@@ -52,6 +55,21 @@ namespace Umbraco.Extensions
         {
             const string NullIpAddress = "::1";
             return address != null && address.ToString() != NullIpAddress;
+        }
+
+        public static string GetRawBodyString(this HttpRequest request, Encoding encoding = null)
+        {
+            request.Body.Seek(0, SeekOrigin.Begin);
+
+            var reader = new StreamReader(request.Body, encoding ?? Encoding.UTF8);
+
+            var result = reader.ReadToEnd();
+            request.Body.Seek(0, SeekOrigin.Begin);
+            return result;
+
+
+
+
         }
     }
 }

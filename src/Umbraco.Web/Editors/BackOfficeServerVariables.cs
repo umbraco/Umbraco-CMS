@@ -174,10 +174,7 @@ namespace Umbraco.Web.Editors
                             "currentUserApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
                                 controller => controller.PostChangePassword(null))
                         },
-                        {
-                            "entityApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<EntityController>(
-                                controller => controller.GetById(0, UmbracoEntityTypes.Media))
-                        },
+
                         // {
                         //     "dataTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DataTypeController>(
                         //         controller => controller.GetById(0))

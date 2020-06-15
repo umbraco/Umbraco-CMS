@@ -227,7 +227,6 @@
     <Compile Include="WebApi\SerializeVersionAttribute.cs" />
     <Compile Include="WebApi\TrimModelBinder.cs" />
     <Compile Include="Editors\Filters\MemberSaveModelValidator.cs" />
-    <Compile Include="Editors\FromJsonPathAttribute.cs" />
     <Compile Include="Editors\Filters\IsCurrentUserModelFilterAttribute.cs" />
     <Compile Include="WebApi\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
@@ -303,7 +302,6 @@
     <Compile Include="Mvc\MinifyJavaScriptResultAttribute.cs" />
     <Compile Include="Mvc\EnsurePublishedContentRequestAttribute.cs" />
     <Compile Include="Mvc\UmbracoViewPage.cs" />
-    <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Editors\CurrentUserController.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />

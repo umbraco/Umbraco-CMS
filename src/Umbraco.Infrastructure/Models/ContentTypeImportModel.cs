@@ -6,7 +6,7 @@ using Umbraco.Web.Models.ContentEditing;
 namespace Umbraco.Web.Models
 {
     [DataContract(Name = "contentTypeImportModel")]
-    public class ContentTypeImportModel : INotificationModel, IHaveUploadedFiles
+    public class ContentTypeImportModel : INotificationModel
     {
         [DataMember(Name = "alias")]
         public string Alias { get; set; }
@@ -19,7 +19,5 @@ namespace Umbraco.Web.Models
 
         [DataMember(Name = "tempFileName")]
         public string TempFileName { get; set; }
-
-        public List<ContentPropertyFile> UploadedFiles { get; } = new List<ContentPropertyFile>();
     }
 }
