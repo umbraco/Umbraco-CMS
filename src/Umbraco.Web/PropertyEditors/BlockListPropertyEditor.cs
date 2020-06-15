@@ -22,8 +22,8 @@ namespace Umbraco.Web.PropertyEditors
         Icon = "icon-thumbnail-list")]
     public class BlockListPropertyEditor : BlockEditorPropertyEditor
     {
-        public BlockListPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService)
-            : base(logger, propertyEditors, dataTypeService, contentTypeService, new DataHelper())
+        public BlockListPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService localizedTextService)
+            : base(logger, propertyEditors, dataTypeService, contentTypeService, new DataHelper(), localizedTextService)
         { }
 
         #region Pre Value Editor

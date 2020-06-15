@@ -23,14 +23,16 @@ namespace Umbraco.Web.PropertyEditors
         public const string ContentTypeKeyPropertyKey = "contentTypeKey";
         public const string UdiPropertyKey = "udi";
         private readonly IBlockEditorDataHelper _dataHelper;
+        private readonly ILocalizedTextService _localizedTextService;
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
         private readonly IContentTypeService _contentTypeService;
 
-        public BlockEditorPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, IBlockEditorDataHelper dataHelper)
+        public BlockEditorPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, IBlockEditorDataHelper dataHelper, ILocalizedTextService localizedTextService)
             : base(logger)
         {
             _dataHelper = dataHelper;
+            _localizedTextService = localizedTextService;
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
             _contentTypeService = contentTypeService;
@@ -41,7 +43,7 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new BlockEditorPropertyValueEditor(Attribute, _dataHelper, PropertyEditors, _dataTypeService, _contentTypeService);
+        protected override IDataValueEditor CreateValueEditor() => new BlockEditorPropertyValueEditor(Attribute, _dataHelper, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService);
 
         internal class BlockEditorPropertyValueEditor : DataValueEditor, IDataValueReference
         {
@@ -50,14 +52,14 @@ namespace Umbraco.Web.PropertyEditors
             private readonly IDataTypeService _dataTypeService;
             private readonly BlockEditorValues _blockEditorValues;
 
-            public BlockEditorPropertyValueEditor(DataEditorAttribute attribute, IBlockEditorDataHelper dataHelper, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService)
+            public BlockEditorPropertyValueEditor(DataEditorAttribute attribute, IBlockEditorDataHelper dataHelper, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService)
                 : base(attribute)
             {
                 _dataHelper = dataHelper;
                 _propertyEditors = propertyEditors;
                 _dataTypeService = dataTypeService;
                 _blockEditorValues = new BlockEditorValues(dataHelper, contentTypeService);
-                Validators.Add(new BlockEditorValidator(propertyEditors, dataTypeService, _blockEditorValues));
+                Validators.Add(new BlockEditorValidator(_blockEditorValues, propertyEditors, dataTypeService, textService));
             }
 
             public IEnumerable<UmbracoEntityReference> GetReferences(object value)
