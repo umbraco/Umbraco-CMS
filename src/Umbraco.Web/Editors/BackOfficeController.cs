@@ -451,10 +451,10 @@ namespace Umbraco.Web.Editors
             else
             {
                 //Now we need to perform the auto-link, so first we need to lookup/create a user with the email address
-                var foundByEmail = Services.UserService.GetByEmail(loginInfo.Email);
-                if (foundByEmail != null)
+                var autoLinkUser = UserManager.FindByEmail(loginInfo.Email);
+                if (autoLinkUser != null)
                 {
-                    ViewData.SetExternalSignInError(new[] { "A user with this email address already exists locally. You will need to login locally to Umbraco and link this external provider: " + loginInfo.Login.LoginProvider });
+                    await LinkUser(autoLinkUser, loginInfo);
                 }
                 else
                 {
@@ -463,7 +463,7 @@ namespace Umbraco.Web.Editors
 
                     var groups = Services.UserService.GetUserGroupsByAlias(autoLinkOptions.GetDefaultUserGroups(UmbracoContext, loginInfo));
 
-                    var autoLinkUser = BackOfficeIdentityUser.CreateNew(
+                    autoLinkUser = BackOfficeIdentityUser.CreateNew(
                         loginInfo.Email,
                         loginInfo.Email,
                         autoLinkOptions.GetDefaultCulture(UmbracoContext, loginInfo));
@@ -487,29 +487,34 @@ namespace Umbraco.Web.Editors
                     }
                     else
                     {
-                        var linkResult = await UserManager.AddLoginAsync(autoLinkUser.Id, loginInfo.Login);
-                        if (linkResult.Succeeded == false)
-                        {
-                            ViewData.SetExternalSignInError(linkResult.Errors);
-
-                            //If this fails, we should really delete the user since it will be in an inconsistent state!
-                            var deleteResult = await UserManager.DeleteAsync(autoLinkUser);
-                            if (deleteResult.Succeeded == false)
-                            {
-                                //DOH! ... this isn't good, combine all errors to be shown
-                                ViewData.SetExternalSignInError(linkResult.Errors.Concat(deleteResult.Errors));
-                            }
-                        }
-                        else
-                        {
-                            //sign in
-                            await SignInManager.SignInAsync(autoLinkUser, isPersistent: false, rememberBrowser: false);
-                        }
+                        await LinkUser(autoLinkUser, loginInfo);
                     }
                 }
 
             }
             return true;
+        }
+
+        private async Task LinkUser(BackOfficeIdentityUser autoLinkUser, ExternalLoginInfo loginInfo)
+        {
+            var linkResult = await UserManager.AddLoginAsync(autoLinkUser.Id, loginInfo.Login);
+            if (linkResult.Succeeded == false)
+            {
+                ViewData.SetExternalSignInError(linkResult.Errors);
+
+                //If this fails, we should really delete the user since it will be in an inconsistent state!
+                var deleteResult = await UserManager.DeleteAsync(autoLinkUser);
+                if (deleteResult.Succeeded == false)
+                {
+                    //DOH! ... this isn't good, combine all errors to be shown
+                    ViewData.SetExternalSignInError(linkResult.Errors.Concat(deleteResult.Errors));
+                }
+            }
+            else
+            {
+                //sign in
+                await SignInManager.SignInAsync(autoLinkUser, isPersistent: false, rememberBrowser: false);
+            }
         }
 
         private ActionResult RedirectToLocal(string returnUrl)
