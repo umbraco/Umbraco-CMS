@@ -16,6 +16,15 @@
     <umb-editor-container>
         <umb-box>
             <umb-box-content>
+                <div class="umb-control-group">
+                    <umb-color-swatches
+                        use-color-class="true"
+                        colors="vm.colors"
+                        selected-color="vm.color"
+                        size="s"
+                        on-select="vm.selectColor(color)">
+                    </umb-color-swatches>
+                </div>
 
                 <div class="umb-control-group">
                     <div class="form-search">
@@ -31,19 +40,9 @@
                     </div>
                 </div>
 
-                <div class="umb-control-group">
-                    <umb-color-swatches
-                        use-color-class="true"
-                        colors="vm.colors"
-                        selected-color="vm.color"
-                        size="s"
-                        on-select="vm.selectColor(color)">
-                    </umb-color-swatches>
-                </div>
-
                 <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
-                <div class="umb-control-group" ng-show="!vm.loading && filtered.length > 0 ">
+                <div class="umb-control-group" ng-show="!vm.loading && filtered.length > 0">
                     <ul class="umb-iconpicker" ng-class="vm.color.value" ng-show="vm.icons">
                         <li class="umb-iconpicker-item" ng-class="{'-selected': icon == model.icon}" ng-repeat="icon in filtered = (vm.icons | filter: searchTerm) track by $id(icon)">
                             <button type="button" title="{{icon}}" ng-click="vm.selectIcon(icon, vm.color.value)" prevent-default>
