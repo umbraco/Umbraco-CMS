@@ -400,7 +400,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                autoLinkOptions = authType.GetExternalAuthenticationOptions();
+                autoLinkOptions = authType.GetExternalSignInAutoLinkOptions();
             }
 
             // Sign in the user with this external login provider if the user already has a login

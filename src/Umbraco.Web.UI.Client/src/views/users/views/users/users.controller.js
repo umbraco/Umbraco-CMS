@@ -71,7 +71,7 @@
 
         vm.denyLocalLogin = externalLoginInfoService.hasDenyLocalLogin();
 
-        // No buttons with denyLocalLogin
+        // No default buttons with denyLocalLogin
         // Don't show the invite button if no email is configured
         if (!vm.denyLocalLogin) {
             if (Umbraco.Sys.ServerVariables.umbracoSettings.showUserInvite) {
@@ -96,6 +96,19 @@
                     handler: function () {
                         vm.setUsersViewState('createUser');
                     }
+                };
+            }
+        }
+        else {
+            // if deny local login then check if there's an invite link in the config
+
+            var customInviteLink = externalLoginInfoService.getUserInviteLink();
+            if (customInviteLink) {
+                vm.defaultButton = {
+                    type: "link",
+                    labelKey: "user_inviteUser",
+                    href: customInviteLink,
+                    hrefTarget: "_blank"
                 };
             }
         }

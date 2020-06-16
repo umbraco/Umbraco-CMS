@@ -3,8 +3,10 @@
    <umb-button
       ng-if="defaultButton"
       alias="{{defaultButton.alias ? defaultButton.alias : 'groupPrimary' }}"
-      type="button"
+      type="{{defaultButton.type}}"
       action="defaultButton.handler()"
+      href="{{defaultButton.href}}"
+      href-target="{{defaultButton.hrefTarget}}"
       button-style="{{buttonStyle}}"
       state="state"
       label="{{defaultButton.labelKey}}"

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using Microsoft.AspNet.Identity.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -7,6 +8,7 @@ using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Web.Security
 {
+
     /// <summary>
     /// Options used to configure auto-linking external OAuth providers
     /// </summary>
@@ -33,12 +35,14 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// A callback executed during account auto-linking and before the user is persisted
         /// </summary>
+        [IgnoreDataMember]
         public Action<BackOfficeIdentityUser, ExternalLoginInfo> OnAutoLinking { get; set; }
 
         /// <summary>
         /// A callback executed during every time a user authenticates using an external login.
         /// returns a boolean indicating if sign in should continue or not.
         /// </summary>
+        [IgnoreDataMember]
         public Func<BackOfficeIdentityUser, ExternalLoginInfo, bool> OnExternalLogin { get; set; }
 
 

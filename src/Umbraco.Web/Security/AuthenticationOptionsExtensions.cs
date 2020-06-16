@@ -9,79 +9,60 @@ namespace Umbraco.Web.Security
 {
     public static class AuthenticationOptionsExtensions
     {
+        // these are used for backwards compat
+        private const string ExternalSignInAutoLinkOptionsProperty = "ExternalSignInAutoLinkOptions";
+        private const string ChallengeResultCallbackProperty = "ChallengeResultCallback";
 
         /// <summary>
-        /// When trying to implement an Azure AD B2C provider or other OAuth provider that requires a customized Challenge Result in order to work then
-        /// this must be used.
+        /// Used to specify all back office external login options
         /// </summary>
         /// <param name="authOptions"></param>
-        /// <param name="authProperties"></param>
-        /// <remarks>
-        /// See: http://issues.umbraco.org/issue/U4-7353
-        /// </remarks>
+        /// <param name="externalLoginProviderOptions"></param>
+        public static void SetBackOfficeExternalLoginProviderOptions(this AuthenticationOptions authOptions,
+            BackOfficeExternalLoginProviderOptions externalLoginProviderOptions)
+        {
+            authOptions.Description.Properties[Constants.Security.BackOfficeExternalLoginOptionsProperty] = externalLoginProviderOptions;
+
+            // for backwards compat, we need to add these:
+            if (externalLoginProviderOptions.AutoLinkOptions != null)
+                authOptions.Description.Properties[ExternalSignInAutoLinkOptionsProperty] = externalLoginProviderOptions.AutoLinkOptions;
+            if (externalLoginProviderOptions.OnChallenge != null)
+                authOptions.Description.Properties[ChallengeResultCallbackProperty] = externalLoginProviderOptions.OnChallenge;
+        }
+
+        [Obsolete("Use SetBackOfficeExternalLoginProviderOptions instead")]
         public static void SetSignInChallengeResultCallback(
             this AuthenticationOptions authOptions,
             Func<IOwinContext, AuthenticationProperties> authProperties)
         {
-            authOptions.Description.Properties["ChallengeResultCallback"] = authProperties;
+            authOptions.Description.Properties[ChallengeResultCallbackProperty] = authProperties;
         }
 
         public static AuthenticationProperties GetSignInChallengeResult(this AuthenticationDescription authenticationDescription, IOwinContext ctx)
         {
-            if (authenticationDescription.Properties.ContainsKey("ChallengeResultCallback") == false) return null;
-            var cb = authenticationDescription.Properties["ChallengeResultCallback"] as Func<IOwinContext, AuthenticationProperties>;
+            if (authenticationDescription.Properties.ContainsKey(ChallengeResultCallbackProperty) == false) return null;
+            var cb = authenticationDescription.Properties[ChallengeResultCallbackProperty] as Func<IOwinContext, AuthenticationProperties>;
             if (cb == null) return null;
             return cb(ctx);
         }
 
-        /// <summary>
-        /// Used during the External authentication process to assign external sign-in options
-        /// that are used by the Umbraco authentication process.
-        /// </summary>
-        /// <param name="authOptions"></param>
-        /// <param name="options"></param>
+        [Obsolete("Use SetBackOfficeExternalLoginProviderOptions instead")]
         public static void SetExternalSignInAutoLinkOptions(
             this AuthenticationOptions authOptions,
             ExternalSignInAutoLinkOptions options)
         {
-            authOptions.Description.Properties["ExternalSignInAutoLinkOptions"] = options;
+            authOptions.Description.Properties[ExternalSignInAutoLinkOptionsProperty] = options;
         }
 
-        /// <summary>
-        /// Used during the External authentication process to retrieve external sign-in options
-        /// that have been set with SetExternalAuthenticationOptions
-        /// </summary>
-        /// <param name="authenticationDescription"></param>
+        [Obsolete("Use GetExternalSignInAutoLinkOptions instead")]
         public static ExternalSignInAutoLinkOptions GetExternalAuthenticationOptions(this AuthenticationDescription authenticationDescription)
+            => authenticationDescription.GetExternalSignInAutoLinkOptions();
+
+        public static ExternalSignInAutoLinkOptions GetExternalSignInAutoLinkOptions(this AuthenticationDescription authenticationDescription)
         {
-            if (authenticationDescription.Properties.ContainsKey("ExternalSignInAutoLinkOptions") == false) return null;
-            var options = authenticationDescription.Properties["ExternalSignInAutoLinkOptions"] as ExternalSignInAutoLinkOptions;
+            if (authenticationDescription.Properties.ContainsKey(ExternalSignInAutoLinkOptionsProperty) == false) return null;
+            var options = authenticationDescription.Properties[ExternalSignInAutoLinkOptionsProperty] as ExternalSignInAutoLinkOptions;
             return options;
-        }
-
-        /// <summary>
-        /// When set this will disable all local login ability within Umbraco
-        /// </summary>
-        /// <param name="options"></param>
-        /// <remarks>
-        /// Even if there are multiple OAuth providers installed if any of these specifies this option then all local login ability is disabled.
-        /// </remarks>
-        public static void DenyLocalLogin(this AuthenticationOptions options)
-        {
-            options.Description.Properties[Constants.Security.BackOfficeExternalAuthenticationDenyLocalLoginProperty] = true;
-        }
-
-        /// <summary>
-        /// When specified this will automatically redirect to the OAuth login provider instead of prompting the user to click on the OAuth button first.
-        /// </summary>
-        /// <param name="options"></param>
-        /// <remarks>
-        /// This is generally used in conjunction with <see cref="DenyLocalLogin(AuthenticationOptions)"/>. If more than one OAuth provider specifies this, the last registered
-        /// provider's redirect settings will win.
-        /// </remarks>
-        public static void AutoLoginRedirect(this AuthenticationOptions options)
-        {
-            options.Description.Properties[Constants.Security.BackOfficeExternalAuthenticationAutoLoginRedirectProperty] = true;
         }
 
         /// <summary>

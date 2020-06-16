@@ -54,14 +54,21 @@ namespace Umbraco.Web.Security
         public static string GetAutoLoginProvider(this IAuthenticationManager manager)
         {
             var found = manager.GetExternalAuthenticationTypes()
-                .LastOrDefault(p => p.Properties.ContainsKey(Constants.Security.BackOfficeAuthenticationType) && p.Properties.ContainsKey(Constants.Security.BackOfficeExternalAuthenticationAutoLoginRedirectProperty));
+                .LastOrDefault(p => p.Properties.ContainsKey(Constants.Security.BackOfficeAuthenticationType)
+                    && p.Properties.TryGetValue(Constants.Security.BackOfficeExternalLoginOptionsProperty, out var options)
+                    && options is BackOfficeExternalLoginProviderOptions externalLoginProviderOptions
+                    && externalLoginProviderOptions.AutoRedirectLoginToExternalProvider);
 
             return found?.AuthenticationType;
         }
 
         public static bool HasDenyLocalLogin(this IAuthenticationManager manager)
         {
-            return manager.GetExternalAuthenticationTypes().Any(p => p.Properties.ContainsKey(Constants.Security.BackOfficeExternalAuthenticationDenyLocalLoginProperty));
+            return manager.GetExternalAuthenticationTypes()
+                .Any(p => p.Properties.ContainsKey(Constants.Security.BackOfficeAuthenticationType)
+                    && p.Properties.TryGetValue(Constants.Security.BackOfficeExternalLoginOptionsProperty, out var options)
+                    && options is BackOfficeExternalLoginProviderOptions externalLoginProviderOptions
+                    && externalLoginProviderOptions.DenyLocalLogin);
         }
 
         /// <summary>
