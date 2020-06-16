@@ -1,16 +1,27 @@
-@checkboxWidth: 16px;
-@checkboxHeight: 16px;
+@checkboxWidth: 18px;
+@checkboxHeight: 18px;
+label.umb-form-check--checkbox{
+    margin:3px 0;
+}
 
 .umb-form-check {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
     position: relative;
-    padding: 0 0 0 26px !important;
+    padding-left: 0px;
     margin: 0;
     min-height: 22px;
-    line-height: 22px;
     cursor: pointer !important;
+
+    .umb-form-check__symbol {
+        margin-top: 4px;
+        margin-right: 10px;
+    }
+    .umb-form-check__info {
+        margin-left:20px;
+        position: relative;
+        top: 3px;
+    }
+    
 
     &.-small-text{
         font-size: 13px;
@@ -22,7 +33,6 @@
 
     &__text {
         position: relative;
-        top: 1px;
         user-select: none;
     }
 
@@ -90,10 +100,10 @@
     &__state {
         display: flex;
         height: 18px;
-        margin-top: 2px;
         position: absolute;
+        margin-top: 2px;
         top: 0;
-        left: 0;
+        left: -1px;
     }
 
     &__check {
@@ -101,6 +111,7 @@
         position: relative;
         background: @white;
         border: 1px solid @inputBorder;
+        border-radius: @baseBorderRadius;
         width: @checkboxWidth;
         height: @checkboxHeight;
 
@@ -160,5 +171,6 @@
     &.umb-form-check--disabled {
         cursor: not-allowed !important;
         opacity: 0.5;
+        pointer-events: none;
     }
 }

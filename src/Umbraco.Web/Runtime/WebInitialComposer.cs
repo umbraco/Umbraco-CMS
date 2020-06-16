@@ -38,6 +38,8 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Core.Models;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Runtime
 {
@@ -177,7 +179,7 @@ namespace Umbraco.Web.Runtime
                 .Remove<TinyMceValueConverter>()
                 .Remove<TextStringValueConverter>()
                 .Remove<MarkdownEditorValueConverter>();
-            
+
             // add all known factories, devs can then modify this list on application
             // startup either by binding to events or in their own global.asax
             composition.FilteredControllerFactory()
@@ -190,6 +192,8 @@ namespace Umbraco.Web.Runtime
             composition.MediaUrlProviders()
                 .Append<DefaultMediaUrlProvider>();
 
+            composition.RegisterUnique<IImageUrlGenerator, ImageProcessorImageUrlGenerator>();
+
             composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
             composition.ContentFinders()
@@ -199,8 +203,12 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentFinderByUrl>()
                 .Append<ContentFinderByIdPath>()
                 //.Append<ContentFinderByUrlAndTemplate>() // disabled, this is an odd finder
-                .Append<ContentFinderByUrlAlias>()
-                .Append<ContentFinderByRedirectUrl>();
+                .Append<ContentFinderByUrlAlias>();
+                //only append ContentFinderByRedirectUrl if RedirectUrlTracking is not disabled
+                if (composition.Configs.Settings().WebRouting.DisableRedirectUrlTracking == false)
+                {
+                    composition.ContentFinders().Append<ContentFinderByRedirectUrl>();
+                }
 
             composition.RegisterUnique<ISiteDomainHelper, SiteDomainHelper>();
 

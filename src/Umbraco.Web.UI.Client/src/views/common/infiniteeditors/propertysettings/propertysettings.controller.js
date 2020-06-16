@@ -30,6 +30,7 @@
         vm.close = close;
 
         vm.toggleAllowCultureVariants = toggleAllowCultureVariants;
+        vm.toggleAllowSegmentVariants = toggleAllowSegmentVariants;
         vm.toggleValidation = toggleValidation;
         vm.toggleShowOnMemberProfile = toggleShowOnMemberProfile;
         vm.toggleMemberCanEdit = toggleMemberCanEdit;
@@ -56,7 +57,8 @@
                 "validation_validateAsEmail", 
                 "validation_validateAsNumber", 
                 "validation_validateAsUrl", 
-                "validation_enterCustomValidation"
+                "validation_enterCustomValidation",
+                "validation_fieldIsMandatory"
             ];
 
             localizationService.localizeMany(labels)
@@ -66,6 +68,7 @@
                     vm.labels.validateAsNumber = data[1];
                     vm.labels.validateAsUrl = data[2];
                     vm.labels.customValidation = data[3];
+                    vm.labels.fieldIsMandatory = data[4];
 
                     vm.validationTypes = [
                         {
@@ -112,7 +115,7 @@
                 property: $scope.model.property,
                 contentTypeName: $scope.model.contentTypeName,
                 view: "views/common/infiniteeditors/datatypepicker/datatypepicker.html",
-                size: "small",
+                size: "medium",
                 submit: function(model) {
 
                     $scope.model.updateSameDataTypes = model.updateSameDataTypes;
@@ -244,6 +247,10 @@
 
         function toggleAllowCultureVariants() {            
             $scope.model.property.allowCultureVariant = toggleValue($scope.model.property.allowCultureVariant);
+        }
+
+        function toggleAllowSegmentVariants() {            
+            $scope.model.property.allowSegmentVariant = toggleValue($scope.model.property.allowSegmentVariant);
         }
 
         function toggleValidation() {

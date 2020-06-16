@@ -214,9 +214,9 @@ namespace Umbraco.Core.Xml
                 var xmlDoc = new XmlDocument();
                 //Load the file into the XmlDocument
                 xmlDoc.Load(reader);
-                
+
                 return xmlDoc;
-            }   
+            }
         }
 
         /// <summary>
@@ -335,7 +335,7 @@ namespace Umbraco.Core.Xml
             var child = parent.SelectSingleNode(name);
             if (child != null)
             {
-                child.InnerXml = "<![CDATA[" + value + "]]>"; ;
+                child.InnerXml = "<![CDATA[" + value + "]]>";
                 return child;
             }
             return AddCDataNode(xd, name, value);

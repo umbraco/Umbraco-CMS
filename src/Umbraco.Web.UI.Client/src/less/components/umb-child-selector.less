@@ -16,23 +16,24 @@
 .umb-child-selector__child.-placeholder {
   border: 1px dashed @gray-8;
   background: none;
-  cursor: pointer;
   text-align: center;
   justify-content: center;
-  
-  color:@ui-action-type;
+  width: 100%;
+  color: @ui-action-type;
+
   &:hover {
-      color:@ui-action-type-hover;
-      border-color:@ui-action-type-hover;
-      text-decoration:none;
+      color: @ui-action-type-hover;
+      border-color: @ui-action-type-hover;
+      text-decoration: none;
   }
 }
 
 .umb-child-selector__children-container {
-  margin-left: 30px;
-  .umb-child-selector__child {
-      cursor: move;
-  }
+    margin-left: 30px;
+
+    .umb-child-selector__child.ui-sortable-handle {
+        cursor: move;
+    }
 }
 
 .umb-child-selector__child-description {
@@ -65,5 +66,6 @@
 }
 
 .umb-child-selector__child-remove {
-  cursor: pointer;
+  background: none;
+  border: none;
 }
