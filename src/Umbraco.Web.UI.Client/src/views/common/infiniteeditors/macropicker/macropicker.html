@@ -41,11 +41,8 @@
                                 </li>
                             </ul>
 
-                            <umb-empty-state ng-if="nomacros"
-                                                position="center">
-                                <localize key="defaultdialogs_noMacros">
-                                    There are no macros available to insert
-                                </localize>
+                            <umb-empty-state ng-if="nomacros">
+                                <localize key="defaultdialogs_noMacros">There are no macros available to insert</localize>
                             </umb-empty-state>
                         </div>
 
@@ -65,8 +62,7 @@
                                 </li>
                             </ul>
 
-                            <umb-empty-state ng-if="noMacroParams"
-                                                position="center">
+                            <umb-empty-state ng-if="noMacroParams">
                                 <localize key="defaultdialogs_noMacroParams">There are no parameters for this macro</localize>
                             </umb-empty-state>
 
