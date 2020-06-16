@@ -28,13 +28,20 @@
  * 
  * <pre>
  * 
+ *     // We must get a scope that exists in all the lifetime of this data. Across variants and split-view.
+ *     var scopeOfExistence = $scope;
+ *     // Setup your component to require umbVariantContentEditors and use the method getScope to retrive a shared scope for multiple editors of this content.
+ *     if(vm.umbVariantContentEditors && vm.umbVariantContentEditors.getScope) {
+ *         scopeOfExistence = vm.umbVariantContentEditors.getScope();
+ *     }
+ * 
  *     // Define variables for layout and modelObject as you will be using these through our your property-editor.
  *     var layout;
  *     var modelObject;
  *     
  *     // When we are ready we can instantiate the Model Object can load the dependencies of it.
  *     vm.$onInit = function() {
- *         modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, $scope);
+ *         modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, scopeOfExistence);
  *         modelObject.load().then(onLoaded);
  *     }
  * 
@@ -171,12 +178,13 @@
 
     function blockEditorModelObjectFactory($interpolate, udiService, contentResource) {
 
-
         /**
          * Simple mapping from property model content entry to editing model,
          * needs to stay simple to avoid deep watching.
          */
         function mapToElementModel(elementModel, dataModel) {
+
+            if (!elementModel || !elementModel.variants || !elementModel.variants.length) { return; }
 
             var variant = elementModel.variants[0];
             
@@ -190,6 +198,7 @@
                     }
                 }
             }
+            
         }
 
         /**
@@ -198,6 +207,8 @@
          */
         function mapToPropertyModel(elementModel, dataModel) {
             
+            if (!elementModel || !elementModel.variants || !elementModel.variants.length) { return; }
+
             var variant = elementModel.variants[0];
             
             for (var t = 0; t < variant.tabs.length; t++) {
@@ -210,6 +221,7 @@
                     }
                 }
             }
+            
         }
 
         /**
@@ -272,7 +284,7 @@
             // Start watching each property value.
             var variant = model.variants[0];
             var field = forSettings ? "settings" : "content";
-            var watcherCreator = forSettings ? createSettingsModelPropWatcher : createDataModelPropWatcher;
+            var watcherCreator = forSettings ? createSettingsModelPropWatcher : createContentModelPropWatcher;
             for (var t = 0; t < variant.tabs.length; t++) {
                 var tab = variant.tabs[t];
                 for (var p = 0; p < tab.properties.length; p++) {
@@ -283,6 +295,13 @@
                     // But we like to sync non-primative values as well! Yes, and this does happen, just not through this code, but through the nature of JavaScript. 
                     // Non-primative values act as references to the same data and are therefor synced.
                     blockObject.watchers.push(isolatedScope.$watch("blockObjects._" + blockObject.key + "." + field + ".variants[0].tabs[" + t + "].properties[" + p + "].value", watcherCreator(blockObject, prop)));
+                    
+                    // We also like to watch our data model to be able to capture changes coming from other places.
+                    if (forSettings === true) {
+                        blockObject.watchers.push(isolatedScope.$watch("blockObjects._" + blockObject.key + "." + "layout.settings" + "." + prop.alias, createLayoutSettingsModelWatcher(blockObject, prop)));
+                    } else {
+                        blockObject.watchers.push(isolatedScope.$watch("blockObjects._" + blockObject.key + "." + "data" + "." + prop.alias, createDataModelWatcher(blockObject, prop)));
+                    }
                 }
             }
             if (blockObject.watchers.length === 0) {
@@ -292,9 +311,30 @@
         }
 
         /**
+         * Used to create a prop watcher for the data in the property editor data model.
+         */
+        function createDataModelWatcher(blockObject, prop)  {
+            return function() {
+                // sync data:
+                prop.value = blockObject.data[prop.alias];
+
+                blockObject.updateLabel();
+            }
+        }
+        /**
+         * Used to create a prop watcher for the settings in the property editor data model.
+         */
+        function createLayoutSettingsModelWatcher(blockObject, prop)  {
+            return function() {
+                // sync data:
+                prop.value = blockObject.layout.settings[prop.alias];
+            }
+        }
+
+        /**
          * Used to create a scoped watcher for a content property on a blockObject.
          */
-        function createDataModelPropWatcher(blockObject, prop)  {
+        function createContentModelPropWatcher(blockObject, prop)  {
             return function() {
                 // sync data:
                 blockObject.data[prop.alias] = prop.value;
@@ -482,8 +522,9 @@
              * @ngdoc method
              * @name getBlockObject
              * @methodOf umbraco.services.blockEditorModelObject
-             * @description Retrieve editor friendly model of a block.
-             * BlockObject is a class instance which setups live syncronization of content and settings models back to the data of your property editor model.
+             * @description Retrieve a Block Object for the given layout entry.
+             * The Block Object offers the nesecary data to display and edit a block.
+             * The Block Object setups live syncronization of content and settings models back to the data of your Property Editor model.
              * The returned object, named ´BlockObject´, contains several usefull models to make editing of this block happen.
              * The ´BlockObject´ contains the following properties:
              * - key {string}: runtime generated key, usefull for tracking of this object
@@ -509,19 +550,32 @@
                 }
 
                 var blockConfiguration = this.getBlockConfiguration(dataModel.contentTypeKey);
+                var contentScaffold;
 
                 if (blockConfiguration === null) {
-                    console.error("The block entry of "+udi+" is not begin initialized cause its contentTypeKey is not allowed for this PropertyEditor")
-                    // This is not an allowed block type, therefor we return null;
-                    return null;
+                    console.error("The block entry of "+udi+" is not begin initialized cause its contentTypeKey is not allowed for this PropertyEditor");
+                } else {
+                    var contentScaffold = this.getScaffoldFromKey(blockConfiguration.contentTypeKey);
+                    if(contentScaffold === null) {
+                        console.error("The block entry of "+udi+" is not begin initialized cause its Element Type was not loaded.");
+                    }
                 }
 
-                var contentScaffold = this.getScaffoldFromKey(blockConfiguration.contentTypeKey);
-                if(contentScaffold === null) {
-                    return null;
+                if (blockConfiguration === null || contentScaffold === null) {
+
+                    blockConfiguration = {
+                        label: "Unsupported Block ("+udi+")",
+                        unsupported: true
+                    };
+                    contentScaffold = {};
+                    
                 }
 
                 var blockObject = {};
+                // Set an angularJS cloneNode method, to avoid this object begin cloned.
+                blockObject.cloneNode = function() {
+                    return null;// angularJS accept this as a cloned value as long as the 
+                }
                 blockObject.key = String.CreateGuid().replace(/-/g, "");
                 blockObject.config = Utilities.copy(blockConfiguration);
                 if (blockObject.config.label && blockObject.config.label !== "") {

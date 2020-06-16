@@ -4,9 +4,9 @@
 
     <div class="umb-block-list__wrapper" ng-style="vm.listWrapperStyles">
 
-        <div ui-sortable="vm.sortableOptions" ng-model="vm.blocks" ng-if="vm.loading !== true">
+        <div ui-sortable="vm.sortableOptions" ng-model="vm.layout" ng-if="vm.loading !== true">
 
-            <div ng-repeat="block in vm.blocks track by block.key">
+            <div ng-repeat="layout in vm.layout track by layout.$block.key">
 
                 <button
                     type="button"
@@ -18,27 +18,27 @@
                     <div class="__plus" ng-style="{'left':inlineCreateButtonCtrl.plusPosX}">+</div>
                 </button>
 
-                <div class="umb-block-list__block" ng-class="{'--open':block.isOpen}">
+                <div class="umb-block-list__block" ng-class="{'--open':layout.$block.isOpen}">
 
-                    <umb-block-list-scoped-block-content ng-if="block.config.stylesheet" class="umb-block-list__block--content blockelement__draggable-element" view="{{block.view}}" stylesheet="/{{::block.config.stylesheet}}" api="vm.blockEditorApi" block="block" index="$index">
+                    <umb-block-list-scoped-block-content ng-if="layout.$block.config.stylesheet" class="umb-block-list__block--content blockelement__draggable-element" view="{{layout.$block.view}}" stylesheet="/{{::layout.$block.config.stylesheet}}" api="vm.blockEditorApi" block="layout.$block" index="$index">
                     </umb-block-list-scoped-block-content>
-                    <umb-block-list-block-content ng-if="!block.config.stylesheet" class="umb-block-list__block--content" view="{{block.view}}" api="vm.blockEditorApi" block="block" index="$index">
+                    <umb-block-list-block-content ng-if="!layout.$block.config.stylesheet" class="umb-block-list__block--content" view="{{layout.$block.view}}" api="vm.blockEditorApi" block="layout.$block" index="$index">
                     </umb-block-list-block-content>
 
                     <div class="umb-block-list__block--actions">
-                        <button type="button" class="btn-reset umb-outline action --settings" localize="title" title="actions_editSettings" ng-click="vm.blockEditorApi.openSettingsForBlock(block);" ng-if="block.showSettings === true">
+                        <button type="button" class="btn-reset umb-outline action --settings" localize="title" title="actions_editSettings" ng-click="vm.blockEditorApi.openSettingsForBlock(layout.$block);" ng-if="layout.$block.showSettings === true">
                             <i class="icon icon-settings" aria-hidden="true"></i>
                             <span class="sr-only">
                                 <localize key="general_settings">Settings</localize>
                             </span>
                         </button>
-                        <button type="button" class="btn-reset umb-outline action --copy" localize="title" title="actions_copy" ng-click="vm.blockEditorApi.requestCopyBlock(block);" ng-if="vm.showCopy">
+                        <button type="button" class="btn-reset umb-outline action --copy" localize="title" title="actions_copy" ng-click="vm.blockEditorApi.requestCopyBlock(layout.$block);" ng-if="layout.$block.showCopy === true">
                             <i class="icon icon-documents" aria-hidden="true"></i>
                             <span class="sr-only">
                                 <localize key="general_copy">Copy</localize>
                             </span>
                         </button>
-                        <button type="button" class="btn-reset umb-outline action --delete" localize="title" title="actions_delete" ng-click="vm.blockEditorApi.requestDeleteBlock(block);">
+                        <button type="button" class="btn-reset umb-outline action --delete" localize="title" title="actions_delete" ng-click="vm.blockEditorApi.requestDeleteBlock(layout.$block);">
                             <i class="icon icon-trash" aria-hidden="true"></i>
                             <span class="sr-only">
                                 <localize key="general_delete">Delete</localize>
@@ -56,21 +56,21 @@
             type="button"
             class="btn-reset umb-block-list__create-button umb-outline"
             ng-class="{ '--disabled': vm.availableBlockTypes.length === 0 }"
-            ng-click="vm.showCreateDialog(vm.blocks.length, $event)"
+            ng-click="vm.showCreateDialog(vm.layout.length, $event)"
         >
             <localize key="grid_addElement"></localize>
         </button>
 
-        <input type="hidden" name="minCount" ng-model="vm.blocks" />
-        <input type="hidden" name="maxCount" ng-model="vm.blocks" />
+        <input type="hidden" name="minCount" ng-model="vm.layout" />
+        <input type="hidden" name="maxCount" ng-model="vm.layout" />
         <div ng-messages="vm.propertyForm.minCount.$error" show-validation-on-submit>
             <div class="help text-error" ng-message="minCount">
-                <localize key="validation_entriesShort" tokens="[vm.validationLimit.min, vm.validationLimit.min - vm.blocks.length]" watch-tokens="true">Minimum %0% entries, needs <strong>%1%</strong> more.</localize>
+                <localize key="validation_entriesShort" tokens="[vm.validationLimit.min, vm.validationLimit.min - vm.layout.length]" watch-tokens="true">Minimum %0% entries, needs <strong>%1%</strong> more.</localize>
             </div>
         </div>
-        <div ng-if="vm.propertyForm.maxCount.$error === true && vm.blocks.length > vm.validationLimit.max">
+        <div ng-if="vm.propertyForm.maxCount.$error === true && vm.layout.length > vm.validationLimit.max">
             <div class="help text-error">
-                <localize key="validation_entriesExceed" tokens="[vm.validationLimit.max, vm.blocks.length - vm.validationLimit.max]" watch-tokens="true">Maximum %0% entries, <strong>%1%</strong> too many.</localize>
+                <localize key="validation_entriesExceed" tokens="[vm.validationLimit.max, vm.layout.length - vm.validationLimit.max]" watch-tokens="true">Maximum %0% entries, <strong>%1%</strong> too many.</localize>
             </div>
         </div>
 
