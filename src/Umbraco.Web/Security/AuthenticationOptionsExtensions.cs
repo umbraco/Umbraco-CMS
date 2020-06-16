@@ -59,9 +59,29 @@ namespace Umbraco.Web.Security
             return options;
         }
 
+        /// <summary>
+        /// When set this will disable all local login ability within Umbraco
+        /// </summary>
+        /// <param name="options"></param>
+        /// <remarks>
+        /// Even if there are multiple OAuth providers installed if any of these specifies this option then all local login ability is disabled.
+        /// </remarks>
         public static void DenyLocalLogin(this AuthenticationOptions options)
         {
             options.Description.Properties["UmbracoBackOffice_DenyLocalLogin"] = true;
+        }
+
+        /// <summary>
+        /// When specified this will automatically redirect to the OAuth login provider instead of prompting the user to click on the OAuth button first.
+        /// </summary>
+        /// <param name="options"></param>
+        /// <remarks>
+        /// This is generally used in conjunction with <see cref="DenyLocalLogin(AuthenticationOptions)"/>. If more than one OAuth provider specifies this, the last registered
+        /// provider's redirect settings will win.
+        /// </remarks>
+        public static void AutoLoginRedirect(this AuthenticationOptions options)
+        {
+            options.Description.Properties["UmbracoBackOffice_AutoLoginRedirect"] = true;
         }
 
         /// <summary>

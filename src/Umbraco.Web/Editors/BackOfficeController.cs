@@ -365,6 +365,16 @@ namespace Umbraco.Web.Editors
 
             if (loginInfo == null || loginInfo.ExternalIdentity.IsAuthenticated == false)
             {
+
+                // Check if there's any OAuth provider registered for auto-redirecting
+                var oauthRedirect = OwinContext.Authentication.GetExternalAuthenticationTypes()
+                    .FirstOrDefault(p => p.Properties.ContainsKey("UmbracoBackOffice") && p.Properties.ContainsKey("UmbracoBackOffice_AutoLoginRedirect"));
+
+                if (oauthRedirect != null)
+                {
+                    return ExternalLogin(oauthRedirect.AuthenticationType);
+                }
+
                 return defaultResponse();
             }
 
