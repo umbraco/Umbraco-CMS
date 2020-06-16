@@ -19,7 +19,7 @@
  * </pre>
  *
  * 
- * See {@link umbraco.services.BlockEditorModelObject BlockEditorModelObject} for more samples.
+ * See {@link umbraco.services.blockEditorModelObject BlockEditorModelObject} for more samples.
  * 
  */
 (function () {
@@ -35,10 +35,10 @@
          * 
          * @description
          * Create a new Block Editor Model Object.
-         * See {@link umbraco.services.blockEditorModelObject BlockEditorModelObject}
+         * See {@link umbraco.services.blockEditorModelObject blockEditorModelObject}
          * 
-         * @see umbraco.services.BlockEditorModelObject
-         * @return {BlockEditorModelObject} A instance of the BlockEditorModelObject class.
+         * @see umbraco.services.blockEditorModelObject
+         * @return {blockEditorModelObject} A instance of the BlockEditorModelObject class.
          */
         function createModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations, propertyScope) {
             return new blockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations, propertyScope);

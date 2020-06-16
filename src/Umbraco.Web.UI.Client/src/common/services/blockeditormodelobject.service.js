@@ -1,6 +1,6 @@
 /**
  * @ngdoc service
- * @name umbraco.services.BlockEditorModelObject
+ * @name umbraco.services.blockEditorModelObject
  *
  * @description
  * <b>Added in Umbraco 8.7</b>. Model Object for dealing with data of Block Editors.
@@ -120,7 +120,7 @@
  *     }
  * </pre>
  * 
- * See getBlockObject method for more information on the properties avaiable on a Block Object.
+ * See {@link umbraco.services.blockEditorModelObject#methods_getBlockObject getBlockObject} method for more information on the properties avaiable on a Block Object.
  * 
  * ## <b>Remove a Block</b>
  * 
@@ -339,7 +339,7 @@
         /**
          * @ngdoc method
          * @name constructor
-         * @methodOf umbraco.services.BlockEditorModelObject
+         * @methodOf umbraco.services.blockEditorModelObject
          * @description Constructor of the model object used to handle Block Editor data.
          * @param {object} propertyModelValue data object of the property editor, usually model.value.
          * @param {string} propertyEditorAlias alias of the property.
@@ -375,9 +375,9 @@
         BlockEditorModelObject.prototype = {
 
             /**
-             * @ngdoc function
+             * @ngdoc method
              * @name getBlockConfiguration
-             * @methodOf umbraco.services.BlockEditorModelObject
+             * @methodOf umbraco.services.blockEditorModelObject
              * @description Get block configuration object for a given contentTypeKey.
              * @param {string} key contentTypeKey to recive the configuration model for.
              * @returns {Object | null} Configuration model for the that specific block. Or ´null´ if the contentTypeKey isnt available in the current block configurations.
@@ -387,9 +387,9 @@
             },
 
             /**
-             * @ngdoc function
+             * @ngdoc method
              * @name load
-             * @methodOf umbraco.services.BlockEditorModelObject
+             * @methodOf umbraco.services.blockEditorModelObject
              * @description Load the scaffolding models for the given configuration, these are needed to provide usefull models for each block.
              * @param {Object} blockObject BlockObject to recive data values from.
              * @returns {Promise} A Promise object which resolves when all scaffold models are loaded.
@@ -419,9 +419,9 @@
             },
 
             /**
-             * @ngdoc function
+             * @ngdoc method
              * @name getAvailableAliasesForBlockContent
-             * @methodOf umbraco.services.BlockEditorModelObject
+             * @methodOf umbraco.services.blockEditorModelObject
              * @description Retrive a list of aliases that are available for content of blocks in this property editor, does not contain aliases of block settings.
              * @return {Array} array of strings representing alias.
              */
@@ -430,9 +430,9 @@
             },
 
             /**
-             * @ngdoc function
+             * @ngdoc method
              * @name getAvailableBlocksForBlockPicker
-             * @methodOf umbraco.services.BlockEditorModelObject
+             * @methodOf umbraco.services.blockEditorModelObject
              * @description Retrive a list of available blocks, the list containing object with the confirugation model(blockConfigModel) and the element type model(elementTypeModel).
              * The purpose of this data is to provide it for the Block Picker.
              * @return {Array} array of objects representing available blocks, each object containing properties blockConfigModel and elementTypeModel.
@@ -455,9 +455,9 @@
             },
 
             /**
-             * @ngdoc function
+             * @ngdoc method
              * @name getScaffoldFromKey
-             * @methodOf umbraco.services.BlockEditorModelObject
+             * @methodOf umbraco.services.blockEditorModelObject
              * @description Get scaffold model for a given contentTypeKey.
              * @param {string} key contentTypeKey to recive the scaffold model for.
              * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
@@ -467,9 +467,9 @@
             },
 
             /**
-             * @ngdoc function
+             * @ngdoc method
              * @name getScaffoldFromAlias
-             * @methodOf umbraco.services.BlockEditorModelObject
+             * @methodOf umbraco.services.blockEditorModelObject
              * @description Get scaffold model for a given contentTypeAlias, used by clipboardService.
              * @param {string} alias contentTypeAlias to recive the scaffold model for.
              * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
@@ -479,9 +479,9 @@
             },
 
             /**
-             * @ngdoc function
+             * @ngdoc method
              * @name getBlockObject
-             * @methodOf umbraco.services.BlockEditorModelObject
+             * @methodOf umbraco.services.blockEditorModelObject
              * @description Retrieve editor friendly model of a block.
              * BlockObject is a class instance which setups live syncronization of content and settings models back to the data of your property editor model.
              * The returned object, named ´BlockObject´, contains several usefull models to make editing of this block happen.
@@ -580,9 +580,9 @@
             },
 
             /**
-             * @ngdoc function
+             * @ngdoc method
              * @name removeDataAndDestroyModel
-             * @methodOf umbraco.services.BlockEditorModelObject
+             * @methodOf umbraco.services.blockEditorModelObject
              * @description Removes the data and destroys the Block Model.
              * Notive this method does not remove the block from your layout, this will need to be handlede by the Property Editor since this services donst know about your layout structure.
              * @param {Object} blockObject The BlockObject to be removed and destroyed.
@@ -593,9 +593,9 @@
             },
 
             /**
-             * @ngdoc function
+             * @ngdoc method
              * @name destroyBlockObject
-             * @methodOf umbraco.services.BlockEditorModelObject
+             * @methodOf umbraco.services.blockEditorModelObject
              * @description Destroys the Block Model, but all data is kept.
              * @param {Object} blockObject The BlockObject to be destroyed.
              */
@@ -610,11 +610,11 @@
             },
 
             /**
-             * @ngdoc function
+             * @ngdoc method
              * @name getLayout
-             * @methodOf umbraco.services.BlockEditorModelObject
+             * @methodOf umbraco.services.blockEditorModelObject
              * @description Retrieve the layout object from this specific property editor model.
-             * @param {object} DefaultStructure if no data exist the layout of your poerty editor will be set to this object.
+             * @param {object} defaultStructure if no data exist the layout of your poerty editor will be set to this object.
              * @return {Object} Layout object, structure depends on the model of your property editor.
              */
             getLayout: function(defaultStructure) {
@@ -625,9 +625,9 @@
             },
             
             /**
-             * @ngdoc function
+             * @ngdoc method
              * @name create
-             * @methodOf umbraco.services.BlockEditorModelObject
+             * @methodOf umbraco.services.blockEditorModelObject
              * @description Create a empty layout entry, notice the layout entry is not added to the property editors model layout object, since the layout sturcture depends on the property editor.
              * @param {string} contentTypeKey the contentTypeKey of the block you wish to create, if contentTypeKey is not avaiable in the block configuration then ´null´ will be returned.
              * @return {Object | null} Layout entry object, to be inserted at a decired location in the layout object. Or null if contentTypeKey is unavaiaible.
@@ -651,9 +651,9 @@
             },
 
             /**
-             * @ngdoc function
+             * @ngdoc method
              * @name createFromElementType
-             * @methodOf umbraco.services.BlockEditorModelObject
+             * @methodOf umbraco.services.blockEditorModelObject
              * @description Insert data from ElementType Model
              * @return {Object | null} Layout entry object, to be inserted at a decired location in the layout object. Or ´null´ if the given ElementType isnt supported by the block configuration.
              */
