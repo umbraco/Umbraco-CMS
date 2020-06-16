@@ -48,7 +48,7 @@ namespace Umbraco.Web.Security
         /// <param name="umbracoContext"></param>
         /// <param name="loginInfo"></param>
         /// <returns></returns>
-        public string[] GetDefaultUserGroups(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
+        public virtual string[] GetDefaultUserGroups(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
         {
             return _defaultUserGroups;
         }
@@ -61,7 +61,7 @@ namespace Umbraco.Web.Security
         ///
         /// For public auth providers this should always be false!!!
         /// </summary>
-        public bool ShouldAutoLinkExternalAccount(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
+        public virtual bool ShouldAutoLinkExternalAccount(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
         {
             return _autoLinkExternalAccount;
         }
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// The default Culture to use for auto-linking users
         /// </summary>
-        public string GetDefaultCulture(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
+        public virtual string GetDefaultCulture(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
         {
             return _defaultCulture;
         }
