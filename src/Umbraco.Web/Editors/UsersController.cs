@@ -29,6 +29,7 @@ using Umbraco.Web.Editors.Filters;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
@@ -517,6 +518,14 @@ namespace Umbraco.Web.Editors
             }
 
             var hasErrors = false;
+
+            // we need to check if there's any Deny Local login providers present, if so we need to ensure that the user's email address cannot be changed
+            var owinContext = Request.TryGetOwinContext().Result;
+            var hasDenyLocalLogin = owinContext.Authentication.HasDenyLocalLogin();
+            if (hasDenyLocalLogin)
+            {
+                userSave.Email = found.Email; // it cannot change, this would only happen if people are mucking around with the request
+            }
 
             var existing = Services.UserService.GetByEmail(userSave.Email);
             if (existing != null && existing.Id != userSave.Id)

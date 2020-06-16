@@ -9,11 +9,13 @@ using Umbraco.Core.Composing;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.Models;
+using Umbraco.Core;
 
 namespace Umbraco.Web
 {
     using Core.Configuration;
     using Umbraco.Web.JavaScript;
+    using Umbraco.Web.Security;
 
     /// <summary>
     /// HtmlHelper extensions for the back office
@@ -58,8 +60,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static IHtmlString AngularValueExternalLoginInfoScript(this HtmlHelper html, IEnumerable<string> externalLoginErrors)
         {
-            var loginProviders = html.ViewContext.HttpContext.GetOwinContext().Authentication.GetExternalAuthenticationTypes()
-                .Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
+            var loginProviders = html.ViewContext.HttpContext.GetOwinContext().Authentication.GetBackOfficeExternalLoginProviders()
                 .Select(p => new
                 {
                     authType = p.AuthenticationType,

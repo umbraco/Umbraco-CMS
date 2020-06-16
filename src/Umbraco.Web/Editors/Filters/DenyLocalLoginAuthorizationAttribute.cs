@@ -1,12 +1,7 @@
-﻿using Microsoft.Owin.Security;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Http;
+﻿using System.Web.Http;
 using System.Web.Http.Controllers;
 using Umbraco.Web.WebApi;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Editors.Filters
 {
@@ -17,10 +12,7 @@ namespace Umbraco.Web.Editors.Filters
             var owinContext = actionContext.Request.TryGetOwinContext().Result;
 
             // no authorization if any external logins deny local login
-            if (owinContext.Authentication.GetExternalAuthenticationTypes().Any(p => p.Properties.ContainsKey("UmbracoBackOffice_DenyLocalLogin")))
-                return false;
-
-            return true;
+            return !owinContext.Authentication.HasDenyLocalLogin();
         }
     }
 }

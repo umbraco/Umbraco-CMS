@@ -68,7 +68,7 @@ namespace Umbraco.Web.Security
         /// </remarks>
         public static void DenyLocalLogin(this AuthenticationOptions options)
         {
-            options.Description.Properties["UmbracoBackOffice_DenyLocalLogin"] = true;
+            options.Description.Properties[Constants.Security.BackOfficeExternalAuthenticationDenyLocalLoginProperty] = true;
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Umbraco.Web.Security
         /// </remarks>
         public static void AutoLoginRedirect(this AuthenticationOptions options)
         {
-            options.Description.Properties["UmbracoBackOffice_AutoLoginRedirect"] = true;
+            options.Description.Properties[Constants.Security.BackOfficeExternalAuthenticationAutoLoginRedirectProperty] = true;
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace Umbraco.Web.Security
             options.Description.Properties["SocialIcon"] = icon;
 
             //flag for use in back office
-            options.Description.Properties["UmbracoBackOffice"] = true;
+            options.Description.Properties[Constants.Security.BackOfficeAuthenticationType] = true;
 
             if (callbackPath.IsNullOrWhiteSpace())
             {
