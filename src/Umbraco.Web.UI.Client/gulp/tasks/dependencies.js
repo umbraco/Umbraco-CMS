@@ -44,7 +44,8 @@ function dependencies() {
         },
         {
             "name": "angular-aria",
-            "src":  ["./node_modules/angular-aria/angular-aria.min.js"],
+            "src":  ["./node_modules/angular-aria/angular-aria.min.js",
+                    "./node_modules/angular-aria/angular-aria.min.js.map"],
             "base": "./node_modules/angular-aria"
         },
         {
