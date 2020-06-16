@@ -14,8 +14,8 @@ namespace Umbraco.Web.PropertyEditors
             Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
         public bool IgnoreUserStartNodes { get; set; }
 
-        [ConfigurationField("hideAnchor", "Hide anchor/query", "boolean",
-            Description = "Selecting this hides the anchor/query field.")]
+        [ConfigurationField("hideAnchor", "Hide anchor/query string", "boolean",
+            Description = "Selecting this hides the anchor/query string field.")]
         public bool HideAnchor { get; set; }
 
         [ConfigurationField("hideTarget", "Hide target", "boolean",
