@@ -45,7 +45,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
             return $scope.renderModel.length;
         },
         function () {
-            //Validate!
+            // Validate
             if ($scope.model.config && $scope.model.config.minNumber && parseInt($scope.model.config.minNumber) > $scope.renderModel.length) {
                 $scope.multiUrlPickerForm.minCount.$setValidity("minCount", false);
             }
@@ -59,6 +59,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
             else {
                 $scope.multiUrlPickerForm.maxCount.$setValidity("maxCount", true);
             }
+
             $scope.sortableOptions.disabled = $scope.renderModel.length === 1;
         }
     );
@@ -86,10 +87,11 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
             hideTarget: $scope.model.config && $scope.model.config.hideTarget ? true : false,
             submit: function (model) {
                 if (model.target.url || model.target.anchor) {
-                    // if an anchor exists, check that it is appropriately prefixed
+                    // If an anchor exists, check that it is appropriately prefixed
                     if (model.target.anchor && model.target.anchor[0] !== '?' && model.target.anchor[0] !== '#') {
                         model.target.anchor = (model.target.anchor.indexOf('=') === -1 ? '#' : '?') + model.target.anchor;
                     }
+
                     if (link) {
                         link.udi = model.target.udi;
                         link.name = model.target.name || model.target.url || model.target.anchor;
@@ -104,6 +106,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
                             udi: model.target.udi,
                             url: model.target.url
                         };
+
                         $scope.renderModel.push(link);
                     }
 
@@ -125,12 +128,14 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
 
                     currentForm.$setDirty();
                 }
+
                 editorService.close();
             },
             close: function () {
                 editorService.close();
             }
         };
+
         editorService.linkPicker(linkPicker);
     };
 
@@ -140,14 +145,14 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
                 vm.labels.general_recycleBin = data[0];
             });
 
-        // if the property is mandatory, set the minCount config to 1 (unless of course it is set to something already),
+        // If the property is mandatory, set the minCount config to 1 (unless of course it is set to something already),
         // that way the minCount/maxCount validation handles the mandatory as well
         if ($scope.model.validation && $scope.model.validation.mandatory && !$scope.model.config.minNumber) {
             $scope.model.config.minNumber = 1;
         }
 
         _.each($scope.model.value, function (item){
-            // we must reload the "document" link URLs to match the current editor culture
+            // We must reload the "document" link URLs to match the current editor culture
             if (item.udi && item.udi.indexOf("/document/") > 0) {
                 item.url = null;
                 entityResource.getUrlByUdi(item.udi).then(function (data) {
@@ -161,4 +166,3 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
 }
 
 angular.module("umbraco").controller("Umbraco.PropertyEditors.MultiUrlPickerController", multiUrlPickerController);
-
