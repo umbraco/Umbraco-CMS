@@ -8,6 +8,8 @@ var connect = require('gulp-connect');
 var open = require('gulp-open');
 var gulpDocs = require('gulp-ngdocs');
 
+var documentationFiles = ['../Umbraco.Web.UI.Client/src/common/**/*.js', './src/api/**/*.ngdoc'];
+
 /**************************
  * Build Backoffice UI API documentation
  **************************/
@@ -24,14 +26,14 @@ gulp.task('docs', [], function (cb) {
 
     return gulpDocs.sections({
         api: {
-            glob: ['../Umbraco.Web.UI.Client/src/common/**/*.js', './src/api/**/*.ngdoc'],
+            glob: documentationFiles,
             api: true,
             title: 'UI API Documentation'
         }
     })
     .pipe(gulpDocs.process(options))
     .pipe(gulp.dest('./api'));
-    cb();
+    
 });
 
 gulp.task('connect:docs', function (cb) {
@@ -42,6 +44,10 @@ gulp.task('connect:docs', function (cb) {
         port: 8880
     });
     cb();
+});
+
+gulp.task('watch:docs', function (cb) {
+    return gulp.watch(documentationFiles, ['docs']);
 });
 
 gulp.task('open:docs', function (cb) {
@@ -55,5 +61,5 @@ gulp.task('open:docs', function (cb) {
     cb();
 });
 
-gulp.task('watch', ['docs', 'connect:docs', 'open:docs']);
+gulp.task('watch', ['docs', 'connect:docs', 'open:docs', 'watch:docs']);
 
