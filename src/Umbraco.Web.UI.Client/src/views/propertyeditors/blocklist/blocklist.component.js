@@ -478,7 +478,7 @@
             scroll: true,
             update: function (ev, ui) {
                 setDirty();
-            },
+            }
         };
 
 
