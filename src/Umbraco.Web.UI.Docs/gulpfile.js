@@ -32,7 +32,8 @@ gulp.task('docs', [], function (cb) {
         }
     })
     .pipe(gulpDocs.process(options))
-    .pipe(gulp.dest('./api'));
+    .pipe(gulp.dest('./api'))
+    .pipe(connect.reload());
     
 });
 
