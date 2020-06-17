@@ -184,21 +184,27 @@
                 "event": "click"
             },
             {
-                "element": "[ng-controller*='Umbraco.Editors.DataTypePickerController'] [data-element='editor-data-type-picker']",
+                "element": "[data-element~='editor-data-type-picker']",
                 "elementPreventClick": true,
                 "title": "Editor picker",
-                "content": "<p>In the editor picker dialog we can pick one of the many built-in editors.</p>"
+                "content": "<p>In the editor picker dialog we can pick one of the many built-in editors.</p><p><em>You can choose from preconfigured data types (Reuse) or create a new configuration (Available editors)</em>.</p>"
             },
             {
-                "element": "[data-element~='editor-data-type-picker'] [data-element='datatype-Textarea']",
+                "element": "[data-element~='editor-data-type-picker'] [data-element='editor-Textarea']",
                 "title": "Select editor",
                 "content": "Select the <b>Textarea</b> editor. This will add a textarea to the Welcome Text property.",
                 "event": "click"
             },
             {
-                "element": "[data-element='editor-data-type-picker'] [data-element='datatypeconfig-Textarea'] > a",
+                "element": "[data-element~='editor-data-type-settings']",
+                "elementPreventClick": true,
                 "title": "Editor settings",
-                "content": "Each property editor can have individual settings. For the textarea editor you can set a character limit but in this case it is not needed.",
+                "content": "Each property editor can have individual settings. For the textarea editor you can set a character limit but in this case it is not needed."
+            },
+            {
+                "element": "[data-element~='editor-data-type-settings'] [data-element='button-submit']",
+                "title": "Save editor",
+                "content": "Click <b>Submit</b> to save the changes.",
                 "event": "click"
             },
             {
