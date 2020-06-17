@@ -39,7 +39,7 @@ namespace Umbraco.Configuration.Models
         }
 
         public int TimeOutInMinutes => _configuration.GetValue(Prefix + "TimeOutInMinutes", 20);
-        public string DefaultUILanguage => _configuration.GetValue(Prefix + "TimeOutInMinutes", "en-US");
+        public string DefaultUILanguage => _configuration.GetValue(Prefix + "DefaultUILanguage", "en-US");
 
         public bool HideTopLevelNodeFromPath =>
             _configuration.GetValue(Prefix + "HideTopLevelNodeFromPath", false);

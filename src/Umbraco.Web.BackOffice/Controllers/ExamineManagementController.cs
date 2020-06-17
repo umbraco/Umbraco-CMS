@@ -18,7 +18,7 @@ using SearchResult = Umbraco.Web.Models.ContentEditing.SearchResult;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class ExamineManagementController : UmbracoAuthorizedJsonController
     {
         private readonly IExamineManager _examineManager;

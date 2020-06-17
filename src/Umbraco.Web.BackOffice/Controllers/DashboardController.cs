@@ -25,7 +25,7 @@ using Umbraco.Web.WebApi.Filters;
 namespace Umbraco.Web.BackOffice.Controllers
 {
     //we need to fire up the controller like this to enable loading of remote css directly from this controller
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [ValidationFilter]
     [AngularJsonOnlyConfiguration] // TODO: This could be applied with our Application Model conventions
     [IsBackOffice]
@@ -67,7 +67,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private static readonly HttpClient HttpClient = new HttpClient();
 
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
-        [TypeFilter(typeof(ValidateAngularAntiForgeryTokenAttribute))]
+        [ValidateAngularAntiForgeryToken]
         public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
         {
             var user = _umbracoContextAccessor.GetRequiredUmbracoContext().Security.CurrentUser;
@@ -211,7 +211,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         // return IDashboardSlim - we don't need sections nor access rules
-        [TypeFilter(typeof(ValidateAngularAntiForgeryTokenAttribute))]
+        [ValidateAngularAntiForgeryToken]
         [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
         public IEnumerable<Tab<IDashboardSlim>> GetDashboard(string section)
         {

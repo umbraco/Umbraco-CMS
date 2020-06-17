@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Core;
 
-namespace Umbraco.Tests.Clr
+namespace Umbraco.Tests.UnitTests.Umbraco.Core
 {
     [TestFixture]
     public class ReflectionTests
@@ -25,36 +25,15 @@ namespace Umbraco.Tests.Clr
             Assert.Contains(typeof(object), types);
         }
 
-        [Test]
-        public void GetInterfacesIsOk()
-        {
-            // tests that GetInterfaces gets _all_ interfaces
-            // so the AllInterfaces extension method is useless
-
-            var type = typeof(Class2);
-            var interfaces = type.GetInterfaces();
-            Assert.AreEqual(2, interfaces.Length);
-            Assert.Contains(typeof(IInterface1), interfaces);
-            Assert.Contains(typeof(IInterface2), interfaces);
-        }
-
         #region Test Objects
 
-        interface IInterface1
-        { }
-
-        interface IInterface2 : IInterface1
+        private class Class1
         {
-            void Method();
         }
 
-        class Class1 : IInterface2
+        private class Class2 : Class1
         {
-            public void Method() { }
         }
-
-        class Class2 : Class1
-        { }
 
         #endregion
     }

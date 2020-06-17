@@ -14,7 +14,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Net;
+using Umbraco.Core.Templates;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;

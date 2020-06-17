@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Strings;
 
-namespace Umbraco.Core.Net
+namespace Umbraco.Core.Templates
 {
     /// <summary>
     /// Methods used to render umbraco components as HTML in templates

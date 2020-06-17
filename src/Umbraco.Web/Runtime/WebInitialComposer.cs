@@ -4,7 +4,7 @@ using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.Net;
+using Umbraco.Core.Templates;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -40,8 +40,6 @@ namespace Umbraco.Web.Runtime
             composition.Register<IPublishedMemberCache>(factory => factory.GetInstance<IUmbracoContext>().PublishedSnapshot.Members);
             composition.RegisterUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
             composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
-
-            composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
 
 
             // register the umbraco helper - this is Transient! very important!

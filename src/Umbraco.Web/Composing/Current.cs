@@ -11,7 +11,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Net;
+using Umbraco.Core.Templates;
 using Umbraco.Net;
 using Umbraco.Core.PackageActions;
 using Umbraco.Core.Packaging;

@@ -1,13 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Routing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Extensions;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
+using Umbraco.Web.BackOffice.Controllers;
 
 namespace Umbraco.Web.BackOffice.Security
 {
@@ -20,7 +23,7 @@ namespace Umbraco.Web.BackOffice.Security
     /// Umbraco's back office cookie needs to be read on two paths: /umbraco and /install and /base therefore we cannot just set the cookie path to be /umbraco,
     /// instead we'll specify our own cookie manager and return null if the request isn't for an acceptable path.
     /// </remarks>
-    internal class BackOfficeCookieManager : ChunkingCookieManager, ICookieManager
+    public class BackOfficeCookieManager : ChunkingCookieManager, ICookieManager
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IRuntimeState _runtime;
@@ -28,13 +31,25 @@ namespace Umbraco.Web.BackOffice.Security
         private readonly IGlobalSettings _globalSettings;
         private readonly IRequestCache _requestCache;
         private readonly string[] _explicitPaths;
-        private readonly string _getRemainingSecondsPath;
 
-        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtime, IHostingEnvironment hostingEnvironment, IGlobalSettings globalSettings, IRequestCache requestCache)
-            : this(umbracoContextAccessor, runtime, hostingEnvironment, globalSettings, requestCache, null)
+        public BackOfficeCookieManager(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IRuntimeState runtime,
+            IHostingEnvironment hostingEnvironment,
+            IGlobalSettings globalSettings,
+            IRequestCache requestCache,
+            LinkGenerator linkGenerator)
+            : this(umbracoContextAccessor, runtime, hostingEnvironment, globalSettings, requestCache, linkGenerator, null)
         { }
 
-        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtime, IHostingEnvironment hostingEnvironment, IGlobalSettings globalSettings, IRequestCache requestCache, IEnumerable<string> explicitPaths)
+        public BackOfficeCookieManager(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IRuntimeState runtime,
+            IHostingEnvironment hostingEnvironment,
+            IGlobalSettings globalSettings,
+            IRequestCache requestCache,
+            LinkGenerator linkGenerator,
+            IEnumerable<string> explicitPaths)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _runtime = runtime;
@@ -42,9 +57,6 @@ namespace Umbraco.Web.BackOffice.Security
             _globalSettings = globalSettings;
             _requestCache = requestCache;
             _explicitPaths = explicitPaths?.ToArray();
-            var backOfficePath = _globalSettings.GetBackOfficePath(_hostingEnvironment);
-            // TODO: We shouldn't hard code this path
-            _getRemainingSecondsPath = $"{backOfficePath}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds";
         }
 
         /// <summary>
@@ -60,7 +72,7 @@ namespace Umbraco.Web.BackOffice.Security
         /// * it is a /base request
         /// * it is a preview request
         /// </remarks>
-        internal bool ShouldAuthenticateRequest(Uri requestUri, bool checkForceAuthTokens = true)
+        public bool ShouldAuthenticateRequest(Uri requestUri, bool checkForceAuthTokens = true)
         {
             // Do not authenticate the request if we are not running (don't have a db, are not configured) - since we will never need
             // to know a current user in this scenario - we treat it as a new install. Without this we can have some issues
@@ -74,9 +86,6 @@ namespace Umbraco.Web.BackOffice.Security
             //check the explicit paths
             if (_explicitPaths != null)
                 return _explicitPaths.Any(x => x.InvariantEquals(requestUri.AbsolutePath));
-
-            //check user seconds path
-            if (requestUri.AbsolutePath.InvariantEquals(_getRemainingSecondsPath)) return false;
 
             if (//check the explicit flag
                 checkForceAuthTokens && _requestCache.IsAvailable && _requestCache.Get(Constants.Security.ForceReAuthFlag) != null

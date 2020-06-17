@@ -3,7 +3,7 @@ using Lucene.Net.Index;
 using NUnit.Framework;
 using Umbraco.Core;
 
-namespace Umbraco.Tests.CoreThings
+namespace Umbraco.Tests.UnitTests.Umbraco.Core
 {
     [TestFixture]
     public class DelegateExtensionsTests

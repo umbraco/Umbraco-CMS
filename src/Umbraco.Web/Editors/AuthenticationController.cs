@@ -386,30 +386,7 @@ namespace Umbraco.Web.Editors
         }
 
 
-        /// <summary>
-        /// Logs the current user out
-        /// </summary>
-        /// <returns></returns>
-        [ClearAngularAntiForgeryToken]
-        [ValidateAngularAntiForgeryToken]
-        public HttpResponseMessage PostLogout()
-        {
-            var owinContext = Request.TryGetOwinContext().Result;
-
-            owinContext.Authentication.SignOut(
-                Core.Constants.Security.BackOfficeAuthenticationType,
-                Core.Constants.Security.BackOfficeExternalAuthenticationType);
-
-            Logger.Info<AuthenticationController>("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, owinContext.Request.RemoteIpAddress);
-
-            if (UserManager != null)
-            {
-                int.TryParse(User.Identity.GetUserId(), out var userId);
-                UserManager.RaiseLogoutSuccessEvent(User, userId);
-            }
-
-            return Request.CreateResponse(HttpStatusCode.OK);
-        }
+        
 
         // NOTE: This has been migrated to netcore, but in netcore we don't explicitly set the principal in this method, that's done in ConfigureUmbracoBackOfficeCookieOptions so don't worry about that
         private HttpResponseMessage SetPrincipalAndReturnUserDetail(IUser user, IPrincipal principal)
