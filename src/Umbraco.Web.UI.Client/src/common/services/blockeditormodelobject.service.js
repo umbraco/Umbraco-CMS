@@ -564,7 +564,7 @@
                 if (blockConfiguration === null || contentScaffold === null) {
 
                     blockConfiguration = {
-                        label: "Unsupported Block ("+udi+")",
+                        label: "Unsupported Block",
                         unsupported: true
                     };
                     contentScaffold = {};
