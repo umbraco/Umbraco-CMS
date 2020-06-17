@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
@@ -15,94 +16,98 @@ using Umbraco.Web.Models.ContentEditing;
 namespace Umbraco.Web.Editors
 {
     /// <summary>
-    /// An action filter that wires up the persisted entity of the DataTypeSave model and validates the whole request
+    /// An attribute/filter that wires up the persisted entity of the DataTypeSave model and validates the whole request
     /// </summary>
-    internal sealed class DataTypeValidateAttribute : ActionFilterAttribute
+    internal sealed class DataTypeValidateAttribute : TypeFilterAttribute
     {
-        private readonly IDataTypeService _dataTypeService;
-        private readonly PropertyEditorCollection _propertyEditorCollection;
-        private readonly UmbracoMapper _umbracoMapper;
-
-
-        /// <summary>
-        /// For use in unit tests. Not possible to use as attribute ctor.
-        /// </summary>
-        /// <param name="dataTypeService"></param>
-        /// <param name="propertyEditorCollection"></param>
-        /// <param name="umbracoMapper"></param>
-        public DataTypeValidateAttribute(IDataTypeService dataTypeService, PropertyEditorCollection propertyEditorCollection, UmbracoMapper umbracoMapper)
+        public DataTypeValidateAttribute() : base(typeof(DataTypeValidateFilter))
         {
-            _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
-            _propertyEditorCollection = propertyEditorCollection ?? throw new ArgumentNullException(nameof(propertyEditorCollection));
-            _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
         }
 
-        public override void OnActionExecuting(ActionExecutingContext context)
+        private class DataTypeValidateFilter : IActionFilter
         {
-            var dataType = (DataTypeSave) context.ActionArguments["dataType"];
+            private readonly IDataTypeService _dataTypeService;
+            private readonly PropertyEditorCollection _propertyEditorCollection;
+            private readonly UmbracoMapper _umbracoMapper;
 
-            dataType.Name = dataType.Name.CleanForXss('[', ']', '(', ')', ':');
-            dataType.Alias = dataType.Alias == null ? dataType.Name : dataType.Alias.CleanForXss('[', ']', '(', ')', ':');
-
-            // get the property editor, ensuring that it exits
-            if (!_propertyEditorCollection.TryGet(dataType.EditorAlias, out var propertyEditor))
+            public DataTypeValidateFilter(IDataTypeService dataTypeService, PropertyEditorCollection propertyEditorCollection, UmbracoMapper umbracoMapper)
             {
-                var message = $"Property editor \"{dataType.EditorAlias}\" was not found.";
-                context.Result = new UmbracoProblemResult(message, HttpStatusCode.NotFound);
-                return;
+                _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
+                _propertyEditorCollection = propertyEditorCollection ?? throw new ArgumentNullException(nameof(propertyEditorCollection));
+                _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
             }
 
-            // assign
-            dataType.PropertyEditor = propertyEditor;
-
-            // validate that the data type exists, or create one if required
-            IDataType persisted;
-            switch (dataType.Action)
+            public void OnActionExecuted(ActionExecutedContext context)
             {
-                case ContentSaveAction.Save:
-                    persisted = _dataTypeService.GetDataType(Convert.ToInt32(dataType.Id));
-                    if (persisted == null)
-                    {
-                        var message = $"Data type with id {dataType.Id} was not found.";
-                        context.Result = new UmbracoProblemResult(message, HttpStatusCode.NotFound);
-                        return;
-                    }
-                    // map the model to the persisted instance
-                    _umbracoMapper.Map(dataType, persisted);
-                    break;
+            }
 
-                case ContentSaveAction.SaveNew:
-                    // create the persisted model from mapping the saved model
-                    persisted = _umbracoMapper.Map<IDataType>(dataType);
-                    ((DataType) persisted).ResetIdentity();
-                    break;
+            public void OnActionExecuting(ActionExecutingContext context)
+            {
+                var dataType = (DataTypeSave)context.ActionArguments["dataType"];
 
-                default:
-                    context.Result = new UmbracoProblemResult($"Data type action {dataType.Action} was not found.", HttpStatusCode.NotFound);
+                dataType.Name = dataType.Name.CleanForXss('[', ']', '(', ')', ':');
+                dataType.Alias = dataType.Alias == null ? dataType.Name : dataType.Alias.CleanForXss('[', ']', '(', ')', ':');
+
+                // get the property editor, ensuring that it exits
+                if (!_propertyEditorCollection.TryGet(dataType.EditorAlias, out var propertyEditor))
+                {
+                    var message = $"Property editor \"{dataType.EditorAlias}\" was not found.";
+                    context.Result = new UmbracoProblemResult(message, HttpStatusCode.NotFound);
                     return;
-            }
+                }
 
-            // assign (so it's available in the action)
-            dataType.PersistedDataType = persisted;
+                // assign
+                dataType.PropertyEditor = propertyEditor;
 
-            // validate the configuration
-            // which is posted as a set of fields with key (string) and value (object)
-            var configurationEditor = propertyEditor.GetConfigurationEditor();
-            foreach (var field in dataType.ConfigurationFields)
-            {
-                var editorField = configurationEditor.Fields.SingleOrDefault(x => x.Key == field.Key);
-                if (editorField == null) continue;
+                // validate that the data type exists, or create one if required
+                IDataType persisted;
+                switch (dataType.Action)
+                {
+                    case ContentSaveAction.Save:
+                        persisted = _dataTypeService.GetDataType(Convert.ToInt32(dataType.Id));
+                        if (persisted == null)
+                        {
+                            var message = $"Data type with id {dataType.Id} was not found.";
+                            context.Result = new UmbracoProblemResult(message, HttpStatusCode.NotFound);
+                            return;
+                        }
+                        // map the model to the persisted instance
+                        _umbracoMapper.Map(dataType, persisted);
+                        break;
 
-                // run each IValueValidator (with null valueType and dataTypeConfiguration: not relevant here)
-                foreach (var validator in editorField.Validators)
-                foreach (var result in validator.Validate(field.Value, null, null))
-                    context.ModelState.AddValidationError(result, "Properties", field.Key);
-            }
+                    case ContentSaveAction.SaveNew:
+                        // create the persisted model from mapping the saved model
+                        persisted = _umbracoMapper.Map<IDataType>(dataType);
+                        ((DataType)persisted).ResetIdentity();
+                        break;
 
-            if (context.ModelState.IsValid == false)
-            {
-                // if it is not valid, do not continue and return the model state
-                throw HttpResponseException.CreateValidationErrorResponse(context.ModelState);
+                    default:
+                        context.Result = new UmbracoProblemResult($"Data type action {dataType.Action} was not found.", HttpStatusCode.NotFound);
+                        return;
+                }
+
+                // assign (so it's available in the action)
+                dataType.PersistedDataType = persisted;
+
+                // validate the configuration
+                // which is posted as a set of fields with key (string) and value (object)
+                var configurationEditor = propertyEditor.GetConfigurationEditor();
+                foreach (var field in dataType.ConfigurationFields)
+                {
+                    var editorField = configurationEditor.Fields.SingleOrDefault(x => x.Key == field.Key);
+                    if (editorField == null) continue;
+
+                    // run each IValueValidator (with null valueType and dataTypeConfiguration: not relevant here)
+                    foreach (var validator in editorField.Validators)
+                        foreach (var result in validator.Validate(field.Value, null, null))
+                            context.ModelState.AddValidationError(result, "Properties", field.Key);
+                }
+
+                if (context.ModelState.IsValid == false)
+                {
+                    // if it is not valid, do not continue and return the model state
+                    throw HttpResponseException.CreateValidationErrorResponse(context.ModelState);
+                }
             }
         }
     }

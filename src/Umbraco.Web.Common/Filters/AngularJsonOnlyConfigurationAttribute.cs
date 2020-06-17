@@ -1,5 +1,4 @@
-﻿
-using System.Buffers;
+﻿using System.Buffers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
@@ -16,7 +15,7 @@ namespace Umbraco.Web.Common.Filters
         {
         }
 
-        private class AngularJsonOnlyConfigurationFilter :  IResultFilter
+        private class AngularJsonOnlyConfigurationFilter : IResultFilter
         {
             private readonly IOptions<MvcNewtonsoftJsonOptions> _mvcNewtonsoftJsonOptions;
             private readonly ArrayPool<char> _arrayPool;
@@ -31,7 +30,6 @@ namespace Umbraco.Web.Common.Filters
 
             public void OnResultExecuted(ResultExecutedContext context)
             {
-
             }
 
             public void OnResultExecuting(ResultExecutingContext context)
