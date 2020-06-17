@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Features;
 using Umbraco.Web.WebApi.Filters;
-using Umbraco.Web.Common.Attributes;
 
 namespace Umbraco.Web.Common.Controllers
 {

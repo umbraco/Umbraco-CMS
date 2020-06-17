@@ -106,7 +106,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// cookies which means that the auth cookie could be valid but the csrf cookies are no longer there, in that case we need to re-set the csrf cookies.
         /// </remarks>
         [UmbracoAuthorize]
-        [TypeFilter(typeof(SetAngularAntiForgeryTokens))]
+        [SetAngularAntiForgeryTokens]
         //[CheckIfUserTicketDataIsStale] // TODO: Migrate this, though it will need to be done differently at the cookie auth level
         public UserDetail GetCurrentUser()
         {
@@ -123,7 +123,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Logs a user in
         /// </summary>
         /// <returns></returns>
-        [TypeFilter(typeof(SetAngularAntiForgeryTokens))]
+        [SetAngularAntiForgeryTokens]
         public async Task<UserDetail> PostLogin(LoginModel loginModel)
         {
             // Sign the user in with username/password, this also gives a chance for developers to
@@ -188,7 +188,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Logs the current user out
         /// </summary>
         /// <returns></returns>
-        [TypeFilter(typeof(ValidateAngularAntiForgeryTokenAttribute))]
+        [ValidateAngularAntiForgeryToken]
         public IActionResult PostLogout()
         {
             HttpContext.SignOutAsync(Core.Constants.Security.BackOfficeAuthenticationType);
