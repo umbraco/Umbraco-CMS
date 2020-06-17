@@ -134,7 +134,6 @@
             // Append the blockObjects to our layout.
             vm.layout.forEach(entry => {
                 if (entry.$block === undefined || entry.$block === null) {
-                    console.log("We are creating a BlockObject for", entry.udi);
                     var block = getBlockObject(entry);
     
                     // If this entry was not supported by our property-editor it would return 'null'.
@@ -369,9 +368,11 @@
         }
 
         var requestCopyAllBlocks = function() {
+
+            var elementTypesToCopy = vm.layout.filter(entry => entry.$block.config.unsupported !== true).map(entry => entry.$block.content);
             
             // list aliases
-            var aliases = vm.layout.map(entry => entry.$block.content.contentTypeAlias);
+            var aliases = elementTypesToCopy.map(content => content.contentTypeAlias);
 
             // remove dublicates
             aliases = aliases.filter((item, index) => aliases.indexOf(item) === index);
@@ -381,8 +382,6 @@
                 contentNodeName = vm.umbVariantContent.editor.content.name;
             }
             // TODO: check if we are in an overlay and then lets get the Label of this block.
-
-            var elementTypesToCopy = vm.layout.map(entry => entry.$block.content);
 
             localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function(localizedLabel) {
                 clipboardService.copyArray("elementTypeArray", aliases, elementTypesToCopy, localizedLabel, "icon-thumbnail-list", vm.model.id);
