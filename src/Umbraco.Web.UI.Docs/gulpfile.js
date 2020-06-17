@@ -54,3 +54,6 @@ gulp.task('open:docs', function (cb) {
     .pipe(open(options));
     cb();
 });
+
+gulp.task('watch', ['docs', 'connect:docs', 'open:docs']);
+
