@@ -10,13 +10,12 @@
                 </p>
 
                 <!-- FILE -->
-                <div ng-class="{'trashed': media.trashed}" class="umb-icon-holder" ng-hide="media.thumbnail">
-                    <span class="file-icon">
-                        <i class="icon {{media.icon}}"></i>
-                        <span ng-if="media.extension">.{{media.extension}}</span>
-                    </span>
-                    <small>{{media.name}}</small>
-                </div>
+                <umb-file-icon ng-hide="media.thumbnail" ng-class="{'trashed': media.trashed}"
+                               extension="{{media.extension}}"
+                               icon="{{media.icon}}"
+                               size="s"
+                               text="{{media.name}}">
+                </umb-file-icon>
 
                 <div class="umb-sortable-thumbnails__actions" data-element="sortable-thumbnail-actions">
                     <button type="button" aria-label="Remove" class="umb-sortable-thumbnails__action -red btn-reset" data-element="action-remove" ng-click="remove()">
