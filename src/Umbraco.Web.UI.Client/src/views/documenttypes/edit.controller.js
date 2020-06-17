@@ -259,12 +259,14 @@
         function loadButtons() {
             vm.page.navigation = vm.contentType.apps;
 
-            Utilies.forEach(vm.contentType.apps,
-                function (val, index) {
-                    if (disableTemplates === true && val.alias === "templates") {
-                        vm.page.navigation.splice(index, 1);
-                    }
-                });
+            if (disableTemplates === true) {
+                Utilities.forEach(vm.contentType.apps,
+                    (app, index) => {
+                        if (app.alias === "templates") {
+                            vm.page.navigation.splice(index, 1);
+                        }
+                    });
+            }
 
             initializeActiveNavigationPanel();
         }
@@ -493,9 +495,8 @@
                     if (treeExists) {
                         navigationService.syncTree({ tree: "templates", path: [], forceReload: true })
                             .then(function (syncArgs) {
-                                navigationService.reloadNode(syncArgs.node)
-                            }
-                            );
+                                navigationService.reloadNode(syncArgs.node);
+                            });
                     }
                 });
             }
