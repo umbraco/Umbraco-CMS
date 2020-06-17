@@ -277,7 +277,6 @@ In the following example you see how to run some custom logic before a step goes
                     }
 
                     startStep();
-                    // tour completed - final step
                 } else {
                     // tour completed - final step
                     scope.loadingStep = true;
