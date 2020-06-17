@@ -16,12 +16,6 @@ namespace Umbraco.Web.ContentApps
         {
             switch (source)
             {
-                case IContent _:
-                    return null;
-                case IMedia _:
-                    return null;
-                case IMember _:
-                    return null;
                 case IContentType _:
                     return _contentTypeApp ?? (_contentTypeApp = new ContentApp()
                     {
@@ -32,7 +26,7 @@ namespace Umbraco.Web.ContentApps
                         Weight = Weight
                     });
                 default:
-                    throw new NotSupportedException($"Object type {source.GetType()} is not supported here.");
+                    return null;
             }
         }
     }

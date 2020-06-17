@@ -38,7 +38,7 @@
         vm.page.loading = false;
         vm.page.saveButtonState = "init";
         vm.page.navigation = [];
-     
+
         var labelKeys = [
             "general_design",
             "general_listView",
@@ -249,7 +249,7 @@
             contentTypeResource.getById(documentTypeId).then(function (dt) {
                 init(dt);
                 // we don't need to sync the tree in infinite mode
-                if(!infiniteMode) { 
+                if (!infiniteMode) {
                     syncTreeNode(vm.contentType, dt.path, true);
                 }
                 vm.page.loading = false;
@@ -257,15 +257,15 @@
         }
 
         function loadButtons() {
-			vm.page.navigation = vm.contentType.apps;
-			
-			angular.forEach(vm.contentType.apps,
+            vm.page.navigation = vm.contentType.apps;
+
+            Utilies.forEach(vm.contentType.apps,
                 function (val, index) {
                     if (disableTemplates === true && val.alias === "templates") {
                         vm.page.navigation.splice(index, 1);
                     }
                 });
-			
+
             initializeActiveNavigationPanel();
         }
 
@@ -283,7 +283,7 @@
                     }
                 }
             }
-			if (initialViewSetFromRouteParams === false) {
+            if (initialViewSetFromRouteParams === false) {
                 vm.page.navigation[0].active = true;
             }
         }
@@ -345,17 +345,17 @@
                 }).then(function (data) {
                     //success
                     // we don't need to sync the tree in infinite mode
-                    if(!infiniteMode) {
+                    if (!infiniteMode) {
                         syncTreeNode(vm.contentType, data.path);
                     }
 
                     // emit event
                     var args = { documentType: vm.contentType };
                     eventsService.emit("editors.documentType.saved", args);
-                    
+
                     vm.page.saveButtonState = "success";
 
-                    if(infiniteMode && $scope.model.submit) {
+                    if (infiniteMode && $scope.model.submit) {
                         $scope.model.documentTypeAlias = vm.contentType.alias;
                         $scope.model.submit($scope.model);
                     }
@@ -414,10 +414,10 @@
 
             vm.contentType = contentType;
 
-			//set a shared state
+            //set a shared state
             editorState.set(vm.contentType);
-			
-			loadButtons();
+
+            loadButtons();
         }
 
         /** Syncs the template alias for new doc types before saving if a template is to be created */
@@ -495,16 +495,16 @@
                             .then(function (syncArgs) {
                                 navigationService.reloadNode(syncArgs.node)
                             }
-                        );
+                            );
                     }
-                }); 
+                });
             }
         }));
 
         evts.push(eventsService.on("editors.groupsBuilder.changed", function(name, args) {
             angularHelper.getCurrentForm($scope).$setDirty();
         }));
-		
+
         //ensure to unregister from all events!
         $scope.$on('$destroy', function () {
             for (var e in evts) {

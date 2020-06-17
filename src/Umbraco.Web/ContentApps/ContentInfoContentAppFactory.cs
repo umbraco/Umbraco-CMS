@@ -48,11 +48,8 @@ namespace Umbraco.Web.ContentApps
                         Weight = Weight
                     });
 
-                case IContentType _:
-                    return null;
-
                 default:
-                    throw new NotSupportedException($"Object type {o.GetType()} is not supported here.");
+                    return null;
             }
         }
     }
