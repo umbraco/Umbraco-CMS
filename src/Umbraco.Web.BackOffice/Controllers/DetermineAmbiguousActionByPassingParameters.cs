@@ -31,7 +31,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
                     var type = parameterDescriptor.ParameterType;
 
-                    if(typeof(IEnumerable).IsAssignableFrom(type))
+                    if(typeof(IEnumerable).IsAssignableFrom(type) && typeof(string) != type)
                     {
                         type = type.GetElementType();
                     }
@@ -53,6 +53,14 @@ namespace Umbraco.Web.BackOffice.Controllers
                         else if (type == typeof(string))
                         {
                             canUse &= true;
+                        }
+                        else if (type == typeof(bool))
+                        {
+                            canUse &= bool.TryParse(value, out _);
+                        }
+                        else if (type == typeof(Direction))
+                        {
+                            canUse &= Enum<Direction>.TryParse(value, out _);
                         }
                         else
                         {

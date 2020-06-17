@@ -295,7 +295,6 @@
     <Compile Include="Cache\AppCacheTests.cs" />
     <Compile Include="Cache\HttpRequestAppCacheTests.cs" />
     <Compile Include="Cache\RuntimeAppCacheTests.cs" />
-    <Compile Include="Web\Controllers\ContentControllerUnitTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
     <Compile Include="Macros\MacroParserTests.cs" />
     <Compile Include="Models\ContentExtensionsTests.cs" />

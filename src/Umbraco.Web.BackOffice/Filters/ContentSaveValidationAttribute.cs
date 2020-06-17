@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -22,7 +23,9 @@ namespace Umbraco.Web.BackOffice.Filters
     {
         public ContentSaveValidationAttribute() : base(typeof(ContentSaveValidationFilter))
         {
+            Order = -3000; // More important than ModelStateInvalidFilter.FilterOrder
         }
+
 
         private sealed class ContentSaveValidationFilter : IActionFilter
         {
@@ -79,7 +82,7 @@ namespace Umbraco.Web.BackOffice.Filters
             {
                 if (!contentItem.Variants.Any(x => x.Save))
                 {
-                    actionContext.Result = new NotFoundObjectResult("No variants flagged for saving");
+                    actionContext.Result = new NotFoundObjectResult(new {Message = "No variants flagged for saving"});
                     return false;
                 }
 

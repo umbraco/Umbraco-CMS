@@ -135,7 +135,7 @@ namespace Umbraco.Web
             get
             {
                 //NOTE: the request can be null during app startup!
-                return Current.HostingEnvironment.IsDebugMode
+                return _hostingEnvironment.IsDebugMode
                        && (string.IsNullOrEmpty(_requestAccessor.GetRequestValue("umbdebugshowtrace")) == false
                            || string.IsNullOrEmpty(_requestAccessor.GetRequestValue("umbdebug")) == false
                            || string.IsNullOrEmpty(_cookieManager.GetCookieValue("UMB-DEBUG")) == false);

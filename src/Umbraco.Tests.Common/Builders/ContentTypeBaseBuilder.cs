@@ -43,6 +43,7 @@ namespace Umbraco.Tests.Common.Builders
         private string _thumbnail;
         private bool? _trashed;
         private bool? _isContainer;
+        protected ContentVariation? ContentVariation { get; set; }
 
         protected IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
@@ -81,6 +82,8 @@ namespace Umbraco.Tests.Common.Builders
         protected bool GetTrashed() => _trashed ?? false;
 
         protected bool GetIsContainer() => _isContainer ?? false;
+        protected ContentVariation GetContentVariation() => ContentVariation ?? Core.Models.ContentVariation.Nothing;
+
 
         protected void BuildPropertyGroups(ContentTypeCompositionBase contentType, IEnumerable<PropertyGroup> propertyGroups)
         {
@@ -89,6 +92,8 @@ namespace Umbraco.Tests.Common.Builders
                 contentType.PropertyGroups.Add(propertyGroup);
             }
         }
+
+
 
         protected void BuildPropertyTypeIds(ContentTypeCompositionBase contentType, int? propertyTypeIdsIncrementingFrom)
         {

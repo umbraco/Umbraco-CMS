@@ -488,23 +488,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
-        public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(
-                int id,
-                int pageNumber = 0,  // TODO: This should be '1' as it's not the index
-                int pageSize = 0,
-                string orderBy = "SortOrder",
-                Direction orderDirection = Direction.Ascending,
-                bool orderBySystemField = true,
-                string filter = "")
-        {
-            return GetChildren(id, null, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
-        }
-
-        /// <summary>
-        /// Gets the children for the content id passed in
-        /// </summary>
-        /// <returns></returns>
-        [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
+        [DetermineAmbiguousActionByPassingParameters]
         public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(
                 int id,
                 string includeProperties,

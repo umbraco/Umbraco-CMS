@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Web.Http;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -7,14 +6,13 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Web.Editors;
+using Umbraco.Tests.Common.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Web.Controllers
 {
     [TestFixture]
     public class ContentControllerUnitTests
-    {        
+    {
 
         [Test]
         public void Access_Allowed_By_Path()

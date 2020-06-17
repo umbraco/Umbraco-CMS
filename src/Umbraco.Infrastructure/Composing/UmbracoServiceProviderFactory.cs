@@ -2,6 +2,7 @@
 using LightInject.Microsoft.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Diagnostics;
 using Umbraco.Composing;
 using Umbraco.Core.Composing.LightInject;
 using Umbraco.Core.Configuration;
@@ -92,7 +93,7 @@ namespace Umbraco.Core.Composing
                     _container.GetInstance<IBackOfficeInfo>(),
                     _container.GetInstance<Umbraco.Core.Logging.IProfiler>());
             }
-            
+
 
             return provider;
         }

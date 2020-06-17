@@ -9,6 +9,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// currently in the request.
     /// </summary>
     [TypeFilter(typeof(AppendCurrentEventMessagesAttribute))]
+    //[PrefixlessBodyModelValidator] // TODO implement this!!
     public abstract class BackOfficeNotificationsController : UmbracoAuthorizedJsonController
     {
 
