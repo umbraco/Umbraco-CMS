@@ -184,14 +184,14 @@ namespace Umbraco.Web.BackOffice.Controllers
                             "imagesApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ImagesController>(
                                 controller => controller.GetBigThumbnail(""))
                         },
-                        // {
-                        //     "sectionApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<SectionController>(
-                        //         controller => controller.GetSections())
-                        // },
-                        // {
-                        //     "treeApplicationApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
-                        //         controller => controller.GetApplicationTrees(null, null, null, TreeUse.None))
-                        // },
+                        {
+                            "sectionApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<SectionController>(
+                                controller => controller.GetSections())
+                        },
+                        {
+                            "treeApplicationApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
+                                controller => controller.GetApplicationTrees(null, null, null, TreeUse.None))
+                        },
                         // {
                         //     "contentTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
                         //         controller => controller.GetAllowedChildren(0))

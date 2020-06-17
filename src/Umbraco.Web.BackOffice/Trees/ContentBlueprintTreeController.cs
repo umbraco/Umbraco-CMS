@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -40,10 +41,10 @@ namespace Umbraco.Web.Trees
             IEntityService entityService)
             : base(localizedTextService, umbracoApiControllerTypeCollection)
         {
-            _menuItemCollectionFactory = menuItemCollectionFactory;
-            _contentService = contentService;
-            _contentTypeService = contentTypeService;
-            _entityService = entityService;
+            _menuItemCollectionFactory = menuItemCollectionFactory ?? throw new ArgumentNullException(nameof(menuItemCollectionFactory));
+            _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
+            _contentTypeService = contentTypeService ?? throw new ArgumentNullException(nameof(contentTypeService));
+            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
         }
 
         protected override TreeNode CreateRootNode(FormCollection queryStrings)

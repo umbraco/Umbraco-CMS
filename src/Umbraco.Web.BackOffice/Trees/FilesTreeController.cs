@@ -20,12 +20,10 @@ namespace Umbraco.Web.Trees
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
             IMenuItemCollectionFactory menuItemCollectionFactory,
-            IIOHelper ioHelper,
-            IHostingEnvironment hostingEnvironment,
-            ILogger logger)
+            IFileSystem fileSystem)
             : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory)
         {
-            FileSystem = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, "~/");
+            FileSystem = fileSystem;
         }
 
         protected override string[] Extensions => ExtensionsStatic;
