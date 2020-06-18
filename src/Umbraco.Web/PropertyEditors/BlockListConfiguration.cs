@@ -11,21 +11,9 @@ namespace Umbraco.Web.PropertyEditors
     public class BlockListConfiguration
     {
 
+
         [ConfigurationField("blocks", "Available Blocks", "views/propertyeditors/blocklist/prevalue/blocklist.blockconfiguration.html", Description = "Define the available blocks.")]
         public BlockConfiguration[] Blocks { get; set; }
-
-
-        [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of blocks")]
-        public NumberRange ValidationLimit { get; set; } = new NumberRange();
-
-        public class NumberRange
-        {
-            [JsonProperty("min")]
-            public int? Min { get; set; }
-
-            [JsonProperty("max")]
-            public int? Max { get; set; }
-        }
 
         public class BlockConfiguration
         {
@@ -58,11 +46,24 @@ namespace Umbraco.Web.PropertyEditors
             public string EditorSize { get; set; }
         }
 
+        [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of blocks")]
+        public NumberRange ValidationLimit { get; set; } = new NumberRange();
+
+        public class NumberRange
+        {
+            [JsonProperty("min")]
+            public int? Min { get; set; }
+
+            [JsonProperty("max")]
+            public int? Max { get; set; }
+        }
+
         [ConfigurationField("useInlineEditingAsDefault", "Inline editing mode", "boolean", Description = "Use the inline editor as the default block view.")]
         public bool UseInlineEditingAsDefault { get; set; }
 
         [ConfigurationField("maxPropertyWidth", "Property editor width", "textstring", Description = "optional css overwrite, example: 800px or 100%")]
         public string MaxPropertyWidth { get; set; }
+
 
     }
 }
