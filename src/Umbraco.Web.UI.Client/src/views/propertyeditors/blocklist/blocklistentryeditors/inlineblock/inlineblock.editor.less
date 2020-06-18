@@ -7,7 +7,7 @@
     border-radius: @baseBorderRadius;
     transition: border-color 120ms;
 
-    .umb-block-list__block:not(.--open) &:hover {
+    .umb-block-list__block:not(.--active) &:hover {
         border-color: @gray-8;
     }
 
@@ -44,7 +44,7 @@
         }
     }
 
-    .umb-block-list__block.--open & {
+    .umb-block-list__block.--active & {
         border-color: @gray-8;
         box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.05);
         > button {

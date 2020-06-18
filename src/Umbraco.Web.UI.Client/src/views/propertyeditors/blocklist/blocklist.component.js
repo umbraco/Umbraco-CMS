@@ -228,6 +228,10 @@
 
             blockObject.active = true;
 
+            if (inlineEditing === true && openSettings !== true) {
+                return;
+            }
+
             // make a clone to avoid editing model directly.
             var blockContentClone = Utilities.copy(blockObject.content);
             var blockSettingsClone = null;
@@ -304,7 +308,7 @@
                     
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                         editorService.close();
-                        if (added && vm.model.config.useInlineEditingAsDefault !== true && vm.layout.length > createIndex) {
+                        if (added && vm.layout.length > createIndex) {
                             editBlock(vm.layout[createIndex].$block);
                         }
                     }

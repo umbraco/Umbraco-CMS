@@ -18,7 +18,7 @@
                     <div class="__plus" ng-style="{'left':inlineCreateButtonCtrl.plusPosX}">+</div>
                 </button>
 
-                <div class="umb-block-list__block" ng-class="{'--open':layout.$block.isOpen}">
+                <div class="umb-block-list__block" ng-class="{'--active':layout.$block.active}">
 
                     <umb-block-list-scoped-block-content ng-if="layout.$block.config.stylesheet" class="umb-block-list__block--content blockelement__draggable-element" view="{{layout.$block.view}}" stylesheet="/{{::layout.$block.config.stylesheet}}" api="vm.blockEditorApi" block="layout.$block" index="$index">
                     </umb-block-list-scoped-block-content>

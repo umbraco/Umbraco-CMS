@@ -6,7 +6,7 @@
         const bc = this;
 
         bc.openBlock = function(block) {
-            block.isOpen = !block.isOpen;
+            block.active = !block.active;
         }
 
     }
