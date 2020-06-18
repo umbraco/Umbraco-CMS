@@ -18,6 +18,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Exceptions;
+using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.BackOffice.Controllers
@@ -25,7 +26,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// <summary>
     /// An abstract base controller used for media/content/members to try to reduce code replication.
     /// </summary>
-    //[JsonDateTimeFormatAttribute] //TODO Reintroduce
+    [JsonDateTimeFormat]
     public abstract class ContentControllerBase : BackOfficeNotificationsController
     {
         protected ICultureDictionary CultureDictionary { get; }

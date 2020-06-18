@@ -237,7 +237,6 @@
     <Compile Include="Editors\UsersController.cs" />
     <Compile Include="HttpContextUmbracoContextAccessor.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
-    <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="Editors\MemberGroupController.cs" />
     <Compile Include="Composing\CompositionExtensions\Controllers.cs" />
     <Compile Include="Composing\ModuleInjector.cs" />
@@ -323,7 +322,6 @@
     <Compile Include="WebApi\Filters\SetAngularAntiForgeryTokensAttribute.cs" />
     <Compile Include="WebApi\Filters\ValidateAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="WebApi\HttpControllerContextExtensions.cs" />
-    <Compile Include="Editors\ContentControllerBase.cs" />
     <Compile Include="Controllers\UmbRegisterController.cs" />
     <Compile Include="Models\ProfileModel.cs" />
     <Compile Include="Models\LoginStatusModel.cs" />
@@ -362,7 +360,6 @@
     <Compile Include="WebApi\IsBackOfficeAttribute.cs" />
     <Compile Include="Editors\Filters\ContentModelValidator.cs" />
     <Compile Include="WebApi\Filters\FileUploadCleanupFilterAttribute.cs" />
-    <Compile Include="WebApi\Filters\OutgoingDateTimeFormatAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoApplicationAuthorizeAttribute.cs" />
     <Compile Include="WebApi\GuidNoHyphenConverter.cs" />
     <Compile Include="WebApi\HttpRequestMessageExtensions.cs" />
