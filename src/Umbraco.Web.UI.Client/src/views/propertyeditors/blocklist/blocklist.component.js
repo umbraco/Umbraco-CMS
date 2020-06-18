@@ -139,8 +139,6 @@
                     // If this entry was not supported by our property-editor it would return 'null'.
                     if(block !== null) {
                         entry.$block = block;
-                    } else {
-                        entry.$block = blockEditorService.UNSUPPORTED_BLOCKOBJECT;
                     }
                 }
             });
