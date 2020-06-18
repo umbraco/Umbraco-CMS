@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Formatting;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
+using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Search;
-using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Trees
 {
@@ -16,22 +19,31 @@ namespace Umbraco.Web.Trees
     public class MemberTypeTreeController : MemberTypeAndGroupTreeControllerBase, ISearchableTree
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
+        private readonly IMemberTypeService _memberTypeService;
 
-        public MemberTypeTreeController(UmbracoTreeSearcher treeSearcher)
+        public MemberTypeTreeController(
+            ILocalizedTextService localizedTextService,
+            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+            IMenuItemCollectionFactory menuItemCollectionFactory,
+            UmbracoTreeSearcher treeSearcher,
+            IMemberTypeService memberTypeService)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory)
         {
             _treeSearcher = treeSearcher;
+            _memberTypeService = memberTypeService;
         }
 
-        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+
+        protected override TreeNode CreateRootNode(FormCollection queryStrings)
         {
             var root = base.CreateRootNode(queryStrings);
             //check if there are any member types
-            root.HasChildren = Services.MemberTypeService.GetAll().Any();
+            root.HasChildren = _memberTypeService.GetAll().Any();
             return root;
         }
-        protected override IEnumerable<TreeNode> GetTreeNodesFromService(string id, FormDataCollection queryStrings)
+        protected override IEnumerable<TreeNode> GetTreeNodesFromService(string id, FormCollection queryStrings)
         {
-            return Services.MemberTypeService.GetAll()
+            return _memberTypeService.GetAll()
                 .OrderBy(x => x.Name)
                 .Select(dt => CreateTreeNode(dt, Constants.ObjectTypes.MemberType, id, queryStrings, dt?.Icon ?? Constants.Icons.MemberType, false));
         }

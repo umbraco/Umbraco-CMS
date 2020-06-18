@@ -1,9 +1,8 @@
-using System.Net.Http.Formatting;
 using Umbraco.Web.Models.Trees;
-using Umbraco.Web.WebApi.Filters;
-using System.Web.Http.ModelBinding;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Umbraco.Web.Common.ModelBinders;
 
-//Migrated to .NET CORE
 namespace Umbraco.Web.Trees
 {
     /// <summary>
@@ -17,7 +16,9 @@ namespace Umbraco.Web.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        TreeNode GetTreeNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]
-            FormDataCollection queryStrings);
+        ActionResult<TreeNode> GetTreeNode(
+            string id,
+            [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings
+            );
     }
 }

@@ -1,8 +1,10 @@
-﻿using System.Net.Http.Formatting;
-using Umbraco.Core;
+﻿using Microsoft.AspNetCore.Http;
+using Umbraco.Core.Services;
+using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web.WebApi;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -13,13 +15,20 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class LogViewerTreeController : TreeController
     {
-        protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
+        public LogViewerTreeController(
+            ILocalizedTextService localizedTextService,
+            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection)
+            : base(localizedTextService, umbracoApiControllerTypeCollection)
+        {
+        }
+
+        protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
         {
             //We don't have any child nodes & only use the root node to load a custom UI
             return new TreeNodeCollection();
         }
 
-        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        protected override MenuItemCollection GetMenuForNode(string id, FormCollection queryStrings)
         {
             //We don't have any menu item options (such as create/delete/reload) & only use the root node to load a custom UI
             return null;
@@ -29,7 +38,7 @@ namespace Umbraco.Web.Trees
         /// Helper method to create a root model for a tree
         /// </summary>
         /// <returns></returns>
-        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        protected override TreeNode CreateRootNode(FormCollection queryStrings)
         {
             var root = base.CreateRootNode(queryStrings);
 

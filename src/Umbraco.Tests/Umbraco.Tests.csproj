@@ -93,6 +93,7 @@
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.SelfHost" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Tracing" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.7" />
     <PackageReference Include="Microsoft.Owin" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Hosting" Version="4.0.1" />
@@ -145,6 +146,14 @@
     <Compile Include="Security\OwinDataProtectorTokenProviderTests.cs" />
     <Compile Include="Services\KeyValueServiceTests.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
+    <Compile Include="TestHelpers\Entities\MockedContent.cs" />
+    <Compile Include="TestHelpers\Entities\MockedContentTypes.cs" />
+    <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
+    <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
+    <Compile Include="TestHelpers\Entities\MockedMember.cs" />
+    <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
+    <Compile Include="TestHelpers\Entities\MockedUser.cs" />
+    <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
     <Compile Include="UmbracoExamine\ExamineExtensions.cs" />
     <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionTests.cs" />
     <Compile Include="PropertyEditors\NestedContentPropertyComponentTests.cs" />
@@ -212,7 +221,6 @@
     <Compile Include="TestHelpers\ControllerTesting\TestRunner.cs" />
     <Compile Include="TestHelpers\ControllerTesting\TestStartup.cs" />
     <Compile Include="TestHelpers\ControllerTesting\TraceExceptionLogger.cs" />
-    <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
     <Compile Include="Testing\Objects\Accessors\NoHttpContextAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestExamineManager.cs" />
     <Compile Include="Testing\ContentBaseExtensions.cs" />
@@ -226,7 +234,6 @@
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
     <Compile Include="Testing\UmbracoTestBase.cs" />
-    <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="CoreThings\TryConvertToTests.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
@@ -304,7 +311,6 @@
     <Compile Include="Persistence\Repositories\TagRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\NotificationsRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TemplateRepositoryTest.cs" />
-    <Compile Include="Models\Mapping\ContentWebModelMappingTests.cs" />
     <Compile Include="PropertyEditors\ImageCropperTest.cs" />
     <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
     <Compile Include="PropertyEditors\ColorListValidatorTest.cs" />
@@ -389,9 +395,6 @@
     <Compile Include="Persistence\Repositories\StylesheetRepositoryTest.cs" />
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
     <Compile Include="Publishing\PublishingStrategyTests.cs" />
-    <Compile Include="TestHelpers\Entities\MockedMember.cs" />
-    <Compile Include="TestHelpers\Entities\MockedUser.cs" />
-    <Compile Include="TestHelpers\Stubs\TestProfiler.cs" />
     <Compile Include="CoreThings\ObjectExtensionsTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedContentCacheTests.cs" />
     <Compile Include="Composing\LazyCollectionBuilderTests.cs" />
@@ -425,10 +428,6 @@
     <Compile Include="TestHelpers\Stubs\TestControllerFactory.cs" />
     <Compile Include="TestHelpers\BaseUsingSqlCeSyntax.cs" />
     <Compile Include="TestHelpers\BaseWebTest.cs" />
-    <Compile Include="TestHelpers\Entities\MockedContent.cs" />
-    <Compile Include="TestHelpers\Entities\MockedContentTypes.cs" />
-    <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
-    <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
     <Compile Include="UmbracoExamine\EventsTest.cs" />
     <Compile Include="Composing\TypeHelperTests.cs" />
     <Compile Include="UmbracoExamine\ExamineBaseTest.cs" />
@@ -454,7 +453,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Strings\StringExtensionsTests.cs" />
     <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
-    <Compile Include="Composing\TypeFinderTests.cs" />
     <Compile Include="Routing\UmbracoModuleTests.cs" />
     <Compile Include="Web\UrlHelperExtensionTests.cs" />
     <Compile Include="Web\WebExtensionMethodTests.cs" />

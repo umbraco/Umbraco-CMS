@@ -1,29 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Formatting;
-using System.Web.Http;
-using System.Web.Http.ModelBinding;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
-using Umbraco.Core.Security;
+using Umbraco.Extensions;
 using Umbraco.Web.Actions;
+using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Web.Security;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Trees
 {
@@ -39,27 +33,27 @@ namespace Umbraco.Web.Trees
     [SearchableTree("searchResultFormatter", "configureMemberResult")]
     public class MemberTreeController : TreeController, ISearchableTree, ITreeNodeController
     {
-
-
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
+        private readonly IMemberService _memberService;
+        private readonly IMemberTypeService _memberTypeService;
+        private readonly IWebSecurity _webSecurity;
 
         public MemberTreeController(
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger logger,
-            IRuntimeState runtimeState,
-            UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider,
+            ILocalizedTextService localizedTextService,
+            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
             UmbracoTreeSearcher treeSearcher,
-            IMenuItemCollectionFactory menuItemCollectionFactory)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
+            IMenuItemCollectionFactory menuItemCollectionFactory,
+            IMemberService memberService,
+            IMemberTypeService memberTypeService,
+            IWebSecurity webSecurity)
+            : base(localizedTextService, umbracoApiControllerTypeCollection)
         {
             _treeSearcher = treeSearcher;
             _menuItemCollectionFactory = menuItemCollectionFactory;
+            _memberService = memberService;
+            _memberTypeService = memberTypeService;
+            _webSecurity = webSecurity;
         }
 
         /// <summary>
@@ -68,27 +62,27 @@ namespace Umbraco.Web.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        public TreeNode GetTreeNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings)
+        public ActionResult<TreeNode> GetTreeNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
             var node = GetSingleTreeNode(id, queryStrings);
 
             //add the tree alias to the node since it is standalone (has no root for which this normally belongs)
-            node.AdditionalData["treeAlias"] = TreeAlias;
+            node.Value.AdditionalData["treeAlias"] = TreeAlias;
             return node;
         }
 
-        protected TreeNode GetSingleTreeNode(string id, FormDataCollection queryStrings)
+        protected ActionResult<TreeNode> GetSingleTreeNode(string id, FormCollection queryStrings)
         {
             Guid asGuid;
             if (Guid.TryParse(id, out asGuid) == false)
             {
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                return NotFound();
             }
 
-            var member = Services.MemberService.GetByKey(asGuid);
+            var member = _memberService.GetByKey(asGuid);
             if (member == null)
             {
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                return NotFound();
             }
 
             var node = CreateTreeNode(
@@ -107,17 +101,17 @@ namespace Umbraco.Web.Trees
             return node;
         }
 
-        protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
+        protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
 
             if (id == Constants.System.RootString)
             {
                 nodes.Add(
-                        CreateTreeNode(Constants.Conventions.MemberTypes.AllMembersListId, id, queryStrings, Services.TextService.Localize("member/allMembers"), Constants.Icons.MemberType, true,
+                        CreateTreeNode(Constants.Conventions.MemberTypes.AllMembersListId, id, queryStrings, LocalizedTextService.Localize("member/allMembers"), Constants.Icons.MemberType, true,
                             queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + Constants.Conventions.MemberTypes.AllMembersListId));
 
-                nodes.AddRange(Services.MemberTypeService.GetAll()
+                nodes.AddRange(_memberTypeService.GetAll()
                         .Select(memberType =>
                             CreateTreeNode(memberType.Alias, id, queryStrings, memberType.Name, memberType.Icon.IfNullOrWhiteSpace(Constants.Icons.Member), true,
                                 queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + memberType.Alias)));
@@ -131,7 +125,7 @@ namespace Umbraco.Web.Trees
             return nodes;
         }
 
-        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        protected override MenuItemCollection GetMenuForNode(string id, FormCollection queryStrings)
         {
             var menu = _menuItemCollectionFactory.Create();
 
@@ -142,18 +136,18 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 //Create the normal create action
-                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
 
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                 return menu;
             }
 
             //add delete option for all members
-            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
 
-            if (Security.CurrentUser.HasAccessToSensitiveData())
+            if (_webSecurity.CurrentUser.HasAccessToSensitiveData())
             {
-                menu.Items.Add(new ExportMember(Services.TextService));
+                menu.Items.Add(new ExportMember(LocalizedTextService));
             }
 
             return menu;

@@ -1,61 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Formatting;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
+using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Search;
-using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
     [Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, SortOrder = 0, TreeGroup = Constants.Trees.Groups.Settings)]
-    [Mvc.PluginController("UmbracoTrees")]
+    [PluginController("UmbracoTrees")]
     [CoreTree]
     public class ContentTypeTreeController : TreeController, ISearchableTree
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
+        private readonly IContentTypeService _contentTypeService;
+        private readonly IEntityService _entityService;
 
-        public ContentTypeTreeController(
-            UmbracoTreeSearcher treeSearcher,
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger logger,
-            IRuntimeState runtimeState,
-            UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider,
-            IMenuItemCollectionFactory menuItemCollectionFactory)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
+        public ContentTypeTreeController(ILocalizedTextService localizedTextService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, UmbracoTreeSearcher treeSearcher, IMenuItemCollectionFactory menuItemCollectionFactory, IContentTypeService contentTypeService, IEntityService entityService) : base(localizedTextService, umbracoApiControllerTypeCollection)
         {
             _treeSearcher = treeSearcher;
             _menuItemCollectionFactory = menuItemCollectionFactory;
+            _contentTypeService = contentTypeService;
+            _entityService = entityService;
         }
 
-        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        protected override TreeNode CreateRootNode(FormCollection queryStrings)
         {
             var root = base.CreateRootNode(queryStrings);
             //check if there are any types
-            root.HasChildren = Services.ContentTypeService.GetAll().Any();
+            root.HasChildren = _contentTypeService.GetAll().Any();
             return root;
         }
 
-        protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
+        protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
         {
             var intId = id.TryConvertTo<int>();
             if (intId == false) throw new InvalidOperationException("Id must be an integer");
@@ -63,7 +51,7 @@ namespace Umbraco.Web.Trees
             var nodes = new TreeNodeCollection();
 
             nodes.AddRange(
-                Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.DocumentTypeContainer)
+                _entityService.GetChildren(intId.Result, UmbracoObjectTypes.DocumentTypeContainer)
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
@@ -76,10 +64,10 @@ namespace Umbraco.Web.Trees
                     }));
 
             //if the request is for folders only then just return
-            if (queryStrings["foldersonly"].IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1") return nodes;
+            if (queryStrings["foldersonly"].ToString().IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1") return nodes;
 
-            var children = Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.DocumentType).ToArray();
-            var contentTypes = Services.ContentTypeService.GetAll(children.Select(c => c.Id).ToArray()).ToDictionary(c => c.Id);
+            var children = _entityService.GetChildren(intId.Result, UmbracoObjectTypes.DocumentType).ToArray();
+            var contentTypes = _contentTypeService.GetAll(children.Select(c => c.Id).ToArray()).ToDictionary(c => c.Id);
             nodes.AddRange(
                 children
                     .OrderBy(entity => entity.Name)
@@ -106,7 +94,7 @@ namespace Umbraco.Web.Trees
             return nodes;
         }
 
-        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        protected override MenuItemCollection GetMenuForNode(string id, FormCollection queryStrings)
         {
             var menu = _menuItemCollectionFactory.Create();
 
@@ -116,27 +104,27 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // root actions
-                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
-                menu.Items.Add(new MenuItem("importDocumentType", Services.TextService)
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add(new MenuItem("importDocumentType", LocalizedTextService)
                 {
                     Icon = "page-up",
                     SeparatorBefore = true,
                     OpensDialog = true
                 });
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
                 return menu;
             }
 
-            var container = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.DocumentTypeContainer);
+            var container = _entityService.Get(int.Parse(id), UmbracoObjectTypes.DocumentTypeContainer);
             if (container != null)
             {
                 //set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
-                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
 
-                menu.Items.Add(new MenuItem("rename", Services.TextService)
+                menu.Items.Add(new MenuItem("rename", LocalizedTextService)
                 {
                     Icon = "icon icon-edit"
                 });
@@ -144,30 +132,30 @@ namespace Umbraco.Web.Trees
                 if (container.HasChildren == false)
                 {
                     //can delete doc type
-                    menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
+                    menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true);
                 }
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
             }
             else
             {
-                var ct = Services.ContentTypeService.Get(int.Parse(id));
-                var parent = ct == null ? null : Services.ContentTypeService.Get(ct.ParentId);
+                var ct = _contentTypeService.Get(int.Parse(id));
+                var parent = ct == null ? null : _contentTypeService.Get(ct.ParentId);
 
-                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
                 //no move action if this is a child doc type
                 if (parent == null)
                 {
-                    menu.Items.Add<ActionMove>(Services.TextService, true, opensDialog: true);
+                    menu.Items.Add<ActionMove>(LocalizedTextService, true, opensDialog: true);
                 }
-                menu.Items.Add<ActionCopy>(Services.TextService, opensDialog: true);
-                menu.Items.Add(new MenuItem("export", Services.TextService)
+                menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add(new MenuItem("export", LocalizedTextService)
                 {
                     Icon = "download-alt",
                     SeparatorBefore = true,
                     OpensDialog = true
                 });
-                menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true);
+                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
             }
 

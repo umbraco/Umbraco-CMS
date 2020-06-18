@@ -9,7 +9,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using System;
-//Migrated to .NET CORE
+
 namespace Umbraco.Web.Models.Mapping
 {
     /// <summary>
@@ -51,7 +51,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties);
         }
 
-        // Umbraco.Code.MapAll -Properties -Errors -Edited -Updater -Alias -IsContainer -TreeNodeUrl
+        // Umbraco.Code.MapAll -Properties -Errors -Edited -Updater -Alias -IsContainer
         private void Map(IMedia source, MediaItemDisplay target, MapperContext context)
         {
             target.ContentApps = _commonMapper.GetContentApps(source);
@@ -73,7 +73,7 @@ namespace Umbraco.Web.Models.Mapping
             target.State = null;
             target.Tabs = _tabsAndPropertiesMapper.Map(source, context);
             target.Trashed = source.Trashed;
-            //target.TreeNodeUrl = _commonTreeNodeMapper.GetTreeNodeUrl<MediaTreeController>(source);
+            target.TreeNodeUrl = _commonTreeNodeMapper.GetTreeNodeUrl<MediaTreeController>(source);
             target.Udi = Udi.Create(Constants.UdiEntityType.Media, source.Key);
             target.UpdateDate = source.UpdateDate;
             target.VariesByCulture = source.ContentType.VariesByCulture();

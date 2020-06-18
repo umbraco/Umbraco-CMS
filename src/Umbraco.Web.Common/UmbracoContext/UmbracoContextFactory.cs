@@ -28,6 +28,7 @@ namespace Umbraco.Web
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICookieManager _cookieManager;
         private readonly IRequestAccessor _requestAccessor;
+        private readonly IWebSecurity _webSecurity;
         private readonly UriUtility _uriUtility;
 
         /// <summary>
@@ -44,7 +45,8 @@ namespace Umbraco.Web
             UriUtility uriUtility,
             IHttpContextAccessor httpContextAccessor,
             ICookieManager cookieManager,
-            IRequestAccessor requestAccessor)
+            IRequestAccessor requestAccessor,
+             IWebSecurity webSecurity)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -57,6 +59,7 @@ namespace Umbraco.Web
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _cookieManager = cookieManager ?? throw new ArgumentNullException(nameof(cookieManager));
             _requestAccessor = requestAccessor ?? throw new ArgumentNullException(nameof(requestAccessor));
+            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
         }
 
         private IUmbracoContext CreateUmbracoContext()
@@ -72,11 +75,9 @@ namespace Umbraco.Web
                 _variationContextAccessor.VariationContext = new VariationContext(_defaultCultureAccessor.DefaultCulture);
             }
 
-            IWebSecurity webSecurity = new WebSecurity(_userService, _globalSettings, _hostingEnvironment, _httpContextAccessor);
-
             return new UmbracoContext(
                 _publishedSnapshotService,
-                webSecurity,
+                _webSecurity,
                 _globalSettings,
                 _hostingEnvironment,
                 _variationContextAccessor,

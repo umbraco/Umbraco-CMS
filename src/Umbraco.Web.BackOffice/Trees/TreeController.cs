@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web.Trees;
@@ -17,17 +16,17 @@ namespace Umbraco.Web.BackOffice.Trees
 
         private readonly TreeAttribute _treeAttribute;
 
-        private readonly ILocalizedTextService _textService;
+        protected ILocalizedTextService LocalizedTextService { get; }
 
-        protected TreeController(ILocalizedTextService textService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection)
+        protected TreeController(ILocalizedTextService localizedTextService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection)
             : base(umbracoApiControllerTypeCollection)
         {
-            _textService = textService ?? throw new ArgumentNullException(nameof(textService));
+            LocalizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             _treeAttribute = GetTreeAttribute();
         }
 
         /// <inheritdoc />
-        public override string RootNodeDisplayName => Tree.GetRootNodeDisplayName(this, _textService);
+        public override string RootNodeDisplayName => Tree.GetRootNodeDisplayName(this, LocalizedTextService);
 
         /// <inheritdoc />
         public override string TreeGroup => _treeAttribute.TreeGroup;

@@ -115,7 +115,7 @@ namespace Umbraco.Tests.Web.Controllers
             Composition.RegisterUnique(f => langService.Object);
             Composition.RegisterUnique(f => textService.Object);
             Composition.RegisterUnique(f => Mock.Of<ICultureDictionaryFactory>());
-            Composition.RegisterUnique(f => new UmbracoApiControllerTypeCollection(new[] { typeof(ContentTreeController) }));
+            Composition.RegisterUnique(f => new UmbracoApiControllerTypeCollection(new Type[] {  }));
         }
 
         private MultipartFormDataContent GetMultiPartRequestContent(string json)

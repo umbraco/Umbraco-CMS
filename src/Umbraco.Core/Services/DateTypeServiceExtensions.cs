@@ -4,7 +4,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Services
 {
-    internal static class DateTypeServiceExtensions
+    public static class DateTypeServiceExtensions
     {
         public static bool IsDataTypeIgnoringUserStartNodes(this IDataTypeService dataTypeService, Guid key)
         {

@@ -19,7 +19,7 @@ namespace Umbraco.Web.Actions
             return this.OfType<T>().FirstOrDefault();
         }
 
-        internal IEnumerable<IAction> GetByLetters(IEnumerable<string> letters)
+        public IEnumerable<IAction> GetByLetters(IEnumerable<string> letters)
         {
             var actions = this.ToArray(); // no worry: internally, it's already an array
             return letters
@@ -29,7 +29,7 @@ namespace Umbraco.Web.Actions
                 .ToList();
         }
 
-        internal IReadOnlyList<IAction> FromEntityPermission(EntityPermission entityPermission)
+        public IReadOnlyList<IAction> FromEntityPermission(EntityPermission entityPermission)
         {
             var actions = this.ToArray(); // no worry: internally, it's already an array
             return entityPermission.AssignedPermissions

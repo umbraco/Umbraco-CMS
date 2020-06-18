@@ -1,12 +1,16 @@
 ﻿using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Hosting;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Routing;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Runtime;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.BackOffice.Runtime
 {
@@ -31,6 +35,16 @@ namespace Umbraco.Web.BackOffice.Runtime
             var umbracoApiControllerTypes = composition.TypeLoader.GetUmbracoApiControllers().ToList();
             composition.Trees()
                 .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
+
+
+            composition.ComposeWebMappingProfiles();
+
+            composition.RegisterUniqueFor<IFileSystem, FilesTreeController>(factory =>
+                new PhysicalFileSystem(
+                    factory.GetInstance<IIOHelper>(),
+                    factory.GetInstance<IHostingEnvironment>(),
+                    factory.GetInstance<ILogger>(),
+                    "~/"));
         }
     }
 }

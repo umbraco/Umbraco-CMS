@@ -1,55 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Formatting;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.Trees;
-using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Umbraco.Web.Search;
-using Umbraco.Core.Mapping;
-using Umbraco.Web.Routing;
+using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
     [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, SortOrder = 1, TreeGroup = Constants.Trees.Groups.Settings)]
-    [Mvc.PluginController("UmbracoTrees")]
+    [PluginController("UmbracoTrees")]
     [CoreTree]
     public class MediaTypeTreeController : TreeController, ISearchableTree
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
         private readonly IMediaTypeService _mediaTypeService;
+        private readonly IEntityService  _entityService;
 
-        public MediaTypeTreeController(
-            UmbracoTreeSearcher treeSearcher,
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger logger,
-            IRuntimeState runtimeState,
-            UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider,
-            IMenuItemCollectionFactory menuItemCollectionFactory,
-            IMediaTypeService mediaTypeService)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
+        public MediaTypeTreeController(ILocalizedTextService localizedTextService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, UmbracoTreeSearcher treeSearcher, IMenuItemCollectionFactory menuItemCollectionFactory, IMediaTypeService mediaTypeService, IEntityService entityService) : base(localizedTextService, umbracoApiControllerTypeCollection)
         {
             _treeSearcher = treeSearcher;
             _menuItemCollectionFactory = menuItemCollectionFactory;
             _mediaTypeService = mediaTypeService;
+            _entityService = entityService;
         }
 
-        protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
+        protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
         {
             var intId = id.TryConvertTo<int>();
             if (intId == false) throw new InvalidOperationException("Id must be an integer");
@@ -57,7 +43,7 @@ namespace Umbraco.Web.Trees
             var nodes = new TreeNodeCollection();
 
             nodes.AddRange(
-                Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.MediaTypeContainer)
+                _entityService.GetChildren(intId.Result, UmbracoObjectTypes.MediaTypeContainer)
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
@@ -70,12 +56,12 @@ namespace Umbraco.Web.Trees
                     }));
 
             // if the request is for folders only then just return
-            if (queryStrings["foldersonly"].IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1") return nodes;
+            if (queryStrings["foldersonly"].ToString().IsNullOrWhiteSpace() == false && queryStrings["foldersonly"].ToString() == "1") return nodes;
 
             var mediaTypes = _mediaTypeService.GetAll();
 
             nodes.AddRange(
-                Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.MediaType)
+                _entityService.GetChildren(intId.Result, UmbracoObjectTypes.MediaType)
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
@@ -92,7 +78,7 @@ namespace Umbraco.Web.Trees
             return nodes;
         }
 
-        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        protected override MenuItemCollection GetMenuForNode(string id, FormCollection queryStrings)
         {
             var menu = _menuItemCollectionFactory.Create();
 
@@ -102,20 +88,20 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // root actions
-                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
-                menu.Items.Add(new RefreshNode(Services.TextService));
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add(new RefreshNode(LocalizedTextService));
                 return menu;
             }
 
-            var container = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.MediaTypeContainer);
+            var container = _entityService.Get(int.Parse(id), UmbracoObjectTypes.MediaTypeContainer);
             if (container != null)
             {
                 // set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
-                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
 
-                menu.Items.Add(new MenuItem("rename", Services.TextService.Localize("actions/rename"))
+                menu.Items.Add(new MenuItem("rename", LocalizedTextService.Localize("actions/rename"))
                 {
                     Icon = "icon icon-edit"
                 });
@@ -123,29 +109,29 @@ namespace Umbraco.Web.Trees
                 if (container.HasChildren == false)
                 {
                     // can delete doc type
-                    menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+                    menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
                 }
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
             }
             else
             {
-                var ct = Services.MediaTypeService.Get(int.Parse(id));
-                var parent = ct == null ? null : Services.MediaTypeService.Get(ct.ParentId);
+                var ct = _mediaTypeService.Get(int.Parse(id));
+                var parent = ct == null ? null : _mediaTypeService.Get(ct.ParentId);
 
-                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
 
                 // no move action if this is a child doc type
                 if (parent == null)
                 {
-                    menu.Items.Add<ActionMove>(Services.TextService, true, opensDialog: true);
+                    menu.Items.Add<ActionMove>(LocalizedTextService, true, opensDialog: true);
                 }
 
-                menu.Items.Add<ActionCopy>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true);
                 if(ct.IsSystemMediaType() == false)
                 {
-                    menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+                    menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
                 }
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
             }
 

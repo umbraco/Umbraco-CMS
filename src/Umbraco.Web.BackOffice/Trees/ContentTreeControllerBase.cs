@@ -3,52 +3,58 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Net.Http.Formatting;
-using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.Trees;
-using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Models.Entities;
-using System.Web.Http.ModelBinding;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Web.Actions;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Security;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Mapping;
-using Umbraco.Web.Routing;
+using Umbraco.Extensions;
+using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.Common.Exceptions;
+using Umbraco.Web.Common.ModelBinders;
+using Umbraco.Web.Security;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Trees
 {
     public abstract class ContentTreeControllerBase : TreeController, ITreeNodeController
     {
+        private readonly IEntityService _entityService;
+        private readonly IWebSecurity _webSecurity;
+        private readonly ILogger _logger;
+        private readonly ActionCollection _actionCollection;
+        private readonly IUserService _userService;
+        private readonly IDataTypeService _dataTypeService;
         public IMenuItemCollectionFactory MenuItemCollectionFactory { get; }
 
 
         protected ContentTreeControllerBase(
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger logger,
-            IRuntimeState runtimeState,
-            UmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider,
-            IMenuItemCollectionFactory menuItemCollectionFactory)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
+            ILocalizedTextService localizedTextService,
+            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+            IMenuItemCollectionFactory menuItemCollectionFactory,
+            IEntityService entityService,
+            IWebSecurity webSecurity,
+            ILogger logger,
+            ActionCollection actionCollection,
+            IUserService userService,
+            IDataTypeService dataTypeService
+            )
+            : base(localizedTextService, umbracoApiControllerTypeCollection)
         {
+            _entityService = entityService;
+            _webSecurity = webSecurity;
+            _logger = logger;
+            _actionCollection = actionCollection;
+            _userService = userService;
+            _dataTypeService = dataTypeService;
             MenuItemCollectionFactory = menuItemCollectionFactory;
         }
 
-        protected ContentTreeControllerBase()
-        {
-        }
 
         #region Actions
 
@@ -58,7 +64,7 @@ namespace Umbraco.Web.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        public TreeNode GetTreeNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings)
+        public ActionResult<TreeNode> GetTreeNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
             int asInt;
             Guid asGuid = Guid.Empty;
@@ -66,16 +72,16 @@ namespace Umbraco.Web.Trees
             {
                 if (Guid.TryParse(id, out asGuid) == false)
                 {
-                    throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                    return NotFound();
                 }
             }
 
             var entity = asGuid == Guid.Empty
-                    ? Services.EntityService.Get(asInt, UmbracoObjectType)
-                    : Services.EntityService.Get(asGuid, UmbracoObjectType);
+                    ? _entityService.Get(asInt, UmbracoObjectType)
+                    : _entityService.Get(asGuid, UmbracoObjectType);
             if (entity == null)
             {
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                return NotFound();
             }
 
             var node = GetSingleTreeNode(entity, entity.ParentId.ToInvariantString(), queryStrings);
@@ -92,7 +98,7 @@ namespace Umbraco.Web.Trees
         /// </summary>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        protected override TreeNode CreateRootNode(FormCollection queryStrings)
         {
             var node = base.CreateRootNode(queryStrings);
 
@@ -104,7 +110,7 @@ namespace Umbraco.Web.Trees
             return node;
         }
 
-        protected abstract TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormDataCollection queryStrings);
+        protected abstract TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormCollection queryStrings);
 
         /// <summary>
         /// Returns a <see cref="TreeNode"/> for the <see cref="IUmbracoEntity"/> and
@@ -114,7 +120,7 @@ namespace Umbraco.Web.Trees
         /// <param name="parentId"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        internal TreeNode GetSingleTreeNodeWithAccessCheck(IEntitySlim e, string parentId, FormDataCollection queryStrings,
+        internal TreeNode GetSingleTreeNodeWithAccessCheck(IEntitySlim e, string parentId, FormCollection queryStrings,
             int[] startNodeIds, string[] startNodePaths)
         {
             var entityIsAncestorOfStartNodes = ContentPermissionsHelper.IsInBranchOfStartNode(e.Path, startNodeIds, startNodePaths, out var hasPathAccess);
@@ -141,12 +147,12 @@ namespace Umbraco.Web.Trees
             switch (RecycleBinId)
             {
                 case Constants.System.RecycleBinMedia:
-                    startNodeIds = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
-                    startNodePaths = Security.CurrentUser.GetMediaStartNodePaths(Services.EntityService);
+                    startNodeIds = _webSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService);
+                    startNodePaths = _webSecurity.CurrentUser.GetMediaStartNodePaths(_entityService);
                     break;
                 case Constants.System.RecycleBinContent:
-                    startNodeIds = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
-                    startNodePaths = Security.CurrentUser.GetContentStartNodePaths(Services.EntityService);
+                    startNodeIds = _webSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService);
+                    startNodePaths = _webSecurity.CurrentUser.GetContentStartNodePaths(_entityService);
                     break;
                 default:
                     throw new NotSupportedException("Path access is only determined on content or media");
@@ -168,7 +174,7 @@ namespace Umbraco.Web.Trees
         /// </summary>
         protected abstract int[] UserStartNodes { get; }
 
-        protected virtual TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings)
+        protected virtual TreeNodeCollection PerformGetTreeNodes(string id, FormCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
 
@@ -190,7 +196,7 @@ namespace Umbraco.Web.Trees
                 // TODO: in the future we could return a validation statement so we can have some UI to notify the user they don't have access
                 if (ignoreUserStartNodes == false && HasPathAccess(id, queryStrings) == false)
                 {
-                    Logger.Warn<ContentTreeControllerBase>("User {Username} does not have access to node with id {Id}", Security.CurrentUser.Username, id);
+                    _logger.Warn<ContentTreeControllerBase>("User {Username} does not have access to node with id {Id}", _webSecurity.CurrentUser.Username, id);
                     return nodes;
                 }
 
@@ -225,7 +231,7 @@ namespace Umbraco.Web.Trees
                 var topNodeIds = entities.Except(topMostEntities).Select(GetTopNodeId).Where(x => x != 0).Distinct().ToArray();
                 if (topNodeIds.Length > 0)
                 {
-                    var topNodes = Services.EntityService.GetAll(UmbracoObjectType, topNodeIds.ToArray());
+                    var topNodes = _entityService.GetAll(UmbracoObjectType, topNodeIds.ToArray());
                     nodes.AddRange(topNodes.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths)).Where(x => x != null));
                 }
             }
@@ -247,11 +253,11 @@ namespace Umbraco.Web.Trees
             return parts.Length >= 2 && int.TryParse(parts[1], out id) ? id : 0;
         }
 
-        protected abstract MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings);
+        protected abstract MenuItemCollection PerformGetMenuForNode(string id, FormCollection queryStrings);
 
         protected abstract UmbracoObjectTypes UmbracoObjectType { get; }
 
-        protected virtual IEnumerable<IEntitySlim> GetChildEntities(string id, FormDataCollection queryStrings)
+        protected virtual IEnumerable<IEntitySlim> GetChildEntities(string id, FormCollection queryStrings)
         {
             // try to parse id as an integer else use GetEntityFromId
             // which will grok Guids, Udis, etc and let use obtain the id
@@ -273,7 +279,7 @@ namespace Umbraco.Web.Trees
             if (!ignoreUserStartNodes && entityId == Constants.System.Root && UserStartNodes.Contains(Constants.System.Root) == false)
             {
                 result = UserStartNodes.Length > 0
-                    ? Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes).ToArray()
+                    ? _entityService.GetAll(UmbracoObjectType, UserStartNodes).ToArray()
                     : Array.Empty<IEntitySlim>();
             }
             else
@@ -285,7 +291,7 @@ namespace Umbraco.Web.Trees
         }
 
         private IEnumerable<IEntitySlim> GetChildrenFromEntityService(int entityId)
-            => Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToList();
+            => _entityService.GetChildren(entityId, UmbracoObjectType).ToList();
 
         /// <summary>
         /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
@@ -294,7 +300,7 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings"></param>
         /// <returns></returns>
         //we should remove this in v8, it's now here for backwards compat only
-        protected abstract bool HasPathAccess(string id, FormDataCollection queryStrings);
+        protected abstract bool HasPathAccess(string id, FormCollection queryStrings);
 
         /// <summary>
         /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
@@ -302,12 +308,12 @@ namespace Umbraco.Web.Trees
         /// <param name="entity"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        protected bool HasPathAccess(IUmbracoEntity entity, FormDataCollection queryStrings)
+        protected bool HasPathAccess(IUmbracoEntity entity, FormCollection queryStrings)
         {
             if (entity == null) return false;
             return RecycleBinId == Constants.System.RecycleBinContent
-                ? Security.CurrentUser.HasContentPathAccess(entity, Services.EntityService)
-                : Security.CurrentUser.HasMediaPathAccess(entity, Services.EntityService);
+                ? _webSecurity.CurrentUser.HasContentPathAccess(entity, _entityService)
+                : _webSecurity.CurrentUser.HasMediaPathAccess(entity, _entityService);
         }
 
         /// <summary>
@@ -319,7 +325,7 @@ namespace Umbraco.Web.Trees
         /// <remarks>
         /// This method is overwritten strictly to render the recycle bin, it should serve no other purpose
         /// </remarks>
-        protected sealed override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
+        protected sealed override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
         {
             //check if we're rendering the root
             if (id == Constants.System.RootString && UserStartNodes.Contains(Constants.System.Root))
@@ -339,14 +345,14 @@ namespace Umbraco.Web.Trees
 
                 //only render the recycle bin if we are not in dialog and the start id is still the root
                 //we need to check for the "application" key in the queryString because its value is required here,
-                //and for some reason when there are no dashboards, this parameter is missing  
+                //and for some reason when there are no dashboards, this parameter is missing
                 if (IsDialog(queryStrings) == false && id == Constants.System.RootString && queryStrings.HasKey("application"))
                 {
                     nodes.Add(CreateTreeNode(
                         RecycleBinId.ToInvariantString(),
                         id,
                         queryStrings,
-                        Services.TextService.Localize("general/recycleBin"),
+                        LocalizedTextService.Localize("general/recycleBin"),
                         "icon-trash",
                         RecycleBinSmells,
                         queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/recyclebin"));
@@ -378,7 +384,7 @@ namespace Umbraco.Web.Trees
             // of this container node. If that is true, the HasChildren must be true so that the tree node still renders even though this current node is a container/list view.
             if (isContainer && UserStartNodes.Length > 0 && UserStartNodes.Contains(Constants.System.Root) == false)
             {
-                var startNodes = Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes);
+                var startNodes = _entityService.GetAll(UmbracoObjectType, UserStartNodes);
                 //if any of these start nodes' parent is current, then we need to render children normally so we need to switch some logic and tell
                 // the UI that this node does have children and that it isn't a container
 
@@ -404,7 +410,7 @@ namespace Umbraco.Web.Trees
         /// <remarks>
         /// Currently this just checks if it is a container type, if it is we cannot render children. In the future this might check for other things.
         /// </remarks>
-        private TreeNodeCollection GetTreeNodesInternal(string id, FormDataCollection queryStrings)
+        private TreeNodeCollection GetTreeNodesInternal(string id, FormCollection queryStrings)
         {
             var current = GetEntityFromId(id);
 
@@ -426,16 +432,16 @@ namespace Umbraco.Web.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        protected sealed override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        protected sealed override MenuItemCollection GetMenuForNode(string id, FormCollection queryStrings)
         {
             if (RecycleBinId.ToInvariantString() == id)
             {
                 // get the default assigned permissions for this user
                 var deleteAllowed = false;
-                var deleteAction = Current.Actions.FirstOrDefault(y => y.Letter == ActionDelete.ActionLetter);
+                var deleteAction = _actionCollection.FirstOrDefault(y => y.Letter == ActionDelete.ActionLetter);
                 if (deleteAction != null)
                 {
-                    var perms = Security.CurrentUser.GetPermissions(Constants.System.RecycleBinContentString, Services.UserService);
+                    var perms = _webSecurity.CurrentUser.GetPermissions(Constants.System.RecycleBinContentString, _userService);
                     deleteAllowed = perms.FirstOrDefault(x => x.Contains(deleteAction.Letter)) != null;
                 }
 
@@ -443,12 +449,12 @@ namespace Umbraco.Web.Trees
                 // only add empty recycle bin if the current user is allowed to delete by default
                 if (deleteAllowed)
                 {
-	                menu.Items.Add(new MenuItem("emptyRecycleBin", Services.TextService)
+	                menu.Items.Add(new MenuItem("emptyRecycleBin", LocalizedTextService)
 	                {
 	                    Icon = "trash",
 	                    OpensDialog = true
 	                });
-	                menu.Items.Add(new RefreshNode(Services.TextService, true));
+	                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 				}
                 return menu;
             }
@@ -486,8 +492,8 @@ namespace Umbraco.Web.Trees
 
         internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
-            var permissionsForPath = Services.UserService.GetPermissionsForPath(Security.CurrentUser, dd.Path).GetAllPermissions();
-            return Current.Actions.GetByLetters(permissionsForPath).Select(x => new MenuItem(x));
+            var permissionsForPath = _userService.GetPermissionsForPath(_webSecurity.CurrentUser, dd.Path).GetAllPermissions();
+            return _actionCollection.GetByLetters(permissionsForPath).Select(x => new MenuItem(x));
         }
 
         /// <summary>
@@ -549,16 +555,16 @@ namespace Umbraco.Web.Trees
 
                 if (Guid.TryParse(s, out var idGuid))
                 {
-                    entity = Services.EntityService.Get(idGuid, UmbracoObjectType);
+                    entity = _entityService.Get(idGuid, UmbracoObjectType);
                 }
                 else if (int.TryParse(s, out var idInt))
                 {
-                    entity = Services.EntityService.Get(idInt, UmbracoObjectType);
+                    entity = _entityService.Get(idInt, UmbracoObjectType);
                 }
                 else if (UdiParser.TryParse(s, out var idUdi))
                 {
                     var guidUdi = idUdi as GuidUdi;
-                    entity = guidUdi != null ? Services.EntityService.Get(guidUdi.Guid, UmbracoObjectType) : null;
+                    entity = guidUdi != null ? _entityService.Get(guidUdi.Guid, UmbracoObjectType) : null;
                 }
                 else
                 {
@@ -580,12 +586,12 @@ namespace Umbraco.Web.Trees
         /// </summary>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        internal bool IgnoreUserStartNodes(FormDataCollection queryStrings)
+        internal bool IgnoreUserStartNodes(FormCollection queryStrings)
         {
             if (_ignoreUserStartNodes.HasValue) return _ignoreUserStartNodes.Value;
 
             var dataTypeKey = queryStrings.GetValue<Guid?>(TreeQueryStringParameters.DataTypeKey);
-            _ignoreUserStartNodes = dataTypeKey.HasValue && Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeKey.Value);
+            _ignoreUserStartNodes = dataTypeKey.HasValue && _dataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeKey.Value);
 
             return _ignoreUserStartNodes.Value;
         }

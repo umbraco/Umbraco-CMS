@@ -2,7 +2,7 @@
 using Umbraco.Core.Models;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
-
+//Migrated to .NET CORE
 namespace Umbraco.Web.Models.Mapping
 {
     public class CommonTreeNodeMapper
