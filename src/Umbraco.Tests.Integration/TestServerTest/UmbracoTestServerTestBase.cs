@@ -64,7 +64,8 @@ namespace Umbraco.Tests.Integration.TestServerTest
         [TearDown]
         public void TearDown()
         {
-            Client.Dispose();
+
+            Factory.Dispose();
 
             if (Current.IsInitialized)
             {

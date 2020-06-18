@@ -92,7 +92,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
         {
             var url = PrepareUrl<ContentController>(x => x.PostSave(null));
 
-            var contentService = GetRequiredService<IContentService>();
+
             var contentTypeService = GetRequiredService<IContentTypeService>();
 
             var contentType = new ContentTypeBuilder()
@@ -108,6 +108,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
 
             contentTypeService.Save(contentType);
 
+            var contentService = GetRequiredService<IContentService>();
             var content = new ContentBuilder()
                 .WithId(0)
                 .WithName("Invariant")
@@ -139,8 +140,12 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
 
             var body = await response.Content.ReadAsStringAsync();
 
-             Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
-             Assert.AreEqual(")]}',\n{\"message\":\"No variants flagged for saving\"}", body);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+                Assert.AreEqual(")]}',\n{\"message\":\"No variants flagged for saving\"}", body);
+            });
+
         }
 
         /// <summary>
@@ -253,9 +258,13 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
 
             body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
 
-             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, body);
-             var display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
-             Assert.AreEqual(1, display.Variants.Count());
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, body);
+                var display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
+                Assert.AreEqual(1, display.Variants.Count());
+            });
+
         }
 
         [Test]
@@ -307,11 +316,13 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
 
             body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
 
-             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-             var display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
-             Assert.AreEqual(1, display.Errors.Count());
-             Assert.IsTrue(display.Errors.ContainsKey("Variants[0].Name"));
-             //ModelState":{"Variants[0].Name":["Required"]}
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+                var display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
+                Assert.AreEqual(1, display.Errors.Count(), string.Join(",", display.Errors));
+                CollectionAssert.Contains(display.Errors.Keys, "Variants[0].Name");
+            });
         }
 
         [Test]
@@ -358,15 +369,18 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
             });
 
             // Assert
-
             var body = await response.Content.ReadAsStringAsync();
-
             body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-            var display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
-            Assert.AreEqual(2, display.Errors.Count());
-            Assert.IsTrue(display.Errors.ContainsKey("Variants[0].Name"));
-            Assert.IsTrue(display.Errors.ContainsKey("_content_variant_en-US_null_"));
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+                var display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
+                Assert.AreEqual(2, display.Errors.Count());
+                CollectionAssert.Contains(display.Errors.Keys, "Variants[0].Name");
+                CollectionAssert.Contains(display.Errors.Keys, "_content_variant_en-US_null_");
+            });
+
+
         }
 
 
