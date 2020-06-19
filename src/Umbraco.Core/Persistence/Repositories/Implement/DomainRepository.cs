@@ -8,13 +8,12 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
-    // TODO: We need to get a readonly ISO code for the domain assigned
-
     internal class DomainRepository : NPocoRepositoryBase<int, IDomain>, IDomainRepository
     {
         public DomainRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
@@ -39,8 +38,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 sql.Where("umbracoDomain.id in (@ids)", new { ids = ids });
             }
+            sql.OrderBy<DomainDto>(dto => dto.SortOrder);
 
-            return Database.Fetch<DomainDto>(sql).Select(ConvertFromDto);
+            return Database.Fetch<DomainDto>(sql).Select(DomainFactory.BuildEntity);
         }
 
         protected override IEnumerable<IDomain> PerformGetByQuery(IQuery<IDomain> query)
@@ -104,8 +104,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             entity.AddingEntity();
 
-            var factory = new DomainModelFactory();
-            var dto = factory.BuildDto(entity);
+            // Get sort order
+            entity.SortOrder = GetNewSortOrder(entity.RootContentId);
+
+            var dto = DomainFactory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
@@ -140,8 +142,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (languageExists == 0) throw new NullReferenceException("No language exists with id " + entity.LanguageId.Value);
             }
 
-            var factory = new DomainModelFactory();
-            var dto = factory.BuildDto(entity);
+            var dto = DomainFactory.BuildDto(entity);
 
             Database.Update(dto);
 
@@ -153,6 +154,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             entity.ResetDirtyProperties();
         }
+
+        protected int GetNewSortOrder(int? rootContentId)
+            => Database.ExecuteScalar<int>("SELECT COALESCE(MAX(sortOrder), -1) FROM umbracoDomain WHERE domainRootStructureID = @rootContentId", new { rootContentId }) + 1;
 
         public IDomain GetByName(string domainName)
         {
@@ -174,36 +178,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return GetMany()
                 .Where(x => x.RootContentId == contentId)
                 .Where(x => includeWildcards || x.IsWildcard == false);
-        }
-
-        private IDomain ConvertFromDto(DomainDto dto)
-        {
-            var factory = new DomainModelFactory();
-            var entity = factory.BuildEntity(dto);
-            return entity;
-        }
-
-        internal class DomainModelFactory
-        {
-
-            public IDomain BuildEntity(DomainDto dto)
-            {
-                var domain = new UmbracoDomain(dto.DomainName, dto.IsoCode)
-                {
-                    Id = dto.Id,
-                    LanguageId = dto.DefaultLanguage,
-                    RootContentId = dto.RootStructureId
-                };
-                // reset dirty initial properties (U4-1946)
-                domain.ResetDirtyProperties(false);
-                return domain;
-            }
-
-            public DomainDto BuildDto(IDomain entity)
-            {
-                var dto = new DomainDto { DefaultLanguage = entity.LanguageId, DomainName = entity.DomainName, Id = entity.Id, RootStructureId = entity.RootContentId };
-                return dto;
-            }
         }
     }
 }
