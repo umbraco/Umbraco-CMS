@@ -92,7 +92,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.AddingEntity();
 
             // Get sort order
-            entity.SortOrder = GetNewSortOrder(entity.RootContentId);
+            entity.SortOrder = GetNewSortOrder(entity.RootContentId, entity.IsWildcard);
 
             var dto = DomainFactory.BuildDto(entity);
 
@@ -141,8 +141,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.ResetDirtyProperties();
         }
 
-        protected int GetNewSortOrder(int? rootContentId)
-            => Database.ExecuteScalar<int>("SELECT COALESCE(MAX(sortOrder), -1) FROM umbracoDomain WHERE domainRootStructureID = @rootContentId", new { rootContentId }) + 1;
+        protected int GetNewSortOrder(int? rootContentId, bool isWildcard)
+            => isWildcard ? -1 : Database.ExecuteScalar<int>("SELECT COALESCE(MAX(sortOrder), -1) + 1 FROM umbracoDomain WHERE domainRootStructureID = @rootContentId AND NOT (LEN(domainName) = 0 OR CHARINDEX('*', domainName) = 1)", new { rootContentId });
 
         public IDomain GetByName(string domainName)
             => GetMany().FirstOrDefault(x => x.DomainName.InvariantEquals(domainName));
