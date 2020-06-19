@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Web.Mvc;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
@@ -53,19 +55,32 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="viewData"></param>
         /// <returns></returns>
+        public static BackOfficeExternalLoginProviderErrors GetExternalSignInProviderErrors(this ViewDataDictionary viewData)
+        {
+            return (BackOfficeExternalLoginProviderErrors)viewData[TokenExternalSignInError];
+        }
+
+        [Obsolete("Use GetExternalSignInProviderErrors instead")]
         public static IEnumerable<string> GetExternalSignInError(this ViewDataDictionary viewData)
         {
-            return (IEnumerable<string>)viewData[TokenExternalSignInError];
+            var errs = viewData.GetExternalSignInProviderErrors();
+            return errs.Errors;
         }
 
         /// <summary>
         /// Used by the back office controller to register any external login provider errors
         /// </summary>
         /// <param name="viewData"></param>
-        /// <param name="value"></param>
+        /// <param name="errors"></param>
+        public static void SetExternalSignInProviderErrors(this ViewDataDictionary viewData, BackOfficeExternalLoginProviderErrors errors)
+        {
+            viewData[TokenExternalSignInError] = errors;
+        }
+
+        [Obsolete("Use SetExternalSignInProviderErrors instead")]
         public static void SetExternalSignInError(this ViewDataDictionary viewData, IEnumerable<string> value)
         {
-            viewData[TokenExternalSignInError] = value;
+            viewData[TokenExternalSignInError] = new BackOfficeExternalLoginProviderErrors(string.Empty, value);
         }
 
         public static string GetPasswordResetCode(this ViewDataDictionary viewData)

@@ -76,7 +76,7 @@ namespace Umbraco.Web.Editors
             //if you are hitting VerifyInvite, you're already signed in as a different user, and the token is invalid
             //you'll exit on one of the return RedirectToAction("Default") but you're still logged in so you just get
             //dumped at the default admin view with no detail
-            if(Security.IsAuthenticated())
+            if (Security.IsAuthenticated())
             {
                 AuthenticationManager.SignOut(
                     Core.Constants.Security.BackOfficeAuthenticationType,
@@ -176,7 +176,7 @@ namespace Umbraco.Web.Editors
             {
                 var slashIndex = kv.Key.IndexOf('/');
                 var areaAlias = kv.Key.Substring(0, slashIndex);
-                var valueAlias = kv.Key.Substring(slashIndex+1);
+                var valueAlias = kv.Key.Substring(slashIndex + 1);
                 return new
                 {
                     areaAlias,
@@ -296,7 +296,7 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpGet]
-        public async Task<ActionResult> ValidatePasswordResetCode([Bind(Prefix = "u")]int userId, [Bind(Prefix = "r")]string resetCode)
+        public async Task<ActionResult> ValidatePasswordResetCode([Bind(Prefix = "u")] int userId, [Bind(Prefix = "r")] string resetCode)
         {
             var user = UserManager.FindById(userId);
             if (user != null)
@@ -433,7 +433,10 @@ namespace Umbraco.Web.Editors
             {
                 if (await AutoLinkAndSignInExternalAccount(loginInfo, autoLinkOptions) == false)
                 {
-                    ViewData.SetExternalSignInError(new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to an account" });
+                    ViewData.SetExternalSignInProviderErrors(
+                        new BackOfficeExternalLoginProviderErrors(
+                            loginInfo.Login.LoginProvider,
+                            new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to an account" }));
                 }
 
                 //Remove the cookie otherwise this message will keep appearing
@@ -457,7 +460,10 @@ namespace Umbraco.Web.Editors
             //we are allowing auto-linking/creating of local accounts
             if (loginInfo.Email.IsNullOrWhiteSpace())
             {
-                ViewData.SetExternalSignInError(new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not provided an email address, the account cannot be linked." });
+                ViewData.SetExternalSignInProviderErrors(
+                    new BackOfficeExternalLoginProviderErrors(
+                        loginInfo.Login.LoginProvider,
+                        new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not provided an email address, the account cannot be linked." }));
             }
             else
             {
@@ -494,7 +500,10 @@ namespace Umbraco.Web.Editors
 
                     if (userCreationResult.Succeeded == false)
                     {
-                        ViewData.SetExternalSignInError(userCreationResult.Errors);
+                        ViewData.SetExternalSignInProviderErrors(
+                            new BackOfficeExternalLoginProviderErrors(
+                                loginInfo.Login.LoginProvider,
+                                userCreationResult.Errors));
                     }
                     else
                     {
@@ -511,14 +520,20 @@ namespace Umbraco.Web.Editors
             var linkResult = await UserManager.AddLoginAsync(autoLinkUser.Id, loginInfo.Login);
             if (linkResult.Succeeded == false)
             {
-                ViewData.SetExternalSignInError(linkResult.Errors);
+                ViewData.SetExternalSignInProviderErrors(
+                    new BackOfficeExternalLoginProviderErrors(
+                        loginInfo.Login.LoginProvider,
+                        linkResult.Errors));
 
                 //If this fails, we should really delete the user since it will be in an inconsistent state!
                 var deleteResult = await UserManager.DeleteAsync(autoLinkUser);
                 if (deleteResult.Succeeded == false)
                 {
                     //DOH! ... this isn't good, combine all errors to be shown
-                    ViewData.SetExternalSignInError(linkResult.Errors.Concat(deleteResult.Errors));
+                    ViewData.SetExternalSignInProviderErrors(
+                        new BackOfficeExternalLoginProviderErrors(
+                            loginInfo.Login.LoginProvider,
+                            linkResult.Errors.Concat(deleteResult.Errors)));
                 }
             }
             else

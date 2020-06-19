@@ -14,6 +14,7 @@ using Umbraco.Core;
 namespace Umbraco.Web
 {
     using Core.Configuration;
+    using System;
     using Umbraco.Web.JavaScript;
     using Umbraco.Web.Security;
 
@@ -58,7 +59,7 @@ namespace Umbraco.Web
         /// <param name="html"></param>
         /// <param name="externalLoginErrors"></param>
         /// <returns></returns>
-        public static IHtmlString AngularValueExternalLoginInfoScript(this HtmlHelper html, IEnumerable<string> externalLoginErrors)
+        public static IHtmlString AngularValueExternalLoginInfoScript(this HtmlHelper html, BackOfficeExternalLoginProviderErrors externalLoginErrors)
         {
             var loginProviders = html.ViewContext.HttpContext.GetOwinContext().Authentication.GetBackOfficeExternalLoginProviders()
                 .Select(p => new
@@ -75,19 +76,28 @@ namespace Umbraco.Web
 
             if (externalLoginErrors != null)
             {
-                foreach (var error in externalLoginErrors)
+                foreach (var error in externalLoginErrors.Errors)
                 {
                     sb.AppendFormat(@"errors.push(""{0}"");", error).AppendLine();
                 }
             }
 
+            // TODO: Here we can check if there are 
+
             sb.AppendLine(@"app.value(""externalLoginInfo"", {");
+            sb.AppendLine($@"errorProvider: '{externalLoginErrors.AuthenticationType}',");
             sb.AppendLine(@"errors: errors,");
             sb.Append(@"providers: ");
             sb.AppendLine(JsonConvert.SerializeObject(loginProviders));
             sb.AppendLine(@"});");
 
             return html.Raw(sb.ToString());
+        }
+
+        [Obsolete("Use the other overload instead")]
+        public static IHtmlString AngularValueExternalLoginInfoScript(this HtmlHelper html, IEnumerable<string> externalLoginErrors)
+        {
+            return html.AngularValueExternalLoginInfoScript(new BackOfficeExternalLoginProviderErrors(string.Empty, externalLoginErrors));
         }
 
         /// <summary>
