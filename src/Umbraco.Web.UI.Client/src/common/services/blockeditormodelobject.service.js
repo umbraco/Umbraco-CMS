@@ -403,8 +403,6 @@
 
             this.scaffolds = [];
 
-            this.watchers = [];
-
             this.isolatedScope = propertyScope.$new(true);
             this.isolatedScope.blockObjects = {};
             
@@ -527,6 +525,7 @@
              * The Block Object setups live syncronization of content and settings models back to the data of your Property Editor model.
              * The returned object, named ´BlockObject´, contains several usefull models to make editing of this block happen.
              * The ´BlockObject´ contains the following properties:
+             * - key {string}: runtime generated key, usefull for tracking of this object
              * - content {Object}: Content model, the content data in a ElementType model.
              * - settings {Object}: Settings model, the settings data in a ElementType model.
              * - config {Object}: A local deep copy of the block configuration model.
@@ -576,6 +575,7 @@
                 blockObject.cloneNode = function() {
                     return null;// angularJS accept this as a cloned value as long as the 
                 }
+                blockObject.key = String.CreateGuid().replace(/-/g, "");
                 blockObject.config = Utilities.copy(blockConfiguration);
                 if (blockObject.config.label && blockObject.config.label !== "") {
                     blockObject.labelInterpolator = $interpolate(blockObject.config.label);
@@ -763,7 +763,6 @@
                 delete this.propertyEditorAlias;
                 delete this.blockConfigurations;
                 delete this.scaffolds;
-                delete this.watchers;
                 this.isolatedScope.$destroy();
                 delete this.isolatedScope;
             }

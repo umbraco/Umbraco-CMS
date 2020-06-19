@@ -6,7 +6,7 @@
 
         <div ui-sortable="vm.sortableOptions" ng-model="vm.layout" ng-if="vm.loading !== true">
 
-            <div ng-repeat="layout in vm.layout track by layout.$block.content.udi">
+            <div ng-repeat="layout in vm.layout track by layout.$block.key">
 
                 <button
                     type="button"
