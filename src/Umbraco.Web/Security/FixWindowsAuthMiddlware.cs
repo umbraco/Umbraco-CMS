@@ -8,6 +8,7 @@ using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {
+
     /// <summary>
     /// This is used to inspect the request to see if 2 x identities are assigned: A windows one and a back office one.
     /// When this is the case, it means that auth has executed for Windows & auth has executed for our back office cookie

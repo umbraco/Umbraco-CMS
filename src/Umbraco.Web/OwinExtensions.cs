@@ -12,6 +12,16 @@ namespace Umbraco.Web
 {
     public static class OwinExtensions
     {
+        public static void SetExternalLoginProviderErrors(this IOwinContext owinContext, BackOfficeExternalLoginProviderErrors errors)
+        {
+            // TODO: Once this is set, we could use more custom middleware to set the cookie and redirect so it's not up to the
+            // oauth provider to handle all of this manually
+            owinContext.Set(errors);
+        }
+
+        internal static BackOfficeExternalLoginProviderErrors GetExternalLoginProviderErrors(this IOwinContext owinContext)
+            => owinContext.Get<BackOfficeExternalLoginProviderErrors>();
+
         /// <summary>
         /// Gets the <see cref="ISecureDataFormat{AuthenticationTicket}"/> for the Umbraco back office cookie
         /// </summary>

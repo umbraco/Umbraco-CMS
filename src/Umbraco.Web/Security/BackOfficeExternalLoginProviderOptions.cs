@@ -1,10 +1,12 @@
 ﻿using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using System;
+using System.Collections;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Security
 {
+
     /// <summary>
     /// Options used to configure back office external login providers
     /// </summary>
@@ -45,5 +47,22 @@ namespace Umbraco.Web.Security
         /// provider's redirect settings will win.
         /// </remarks>
         public bool AutoRedirectLoginToExternalProvider { get; set; }
+
+        /// <summary>
+        /// A path (can be a virtual path) to a custom angular view that can be used to customize the login page UI
+        /// </summary>
+        /// <remarks>
+        /// The types of customization used for this view are:
+        /// - Displaying external login provider errors
+        /// - Displaying extra information, links, etc... to the user when logging out
+        /// - Displaying extra information, links, etc... to the user when logging in (if auto-login redirect is disabled)
+        /// </remarks>
+        public string BackOfficeCustomLoginView { get; set; }
+
+        /// <summary>
+        /// If set to true then Umbraco will not automatically show any external login provider errors for this provider and instead will leave it up to the custom view
+        /// assigned to display any errors
+        /// </summary>
+        public bool BackOfficeCustomLoginViewHandlesErrors { get; set; }
     }
 }

@@ -48,11 +48,21 @@ namespace Umbraco.Web
             viewData[TokenUmbracoBaseFolder] = value;
         }
 
+        /// <summary>
+        /// Used by the back office login screen to get any registered external login provider errors
+        /// </summary>
+        /// <param name="viewData"></param>
+        /// <returns></returns>
         public static IEnumerable<string> GetExternalSignInError(this ViewDataDictionary viewData)
         {
             return (IEnumerable<string>)viewData[TokenExternalSignInError];
         }
 
+        /// <summary>
+        /// Used by the back office controller to register any external login provider errors
+        /// </summary>
+        /// <param name="viewData"></param>
+        /// <param name="value"></param>
         public static void SetExternalSignInError(this ViewDataDictionary viewData, IEnumerable<string> value)
         {
             viewData[TokenExternalSignInError] = value;
