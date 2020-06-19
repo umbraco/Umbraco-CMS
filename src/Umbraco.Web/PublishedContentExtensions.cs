@@ -296,7 +296,7 @@ namespace Umbraco.Web
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
-        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
+        // TODO: This method should be removed or moved to an extension method on HtmlHelper.
         public static HtmlString IsEqual(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
         {
             return content.IsEqual(other, valueIfTrue, string.Empty);
@@ -312,13 +312,23 @@ namespace Umbraco.Web
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
-        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
+        // TODO: This method should be removed or moved to an extension method on HtmlHelper.
         public static HtmlString IsEqual(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(HttpUtility.HtmlEncode(content.IsEqual(other) ? valueIfTrue : valueIfFalse));
         }
 
-        [Obsolete("Use the negated value of IsEqual() instead.")]
+        /// <summary>
+        /// If the specified <paramref name="content" /> is not equal to <paramref name="other" />, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <paramref name="valueIfFalse" />.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="other">The other content.</param>
+        /// <param name="valueIfTrue">The value if <c>true</c>.</param>
+        /// <param name="valueIfFalse">The value if <c>false</c>.</param>
+        /// <returns>
+        /// The HTML encoded value.
+        /// </returns>
+        // TODO: This method should be removed or moved to an extension method on HtmlHelper.
         public static bool IsNotEqual(this IPublishedContent content, IPublishedContent other)
         {
             return content.IsEqual(other) == false;
@@ -333,7 +343,7 @@ namespace Umbraco.Web
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
-        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
+        // TODO: This method should be removed or moved to an extension method on HtmlHelper.
         public static HtmlString IsNotEqual(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
         {
             return content.IsNotEqual(other, valueIfTrue, string.Empty);
@@ -349,7 +359,7 @@ namespace Umbraco.Web
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
-        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
+        // TODO: This method should be removed or moved to an extension method on HtmlHelper.
         public static HtmlString IsNotEqual(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(HttpUtility.HtmlEncode(content.IsNotEqual(other) ? valueIfTrue : valueIfFalse));
@@ -373,7 +383,7 @@ namespace Umbraco.Web
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
-        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
+        // TODO: This method should be removed or moved to an extension method on HtmlHelper.
         public static HtmlString IsDescendant(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
         {
             return content.IsDescendant(other, valueIfTrue, string.Empty);
@@ -389,7 +399,7 @@ namespace Umbraco.Web
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
-        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
+        // TODO: This method should be removed or moved to an extension method on HtmlHelper.
         public static HtmlString IsDescendant(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(HttpUtility.HtmlEncode(content.IsDescendant(other) ? valueIfTrue : valueIfFalse));
@@ -409,7 +419,7 @@ namespace Umbraco.Web
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
-        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
+        // TODO: This method should be removed or moved to an extension method on HtmlHelper.
         public static HtmlString IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
         {
             return content.IsDescendantOrSelf(other, valueIfTrue, string.Empty);
@@ -425,7 +435,7 @@ namespace Umbraco.Web
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
-        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
+        // TODO: This method should be removed or moved to an extension method on HtmlHelper.
         public static HtmlString IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(HttpUtility.HtmlEncode(content.IsDescendantOrSelf(other) ? valueIfTrue : valueIfFalse));
@@ -445,7 +455,7 @@ namespace Umbraco.Web
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
-        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
+        // TODO: This method should be removed or moved to an extension method on HtmlHelper.
         public static HtmlString IsAncestor(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
         {
             return content.IsAncestor(other, valueIfTrue, string.Empty);
@@ -461,7 +471,7 @@ namespace Umbraco.Web
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
-        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
+        // TODO: This method should be removed or moved to an extension method on HtmlHelper.
         public static HtmlString IsAncestor(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(HttpUtility.HtmlEncode(content.IsAncestor(other) ? valueIfTrue : valueIfFalse));
@@ -481,7 +491,7 @@ namespace Umbraco.Web
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
-        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
+        // TODO: This method should be removed or moved to an extension method on HtmlHelper.
         public static HtmlString IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
         {
             return content.IsAncestorOrSelf(other, valueIfTrue, string.Empty);
@@ -497,7 +507,7 @@ namespace Umbraco.Web
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
-        [Obsolete("This method should be removed or moved to an extension method on HtmlHelper.")]
+        // TODO: This method should be removed or moved to an extension method on HtmlHelper.
         public static HtmlString IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(HttpUtility.HtmlEncode(content.IsAncestorOrSelf(other) ? valueIfTrue : valueIfFalse));
