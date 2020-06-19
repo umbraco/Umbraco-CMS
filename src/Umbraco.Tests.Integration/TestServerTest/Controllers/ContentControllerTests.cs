@@ -20,17 +20,6 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class ContentControllerTests : UmbracoTestServerTestBase
     {
-        [SetUp]
-        public void Setup()
-        {
-            var localizationService = GetRequiredService<ILocalizationService>();
-
-            //Add another language
-            localizationService.Save(new LanguageBuilder()
-                .WithCultureInfo("da-DK")
-                .WithIsDefault(false)
-                .Build());
-        }
 
         /// <summary>
         ///     Returns 404 if the content wasn't found based on the ID specified
@@ -39,6 +28,14 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
         [Test]
         public async Task PostSave_Validate_Existing_Content()
         {
+            var localizationService = GetRequiredService<ILocalizationService>();
+
+            //Add another language
+            localizationService.Save(new LanguageBuilder()
+                .WithCultureInfo("da-DK")
+                .WithIsDefault(false)
+                .Build());
+
             var url = PrepareUrl<ContentController>(x => x.PostSave(null));
 
             var contentService = GetRequiredService<IContentService>();
@@ -90,6 +87,15 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
         [Test]
         public async Task PostSave_Validate_At_Least_One_Variant_Flagged_For_Saving()
         {
+
+            var localizationService = GetRequiredService<ILocalizationService>();
+
+            //Add another language
+            localizationService.Save(new LanguageBuilder()
+                .WithCultureInfo("da-DK")
+                .WithIsDefault(false)
+                .Build());
+
             var url = PrepareUrl<ContentController>(x => x.PostSave(null));
 
 
@@ -155,6 +161,14 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
         [Test]
         public async Task PostSave_Validate_Properties_Exist()
         {
+            var localizationService = GetRequiredService<ILocalizationService>();
+
+            //Add another language
+            localizationService.Save(new LanguageBuilder()
+                .WithCultureInfo("da-DK")
+                .WithIsDefault(false)
+                .Build());
+
             var url = PrepareUrl<ContentController>(x => x.PostSave(null));
 
             var contentService = GetRequiredService<IContentService>();
@@ -214,6 +228,14 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
         [Test]
         public async Task PostSave_Simple_Invariant()
         {
+            var localizationService = GetRequiredService<ILocalizationService>();
+
+            //Add another language
+            localizationService.Save(new LanguageBuilder()
+                .WithCultureInfo("da-DK")
+                .WithIsDefault(false)
+                .Build());
+
             var url = PrepareUrl<ContentController>(x => x.PostSave(null));
 
             var contentService = GetRequiredService<IContentService>();
@@ -270,6 +292,14 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
         [Test]
         public async Task PostSave_Validate_Empty_Name()
         {
+            var localizationService = GetRequiredService<ILocalizationService>();
+
+            //Add another language
+            localizationService.Save(new LanguageBuilder()
+                .WithCultureInfo("da-DK")
+                .WithIsDefault(false)
+                .Build());
+
             var url = PrepareUrl<ContentController>(x => x.PostSave(null));
 
             var contentService = GetRequiredService<IContentService>();
@@ -328,6 +358,14 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
         [Test]
         public async Task PostSave_Validate_Variants_Empty_Name()
         {
+            var localizationService = GetRequiredService<ILocalizationService>();
+
+            //Add another language
+            localizationService.Save(new LanguageBuilder()
+                .WithCultureInfo("da-DK")
+                .WithIsDefault(false)
+                .Build());
+
             var url = PrepareUrl<ContentController>(x => x.PostSave(null));
 
             var contentService = GetRequiredService<IContentService>();
@@ -383,9 +421,5 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
 
         }
 
-
-        private class TestContentItemSave : ContentItemSave
-        {
-        }
     }
 }
