@@ -7,6 +7,7 @@ using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_1;
 using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_6_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_8_0;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -191,10 +192,13 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<MissingContentVersionsIndexes>("{EE288A91-531B-4995-8179-1D62D9AA3E2E}");
             To<AddMainDomLock>("{2AB29964-02A1-474D-BD6B-72148D2A53A2}");
 
-
+            // to 8.7.0
             To<MissingDictionaryIndex>("{a78e3369-8ea3-40ec-ad3f-5f76929d2b20}");
 
-            //FINAL
+            // to 8.8.0
+            To<AddDomainSortOrder>("{ace18303-f74a-40d2-83c4-4ab24b33cbfb}");
+
+            // FINAL
         }
     }
 }
