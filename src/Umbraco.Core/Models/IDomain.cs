@@ -13,5 +13,7 @@ namespace Umbraco.Core.Models
         /// Readonly value of the language ISO code for the domain
         /// </summary>
         string LanguageIsoCode { get; }
+
+        int SortOrder { get; set; }
     }
 }

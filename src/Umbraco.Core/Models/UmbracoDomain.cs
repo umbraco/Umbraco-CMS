@@ -22,6 +22,7 @@ namespace Umbraco.Core.Models
         private int? _contentId;
         private int? _languageId;
         private string _domainName;
+        private int _sortOrder;
 
         [DataMember]
         public int? LanguageId
@@ -47,8 +48,15 @@ namespace Umbraco.Core.Models
         public bool IsWildcard => string.IsNullOrWhiteSpace(DomainName) || DomainName.StartsWith("*");
 
         /// <summary>
-        /// Readonly value of the language ISO code for the domain
+        /// Read-only value of the language ISO code for the domain.
         /// </summary>
         public string LanguageIsoCode { get; internal set; }
+
+        [DataMember]
+        public int SortOrder
+        {
+            get => _sortOrder;
+            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, nameof(SortOrder));
+        }
     }
 }
