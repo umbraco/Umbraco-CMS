@@ -21,22 +21,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         { }
 
         protected override IRepositoryCachePolicy<IDomain, int> CreateCachePolicy()
-        {
-            return new FullDataSetRepositoryCachePolicy<IDomain, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
-        }
+            => new FullDataSetRepositoryCachePolicy<IDomain, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, false);
 
         protected override IDomain PerformGet(int id)
-        {
-            //use the underlying GetAll which will force cache all domains
-            return GetMany().FirstOrDefault(x => x.Id == id);
-        }
+            // Use the underlying GetAll which will force cache all domains
+            => GetMany().FirstOrDefault(x => x.Id == id);
 
         protected override IEnumerable<IDomain> PerformGetAll(params int[] ids)
         {
             var sql = GetBaseQuery(false).Where("umbracoDomain.id > 0");
             if (ids.Any())
             {
-                sql.Where("umbracoDomain.id in (@ids)", new { ids = ids });
+                sql.Where("umbracoDomain.id in (@ids)", new { ids });
             }
             sql.OrderBy<DomainDto>(dto => dto.SortOrder);
 
@@ -44,9 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         protected override IEnumerable<IDomain> PerformGetByQuery(IQuery<IDomain> query)
-        {
-            throw new NotSupportedException("This repository does not support this method");
-        }
+            => throw new NotSupportedException("This repository does not support this method");
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
@@ -67,23 +61,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         protected override string GetBaseWhereClause()
-        {
-            return "umbracoDomain.id = @id";
-        }
+            => "umbracoDomain.id = @id";
 
         protected override IEnumerable<string> GetDeleteClauses()
-        {
-            var list = new List<string>
-                {
-                    "DELETE FROM umbracoDomain WHERE id = @id"
-                };
-            return list;
-        }
+            => new[]
+            {
+                "DELETE FROM umbracoDomain WHERE id = @id"
+            };
 
         protected override Guid NodeObjectTypeId
-        {
-            get { throw new NotImplementedException(); }
-        }
+            => throw new NotImplementedException();
 
         protected override void PersistNewItem(IDomain entity)
         {
@@ -112,10 +99,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
 
-            //if the language changed, we need to resolve the ISO code!
+            // If the language changed, we need to resolve the ISO code
             if (entity.LanguageId.HasValue)
             {
-                ((UmbracoDomain)entity).LanguageIsoCode = Database.ExecuteScalar<string>("SELECT languageISOCode FROM umbracoLanguage WHERE id=@langId", new { langId = entity.LanguageId });
+                ((UmbracoDomain)entity).LanguageIsoCode = Database.ExecuteScalar<string>("SELECT languageISOCode FROM umbracoLanguage WHERE id = @langId", new { langId = entity.LanguageId });
             }
 
             entity.ResetDirtyProperties();
@@ -125,9 +112,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             entity.UpdatingEntity();
 
-            var exists = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoDomain WHERE domainName = @domainName AND umbracoDomain.id <> @id",
-                new { domainName = entity.DomainName, id = entity.Id });
-            //ensure there is no other domain with the same name on another entity
+            // Ensure there is no other domain with the same name on another entity
+            var exists = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoDomain WHERE domainName = @domainName AND umbracoDomain.id <> @id", new { domainName = entity.DomainName, id = entity.Id });
             if (exists > 0) throw new DuplicateNameException(string.Format("The domain name {0} is already assigned", entity.DomainName));
 
             if (entity.RootContentId.HasValue)
@@ -146,10 +132,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             Database.Update(dto);
 
-            //if the language changed, we need to resolve the ISO code!
+            // If the language changed, we need to resolve the ISO code
             if (entity.WasPropertyDirty("LanguageId"))
             {
-                ((UmbracoDomain)entity).LanguageIsoCode = Database.ExecuteScalar<string>("SELECT languageISOCode FROM umbracoLanguage WHERE id=@langId", new {langId = entity.LanguageId});
+                ((UmbracoDomain)entity).LanguageIsoCode = Database.ExecuteScalar<string>("SELECT languageISOCode FROM umbracoLanguage WHERE id = @langId", new { langId = entity.LanguageId });
             }
 
             entity.ResetDirtyProperties();
@@ -159,25 +145,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             => Database.ExecuteScalar<int>("SELECT COALESCE(MAX(sortOrder), -1) FROM umbracoDomain WHERE domainRootStructureID = @rootContentId", new { rootContentId }) + 1;
 
         public IDomain GetByName(string domainName)
-        {
-            return GetMany().FirstOrDefault(x => x.DomainName.InvariantEquals(domainName));
-        }
+            => GetMany().FirstOrDefault(x => x.DomainName.InvariantEquals(domainName));
 
         public bool Exists(string domainName)
-        {
-            return GetMany().Any(x => x.DomainName.InvariantEquals(domainName));
-        }
+            => GetMany().Any(x => x.DomainName.InvariantEquals(domainName));
 
         public IEnumerable<IDomain> GetAll(bool includeWildcards)
-        {
-            return GetMany().Where(x => includeWildcards || x.IsWildcard == false);
-        }
+            => GetMany().Where(x => includeWildcards || x.IsWildcard == false);
 
         public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
-        {
-            return GetMany()
-                .Where(x => x.RootContentId == contentId)
-                .Where(x => includeWildcards || x.IsWildcard == false);
-        }
+            => GetMany().Where(x => x.RootContentId == contentId).Where(x => includeWildcards || x.IsWildcard == false);
     }
 }
