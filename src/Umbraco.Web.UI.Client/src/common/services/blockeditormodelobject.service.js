@@ -294,17 +294,17 @@
                     // Do notice that it is not performing a deep watch, meaning that we are only watching primatives and changes directly to the object of property-value.
                     // But we like to sync non-primative values as well! Yes, and this does happen, just not through this code, but through the nature of JavaScript. 
                     // Non-primative values act as references to the same data and are therefor synced.
-                    blockObject.watchers.push(isolatedScope.$watch("blockObjects._" + blockObject.key + "." + field + ".variants[0].tabs[" + t + "].properties[" + p + "].value", watcherCreator(blockObject, prop)));
+                    blockObject.__watchers.push(isolatedScope.$watch("blockObjects._" + blockObject.key + "." + field + ".variants[0].tabs[" + t + "].properties[" + p + "].value", watcherCreator(blockObject, prop)));
                     
                     // We also like to watch our data model to be able to capture changes coming from other places.
                     if (forSettings === true) {
-                        blockObject.watchers.push(isolatedScope.$watch("blockObjects._" + blockObject.key + "." + "layout.settings" + "." + prop.alias, createLayoutSettingsModelWatcher(blockObject, prop)));
+                        blockObject.__watchers.push(isolatedScope.$watch("blockObjects._" + blockObject.key + "." + "layout.settings" + "." + prop.alias, createLayoutSettingsModelWatcher(blockObject, prop)));
                     } else {
-                        blockObject.watchers.push(isolatedScope.$watch("blockObjects._" + blockObject.key + "." + "data" + "." + prop.alias, createDataModelWatcher(blockObject, prop)));
+                        blockObject.__watchers.push(isolatedScope.$watch("blockObjects._" + blockObject.key + "." + "data" + "." + prop.alias, createDataModelWatcher(blockObject, prop)));
                     }
                 }
             }
-            if (blockObject.watchers.length === 0) {
+            if (blockObject.__watchers.length === 0) {
                 // If no watcher where created, it means we have no properties to watch. This means that nothing will activate our generate the label, since its only triggered by watchers.
                 blockObject.updateLabel();
             }
@@ -527,13 +527,13 @@
              * The Block Object setups live syncronization of content and settings models back to the data of your Property Editor model.
              * The returned object, named ´BlockObject´, contains several usefull models to make editing of this block happen.
              * The ´BlockObject´ contains the following properties:
-             * - key {string}: runtime generated key, usefull for tracking of this object
-             * - content {Object}: Content model, the content type model for content merged with the content data of this block.
-             * - settings {Object}: Settings model, the content type model for settings merged with the settings data of this block.
-             * - config {Object}: A deep copy of the block configuration model.
+             * - content {Object}: Content model, the content data in a ElementType model.
+             * - settings {Object}: Settings model, the settings data in a ElementType model.
+             * - config {Object}: A local deep copy of the block configuration model.
              * - label {string}: The label for this block.
              * - updateLabel {Method}: Method to trigger an update of the label for this block.
-             * - data {Object}: A reference to the data object from your property editor model.
+             * - data {Object}: A reference to the content data object from your property editor model.
+             * - settingsData {Object}: A reference to the settings data object from your property editor model.
              * - layout {Object}: A refernce to the layout entry from your property editor model.
              * @param {Object} layoutEntry the layout entry object to build the block model from.
              * @return {Object | null} The BlockObject for the given layout entry. Or null if data or configuration wasnt found for this block.
@@ -576,7 +576,6 @@
                 blockObject.cloneNode = function() {
                     return null;// angularJS accept this as a cloned value as long as the 
                 }
-                blockObject.key = String.CreateGuid().replace(/-/g, "");
                 blockObject.config = Utilities.copy(blockConfiguration);
                 if (blockObject.config.label && blockObject.config.label !== "") {
                     blockObject.labelInterpolator = $interpolate(blockObject.config.label);
@@ -594,22 +593,22 @@
 
                 blockObject.data = dataModel;
                 blockObject.layout = layoutEntry;
-                blockObject.watchers = [];
+                blockObject.__watchers = [];
 
+                layoutEntry.settings = null;
                 if (blockConfiguration.settingsElementTypeKey) {
                     var settingsScaffold = this.getScaffoldFromKey(blockConfiguration.settingsElementTypeKey);
-                    if (settingsScaffold === null) {
-                        return null;
-                    }
+                    if (settingsScaffold !== null) {
+                        
+                        blockObject.settingsData = layoutEntry.settings;
 
-                    // make basics from scaffold
-                    blockObject.settings = Utilities.copy(settingsScaffold);
-                    layoutEntry.settings = layoutEntry.settings || {};
-                    if (!layoutEntry.settings.key) { layoutEntry.settings.key = String.CreateGuid(); }
-                    if (!layoutEntry.settings.contentTypeKey) { layoutEntry.settings.contentTypeKey = blockConfiguration.settingsElementTypeKey; }
-                    mapToElementModel(blockObject.settings, layoutEntry.settings);
-                } else {
-                    layoutEntry.settings = null;
+                        // make basics from scaffold
+                        blockObject.settings = Utilities.copy(settingsScaffold);
+                        layoutEntry.settings = layoutEntry.settings || {};
+                        if (!layoutEntry.settings.key) { layoutEntry.settings.key = String.CreateGuid(); }
+                        if (!layoutEntry.settings.contentTypeKey) { layoutEntry.settings.contentTypeKey = blockConfiguration.settingsElementTypeKey; }
+                        mapToElementModel(blockObject.settings, layoutEntry.settings);
+                    }
                 }
 
                 blockObject.retriveValuesFrom = function(content, settings) {
@@ -656,7 +655,7 @@
             destroyBlockObject: function(blockObject) {
 
                 // remove property value watchers:
-                blockObject.watchers.forEach(w => { w(); });
+                blockObject.__watchers.forEach(w => { w(); });
                 
                 // remove model from isolatedScope.
                 delete this.isolatedScope.blockObjects[blockObject.key];
