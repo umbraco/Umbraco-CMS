@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -11,8 +12,7 @@ namespace Umbraco.Core.Services.Implement
     {
         private readonly IDomainRepository _domainRepository;
 
-        public DomainService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
-            IDomainRepository domainRepository)
+        public DomainService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IDomainRepository domainRepository)
             : base(provider, logger, eventMessagesFactory)
         {
             _domainRepository = domainRepository;
@@ -36,6 +36,7 @@ namespace Umbraco.Core.Services.Implement
                 if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                 {
                     scope.Complete();
+
                     return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
@@ -91,11 +92,55 @@ namespace Umbraco.Core.Services.Implement
                 if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     scope.Complete();
+
                     return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 _domainRepository.Save(domainEntity);
                 scope.Complete();
+
+                saveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(Saved, this, saveEventArgs);
+            }
+
+            return OperationResult.Attempt.Succeed(evtMsgs);
+        }
+
+        public Attempt<OperationResult> Sort(IEnumerable<IDomain> items)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+
+            var domains = items.ToArray();
+            if (domains.Length == 0) return OperationResult.Attempt.NoOperation(evtMsgs);
+
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var saveEventArgs = new SaveEventArgs<IDomain>(domains, evtMsgs);
+                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                {
+                    scope.Complete();
+
+                    return OperationResult.Attempt.Cancel(evtMsgs);
+                }
+
+                scope.WriteLock(Constants.Locks.Domains);
+
+                var sortOrder = 0;
+                foreach (var domain in domains)
+                {
+                    // If the current sort order equals that of the domain we don't need to update it, so just increment the sort order and continue
+                    if (domain.SortOrder == sortOrder)
+                    {
+                        sortOrder++;
+                        continue;
+                    }
+
+                    domain.SortOrder = sortOrder++;
+                    _domainRepository.Save(domain);
+                }
+
+                scope.Complete();
+
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(Saved, this, saveEventArgs);
             }
@@ -104,26 +149,26 @@ namespace Umbraco.Core.Services.Implement
         }
 
         #region Event Handlers
+
         /// <summary>
-        /// Occurs before Delete
+        /// Occurs before Delete.
         /// </summary>
         public static event TypedEventHandler<IDomainService, DeleteEventArgs<IDomain>> Deleting;
 
         /// <summary>
-        /// Occurs after Delete
+        /// Occurs after Delete.
         /// </summary>
         public static event TypedEventHandler<IDomainService, DeleteEventArgs<IDomain>> Deleted;
 
         /// <summary>
-        /// Occurs before Save
+        /// Occurs before Save.
         /// </summary>
         public static event TypedEventHandler<IDomainService, SaveEventArgs<IDomain>> Saving;
 
         /// <summary>
-        /// Occurs after Save
+        /// Occurs after Save.
         /// </summary>
         public static event TypedEventHandler<IDomainService, SaveEventArgs<IDomain>> Saved;
-
 
         #endregion
     }
