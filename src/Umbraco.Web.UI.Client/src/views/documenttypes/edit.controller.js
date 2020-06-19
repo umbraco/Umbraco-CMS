@@ -278,7 +278,7 @@
             var view = $routeParams.view;
             if (view) {
                 for (var i = 0; i < vm.page.navigation.length; i++) {
-                    if (vm.page.navigation[i].alias.toLowerCase() === view.toLowerCase()) {
+                    if (vm.page.navigation[i].alias.localeCompare(view, undefined, { sensitivity: 'accent' }) === 0) {
                         vm.page.navigation[i].active = true;
                         initialViewSetFromRouteParams = true;
                         break;
