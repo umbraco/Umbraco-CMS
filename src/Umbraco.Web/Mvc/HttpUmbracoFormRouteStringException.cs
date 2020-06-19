@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Runtime.Serialization;
 using System.Web;
 
@@ -12,6 +11,13 @@ namespace Umbraco.Web.Mvc
     [Serializable]
     public sealed class HttpUmbracoFormRouteStringException : HttpException
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HttpUmbracoFormRouteStringException" /> class.
+        /// </summary>
+        public HttpUmbracoFormRouteStringException()
+        { }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="HttpUmbracoFormRouteStringException" /> class.
         /// </summary>
         /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception being thrown.</param>
@@ -36,6 +42,5 @@ namespace Umbraco.Web.Mvc
         public HttpUmbracoFormRouteStringException(string message, Exception innerException)
             : base(message, innerException)
         { }
-
     }
 }

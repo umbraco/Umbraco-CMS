@@ -12,7 +12,7 @@ angular.module("umbraco")
             $scope.textAreaHtmlId = $scope.model.alias + "_" + String.CreateGuid();
             
             var editorConfig = $scope.model.config ? $scope.model.config.editor : null;
-            if (!editorConfig || angular.isString(editorConfig)) {
+            if (!editorConfig || Utilities.isString(editorConfig)) {
                 editorConfig = tinyMceService.defaultPrevalues();
             }
             //make sure there's a max image size
@@ -89,7 +89,10 @@ angular.module("umbraco")
                 
                 angular.extend(baseLineConfigObj, standardConfig);
                 
-                tinymce.init(baseLineConfigObj);
+                // We need to wait for DOM to have rendered before we can find the element by ID.
+                $timeout(function () {
+                    tinymce.init(baseLineConfigObj);
+                }, 150);
                 
                 //listen for formSubmitting event (the result is callback used to remove the event subscription)
                 var unsubscribe = $scope.$on("formSubmitting", function () {
@@ -97,6 +100,10 @@ angular.module("umbraco")
                         $scope.model.value = tinyMceEditor.getContent();
                     }
                 });
+
+                $scope.focus = function () {
+                    tinyMceEditor.focus();
+                }
 
                 //when the element is disposed we need to unsubscribe!
                 // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom

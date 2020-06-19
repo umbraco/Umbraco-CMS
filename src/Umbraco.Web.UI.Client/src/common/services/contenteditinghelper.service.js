@@ -10,7 +10,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
     function isValidIdentifier(id) {
 
         //empty id <= 0
-        if (angular.isNumber(id)) {
+        if (Utilities.isNumber(id)) {
             if (id === 0) {
                 return false;
             }
@@ -39,7 +39,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
         /** Used by the content editor and mini content editor to perform saving operations */
         contentEditorPerformSave: function (args) {
-            if (!angular.isObject(args)) {
+            if (!Utilities.isObject(args)) {
                 throw "args must be an object";
             }
             if (!args.scope) {
@@ -152,7 +152,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
         here we'll build the buttons according to the chars of the user. */
         configureContentEditorButtons: function (args) {
 
-            if (!angular.isObject(args)) {
+            if (!Utilities.isObject(args)) {
                 throw "args must be an object";
             }
             if (!args.content) {
@@ -328,9 +328,11 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
          *
          * @description
          * Returns a id for the variant that is unique between all variants on the content
+         * Note "invariant" is used for the invariant culture,
+         * "null" is used for the NULL segment
          */
         buildCompositeVariantId: function (variant) {
-            return (variant.language ? variant.language.culture : "invariant") + "_" + (variant.segment ? variant.segment : "");
+            return (variant.language ? variant.language.culture : "invariant") + "_" + (variant.segment ? variant.segment : "null");
         },
 
 
@@ -464,6 +466,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                     "properties",
                     "apps",
                     "createDateFormatted",
+                    "releaseDateFormatted",
+                    "expireDateFormatted",
                     "releaseDate",
                     "expireDate"
                 ], function (i) {
@@ -616,7 +620,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                         }
                     }
 
-                    if (!this.redirectToCreatedContent(args.err.data.id) || args.softRedirect) {
+                    if (!this.redirectToCreatedContent(args.err.data.id, args.softRedirect) || args.softRedirect) {
                         // If we are not redirecting it's because this is not newly created content, else in some cases we are
                         // soft-redirecting which means the URL will change but the route wont (i.e. creating content). 
 
@@ -662,7 +666,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 throw "args.savedContent cannot be null";
             }
 
-            if (!this.redirectToCreatedContent(args.redirectId ? args.redirectId : args.savedContent.id) || args.softRedirect) {
+            if (!this.redirectToCreatedContent(args.redirectId ? args.redirectId : args.savedContent.id, args.softRedirect) || args.softRedirect) {
 
                 // If we are not redirecting it's because this is not newly created content, else in some cases we are
                 // soft-redirecting which means the URL will change but the route wont (i.e. creating content). 
@@ -685,7 +689,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
          * We need to decide if we need to redirect to edito mode or if we will remain in create mode.
          * We will only need to maintain create mode if we have not fulfilled the basic requirements for creating an entity which is at least having a name and ID
          */
-        redirectToCreatedContent: function (id) {
+        redirectToCreatedContent: function (id, softRedirect) {
 
             //only continue if we are currently in create mode and not in infinite mode and if the resulting ID is valid
             if ($routeParams.create && (isValidIdentifier(id))) {
@@ -696,10 +700,12 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 // /belle/#/content/edit/9876 (where 9876 is the new id)
 
                 //clear the query strings
-                navigationService.clearSearch(["cculture"]);
-                
+                navigationService.clearSearch(["cculture", "csegment"]);
+                if (softRedirect) {
+                    navigationService.setSoftRedirect();
+                }
                 //change to new path
-                $location.path("/" + $routeParams.section + "/" + $routeParams.tree + "/" + $routeParams.method + "/" + id);
+                $location.path("/" + $routeParams.section + "/" + $routeParams.tree + "/" + $routeParams.method + "/" + id);                
                 //don't add a browser history for this
                 $location.replace();
                 return true;

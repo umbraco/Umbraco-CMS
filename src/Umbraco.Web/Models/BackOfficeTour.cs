@@ -16,20 +16,32 @@ namespace Umbraco.Web.Models
 
         [DataMember(Name = "name")]
         public string Name { get; set; }
+
         [DataMember(Name = "alias")]
         public string Alias { get; set; }
+
         [DataMember(Name = "group")]
         public string Group { get; set; }
+
         [DataMember(Name = "groupOrder")]
         public int GroupOrder { get; set; }
+
+        [DataMember(Name = "hidden")]
+        public bool Hidden { get; set; }
+
         [DataMember(Name = "allowDisable")]
         public bool AllowDisable { get; set; }
+
         [DataMember(Name = "requiredSections")]
         public List<string> RequiredSections { get; set; }
+
         [DataMember(Name = "steps")]
         public BackOfficeTourStep[] Steps { get; set; }
 
         [DataMember(Name = "culture")]
         public string Culture { get; set; }
+
+        [DataMember(Name = "contentType")]
+        public string ContentType { get; set; }
     }
 }

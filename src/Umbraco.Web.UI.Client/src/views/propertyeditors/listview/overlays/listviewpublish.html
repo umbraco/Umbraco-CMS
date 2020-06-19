@@ -1,41 +1,43 @@
 <div ng-controller="Umbraco.Overlays.ListViewPublishController as vm">
 
+        <!-- Single language -->
         <div ng-if="!vm.languages">
             <p><localize key="prompt_confirmListViewPublish"></localize></p>
         </div>
 
-        <div ng-if="vm.languages.length > 1">
+        <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
+                <umb-load-indicator></umb-load-indicator>
+        </div>
+
+        <!-- Multiple languages -->
+        <div ng-if="vm.languages.length > 1 && !vm.loading">
 
             <div class="mb3">
                 <p><localize key="content_languagesToPublish"></localize></p>
             </div>
 
-            <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
-                <umb-load-indicator></umb-load-indicator>
-            </div>
+            <div class="umb-list umb-list--condensed">
 
-            <div class="umb-list umb-list--condensed" ng-if="!vm.loading">
+                <div class="bold mb1">
+                    <localize key="treeHeaders_languages"></localize>
+                </div>
 
                 <div class="umb-list-item" ng-repeat="language in vm.languages track by language.id">
                     <ng-form name="publishLanguageSelectorForm">
-                        <div class="flex">
-                            <input
-                                id="{{language.culture}}"
-                                name="publishLanguageSelector"
-                                type="checkbox"
-                                ng-model="language.publish"
-                                ng-change="vm.changeSelection(language)"
-                                style="margin-right: 8px;" />
+                        <div>
+
+                            <umb-checkbox name="publishLanguageSelector"
+                                          model="language.publish"
+                                          on-change="vm.changeSelection(language)"
+                                          text="{{language.name}}"
+                                           />
+
                             <div>
-                                <label for="{{language.culture}}" style="margin-bottom: 2px;">
-                                    <span>{{ language.name }}</span>
-                                </label>
-
-                                <div class="umb-list-item__description">
+                                <span class="db umb-list-item__description umb-list-item__description--checkbox">
                                     <span ng-if="language.isMandatory"><localize key="languages_mandatoryLanguage"></localize></span>
-                                </div>
-
+                                </span>
                             </div>
+
                         </div>
 
                     </ng-form>

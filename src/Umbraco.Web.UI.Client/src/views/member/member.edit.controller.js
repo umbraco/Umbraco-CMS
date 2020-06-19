@@ -14,6 +14,10 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
     var listName = infiniteMode ? $scope.model.listname : $routeParams.listName;
     var docType = infiniteMode ? $scope.model.doctype : $routeParams.doctype;
 
+    $scope.header = {};
+    $scope.header.editorfor = "visuallyHiddenTexts_newMember";
+    $scope.header.setPageTitle = true;
+
     //setup scope vars
     $scope.page = {};
     $scope.page.loading = true;
@@ -41,9 +45,7 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
 
                     $scope.content = data;
 
-                    setHeaderNameState($scope.content);
-
-                    editorState.set($scope.content);
+                    init();
 
                     $scope.page.loading = false;
 
@@ -55,9 +57,7 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
                 .then(function (data) {
                     $scope.content = data;
 
-                    setHeaderNameState($scope.content);
-
-                    editorState.set($scope.content);
+                    init();
 
                     $scope.page.loading = false;
 
@@ -86,9 +86,7 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
 
                     $scope.content = data;
 
-                    setHeaderNameState($scope.content);
-
-                    editorState.set($scope.content);
+                    init();
 
                     if (!infiniteMode) {
                         var path = buildTreePath(data);
@@ -117,11 +115,48 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
 
     }
 
-    function setHeaderNameState(content) {
+    function init() {
 
-      if(content.membershipScenario === 0) {
-         $scope.page.nameLocked = true;
-      }
+        var content = $scope.content;
+
+        // we need to check wether an app is present in the current data, if not we will present the default app.
+        var isAppPresent = false;
+
+        // on first init, we dont have any apps. but if we are re-initializing, we do, but ...
+        if ($scope.app) {
+
+            // lets check if it still exists as part of our apps array. (if not we have made a change to our docType, even just a re-save of the docType it will turn into new Apps.)
+            _.forEach(content.apps, function (app) {
+                if (app === $scope.app) {
+                    isAppPresent = true;
+                }
+            });
+
+            // if we did reload our DocType, but still have the same app we will try to find it by the alias.
+            if (isAppPresent === false) {
+                _.forEach(content.apps, function (app) {
+                    if (app.alias === $scope.app.alias) {
+                        isAppPresent = true;
+                        app.active = true;
+                        $scope.appChanged(app);
+                    }
+                });
+            }
+
+        }
+
+        // if we still dont have a app, lets show the first one:
+        if (isAppPresent === false) {
+            content.apps[0].active = true;
+            $scope.appChanged(content.apps[0]);
+        }
+
+        if (content.membershipScenario === 0) {
+            $scope.page.nameLocked = true;
+        }
+
+        editorState.set($scope.content);
+
     }
 
     /** Just shows a simple notification that there are client side validation issues to be fixed */
@@ -189,6 +224,15 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
         }
 
     };
+
+    $scope.appChanged = function (app) {
+        $scope.app = app;
+
+        // setup infinite mode
+        if (infiniteMode) {
+            $scope.page.submitButtonLabelKey = "buttons_saveAndClose";
+        }
+    }
 
     $scope.showBack = function () {
         return !!listName;

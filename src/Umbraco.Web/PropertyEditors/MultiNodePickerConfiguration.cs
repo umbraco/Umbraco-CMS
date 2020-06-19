@@ -20,7 +20,7 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("maxNumber", "Maximum number of items", "number")]
         public int MaxNumber { get; set; }
 
-        [ConfigurationField("showOpenButton", "Show open button (this feature is in preview!)", "boolean", Description = "Opens the node in a dialog")]
+        [ConfigurationField("showOpenButton", "Show open button", "boolean", Description = "Opens the node in a dialog")]
         public bool ShowOpen { get; set; }
 
         [ConfigurationField(Core.Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,

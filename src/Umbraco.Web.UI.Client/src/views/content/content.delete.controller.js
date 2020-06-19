@@ -80,20 +80,6 @@ function ContentDeleteController($scope, $timeout, contentResource, treeService,
     $scope.close = function () {
         navigationService.hideDialog();
     };
-
-  
-    languageResource.getAll().then(function (data) {
-
-        $scope.hasMoreThanOneLanguage = data.length > 1;
-    }, function (err) {
-        toggleDeleting(false);
-
-        //check if response is ysod
-        if (err.status && err.status >= 500) {
-            // TODO: All YSOD handling should be done with an interceptor
-            overlayService.ysod(err);
-        }
-    });
 }
 
 angular.module("umbraco").controller("Umbraco.Editors.Content.DeleteController", ContentDeleteController);

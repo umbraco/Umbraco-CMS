@@ -7,6 +7,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using System;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -77,7 +78,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
 
                 partialView = new PartialView(PartialViewType.PartialView, "\\test-path-4.cshtml") { Content = "// partialView" };
-                Assert.Throws<FileSecurityException>(() => // fixed in 7.3 - 7.2.8 used to strip the \
+                Assert.Throws<UnauthorizedAccessException>(() => // fixed in 7.3 - 7.2.8 used to strip the \
                 {
                     repository.Save(partialView);
                 });
@@ -86,11 +87,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.IsNull(partialView);
 
                 // fixed in 7.3 - 7.2.8 used to...
-                Assert.Throws<FileSecurityException>(() =>
+                Assert.Throws<UnauthorizedAccessException>(() =>
                 {
                     partialView = (PartialView) repository.Get("\\test-path-4.cshtml"); // outside the filesystem, does not exist
                 });
-                Assert.Throws<FileSecurityException>(() =>
+                Assert.Throws<UnauthorizedAccessException>(() =>
                 {
                     partialView = (PartialView) repository.Get("../../packages.config"); // outside the filesystem, exists
                 });

@@ -53,7 +53,7 @@
       <add name="umbracoBaseRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
       <add name="viewstateMoverModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
       <add name=" UmbracoModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-      <add name="UmbracoModule" type="Umbraco.Web.UmbracoModule,umbraco" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
+      <add name="UmbracoModule" type="Umbraco.Web.UmbracoModule,Umbraco.Web" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
     </httpModules>
 
     <httpHandlers xdt:Transform="InsertIfMissing" />
@@ -76,7 +76,7 @@
       <!-- Note, we're removing the one that starts with a space here, don't correct it -->
       <!-- This to fix a quirk we for a lot of releases where we added it with the space by default -->
       <add name=" UmbracoModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-      <add name="UmbracoModule" type="Umbraco.Web.UmbracoModule,umbraco" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
+      <add name="UmbracoModule" type="Umbraco.Web.UmbracoModule,Umbraco.Web" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
     </modules>
 
     <staticContent xdt:Transform="InsertIfMissing" />

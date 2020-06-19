@@ -182,6 +182,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     throw new InvalidOperationException($"Cannot save the default language ({entity.IsoCode}) as non-default. Make another language the default language instead.");
             }
 
+            if (entity.IsPropertyDirty(nameof(ILanguage.IsoCode)))
+            {
+                //if the iso code is changing, ensure there's not another lang with the same code already assigned
+                var sameCode = Sql()
+                   .SelectCount()                   
+                   .From<LanguageDto>()
+                   .Where<LanguageDto>(x => x.IsoCode == entity.IsoCode && x.Id != entity.Id);
+
+                var countOfSameCode = Database.ExecuteScalar<int>(sameCode);
+                if (countOfSameCode > 0)
+                    throw new InvalidOperationException($"Cannot update the language to a new culture: {entity.IsoCode} since that culture is already assigned to another language entity.");
+            }
+
             // fallback cycles are detected at service level
 
             // update

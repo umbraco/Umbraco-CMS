@@ -75,19 +75,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected sealed override IEnumerable<string> GetDeleteClauses()
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
-        protected sealed override Guid NodeObjectTypeId => throw new WontImplementException();
+        protected sealed override Guid NodeObjectTypeId => throw new InvalidOperationException("This property won't be implemented.");
 
         protected sealed override void PersistNewItem(TEntity entity)
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         protected sealed override void PersistUpdatedItem(TEntity entity)
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         #endregion

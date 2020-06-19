@@ -40,13 +40,28 @@ namespace Umbraco.Web.WebApi
                 Current.Factory.GetInstance<AppCaches>(),
                 Current.Factory.GetInstance<IProfilingLogger>(),
                 Current.Factory.GetInstance<IRuntimeState>(),
-                Current.Factory.GetInstance<UmbracoHelper>()
+                Current.Factory.GetInstance<UmbracoHelper>(),
+                Current.Factory.GetInstance<UmbracoMapper>()
             )
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoApiControllerBase"/> class with all its dependencies.
         /// </summary>
+        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper)
+        {
+            UmbracoContextAccessor = umbracoContextAccessor;
+            GlobalSettings = globalSettings;
+            SqlContext = sqlContext;
+            Services = services;
+            AppCaches = appCaches;
+            Logger = logger;
+            RuntimeState = runtimeState;
+            Umbraco = umbracoHelper;
+            Mapper = umbracoMapper;
+        }
+
+        [Obsolete("This constructor is obsolete since it doesn't inject the UmbracoMapper. The UmbracoMapper will be resolved from the service locator Current.Mapper, which is not good for testability. Inject the UmbracoMapper using full constructor injection instead.")]
         protected UmbracoApiControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
         {
             UmbracoContextAccessor = umbracoContextAccessor;
@@ -58,7 +73,7 @@ namespace Umbraco.Web.WebApi
             RuntimeState = runtimeState;
             Umbraco = umbracoHelper;
 
-            // fixme - can we break all ctors?
+            // not good for testability, hence the obsolete.
             Mapper = Current.Mapper;
         }
 

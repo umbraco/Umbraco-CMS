@@ -7,19 +7,31 @@
 
         <div class="umb-packages-section">
             <div class="umb-packages-search">
-                <input class="-full-width-input" type="text" name="query" localize="placeholder" placeholder="@packager_packageSearch" umb-auto-focus ng-model="vm.searchQuery" ng-change="vm.search()" no-dirty-check>
+                <label for="package-query" class="sr-only">
+                    <localize key="packager_packageSearch">Search for packages</localize>
+                </label>
+                <input
+                    class="-full-width-input"
+                    type="text"
+                    name="query"
+                    id="package-query"
+                    localize="placeholder"
+                    placeholder="@packager_packageSearch"
+                    umb-auto-focus ng-model="vm.searchQuery"
+                    ng-change="vm.search()"
+                    no-dirty-check>
             </div>
         </div>
 
         <div class="umb-packages-section" ng-if="vm.searchQuery == ''">
             <div class="umb-packages-categories">
-                <a href=""
+                <button type="button"
                    class="umb-packages-category"
                    ng-click="vm.selectCategory(category, vm.categories)"
                    ng-repeat="category in vm.categories"
                    ng-class="{'-active': category.active, '-first': $first, '-last': $last}">
-                    <div>{{category.name}}</div>
-                </a>
+                    {{category.name}}
+                </button>
             </div>
         </div>
 
@@ -30,7 +42,7 @@
                 <div class="umb-packages">
 
                     <div class="umb-package" ng-repeat="package in vm.popular">
-                        <a class="umb-package-link" href="" ng-click="vm.showPackageDetails(package)">
+                        <button type="button" class="umb-package-link" ng-click="vm.showPackageDetails(package)">
 
                             <div class="umb-package-icon">
                                 <img ng-src="{{package.icon}}" alt="" />
@@ -42,15 +54,17 @@
 
                                 <div class="umb-package-numbers">
                                     <small class="umb-package-downloads">
-                                        <i class="icon-download-alt"></i> <strong>{{package.downloads}}</strong>
+                                        <i class="icon-download-alt" aria-hidden="true"></i>
+                                        <strong>{{package.downloads}}</strong>
                                     </small>
                                     <small class="umb-package-likes">
-                                        <i class="icon-hearts"></i> <strong>{{package.likes}}</strong>
+                                        <i class="icon-hearts" aria-hidden="true"></i>
+                                        <strong>{{package.likes}}</strong>
                                     </small>
                                 </div>
 
                             </div>
-                        </a>
+                        </button>
                     </div> <!-- end package -->
 
                 </div> <!-- end packages -->
@@ -64,7 +78,7 @@
                 <div class="umb-packages">
 
                     <div class="umb-package" ng-repeat="package in vm.packages">
-                        <a class="umb-package-link" href="" ng-click="vm.showPackageDetails(package)">
+                        <button type="button" class="umb-package-link" ng-click="vm.showPackageDetails(package)">
 
                             <div class="umb-package-icon">
                                 <img ng-src="{{package.icon}}" alt="" />
@@ -76,15 +90,17 @@
 
                                 <div class="umb-package-numbers">
                                     <small class="umb-package-downloads">
-                                        <i class="icon-download-alt"></i> <strong>{{ package.downloads }}</strong>
+                                        <i class="icon-download-alt" aria-hidden="true"></i>
+                                        <strong>{{ package.downloads }}</strong>
                                     </small>
                                     <small class="umb-package-likes">
-                                        <i class="icon-hearts"></i> <strong>{{ package.likes }}</strong>
+                                        <i class="icon-hearts" aria-hidden="true"></i>
+                                        <strong>{{ package.likes }}</strong>
                                     </small>
                                 </div>
 
                             </div>
-                        </a>
+                        </button>
                     </div> <!-- end package -->
 
                 </div> <!-- end packages -->
@@ -140,9 +156,9 @@
                             <div class="umb-package-details__description" ng-bind-html="vm.package.description"></div>
                             <div class="umb-gallery">
                                 <div class="umb-gallery__thumbnails">
-                                <a class="umb-gallery__thumbnail" ng-repeat="image in vm.package.images" ng-click="vm.openLightbox($index, vm.package.images)">
-                                        <img ng-src="{{ image.thumbnail }}" />
-                                    </a>
+                                <button type="button" class="umb-gallery__thumbnail" ng-repeat="image in vm.package.images" ng-click="vm.openLightbox($index, vm.package.images)">
+                                    <img ng-src="{{ image.thumbnail }}" />
+                                </button>
                                 </div>
                             </div>
                         </umb-box-content>
@@ -187,7 +203,7 @@
                                 <div class="umb-package-details__owner-profile-avatar">
                                 <umb-avatar
                                     size="m"
-                                    img-src="{{ 'https://our.umbraco.org' + vm.package.ownerInfo.ownerAvatar }}">
+                                    img-src="{{ 'https://our.umbraco.com' + vm.package.ownerInfo.ownerAvatar }}">
                                 </umb-avatar>
                                 </div>
 
@@ -274,7 +290,7 @@
                             <div>
                                 <div class="umb-package-details__information-item" ng-repeat="externalSource in vm.package.externalSources">
                                     <a class="umb-package-details__link" target="_blank" href="{{ externalSource.url }}">
-                                        <i class="icon-out"></i>
+                                        <i class="icon-out" aria-hidden="true"></i>
                                         {{ externalSource.name }}
                                     </a>
                                 </div>
@@ -304,7 +320,7 @@
 
                     <form novalidate name="localPackageForm" class="w-100">
                         <div class="umb-package-icon">
-                            <i ng-if="!vm.localPackage.icon" class="icon-box"></i>
+                            <i ng-if="!vm.localPackage.icon" class="icon-box" aria-hidden="true"></i>
                             <img ng-if="vm.localPackage.icon" ng-src="{{vm.localPackage.icon}}" alt="" />
                         </div>
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -100,13 +101,7 @@ namespace Umbraco.Web.Cache
             //if (Suspendable.PageCacheRefresher.CanUpdateDocumentCache)
             //  ...
 
-            _publishedSnapshotService.Notify(payloads, out _, out var publishedChanged);
-
-            if (payloads.Any(x => x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll)) || publishedChanged)
-            {
-                // when a public version changes
-                AppCaches.ClearPartialViewCache();
-            }
+            NotifyPublishedSnapshotService(_publishedSnapshotService, AppCaches, payloads);
 
             base.Refresh(payloads);
         }
@@ -114,32 +109,45 @@ namespace Umbraco.Web.Cache
         // these events should never trigger
         // everything should be PAYLOAD/JSON
 
-        public override void RefreshAll()
-        {
-            throw new NotSupportedException();
-        }
+        public override void RefreshAll() => throw new NotSupportedException();
 
-        public override void Refresh(int id)
-        {
-            throw new NotSupportedException();
-        }
+        public override void Refresh(int id) => throw new NotSupportedException();
 
-        public override void Refresh(Guid id)
-        {
-            throw new NotSupportedException();
-        }
+        public override void Refresh(Guid id) => throw new NotSupportedException();
 
-        public override void Remove(int id)
-        {
-            throw new NotSupportedException();
-        }
+        public override void Remove(int id) => throw new NotSupportedException();
 
         #endregion
 
         #region Json
 
+        /// <summary>
+        /// Refreshes the publish snapshot service and if there are published changes ensures that partial view caches are refreshed too
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="appCaches"></param>
+        /// <param name="payloads"></param>
+        internal static void NotifyPublishedSnapshotService(IPublishedSnapshotService service, AppCaches appCaches, JsonPayload[] payloads)
+        {
+            service.Notify(payloads, out _, out var publishedChanged);
+
+            if (payloads.Any(x => x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll)) || publishedChanged)
+            {
+                // when a public version changes
+                appCaches.ClearPartialViewCache();
+            }
+        }
+
         public class JsonPayload
         {
+            [Obsolete("Use the constructor specifying a GUID instead, using this constructor will result in not refreshing all caches")]
+            public JsonPayload(int id, TreeChangeTypes changeTypes)
+            {
+                Id = id;
+                ChangeTypes = changeTypes;
+            }
+
+            [JsonConstructor]
             public JsonPayload(int id, Guid? key, TreeChangeTypes changeTypes)
             {
                 Id = id;

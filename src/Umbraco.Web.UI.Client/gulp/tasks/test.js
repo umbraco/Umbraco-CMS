@@ -1,32 +1,40 @@
 'use strict';
 
-var config = require('../config');
-var gulp = require('gulp');
 var karmaServer = require('karma').Server;
-var runSequence = require('run-sequence');
 
 /**************************
  * Build tests
  **************************/
 
- // Karma test
-gulp.task('runTests', function(cb) {
-    runSequence("js", "test:unit", cb);
-});
+// Karma test
+function testUnit() {
 
-gulp.task('test:unit', function () {
+    return new karmaServer({
+        configFile: __dirname + "/../../test/config/karma.conf.js"
+    })
+    .start();
+};
 
-    new karmaServer({
+// Run karma test server
+function runUnitTestServer() {
+
+    return new karmaServer({
         configFile: __dirname + "/../../test/config/karma.conf.js",
+        autoWatch: true,
+        port: 9999,
+        singleRun: false,
+        browsers: ['ChromeDebugging'],
         keepalive: true
     })
     .start();
-});
+};
 
-gulp.task('test:e2e', function() {
-    new karmaServer({
+function testE2e() {
+    return new karmaServer({
         configFile: __dirname + "/../../test/config/e2e.js",
         keepalive: true
     })
     .start();
-});
+};
+
+module.exports = { testUnit: testUnit, testE2e: testE2e, runUnitTestServer: runUnitTestServer };

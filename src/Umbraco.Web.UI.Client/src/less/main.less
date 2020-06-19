@@ -116,24 +116,48 @@ h5.-black {
   margin: 20px;
 }
 .umb-control-group {
-  border-bottom: 1px solid @gray-11;
-  padding-bottom: 20px;
+    position: relative;
+
+    &.umb-control-group__listview {
+        // position: relative messes up the listview status messages (e.g. "no search results")
+        position: unset;
+    }
+
+    &::after {
+        content: '';
+        display:block;
+        margin-top: 20px;
+        width: 100%;
+        height: 1px;
+        background-color: @gray-11;
+    }
 }
 
 .umb-control-group.-no-border {
-  border: none;
+    &::after {
+        margin-top: 0px;
+        height: 0;
+        background-color: transparent;
+    }
 }
 
 .umb-property:last-of-type .umb-control-group {
-  border: none;
-  margin-bottom: 0 !important;
-  padding-bottom: 0;
+    &::after {
+        margin-top: 0px;
+        height: 0;
+        background-color: transparent;
+    }
+    margin-bottom: 0 !important;
 }
 
 /* BLOCK MODE */
 .block-form .umb-control-group {
-  border-bottom: none;
-  padding-bottom: 0;
+    margin-top: 0px;
+    &::after {
+        margin-top: 0px;
+        height: 0;
+        background-color: transparent;
+    }
 }
 
 .block-form .umb-control-group label .help-block,
@@ -163,7 +187,44 @@ h5.-black {
 }
 
 .umb-control-group .umb-el-wrap {
-  padding: 0
+  padding: 0;
+}
+.umb-control-group .control-header {
+    
+    .control-label {
+        float: left;
+    }
+
+    .control-description {
+        display: block;
+        clear: both;
+    }
+}
+.form-horizontal .umb-control-group .control-header {
+    float: left;
+    width: 160px;
+    padding-top: 5px;
+    text-align: left;
+
+    .control-label {
+        width: auto;
+        padding-top: 0;
+        text-align: left;
+    }
+
+    .control-description {
+        max-width:480px;// avoiding description becoming too wide when its placed on top of property.
+        margin-bottom: 10px;
+    }
+}
+@media (max-width: 767px) {
+    
+    .form-horizontal .umb-control-group .control-header {
+        float: none;
+        width: 100%;
+    }
+    
+
 }
 
 /* LABELS*/
