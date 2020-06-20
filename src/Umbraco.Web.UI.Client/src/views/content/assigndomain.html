@@ -24,13 +24,14 @@
                 </div>
 
                 <h5 class="umb-pane-title"><localize key="assignDomain_setDomains">Domains</localize></h5>
-                <small class="db mb3">
+                <small class="mb3">
                     <localize key="assignDomain_domainHelpWithVariants"></localize>
                 </small>
-                <div class="umb-el-wrap  hidelabel">
-                    <table class="table table-condensed table-bordered domains mb3" ng-if="vm.domains.length > 0">
+                <div class="umb-el-wrap hidelabel form-horizontal">
+                    <table class="table table-striped table-condensed" ng-if="vm.domains.length > 0">
                         <thead>
                             <tr>
+                                <th />
                                 <th>
                                     <localize key="assignDomain_domain"></localize>
                                     <span class="umb-control-required">*</span>
@@ -42,12 +43,13 @@
                                 <th />
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody ui-sortable="sortableOptions" ng-model="vm.domains">
                             <tr ng-repeat="domain in vm.domains">
                                 <td>
-
+                                    <i class="icon icon-navigation handle"></i>
+                                </td>
+                                <td>
                                     <input type="text" class="w-100" ng-model="domain.name" name="domain_name_{{$index}}" required umb-auto-focus />
-
                                     <span ng-if="vm.domainForm.$submitted" ng-messages="vm.domainForm['domain_name_' + $index].$error">
                                         <span class="help-inline" ng-message="required"><localize key="validation_invalidEmpty"></localize></span>
                                     </span>
@@ -56,7 +58,7 @@
                                 <td>
                                     <select
                                         name="domain_language_{{$index}}"
-                                        class="language w-100"
+                                        class="w-100"
                                         ng-model="domain.lang"
                                         ng-options="lang.name for lang in vm.languages"
                                         required>
@@ -64,10 +66,10 @@
                                 </td>
                                 <td>
                                     <umb-button
-                                        icon="icon-trash"
-                                        action="vm.removeDomain($index)"
                                         type="button"
-                                        button-style="danger">
+                                        button-style="danger"
+                                        label-key="general_delete"
+                                        action="vm.removeDomain($index)">
                                     </umb-button>
                                 </td>
                             </tr>

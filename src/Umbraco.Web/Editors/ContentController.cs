@@ -1782,6 +1782,7 @@ namespace Umbraco.Web.Editors
             var names = new List<string>();
 
             // create or update domains in the model
+            var sortOrder = 0;
             foreach (var domainModel in model.Domains.Where(m => string.IsNullOrWhiteSpace(m.Name) == false))
             {
                 language = languages.FirstOrDefault(l => l.Id == domainModel.Lang);
@@ -1801,6 +1802,7 @@ namespace Umbraco.Web.Editors
                 if (domain != null)
                 {
                     domain.LanguageId = language.Id;
+                    domain.SortOrder = sortOrder++;
                     Services.DomainService.Save(domain);
                 }
                 else if (Services.DomainService.Exists(domainModel.Name))
@@ -1829,7 +1831,8 @@ namespace Umbraco.Web.Editors
                     var newDomain = new UmbracoDomain(name)
                     {
                         LanguageId = domainModel.Lang,
-                        RootContentId = model.NodeId
+                        RootContentId = model.NodeId,
+                        SortOrder = sortOrder++
                     };
                     var saveAttempt = Services.DomainService.Save(newDomain);
                     if (saveAttempt == false)
