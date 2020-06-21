@@ -53,7 +53,7 @@
                                     <span ng-if="vm.domainForm.$submitted" ng-messages="vm.domainForm['domain_name_' + $index].$error">
                                         <span class="help-inline" ng-message="required"><localize key="validation_invalidEmpty"></localize></span>
                                     </span>
-                                    <span ng-show="domain.duplicate" class="help-inline"><localize key="assignDomain_duplicateDomain"></localize><span ng-show="domain.other">({{domain.other}})</span></span>
+                                    <span ng-show="domain.duplicate" class="help-inline"><localize key="assignDomain_duplicateDomain"></localize> <span ng-show="domain.other">({{domain.other}})</span></span>
                                 </td>
                                 <td>
                                     <select
