@@ -79,6 +79,12 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
+   public UserBuilder<TParent> WithUsername(string username)
+        {
+            _username = username;
+            return this;
+        }
+
         public UserBuilder<TParent> WithComments(string comments)
         {
             _comments = comments;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -9,6 +10,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
@@ -176,110 +178,114 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
         // [Test]
         // public async Task PostUnlockUsers_When_User_Lockout_Update_Fails_Expect_Failure_Response()
         // {
-        //     var mockUserManager = CreateMockUserManager();
-        //     var usersController = CreateSut(mockUserManager);
-        //
-        //     const string expectedMessage = "identity error!";
-        //     var user = new BackOfficeIdentityUser(
-        //         new Mock<IGlobalSettings>().Object,
-        //         1,
-        //         new List<IReadOnlyUserGroup>())
-        //     {
-        //         Name = "bob"
-        //     };
-        //
-        //     mockUserManager.Setup(x => x.FindByIdAsync(It.IsAny<string>()))
-        //         .ReturnsAsync(user);
-        //     mockUserManager.Setup(x => x.SetLockoutEndDateAsync(user, It.IsAny<DateTimeOffset?>()))
-        //         .ReturnsAsync(IdentityResult.Failed(new IdentityError {Description = expectedMessage}));
-        //
-        //     var response = await usersController.PostUnlockUsers(new[] { 1 });
-        //
-        //     Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        //     Assert.True(response.Headers.TryGetValues("X-Status-Reason", out var values));
-        //     Assert.True(values.Contains("Validation failed"));
-        //
-        //     var responseContent = response.Content as ObjectContent<HttpError>;
-        //     var responseValue = responseContent?.Value as HttpError;
-        //     Assert.NotNull(responseValue);
-        //     Assert.True(responseValue.Message.Contains(expectedMessage));
-        //     Assert.True(responseValue.Message.Contains(user.Id.ToString()));
+        //     //
+        //     // var mockUserManager = CreateMockUserManager();
+        //     // var usersController = CreateSut(mockUserManager);
+        //     //
+        //     // const string expectedMessage = "identity error!";
+        //     // var user = new BackOfficeIdentityUser(
+        //     //     new Mock<IGlobalSettings>().Object,
+        //     //     1,
+        //     //     new List<IReadOnlyUserGroup>())
+        //     // {
+        //     //     Name = "bob"
+        //     // };
+        //     //
+        //     // mockUserManager.Setup(x => x.FindByIdAsync(It.IsAny<string>()))
+        //     //     .ReturnsAsync(user);
+        //     // mockUserManager.Setup(x => x.SetLockoutEndDateAsync(user, It.IsAny<DateTimeOffset?>()))
+        //     //     .ReturnsAsync(IdentityResult.Failed(new IdentityError {Description = expectedMessage}));
+        //     //
+        //     // var response = await usersController.PostUnlockUsers(new[] { 1 });
+        //     //
+        //     // Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+        //     // Assert.True(response.Headers.TryGetValues("X-Status-Reason", out var values));
+        //     // Assert.True(values.Contains("Validation failed"));
+        //     //
+        //     // var responseContent = response.Content as ObjectContent<HttpError>;
+        //     // var responseValue = responseContent?.Value as HttpError;
+        //     // Assert.NotNull(responseValue);
+        //     // Assert.True(responseValue.Message.Contains(expectedMessage));
+        //     // Assert.True(responseValue.Message.Contains(user.Id.ToString()));
         // }
         //
-        // [Test]
-        // public async Task PostUnlockUsers_When_One_UserId_Supplied_Expect_User_Locked_Out_With_Correct_Response_Message()
-        // {
-        //     var mockUserManager = CreateMockUserManager();
-        //     var usersController = CreateSut(mockUserManager);
-        //
-        //     var user = new BackOfficeIdentityUser(
-        //         new Mock<IGlobalSettings>().Object,
-        //         1,
-        //         new List<IReadOnlyUserGroup>())
-        //     {
-        //         Name = "bob"
-        //     };
-        //
-        //     mockUserManager.Setup(x => x.FindByIdAsync(user.Id.ToString()))
-        //         .ReturnsAsync(user);
-        //     mockUserManager.Setup(x => x.SetLockoutEndDateAsync(user, It.IsAny<DateTimeOffset>()))
-        //         .ReturnsAsync(IdentityResult.Success)
-        //         .Verifiable();
-        //
-        //     var response = await usersController.PostUnlockUsers(new[] { user.Id });
-        //
-        //     Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        //
-        //     var responseContent = response.Content as ObjectContent<SimpleNotificationModel>;
-        //     var notifications = responseContent?.Value as SimpleNotificationModel;
-        //     Assert.NotNull(notifications);
-        //     Assert.AreEqual(user.Name, notifications.Message);
-        //     mockUserManager.Verify();
-        // }
-        //
-        // [Test]
-        // public async Task PostUnlockUsers_When_Multiple_UserIds_Supplied_Expect_User_Locked_Out_With_Correct_Response_Message()
-        // {
-        //     var mockUserManager = CreateMockUserManager();
-        //     var usersController = CreateSut(mockUserManager);
-        //
-        //     var user1 = new BackOfficeIdentityUser(
-        //         new Mock<IGlobalSettings>().Object,
-        //         1,
-        //         new List<IReadOnlyUserGroup>())
-        //     {
-        //         Name = "bob"
-        //     };
-        //     var user2 = new BackOfficeIdentityUser(
-        //         new Mock<IGlobalSettings>().Object,
-        //         2,
-        //         new List<IReadOnlyUserGroup>())
-        //     {
-        //         Name = "alice"
-        //     };
-        //     var userIdsToLock = new[] {user1.Id, user2.Id};
-        //
-        //     mockUserManager.Setup(x => x.FindByIdAsync(user1.Id.ToString()))
-        //         .ReturnsAsync(user1);
-        //     mockUserManager.Setup(x => x.FindByIdAsync(user2.Id.ToString()))
-        //         .ReturnsAsync(user2);
-        //     mockUserManager.Setup(x => x.SetLockoutEndDateAsync(user1, It.IsAny<DateTimeOffset>()))
-        //         .ReturnsAsync(IdentityResult.Success)
-        //         .Verifiable();
-        //     mockUserManager.Setup(x => x.SetLockoutEndDateAsync(user2, It.IsAny<DateTimeOffset>()))
-        //         .ReturnsAsync(IdentityResult.Success)
-        //         .Verifiable();
-        //
-        //     var response = await usersController.PostUnlockUsers(userIdsToLock);
-        //
-        //     Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        //
-        //     var responseContent = response.Content as ObjectContent<SimpleNotificationModel>;
-        //     var notifications = responseContent?.Value as SimpleNotificationModel;
-        //     Assert.NotNull(notifications);
-        //     Assert.AreEqual(userIdsToLock.Length.ToString(), notifications.Message);
-        //     mockUserManager.Verify();
-        // }
+        [Test]
+        public async Task PostUnlockUsers_When_One_UserId_Supplied_Expect_User_Locked_Out_With_Correct_Response_Message()
+        {
+            var userService = GetRequiredService<IUserService>();
+
+            var user = new UserBuilder()
+                .AddUserGroup()
+                .WithAlias("writer") // Needs to be an existing alias
+                .Done()
+                .WithIsLockedOut(true, DateTime.UtcNow)
+                .Build();
+
+            userService.Save(user);
+            var url = PrepareUrl<UsersController>(x => x.PostUnlockUsers(new []{user.Id}));
+
+            // Act
+            var response = await Client.PostAsync(url, new StringContent(string.Empty));
+            var body = await response.Content.ReadAsStringAsync();
+            body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            var actual = JsonConvert.DeserializeObject<SimpleNotificationModel>(body, new JsonSerializerSettings
+            {
+                ContractResolver = new IgnoreRequiredAttributsResolver()
+            });
+
+            Assert.Multiple(() =>
+            {
+                Assert.NotNull(actual);
+                Assert.AreEqual($"{user.Name} is now unlocked", actual.Message);
+            });
+        }
+
+        [Test]
+        public async Task PostUnlockUsers_When_Multiple_UserIds_Supplied_Expect_User_Locked_Out_With_Correct_Response_Message()
+        {
+            var numberOfUsers = 3;
+            var userService = GetRequiredService<IUserService>();
+
+            var users = new List<IUser>();
+            for (int i = 0; i < numberOfUsers; i++)
+            {
+                users.Add(new UserBuilder()
+                    .WithName($"Test User {i}")
+                    .WithEmail($"TestUser{i}@umbraco.com")
+                    .WithUsername($"TestUser{i}")
+                    .AddUserGroup()
+                    .WithAlias("writer") // Needs to be an existing alias
+                    .Done()
+                    .WithIsLockedOut(true, DateTime.UtcNow)
+                    .Build());
+            }
+
+            foreach (var user in users)
+            {
+                userService.Save(user);
+            }
+
+
+
+            var url = PrepareUrl<UsersController>(x => x.PostUnlockUsers(users.Select(x=>x.Id).ToArray()));
+
+            // Act
+            var response = await Client.PostAsync(url, new StringContent(string.Empty));
+            var body = await response.Content.ReadAsStringAsync();
+            body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            var actual = JsonConvert.DeserializeObject<SimpleNotificationModel>(body, new JsonSerializerSettings
+            {
+                ContractResolver = new IgnoreRequiredAttributsResolver()
+            });
+
+            Assert.Multiple(() =>
+            {
+                Assert.NotNull(actual);
+                Assert.AreEqual($"Unlocked {users.Count()} users", actual.Message);
+            });
+        }
         //
          // [Test]
          // public async Task GetPagedUsers_Fips()
