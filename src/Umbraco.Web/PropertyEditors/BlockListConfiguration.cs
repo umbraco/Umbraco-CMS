@@ -58,6 +58,9 @@ namespace Umbraco.Web.PropertyEditors
             public int? Max { get; set; }
         }
 
+        [ConfigurationField("useLiveEditing", "Live editing mode", "boolean", Description = "Live editing in editor overlays for live updated custom views.")]
+        public bool UseLiveEditing { get; set; }
+
         [ConfigurationField("useInlineEditingAsDefault", "Inline editing mode", "boolean", Description = "Use the inline editor as the default block view.")]
         public bool UseInlineEditingAsDefault { get; set; }
 

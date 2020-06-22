@@ -7,6 +7,14 @@ angular.module("umbraco")
         vm.content = $scope.model.content;
         vm.settings = $scope.model.settings;
 
+        localizationService.localizeMany([
+            $scope.model.liveEditing ? "prompt_discardChanges" : "general_close",
+            $scope.model.liveEditing ? "buttons_confirmActionConfirm" : "buttons_submitChanges"
+        ]).then(function (data) {
+            vm.closeLabel = data[0];
+            vm.submitLabel = data[1];
+        });
+
         vm.model = $scope.model;
 
         vm.tabs = [];

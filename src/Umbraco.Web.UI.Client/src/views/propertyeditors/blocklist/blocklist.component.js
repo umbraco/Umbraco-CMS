@@ -37,13 +37,13 @@
         var deleteAllBlocksAction;
 
         var inlineEditing = false;
+        var liveEditing = true;
 
         var vm = this;
 
         vm.loading = true;
         vm.currentBlockInFocus = null;
         vm.setBlockFocus = function(block) {
-            console.log("setBlockFocus", block.label)
             if(vm.currentBlockInFocus !== null) {
                 vm.currentBlockInFocus.focus = false;
             }
@@ -69,6 +69,7 @@
         vm.$onInit = function() {
 
             inlineEditing = vm.model.config.useInlineEditingAsDefault;
+            liveEditing = vm.model.config.useLiveEditing;
 
             vm.validationLimit = vm.model.config.validationLimit;
 
@@ -246,21 +247,38 @@
                 content: blockContentClone,
                 hideContent: hideContent,
                 openSettings: openSettings === true,
+                liveEditing: liveEditing,
                 settings: blockSettingsClone,
                 title: blockObject.label,
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
                 size: blockObject.config.editorSize || "medium",
                 submit: function(blockEditorModel) {
-                    
-                    blockObject.retriveValuesFrom(blockEditorModel.content, blockEditorModel.settings)
 
-                    blockEditorModel.close();
+                    if (liveEditing === false) {
+                        // transfer values when submitting in none-liveediting mode.
+                        blockObject.retriveValuesFrom(blockEditorModel.content, blockEditorModel.settings)
+                    }
+
+                    blockObject.active = false;
+                    editorService.close();
                 },
                 close: function() {
+
+                    if (liveEditing === true) {
+                        // revert values when closing in liveediting mode.
+                        blockObject.retriveValuesFrom(blockContentClone, blockSettingsClone)
+                    }
+
                     blockObject.active = false;
                     editorService.close();
                 }
             };
+
+            if (liveEditing === true) {
+                blockEditorModel.content = blockObject.content;
+            } else {
+                blockEditorModel.content = blockContentClone;
+            }
 
             // open property settings editor
             editorService.open(blockEditorModel);
