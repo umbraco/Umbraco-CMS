@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 using Umbraco.Web.Security;
 
@@ -64,7 +65,7 @@ namespace Umbraco.Web
         public static IEnumerable<string> GetExternalSignInError(this ViewDataDictionary viewData)
         {
             var errs = viewData.GetExternalSignInProviderErrors();
-            return errs.Errors;
+            return errs?.Errors ?? Enumerable.Empty<string>();
         }
 
         /// <summary>

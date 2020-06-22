@@ -46,8 +46,9 @@
         vm.allowPasswordReset = Umbraco.Sys.ServerVariables.umbracoSettings.canSendRequiredEmail && Umbraco.Sys.ServerVariables.umbracoSettings.allowPasswordReset;
         vm.errorMsg = "";
         vm.externalLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl;
-        vm.externalLoginProviders = externalLoginInfo.providers;
+        vm.externalLoginProviders = externalLoginInfoService.getLoginProviders();
         vm.denyLocalLogin = externalLoginInfoService.hasDenyLocalLogin();
+        vm.externalLoginProviderView = externalLoginInfo.errorProvider ? externalLoginInfoService.getExternalLoginProviderViewForErrors(externalLoginInfo.errorProvider) : null;
         vm.externalLoginInfo = externalLoginInfo;
         vm.resetPasswordCodeInfo = resetPasswordCodeInfo;
         vm.backgroundImage = Umbraco.Sys.ServerVariables.umbracoSettings.loginBackgroundImage;

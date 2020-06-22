@@ -82,10 +82,9 @@ namespace Umbraco.Web
                 }
             }
 
-            // TODO: Here we can check if there are 
-
             sb.AppendLine(@"app.value(""externalLoginInfo"", {");
-            sb.AppendLine($@"errorProvider: '{externalLoginErrors.AuthenticationType}',");
+            if (externalLoginErrors?.AuthenticationType != null)
+                sb.AppendLine($@"errorProvider: '{externalLoginErrors.AuthenticationType}',");
             sb.AppendLine(@"errors: errors,");
             sb.Append(@"providers: ");
             sb.AppendLine(JsonConvert.SerializeObject(loginProviders));
