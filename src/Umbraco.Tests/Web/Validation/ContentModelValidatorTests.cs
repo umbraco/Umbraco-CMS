@@ -25,6 +25,7 @@ using Umbraco.Tests.TestHelpers;
 using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Web.PropertyEditors.Validation;
 
 namespace Umbraco.Tests.Web.Validation
 {
@@ -43,7 +44,7 @@ namespace Umbraco.Tests.Web.Validation
             _contentType = MockedContentTypes.CreateTextPageContentType(ContentTypeAlias);
             // add complex editor
             _contentType.AddPropertyType(
-                new PropertyType("complexTest", ValueStorageType.Ntext) { Alias = "complex", Name = "Meta Keywords", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = ComplexDataTypeId },
+                new PropertyType("complexTest", ValueStorageType.Ntext) { Alias = "complex", Name = "Complex", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = ComplexDataTypeId },
                 "Content");
 
             // make them all validate with a regex rule that will not pass
@@ -94,6 +95,27 @@ namespace Umbraco.Tests.Web.Validation
         }
 
         [Test]
+        public void TestSerializer()
+        {
+            var nestedLevel2 = new NestedValidationResults();
+            nestedLevel2.AddElementTypeValidationResults(
+                new ValidationResultCollection(
+                    new ValidationResult("error2-1", new[] { "level2" }),
+                    new ValidationResult("error2-2", new[] { "level2" })));
+
+            var nestedLevel1 = new NestedValidationResults();
+            nestedLevel1.AddElementTypeValidationResults(
+                new ValidationResultCollection(
+                    new ValidationResult("error1-1", new[] { "level1" }),
+                    nestedLevel2));
+
+            var propValidationResult = new PropertyValidationResult(nestedLevel1);
+
+            var serialized = JsonConvert.SerializeObject(propValidationResult, Formatting.Indented, new ValidationResultConverter());
+            Console.WriteLine(serialized);
+        }
+
+        [Test]
         public void Test()
         {
             var validator = new ContentSaveModelValidator(
@@ -105,18 +127,37 @@ namespace Umbraco.Tests.Web.Validation
 
             // TODO: Ok now test with a 3rd/4th level complex nested editor
 
+            //            const string complexValue = @"[{
+            //		""key"": ""c8df5136-d606-41f0-9134-dea6ae0c2fd9"",
+            //		""name"": ""Hello world"",
+            //		""ncContentTypeAlias"": """ + ContentTypeAlias + @""",
+            //		""title"": ""Hello world""
+            //	}, {
+            //		""key"": ""f916104a-4082-48b2-a515-5c4bf2230f38"",
+            //		""name"": ""Super nested"",
+            //		""ncContentTypeAlias"": """ + ContentTypeAlias + @""",
+            //		""title"": ""Hi there!""
+            //	}
+            //]";
+
             const string complexValue = @"[{
-		""key"": ""c8df5136-d606-41f0-9134-dea6ae0c2fd9"",
-		""name"": ""Hello world"",
-		""ncContentTypeAlias"": """ + ContentTypeAlias + @""",
-		""title"": ""Hello world""
-	}, {
-		""key"": ""f916104a-4082-48b2-a515-5c4bf2230f38"",
-		""name"": ""Hello worldsss ddf"",
-		""ncContentTypeAlias"": """ + ContentTypeAlias + @""",
-		""title"": ""Hello worldsss ddf""
-	}
-]";
+            		""key"": ""c8df5136-d606-41f0-9134-dea6ae0c2fd9"",
+            		""name"": ""Hello world"",
+            		""ncContentTypeAlias"": """ + ContentTypeAlias + @""",
+            		""title"": ""Hello world""
+            	}, {
+            		""key"": ""f916104a-4082-48b2-a515-5c4bf2230f38"",
+            		""name"": ""Super nested"",
+            		""ncContentTypeAlias"": """ + ContentTypeAlias + @""",
+            		""title"": ""Hi there!"",
+                    ""complex"" : [{
+            		    ""key"": ""77E15DE9-1C79-47B2-BC60-4913BC4D4C6A"",
+            		    ""name"": ""I am a sub nested content"",
+            		    ""ncContentTypeAlias"": """ + ContentTypeAlias + @""",
+            		    ""title"": ""Hello up there :)""
+            	    }]
+            	}
+            ]";
             content.SetValue("complex", complexValue);
 
             // map the persisted properties to a model representing properties to save
@@ -177,7 +218,7 @@ namespace Umbraco.Tests.Web.Validation
             Assert.AreEqual(5, modelState.Keys.Count);
             const string complexPropertyKey = "_Properties.complex.invariant.null";
             Assert.IsTrue(modelState.Keys.Contains(complexPropertyKey));
-            foreach(var state in modelState.Where(x => x.Key != complexPropertyKey))
+            foreach (var state in modelState.Where(x => x.Key != complexPropertyKey))
             {
                 foreach (var error in state.Value.Errors)
                 {
@@ -194,11 +235,11 @@ namespace Umbraco.Tests.Web.Validation
             Assert.AreEqual(JTokenType.Array, jsonNestedError["nestedValidation"].Type);
             var nestedValidation = (JArray)jsonNestedError["nestedValidation"];
             Assert.AreEqual(2, nestedValidation.Count); // there are 2 because there are 2 nested content rows
-            foreach(var rowErrors in nestedValidation)
+            foreach (var rowErrors in nestedValidation)
             {
                 var elementTypeErrors = (JArray)rowErrors; // this is an array of errors for the nested content row (element type)
                 Assert.AreEqual(2, elementTypeErrors.Count);
-                foreach(var elementTypeErr in elementTypeErrors)
+                foreach (var elementTypeErr in elementTypeErrors)
                 {
                     Assert.IsNotEmpty(elementTypeErr["errorMessage"].Value<string>());
                     Assert.AreEqual(1, elementTypeErr["memberNames"].Value<JArray>().Count);

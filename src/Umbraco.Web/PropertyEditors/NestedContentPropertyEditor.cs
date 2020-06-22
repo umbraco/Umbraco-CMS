@@ -98,41 +98,37 @@ namespace Umbraco.Web.PropertyEditors
 
             public override string ConvertDbToString(PropertyType propertyType, object propertyValue, IDataTypeService dataTypeService)
             {
-                var vals = _nestedContentValues.GetPropertyValues(propertyValue, out var deserialized).ToList();
+                var rows = _nestedContentValues.GetPropertyValues(propertyValue);
 
-                if (vals.Count == 0)
+                if (rows.Count == 0)
                     return string.Empty;
 
-                foreach (var row in vals)
+                foreach (var row in rows.ToList())
                 {
-                    if (row.PropType == null)
-                    {
-                        // type not found, and property is not system: just delete the value
-                        if (IsSystemPropertyKey(row.PropKey) == false)
-                            row.JsonRowValue[row.PropKey] = null;
-                    }
-                    else
+                    foreach(var prop in row.PropertyValues.ToList())
                     {
                         try
                         {
                             // convert the value, and store the converted value
-                            var propEditor = _propertyEditors[row.PropType.PropertyEditorAlias];
+                            var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
                             if (propEditor == null) continue;
 
-                            var tempConfig = dataTypeService.GetDataType(row.PropType.DataTypeId).Configuration;
+                            var tempConfig = dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
                             var valEditor = propEditor.GetValueEditor(tempConfig);
-                            var convValue = valEditor.ConvertDbToString(row.PropType, row.JsonRowValue[row.PropKey]?.ToString(), dataTypeService);
-                            row.JsonRowValue[row.PropKey] = convValue;
+                            var convValue = valEditor.ConvertDbToString(prop.Value.PropertyType, prop.Value.Value, dataTypeService);
+
+                            // update the raw value since this is what will get serialized out
+                            row.RawPropertyValues[prop.Key] = convValue;
                         }
                         catch (InvalidOperationException)
                         {
                             // deal with weird situations by ignoring them (no comment)
-                            row.JsonRowValue[row.PropKey] = null;
+                            row.RawPropertyValues.Remove(prop.Key);
                         }
                     }
                 }
 
-                return JsonConvert.SerializeObject(deserialized).ToXmlString<string>();
+                return JsonConvert.SerializeObject(rows).ToXmlString<string>();
             }
 
             #endregion
@@ -143,98 +139,92 @@ namespace Umbraco.Web.PropertyEditors
 
             // note: there is NO variant support here
 
+            // TODO: What does this do?
             public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
             {
                 var val = property.GetValue(culture, segment);
 
-                var vals = _nestedContentValues.GetPropertyValues(val, out var deserialized).ToList();
+                var rows = _nestedContentValues.GetPropertyValues(val);
 
-                if (vals.Count == 0)
+                if (rows.Count == 0)
                     return string.Empty;
 
-                foreach (var row in vals)
+                foreach (var row in rows.ToList())
                 {
-                    if (row.PropType == null)
-                    {
-                        // type not found, and property is not system: just delete the value
-                        if (IsSystemPropertyKey(row.PropKey) == false)
-                            row.JsonRowValue[row.PropKey] = null;
-                    }
-                    else
+                    foreach(var prop in row.PropertyValues.ToList())
                     {
                         try
                         {
                             // create a temp property with the value
                             // - force it to be culture invariant as NC can't handle culture variant element properties
-                            row.PropType.Variations = ContentVariation.Nothing;
-                            var tempProp = new Property(row.PropType);
-                            tempProp.SetValue(row.JsonRowValue[row.PropKey] == null ? null : row.JsonRowValue[row.PropKey].ToString());
+                            prop.Value.PropertyType.Variations = ContentVariation.Nothing;
+                            var tempProp = new Property(prop.Value.PropertyType);
+
+                            tempProp.SetValue(prop.Value.Value);
 
                             // convert that temp property, and store the converted value
-                            var propEditor = _propertyEditors[row.PropType.PropertyEditorAlias];
+                            var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
                             if (propEditor == null)
                             {
-                                row.JsonRowValue[row.PropKey] = tempProp.GetValue()?.ToString();
+                                // update the raw value since this is what will get serialized out
+                                row.RawPropertyValues[prop.Key] = tempProp.GetValue()?.ToString();
                                 continue;
                             }
 
-                            var tempConfig = dataTypeService.GetDataType(row.PropType.DataTypeId).Configuration;
+                            var tempConfig = dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
                             var valEditor = propEditor.GetValueEditor(tempConfig);
                             var convValue = valEditor.ToEditor(tempProp, dataTypeService);
-                            row.JsonRowValue[row.PropKey] = convValue == null ? null : JToken.FromObject(convValue);
+
+                            // update the raw value since this is what will get serialized out
+                            row.RawPropertyValues[prop.Key] = convValue == null ? null : JToken.FromObject(convValue);
                         }
                         catch (InvalidOperationException)
                         {
                             // deal with weird situations by ignoring them (no comment)
-                            row.JsonRowValue[row.PropKey] = null;
+                            row.RawPropertyValues.Remove(prop.Key);
                         }
                     }
                 }
 
                 // return json
-                return deserialized;
+                return rows;
             }
 
+            // TODO: What does this do?
             public override object FromEditor(ContentPropertyData editorValue, object currentValue)
             {
                 if (editorValue.Value == null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
                     return null;
 
-                var vals = _nestedContentValues.GetPropertyValues(editorValue.Value, out var deserialized).ToList();
+                var rows = _nestedContentValues.GetPropertyValues(editorValue.Value);
 
-                if (vals.Count == 0)
+                if (rows.Count == 0)
                     return string.Empty;
 
-                foreach (var row in vals)
+                foreach (var row in rows.ToList())
                 {
-                    if (row.PropType == null)
-                    {
-                        // type not found, and property is not system: just delete the value
-                        if (IsSystemPropertyKey(row.PropKey) == false)
-                            row.JsonRowValue[row.PropKey] = null;
-                    }
-                    else
+                    foreach(var prop in row.PropertyValues.ToList())
                     {
                         // Fetch the property types prevalue
-                        var propConfiguration = _dataTypeService.GetDataType(row.PropType.DataTypeId).Configuration;
+                        var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
 
                         // Lookup the property editor
-                        var propEditor = _propertyEditors[row.PropType.PropertyEditorAlias];
+                        var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
                         if (propEditor == null) continue;
 
                         // Create a fake content property data object
-                        var contentPropData = new ContentPropertyData(row.JsonRowValue[row.PropKey], propConfiguration);
+                        var contentPropData = new ContentPropertyData(prop.Value.Value, propConfiguration);
 
                         // Get the property editor to do it's conversion
-                        var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, row.JsonRowValue[row.PropKey]);
+                        var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, prop.Value.Value);
 
-                        // Store the value back
-                        row.JsonRowValue[row.PropKey] = (newValue == null) ? null : JToken.FromObject(newValue);
+                        // update the raw value since this is what will get serialized out
+                        row.RawPropertyValues[prop.Key] = (newValue == null) ? null : JToken.FromObject(newValue);
                     }
                 }
 
                 // return json
-                return JsonConvert.SerializeObject(deserialized);
+                return JsonConvert.SerializeObject(rows);
             }
             #endregion
 
@@ -244,20 +234,21 @@ namespace Umbraco.Web.PropertyEditors
 
                 var result = new List<UmbracoEntityReference>();
 
-                foreach (var row in _nestedContentValues.GetPropertyValues(rawJson, out _))
+                foreach (var row in _nestedContentValues.GetPropertyValues(rawJson))
                 {
-                    if (row.PropType == null) continue;
+                    foreach(var prop in row.PropertyValues)
+                    {
+                        var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
 
-                    var propEditor = _propertyEditors[row.PropType.PropertyEditorAlias];
+                        var valueEditor = propEditor?.GetValueEditor();
+                        if (!(valueEditor is IDataValueReference reference)) continue;
 
-                    var valueEditor = propEditor?.GetValueEditor();
-                    if (!(valueEditor is IDataValueReference reference)) continue;
+                        var val = prop.Value.Value?.ToString();
 
-                    var val = row.JsonRowValue[row.PropKey]?.ToString();
+                        var refs = reference.GetReferences(val);
 
-                    var refs = reference.GetReferences(val);
-
-                    result.AddRange(refs);
+                        result.AddRange(refs);
+                    }
                 }
 
                 return result;
@@ -274,14 +265,16 @@ namespace Umbraco.Web.PropertyEditors
                 _nestedContentValues = nestedContentValues;
             }
 
-            protected override IEnumerable<ElementTypeValidationModel> GetElementsFromValue(object value)
+            protected override IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object value)
             {
-                foreach (var row in _nestedContentValues.GetPropertyValues(value, out _))
+                foreach (var row in _nestedContentValues.GetPropertyValues(value))
                 {
-                    if (row.PropType == null) continue;
-
-                    var val = row.JsonRowValue[row.PropKey];
-                    yield return new ElementTypeValidationModel(val, row.PropType);
+                    var elementValidation = new ElementTypeValidationModel();
+                    foreach (var prop in row.PropertyValues)
+                    {
+                        elementValidation.AddPropertyTypeValidation(new PropertyTypeValidationModel(prop.Value.Value, prop.Value.PropertyType));                        
+                    }
+                    yield return elementValidation;
                 }
             }
         }
@@ -295,85 +288,128 @@ namespace Umbraco.Web.PropertyEditors
                 _contentTypes = new Lazy<Dictionary<string, IContentType>>(() => contentTypeService.GetAll().ToDictionary(c => c.Alias));
             }
 
-            private IContentType GetElementType(JObject item)
+            private IContentType GetElementType(NestedContentRowValue item)
             {
-                var contentTypeAlias = item[ContentTypeAliasPropertyKey]?.ToObject<string>() ?? string.Empty;
-                _contentTypes.Value.TryGetValue(contentTypeAlias, out var contentType);
+                _contentTypes.Value.TryGetValue(item.ContentTypeAlias, out var contentType);
                 return contentType;
             }
 
-            public IEnumerable<RowValue> GetPropertyValues(object propertyValue, out List<JObject> deserialized)
+            // TODO: See note for "RowValue", luckily this is all internal as I'm pretty sure we should totally overhaul this
+            public IReadOnlyList<NestedContentRowValue> GetPropertyValues(object propertyValue)
             {
-                var rowValues = new List<RowValue>();
-
-                deserialized = null;
-
                 if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
-                    return Enumerable.Empty<RowValue>();
+                    return new List<NestedContentRowValue>();
 
-                deserialized = JsonConvert.DeserializeObject<List<JObject>>(propertyValue.ToString());
+                var rowValues = JsonConvert.DeserializeObject<List<NestedContentRowValue>>(propertyValue.ToString());
 
                 // There was a note here about checking if the result had zero items and if so it would return null, so we'll continue to do that
                 // The original note was: "Issue #38 - Keep recursive property lookups working"
                 // Which is from the original NC tracker: https://github.com/umco/umbraco-nested-content/issues/38
                 // This check should be used everywhere when iterating NC prop values, instead of just the one previous place so that
                 // empty values don't get persisted when there is nothing, it should actually be null.
-                if (deserialized == null || deserialized.Count == 0)
-                    return Enumerable.Empty<RowValue>();
+                if (rowValues == null || rowValues.Count == 0)
+                    return new List<NestedContentRowValue>();
 
-                var index = 0;
+                var contentTypePropertyTypes = new Dictionary<string, Dictionary<string, PropertyType>>();
 
-                foreach (var o in deserialized)
+                foreach (var row in rowValues)
                 {
-                    var propValues = o;
-
-                    var contentType = GetElementType(propValues);
+                    var contentType = GetElementType(row);
                     if (contentType == null)
                         continue;
 
-                    var propertyTypes = contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x);
-                    var propAliases = propValues.Properties().Select(x => x.Name);
-                    foreach (var propAlias in propAliases)
+                    // get the prop types for this content type but keep a dictionary of found ones so we don't have to keep re-looking and re-creating
+                    // objects on each iteration.
+                    if (!contentTypePropertyTypes.TryGetValue(contentType.Alias, out var propertyTypes))
+                        propertyTypes = contentTypePropertyTypes[contentType.Alias] = contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x);
+
+                    // find any keys that are not real property types and remove them
+                    foreach(var prop in row.RawPropertyValues.ToList())
                     {
-                        propertyTypes.TryGetValue(propAlias, out var propType);
-                        rowValues.Add(new RowValue(propAlias, propType, propValues, index));
+                        if (IsSystemPropertyKey(prop.Key)) continue;
+
+                        // doesn't exist so remove it
+                        if (!propertyTypes.TryGetValue(prop.Key, out var propType))
+                        {                            
+                            row.RawPropertyValues.Remove(prop.Key); 
+                        }   
+                        else
+                        {
+                            // set the value to include the resolved property type
+                            row.PropertyValues[prop.Key] = new NestedContentPropertyValue
+                            {
+                                PropertyType = propType,
+                                Value = prop.Value
+                            };
+                        }
                     }
-                    index++;
                 }
 
                 return rowValues;
             }
 
-            internal class RowValue
+            internal class NestedContentPropertyValue
             {
-                public RowValue(string propKey, PropertyType propType, JObject propValues, int index)
-                {
-                    PropKey = propKey ?? throw new ArgumentNullException(nameof(propKey));
-                    PropType = propType;
-                    JsonRowValue = propValues ?? throw new ArgumentNullException(nameof(propValues));
-                    RowIndex = index;
-                }
-
-                /// <summary>
-                /// The current property key being iterated for the row value
-                /// </summary>
-                public string PropKey { get; }
-
-                /// <summary>
-                /// The <see cref="PropertyType"/> of the value (if any), this may be null
-                /// </summary>
-                public PropertyType PropType { get; }
-
-                /// <summary>
-                /// The json values for the current row
-                /// </summary>
-                public JObject JsonRowValue { get; }
-
-                /// <summary>
-                /// The Nested Content row index
-                /// </summary>
-                public int RowIndex { get; }
+                public object Value { get; set; }
+                public PropertyType PropertyType { get; set; }
             }
+
+            internal class NestedContentRowValue
+            {
+                [JsonProperty("name")]
+                public string Name { get; set; }
+
+                [JsonProperty("ncContentTypeAlias")]
+                public string ContentTypeAlias { get; set; }
+
+                /// <summary>
+                /// The remaining properties will be serialized to a dictionary
+                /// </summary>
+                /// <remarks>
+                /// The JsonExtensionDataAttribute is used to put the non-typed properties into a bucket
+                /// http://www.newtonsoft.com/json/help/html/DeserializeExtensionData.htm
+                /// NestedContent serializes to string, int, whatever eg
+                ///   "stringValue":"Some String","numericValue":125,"otherNumeric":null
+                /// </remarks>
+                [JsonExtensionData]
+                public IDictionary<string, object> RawPropertyValues { get; set; }
+
+                [JsonIgnore]
+                public IDictionary<string, NestedContentPropertyValue> PropertyValues { get; set; } = new Dictionary<string, NestedContentPropertyValue>();
+            }
+
+            //// TODO: This is a very odd class, it represents one 'row' of json per value of an NC item. It is a total
+            //// waste of data and the JsonRowValue string value is copied (i think for each 'row'), need to revisit this and make sure it makes sense.
+            //internal class RowValue
+            //{
+            //    public RowValue(string propKey, PropertyType propType, JObject propValues, int index)
+            //    {
+            //        PropKey = propKey ?? throw new ArgumentNullException(nameof(propKey));
+            //        PropType = propType;
+            //        JsonRowValue = propValues ?? throw new ArgumentNullException(nameof(propValues));
+            //        RowIndex = index;
+            //    }
+
+            //    /// <summary>
+            //    /// The current property key being iterated for the row value
+            //    /// </summary>
+            //    public string PropKey { get; }
+
+            //    /// <summary>
+            //    /// The <see cref="PropertyType"/> of the value (if any), this may be null
+            //    /// </summary>
+            //    public PropertyType PropType { get; }
+
+            //    /// <summary>
+            //    /// The json values for the current row
+            //    /// </summary>
+            //    public JObject JsonRowValue { get; }
+
+            //    /// <summary>
+            //    /// The Nested Content row index
+            //    /// </summary>
+            //    public int RowIndex { get; }
+            //}
         }
 
         #endregion

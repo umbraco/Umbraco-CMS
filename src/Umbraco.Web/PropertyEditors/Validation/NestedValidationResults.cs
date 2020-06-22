@@ -3,6 +3,17 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Web.PropertyEditors.Validation
 {
+    public class ValidationResultCollection : ValidationResult
+    {
+        public ValidationResultCollection(params ValidationResult[] nested)
+            : base(string.Empty)
+        {
+            ValidationResults = new List<ValidationResult>(nested);
+        }
+
+        public IList<ValidationResult> ValidationResults { get; }
+    }
+
     /// <summary>
     /// Custom <see cref="ValidationResult"/> that contains a list of nested validation results
     /// </summary>
@@ -11,12 +22,16 @@ namespace Umbraco.Web.PropertyEditors.Validation
     /// </remarks>
     public class NestedValidationResults : ValidationResult
     {
-        public NestedValidationResults(IEnumerable<ValidationResult> nested)
+        public NestedValidationResults()
             : base(string.Empty)
         {
-            ValidationResults = new List<ValidationResult>(nested);
         }
 
-        public IList<ValidationResult> ValidationResults { get; }
+        public void AddElementTypeValidationResults(ValidationResultCollection resultCollection)
+        {
+            ValidationResults.Add(resultCollection);
+        }
+
+        public IList<ValidationResultCollection> ValidationResults { get; } = new List<ValidationResultCollection>();
     }
 }

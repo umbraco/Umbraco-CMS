@@ -34,37 +34,49 @@ namespace Umbraco.Web.PropertyEditors.Validation
 
             var validationResult = (ValidationResult)value;
 
-            if (validationResult is NestedValidationResults nestedResult)
-            {
-                if (nestedResult.ValidationResults.Count > 0)
-                {
-                    var validationItems = JToken.FromObject(nestedResult.ValidationResults, camelCaseSerializer);
-                    validationItems.WriteTo(writer);
-                }
-            }
-            else
+            if (validationResult is NestedValidationResults nestedResult && nestedResult.ValidationResults.Count > 0)
             {
                 var jo = new JObject();
+                // recurse to write out an array of ValidationResultCollection
+                var obj = JArray.FromObject(nestedResult.ValidationResults, camelCaseSerializer);
+                jo.Add("nestedValidation", obj);
+                jo.WriteTo(writer);
+            }
+            else if (validationResult is ValidationResultCollection resultCollection && resultCollection.ValidationResults.Count > 0)
+            {
+                var ja = new JArray();
+                foreach (var result in resultCollection.ValidationResults)
+                {
+                    // recurse to write out the ValidationResult
+                    var obj = JObject.FromObject(result, camelCaseSerializer);
+                    ja.Add(obj);
+                }
+                ja.WriteTo(writer);
+            }
+            else 
+            {
+                
+                if (validationResult is PropertyValidationResult propertyValidationResult
+                    && propertyValidationResult.NestedResuls?.ValidationResults.Count > 0)
+                {
+                    // recurse to write out the NestedValidationResults
+                    var obj = JToken.FromObject(propertyValidationResult.NestedResuls, camelCaseSerializer);
+                    obj.WriteTo(writer);
+                }
 
+                var jo = new JObject();
                 if (!validationResult.ErrorMessage.IsNullOrWhiteSpace())
                 {
-                    jo.Add("errorMessage", JToken.FromObject(validationResult.ErrorMessage, camelCaseSerializer));
+                    var errObj = JToken.FromObject(validationResult.ErrorMessage, camelCaseSerializer);
+                    jo.Add("errorMessage", errObj);
                 }
-
                 if (validationResult.MemberNames.Any())
                 {
-                    jo.Add("memberNames", JToken.FromObject(validationResult.MemberNames, camelCaseSerializer));
+                    var memberNamesObj = JToken.FromObject(validationResult.MemberNames, camelCaseSerializer);
+                    jo.Add("memberNames", memberNamesObj);
                 }
-
-                if (validationResult is PropertyValidationResult propertyValidationResult)
-                {
-                    if (propertyValidationResult.NestedResuls?.ValidationResults.Count > 0)
-                    {
-                        jo.Add("nestedValidation", JToken.FromObject(propertyValidationResult.NestedResuls, camelCaseSerializer));
-                    }
-                }
-
-                jo.WriteTo(writer);
+                if (jo.HasValues)
+                    jo.WriteTo(writer);
             }
         }
     }

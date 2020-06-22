@@ -97,15 +97,18 @@ namespace Umbraco.Web.PropertyEditors
                 _blockEditorValues = blockEditorValues;
             }
 
-            protected override IEnumerable<ElementTypeValidationModel> GetElementsFromValue(object value)
+            protected override IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object value)
             {
-                foreach (var row in _blockEditorValues.GetPropertyValues(value, out _))
-                {
-                    if (row.PropType == null) continue;
+                // TODO: Fix all of this
+                return Enumerable.Empty<ElementTypeValidationModel>();
 
-                    var val = row.JsonRowValue[row.PropKey];
-                    yield return new ElementTypeValidationModel(val, row.PropType);
-                }
+                //foreach (var row in _blockEditorValues.GetPropertyValues(value, out _))
+                //{
+                //    if (row.PropType == null) continue;
+
+                //    var val = row.JsonRowValue[row.PropKey];
+                //    yield return new ElementTypeValidationModel(val, row.PropType);
+                //}
             }
         }
 
@@ -179,6 +182,8 @@ namespace Umbraco.Web.PropertyEditors
                 return rowValues;
             }
 
+            // TODO: See notes in NestedContent property editor, this all needs to die and whatever is used should be shared between the editors
+
             internal class RowValue
             {
                 public RowValue(string propKey, PropertyType propType, JObject propValues, int index)
@@ -221,6 +226,7 @@ namespace Umbraco.Web.PropertyEditors
         }
         #endregion
 
+        // TODO: This isn't even used :/
         private static bool IsSystemPropertyKey(string propertyKey) => ContentTypeKeyPropertyKey == propertyKey || UdiPropertyKey == propertyKey;
     }
 }

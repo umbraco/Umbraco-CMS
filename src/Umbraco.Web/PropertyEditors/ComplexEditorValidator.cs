@@ -22,44 +22,63 @@ namespace Umbraco.Web.PropertyEditors
             _propertyValidationService = new PropertyValidationService(propertyEditors, dataTypeService, textService);
         }
 
+        /// <summary>
+        /// Return a single <see cref="NestedValidationResults"/> for all sub nested validation results in the complex editor
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="valueType"></param>
+        /// <param name="dataTypeConfiguration"></param>
+        /// <returns></returns>
         public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
         {
-            var elements = GetElementsFromValue(value);
-            var rowResults = GetNestedValidationResults(elements).ToList();
+            var elementTypeValues = GetElementTypeValidation(value).ToList();
+            var rowResults = GetNestedValidationResults(elementTypeValues).ToList();
 
-            return rowResults.Count > 0
-                ? new NestedValidationResults(rowResults).Yield()
-                : Enumerable.Empty<ValidationResult>();
+            if (rowResults.Count > 0)
+            {
+                var result = new NestedValidationResults();
+                foreach(var rowResult in rowResults)
+                {
+                    result.AddElementTypeValidationResults(rowResult);
+                }
+                return result.Yield();
+            }
+
+            return Enumerable.Empty<ValidationResult>();
         }
 
-        protected abstract IEnumerable<ElementTypeValidationModel> GetElementsFromValue(object value);
+       
+        protected abstract IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object value);
 
         /// <summary>
-        /// Return a nested validation result per row
+        /// Return a nested validation result per row (Element Type)
         /// </summary>
         /// <param name="rawValue"></param>
         /// <returns></returns>
-        protected IEnumerable<NestedValidationResults> GetNestedValidationResults(IEnumerable<ElementTypeValidationModel> elements)
+        protected IEnumerable<ValidationResultCollection> GetNestedValidationResults(IEnumerable<ElementTypeValidationModel> elements)
         {
             foreach (var row in elements)
             {
                 var nestedValidation = new List<ValidationResult>();
 
-                foreach(var validationResult in _propertyValidationService.ValidatePropertyValue(row.PropertyType, row.PostedValue))
+                foreach (var prop in row.PropertyTypeValidation)
                 {
-                    nestedValidation.Add(validationResult);
+                    foreach (var validationResult in _propertyValidationService.ValidatePropertyValue(prop.PropertyType, prop.PostedValue))
+                    {
+                        nestedValidation.Add(validationResult);
+                    }
                 }
 
                 if (nestedValidation.Count > 0)
                 {
-                    yield return new NestedValidationResults(nestedValidation);
+                    yield return new ValidationResultCollection(nestedValidation.ToArray());
                 }
             }
         }
 
-        public class ElementTypeValidationModel
+        public class PropertyTypeValidationModel
         {
-            public ElementTypeValidationModel(object postedValue, PropertyType propertyType)
+            public PropertyTypeValidationModel(object postedValue, PropertyType propertyType)
             {
                 PostedValue = postedValue ?? throw new ArgumentNullException(nameof(postedValue));
                 PropertyType = propertyType ?? throw new ArgumentNullException(nameof(propertyType));
@@ -67,7 +86,14 @@ namespace Umbraco.Web.PropertyEditors
 
             public object PostedValue { get; }
             public PropertyType PropertyType { get; }
+        }
 
+        public class ElementTypeValidationModel
+        {
+            private List<PropertyTypeValidationModel> _list = new List<PropertyTypeValidationModel>();
+            public IEnumerable<PropertyTypeValidationModel> PropertyTypeValidation => _list;
+
+            public void AddPropertyTypeValidation(PropertyTypeValidationModel propValidation) => _list.Add(propValidation);
         }
     }
 }
