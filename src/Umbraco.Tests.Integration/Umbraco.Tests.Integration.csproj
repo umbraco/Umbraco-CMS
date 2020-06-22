@@ -15,6 +15,7 @@
 
     <ItemGroup>
         <PackageReference Include="LightInject.Microsoft.DependencyInjection" Version="3.3.0" />
+        <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.4" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
         <PackageReference Include="Moq" Version="4.13.1" />

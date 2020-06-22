@@ -20,7 +20,7 @@ namespace Umbraco.Web.Security
         public const string OwinMarkerKey = "Umbraco.Web.Security.Identity.BackOfficeUserManagerMarker";
 
         public BackOfficeOwinUserManager(
-            IPasswordConfiguration passwordConfiguration,
+            IUserPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
             IUserStore<BackOfficeIdentityUser> store,
             IOptions<BackOfficeIdentityOptions> optionsAccessor,
@@ -30,14 +30,14 @@ namespace Umbraco.Web.Security
             BackOfficeIdentityErrorDescriber errors,
             IDataProtectionProvider dataProtectionProvider,
             ILogger<UserManager<BackOfficeIdentityUser>> logger)
-            : base(ipResolver, store, optionsAccessor, null, userValidators, passwordValidators, keyNormalizer, errors, null, logger)
+            : base(ipResolver, store, optionsAccessor, null, userValidators, passwordValidators, keyNormalizer, errors, null, logger, passwordConfiguration)
         {
             PasswordConfiguration = passwordConfiguration;
             InitUserManager(this, dataProtectionProvider);
         }
-        
+
         #region Static Create methods
-        
+
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager
         /// </summary>
@@ -54,7 +54,7 @@ namespace Umbraco.Web.Security
             ILogger<UserManager<BackOfficeIdentityUser>> logger)
         {
             var store = new BackOfficeUserStore(userService, entityService, externalLoginService, globalSettings, mapper);
-            
+
             return Create(
                 passwordConfiguration,
                 ipResolver,
@@ -68,7 +68,7 @@ namespace Umbraco.Web.Security
         /// Creates a BackOfficeUserManager instance with all default options and a custom BackOfficeUserManager instance
         /// </summary>
         public static BackOfficeOwinUserManager Create(
-            IPasswordConfiguration passwordConfiguration,
+            IUserPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
             IUserStore<BackOfficeIdentityUser> customUserStore,
             BackOfficeIdentityErrorDescriber errors,
@@ -88,7 +88,7 @@ namespace Umbraco.Web.Security
             options.Password.RequireDigit = passwordConfiguration.RequireDigit;
             options.Password.RequireLowercase = passwordConfiguration.RequireLowercase;
             options.Password.RequireUppercase = passwordConfiguration.RequireUppercase;
-            
+
             // Ensure Umbraco security stamp claim type is used
             options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
             options.ClaimsIdentity.UserNameClaimType = ClaimTypes.Name;
@@ -109,7 +109,7 @@ namespace Umbraco.Web.Security
                 new OptionsWrapper<BackOfficeIdentityOptions>(options),
                 userValidators,
                 passwordValidators,
-                new BackOfficeLookupNormalizer(), 
+                new BackOfficeLookupNormalizer(),
                 errors,
                 dataProtectionProvider,
                 logger);

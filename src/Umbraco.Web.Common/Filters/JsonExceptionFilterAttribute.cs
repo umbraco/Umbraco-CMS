@@ -45,23 +45,15 @@ namespace Umbraco.Web.Common.Filters
 
             private object GetModel(Exception ex)
             {
-                object error;
+                var error = new ExceptionViewModel
+                {
+                    ExceptionMessage = ex.Message
+                };
 
                 if (_hostingEnvironment.IsDebugMode)
                 {
-                    error = new
-                    {
-                        ExceptionMessage = ex.Message,
-                        ExceptionType = ex.GetType(),
-                        StackTrace = ex.StackTrace
-                    };
-                }
-                else
-                {
-                    error = new
-                    {
-                        ExceptionMessage = ex.Message
-                    };
+                    error.ExceptionType = ex.GetType();
+                    error.StackTrace = ex.StackTrace;
                 }
 
                 return error;

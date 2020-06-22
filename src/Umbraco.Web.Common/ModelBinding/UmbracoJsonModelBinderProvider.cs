@@ -9,6 +9,7 @@ using System.Buffers;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Umbraco.Web.Common.Formatters;
 
 namespace Umbraco.Web.Common.ModelBinding
 {
@@ -44,18 +45,7 @@ namespace Umbraco.Web.Common.ModelBinding
                     jsonOptions)
             };
         }
-        private class IgnoreRequiredAttributsResolver : DefaultContractResolver
-        {
-            protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
-            {
-                var property = base.CreateProperty(member, memberSerialization);
 
-
-                property.Required = Required.Default;
-
-                return property;
-            }
-        }
 
     }
 }
