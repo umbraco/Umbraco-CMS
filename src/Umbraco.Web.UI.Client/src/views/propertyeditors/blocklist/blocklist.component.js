@@ -244,11 +244,9 @@
             var hideContent = (openSettings === true && inlineEditing === true);
             
             var blockEditorModel = {
-                content: blockContentClone,
                 hideContent: hideContent,
                 openSettings: openSettings === true,
                 liveEditing: liveEditing,
-                settings: blockSettingsClone,
                 title: blockObject.label,
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
                 size: blockObject.config.editorSize || "medium",
@@ -256,7 +254,7 @@
 
                     if (liveEditing === false) {
                         // transfer values when submitting in none-liveediting mode.
-                        blockObject.retriveValuesFrom(blockEditorModel.content, blockEditorModel.settings)
+                        blockObject.retriveValuesFrom(blockEditorModel.content, blockEditorModel.settings);
                     }
 
                     blockObject.active = false;
@@ -266,7 +264,7 @@
 
                     if (liveEditing === true) {
                         // revert values when closing in liveediting mode.
-                        blockObject.retriveValuesFrom(blockContentClone, blockSettingsClone)
+                        blockObject.retriveValuesFrom(blockContentClone, blockSettingsClone);
                     }
 
                     blockObject.active = false;
@@ -276,8 +274,10 @@
 
             if (liveEditing === true) {
                 blockEditorModel.content = blockObject.content;
+                blockEditorModel.settings = blockObject.settings;
             } else {
                 blockEditorModel.content = blockContentClone;
+                blockEditorModel.settings = blockSettingsClone;
             }
 
             // open property settings editor
