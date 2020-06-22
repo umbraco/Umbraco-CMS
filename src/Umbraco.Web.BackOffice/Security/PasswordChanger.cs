@@ -2,15 +2,14 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Umbraco.Core;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Extensions;
 using Umbraco.Web.Models;
-using Umbraco.Web.Security;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 
-//Migrated to .NET CORE
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Security
 {
     internal class PasswordChanger
     {
@@ -33,7 +32,7 @@ namespace Umbraco.Web.Editors
             IUser currentUser,
             IUser savingUser,
             ChangingPasswordModel passwordModel,
-            BackOfficeOwinUserManager userMgr)
+            BackOfficeUserManager userMgr)
         {
             if (passwordModel == null) throw new ArgumentNullException(nameof(passwordModel));
             if (userMgr == null) throw new ArgumentNullException(nameof(userMgr));

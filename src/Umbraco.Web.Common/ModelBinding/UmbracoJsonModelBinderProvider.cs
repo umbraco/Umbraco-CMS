@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using System.Buffers;
+using System.Reflection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Umbraco.Web.Common.ModelBinding
 {
@@ -25,6 +28,11 @@ namespace Umbraco.Web.Common.ModelBinding
             {
                 AllowInputFormatterExceptionMessages = true
             };
+
+            var ss = jsonOptions.SerializerSettings; // Just use the defaults as base
+
+            // We need to ignore required attributes when serializing. E.g UserSave.ChangePassword. Otherwise the model is not model bound.
+            ss.ContractResolver = new IgnoreRequiredAttributsResolver();
             return new IInputFormatter[]
             {
                 new NewtonsoftJsonInputFormatter(
@@ -36,5 +44,18 @@ namespace Umbraco.Web.Common.ModelBinding
                     jsonOptions)
             };
         }
+        private class IgnoreRequiredAttributsResolver : DefaultContractResolver
+        {
+            protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+            {
+                var property = base.CreateProperty(member, memberSerialization);
+
+
+                property.Required = Required.Default;
+
+                return property;
+            }
+        }
+
     }
 }

@@ -107,7 +107,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
         /// <returns></returns>
-        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
+        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
         public MediaItemDisplay GetEmpty(string contentTypeAlias, int parentId)
         {
             var contentType = _mediaTypeService.Get(contentTypeAlias);
@@ -155,7 +155,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
+        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
         [EnsureUserPermissionForMedia("id")]
         [DetermineAmbiguousActionByPassingParameters]
         public MediaItemDisplay GetById(int id)
@@ -176,7 +176,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
+        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
         [EnsureUserPermissionForMedia("id")]
         [DetermineAmbiguousActionByPassingParameters]
         public MediaItemDisplay GetById(Guid id)
@@ -197,7 +197,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
+        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
         [EnsureUserPermissionForMedia("id")]
         [DetermineAmbiguousActionByPassingParameters]
         public MediaItemDisplay GetById(Udi id)
@@ -215,7 +215,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        //[FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))] // TODO introduce when moved to .NET Core
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))]
         public IEnumerable<MediaItemDisplay> GetByIds([FromQuery]int[] ids)
         {
             var foundMedia = _mediaService.GetByIds(ids);
@@ -259,7 +259,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Returns the root media objects
         /// </summary>
-        //[FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>))] // TODO introduce when moved to .NET Core
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>))]
         public IEnumerable<ContentItemBasic<ContentPropertyBasic>> GetRootMedia()
         {
             // TODO: Add permissions check!

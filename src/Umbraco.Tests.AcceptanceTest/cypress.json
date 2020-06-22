@@ -1,5 +1,5 @@
 {
-    "baseUrl": "https://localhost:44331",
+    "baseUrl": "http://localhost:9000",
     "viewportHeight": 1024,
     "viewportWidth": 1200,
     "env": {

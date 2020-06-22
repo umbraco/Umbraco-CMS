@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -14,6 +15,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// data used to display vs save
     /// </remarks>
     [DataContract(Name = "user", Namespace = "")]
+    [JsonObject(MemberSerialization.OptOut)]
     public class UserSave : EntityBasic, IValidatableObject
     {
         [DataMember(Name = "changePassword", IsRequired = true)]

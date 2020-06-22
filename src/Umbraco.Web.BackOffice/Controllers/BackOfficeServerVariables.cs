@@ -164,14 +164,14 @@ namespace Umbraco.Web.BackOffice.Controllers
                             "embedApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
                                 controller => controller.GetEmbed("", 0, 0))
                         },
-                        // {
-                        //     "userApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<UsersController>(
-                        //         controller => controller.PostSaveUser(null))
-                        // },
-                        // {
-                        //     "userGroupsApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<UserGroupsController>(
-                        //         controller => controller.PostSaveUserGroup(null))
-                        // },
+                        {
+                            "userApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<UsersController>(
+                                controller => controller.PostSaveUser(null))
+                        },
+                        {
+                            "userGroupsApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<UserGroupsController>(
+                                controller => controller.PostSaveUserGroup(null))
+                        },
                         {
                             "contentApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ContentController>(
                                 controller => controller.PostSave(null))
@@ -212,10 +212,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                             "authenticationApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<AuthenticationController>(
                                 controller => controller.PostLogin(null))
                         },
-                        // {
-                        //     "currentUserApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
-                        //         controller => controller.PostChangePassword(null))
-                        // },
+                        {
+                            "currentUserApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
+                                controller => controller.PostChangePassword(null))
+                        },
                         {
                             "entityApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<EntityController>(
                                 controller => controller.GetById(0, UmbracoEntityTypes.Media))
@@ -260,10 +260,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                             "memberTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberTypeController>(
                                 controller => controller.GetAllTypes())
                         },
-                        // {
-                        //     "memberGroupApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberGroupController>(
-                        //         controller => controller.GetAllGroups())
-                        // },
+                        {
+                            "memberGroupApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberGroupController>(
+                                controller => controller.GetAllGroups())
+                        },
                         {
                             "updateCheckApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<UpdateCheckController>(
                                 controller => controller.GetCheck())
@@ -296,10 +296,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                             "healthCheckBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
                                 controller => controller.GetAllHealthChecks())
                         },
-                        // {
-                        //     "templateQueryApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TemplateQueryController>(
-                        //         controller => controller.PostTemplateQuery(null))
-                        // },
+                        {
+                            "templateQueryApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TemplateQueryController>(
+                                controller => controller.PostTemplateQuery(null))
+                        },
                         {
                             "codeFileApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<CodeFileController>(
                                 controller => controller.GetByPath("", ""))
