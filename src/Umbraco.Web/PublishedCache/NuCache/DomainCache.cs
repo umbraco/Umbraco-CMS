@@ -25,7 +25,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             var list = _snapshot.GetAll();
             if (includeWildcards == false) list = list.Where(x => x.IsWildcard == false);
-            return list;
+            return list.OrderBy(x => x.SortOrder);
         }
 
         /// <inheritdoc />
@@ -37,7 +37,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var list = _snapshot.GetAll();
             list = list.Where(x => x.ContentId == documentId);
             if (includeWildcards == false) list = list.Where(x => x.IsWildcard == false);
-            return list;
+            return list.OrderBy(x => x.SortOrder);
         }
 
         /// <inheritdoc />

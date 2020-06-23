@@ -219,8 +219,8 @@ namespace Umbraco.Tests.Routing
                     if (contentId != 9876) return Enumerable.Empty<Domain>();
                     return new[]
                     {
-                        new Domain(2, "example.us", 9876, CultureInfo.GetCultureInfo("en-US"), false), //default
-                        new Domain(3, "example.fr", 9876, CultureInfo.GetCultureInfo("fr-FR"), false)
+                        new Domain(2, "example.us", 9876, CultureInfo.GetCultureInfo("en-US"), false, 0), //default
+                        new Domain(3, "example.fr", 9876, CultureInfo.GetCultureInfo("fr-FR"), false, 0)
                     };
                 });
             domainCache.Setup(x => x.DefaultCulture).Returns(CultureInfo.GetCultureInfo("en-US").Name);
@@ -273,8 +273,8 @@ namespace Umbraco.Tests.Routing
                     if (contentId != 9876) return Enumerable.Empty<Domain>();
                     return new[]
                     {
-                        new Domain(2, "example.us", 9876, CultureInfo.GetCultureInfo("en-US"), false), //default
-                        new Domain(3, "example.fr", 9876, CultureInfo.GetCultureInfo("fr-FR"), false)
+                        new Domain(2, "example.us", 9876, CultureInfo.GetCultureInfo("en-US"), false, 0), //default
+                        new Domain(3, "example.fr", 9876, CultureInfo.GetCultureInfo("fr-FR"), false, 0)
                     };
                 });
             domainCache.Setup(x => x.DefaultCulture).Returns(CultureInfo.GetCultureInfo("en-US").Name);

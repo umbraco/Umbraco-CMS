@@ -23,7 +23,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         {
             return _domainService.GetAll(includeWildcards)
                 .Where(x => x.RootContentId.HasValue && x.LanguageIsoCode.IsNullOrWhiteSpace() == false)
-                .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId.Value, CultureInfo.GetCultureInfo(x.LanguageIsoCode), x.IsWildcard));
+                .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId.Value, CultureInfo.GetCultureInfo(x.LanguageIsoCode), x.IsWildcard, x.SortOrder));
         }
 
         /// <inheritdoc />
@@ -31,7 +31,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         {
             return _domainService.GetAssignedDomains(documentId, includeWildcards)
                  .Where(x => x.RootContentId.HasValue && x.LanguageIsoCode.IsNullOrWhiteSpace() == false)
-                .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId.Value, CultureInfo.GetCultureInfo(x.LanguageIsoCode), x.IsWildcard));
+                .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId.Value, CultureInfo.GetCultureInfo(x.LanguageIsoCode), x.IsWildcard, x.SortOrder));
         }
 
         /// <inheritdoc />
