@@ -669,7 +669,7 @@
              * @name removeDataAndDestroyModel
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Removes the data and destroys the Block Model.
-             * Notive this method does not remove the block from your layout, this will need to be handlede by the Property Editor since this services donst know about your layout structure.
+             * Notice this method does not remove the block from your layout, this will need to be handlede by the Property Editor since this services donst know about your layout structure.
              * @param {Object} blockObject The BlockObject to be removed and destroyed.
              */
             removeDataAndDestroyModel: function (blockObject) {
@@ -786,6 +786,14 @@
                 return this.value.data.find(entry => entry.udi === udi) || null;
             },
 
+            /**
+             * @ngdoc method
+             * @name removeDataByUdi
+             * @methodOf umbraco.services.blockEditorModelObject
+             * @description Removes the data of a given UDI.
+             * Notice this method does not remove the block from your layout, this will need to be handlede by the Property Editor since this services donst know about your layout structure.
+             * @param {string} udi The UDI of the data to be removed.
+             */
             removeDataByUdi: function(udi) {
                 const index = this.value.data.findIndex(o => o.udi === udi);
                 if (index !== -1) {
@@ -793,6 +801,12 @@
                 }
             },
 
+            /**
+             * @ngdoc method
+             * @name destroy
+             * @methodOf umbraco.services.blockEditorModelObject
+             * @description Notice you should not need to destroy the BlockEditorModelObject since it will automaticly be destroyed when the scope of existance gets destroyed.
+             */
             destroy: function() {
 
                 this.__watchers.forEach(w => { w(); });
