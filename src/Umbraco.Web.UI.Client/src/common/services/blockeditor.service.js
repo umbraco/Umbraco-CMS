@@ -38,10 +38,15 @@
          * See {@link umbraco.services.blockEditorModelObject blockEditorModelObject}
          * 
          * @see umbraco.services.blockEditorModelObject
+         * @param {object} propertyModelValue data object of the property editor, usually model.value.
+         * @param {string} propertyEditorAlias alias of the property.
+         * @param {object} blockConfigurations block configurations.
+         * @param {angular-scope} scopeOfExistance A local angularJS scope that exists as long as the data exists.
+         * @param {angular-scope} propertyEditorScope A local angularJS scope that represents the property editors scope.
          * @return {blockEditorModelObject} A instance of the BlockEditorModelObject class.
          */
-        function createModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations, propertyScope) {
-            return new blockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations, propertyScope);
+        function createModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations, scopeOfExistance, propertyEditorScope) {
+            return new blockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations, scopeOfExistance, propertyEditorScope);
         }
 
         return {

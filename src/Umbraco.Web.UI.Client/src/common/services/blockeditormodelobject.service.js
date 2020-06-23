@@ -360,8 +360,7 @@
         var notSupportedProperties = [
             "Umbraco.Tags",
             "Umbraco.UploadField",
-            "Umbraco.ImageCropper",
-            "Umbraco.NestedContent"
+            "Umbraco.ImageCropper"
         ];
         function replaceUnsupportedProperties(scaffold) {
             scaffold.variants.forEach((variant) => {
@@ -384,14 +383,17 @@
          * @param {object} propertyModelValue data object of the property editor, usually model.value.
          * @param {string} propertyEditorAlias alias of the property.
          * @param {object} blockConfigurations block configurations.
-         * @param {angular-scope} propertyScope The local angularJS scope.
+         * @param {angular-scope} scopeOfExistance A local angularJS scope that exists as long as the data exists.
+         * @param {angular-scope} propertyEditorScope A local angularJS scope that represents the property editors scope.
          * @returns {BlockEditorModelObject} A instance of BlockEditorModelObject.
          */
-        function BlockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations, propertyScope) {
+        function BlockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations, scopeOfExistance, propertyEditorScope) {
 
             if (!propertyModelValue) {
                 throw new Error("propertyModelValue cannot be undefined, to ensure we keep the binding to the angular model we need minimum an empty object.");
             }
+
+            this.__watchers = [];
 
             // ensure basic part of data-structure is in place:
             this.value = propertyModelValue;
@@ -403,10 +405,12 @@
 
             this.scaffolds = [];
 
-            this.isolatedScope = propertyScope.$new(true);
+            this.isolatedScope = scopeOfExistance.$new(true);
             this.isolatedScope.blockObjects = {};
             
-            this.isolatedScope.$on("$destroy", this.onDestroyed.bind(this));
+            this.__watchers.push(this.isolatedScope.$on("$destroy", this.onDestroyed.bind(this)));
+
+            this.__watchers.push(propertyEditorScope.$on("postFormSubmitting", this.sync.bind(this)));
 
         };
         
@@ -620,11 +624,21 @@
                     }
                 }
 
+
+                blockObject.sync = function() {
+                    if (this.content !== null) {
+                        mapToPropertyModel(this.content, this.data);
+                    }
+                    if (this.config.settingsElementTypeKey !== null) {
+                        mapToPropertyModel(this.settings, this.layout.settings);
+                    }
+                }
+
                 // first time instant update of label.
                 blockObject.label = getBlockLabel(blockObject);
 
                 // Add blockObject to our isolated scope to enable watching its values:
-                this.isolatedScope.blockObjects["_"+blockObject.key] = blockObject;
+                this.isolatedScope.blockObjects["_" + blockObject.key] = blockObject;
                 addWatchers(blockObject, this.isolatedScope);
                 addWatchers(blockObject, this.isolatedScope, true);
 
@@ -656,9 +670,13 @@
 
                 // remove property value watchers:
                 blockObject.__watchers.forEach(w => { w(); });
+
+                // help carbage collector:
+                delete blockObject.layout;
+                delete blockObject.data;
                 
                 // remove model from isolatedScope.
-                delete this.isolatedScope.blockObjects[blockObject.key];
+                delete this.isolatedScope.blockObjects["_" + blockObject.key];
 
             },
 
@@ -732,6 +750,20 @@
 
             },
 
+
+
+            /**
+             * @ngdoc method
+             * @name sync
+             * @methodOf umbraco.services.blockEditorModelObject
+             * @description Force immidiate update of the blockobject models to the property model.
+             */
+            sync: function() {
+                for (const key in this.isolatedScope.blockObjects) {
+                    this.isolatedScope.blockObjects[key].sync();
+                }
+            },
+
             // private
             _createDataEntry: function(elementTypeKey) {
                 var content = {
@@ -755,10 +787,12 @@
 
             onDestroyed: function() {
 
+                this.__watchers.forEach(w => { w(); });
                 for (const key in this.isolatedScope.blockObjects) {
                     this.destroyBlockObject(this.isolatedScope.blockObjects[key]);
                 }
                 
+                delete this.__watchers;
                 delete this.value;
                 delete this.propertyEditorAlias;
                 delete this.blockConfigurations;

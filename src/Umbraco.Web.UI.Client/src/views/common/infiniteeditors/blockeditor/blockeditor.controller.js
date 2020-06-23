@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
 .controller("Umbraco.Editors.BlockEditorController",
-    function ($scope, localizationService) {
+    function ($scope, localizationService, formHelper) {
         var vm = this;
 
         vm.content = $scope.model.content;
@@ -61,7 +61,9 @@ angular.module("umbraco")
 
         vm.submitAndClose = function () {
             if ($scope.model && $scope.model.submit) {
-                $scope.model.submit($scope.model);
+                if (formHelper.submitForm({ scope: $scope })) {
+                    $scope.model.submit($scope.model);
+                }
             }
         }
 

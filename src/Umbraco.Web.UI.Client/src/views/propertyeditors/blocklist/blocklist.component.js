@@ -90,7 +90,7 @@
             }
             
             // Create Model Object, to manage our data for this Block Editor.
-            modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, scopeOfExistence);
+            modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, scopeOfExistence, $scope);
             modelObject.load().then(onLoaded);
 
             copyAllBlocksAction = {
@@ -518,11 +518,8 @@
                 
             }
         }
-
-
-
-
         unsubscribe.push($scope.$watch(() => vm.layout.length, onAmountOfBlocksChanged));
+
         
         $scope.$on("$destroy", function () {
             for (const subscription of unsubscribe) {
