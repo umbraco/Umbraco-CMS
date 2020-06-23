@@ -643,6 +643,19 @@
                 addWatchers(blockObject, this.isolatedScope);
                 addWatchers(blockObject, this.isolatedScope, true);
 
+                blockObject.destroy = function() {
+                    // remove property value watchers:
+                    this.__watchers.forEach(w => { w(); });
+
+                    // help carbage collector:
+                    delete this.layout;
+                    delete this.data;
+                    
+                    // remove model from isolatedScope.
+                    delete this.__scope.blockObjects["_" + this.key];
+                    delete this.__scope;
+                }
+
                 return blockObject;
 
             },
@@ -669,15 +682,7 @@
              */
             destroyBlockObject: function(blockObject) {
 
-                // remove property value watchers:
-                blockObject.__watchers.forEach(w => { w(); });
-
-                // help carbage collector:
-                delete blockObject.layout;
-                delete blockObject.data;
-                
-                // remove model from isolatedScope.
-                delete this.isolatedScope.blockObjects["_" + blockObject.key];
+                blockObject.destroy();
 
             },
 
