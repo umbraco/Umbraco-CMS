@@ -1200,7 +1200,7 @@ namespace Umbraco.Tests.PublishedContent
         ///  2) Save and publish it
         ///  3) Publish it with descendants
         ///  4) Repeat steps 2 and 3
-        ///  
+        ///
         /// Which has caused an exception. To replicate this test:
         ///  1) RefreshBranch with kits for a branch where the top most node is unpublished
         ///  2) RefreshBranch with kits for the branch where the top most node is published
@@ -1370,7 +1370,6 @@ namespace Umbraco.Tests.PublishedContent
             var items = snapshot.Content.GetByXPath("/root/itype");
             Assert.AreEqual(items.Count(), items.Count());
         }
-
         private void AssertLinkedNode(ContentNode node, int parent, int prevSibling, int nextSibling, int firstChild, int lastChild)
         {
             Assert.AreEqual(parent, node.ParentContentId);

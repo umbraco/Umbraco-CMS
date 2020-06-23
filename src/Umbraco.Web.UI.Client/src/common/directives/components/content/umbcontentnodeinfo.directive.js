@@ -323,7 +323,7 @@
                 // find the urls for the currently selected language
                 if (scope.node.variants.length > 1) {
                     // nodes with variants
-                    scope.currentUrls = _.filter(scope.node.urls, (url) => scope.currentVariant.language.culture === url.culture);
+                    scope.currentUrls = _.filter(scope.node.urls, (url) => (scope.currentVariant.language && scope.currentVariant.language.culture === url.culture));
                 } else {
                     // invariant nodes
                     scope.currentUrls = scope.node.urls;

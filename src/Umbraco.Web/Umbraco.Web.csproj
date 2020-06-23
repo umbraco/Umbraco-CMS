@@ -129,11 +129,16 @@
     <Compile Include="Cache\UserGroupCacheRefresher.cs" />
     <Compile Include="Cache\UserGroupPermissionsCacheRefresher.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
+    <Compile Include="Compose\NestedContentPropertyComponent.cs" />
     <Compile Include="Compose\NotificationsComposer.cs" />
     <Compile Include="Compose\PublicAccessComposer.cs" />
     <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
+    <Compile Include="ContentApps\ContentTypeTemplatesContentAppFactory.cs" />
+    <Compile Include="ContentApps\ContentTypePermissionsContentAppFactory.cs" />
+    <Compile Include="ContentApps\ContentTypeListViewContentAppFactory.cs" />
+    <Compile Include="ContentApps\ContentTypeDesignContentAppFactory.cs" />
     <Compile Include="ContentApps\ListViewContentAppFactory.cs" />
     <Compile Include="Dashboards\ContentDashboard.cs" />
     <Compile Include="Dashboards\DashboardCollection.cs" />
@@ -156,6 +161,7 @@
     <Compile Include="Editors\MacrosController.cs" />
     <Compile Include="Editors\RelationTypeController.cs" />
     <Compile Include="Editors\TinyMceController.cs" />
+    <Compile Include="HealthCheck\Checks\Data\DatabaseIntegrityCheck.cs" />
     <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
     <Compile Include="IUmbracoContextFactory.cs" />
     <Compile Include="Install\ChangesMonitor.cs" />
@@ -236,6 +242,7 @@
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
     <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
     <Compile Include="Profiling\WebProfilingController.cs" />
+    <Compile Include="Compose\NestedContentPropertyComposer.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />

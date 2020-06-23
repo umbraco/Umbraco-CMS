@@ -19,9 +19,9 @@
         function registerAllTours() {
             tours = [];
             return tourResource.getTours().then(function (tourFiles) {
-                tourFiles.forEach(tourFile => {
+                Utilities.forEach(tourFiles, tourFile => {
 
-                    tourFile.tours.forEach(newTour => {
+                    Utilities.forEach(tourFile.tours, newTour => {
                         validateTour(newTour);
                         validateTourRegistration(newTour);
                         tours.push(newTour);
@@ -251,7 +251,7 @@
          */
         function validateTourRegistration(tour) {
             // check for existing tours with the same alias
-            tours.forEach(existingTour => {
+            Utilities.forEach(tours, existingTour => {
                 if (existingTour.alias === tour.alias) {
                     throw "A tour with the alias " + tour.alias + " is already registered";
                 }
@@ -267,17 +267,17 @@
             var deferred = $q.defer();
             currentUserResource.getTours().then(function (storedTours) {
 
-                storedTours.forEach(storedTour => {
+                Utilities.forEach(storedTours, storedTour => {
 
                     if (storedTour.completed === true) {
-                        tours.forEach(tour => {
+                        Utilities.forEach(tours, tour => {
                             if (storedTour.alias === tour.alias) {
                                 tour.completed = true;
                             }
                         });
                     }
                     if (storedTour.disabled === true) {
-                        tours.forEach(tour => {
+                        Utilities.forEach(tours, tour => {
                             if (storedTour.alias === tour.alias) {
                                 tour.disabled = true;
                             }
