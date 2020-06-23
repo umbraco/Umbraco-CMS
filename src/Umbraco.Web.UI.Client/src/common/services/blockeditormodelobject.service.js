@@ -599,10 +599,11 @@
                 blockObject.layout = layoutEntry;
                 blockObject.__watchers = [];
 
-                layoutEntry.settings = null;
                 if (blockConfiguration.settingsElementTypeKey) {
                     var settingsScaffold = this.getScaffoldFromKey(blockConfiguration.settingsElementTypeKey);
                     if (settingsScaffold !== null) {
+
+                        layoutEntry.settings = layoutEntry.settings || {};
                         
                         blockObject.settingsData = layoutEntry.settings;
 
