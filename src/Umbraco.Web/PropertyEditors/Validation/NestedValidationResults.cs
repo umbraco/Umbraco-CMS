@@ -3,15 +3,28 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Web.PropertyEditors.Validation
 {
-    public class ValidationResultCollection : ValidationResult
+    public class PropertyTypeValidationResult : ValidationResult
     {
-        public ValidationResultCollection(params ValidationResult[] nested)
+        public PropertyTypeValidationResult(string propertyTypeAlias)
             : base(string.Empty)
         {
-            ValidationResults = new List<ValidationResult>(nested);
+            PropertyTypeAlias = propertyTypeAlias;
         }
 
-        public IList<ValidationResult> ValidationResults { get; }
+        public IList<ValidationResult> ValidationResults { get; } = new List<ValidationResult>();
+        public string PropertyTypeAlias { get; }
+    }
+
+    public class ElementTypeValidationResult : ValidationResult
+    {
+        public ElementTypeValidationResult(string elementTypeAlias)
+            : base(string.Empty)
+        {
+            ElementTypeAlias = elementTypeAlias;
+        }
+
+        public IList<PropertyTypeValidationResult> ValidationResults { get; } = new List<PropertyTypeValidationResult>();
+        public string ElementTypeAlias { get; }
     }
 
     /// <summary>
@@ -27,11 +40,6 @@ namespace Umbraco.Web.PropertyEditors.Validation
         {
         }
 
-        public void AddElementTypeValidationResults(ValidationResultCollection resultCollection)
-        {
-            ValidationResults.Add(resultCollection);
-        }
-
-        public IList<ValidationResultCollection> ValidationResults { get; } = new List<ValidationResultCollection>();
+        public IList<ElementTypeValidationResult> ValidationResults { get; } = new List<ElementTypeValidationResult>();
     }
 }

@@ -269,10 +269,11 @@ namespace Umbraco.Web.PropertyEditors
             {
                 foreach (var row in _nestedContentValues.GetPropertyValues(value))
                 {
-                    var elementValidation = new ElementTypeValidationModel();
+                    var elementValidation = new ElementTypeValidationModel(row.ContentTypeAlias);
                     foreach (var prop in row.PropertyValues)
                     {
-                        elementValidation.AddPropertyTypeValidation(new PropertyTypeValidationModel(prop.Value.Value, prop.Value.PropertyType));                        
+                        elementValidation.AddPropertyTypeValidation(
+                            new PropertyTypeValidationModel(prop.Value.PropertyType, prop.Value.Value));                        
                     }
                     yield return elementValidation;
                 }

@@ -42,16 +42,25 @@ namespace Umbraco.Web.PropertyEditors.Validation
                 jo.Add("nestedValidation", obj);
                 jo.WriteTo(writer);
             }
-            else if (validationResult is ValidationResultCollection resultCollection && resultCollection.ValidationResults.Count > 0)
+            else if (validationResult is ElementTypeValidationResult elementTypeValidationResult && elementTypeValidationResult.ValidationResults.Count > 0)
             {
-                var ja = new JArray();
-                foreach (var result in resultCollection.ValidationResults)
-                {
-                    // recurse to write out the ValidationResult
-                    var obj = JObject.FromObject(result, camelCaseSerializer);
-                    ja.Add(obj);
+                var joElementType = new JObject();
+                var joPropertyType = new JObject();
+                // loop over property validations
+                foreach (var propTypeResult in elementTypeValidationResult.ValidationResults)
+                {                    
+                    var ja = new JArray();
+                    foreach (var result in propTypeResult.ValidationResults)
+                    {
+                        // recurse to get the validation result object and add to the array
+                        var obj = JObject.FromObject(result, camelCaseSerializer);
+                        ja.Add(obj);
+                    }
+                    // create a dictionary entry 
+                    joPropertyType.Add(propTypeResult.PropertyTypeAlias, ja);
                 }
-                ja.WriteTo(writer);
+                joElementType.Add(elementTypeValidationResult.ElementTypeAlias, joPropertyType);
+                joElementType.WriteTo(writer);
             }
             else 
             {

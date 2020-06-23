@@ -39,7 +39,7 @@ namespace Umbraco.Web.PropertyEditors
                 var result = new NestedValidationResults();
                 foreach(var rowResult in rowResults)
                 {
-                    result.AddElementTypeValidationResults(rowResult);
+                    result.ValidationResults.Add(rowResult);
                 }
                 return result.Yield();
             }
@@ -55,30 +55,36 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="rawValue"></param>
         /// <returns></returns>
-        protected IEnumerable<ValidationResultCollection> GetNestedValidationResults(IEnumerable<ElementTypeValidationModel> elements)
+        protected IEnumerable<ElementTypeValidationResult> GetNestedValidationResults(IEnumerable<ElementTypeValidationModel> elements)
         {
             foreach (var row in elements)
             {
-                var nestedValidation = new List<ValidationResult>();
+                var elementTypeValidationResult = new ElementTypeValidationResult(row.ElementTypeAlias);
 
                 foreach (var prop in row.PropertyTypeValidation)
                 {
+                    var propValidationResult = new PropertyTypeValidationResult(prop.PropertyType.Alias);
+
                     foreach (var validationResult in _propertyValidationService.ValidatePropertyValue(prop.PropertyType, prop.PostedValue))
                     {
-                        nestedValidation.Add(validationResult);
+                        // add the result to the property results
+                        propValidationResult.ValidationResults.Add(validationResult);
                     }
+
+                    // add the property results to the element type results
+                    elementTypeValidationResult.ValidationResults.Add(propValidationResult);
                 }
 
-                if (nestedValidation.Count > 0)
+                if (elementTypeValidationResult.ValidationResults.Count > 0)
                 {
-                    yield return new ValidationResultCollection(nestedValidation.ToArray());
+                    yield return elementTypeValidationResult;
                 }
             }
         }
 
         public class PropertyTypeValidationModel
         {
-            public PropertyTypeValidationModel(object postedValue, PropertyType propertyType)
+            public PropertyTypeValidationModel(PropertyType propertyType, object postedValue)
             {
                 PostedValue = postedValue ?? throw new ArgumentNullException(nameof(postedValue));
                 PropertyType = propertyType ?? throw new ArgumentNullException(nameof(propertyType));
@@ -90,8 +96,16 @@ namespace Umbraco.Web.PropertyEditors
 
         public class ElementTypeValidationModel
         {
+            public ElementTypeValidationModel(string elementTypeAlias)
+            {
+                ElementTypeAlias = elementTypeAlias;
+            }
+
             private List<PropertyTypeValidationModel> _list = new List<PropertyTypeValidationModel>();
+
             public IEnumerable<PropertyTypeValidationModel> PropertyTypeValidation => _list;
+
+            public string ElementTypeAlias { get; }
 
             public void AddPropertyTypeValidation(PropertyTypeValidationModel propValidation) => _list.Add(propValidation);
         }
