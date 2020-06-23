@@ -227,6 +227,7 @@
 
         function editBlock(blockObject, openSettings) {
 
+            var wasNotActiveBefore = blockObject.active !== true;
             blockObject.active = true;
 
             if (inlineEditing === true && openSettings !== true) {
@@ -267,7 +268,9 @@
                         blockObject.retriveValuesFrom(blockContentClone, blockSettingsClone);
                     }
 
-                    blockObject.active = false;
+                    if (wasNotActiveBefore === true) {
+                        blockObject.active = false;
+                    }
                     editorService.close();
                 }
             };
