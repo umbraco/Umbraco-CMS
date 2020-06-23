@@ -17,6 +17,32 @@
                 <umb-box-content>
 
                     <div class="umb-control-group">
+                        <localize key="contentTypeEditor_compositionsDescription"></localize>
+                    </div>
+
+                    <umb-empty-state 
+                        ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes <= 1">
+                        <localize key="contentTypeEditor_noAvailableCompositions"></localize>
+                    </umb-empty-state>
+
+                    <umb-empty-state
+                        ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes > 1">
+                        <localize key="contentTypeEditor_compositionInUse"></localize>
+                    </umb-empty-state>
+
+                    <div ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes > 1 && model.whereCompositionUsed.length > 0">
+                        <h5><localize key="contentTypeEditor_compositionUsageHeading"></localize></h5>
+                        <p><localize key="contentTypeEditor_compositionUsageSpecification"></localize></p>
+                        <umb-node-preview ng-repeat="contentTypeEntity in model.whereCompositionUsed"
+                            icon="contentTypeEntity.contentType.icon"
+                            name="contentTypeEntity.contentType.name"
+                            alias="contentTypeEntity.contentType.alias"
+                            allow-open="true"
+                            on-open="vm.openContentType(contentTypeEntity.contentType, model.section)">
+                        </umb-node-preview>
+                    </div>
+
+                    <div class="umb-control-group" ng-show="vm.availableGroups.length > 0">
                         <div class="form-search">
                             <i class="icon-search"></i>
                             <input 
@@ -30,38 +56,9 @@
                                 no-dirty-check />
                         </div>
                     </div>
-                        
-                    <div class="umb-control-group">
-                        <localize key="contentTypeEditor_compositionsDescription"></localize>
-                    </div>
-                        
-                    <umb-empty-state 
-                        ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes <= 1"
-                        position="center">
-                        <localize key="contentTypeEditor_noAvailableCompositions"></localize>
-                    </umb-empty-state>
-
-                    <umb-empty-state
-                        ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes > 1">
-                        <localize key="contentTypeEditor_compositionInUse"></localize>
-                    </umb-empty-state>
-
-                    <div ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes > 1 && model.whereCompositionUsed.length > 0">
-                        <h5><localize key="contentTypeEditor_compositionUsageHeading"></localize></h5>
-                        <p><localize key="contentTypeEditor_compositionUsageSpecification"></localize></p>
-                        <ul class="umb-checkbox-list">
-                            <li class="umb-checkbox-list__item" 
-                                ng-repeat="contentTypeEntity in model.whereCompositionUsed">
-                                <a ng-click="vm.openContentType(contentTypeEntity.contentType, model.section)">
-                                    <i class="{{contentTypeEntity.contentType.icon}}"></i>
-                                    &nbsp;{{contentTypeEntity.contentType.name}}
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
 
                     <div class="umb-control-group -no-border" ng-if="vm.availableGroups.length > 0">
-                        <ul class="umb-checkbox-list" ng-repeat="group in vm.availableGroups | filter:searchTerm">
+                        <ul class="umb-checkbox-list" ng-repeat="group in filtered = (vm.availableGroups | filter:searchTerm)">
                             <li ng-show="vm.availableGroups.length > 1">
                                 <i class="icon-folder umb-checkbox-list__item-icon"></i>
                                 {{group.containerPath}}
@@ -77,7 +74,7 @@
                                            checklist-model="model.compositeContentTypes"
                                            checklist-value="compositeContentType.contentType.alias"
                                            ng-change="model.selectCompositeContentType(compositeContentType.contentType)"
-                                           ng-disabled="compositeContentType.allowed===false || compositeContentType.inherited" />                                  
+                                           ng-disabled="compositeContentType.allowed===false || compositeContentType.inherited" />
 
                                 </div>
 
@@ -89,6 +86,11 @@
 
                             </li>
                         </ul>
+
+                        <umb-empty-state
+                            ng-if="filtered.length === 0">
+                            <localize key="general_searchNoResult"></localize>
+                        </umb-empty-state>
                     </div>
 
                 </umb-box-content>
