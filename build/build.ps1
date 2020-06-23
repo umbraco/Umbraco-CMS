@@ -475,7 +475,7 @@
     # change baseUrl
     $BaseUrl = "https://our.umbraco.com/apidocs/v8/ui/"
     $IndexPath = "./api/index.html"
-    (Get-Content $IndexPath).replace('location.href.replace(rUrl, indexFile)', "`'" + $BaseUrl + "`'") | Set-Content $IndexPath
+    (Get-Content $IndexPath).replace('origin + location.href.substr(origin.length).replace(rUrl, indexFile)', "`'" + $BaseUrl + "`'") | Set-Content $IndexPath
 
     # zip it
     & $this.BuildEnv.Zip a -tzip -r "$out\ui-docs.zip" "$src\Umbraco.Web.UI.Docs\api\*.*"
