@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "ace-builds": "1.4.2",
-    "angular": "1.7.9",
+    "angular": "1.8.0",
     "angular-animate": "1.7.5",
     "angular-aria": "1.7.9",
     "angular-chart.js": "^1.1.1",
