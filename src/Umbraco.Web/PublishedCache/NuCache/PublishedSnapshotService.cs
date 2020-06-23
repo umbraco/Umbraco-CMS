@@ -882,22 +882,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // they require.
 
                 // These can be run side by side in parallel.
+                using (_contentStore.GetScopedWriteLock(_scopeProvider))
+                {
+                    NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _, out _);
+                }
 
-                Parallel.Invoke(
-                    () =>
-                    {
-                        using (_contentStore.GetScopedWriteLock(_scopeProvider))
-                        {
-                            NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _, out _);
-                        }
-                    },
-                    () =>
-                    {
-                        using (_mediaStore.GetScopedWriteLock(_scopeProvider))
-                        {
-                            NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _);
-                        }
-                    });
+                using (_mediaStore.GetScopedWriteLock(_scopeProvider))
+                {
+                    NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _);
+                }
             }
 
             ((PublishedSnapshot)CurrentPublishedSnapshot)?.Resync();

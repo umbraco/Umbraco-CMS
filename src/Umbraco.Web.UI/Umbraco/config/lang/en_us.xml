@@ -140,6 +140,7 @@
     <key alias="saveToPublish">Send for approval</key>
     <key alias="saveListView">Save list view</key>
     <key alias="schedulePublish">Schedule</key>
+    <key alias="showPage">Preview</key>
     <key alias="saveAndPreview">Save and preview</key>
     <key alias="showPageDisabled">Preview is disabled because there's no template assigned</key>
     <key alias="styleChoose">Choose style</key>
@@ -369,7 +370,8 @@
     <key alias="noDocumentTypesAllowedAtRoot"><![CDATA[There are no allowed document types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Permissions</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available for creating media here. You must enable these in <strong>Media Types Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.]]></key>
     <key alias="noMediaTypesWithNoSettingsAccess">The selected media in the tree doesn't allow for any other media to be created below it.</key>
-    <key alias="noMediaTypesEditPermissions">Edit permissions for this media type</key>    <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
+    <key alias="noMediaTypesEditPermissions">Edit permissions for this media type</key>
+    <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
     <key alias="newFolder">New folder</key>
     <key alias="newDataType">New data type</key>
     <key alias="newJavascriptFile">New JavaScript file</key>
@@ -570,6 +572,9 @@
     <key alias="anchor">#value or ?key=value</key>
     <key alias="enterAlias">Enter alias...</key>
     <key alias="generatingAlias">Generating alias...</key>
+    <key alias="a11yCreateItem">Create item</key>
+    <key alias="a11yEdit">Edit</key>
+    <key alias="a11yName">Name</key>
   </area>
   <area alias="editcontenttype">
     <key alias="createListView" version="7.2">Create custom list view</key>
@@ -690,6 +695,7 @@
     <key alias="icon">Icon</key>
     <key alias="id">Id</key>
     <key alias="import">Import</key>
+    <key alias="includeFromsubFolders">Include subfolders in search</key>
     <key alias="excludeFromSubFolders">Search only this folder</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Inner margin</key>
@@ -1339,10 +1345,13 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="customCrop">User defined</key>
   </area>
   <area alias="rollback">
+    <key alias="changes">Changes</key>
+    <key alias="created">Created</key>
     <key alias="headline">Select a version to compare with the current version</key>
     <key alias="currentVersion">Current version</key>
     <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
     <key alias="documentRolledBack">Document has been rolled back</key>
+    <key alias="headline">Select a version to compare with the current version</key>
     <key alias="htmlHelp">This displays the selected version as HTML, if you wish to see the difference between 2 versions at the same time, use the diff view</key>
     <key alias="rollbackTo">Rollback to</key>
     <key alias="selectVersion">Select version</key>
@@ -2244,6 +2253,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="openBackofficeSearch">Open backoffice search</key>
     <key alias="openCloseBackofficeHelp">Open/Close backoffice help</key>
     <key alias="openCloseBackofficeProfileOptions">Open/Close your profile options</key>
+    <key alias="assignDomainDescription">Setup Culture and Hostnames for %0%</key>
+    <key alias="createDescription">Create new node under %0%</key>
+    <key alias="protectDescription">Setup Public access on %0%</key>
+    <key alias="rightsDescription">Setup Permissions on %0%</key>
+    <key alias="sortDescription">Change sort order for %0%</key>
+    <key alias="createblueprintDescription">Create Content Template based on %0%</key>
     <key alias="openContextMenu">Open context menu for</key>
     <key alias="currentLanguage">Current language</key>
     <key alias="switchLanguage">Switch language to</key>
@@ -2430,5 +2445,22 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="formsDashboard">
     <key alias="formsHeadline">Umbraco Forms</key>
     <key alias="formsDescription">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</key>
+  </area>
+  <area alias="contentTemplatesDashboard">
+    <key alias="whatHeadline">What are Content Templates?</key>
+    <key alias="whatDescription">Content Templates are pre-defined content that can be selected when creating a new content node.</key>
+    <key alias="createHeadline">How do I create a Content Template?</key>
+    <key alias="createDescription">
+        <![CDATA[
+            <p>There are two ways to create a Content Template:</p>
+            <ul>
+                <li>Right-click a content node and select "Create Content Template" to create a new Content Template.</li>
+                <li>Right-click the Content Templates tree in the Settings section and select the Document Type you want to create a Content Template for.</li>
+            </ul>
+            <p>Once given a name, editors can start using the Content Template as a foundation for their new page.</p>
+        ]]>
+    </key>
+    <key alias="manageHeadline">How do I manage Content Templates?</key>
+    <key alias="manageDescription">You can edit and delete Content Templates from the "Content Templates" tree in the Settings section. Expand the Document Type which the Content Template is based on and click it to edit or delete it.</key>
   </area>
 </language>
