@@ -49,26 +49,26 @@
         
         it('fail if no model value', function () {
             function createWithNoModelValue() {
-                blockEditorService.createModelObject(null, "Umbraco.TestBlockEditor", [], $scope);
+                blockEditorService.createModelObject(null, "Umbraco.TestBlockEditor", [], $scope, $scope);
             }
             expect(createWithNoModelValue).toThrow();
         });
 
         it('return a object, with methods', function () {
-            var modelObject = blockEditorService.createModelObject({}, "Umbraco.TestBlockEditor", [], $scope);
+            var modelObject = blockEditorService.createModelObject({}, "Umbraco.TestBlockEditor", [], $scope, $scope);
 
             expect(modelObject).not.toBeUndefined();
             expect(modelObject.load).not.toBeUndefined();
         });
 
         it('getBlockConfiguration provide the requested block configurtion', function () {
-            var modelObject = blockEditorService.createModelObject({}, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope);
+            var modelObject = blockEditorService.createModelObject({}, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope, $scope);
             
             expect(modelObject.getBlockConfiguration(blockConfigurationMock.contentTypeKey).label).toBe(blockConfigurationMock.label);
         });
 
         it('load provides data for itemPicker', function (done) {
-            var modelObject = blockEditorService.createModelObject({}, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope);
+            var modelObject = blockEditorService.createModelObject({}, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope, $scope);
             
             modelObject.load().then(() => {
                 var itemPickerOptions = modelObject.getAvailableBlocksForBlockPicker();
@@ -82,7 +82,7 @@
         it('getLayoutEntry has values', function (done) {
 
             
-            var modelObject = blockEditorService.createModelObject(propertyModelMock, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope);
+            var modelObject = blockEditorService.createModelObject(propertyModelMock, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope, $scope);
             
             modelObject.load().then(() => {
                 
@@ -101,7 +101,7 @@
         it('getBlockObject has values', function (done) {
 
             
-            var modelObject = blockEditorService.createModelObject(propertyModelMock, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope);
+            var modelObject = blockEditorService.createModelObject(propertyModelMock, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope, $scope);
             
             modelObject.load().then(() => {
                 
@@ -123,7 +123,7 @@
 
             var propertyModel = angular.copy(propertyModelMock);
 
-            var modelObject = blockEditorService.createModelObject(propertyModel, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope);
+            var modelObject = blockEditorService.createModelObject(propertyModel, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope, $scope);
             
             modelObject.load().then(() => {
                 
@@ -155,7 +155,7 @@
             propertyModel.data[0].testproperty = complexValue;
 
 
-            var modelObject = blockEditorService.createModelObject(propertyModel, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope);
+            var modelObject = blockEditorService.createModelObject(propertyModel, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope, $scope);
             
             modelObject.load().then(() => {
                 
@@ -180,7 +180,7 @@
 
             var propertyModel = angular.copy(propertyModelMock);
 
-            var modelObject = blockEditorService.createModelObject(propertyModel, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope);
+            var modelObject = blockEditorService.createModelObject(propertyModel, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope, $scope);
             
             modelObject.load().then(() => {
                 
@@ -201,7 +201,7 @@
 
             var propertyModel = angular.copy(propertyModelMock);
 
-            var modelObject = blockEditorService.createModelObject(propertyModel, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope);
+            var modelObject = blockEditorService.createModelObject(propertyModel, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope, $scope);
             
             modelObject.load().then(() => {
                 
