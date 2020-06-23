@@ -51,6 +51,7 @@ namespace Umbraco.Web.Scheduling
             if (!dir.Exists)
             {
                 _logger.Debug<TempFileCleanup>("The cleanup folder doesn't exist {Folder}", dir.FullName);
+                return;
             }
 
             var files = dir.GetFiles("*.*", SearchOption.AllDirectories);
