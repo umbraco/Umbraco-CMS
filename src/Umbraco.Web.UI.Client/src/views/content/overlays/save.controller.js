@@ -9,8 +9,6 @@
         vm.isNew = true;
 
         vm.changeSelection = changeSelection;
-        vm.dirtyVariantFilter = dirtyVariantFilter;
-        vm.pristineVariantFilter = pristineVariantFilter;
 
         function changeSelection(variant) {
             var firstSelected = _.find(vm.variants, function (v) {
@@ -19,16 +17,18 @@
             $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
         }
 
-        function dirtyVariantFilter(variant) {
+        function saveableVariantFilter(variant) {
             //determine a variant is 'dirty' (meaning it will show up as save-able) if it's
             // * the active one
             // * it's editor is in a $dirty state
-            // * it is in NotCreated state
             return (variant.active || variant.isDirty);
         }
 
-        function pristineVariantFilter(variant) {
-            return !(dirtyVariantFilter(variant));
+        function isMandatoryFilter(variant) {
+            //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
+            // * has a mandatory language
+            // * without having a segment, segments cant be mandatory at current state of code.
+            return (variant.language && variant.language.isMandatory === true && variant.segment == null);
         }
 
         function hasAnyData(variant) {
@@ -57,6 +57,7 @@
 
         function onInit() {
             vm.variants = $scope.model.variants;
+            vm.availableVariants = vm.variants.filter(saveableVariantFilter);
 
             if(!$scope.model.title) {
                 localizationService.localize("content_readyToSave").then(function(value){
@@ -64,10 +65,15 @@
                 });
             }
 
-            vm.hasPristineVariants = false;
-
             _.each(vm.variants,
                 function (variant) {
+
+                    //reset state:
+                    variant.save = false;
+                    variant.publish = false;
+
+                    variant.isMandatory = isMandatoryFilter(variant);
+
                     if(variant.state !== "NotCreated"){
                         vm.isNew = false;
                     }
@@ -75,33 +81,39 @@
 
             _.each(vm.variants,
                 function (variant) {
-                    variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
-                    variant.htmlId = "_content_variant_" + variant.compositeId;
-
-                    //check for pristine variants
-                    if (!vm.hasPristineVariants) {
-                        vm.hasPristineVariants = pristineVariantFilter(variant);
-                    }
-
                     if(vm.isNew && hasAnyData(variant)){
                         variant.save = true;
                     }
                 });
 
             if (vm.variants.length !== 0) {
-                //now sort it so that the current one is at the top
-                vm.variants = _.sortBy(vm.variants, function (v) {
-                    return v.active ? 0 : 1;
+
+                _.find(vm.variants, function (v) {
+                    if(v.active) {
+                        //ensure that the current one is selected
+                        v.save = true;
+                    }
                 });
 
-                var active = _.find(vm.variants, function (v) {
-                    return v.active;
+                vm.availableVariants.sort(function (a, b) {
+                    if (a.language && b.language) {
+                        if (a.language.name > b.language.name) {
+                            return -1;
+                        }
+                        if (a.language.name < b.language.name) {
+                            return 1;
+                        }
+                    }
+                    if (a.segment && b.segment) {
+                        if (a.segment > b.segment) {
+                            return -1;
+                        }
+                        if (a.segment < b.segment) {
+                            return 1;
+                        }
+                    }
+                    return 0;
                 });
-
-                if (active) {
-                    //ensure that the current one is selected
-                    active.save = true;
-                }
 
             } else {
                 //disable save button if we have nothing to save

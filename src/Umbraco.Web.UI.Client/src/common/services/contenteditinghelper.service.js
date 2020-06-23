@@ -328,9 +328,11 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
          *
          * @description
          * Returns a id for the variant that is unique between all variants on the content
+         * Note "invariant" is used for the invariant culture,
+         * "null" is used for the NULL segment
          */
         buildCompositeVariantId: function (variant) {
-            return (variant.language ? variant.language.culture : "invariant") + "_" + (variant.segment ? variant.segment : "");
+            return (variant.language ? variant.language.culture : "invariant") + "_" + (variant.segment ? variant.segment : "null");
         },
 
 
@@ -698,7 +700,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 // /belle/#/content/edit/9876 (where 9876 is the new id)
 
                 //clear the query strings
-                navigationService.clearSearch(["cculture"]);
+                navigationService.clearSearch(["cculture", "csegment"]);
                 if (softRedirect) {
                     navigationService.setSoftRedirect();
                 }
