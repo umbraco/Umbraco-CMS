@@ -61,6 +61,7 @@ namespace Umbraco.Web.Scheduling
                 {
                     try
                     {
+                        file.IsReadOnly = false;
                         file.Delete();
                     }
                     catch (Exception ex)
