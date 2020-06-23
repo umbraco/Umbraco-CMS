@@ -408,7 +408,7 @@
             this.isolatedScope = scopeOfExistance.$new(true);
             this.isolatedScope.blockObjects = {};
             
-            this.__watchers.push(this.isolatedScope.$on("$destroy", this.onDestroyed.bind(this)));
+            this.__watchers.push(this.isolatedScope.$on("$destroy", this.destroy.bind(this)));
 
             this.__watchers.push(propertyEditorScope.$on("postFormSubmitting", this.sync.bind(this)));
 
@@ -646,6 +646,7 @@
                 blockObject.destroy = function() {
                     // remove property value watchers:
                     this.__watchers.forEach(w => { w(); });
+                    delete this.__watchers;
 
                     // help carbage collector:
                     delete this.layout;
@@ -654,6 +655,9 @@
                     // remove model from isolatedScope.
                     delete this.__scope.blockObjects["_" + this.key];
                     delete this.__scope;
+
+                    // removes this method, making it unposible to destroy again.
+                    delete this.destroy;
                 }
 
                 return blockObject;
@@ -681,9 +685,7 @@
              * @param {Object} blockObject The BlockObject to be destroyed.
              */
             destroyBlockObject: function(blockObject) {
-
                 blockObject.destroy();
-
             },
 
             /**
@@ -791,7 +793,7 @@
                 }
             },
 
-            onDestroyed: function() {
+            destroy: function() {
 
                 this.__watchers.forEach(w => { w(); });
                 for (const key in this.isolatedScope.blockObjects) {
@@ -805,6 +807,7 @@
                 delete this.scaffolds;
                 this.isolatedScope.$destroy();
                 delete this.isolatedScope;
+                delete this.destroy;
             }
         }
 
