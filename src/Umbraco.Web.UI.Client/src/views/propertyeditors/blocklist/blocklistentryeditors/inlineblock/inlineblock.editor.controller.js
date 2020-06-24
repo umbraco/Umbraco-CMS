@@ -1,12 +1,21 @@
 (function () {
     'use strict';
 
-    function InlineBlockEditor() {
+    function InlineBlockEditor($scope) {
 
         const bc = this;
 
         bc.openBlock = function(block) {
-            block.isOpen = !block.isOpen;
+
+            // if we are closing:
+            if (block.active === true) {
+                // boardcast the formSubmitting event to trigger syncronization or none-live property-editors
+                $scope.$broadcast("formSubmitting", { scope: $scope });
+                // Some property editors need to performe an action after all property editors have reacted to the formSubmitting.
+                $scope.$broadcast("postFormSubmitting", { scope: $scope });
+            }
+
+            block.active = !block.active;
         }
 
     }

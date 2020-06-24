@@ -1,5 +1,5 @@
 
-    <div class="__showcase" ng-style="{'background-color':vm.blockConfigModel.backgroundColor, 'background-image':'url('+vm.blockConfigModel.thumbnail+')'}">
+    <div class="__showcase" ng-style="{'background-color':vm.blockConfigModel.backgroundColor, 'background-image': vm.blockConfigModel.thumbnail ? 'url('+vm.blockConfigModel.thumbnail+')' : 'transparent'}">
         <i ng-if="vm.blockConfigModel.thumbnail == null && vm.elementTypeModel.icon" class="__icon {{ vm.elementTypeModel.icon }}" ng-style="{'color':vm.blockConfigModel.iconColor}" aria-hidden="true"></i>
     </div>
     <div class="__info">

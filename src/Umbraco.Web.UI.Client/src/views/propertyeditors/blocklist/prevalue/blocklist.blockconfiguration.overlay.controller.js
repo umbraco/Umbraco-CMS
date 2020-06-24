@@ -44,6 +44,24 @@
             editorService.documentTypeEditor(editor);
         }
 
+        vm.createElementTypeAndCallback = function(callback) {
+            const editor = {
+                create: true,
+                infiniteMode: true,
+                isElement: true,
+                submit: function (model) {
+                    loadElementTypes().then( function () {
+                        callback(model.documentTypeKey);
+                    });
+                    editorService.close();
+                },
+                close: function () {
+                    editorService.close();
+                }
+            };
+            editorService.documentTypeEditor(editor);
+        }
+
         vm.addSettingsForBlock = function ($event, block) {
 
             localizationService.localizeMany(["blockEditor_headlineAddSettingsElementType", "blockEditor_labelcreateNewElementType"]).then(function(localized) {
@@ -58,15 +76,15 @@
                     createNewItem: {
                         action: function() {
                             overlayService.close();
-                            vm.createElementTypeAndAdd((alias) => {
-                                vm.applySettingsToBlock(block, alias);
+                            vm.createElementTypeAndCallback((key) => {
+                                vm.applySettingsToBlock(block, key);
                             });
                         },
                         icon: "icon-add",
                         name: localized[1]
                     },
                     submit: function (overlay) {
-                        vm.applySettingsToBlock(block, overlay.selectedItem.alias);
+                        vm.applySettingsToBlock(block, overlay.selectedItem.key);
                         overlayService.close();
                     },
                     close: function () {
@@ -85,7 +103,7 @@
         vm.requestRemoveSettingsForBlock = function(block) {
             localizationService.localizeMany(["general_remove", "defaultdialogs_confirmremoveusageof"]).then(function (data) {
 
-                var settingsElementType = vm.getElementTypeByAlias(entry.settingsElementTypeKey);
+                var settingsElementType = vm.getElementTypeByKey(block.settingsElementTypeKey);
 
                 overlayService.confirmRemove({
                     title: data[0],
@@ -94,14 +112,14 @@
                         overlayService.close();
                     },
                     submit: function () {
-                        vm.removeSettingsForEntry(entry);
+                        vm.removeSettingsForBlock(block);
                         overlayService.close();
                     }
                 });
             });
         };
-        vm.removeSettingsForEntry = function(entry) {
-            entry.settingsElementTypeKey = null;
+        vm.removeSettingsForBlock = function(block) {
+            block.settingsElementTypeKey = null;
         };
 
 

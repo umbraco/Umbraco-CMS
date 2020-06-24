@@ -22,7 +22,8 @@
             },
             require: {
                 umbProperty: "?^umbProperty",
-                umbVariantContent: '?^^umbVariantContent'
+                umbVariantContent: '?^^umbVariantContent',
+                umbVariantContentEditors: '?^^umbVariantContentEditors'
             }
         });
 
@@ -36,15 +37,22 @@
         var deleteAllBlocksAction;
 
         var inlineEditing = false;
+        var liveEditing = true;
 
         var vm = this;
 
         vm.loading = true;
-        vm.moveFocusToBlock = null;
-        vm.showCopy = clipboardService.isSupported();
+        vm.currentBlockInFocus = null;
+        vm.setBlockFocus = function(block) {
+            if(vm.currentBlockInFocus !== null) {
+                vm.currentBlockInFocus.focus = false;
+            }
+            vm.currentBlockInFocus = block;
+            block.focus = true;
+        }
+        vm.supportCopy = clipboardService.isSupported();
 
-        var layout = [];// The layout object specific to this Block Editor, will be a direct reference from Property Model.
-        vm.blocks = [];// Runtime list of block models, needs to be synced to property model on form submit.
+        vm.layout = [];// The layout object specific to this Block Editor, will be a direct reference from Property Model.
         vm.availableBlockTypes = [];// Available block entries of this property editor.
 
         var labels = {};
@@ -57,6 +65,7 @@
         vm.$onInit = function() {
 
             inlineEditing = vm.model.config.useInlineEditingAsDefault;
+            liveEditing = vm.model.config.useLiveEditing;
 
             vm.validationLimit = vm.model.config.validationLimit;
 
@@ -70,10 +79,15 @@
             if(typeof vm.model.value !== 'object' || vm.model.value === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
                 vm.model.value = {};
             }
+
+            var scopeOfExistence = $scope;
+            if(vm.umbVariantContentEditors && vm.umbVariantContentEditors.getScope) {
+                scopeOfExistence = vm.umbVariantContentEditors.getScope();
+            }
             
             // Create Model Object, to manage our data for this Block Editor.
-            modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, $scope);
-            modelObject.loadScaffolding().then(onLoaded);
+            modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, scopeOfExistence, $scope);
+            modelObject.load().then(onLoaded);
 
             copyAllBlocksAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
@@ -112,36 +126,48 @@
         function onLoaded() {
 
             // Store a reference to the layout model, because we need to maintain this model.
-            layout = modelObject.getLayout();
+            vm.layout = modelObject.getLayout([]);
 
-            // maps layout entries to editor friendly models aka. BlockModels.
-            layout.forEach(entry => {
-                var block = getBlockModel(entry);
-                // If this entry was not supported by our property-editor it would return 'null'.
-                if(block !== null) {
-                    vm.blocks.push(block);
+            // Append the blockObjects to our layout.
+            vm.layout.forEach(entry => {
+                if (entry.$block === undefined || entry.$block === null) {
+                    var block = getBlockObject(entry);
+    
+                    // If this entry was not supported by our property-editor it would return 'null'.
+                    if(block !== null) {
+                        entry.$block = block;
+                    }
                 }
             });
 
-            vm.availableContentTypesAliases = modelObject.getAvailableAliasForBlockContent();
+            vm.availableContentTypesAliases = modelObject.getAvailableAliasesForBlockContent();
             vm.availableBlockTypes = modelObject.getAvailableBlocksForBlockPicker();
 
             vm.loading = false;
-            
+
             $scope.$evalAsync();
 
         }
 
+        function getDefaultViewForBlock(block) {
+            
+            if (block.config.unsupported === true)
+                return "views/propertyeditors/blocklist/blocklistentryeditors/unsupportedblock/unsupportedblock.editor.html";
 
-        function getBlockModel(entry) {
-            var block = modelObject.getBlockModel(entry);
+            if (inlineEditing === true)
+                return "views/propertyeditors/blocklist/blocklistentryeditors/inlineblock/inlineblock.editor.html";
+            return "views/propertyeditors/blocklist/blocklistentryeditors/labelblock/labelblock.editor.html";
+        }
+
+        function getBlockObject(entry) {
+            var block = modelObject.getBlockObject(entry);
 
             if (block === null) return null;
 
-            // Lets apply fallback views, and make the view available directly on the blockModel.
-            block.view = (block.config.view ? "/" + block.config.view : (inlineEditing ? "views/propertyeditors/blocklist/blocklistentryeditors/inlineblock/inlineblock.editor.html" : "views/propertyeditors/blocklist/blocklistentryeditors/labelblock/labelblock.editor.html"));
+            block.view = (block.config.view ? "/" + block.config.view : getDefaultViewForBlock(block));
 
             block.showSettings = block.config.settingsElementTypeKey != null;
+            block.showCopy = vm.supportCopy && block.config.contentTypeKey != null;// if we have content, otherwise it dosnt make sense to copy.
 
             return block;
         }
@@ -156,21 +182,21 @@
             }
 
             // make block model
-            var blockModel = getBlockModel(layoutEntry);
-            if (blockModel === null) {
+            var blockObject = getBlockObject(layoutEntry);
+            if (blockObject === null) {
                 return false;
             }
             
-            // If we reach this line, we are good to add the layoutEntry and blockModel to our models.
+            // If we reach this line, we are good to add the layoutEntry and blockObject to our models.
+
+            // Add the Block Object to our layout entry.
+            layoutEntry.$block = blockObject;
 
             // add layout entry at the decired location in layout.
-            layout.splice(index, 0, layoutEntry);
-
-            // apply block model at decired location in blocks.
-            vm.blocks.splice(index, 0, blockModel);
+            vm.layout.splice(index, 0, layoutEntry);
             
             // lets move focus to this new block.
-            vm.moveFocusToBlock = blockModel;
+            vm.setBlockFocus(blockObject);
 
             return true;
 
@@ -180,60 +206,78 @@
 
         function deleteBlock(block) {
 
-            var index = vm.blocks.indexOf(block);
-            if(index !== -1) {
-
-                var layoutIndex = layout.findIndex(entry => entry.udi === block.content.udi);
-                if(layoutIndex !== -1) {
-                    layout.splice(index, 1);
-                } else {
-                    throw new Error("Could not find layout entry of block with udi: "+block.content.udi)
-                }
-
-                vm.blocks.splice(index, 1);
-
-                modelObject.removeDataAndDestroyModel(block);
+            var layoutIndex = vm.layout.findIndex(entry => entry.udi === block.content.udi);
+            if(layoutIndex === -1) {
+                throw new Error("Could not find layout entry of block with udi: "+block.content.udi)
             }
+            vm.layout.splice(layoutIndex, 1);
+            modelObject.removeDataAndDestroyModel(block);
+
         }
 
         function deleteAllBlocks() {
-            vm.blocks.forEach(deleteBlock);
+            vm.layout.forEach(entry => {
+                deleteBlock(entry.$block);
+            });
         }
 
-        function editBlock(blockModel, openSettings) {
+        function editBlock(blockObject, openSettings) {
+
+            var wasNotActiveBefore = blockObject.active !== true;
+            blockObject.active = true;
+
+            if (inlineEditing === true && openSettings !== true) {
+                return;
+            }
 
             // make a clone to avoid editing model directly.
-            var blockContentClone = Utilities.copy(blockModel.content);
+            var blockContentClone = Utilities.copy(blockObject.content);
             var blockSettingsClone = null;
 
-            if (blockModel.config.settingsElementTypeKey) {
-                blockSettingsClone = Utilities.copy(blockModel.settings);
+            if (blockObject.config.settingsElementTypeKey) {
+                blockSettingsClone = Utilities.copy(blockObject.settings);
             }
 
             var hideContent = (openSettings === true && inlineEditing === true);
             
             var blockEditorModel = {
-                content: blockContentClone,
                 hideContent: hideContent,
                 openSettings: openSettings === true,
-                settings: blockSettingsClone,
-                title: blockModel.label,
+                liveEditing: liveEditing,
+                title: blockObject.label,
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
-                size: blockModel.config.editorSize || "medium",
+                size: blockObject.config.editorSize || "medium",
                 submit: function(blockEditorModel) {
-                    // To ensure syncronization gets tricked we transfer each property.
-                    if (blockEditorModel.content !== null) {
-                        blockEditorService.mapElementValues(blockEditorModel.content, blockModel.content)
+
+                    if (liveEditing === false) {
+                        // transfer values when submitting in none-liveediting mode.
+                        blockObject.retriveValuesFrom(blockEditorModel.content, blockEditorModel.settings);
                     }
-                    if (blockModel.config.settingsElementTypeKey !== null) {
-                        blockEditorService.mapElementValues(blockEditorModel.settings, blockModel.settings)
-                    }
+
+                    blockObject.active = false;
                     editorService.close();
                 },
                 close: function() {
+
+                    if (liveEditing === true) {
+                        // revert values when closing in liveediting mode.
+                        blockObject.retriveValuesFrom(blockContentClone, blockSettingsClone);
+                    }
+
+                    if (wasNotActiveBefore === true) {
+                        blockObject.active = false;
+                    }
                     editorService.close();
                 }
             };
+
+            if (liveEditing === true) {
+                blockEditorModel.content = blockObject.content;
+                blockEditorModel.settings = blockObject.settings;
+            } else {
+                blockEditorModel.content = blockContentClone;
+                blockEditorModel.settings = blockSettingsClone;
+            }
 
             // open property settings editor
             editorService.open(blockEditorModel);
@@ -280,13 +324,18 @@
                     }
                     
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
-                        blockPickerModel.close();
-                        if (added && vm.model.config.useInlineEditingAsDefault !== true && vm.blocks.length > createIndex) {
-                            editBlock(vm.blocks[createIndex]);
+                        editorService.close();
+                        if (added && vm.layout.length > createIndex) {
+                            editBlock(vm.layout[createIndex].$block);
                         }
                     }
                 },
                 close: function() {
+                    // if opned by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
+                    if (createIndex < vm.layout.length) {
+                        vm.setBlockFocus(vm.layout[Math.max(createIndex-1, 0)].$block);
+                    }
+
                     editorService.close();
                 }
             };
@@ -304,7 +353,7 @@
                     {
                         type: "elementType",
                         pasteData: entry.data,
-                        blockConfigModel: modelObject.getScaffoldFor(entry.key),
+                        blockConfigModel: modelObject.getScaffoldFromAlias(entry.alias),
                         elementTypeModel: {
                             name: entry.label,
                             icon: entry.icon
@@ -338,9 +387,11 @@
         }
 
         var requestCopyAllBlocks = function() {
+
+            var elementTypesToCopy = vm.layout.filter(entry => entry.$block.config.unsupported !== true).map(entry => entry.$block.content);
             
             // list aliases
-            var aliases = vm.blocks.map(block => block.content.contentTypeAlias);
+            var aliases = elementTypesToCopy.map(content => content.contentTypeAlias);
 
             // remove dublicates
             aliases = aliases.filter((item, index) => aliases.indexOf(item) === index);
@@ -349,8 +400,7 @@
             if(vm.umbVariantContent) {
                 contentNodeName = vm.umbVariantContent.editor.content.name;
             }
-
-            var elementTypesToCopy = vm.blocks.map(block => block.content);
+            // TODO: check if we are in an overlay and then lets get the Label of this block.
 
             localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function(localizedLabel) {
                 clipboardService.copyArray("elementTypeArray", aliases, elementTypesToCopy, localizedLabel, "icon-thumbnail-list", vm.model.id);
@@ -371,18 +421,18 @@
             }
 
             // make block model
-            var blockModel = getBlockModel(layoutEntry);
-            if (blockModel === null) {
+            var blockObject = getBlockObject(layoutEntry);
+            if (blockObject === null) {
                 return false;
             }
+
+            // set the BlockObject on our layout entry.
+            layoutEntry.$block = blockObject;
             
             // insert layout entry at the decired location in layout.
-            layout.splice(index, 0, layoutEntry);
+            vm.layout.splice(index, 0, layoutEntry);
 
-            // insert block model at the decired location in blocks.
-            vm.blocks.splice(index, 0, blockModel);
-            
-            vm.moveFocusToBlock = blockModel;
+            vm.currentBlockInFocus = blockObject;
 
             return true;
 
@@ -435,11 +485,6 @@
             openSettingsForBlock: openSettingsForBlock
         }
 
-
-
-        var runtimeSortVars = {};
-
-        vm.sorting = false;
         vm.sortableOptions = {
             axis: "y",
             cursor: "grabbing",
@@ -449,30 +494,8 @@
             distance: 5,
             tolerance: "pointer",
             scroll: true,
-            start: function (ev, ui) {
-                runtimeSortVars.moveFromIndex = ui.item.index();
-                $scope.$evalAsync(function () {
-                    vm.sorting = true;
-                });
-            },
             update: function (ev, ui) {
                 setDirty();
-            },
-            stop: function (ev, ui) {
-
-                // Lets update the layout part of the property model to match the update.
-                var moveFromIndex = runtimeSortVars.moveFromIndex;
-                var moveToIndex = ui.item.index();
-
-                if (moveToIndex !== -1 && moveFromIndex !== moveToIndex) {
-                    var movedEntry = layout[moveFromIndex];
-                    layout.splice(moveFromIndex, 1);
-                    layout.splice(moveToIndex, 0, movedEntry);
-                }
-
-                $scope.$evalAsync(function () {
-                    vm.sorting = false;
-                });
             }
         };
 
@@ -480,30 +503,22 @@
         function onAmountOfBlocksChanged() {
 
             // enable/disable property actions
-            copyAllBlocksAction.isDisabled = vm.blocks.length === 0;
-            deleteAllBlocksAction.isDisabled = vm.blocks.length === 0;
+            copyAllBlocksAction.isDisabled = vm.layout.length === 0;
+            deleteAllBlocksAction.isDisabled = vm.layout.length === 0;
 
             // validate limits:
             if (vm.propertyForm) {
-                if (vm.validationLimit.min !== null && vm.blocks.length < vm.validationLimit.min) {
-                    vm.propertyForm.minCount.$setValidity("minCount", false);
-                }
-                else {
-                    vm.propertyForm.minCount.$setValidity("minCount", true);
-                }
-                if (vm.validationLimit.max !== null && vm.blocks.length > vm.validationLimit.max) {
-                    vm.propertyForm.maxCount.$setValidity("maxCount", false);
-                }
-                else {
-                    vm.propertyForm.maxCount.$setValidity("maxCount", true);
-                }
+
+                var isMinRequirementGood = vm.validationLimit.min === null || vm.layout.length >= vm.validationLimit.min;
+                vm.propertyForm.minCount.$setValidity("minCount", isMinRequirementGood);
+                
+                var isMaxRequirementGood = vm.validationLimit.max === null || vm.layout.length <= vm.validationLimit.max;
+                vm.propertyForm.maxCount.$setValidity("maxCount", isMaxRequirementGood);
+                
             }
         }
+        unsubscribe.push($scope.$watch(() => vm.layout.length, onAmountOfBlocksChanged));
 
-
-
-
-        unsubscribe.push($scope.$watch(() => vm.blocks.length, onAmountOfBlocksChanged));
         
         $scope.$on("$destroy", function () {
             for (const subscription of unsubscribe) {
