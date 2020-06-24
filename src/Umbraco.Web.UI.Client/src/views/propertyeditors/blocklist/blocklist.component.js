@@ -4,7 +4,7 @@
 
     /**
      * @ngdoc component
-     * @name Umbraco.Editors.BlockList.blockListPropertyEditor
+     * @name umbraco.directives.directive:blockListPropertyEditor
      * @function
      *
      * @description

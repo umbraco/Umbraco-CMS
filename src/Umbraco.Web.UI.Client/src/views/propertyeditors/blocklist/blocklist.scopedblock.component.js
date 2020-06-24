@@ -3,9 +3,7 @@
 
     /**
      * @ngdoc component
-     * @name Umbraco.umbBlockListScopedBlockContent
-     * @function
-     *
+     * @name umbraco.directives.directive:umbBlockListScopedBlockContent
      * @description
      * The component for a style-scoped block of the block list property editor.
      */
