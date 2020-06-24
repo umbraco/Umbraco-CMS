@@ -162,6 +162,12 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                 //There will always be at least 4 parts for content properties since all model errors for properties are prefixed with "_Properties"
                 //If it is not prefixed with "_Properties" that means the error is for a field of the object directly.
 
+                // TODO: This 4 part dot notation isn't ideal and instead it would probably be nicer to have a json structure as the key (which could be converted
+                // to base64 if we cannot do that since it's a 'key'). That way the key can be flexible and 'future proof' since I'm sure something in the future
+                // will change for this. Another idea is to just have a single key for one property type and have the model error a json structure that handles 
+                // everything. This would probably be the 'nicest' way but would require quite a lot of work. We are part way there with how we are doing 
+                // validation for complex editors.
+
                 // Example: "_Properties.headerImage.en-US.mySegment.myField"
                 // * it's for a property since it has a _Properties prefix
                 // * it's for the headerImage property type

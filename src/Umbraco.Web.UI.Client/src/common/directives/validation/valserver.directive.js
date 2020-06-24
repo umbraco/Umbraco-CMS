@@ -7,7 +7,7 @@
     **/
 function valServer(serverValidationManager) {
     return {
-        require: ['ngModel', '?^^umbProperty', '?^^umbVariantContent'],
+        require: ['ngModel', '?^^umbProperty', '?^^umbVariantContent', '?^^umbNestedProperty'],
         restrict: "A",
         scope: {},
         link: function (scope, element, attr, ctrls) {
@@ -21,6 +21,7 @@ function valServer(serverValidationManager) {
             
             // optional reference to the varaint-content-controller, needed to avoid validation when the field is invariant on non-default languages.
             var umbVariantCtrl = ctrls.length > 2 ? ctrls[2] : null;
+            var umbNestedPropertyCtrl = ctrls.length > 3 ? ctrls[3] : null;
 
             var currentProperty = umbPropCtrl.property;
             var currentCulture = currentProperty.culture;
@@ -75,7 +76,10 @@ function valServer(serverValidationManager) {
 
                         if (modelCtrl.$invalid) {
                             modelCtrl.$setValidity('valServer', true);
+
                             //clear the server validation entry
+                            // TODO: We'll need to handle this differently since this will need to target the actual 'fieldName' or validation
+                            // path if there is one
                             serverValidationManager.removePropertyError(currentProperty.alias, currentCulture, fieldName, currentSegment);
                             stopWatch();
                         }
@@ -105,9 +109,35 @@ function valServer(serverValidationManager) {
                     stopWatch();
                 }
             }
-            unsubscribe.push(serverValidationManager.subscribe(currentProperty.alias,
+
+            // TODO: If this is a property/field within a complex editor which means it could be a nested/nested/nested property/field
+            // we need to figure out a way to get it's "Path" (or jsonpath) which can be represented by something like:
+            // $.[nestedValidation].[0].[prop1].[nestedValidation].[0].[prop2]
+            // Or ... if we have names instead of indexes (which is seems like we do)
+            // $.nestedValidation.[type1].[prop1].[nestedValidation].[type2].[prop2]
+            // This would mean: 
+            //  - the first row/item in a complex editor
+            //      - within the property 'prop1'
+            //          - the first row/item in a complex editor
+            //              - within the property 'prop2'
+            // So how can we figure out this path? The only way is really by looking up our current hierarchy of items
+            // TODO: OK, so we thought we had it with umb-property being able to know the content type BUT this doesn't work 
+            // because the validation results could have a many rows for the same content type, we need to have the index available
+            // so the firest example above works much better.
+            // ... OK ... looks like we have an index to work with, but we'll need to update the block editor to support this too.
+
+            var propertyValidationPath = umbNestedPropertyCtrl ? umbNestedPropertyCtrl.getValidationPath() : null;
+
+            unsubscribe.push(serverValidationManager.subscribe(
+                currentProperty.alias,
                 currentCulture,
-                fieldName,
+                // use the propertyValidationPath for the fieldName value if there is one since if there is one it means it's a complex
+                // editor and as such the 'fieldName' will be empty. The serverValidationManager knows how to handle the jsonpath
+                // string as the fieldName.
+                // TODO: This isn't quite true! If there is a fieldName specified, then it will need to be added to the 
+                // validation path. We should pass in the fieldName to umbNestedPropertyCtrl.getValidationPath(); since this could very well be targeting a specific field
+
+                propertyValidationPath ? propertyValidationPath : fieldName,
                 serverValidationManagerCallback,
                 currentSegment)
             );

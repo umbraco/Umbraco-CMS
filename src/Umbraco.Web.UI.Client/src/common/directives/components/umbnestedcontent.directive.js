@@ -63,7 +63,8 @@
             templateUrl: Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + "/views/propertyeditors/nestedcontent/nestedcontent.editor.html",
             scope: {
                 ngModel: '=',
-                tabAlias: '='
+                tabAlias: '=',
+                itemIndex: '@'
             },
             link: link
         };

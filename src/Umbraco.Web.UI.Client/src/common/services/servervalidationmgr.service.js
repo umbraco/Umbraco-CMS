@@ -36,7 +36,6 @@ function serverValidationManager($timeout) {
         });
     }
     
-
     function getPropertyErrors(self, propertyAlias, culture, segment, fieldName) {
         if (!Utilities.isString(propertyAlias)) {
             throw "propertyAlias must be a string";
@@ -98,7 +97,30 @@ function serverValidationManager($timeout) {
             }
         }
     }
-    
+
+    function parseComplexEditorError(errorMsg) {
+        var json = JSON.parse(errorMsg);
+
+        var nestedValidation = json["nestedValidation"];
+        if (!nestedValidation) {
+            throw "Invalid JSON structure for complex property, missing 'nestedValidation'";
+        }
+
+        // each key represents an element type, the key is it's alias
+        var keys = Object.keys(nestedValidation);
+
+        // TODO: Could we use an individual instance of serverValidationManager for each element type? It could/should work the way 
+        // it does today since it currently manages all callbacks for all simple properties on a content item based on a content type. 
+        // Hrmmm... only thing is then how to dispose/cleanup of these instances?
+
+        // TODO: ... actually, because we are registering a JSONPath into the 'fieldName' for when complex editors subscribe, perhaps
+        // the only thing we need to do is build up all of the different JSONPath's and their errors here based on this object and then 
+        // execute callbacks for each? So I think we need to make a function recursively return all possible keys! ... we can even have tests
+        // for that :) 
+
+
+    }
+
     return {
         
         /**
@@ -173,7 +195,14 @@ function serverValidationManager($timeout) {
             if (!segment) {
                 segment = null;
             }
-            
+
+            // TODO: Check if the fieldName is a jsonpath, we will know this if it starts with $.
+            // in which case we need to handle this a little differently.
+            if (fieldName && fieldName.startsWith("$.")) {
+                // TODO: Or... Do we even need to deal with it differently? Maybe with some luck 
+                // we can just store that path and use it. Lets see how this goes.
+            }
+
             if (propertyAlias === null) {
                 callbacks.push({
                     propertyAlias: null,
@@ -370,6 +399,10 @@ function serverValidationManager($timeout) {
          * Adds an error message for the content property
          */
         addPropertyError: function (propertyAlias, culture, fieldName, errorMsg, segment) {
+
+            // TODO: We need to handle the errorMsg in a special way to check if this is a json structure. If it is we know we are dealing with
+            // a complex editor and in which case we'll need to adjust how everything works.
+
             if (!propertyAlias) {
                 return;
             }
@@ -383,31 +416,39 @@ function serverValidationManager($timeout) {
                 segment = null;
             }
 
-            //only add the item if it doesn't exist                
-            if (!this.hasPropertyError(propertyAlias, culture, fieldName, segment)) {
-                this.items.push({
-                    propertyAlias: propertyAlias,
-                    culture: culture,
-                    segment: segment,
-                    fieldName: fieldName,
-                    errorMsg: errorMsg
-                });
+            // if the error message is json it's a complex editor validation response that we need to parse
+            if (errorMsg.startsWith("{")) {
+                parseComplexEditorError(errorMsg);
             }
-            
-            //find all errors for this item
-            var errorsForCallback = getPropertyErrors(this, propertyAlias, culture, segment, fieldName);
-            //we should now call all of the call backs registered for this error
-            var cbs = this.getPropertyCallbacks(propertyAlias, culture, fieldName, segment);
-            //call each callback for this error
-            for (var cb in cbs) {
-                executeCallback(this, errorsForCallback, cbs[cb].callback, culture, segment);
-            }
+            else {
 
-            //execute variant specific callbacks here too when a propery error is added
-            var variantCbs = this.getVariantCallbacks(culture, segment);
-            //call each callback for this error
-            for (var cb in variantCbs) {
-                executeCallback(this, errorsForCallback, variantCbs[cb].callback, culture, segment);
+                //only add the item if it doesn't exist                
+                if (!this.hasPropertyError(propertyAlias, culture, fieldName, segment)) {
+                    this.items.push({
+                        propertyAlias: propertyAlias,
+                        culture: culture,
+                        segment: segment,
+                        fieldName: fieldName,
+                        errorMsg: errorMsg
+                    });
+                }
+
+                //find all errors for this item
+                var errorsForCallback = getPropertyErrors(this, propertyAlias, culture, segment, fieldName);
+                //we should now call all of the call backs registered for this error
+                var cbs = this.getPropertyCallbacks(propertyAlias, culture, fieldName, segment);
+                //call each callback for this error
+                for (var cb in cbs) {
+                    executeCallback(this, errorsForCallback, cbs[cb].callback, culture, segment);
+                }
+
+                //execute variant specific callbacks here too when a propery error is added
+                var variantCbs = this.getVariantCallbacks(culture, segment);
+                //call each callback for this error
+                for (var cb in variantCbs) {
+                    executeCallback(this, errorsForCallback, variantCbs[cb].callback, culture, segment);
+                }
+
             }
         },      
         

@@ -15,7 +15,7 @@ angular.module("umbraco.directives")
             restrict: 'E',
             replace: true,
             templateUrl: 'views/components/property/umb-property.html',
-            link: function (scope) {
+            link: function (scope, element, attr, ctrls) {
 
                 scope.controlLabelTitle = null;
                 if(Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
@@ -42,6 +42,8 @@ angular.module("umbraco.directives")
                 self.setPropertyActions = function(actions) {
                     $scope.propertyActions = actions;
                 };
+
+                
 
             }
         };

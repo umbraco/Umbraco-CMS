@@ -54,10 +54,6 @@
             labels.content_createEmpty = data[1];
         });
 
-
-
-
-
         vm.$onInit = function() {
 
             inlineEditing = vm.model.config.useInlineEditingAsDefault;
