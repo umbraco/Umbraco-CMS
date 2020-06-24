@@ -1,4 +1,4 @@
-function listViewController($scope, $interpolate, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper) {
+function listViewController($scope, $interpolate, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper, eventsService) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -837,6 +837,19 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     $scope.createFromBlueprint = createFromBlueprint;
     $scope.toggleDropdown = toggleDropdown;
     $scope.leaveDropdown = leaveDropdown;
+
+    // if this listview has sort order in it, make sure it is updated when sorting is performed on the current content
+    if (_.find($scope.options.includeProperties, property => property.alias === "sortOrder")) {
+        var eventSubscription = eventsService.on("sortCompleted", function (e, args) {
+            if (parseInt(args.id) === parseInt($scope.contentId)) {
+                $scope.reloadView($scope.contentId);
+            }
+        });
+
+        $scope.$on('$destroy', function () {
+            eventsService.unsubscribe(eventSubscription);
+        });
+    }
 
     //GO!
     initView();
