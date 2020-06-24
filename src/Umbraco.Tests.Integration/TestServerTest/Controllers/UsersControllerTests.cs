@@ -101,7 +101,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
          }
 
          [Test]
-         public async Task GetPagedUsers_11()
+         public async Task GetPagedUsers_multiple_pages()
          {
              var totalNumberOfUsers = 11;
              var pageSize = totalNumberOfUsers - 1;
