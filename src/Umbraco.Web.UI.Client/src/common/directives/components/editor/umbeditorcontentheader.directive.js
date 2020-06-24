@@ -27,7 +27,7 @@
                 var title = data[2] + ": ";
                 if (!scope.isNew) {
                     scope.a11yMessage += " " + scope.editor.content.name;
-                    title += scope.content.name;
+                    title += scope.editor.content.name;
                 } else {
                     var name = editorState.current.contentTypeName;
                     scope.a11yMessage += " " + name;
