@@ -4,15 +4,17 @@ using Newtonsoft.Json.Serialization;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core;
 
 namespace Umbraco.Web.PropertyEditors.Validation
 {
     /// <summary>
-    /// Custom json converter for <see cref="ValidationResult"/> and <see cref="PropertyValidationResult"/>
+    /// Custom json converter for <see cref="ValidationResult"/> and <see cref="ContentPropertyValidationResult"/>
     /// </summary>
+    /// <remarks>
+    /// This converter is specifically used to convert validation results for content in order to be able to have nested
+    /// validation results for complex editors.
+    /// </remarks>
     internal class ValidationResultConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType) => typeof(ValidationResult).IsAssignableFrom(objectType);
@@ -34,7 +36,7 @@ namespace Umbraco.Web.PropertyEditors.Validation
 
             var validationResult = (ValidationResult)value;
 
-            if (validationResult is NestedValidationResults nestedResult && nestedResult.ValidationResults.Count > 0)
+            if (validationResult is ComplexEditorValidationResult nestedResult && nestedResult.ValidationResults.Count > 0)
             {
                 var jo = new JObject();
                 // recurse to write out an array of ValidationResultCollection
@@ -42,7 +44,7 @@ namespace Umbraco.Web.PropertyEditors.Validation
                 jo.Add("nestedValidation", obj);
                 jo.WriteTo(writer);
             }
-            else if (validationResult is ElementTypeValidationResult elementTypeValidationResult && elementTypeValidationResult.ValidationResults.Count > 0)
+            else if (validationResult is ComplexEditorElementTypeValidationResult elementTypeValidationResult && elementTypeValidationResult.ValidationResults.Count > 0)
             {
                 var joElementType = new JObject();
                 var joPropertyType = new JObject();
@@ -65,11 +67,11 @@ namespace Umbraco.Web.PropertyEditors.Validation
             else 
             {
                 
-                if (validationResult is PropertyValidationResult propertyValidationResult
-                    && propertyValidationResult.NestedResuls?.ValidationResults.Count > 0)
+                if (validationResult is ContentPropertyValidationResult propertyValidationResult
+                    && propertyValidationResult.ComplexEditorResults?.ValidationResults.Count > 0)
                 {
                     // recurse to write out the NestedValidationResults
-                    var obj = JToken.FromObject(propertyValidationResult.NestedResuls, camelCaseSerializer);
+                    var obj = JToken.FromObject(propertyValidationResult.ComplexEditorResults, camelCaseSerializer);
                     obj.WriteTo(writer);
                 }
 

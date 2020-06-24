@@ -54,7 +54,7 @@ namespace Umbraco.Web
             ValidationResult result, string propertyAlias, string culture = "", string segment = "")
         {
 
-            var propValidationResult = new PropertyValidationResult(result);
+            var propValidationResult = new ContentPropertyValidationResult(result);
 
             var keyParts = new[]
             {

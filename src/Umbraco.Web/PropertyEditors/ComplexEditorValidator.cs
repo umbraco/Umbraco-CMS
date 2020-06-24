@@ -23,7 +23,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <summary>
-        /// Return a single <see cref="NestedValidationResults"/> for all sub nested validation results in the complex editor
+        /// Return a single <see cref="ComplexEditorValidationResult"/> for all sub nested validation results in the complex editor
         /// </summary>
         /// <param name="value"></param>
         /// <param name="valueType"></param>
@@ -36,7 +36,7 @@ namespace Umbraco.Web.PropertyEditors
 
             if (rowResults.Count > 0)
             {
-                var result = new NestedValidationResults();
+                var result = new ComplexEditorValidationResult();
                 foreach(var rowResult in rowResults)
                 {
                     result.ValidationResults.Add(rowResult);
@@ -55,15 +55,15 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="rawValue"></param>
         /// <returns></returns>
-        protected IEnumerable<ElementTypeValidationResult> GetNestedValidationResults(IEnumerable<ElementTypeValidationModel> elements)
+        protected IEnumerable<ComplexEditorElementTypeValidationResult> GetNestedValidationResults(IEnumerable<ElementTypeValidationModel> elements)
         {
             foreach (var row in elements)
             {
-                var elementTypeValidationResult = new ElementTypeValidationResult(row.ElementTypeAlias);
+                var elementTypeValidationResult = new ComplexEditorElementTypeValidationResult(row.ElementTypeAlias);
 
                 foreach (var prop in row.PropertyTypeValidation)
                 {
-                    var propValidationResult = new PropertyTypeValidationResult(prop.PropertyType.Alias);
+                    var propValidationResult = new ComplexEditorPropertyTypeValidationResult(prop.PropertyType.Alias);
 
                     foreach (var validationResult in _propertyValidationService.ValidatePropertyValue(prop.PropertyType, prop.PostedValue))
                     {

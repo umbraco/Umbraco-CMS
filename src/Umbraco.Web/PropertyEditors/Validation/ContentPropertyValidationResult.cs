@@ -8,12 +8,12 @@ namespace Umbraco.Web.PropertyEditors.Validation
     /// <remarks>
     /// This clones the original result and then ensures the nested result if it's the correct type
     /// </remarks>
-    public class PropertyValidationResult : ValidationResult
+    public class ContentPropertyValidationResult : ValidationResult
     {
-        public PropertyValidationResult(ValidationResult nested)
+        public ContentPropertyValidationResult(ValidationResult nested)
             : base(nested.ErrorMessage, nested.MemberNames)
         {
-            NestedResuls = nested as NestedValidationResults;
+            ComplexEditorResults = nested as ComplexEditorValidationResult;
         }
 
         /// <summary>
@@ -22,6 +22,6 @@ namespace Umbraco.Web.PropertyEditors.Validation
         /// <remarks>
         /// There can be nested results for complex editors that contain other editors
         /// </remarks>
-        public NestedValidationResults NestedResuls { get; }
+        public ComplexEditorValidationResult ComplexEditorResults { get; }
     }
 }

@@ -97,17 +97,17 @@ namespace Umbraco.Tests.Web.Validation
         [Test]
         public void TestSerializer()
         {
-            var nestedLevel2 = new NestedValidationResults();
-            var elementTypeResult2 = new ElementTypeValidationResult("type2");
-            var propertyTypeResult2 = new PropertyTypeValidationResult("prop2");
+            var nestedLevel2 = new ComplexEditorValidationResult();
+            var elementTypeResult2 = new ComplexEditorElementTypeValidationResult("type2");
+            var propertyTypeResult2 = new ComplexEditorPropertyTypeValidationResult("prop2");
             propertyTypeResult2.ValidationResults.Add(new ValidationResult("error2-1", new[] { "level2" }));
             propertyTypeResult2.ValidationResults.Add(new ValidationResult("error2-2", new[] { "level2" }));
             elementTypeResult2.ValidationResults.Add(propertyTypeResult2);
             nestedLevel2.ValidationResults.Add(elementTypeResult2);
 
-            var nestedLevel1 = new NestedValidationResults();
-            var elementTypeResult1 = new ElementTypeValidationResult("type1");
-            var propertyTypeResult1 = new PropertyTypeValidationResult("prop1");
+            var nestedLevel1 = new ComplexEditorValidationResult();
+            var elementTypeResult1 = new ComplexEditorElementTypeValidationResult("type1");
+            var propertyTypeResult1 = new ComplexEditorPropertyTypeValidationResult("prop1");
             propertyTypeResult1.ValidationResults.Add(new ValidationResult("error1-1", new[] { "level1" }));
             propertyTypeResult1.ValidationResults.Add(nestedLevel2); // This is a nested result within the level 1
             elementTypeResult1.ValidationResults.Add(propertyTypeResult1);
@@ -115,6 +115,11 @@ namespace Umbraco.Tests.Web.Validation
 
             var serialized = JsonConvert.SerializeObject(nestedLevel1, Formatting.Indented, new ValidationResultConverter());
             Console.WriteLine(serialized);
+
+            var jsonNestedError = JsonConvert.DeserializeObject<JObject>(serialized);
+            Assert.AreEqual(JTokenType.Array, jsonNestedError["nestedValidation"].Type);
+            var nestedValidation = (JArray)jsonNestedError["nestedValidation"];
+            AssertNestedValidation(nestedValidation);
         }
 
         [Test]
@@ -226,12 +231,12 @@ namespace Umbraco.Tests.Web.Validation
             var jsonNestedError = JsonConvert.DeserializeObject<JObject>(nestedError.ErrorMessage);
             Assert.AreEqual(JTokenType.Array, jsonNestedError["nestedValidation"].Type);
             var nestedValidation = (JArray)jsonNestedError["nestedValidation"];
-            AssertNestedValidation(nestedValidation, 2); // there are 2 because there are 2 nested content rows
+            AssertNestedValidation(nestedValidation);
         }
 
-        private void AssertNestedValidation(JArray nestedValidation, int rows)
+        private void AssertNestedValidation(JArray nestedValidation)
         {
-            Assert.AreEqual(rows, nestedValidation.Count); 
+            Assert.Greater(nestedValidation.Count, 0); 
             foreach (var rowErrors in nestedValidation)
             {
                 Assert.AreEqual(JTokenType.Object, rowErrors.Type);
@@ -239,7 +244,7 @@ namespace Umbraco.Tests.Web.Validation
                 Assert.AreEqual(1, elementTypeErrors.Count); // there is 1 element type in error
                 foreach (var elementTypeAliasToErrors in elementTypeErrors)
                 {
-                    Assert.AreEqual("textPage", elementTypeAliasToErrors.Key);
+                    Assert.IsNotEmpty(elementTypeAliasToErrors.Key);
                     var propErrors = (JObject)elementTypeAliasToErrors.Value;
 
                     foreach (var propAliasToErrors in propErrors)
@@ -253,19 +258,15 @@ namespace Umbraco.Tests.Web.Validation
                             if (nested != null)
                             {
                                 // recurse
-                                AssertNestedValidation((JArray)nested, 1); // we know this is 1 row
+                                AssertNestedValidation((JArray)nested);
                                 continue;
                             }
 
                             Assert.IsNotEmpty(propError["errorMessage"].Value<string>());
                             Assert.AreEqual(1, propError["memberNames"].Value<JArray>().Count);
                         }
-
                     }
-
                 }
-
-
             }
         }
 

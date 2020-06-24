@@ -248,8 +248,10 @@
     <Compile Include="PropertyEditors\ComplexEditorValidator.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
-    <Compile Include="PropertyEditors\Validation\NestedValidationResults.cs" />
-    <Compile Include="PropertyEditors\Validation\PropertyValidationResult.cs" />
+    <Compile Include="PropertyEditors\Validation\ComplexEditorElementTypeValidationResult.cs" />
+    <Compile Include="PropertyEditors\Validation\ComplexEditorPropertyTypeValidationResult.cs" />
+    <Compile Include="PropertyEditors\Validation\ComplexEditorValidationResult.cs" />
+    <Compile Include="PropertyEditors\Validation\ContentPropertyValidationResult.cs" />
     <Compile Include="PropertyEditors\Validation\ValidationResultConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\BlockEditorConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\BlockListPropertyValueConverter.cs" />
