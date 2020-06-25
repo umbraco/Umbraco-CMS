@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Core;
 
-namespace Umbraco.Tests.CoreThings
+namespace Umbraco.Tests.UnitTests.Umbraco.Core
 {
     [TestFixture]
     public class VersionExtensionTests
@@ -18,7 +18,7 @@ namespace Umbraco.Tests.CoreThings
         [TestCase(0, 0, 1, 1, "0.0.1.0")]
         [TestCase(0, 0, 0, 1, "0.0.0.0")]
         [TestCase(7, 3, 0, 0, "7.2.2147483647.2147483647")]
-        public void Subract_Revision(int major, int minor, int build, int rev, string outcome)
+        public void Subtract_Revision(int major, int minor, int build, int rev, string outcome)
         {
             var version = new Version(major, minor, build, rev);
 

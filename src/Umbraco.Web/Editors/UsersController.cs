@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Mail;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -52,6 +53,7 @@ namespace Umbraco.Web.Editors
         private readonly ISqlContext _sqlContext;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly ISecuritySettings _securitySettings;
+        private readonly IEmailSender _emailSender;
 
         public UsersController(
             IGlobalSettings globalSettings,
@@ -68,7 +70,8 @@ namespace Umbraco.Web.Editors
             IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
             IPublishedUrlProvider publishedUrlProvider,
-            ISecuritySettings securitySettings)
+            ISecuritySettings securitySettings,
+            IEmailSender emailSender)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _mediaFileSystem = mediaFileSystem;
@@ -77,6 +80,7 @@ namespace Umbraco.Web.Editors
             _sqlContext = sqlContext;
             _imageUrlGenerator = imageUrlGenerator;
             _securitySettings = securitySettings;
+            _emailSender = emailSender;
         }
 
         /// <summary>
@@ -500,17 +504,15 @@ namespace Umbraco.Web.Editors
                 UmbracoUserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
 
-            // TODO: Port email service to ASP.NET Core
-            /*await UserManager.EmailService.SendAsync(
-                //send the special UmbracoEmailMessage which configures it's own sender
-                //to allow for events to handle sending the message if no smtp is configured
-                new UmbracoEmailMessage(new EmailSender(GlobalSettings, true))
-                {
-                    Body = emailBody,
-                    Destination = userDisplay.Email,
-                    Subject = emailSubject
-                });*/
+            var mailMessage = new MailMessage()
+            {
+                Subject = emailSubject,
+                Body = emailBody,
+                IsBodyHtml = true,
+                To = { to.Email}
+            };
 
+            await _emailSender.SendAsync(mailMessage);
         }
 
         /// <summary>

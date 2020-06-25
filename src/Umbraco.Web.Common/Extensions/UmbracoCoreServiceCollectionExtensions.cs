@@ -176,9 +176,10 @@ namespace Umbraco.Web.Common.Extensions
             var globalSettings = configs.Global();
             var connStrings = configs.ConnectionStrings();
             var appSettingMainDomLock = globalSettings.MainDomLock;
+
             var isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
             var mainDomLock = appSettingMainDomLock == "SqlMainDomLock" || isLinux == true
-                ? (IMainDomLock)new SqlMainDomLock(logger, globalSettings, connStrings, dbProviderFactoryCreator)
+                ? (IMainDomLock)new SqlMainDomLock(logger, globalSettings, connStrings, dbProviderFactoryCreator, hostingEnvironment)
                 : new MainDomSemaphoreLock(logger, hostingEnvironment);
 
             var mainDom = new MainDom(logger, mainDomLock);

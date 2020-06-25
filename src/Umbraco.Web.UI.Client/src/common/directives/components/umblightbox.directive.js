@@ -12,9 +12,9 @@
     <div ng-controller="My.Controller as vm">
 
         <div class="my-gallery">
-            <a href="" ng-repeat="image in images" ng-click="vm.openLightbox($index, images)">
+            <button type="button" ng-repeat="image in images" ng-click="vm.openLightbox($index, images)">
                 <img ng-src="image.source" />
-            </a>
+            </button>
         </div>
 
         <umb-lightbox

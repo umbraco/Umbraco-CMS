@@ -103,7 +103,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IHostingEnvironment>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
                     Factory.GetInstance<IPublishedUrlProvider>(),
-                    Factory.GetInstance<ISecuritySettings>()
+                    Factory.GetInstance<ISecuritySettings>(),
+                    Factory.GetInstance<IEmailSender>()
 
                 );
                 return usersController;
@@ -176,7 +177,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IHostingEnvironment>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
                     Factory.GetInstance<IPublishedUrlProvider>(),
-                    Factory.GetInstance<ISecuritySettings>()
+                    Factory.GetInstance<ISecuritySettings>(),
+                    Factory.GetInstance<IEmailSender>()
                 );
                 return usersController;
             }
@@ -219,7 +221,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IHostingEnvironment>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
                     Factory.GetInstance<IPublishedUrlProvider>(),
-                    Factory.GetInstance<ISecuritySettings>()
+                    Factory.GetInstance<ISecuritySettings>(),
+                    Factory.GetInstance<IEmailSender>()
                 );
                 return usersController;
             }
@@ -297,7 +300,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IHostingEnvironment>(),
                     Factory.GetInstance<IImageUrlGenerator>(),
                     Factory.GetInstance<IPublishedUrlProvider>(),
-                    Factory.GetInstance<ISecuritySettings>()
+                    Factory.GetInstance<ISecuritySettings>(),
+                    Factory.GetInstance<IEmailSender>()
                 );
                 return usersController;
             }
@@ -487,7 +491,8 @@ namespace Umbraco.Tests.Web.Controllers
                 Factory.GetInstance<IHostingEnvironment>(),
                 Factory.GetInstance<IImageUrlGenerator>(),
                 Factory.GetInstance<IPublishedUrlProvider>(),
-                Factory.GetInstance<ISecuritySettings>());
+                Factory.GetInstance<ISecuritySettings>(),
+                Factory.GetInstance<IEmailSender>());
 
             var mockOwinContext = new Mock<IOwinContext>();
             var mockUserManagerMarker = new Mock<IBackOfficeUserManagerMarker>();

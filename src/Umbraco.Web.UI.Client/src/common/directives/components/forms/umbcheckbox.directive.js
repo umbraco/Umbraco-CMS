@@ -32,6 +32,7 @@
 @param {boolean} required Set the checkbox to be required.
 @param {callback} onChange Callback when the value of the checkbox change by interaction.
 @param {string} cssClass Set a css class modifier
+@param {boolean} disableDirtyCheck Disable checking if the model is dirty
 
 **/
 
@@ -84,7 +85,8 @@
             required: "<",
             onChange: "&?",
             cssClass: "@?",
-            iconClass: "@?"
+            iconClass: "@?",
+            disableDirtyCheck: "=?"
         }
     };
 
