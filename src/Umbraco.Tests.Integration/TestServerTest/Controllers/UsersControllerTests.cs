@@ -22,7 +22,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Tests.Integration.TestServerTest.Controllers
 {
-  //  [Explicit("We need to fix the tests on buildserver and when running multiple tests in one run")]
+    [Explicit("We need to fix the tests on buildserver and when running multiple tests in one run")]
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class UsersControllerTests : UmbracoTestServerTestBase
@@ -175,40 +175,6 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
             });
         }
 
-        // [Test]
-        // public async Task PostUnlockUsers_When_User_Lockout_Update_Fails_Expect_Failure_Response()
-        // {
-        //     //
-        //     // var mockUserManager = CreateMockUserManager();
-        //     // var usersController = CreateSut(mockUserManager);
-        //     //
-        //     // const string expectedMessage = "identity error!";
-        //     // var user = new BackOfficeIdentityUser(
-        //     //     new Mock<IGlobalSettings>().Object,
-        //     //     1,
-        //     //     new List<IReadOnlyUserGroup>())
-        //     // {
-        //     //     Name = "bob"
-        //     // };
-        //     //
-        //     // mockUserManager.Setup(x => x.FindByIdAsync(It.IsAny<string>()))
-        //     //     .ReturnsAsync(user);
-        //     // mockUserManager.Setup(x => x.SetLockoutEndDateAsync(user, It.IsAny<DateTimeOffset?>()))
-        //     //     .ReturnsAsync(IdentityResult.Failed(new IdentityError {Description = expectedMessage}));
-        //     //
-        //     // var response = await usersController.PostUnlockUsers(new[] { 1 });
-        //     //
-        //     // Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-        //     // Assert.True(response.Headers.TryGetValues("X-Status-Reason", out var values));
-        //     // Assert.True(values.Contains("Validation failed"));
-        //     //
-        //     // var responseContent = response.Content as ObjectContent<HttpError>;
-        //     // var responseValue = responseContent?.Value as HttpError;
-        //     // Assert.NotNull(responseValue);
-        //     // Assert.True(responseValue.Message.Contains(expectedMessage));
-        //     // Assert.True(responseValue.Message.Contains(user.Id.ToString()));
-        // }
-        //
         [Test]
         public async Task PostUnlockUsers_When_One_UserId_Supplied_Expect_User_Locked_Out_With_Correct_Response_Message()
         {
@@ -286,42 +252,5 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
                 Assert.AreEqual($"Unlocked {users.Count()} users", actual.Message);
             });
         }
-        //
-         // [Test]
-         // public async Task GetPagedUsers_Fips()
-         // {
-         //     await RunFipsTest("GetPagedUsers", mock =>
-         //     {
-         //         var users = MockedUser.CreateMulipleUsers(10);
-         //         long outVal = 10;
-         //         mock.Setup(service => service.GetAll(
-         //                 It.IsAny<long>(), It.IsAny<int>(), out outVal, It.IsAny<string>(), It.IsAny<Direction>(),
-         //                 It.IsAny<UserState[]>(), It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<IQuery<IUser>>()))
-         //             .Returns(() => users);
-         //     }, response =>
-         //     {
-         //         var obj = JsonConvert.DeserializeObject<PagedResult<UserBasic>>(response.Item2);
-         //         Assert.AreEqual(10, obj.TotalItems);
-         //         Assert.AreEqual(10, obj.Items.Count());
-         //     });
-         // }
-//
-//         [Test]
-//         public async Task GetById_Fips()
-//         {
-//             const int mockUserId = 1234;
-//             var user = MockedUser.CreateUser();
-//
-//             await RunFipsTest("GetById", mock =>
-//             {
-//                 mock.Setup(service => service.GetUserById(1234))
-//                     .Returns((int i) => i == mockUserId ? user : null);
-//             }, response =>
-//             {
-//                 var obj = JsonConvert.DeserializeObject<UserDisplay>(response.Item2);
-//                 Assert.AreEqual(user.Username, obj.Username);
-//                 Assert.AreEqual(user.Email, obj.Email);
-//             }, new { controller = "Users", action = "GetById" }, $"Users/GetById/{mockUserId}");
-//         }
     }
 }

@@ -147,6 +147,7 @@
     <Compile Include="Compose\NestedContentPropertyComponent.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
+    <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="Macros\MacroRenderer.cs" />
     <Compile Include="Macros\MemberUserKeyProvider.cs" />
     <Compile Include="Macros\PartialViewMacroController.cs" />
