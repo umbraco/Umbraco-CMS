@@ -3,7 +3,7 @@
 
 
     /**
-     * @ngdoc component
+     * @ngdoc directive
      * @name umbraco.directives.directive:blockListPropertyEditor
      * @function
      *

@@ -2,7 +2,7 @@
     "use strict";
 
     /**
-     * @ngdoc component
+     * @ngdoc directive
      * @name umbraco.directives.directive:umbBlockListBlock
      * @description
      * The component for a style-inheriting block of the block list property editor.

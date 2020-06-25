@@ -2,7 +2,7 @@
     "use strict";
 
     /**
-     * @ngdoc component
+     * @ngdoc directive
      * @name umbraco.directives.directive:umbBlockListScopedBlock
      * @description
      * The component for a style-scoped block of the block list property editor.
