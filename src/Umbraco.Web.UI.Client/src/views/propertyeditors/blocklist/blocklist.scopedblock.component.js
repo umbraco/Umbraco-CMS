@@ -3,15 +3,15 @@
 
     /**
      * @ngdoc component
-     * @name umbraco.directives.directive:umbBlockListScopedBlockContent
+     * @name umbraco.directives.directive:umbBlockListScopedBlock
      * @description
      * The component for a style-scoped block of the block list property editor.
      */
     
     angular
         .module("umbraco")
-        .component("umbBlockListScopedBlockContent", {
-            controller: BlockListScopedBlockContentController,
+        .component("umbBlockListScopedBlock", {
+            controller: BlockListScopedBlockController,
             controllerAs: "model",
             bindings: {
                 stylesheet: "@",
@@ -23,7 +23,7 @@
         }
     );
 
-    function BlockListScopedBlockContentController($compile, $element, $scope) {
+    function BlockListScopedBlockController($compile, $element, $scope) {
         var model = this;
         model.$onInit = function() {
             $scope.block = model.block;
