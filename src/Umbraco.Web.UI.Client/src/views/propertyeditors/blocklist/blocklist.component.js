@@ -169,7 +169,8 @@
             if (block === null) return null;
 
             block.view = (block.config.view ? "/" + block.config.view : getDefaultViewForBlock(block));
-
+            
+            block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;
             block.showSettings = block.config.settingsElementTypeKey != null;
             block.showCopy = vm.supportCopy && block.config.contentTypeKey != null;// if we have content, otherwise it dosnt make sense to copy.
 
@@ -212,7 +213,7 @@
 
             var layoutIndex = vm.layout.findIndex(entry => entry.udi === block.content.udi);
             if(layoutIndex === -1) {
-                throw new Error("Could not find layout entry of block with udi: "+block.content.udi)
+                throw new Error("Could not find layout entry of block with udi: "+block.content.udi);
             }
             vm.layout.splice(layoutIndex, 1);
             modelObject.removeDataAndDestroyModel(block);
@@ -225,12 +226,17 @@
             });
         }
 
+        function activateBlock(blockObject) {
+            blockObject.active = true;
+        }
+
         function editBlock(blockObject, openSettings) {
 
             var wasNotActiveBefore = blockObject.active !== true;
-            blockObject.active = true;
-
-            if (inlineEditing === true && openSettings !== true) {
+            activateBlock(blockObject);
+            
+            // dont open the editor overlay if block has hidden its content editor in overlays and we are requesting to open content, not settings.
+            if (openSettings !== true && blockObject.hideContentInOverlay === true) {
                 return;
             }
 
@@ -242,10 +248,8 @@
                 blockSettingsClone = Utilities.copy(blockObject.settings);
             }
 
-            var hideContent = (openSettings === true && inlineEditing === true);
-            
             var blockEditorModel = {
-                hideContent: hideContent,
+                hideContent: blockObject.hideContentInOverlay,
                 openSettings: openSettings === true,
                 liveEditing: liveEditing,
                 title: blockObject.label,
@@ -482,6 +486,7 @@
 
 
         vm.blockEditorApi = {
+            activateBlock: activateBlock,
             editBlock: editBlock,
             requestCopyBlock: requestCopyBlock,
             requestDeleteBlock: requestDeleteBlock,
