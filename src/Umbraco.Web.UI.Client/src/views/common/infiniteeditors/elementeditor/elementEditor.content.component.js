@@ -14,7 +14,7 @@
 
     function ElementEditorContentComponentController() {
 
-        // TODO: we might not need this..
+        // We need a controller for the component to work.
 
     }
 
