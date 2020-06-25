@@ -4,44 +4,54 @@
 
     /**
      * @ngdoc component
-     * @name Umbraco.umbBlockListBlockContent
+     * @name umbraco.umbNestedProperty
      * @function
      *
      * @description
-     * The component for a style-inheriting block of the block list property editor.
+     * Used to have nested property editors within complex editors in order to generate jsonpath for them to be used in validation
      */
     angular
         .module("umbraco")
         .component("umbNestedProperty", {
             transclude: true,
-            template: '<div ng-transclude></div>',
+            template: '<div><pre>{{vm.getValidationPath()}}</pre><div ng-transclude></div></div>',
             controller: NestedPropertyController,
             controllerAs: 'vm',
             bindings: {
                 propertyTypeAlias: "@",
-                elementTypeIndex: "@"
+                elementTypeIndex: "<",
+                findInScopeChain: "<" // TODO: Use/enable this
             },
             require: {
-                umbNestedProperty: "?^^umbNestedProperty"
+                umbNestedProperty: "?^^"
             }
         });
 
-    function NestedPropertyController($scope) {
+    function NestedPropertyController($scope, angularHelper) {
         var vm = this;
         vm.$onInit = function () {
-
+            if (!vm.propertyTypeAlias) {
+                throw "no propertyTypeAlias specified for umbNestedProperty";
+            }
         };
+
+        vm.$postLink = function () {
+            // if directive inheritance (DOM) doesn't find one, then check scope inheritance
+            if (!vm.umbNestedProperty/* && findInScopeChain*/) {
+                var found = angularHelper.traverseScopeChain($scope, s => s.vm && s.vm.constructor.name == "NestedPropertyController");
+                if (found) {
+                    vm.umbNestedProperty = found.vm;
+                }
+            }
+        }
 
         // returns a jsonpath for where this property is located in a hierarchy
         // this will call into all hierarchical parents
         vm.getValidationPath = function () {
             
-            var path = vm.umbNestedProperty ? vm.umbNestedProperty.getValidationPath() : "$";
-            if (vm.propertyTypeAlias && vm.elementTypeIndex) {
-                path += ".[nestedValidation].[" + vm.elementTypeIndex + "].[" + vm.propertyTypeAlias + "]";
-                return path;
-            }
-            return null;
+            var path = vm.umbNestedProperty ? vm.umbNestedProperty.getValidationPath() : "$";            
+            path += ".[nestedValidation].[" + vm.elementTypeIndex + "].[" + vm.propertyTypeAlias + "]";
+            return path;
         }
     }
 

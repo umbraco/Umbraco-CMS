@@ -1,6 +1,8 @@
 (function () {
     "use strict";
 
+    // TODO: Does this belong in the property editors folder?
+
     angular
         .module("umbraco")
         .component("umbBlockCard", {

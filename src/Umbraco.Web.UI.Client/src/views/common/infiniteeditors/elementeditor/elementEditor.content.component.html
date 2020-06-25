@@ -9,19 +9,23 @@
             </div>
 
             <div class="umb-group-panel__content">
-                <umb-property
-                    data-element="property-{{property.alias}}"
-                    ng-repeat="property in group.properties track by property.alias"
-                    property="property"
-                    show-inherit="vm.model.variants.length > 1 && !property.culture && !activeVariant.language.isDefault"
-                    inherits-from="defaultVariant.language.name">
 
-                    <div ng-class="{'o-40 cursor-not-allowed': vm.model.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue}">
-                        <umb-property-editor
-                            model="property"
-                            preview="vm.model.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue">
-                        </umb-property-editor>
-                    </div>
+                <umb-property data-element="property-{{property.alias}}"
+                              ng-repeat="property in group.properties track by property.alias"
+                              property="property"
+                              show-inherit="vm.model.variants.length > 1 && !property.culture && !activeVariant.language.isDefault"
+                              inherits-from="defaultVariant.language.name">
+
+                    <umb-nested-property property-type-alias="{{property.alias}}"
+                                         element-type-index="vm.itemIndex">
+
+                        <div ng-class="{'o-40 cursor-not-allowed': vm.model.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue}">
+                            <umb-property-editor model="property"
+                                                 preview="vm.model.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue">
+                            </umb-property-editor>
+                        </div>
+
+                    </umb-nested-property>
 
                 </umb-property>
             </div>

@@ -5,6 +5,7 @@
         <span>{{block.label}}</span>
     </button>
     <div class="blockelement-inlineblock-editor__inner" ng-class="{'--singleGroup':block.content.variants[0].tabs.length === 1}" ng-if="block.active === true">
-        <umb-element-editor-content model="block.content"></umb-element-editor-content>
+        <!-- NOTE: The 'index' is passed to this via it's scope which is set on the outer component: umbBlockListBlockContent -->
+        <umb-element-editor-content model="block.content" item-index="index"></umb-element-editor-content>
     </div>
 </div>

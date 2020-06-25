@@ -67,7 +67,7 @@
             scope: {
                 ngModel: '=',
                 tabAlias: '=',
-                itemIndex: '@'
+                itemIndex: '='
             },
             link: link
         };

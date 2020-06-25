@@ -10,6 +10,23 @@ function angularHelper($q) {
     return {
 
         /**
+         * Will traverse up the $scope chain to all ancestors until the predicate matches for the current scope or until it's at the root.
+         * @param {any} scope
+         * @param {any} predicate
+         */
+        traverseScopeChain: function (scope, predicate) {
+            var s = scope.$parent;
+            while (s) {
+                var result = predicate(s);
+                if (result === true) {
+                    return s;
+                }
+                s = s.$parent;
+            }
+            return null;
+        },
+
+        /**
          * Method used to re-run the $parsers for a given ngModel
          * @param {} scope 
          * @param {} ngModel 

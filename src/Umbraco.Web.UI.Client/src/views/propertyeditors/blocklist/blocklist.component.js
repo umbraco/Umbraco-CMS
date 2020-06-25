@@ -131,6 +131,7 @@
             // Append the blockObjects to our layout.
             vm.layout.forEach(entry => {
                 if (entry.$block === undefined || entry.$block === null) {
+
                     var block = getBlockObject(entry);
     
                     // If this entry was not supported by our property-editor it would return 'null'.
@@ -221,7 +222,12 @@
             });
         }
 
-        function editBlock(blockObject, openSettings) {
+        function editBlock(blockObject, openSettings, blockIndex) {
+
+            // this must be set
+            if (blockIndex === undefined) {
+                throw "blockIndex was not specified on call to editBlock";
+            }
 
             var wasNotActiveBefore = blockObject.active !== true;
             blockObject.active = true;
@@ -239,12 +245,14 @@
             }
 
             var hideContent = (openSettings === true && inlineEditing === true);
-            
+
             var blockEditorModel = {
+                $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
                 hideContent: hideContent,
                 openSettings: openSettings === true,
                 liveEditing: liveEditing,
                 title: blockObject.label,
+                index: blockIndex,
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
                 size: blockObject.config.editorSize || "medium",
                 submit: function(blockEditorModel) {
@@ -326,7 +334,7 @@
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                         editorService.close();
                         if (added && vm.layout.length > createIndex) {
-                            editBlock(vm.layout[createIndex].$block);
+                            editBlock(vm.layout[createIndex].$block, false, createIndex);
                         }
                     }
                 },
@@ -471,18 +479,16 @@
             });
         }
 
-        function openSettingsForBlock(block) {
-            editBlock(block, true);
+        function openSettingsForBlock(block, blockIndex) {
+            editBlock(block, true, blockIndex);
         }
-
-
 
         vm.blockEditorApi = {
             editBlock: editBlock,
             requestCopyBlock: requestCopyBlock,
             requestDeleteBlock: requestDeleteBlock,
             deleteBlock: deleteBlock,
-            openSettingsForBlock: openSettingsForBlock
+            openSettingsForBlock: openSettingsForBlock 
         }
 
         vm.sortableOptions = {

@@ -8,31 +8,36 @@
 
             <div ng-repeat="layout in vm.layout track by layout.$block.key">
 
-                <button
-                    type="button"
-                    class="btn-reset umb-block-list__block--create-button"
-                    ng-click="vm.showCreateDialog($index, $event)"
-                    ng-controller="Umbraco.PropertyEditors.BlockListPropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
-                    ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)"
-                >
+                <button type="button"
+                        class="btn-reset umb-block-list__block--create-button"
+                        ng-click="vm.showCreateDialog($index, $event)"
+                        ng-controller="Umbraco.PropertyEditors.BlockListPropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
+                        ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)">
                     <div class="__plus" ng-style="{'left':inlineCreateButtonCtrl.plusPosX}">+</div>
                 </button>
 
                 <div class="umb-block-list__block" ng-class="{'--active':layout.$block.active}">
 
-                <umb-nested-property property-type-alias="{{property.propertyAlias}}"
-                                         element-type-index="{{$index}}">
-
-                
-                    <umb-block-list-scoped-block-content ng-if="layout.$block.config.stylesheet" class="umb-block-list__block--content blockelement__draggable-element" view="{{layout.$block.view}}" stylesheet="/{{::layout.$block.config.stylesheet}}" api="vm.blockEditorApi" block="layout.$block" index="$index">
+                    <umb-block-list-scoped-block-content ng-if="layout.$block.config.stylesheet"
+                                                         class="umb-block-list__block--content blockelement__draggable-element"
+                                                         view="{{layout.$block.view}}"
+                                                         stylesheet="/{{::layout.$block.config.stylesheet}}"
+                                                         api="vm.blockEditorApi"
+                                                         block="layout.$block"
+                                                         index="$index">
                     </umb-block-list-scoped-block-content>
-                    <umb-block-list-block-content ng-if="!layout.$block.config.stylesheet" class="umb-block-list__block--content" view="{{layout.$block.view}}" api="vm.blockEditorApi" block="layout.$block" index="$index">
+                    <umb-block-list-block-content ng-if="!layout.$block.config.stylesheet"
+                                                  class="umb-block-list__block--content"
+                                                  view="{{layout.$block.view}}"
+                                                  api="vm.blockEditorApi"
+                                                  block="layout.$block"
+                                                  index="$index">
                     </umb-block-list-block-content>
 
-                    </umb-nested-property>
-                    
                     <div class="umb-block-list__block--actions">
-                        <button type="button" class="btn-reset umb-outline action --settings" localize="title" title="actions_editSettings" ng-click="vm.blockEditorApi.openSettingsForBlock(layout.$block);" ng-if="layout.$block.showSettings === true">
+                        <button type="button" class="btn-reset umb-outline action --settings" localize="title" title="actions_editSettings"
+                                ng-click="vm.blockEditorApi.openSettingsForBlock(layout.$block, $index);"
+                                ng-if="layout.$block.showSettings === true">
                             <i class="icon icon-settings" aria-hidden="true"></i>
                             <span class="sr-only">
                                 <localize key="general_settings">Settings</localize>
@@ -56,14 +61,12 @@
             </div>
         </div>
 
-        <button
-            ng-if="vm.loading !== true"
-            id="{{vm.model.alias}}"
-            type="button"
-            class="btn-reset umb-block-list__create-button umb-outline"
-            ng-class="{ '--disabled': vm.availableBlockTypes.length === 0 }"
-            ng-click="vm.showCreateDialog(vm.layout.length, $event)"
-        >
+        <button ng-if="vm.loading !== true"
+                id="{{vm.model.alias}}"
+                type="button"
+                class="btn-reset umb-block-list__create-button umb-outline"
+                ng-class="{ '--disabled': vm.availableBlockTypes.length === 0 }"
+                ng-click="vm.showCreateDialog(vm.layout.length, $event)">
             <localize key="grid_addElement"></localize>
         </button>
 
@@ -82,12 +85,11 @@
 
     </div>
 
-    <umb-overlay
-        ng-if="vm.blockTypePicker.show"
-        position="target"
-        size="vm.blockTypePicker.size"
-        view="vm.blockTypePicker.view"
-        model="vm.blockTypePicker">
+    <umb-overlay ng-if="vm.blockTypePicker.show"
+                 position="target"
+                 size="vm.blockTypePicker.size"
+                 view="vm.blockTypePicker.view"
+                 model="vm.blockTypePicker">
     </umb-overlay>
 
 
