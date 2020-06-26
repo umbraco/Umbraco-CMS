@@ -17,7 +17,7 @@
             bindings: {
                 view: "@",
                 block: "=",
-                api: "=",
+                api: "<",
                 index: "<"
             }
         }
