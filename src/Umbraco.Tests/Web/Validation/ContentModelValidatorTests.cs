@@ -212,21 +212,18 @@ namespace Umbraco.Tests.Web.Validation
             // assert
 
             Assert.IsFalse(isValid);
-            Assert.AreEqual(5, modelState.Keys.Count);
+            Assert.AreEqual(11, modelState.Keys.Count);
             const string complexPropertyKey = "_Properties.complex.invariant.null";
             Assert.IsTrue(modelState.Keys.Contains(complexPropertyKey));
             foreach (var state in modelState.Where(x => x.Key != complexPropertyKey))
             {
                 foreach (var error in state.Value.Errors)
                 {
-                    Assert.IsTrue(error.ErrorMessage.DetectIsJson());
-                    var json = JsonConvert.DeserializeObject<JObject>(error.ErrorMessage);
-                    Assert.IsNotEmpty(json["errorMessage"].Value<string>());
-                    Assert.AreEqual(1, json["memberNames"].Value<JArray>().Count);
+                    Assert.IsFalse(error.ErrorMessage.DetectIsJson()); // non complex is just an error message                    
                 }
             }
             var complexEditorErrors = modelState.Single(x => x.Key == complexPropertyKey).Value.Errors;
-            Assert.AreEqual(3, complexEditorErrors.Count);
+            Assert.AreEqual(1, complexEditorErrors.Count);
             var nestedError = complexEditorErrors.Single(x => x.ErrorMessage.Contains("nestedValidation"));
             var jsonNestedError = JsonConvert.DeserializeObject<JObject>(nestedError.ErrorMessage);
             Assert.AreEqual(JTokenType.Array, jsonNestedError["nestedValidation"].Type);

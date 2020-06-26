@@ -53,26 +53,14 @@ namespace Umbraco.Web
         internal static void AddPropertyError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
             ValidationResult result, string propertyAlias, string culture = "", string segment = "")
         {
-
-            var propValidationResult = new ContentPropertyValidationResult(result);
-
-            var keyParts = new[]
-            {
+            modelState.AddValidationError(
+                new ContentPropertyValidationResult(result),
                 "_Properties",
                 propertyAlias,
                 //if the culture is null, we'll add the term 'invariant' as part of the key
                 culture.IsNullOrWhiteSpace() ? "invariant" : culture,
                 // if the segment is null, we'll add the term 'null' as part of the key
-                segment.IsNullOrWhiteSpace() ? "null" : segment
-            };
-
-            var key = string.Join(".", keyParts);
-
-            modelState.AddModelError(
-                key,
-                JsonConvert.SerializeObject(
-                    propValidationResult,
-                    new ValidationResultConverter()));
+                segment.IsNullOrWhiteSpace() ? "null" : segment);
         }
 
         /// <summary>
@@ -181,12 +169,12 @@ namespace Umbraco.Web
             var delimitedParts = string.Join(".", parts);
             foreach (var memberName in result.MemberNames)
             {
-                modelState.TryAddModelError($"{delimitedParts}.{memberName}", result.ErrorMessage);
+                modelState.TryAddModelError($"{delimitedParts}.{memberName}", result.ToString());
                 withNames = true;
             }
             if (!withNames)
             {
-                modelState.TryAddModelError($"{delimitedParts}", result.ErrorMessage);
+                modelState.TryAddModelError($"{delimitedParts}", result.ToString());
             }
                 
         }
