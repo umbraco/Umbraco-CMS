@@ -20,9 +20,22 @@
 
                 <div class="umb-block-list__block" ng-class="{'--active':layout.$block.active}">
 
-                    <umb-block-list-scoped-block ng-if="layout.$block.config.stylesheet" class="umb-block-list__block--content blockelement__draggable-element" view="{{layout.$block.view}}" stylesheet="/{{::layout.$block.config.stylesheet}}" api="vm.blockEditorApi" block="layout.$block" index="$index">
+                    <umb-block-list-scoped-block
+                        ng-if="layout.$block.config.stylesheet"
+                        class="umb-block-list__block--content blockelement__draggable-element"
+                        view="{{layout.$block.view}}"
+                        stylesheet="/{{::layout.$block.config.stylesheet}}"
+                        api="vm.blockEditorApi"
+                        block="layout.$block"
+                        index="$index">
                     </umb-block-list-scoped-block>
-                    <umb-block-list-block ng-if="!layout.$block.config.stylesheet" class="umb-block-list__block--content" view="{{layout.$block.view}}" api="vm.blockEditorApi" block="layout.$block" index="$index">
+                    <umb-block-list-block
+                        ng-if="!layout.$block.config.stylesheet"
+                        class="umb-block-list__block--content"
+                        view="{{layout.$block.view}}"
+                        api="vm.blockEditorApi"
+                        block="layout.$block"
+                        index="$index">
                     </umb-block-list-block>
 
                     <div class="umb-block-list__block--actions">
