@@ -20,11 +20,11 @@ namespace Umbraco.Configuration.Models
         {
             new ImagingAutoFillUploadField
             {
-                Alias = "umbracoFile",
-                WidthFieldAlias = "umbracoWidth",
-                HeightFieldAlias ="umbracoHeight",
-                ExtensionFieldAlias = "umbracoExtension",
-                LengthFieldAlias = "umbracoBytes"
+                Alias = Constants.Conventions.Media.File,
+                WidthFieldAlias = Constants.Conventions.Media.Width,
+                HeightFieldAlias =Constants.Conventions.Media.Height,
+                ExtensionFieldAlias =Constants.Conventions.Media.Extension,
+                LengthFieldAlias =Constants.Conventions.Media.Bytes,
             }
         };
 
