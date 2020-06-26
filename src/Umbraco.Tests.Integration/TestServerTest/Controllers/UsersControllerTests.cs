@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
                 body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
                 var actual = JsonConvert.DeserializeObject<UserDisplay>(body, new JsonSerializerSettings
                 {
-                    ContractResolver = new IgnoreRequiredAttributsResolver()
+                    ContractResolver = new IgnoreRequiredAttributesResolver()
                 });
                 Assert.AreEqual(userSave.Name, actual.Name);
                 Assert.AreEqual(userSave.Id, actual.Id);
@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
              Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
              var actual = JsonConvert.DeserializeObject<PagedResult<UserBasic>>(body, new JsonSerializerSettings
              {
-                 ContractResolver = new IgnoreRequiredAttributsResolver()
+                 ContractResolver = new IgnoreRequiredAttributesResolver()
              });
              Assert.Multiple(() =>
              {
@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
              Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
              var actual = JsonConvert.DeserializeObject<PagedResult<UserBasic>>(body, new JsonSerializerSettings
              {
-                 ContractResolver = new IgnoreRequiredAttributsResolver()
+                 ContractResolver = new IgnoreRequiredAttributesResolver()
              });
              Assert.Multiple(() =>
              {
@@ -164,7 +164,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
 
             var actual = JsonConvert.DeserializeObject<ExceptionViewModel>(body, new JsonSerializerSettings
             {
-                ContractResolver = new IgnoreRequiredAttributsResolver()
+                ContractResolver = new IgnoreRequiredAttributesResolver()
             });
             Assert.Multiple(() =>
             {
@@ -197,7 +197,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             var actual = JsonConvert.DeserializeObject<SimpleNotificationModel>(body, new JsonSerializerSettings
             {
-                ContractResolver = new IgnoreRequiredAttributsResolver()
+                ContractResolver = new IgnoreRequiredAttributesResolver()
             });
 
             Assert.Multiple(() =>
@@ -243,7 +243,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             var actual = JsonConvert.DeserializeObject<SimpleNotificationModel>(body, new JsonSerializerSettings
             {
-                ContractResolver = new IgnoreRequiredAttributsResolver()
+                ContractResolver = new IgnoreRequiredAttributesResolver()
             });
 
             Assert.Multiple(() =>

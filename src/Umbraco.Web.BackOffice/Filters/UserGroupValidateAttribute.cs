@@ -23,7 +23,7 @@ namespace Umbraco.Web.BackOffice.Filters
               private readonly IUserService _userService;
               private readonly UmbracoMapper _umbracoMapper;
 
-              public UserGroupValidateFilter(
+        public UserGroupValidateFilter(
             IUserService userService,
             UmbracoMapper umbracoMapper)
         {

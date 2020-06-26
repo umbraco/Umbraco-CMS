@@ -4,7 +4,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Umbraco.Web.Common.Formatters
 {
-    public class IgnoreRequiredAttributsResolver : DefaultContractResolver
+    public class IgnoreRequiredAttributesResolver : DefaultContractResolver
     {
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {

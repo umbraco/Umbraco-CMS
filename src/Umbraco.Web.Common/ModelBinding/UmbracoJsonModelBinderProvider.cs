@@ -33,7 +33,7 @@ namespace Umbraco.Web.Common.ModelBinding
             var ss = jsonOptions.SerializerSettings; // Just use the defaults as base
 
             // We need to ignore required attributes when serializing. E.g UserSave.ChangePassword. Otherwise the model is not model bound.
-            ss.ContractResolver = new IgnoreRequiredAttributsResolver();
+            ss.ContractResolver = new IgnoreRequiredAttributesResolver();
             return new IInputFormatter[]
             {
                 new NewtonsoftJsonInputFormatter(
