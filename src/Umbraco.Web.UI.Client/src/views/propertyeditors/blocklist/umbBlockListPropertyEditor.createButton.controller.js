@@ -4,7 +4,7 @@
     angular
     .module("umbraco")
     .controller("Umbraco.PropertyEditors.BlockListPropertyEditor.CreateButtonController", 
-    function BlockListController($scope) {
+    function Controller($scope) {
         
         var vm = this;
         vm.plusPosX = 0;
