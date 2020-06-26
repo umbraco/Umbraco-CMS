@@ -277,7 +277,6 @@
 
         vm.close = function() {
             if ($scope.model && $scope.model.close) {
-                // TODO: If content has changed, we should notify user.
                 $scope.model.close($scope.model);
             }
         }
