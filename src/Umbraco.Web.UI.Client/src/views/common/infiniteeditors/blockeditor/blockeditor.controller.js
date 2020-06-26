@@ -1,4 +1,3 @@
-//used for the media picker dialog
 angular.module("umbraco")
 .controller("Umbraco.Editors.BlockEditorController",
     function ($scope, localizationService, formHelper) {
