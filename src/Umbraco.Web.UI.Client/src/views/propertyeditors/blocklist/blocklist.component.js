@@ -3,8 +3,8 @@
 
 
     /**
-     * @ngdoc component
-     * @name Umbraco.Editors.BlockList.blockListPropertyEditor
+     * @ngdoc directive
+     * @name umbraco.directives.directive:blockListPropertyEditor
      * @function
      *
      * @description
@@ -23,7 +23,8 @@
             require: {
                 umbProperty: "?^umbProperty",
                 umbVariantContent: '?^^umbVariantContent',
-                umbVariantContentEditors: '?^^umbVariantContentEditors'
+                umbVariantContentEditors: '?^^umbVariantContentEditors',
+                umbElementEditorContent: '?^^umbElementEditorContent'
             }
         });
 
@@ -407,8 +408,9 @@
             var contentNodeName = "";
             if(vm.umbVariantContent) {
                 contentNodeName = vm.umbVariantContent.editor.content.name;
+            } else if (vm.umbElementEditorContent) {
+                contentNodeName = vm.umbElementEditorContent.model.documentType.name
             }
-            // TODO: check if we are in an overlay and then lets get the Label of this block.
 
             localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function(localizedLabel) {
                 clipboardService.copyArray("elementTypeArray", aliases, elementTypesToCopy, localizedLabel, "icon-thumbnail-list", vm.model.id);

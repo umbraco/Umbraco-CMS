@@ -2,18 +2,16 @@
     "use strict";
 
     /**
-     * @ngdoc component
-     * @name Umbraco.umbBlockListScopedBlockContent
-     * @function
-     *
+     * @ngdoc directive
+     * @name umbraco.directives.directive:umbBlockListScopedBlock
      * @description
      * The component for a style-scoped block of the block list property editor.
      */
     
     angular
         .module("umbraco")
-        .component("umbBlockListScopedBlockContent", {
-            controller: BlockListScopedBlockContentController,
+        .component("umbBlockListScopedBlock", {
+            controller: BlockListScopedBlockController,
             controllerAs: "model",
             bindings: {
                 stylesheet: "@",
@@ -25,7 +23,7 @@
         }
     );
 
-    function BlockListScopedBlockContentController($compile, $element, $scope) {
+    function BlockListScopedBlockController($compile, $element, $scope) {
         var model = this;
         model.$onInit = function () {
             // Ugh, due to the way we work with angularjs and property editors not being components and needing to use ng-include,

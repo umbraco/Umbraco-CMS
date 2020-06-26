@@ -1,20 +1,18 @@
 (function () {
     "use strict";
 
-
     /**
-     * @ngdoc component
-     * @name Umbraco.umbBlockListBlockContent
-     * @function
-     *
+     * @ngdoc directive
+     * @name umbraco.directives.directive:umbBlockListBlock
      * @description
      * The component for a style-inheriting block of the block list property editor.
      */
+    
     angular
         .module("umbraco")
-        .component("umbBlockListBlockContent", {
+        .component("umbBlockListBlock", {
             template: '<div ng-include="model.view"></div>',
-            controller: BlockListBlockContentController,
+            controller: BlockListBlockController,
             controllerAs: "model",
             bindings: {
                 view: "@",
@@ -25,7 +23,7 @@
         }
     );
 
-    function BlockListBlockContentController($scope) {
+    function BlockListBlockController($scope) {
         var model = this;
         model.$onInit = function () {
             // Ugh, due to the way we work with angularjs and property editors not being components and needing to use ng-include,

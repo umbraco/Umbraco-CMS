@@ -8,21 +8,14 @@ function elementTypeResource($q, $http, umbRequestHelper) {
     return {
 
         getAll: function () {
-
-            var url = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + "/backoffice/UmbracoApi/ElementType/GetAll";
-            return umbRequestHelper.resourcePromise(
-                $http.get(url),
-                'Failed to retrieve element types'
-            );
             
-            /*
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "elementTypeApiBaseUrl",
                         "GetAll")),
-                "Failed to retrieve data");
-            */
+                "Failed to retrieve element types");
+            
         }
 
     };

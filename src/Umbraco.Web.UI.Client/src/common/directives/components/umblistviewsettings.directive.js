@@ -12,16 +12,18 @@
 
             /* ---------- INIT ---------- */ 
 
+            const setDataType = (dataType) => {
+                scope.dataType = dataType;
+                listViewPrevalueHelper.setPrevalues(dataType.preValues);
+            }
+
             const activate = () => {
 
                 if (scope.enableListView) {
 
                     dataTypeResource.getByName(scope.listViewName)
                         .then(dataType => {
-
-                            scope.dataType = dataType;
-
-                            listViewPrevalueHelper.setPrevalues(dataType.preValues);
+                            setDataType(dataType);
                             scope.customListViewCreated = checkForCustomListView();
                         });
 
@@ -64,7 +66,7 @@
                 dataTypeResource.createCustomListView(scope.modelAlias).then(dataType => {
 
                     // store data type
-                    scope.dataType = dataType;
+                    setDataType(dataType);
 
                     // set list view name on scope
                     scope.listViewName = dataType.name;
@@ -95,7 +97,7 @@
                         .then(defaultDataType => {
 
                             // store data type
-                            scope.dataType = defaultDataType;
+                            setDataType(defaultDataType);
 
                             // change state to default list view
                             scope.customListViewCreated = false;
