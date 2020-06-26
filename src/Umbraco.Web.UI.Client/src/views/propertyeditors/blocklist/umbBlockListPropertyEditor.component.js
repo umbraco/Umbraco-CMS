@@ -387,10 +387,6 @@
 
         };
 
-        function requestCopyBlock(block) {
-            clipboardService.copy("elementTypeArray", block.content.contentTypeAlias, block.content, block.label);
-        }
-
         var requestCopyAllBlocks = function() {
 
             var elementTypesToCopy = vm.layout.filter(entry => entry.$block.config.unsupported !== true).map(entry => entry.$block.content);
