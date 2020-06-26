@@ -50,8 +50,6 @@
                         }
                     });
                     
-                    // Some property editors need to performe an action after all property editors have reacted to the formSubmitting.
-                    $scope.$broadcast("postFormSubmitting", { scope: $scope });
                 }
             });
 
