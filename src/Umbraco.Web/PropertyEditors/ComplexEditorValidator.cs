@@ -72,7 +72,8 @@ namespace Umbraco.Web.PropertyEditors
                     }
 
                     // add the property results to the element type results
-                    elementTypeValidationResult.ValidationResults.Add(propValidationResult);
+                    if (propValidationResult.ValidationResults.Count > 0)
+                        elementTypeValidationResult.ValidationResults.Add(propValidationResult);
                 }
 
                 if (elementTypeValidationResult.ValidationResults.Count > 0)
@@ -86,7 +87,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             public PropertyTypeValidationModel(PropertyType propertyType, object postedValue)
             {
-                PostedValue = postedValue ?? throw new ArgumentNullException(nameof(postedValue));
+                PostedValue = postedValue;
                 PropertyType = propertyType ?? throw new ArgumentNullException(nameof(propertyType));
             }
 

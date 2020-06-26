@@ -37,7 +37,7 @@ namespace Umbraco.Core.Services
             if (dataType == null) throw new InvalidOperationException("No data type found by id " + propertyType.DataTypeId);
 
             var editor = _propertyEditors[propertyType.PropertyEditorAlias];
-            if (editor == null) throw new InvalidOperationException("No property editor found by alias " + propertyType.PropertyEditorAlias); ;
+            if (editor == null) throw new InvalidOperationException("No property editor found by alias " + propertyType.PropertyEditorAlias);
 
             return ValidatePropertyValue(_textService, editor, dataType, postedValue, propertyType.Mandatory, propertyType.ValidationRegExp, propertyType.MandatoryMessage, propertyType.ValidationRegExpMessage);
         }

@@ -255,6 +255,9 @@ namespace Umbraco.Web.PropertyEditors
             }
         }
 
+        /// <summary>
+        /// Validator for nested content to ensure that all nesting of editors is validated
+        /// </summary>
         internal class NestedContentValidator : ComplexEditorValidator
         {
             private readonly NestedContentValues _nestedContentValues;
@@ -280,6 +283,9 @@ namespace Umbraco.Web.PropertyEditors
             }
         }
 
+        /// <summary>
+        /// Used to deserialize the nested content serialized value
+        /// </summary>
         internal class NestedContentValues
         {
             private readonly Lazy<Dictionary<string, IContentType>> _contentTypes;
@@ -295,7 +301,11 @@ namespace Umbraco.Web.PropertyEditors
                 return contentType;
             }
 
-            // TODO: See note for "RowValue", luckily this is all internal as I'm pretty sure we should totally overhaul this
+            /// <summary>
+            /// Deserialize the raw json property value
+            /// </summary>
+            /// <param name="propertyValue"></param>
+            /// <returns></returns>
             public IReadOnlyList<NestedContentRowValue> GetPropertyValues(object propertyValue)
             {
                 if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
@@ -349,12 +359,18 @@ namespace Umbraco.Web.PropertyEditors
                 return rowValues;
             }
 
+            /// <summary>
+            /// Used during deserialization to populate the property value/property type of a nested content row property
+            /// </summary>
             internal class NestedContentPropertyValue
             {
                 public object Value { get; set; }
                 public PropertyType PropertyType { get; set; }
             }
 
+            /// <summary>
+            /// Used to deserialize a nested content row
+            /// </summary>
             internal class NestedContentRowValue
             {
                 [JsonProperty("name")]
@@ -375,42 +391,12 @@ namespace Umbraco.Web.PropertyEditors
                 [JsonExtensionData]
                 public IDictionary<string, object> RawPropertyValues { get; set; }
 
+                /// <summary>
+                /// Used during deserialization to convert the raw property data into data with a property type context
+                /// </summary>
                 [JsonIgnore]
                 public IDictionary<string, NestedContentPropertyValue> PropertyValues { get; set; } = new Dictionary<string, NestedContentPropertyValue>();
             }
-
-            //// TODO: This is a very odd class, it represents one 'row' of json per value of an NC item. It is a total
-            //// waste of data and the JsonRowValue string value is copied (i think for each 'row'), need to revisit this and make sure it makes sense.
-            //internal class RowValue
-            //{
-            //    public RowValue(string propKey, PropertyType propType, JObject propValues, int index)
-            //    {
-            //        PropKey = propKey ?? throw new ArgumentNullException(nameof(propKey));
-            //        PropType = propType;
-            //        JsonRowValue = propValues ?? throw new ArgumentNullException(nameof(propValues));
-            //        RowIndex = index;
-            //    }
-
-            //    /// <summary>
-            //    /// The current property key being iterated for the row value
-            //    /// </summary>
-            //    public string PropKey { get; }
-
-            //    /// <summary>
-            //    /// The <see cref="PropertyType"/> of the value (if any), this may be null
-            //    /// </summary>
-            //    public PropertyType PropType { get; }
-
-            //    /// <summary>
-            //    /// The json values for the current row
-            //    /// </summary>
-            //    public JObject JsonRowValue { get; }
-
-            //    /// <summary>
-            //    /// The Nested Content row index
-            //    /// </summary>
-            //    public int RowIndex { get; }
-            //}
         }
 
         #endregion

@@ -23,44 +23,12 @@ namespace Umbraco.Web.PropertyEditors
     public class BlockListPropertyEditor : BlockEditorPropertyEditor
     {
         public BlockListPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService localizedTextService)
-            : base(logger, propertyEditors, dataTypeService, contentTypeService, new DataHelper(), localizedTextService)
+            : base(logger, propertyEditors, dataTypeService, contentTypeService, localizedTextService)
         { }
 
         #region Pre Value Editor
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new BlockListConfigurationEditor();
-
-        #endregion
-
-        #region IBlockEditorDataHelper
-
-        // TODO: Rename this we don't want to use the name "Helper"
-        private class DataHelper : IBlockEditorDataHelper
-        {
-            public IEnumerable<IBlockReference> GetBlockReferences(JObject layout)
-            {
-                if (!(layout?[Constants.PropertyEditors.Aliases.BlockList] is JArray blLayouts))
-                    yield break;
-
-                foreach (var blLayout in blLayouts)
-                {
-                    if (!(blLayout is JObject blockRef) || !(blockRef[UdiPropertyKey] is JValue udiRef) || udiRef.Type != JTokenType.String || !Udi.TryParse(udiRef.ToString(), out var udi)) continue;
-                    yield return new SimpleRef(udi);
-                }
-            }
-
-            public bool IsEditorSpecificPropertyKey(string propertyKey) => false;
-
-            private class SimpleRef : IBlockReference
-            {
-                public SimpleRef(Udi udi)
-                {
-                    Udi = udi;
-                }
-
-                public Udi Udi { get; }
-            }
-        }
 
         #endregion
     }

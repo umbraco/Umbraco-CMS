@@ -165,7 +165,7 @@ namespace Umbraco.Tests.PropertyEditors
             Assert.AreEqual(0, converted.Layout.Count());
 
             json = @"{
-layout: [],
+layout: {},
 data: []}";
             converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
