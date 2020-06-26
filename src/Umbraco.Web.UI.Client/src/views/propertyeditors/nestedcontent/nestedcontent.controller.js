@@ -480,7 +480,8 @@
         var notSupported = [
             "Umbraco.Tags",
             "Umbraco.UploadField",
-            "Umbraco.ImageCropper"
+            "Umbraco.ImageCropper",
+            "Umbraco.BlockList"
         ];
 
         // Initialize
