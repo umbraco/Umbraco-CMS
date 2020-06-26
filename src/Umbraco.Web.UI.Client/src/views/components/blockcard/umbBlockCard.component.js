@@ -4,7 +4,7 @@
     angular
         .module("umbraco")
         .component("umbBlockCard", {
-            templateUrl: "views/components/blockcard/umb-block-card.component.html",
+            templateUrl: "views/components/blockcard/umb-block-card.html",
             controller: BlockCardController,
             controllerAs: "vm",
             transclude: true,
