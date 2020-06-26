@@ -23,7 +23,7 @@ namespace Umbraco.Web.BackOffice.ModelBinders
     ///     normal json formatter will not figure this out.
     ///     This would also let you bind sub levels of the JSON being sent up too if you wanted with any jsonpath
     /// </remarks>
-    internal class FromJsonPathAttribute : ModelBinderAttribute
+    public class FromJsonPathAttribute : ModelBinderAttribute
     {
         public FromJsonPathAttribute() : base(typeof(JsonPathBinder))
         {
@@ -40,7 +40,7 @@ namespace Umbraco.Web.BackOffice.ModelBinders
                 }
 
 
-                var strJson =  bindingContext.HttpContext.Request.GetRawBodyString();
+                var strJson =  await bindingContext.HttpContext.Request.GetRawBodyStringAsync();
 
 
                 if (string.IsNullOrWhiteSpace(strJson))
