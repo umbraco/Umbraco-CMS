@@ -3,8 +3,7 @@ angular.module("umbraco")
     function ($scope, localizationService, formHelper) {
         var vm = this;
 
-        vm.content = $scope.model.content;
-        vm.settings = $scope.model.settings;
+        vm.model = $scope.model;
 
         localizationService.localizeMany([
             $scope.model.liveEditing ? "prompt_discardChanges" : "general_close",
@@ -14,13 +13,12 @@ angular.module("umbraco")
             vm.submitLabel = data[1];
         });
 
-        vm.model = $scope.model;
 
         vm.tabs = [];
 
-        if (vm.content && vm.content.variants) {
+        if ($scope.model.content && $scope.model.content.variants) {
 
-            var apps = vm.content.apps;
+            var apps = $scope.model.content.apps;
 
             vm.tabs = apps;
 
@@ -41,7 +39,7 @@ angular.module("umbraco")
 
         }
 
-        if (vm.settings && vm.settings.variants) {
+        if ($scope.model.settings && $scope.model.settings.variants) {
             localizationService.localize("blockEditor_tabBlockSettings").then(
                 function (settingsName) {
                     var settingsTab = {
