@@ -11,7 +11,7 @@
 
             /**
              * @ngdoc method
-             * @name umbraco.services.udiService#parse
+             * @name umbraco.services.udiService#create
              * @methodOf umbraco.services.udiService
              * @function
              *
