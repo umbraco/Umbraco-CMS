@@ -10,7 +10,9 @@
 (function () {
     "use strict";
 
-    function BlockConfigurationOverlayController($scope, overlayService, localizationService, editorService, elementTypeResource) {
+    function BlockConfigurationOverlayController($scope, overlayService, localizationService, editorService, elementTypeResource, eventsService) {
+
+        var unsubscribe = [];
 
         var vm = this;
         vm.block = $scope.model.block;
@@ -20,11 +22,14 @@
         function loadElementTypes() {
             return elementTypeResource.getAll().then(function (elementTypes) {
                 vm.elementTypes = elementTypes;
+
+                vm.contentPreview = vm.getElementTypeByKey(vm.block.contentTypeKey);
+                vm.settingsPreview = vm.getElementTypeByKey(vm.block.settingsElementTypeKey);
             });
         }
 
         vm.getElementTypeByKey = function(key) {
-            return _.find(vm.elementTypes, function (type) {
+            return vm.elementTypes.find(function (type) {
                 return type.key === key;
             });
         };
@@ -34,7 +39,6 @@
             const editor = {
                 id: elementTypeId,
                 submit: function (model) {
-                    loadElementTypes();
                     editorService.close();
                 },
                 close: function () {
@@ -50,9 +54,7 @@
                 infiniteMode: true,
                 isElement: true,
                 submit: function (model) {
-                    loadElementTypes().then( function () {
-                        callback(model.documentTypeKey);
-                    });
+                    callback(model.documentTypeKey);
                     editorService.close();
                 },
                 close: function () {
@@ -123,6 +125,26 @@
         };
 
 
+        function updateUsedElementTypes(event, args) {
+            var key = args.documentType.key;
+            for (var i = 0; i<vm.elementTypes.length; i++) {
+                if (vm.elementTypes[i].key === key) {
+                    vm.elementTypes[i] = args.documentType;
+                }
+            }
+            if (vm.contentPreview.key === key) {
+                vm.contentPreview = args.documentType;
+                $scope.$evalAsync();
+            }
+            if (vm.settingsPreview.key === key) {
+                vm.settingsPreview = args.documentType;
+                $scope.$evalAsync();
+            }
+
+        }
+        unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
+
+
         vm.addViewForBlock = function(block) {
             localizationService.localize("blockEditor_headlineSelectView").then(function(localizedTitle) {
 
@@ -132,8 +154,10 @@
                     treeAlias: "files",
                     entityType: "file",
                     isDialog: true,
+                    filter: function (i) {
+                        return !(i.name.indexOf(".html") !== -1);
+                    },
                     select: function (node) {
-                        console.log(node)
                         const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
                         block.view = filepath;
                         editorService.close();
@@ -176,6 +200,9 @@
                     treeAlias: "files",
                     entityType: "file",
                     isDialog: true,
+                    filter: function (i) {
+                        return !(i.name.indexOf(".css") !== -1);
+                    },
                     select: function (node) {
                         const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
                         block.stylesheet = filepath;
@@ -254,6 +281,10 @@
                 $scope.model.close($scope.model);
             }
         }
+
+        $scope.$on('$destroy', function () {
+            unsubscribe.forEach(u => { u(); });
+        });
 
     }
 
