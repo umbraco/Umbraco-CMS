@@ -28,7 +28,7 @@ angular.module("umbraco")
             // replace view of content app.
             var contentApp = apps.find(entry => entry.alias === "umbContent");
             if(contentApp) {
-                contentApp.view = "views/common/infiniteeditors/elementeditor/elementeditor.content.html";
+                contentApp.view = "views/common/infiniteeditors/blockeditor/blockeditor.content.html";
                 if($scope.model.hideContent) {
                     apps.splice(apps.indexOf(contentApp), 1);
                 } else if ($scope.model.openSettings !== true) {
@@ -49,7 +49,7 @@ angular.module("umbraco")
                         "name": settingsName,
                         "alias": "settings",
                         "icon": "icon-settings",
-                        "view": "views/common/infiniteeditors/elementeditor/elementeditor.settings.html"
+                        "view": "views/common/infiniteeditors/blockeditor/blockeditor.settings.html"
                     };
                     vm.tabs.push(settingsTab);
                     if ($scope.model.openSettings) {
@@ -69,7 +69,7 @@ angular.module("umbraco")
 
         vm.close = function() {
             if ($scope.model && $scope.model.close) {
-                // TODO: If content has changed, we should notify user.
+                // TODO: check if content/settings has changed and ask user if they are sure.
                 $scope.model.close($scope.model);
             }
         }

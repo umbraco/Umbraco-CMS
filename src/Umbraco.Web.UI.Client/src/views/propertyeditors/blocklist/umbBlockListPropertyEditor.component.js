@@ -4,7 +4,7 @@
 
     /**
      * @ngdoc directive
-     * @name umbraco.directives.directive:blockListPropertyEditor
+     * @name umbraco.directives.directive:umbBlockListPropertyEditor
      * @function
      *
      * @description
@@ -12,8 +12,8 @@
      */
     angular
         .module("umbraco")
-        .component("blockListPropertyEditor", {
-            templateUrl: "views/propertyeditors/blocklist/blocklist.component.html",
+        .component("umbBlockListPropertyEditor", {
+            templateUrl: "views/propertyeditors/blocklist/umb-block-list-property-editor.html",
             controller: BlockListController,
             controllerAs: "vm",
             bindings: {

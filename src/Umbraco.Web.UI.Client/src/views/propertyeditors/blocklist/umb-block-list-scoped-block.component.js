@@ -6,6 +6,8 @@
      * @name umbraco.directives.directive:umbBlockListScopedBlock
      * @description
      * The component for a style-scoped block of the block list property editor.
+     * Uses a ShadowDom to make a scoped element.
+     * This way the backoffice styling does not collide with the block style.
      */
     
     angular
