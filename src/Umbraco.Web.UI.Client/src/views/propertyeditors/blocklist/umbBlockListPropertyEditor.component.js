@@ -408,7 +408,7 @@
                 clipboardService.copyArray("elementTypeArray", aliases, elementTypesToCopy, localizedLabel, "icon-thumbnail-list", vm.model.id);
             });
         }
-        function requestCopyBlock(block) {
+        function copyBlock(block) {
             clipboardService.copy("elementType", block.content.contentTypeAlias, block.content, block.label);
         }
         function requestPasteFromClipboard(index, pasteEntry) {
@@ -481,7 +481,7 @@
 
         vm.blockEditorApi = {
             editBlock: editBlock,
-            requestCopyBlock: requestCopyBlock,
+            copyBlock: copyBlock,
             requestDeleteBlock: requestDeleteBlock,
             deleteBlock: deleteBlock,
             openSettingsForBlock: openSettingsForBlock

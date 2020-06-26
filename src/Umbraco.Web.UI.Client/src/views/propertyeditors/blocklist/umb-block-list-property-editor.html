@@ -32,7 +32,7 @@
                                 <localize key="general_settings">Settings</localize>
                             </span>
                         </button>
-                        <button type="button" class="btn-reset umb-outline action --copy" localize="title" title="actions_copy" ng-click="vm.blockEditorApi.requestCopyBlock(layout.$block);" ng-if="layout.$block.showCopy === true">
+                        <button type="button" class="btn-reset umb-outline action --copy" localize="title" title="actions_copy" ng-click="vm.blockEditorApi.copyBlock(layout.$block);" ng-if="layout.$block.showCopy === true">
                             <i class="icon icon-documents" aria-hidden="true"></i>
                             <span class="sr-only">
                                 <localize key="general_copy">Copy</localize>
