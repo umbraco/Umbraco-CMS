@@ -36,7 +36,6 @@ namespace Umbraco.Web.BackOffice.Runtime
             composition.Trees()
                 .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
 
-
             composition.ComposeWebMappingProfiles();
 
             composition.RegisterUniqueFor<IFileSystem, FilesTreeController>(factory =>

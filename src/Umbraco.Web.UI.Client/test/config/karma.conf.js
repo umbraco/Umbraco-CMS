@@ -10,6 +10,9 @@ module.exports = function (config) {
         // list of files / patterns to load in the browser
         files: [
 
+            // Jasmine plugins
+            'node_modules/jasmine-promise-matchers/dist/jasmine-promise-matchers.js',
+            
             //libraries
             'node_modules/jquery/dist/jquery.min.js',
             'node_modules/angular/angular.js',
@@ -98,7 +101,14 @@ module.exports = function (config) {
         // - PhantomJS
         // - IE (only Windows)
         // CLI --browsers Chrome,Firefox,Safari
-        browsers: ['PhantomJS'],
+        browsers: ['ChromeHeadless'],
+
+        customLaunchers: {
+            ChromeDebugging: {
+                base: 'Chrome',
+                flags: ['--remote-debugging-port=9333']
+            }
+        },
 
         // allow waiting a bit longer, some machines require this
 
@@ -115,6 +125,7 @@ module.exports = function (config) {
         plugins: [
             require('karma-jasmine'),
             require('karma-phantomjs-launcher'),
+            require('karma-chrome-launcher'),
             require('karma-junit-reporter'),
             require('karma-spec-reporter')
 
