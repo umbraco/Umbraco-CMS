@@ -96,6 +96,15 @@ namespace Umbraco.Core.Templates
             return RenderMacro(content, alias, parameters);
         }
 
+
+        public IHtmlEncodedString RenderMacroForContent(IPublishedContent content, string alias, IDictionary<string, object> parameters)
+        {
+            if(content == null)
+                throw new InvalidOperationException("Cannot render a macro, IPublishedContent is null");
+
+            return RenderMacro(content, alias, parameters);
+        }
+
         /// <summary>
         /// Renders the macro with the specified alias, passing in the specified parameters.
         /// </summary>
