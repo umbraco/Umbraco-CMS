@@ -78,10 +78,6 @@ namespace Umbraco.Web.Runtime
 
             // register preview SignalR hub
             composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>());
-
-
-
-
         }
     }
 }

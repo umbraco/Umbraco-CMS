@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.ContentApps;
@@ -59,7 +60,7 @@ namespace Umbraco.Web.Models.Mapping
             return null;
         }
 
-        public IEnumerable<ContentApp> GetContentApps(IContentBase source)
+        public IEnumerable<ContentApp> GetContentApps(IUmbracoEntity source)
         {
             var apps = _contentAppDefinitions.GetContentAppsFor(source).ToArray();
 

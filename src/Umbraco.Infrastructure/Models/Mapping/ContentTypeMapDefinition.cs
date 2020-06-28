@@ -21,6 +21,7 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     public class ContentTypeMapDefinition : IMapDefinition
     {
+        private readonly CommonMapper _commonMapper;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
         private readonly IFileService _fileService;
@@ -33,10 +34,11 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IHostingEnvironment _hostingEnvironment;
 
 
-        public ContentTypeMapDefinition(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService,
+        public ContentTypeMapDefinition(CommonMapper commonMapper, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService,
             IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService,
             ILogger logger, IShortStringHelper shortStringHelper, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
+            _commonMapper = commonMapper;
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
             _fileService = fileService;
@@ -133,6 +135,7 @@ namespace Umbraco.Web.Models.Mapping
 
             target.AllowCultureVariant = source.VariesByCulture();
             target.AllowSegmentVariant = source.VariesBySegment();
+            target.ContentApps = _commonMapper.GetContentApps(source);
 
             //sync templates
             target.AllowedTemplates = context.MapEnumerable<ITemplate, EntityBasic>(source.AllowedTemplates);
