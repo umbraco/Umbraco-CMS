@@ -17,7 +17,9 @@ namespace Umbraco.Web
         /// HTML encodes the text and replaces text line breaks with HTML line breaks.
         /// </summary>
         /// <param name="text">The text.</param>
-        /// <returns>The HTML encoded text with text line breaks replaced with HTML line breaks (<c>&lt;br /&gt;</c>).</returns>
+        /// <returns>
+        /// The HTML encoded text with text line breaks replaced with HTML line breaks (<c>&lt;br /&gt;</c>).
+        /// </returns>
         public IHtmlString ReplaceLineBreaks(string text)
         {
             var value = HttpUtility.HtmlEncode(text)?

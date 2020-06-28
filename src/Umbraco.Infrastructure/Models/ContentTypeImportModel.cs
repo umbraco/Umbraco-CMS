@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Editors;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models
 {
     [DataContract(Name = "contentTypeImportModel")]
-    public class ContentTypeImportModel : INotificationModel, IHaveUploadedFiles
+    public class ContentTypeImportModel : INotificationModel
     {
         [DataMember(Name = "alias")]
         public string Alias { get; set; }
@@ -19,7 +18,5 @@ namespace Umbraco.Web.Models
 
         [DataMember(Name = "tempFileName")]
         public string TempFileName { get; set; }
-
-        public List<ContentPropertyFile> UploadedFiles => new List<ContentPropertyFile>();
     }
 }

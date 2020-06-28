@@ -285,7 +285,11 @@ namespace Umbraco.Core.Runtime
             composition.ContentApps()
                 .Append<ListViewContentAppFactory>()
                 .Append<ContentEditorContentAppFactory>()
-                .Append<ContentInfoContentAppFactory>();
+                .Append<ContentInfoContentAppFactory>()
+                .Append<ContentTypeDesignContentAppFactory>()
+                .Append<ContentTypeListViewContentAppFactory>()
+                .Append<ContentTypePermissionsContentAppFactory>()
+                .Append<ContentTypeTemplatesContentAppFactory>();
 
             // register published router
             composition.RegisterUnique<IPublishedRouter, PublishedRouter>();

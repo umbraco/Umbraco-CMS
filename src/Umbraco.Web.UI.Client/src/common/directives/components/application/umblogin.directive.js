@@ -274,6 +274,7 @@
             vm.showEmailResetConfirmation = false;
 
             if (vm.requestPasswordResetForm.$invalid) {
+                vm.errorMsg = 'Email address cannot be empty';
                 return;
             }
 

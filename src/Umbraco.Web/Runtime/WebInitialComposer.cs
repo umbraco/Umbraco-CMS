@@ -119,6 +119,7 @@ namespace Umbraco.Web.Runtime
             // register preview SignalR hub
             composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>());
 
+
             // register back office trees
             // the collection builder only accepts types inheriting from TreeControllerBase
             // and will filter out those that are not attributed with TreeAttribute

@@ -19,6 +19,31 @@ function ItemPickerOverlay($scope, localizationService) {
         $scope.submitForm($scope.model);
     };
 
+    $scope.tooltip = {
+        show: false,
+        event: null
+    };
+
+    $scope.showTooltip = function(item, $event) {
+        if (!item.tooltip) {
+            $scope.mouseLeave();
+            return;
+        }
+        $scope.tooltip = {
+            show: true,
+            event: $event,
+            text: item.tooltip
+        };
+    }
+
+    $scope.hideTooltip = function () {
+        $scope.tooltip = {
+            show: false,
+            event: null,
+            text: null
+        };
+    }
+
     onInit();
 
 }
