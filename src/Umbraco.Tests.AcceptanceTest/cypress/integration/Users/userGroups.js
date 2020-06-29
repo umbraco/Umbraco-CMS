@@ -1,4 +1,3 @@
-
 context('User Groups', () => {
 
   beforeEach(() => {
