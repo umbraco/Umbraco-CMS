@@ -51,13 +51,13 @@
 
                               <umb-control-group label="@general_width">
                                  <div class="grid-size-scaler">
-                                      <a href ng-click="scaleDown(currentSection)">
-                                          <i class="icon icon-remove"></i>
-                                      </a>
-                                          {{currentSection.grid}}
-                                      <a href ng-click="scaleUp(currentSection, availableLayoutSpace)">
-                                          <i class="icon icon-add"></i>
-                                      </a>
+                                      <button type="button" class="btn-link" ng-click="scaleDown(currentSection)">
+                                          <i class="icon icon-remove" aria-hidden="true"></i>
+                                      </button>
+                                      <span>{{currentSection.grid}}</span>
+                                      <button type="button" class="btn-link" ng-click="scaleUp(currentSection, availableLayoutSpace)">
+                                          <i class="icon icon-add" aria-hidden="true"></i>
+                                      </button>
                                  </div>
                               </umb-control-group>
 
