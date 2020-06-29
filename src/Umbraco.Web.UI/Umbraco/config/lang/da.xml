@@ -1819,4 +1819,36 @@ Mange hilsner fra Umbraco robotten
   <area alias="propertyActions">
     <key alias="tooltipForPropertyActionsMenu">Åben egenskabshandlinger</key>
   </area>
+  <area alias="blockEditor">
+    <key alias="headlineCreateBlock">Opret ny blok</key>
+    <key alias="headlineAddSettingsElementType">Tilføj en indstillings afsnit</key>
+    <key alias="headlineAddCustomView">Tilføj visning</key>
+    <key alias="headlineAddCustomStylesheet">Tilføj stylesheet</key>
+    <key alias="headlineAddThumbnail">Vælg billede</key>
+    <key alias="labelcreateNewElementType">Opret ny</key>
+    <key alias="labelCustomStylesheet">Overskriv stylesheet</key>
+    <key alias="addCustomStylesheet">Tilføj stylesheet</key>
+    <key alias="headlineEditorAppearance">Redigerings udseende</key>
+    <key alias="headlineDataModels">Data modeller</key>
+    <key alias="headlineCatalogueAppearance">katalog udseende</key>
+    <key alias="labelBackgroundColor">Baggrunds farve</key>
+    <key alias="labelIconColor">Ikon farve</key>
+    <key alias="labelContentElementType">Indholds model</key>
+    <key alias="labelLabelTemplate">Label</key>
+    <key alias="labelCustomView">Speciel visning</key>
+    <key alias="labelSettingsElementType">Indstillings model</key>
+    <key alias="labelEditorSize">Rederings lagets størrelse</key>
+    <key alias="addCustomView">Tilføj speciel visning</key>
+    <key alias="addSettingsElementType">Tilføj instillinger</key>
+    <key alias="labelTemplatePlaceholder">Overskriv label form</key>
+    <key alias="confirmDeleteBlockMessage"><![CDATA[Er du sikker på at du vil slette denne blog: <strong>%0%</strong>.]]></key>
+    <key alias="confirmDeleteBlockNotice">Indhold der benytter sig af denne blog vil gå bort.</key>
+    <key alias="blockConfigurationOverlayTitle"><![CDATA[Konfiguration af '%0%']]></key>
+    <key alias="thumbnail">Billede</key>
+    <key alias="addThumbnail">Tilføj billede</key>
+    <key alias="tabCreateEmpty">Opret ny</key>
+    <key alias="tabClipboard">Udklipsholder</key>
+    <key alias="tabBlockSettings">Indstillinger</key>
+  </area>
+
 </language>
