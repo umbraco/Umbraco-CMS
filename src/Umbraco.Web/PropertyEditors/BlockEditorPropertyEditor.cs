@@ -98,7 +98,7 @@ namespace Umbraco.Web.PropertyEditors
             {
                 foreach (var row in _blockEditorValues.GetPropertyValues(value))
                 {
-                    var elementValidation = new ElementTypeValidationModel(row.ContentTypeAlias);
+                    var elementValidation = new ElementTypeValidationModel(row.ContentTypeAlias, row.Id);
                     foreach (var prop in row.PropertyValues)
                     {
                         elementValidation.AddPropertyTypeValidation(
@@ -174,7 +174,8 @@ namespace Umbraco.Web.PropertyEditors
                     result.Add(new BlockValue
                     {
                         ContentTypeAlias = contentType.Alias,
-                        PropertyValues = propValues
+                        PropertyValues = propValues,
+                        Id = ((GuidUdi)block.Udi).Guid
                     });
                 }
 
@@ -195,6 +196,7 @@ namespace Umbraco.Web.PropertyEditors
             /// </summary>
             internal class BlockValue
             {
+                public Guid Id { get; set; }
                 public string ContentTypeAlias { get; set; }
                 public IDictionary<string, BlockPropertyValue> PropertyValues { get; set; } = new Dictionary<string, BlockPropertyValue>();
             }

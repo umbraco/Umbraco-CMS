@@ -42,9 +42,9 @@ namespace Umbraco.Web
         {
             return state.Where(v => v.Key.StartsWith(prefix + ".")).All(v => !v.Value.Errors.Any());
         }
-        
+
         /// <summary>
-        /// Adds the error to model state correctly for a property so we can use it on the client side.
+        /// Adds an <see cref="ContentPropertyValidationResult"/> error to model state for a property so we can use it on the client side.
         /// </summary>
         /// <param name="modelState"></param>
         /// <param name="result"></param>
@@ -53,8 +53,22 @@ namespace Umbraco.Web
         internal static void AddPropertyError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
             ValidationResult result, string propertyAlias, string culture = "", string segment = "")
         {
+            modelState.AddPropertyValidationError(new ContentPropertyValidationResult(result), propertyAlias, culture, segment);
+        }
+
+        /// <summary>
+        /// Adds the <see cref="ValidationResult"/> to the model state with the appropriate keys for property errors
+        /// </summary>
+        /// <param name="modelState"></param>
+        /// <param name="result"></param>
+        /// <param name="propertyAlias"></param>
+        /// <param name="culture"></param>
+        /// <param name="segment"></param>
+        internal static void AddPropertyValidationError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
+            ValidationResult result, string propertyAlias, string culture = "", string segment = "")
+        {
             modelState.AddValidationError(
-                new ContentPropertyValidationResult(result),
+                result,
                 "_Properties",
                 propertyAlias,
                 //if the culture is null, we'll add the term 'invariant' as part of the key

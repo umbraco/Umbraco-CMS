@@ -4,6 +4,7 @@ using Newtonsoft.Json.Serialization;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Web.Http.ModelBinding;
 using Umbraco.Core;
 
 namespace Umbraco.Web.PropertyEditors.Validation
@@ -38,36 +39,64 @@ namespace Umbraco.Web.PropertyEditors.Validation
 
             if (validationResult is ComplexEditorValidationResult nestedResult && nestedResult.ValidationResults.Count > 0)
             {
-                // TODO: Change to the new validation structure
-
-
-                var jo = new JObject();
-                // recurse to write out an array of ValidationResultCollection
-                var obj = JArray.FromObject(nestedResult.ValidationResults, camelCaseSerializer);
-                jo.Add("nestedValidation", obj);
-                jo.WriteTo(writer);
+                var ja = new JArray();
+                foreach(var nested in nestedResult.ValidationResults)
+                {
+                    // recurse to write out the ComplexEditorElementTypeValidationResult
+                    var block = JObject.FromObject(nested, camelCaseSerializer);
+                    ja.Add(block);
+                }
+                if (nestedResult.ValidationResults.Count > 0)
+                {
+                    ja.WriteTo(writer);
+                }
             }
             else if (validationResult is ComplexEditorElementTypeValidationResult elementTypeValidationResult && elementTypeValidationResult.ValidationResults.Count > 0)
             {
-                var joElementType = new JObject();
-                var joPropertyType = new JObject();
+                var joElementType = new JObject
+                {
+                    { "$id", elementTypeValidationResult.BlockId },
+                    { "$elementTypeAlias", elementTypeValidationResult.ElementTypeAlias }
+                };
+
+                var modelState = new ModelStateDictionary();
+
                 // loop over property validations
                 foreach (var propTypeResult in elementTypeValidationResult.ValidationResults)
                 {
-
-                    // TODO: I think here we could do the ModelState thing? instead of recursing? We'd just have to
-                    // not recurse if it was the exact type of the base class ValidationResult and build up the ModelState values
-                    var ja = new JArray();
-                    foreach (var result in propTypeResult.ValidationResults)
+                    // group the results by their type and iterate the groups
+                    foreach (var result in propTypeResult.ValidationResults.GroupBy(x => x.GetType()))
                     {
-                        // recurse to get the validation result object and add to the array
-                        var obj = JObject.FromObject(result, camelCaseSerializer);
-                        ja.Add(obj);
+                        // if the group's type isn't ComplexEditorValidationResult then it will in 99% of cases be
+                        // just ValidationResult for whcih we want to create the sub "ModelState" data. If it's not a normal
+                        // ValidationResult it will still just be converted to normal ModelState.
+
+                        if (result.Key == typeof(ComplexEditorValidationResult))
+                        {
+                            // if it's ComplexEditorValidationResult then there can only be one which is validated so just get the single
+                            if (result.Any())
+                            {
+                                var complexResult = result.Single();
+                                // recurse to get the validation result object 
+                                var obj = JToken.FromObject(complexResult, camelCaseSerializer);
+                                joElementType.Add(propTypeResult.PropertyTypeAlias, obj);
+                            }
+                        }
+                        else
+                        {
+                            foreach (var v in result)
+                            {
+                                modelState.AddPropertyValidationError(v, propTypeResult.PropertyTypeAlias);
+                            }
+                        }
                     }
-                    // create a dictionary entry 
-                    joPropertyType.Add(propTypeResult.PropertyTypeAlias, ja);
                 }
-                joElementType.Add(elementTypeValidationResult.ElementTypeAlias, joPropertyType);
+
+                if (modelState.Count > 0)
+                {
+                    joElementType.Add("ModelState", JObject.FromObject(modelState.ToErrorDictionary()));
+                }
+
                 joElementType.WriteTo(writer);
             }
             else 

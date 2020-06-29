@@ -59,7 +59,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             foreach (var row in elements)
             {
-                var elementTypeValidationResult = new ComplexEditorElementTypeValidationResult(row.ElementTypeAlias);
+                var elementTypeValidationResult = new ComplexEditorElementTypeValidationResult(row.ElementTypeAlias, row.Id);
 
                 foreach (var prop in row.PropertyTypeValidation)
                 {
@@ -68,7 +68,7 @@ namespace Umbraco.Web.PropertyEditors
                     foreach (var validationResult in _propertyValidationService.ValidatePropertyValue(prop.PropertyType, prop.PostedValue))
                     {
                         // add the result to the property results
-                        propValidationResult.ValidationResults.Add(validationResult);
+                        propValidationResult.AddValidationResult(validationResult);
                     }
 
                     // add the property results to the element type results
@@ -97,9 +97,10 @@ namespace Umbraco.Web.PropertyEditors
 
         public class ElementTypeValidationModel
         {
-            public ElementTypeValidationModel(string elementTypeAlias)
+            public ElementTypeValidationModel(string elementTypeAlias, Guid id)
             {
                 ElementTypeAlias = elementTypeAlias;
+                Id = id;
             }
 
             private List<PropertyTypeValidationModel> _list = new List<PropertyTypeValidationModel>();
@@ -107,6 +108,7 @@ namespace Umbraco.Web.PropertyEditors
             public IEnumerable<PropertyTypeValidationModel> PropertyTypeValidation => _list;
 
             public string ElementTypeAlias { get; }
+            public Guid Id { get; }
 
             public void AddPropertyTypeValidation(PropertyTypeValidationModel propValidation) => _list.Add(propValidation);
         }

@@ -272,7 +272,7 @@ namespace Umbraco.Web.PropertyEditors
             {
                 foreach (var row in _nestedContentValues.GetPropertyValues(value))
                 {
-                    var elementValidation = new ElementTypeValidationModel(row.ContentTypeAlias);
+                    var elementValidation = new ElementTypeValidationModel(row.ContentTypeAlias, row.Id);
                     foreach (var prop in row.PropertyValues)
                     {
                         elementValidation.AddPropertyTypeValidation(
@@ -373,6 +373,9 @@ namespace Umbraco.Web.PropertyEditors
             /// </summary>
             internal class NestedContentRowValue
             {
+                [JsonProperty("key")]
+                public Guid Id{ get; set; }
+
                 [JsonProperty("name")]
                 public string Name { get; set; }
 

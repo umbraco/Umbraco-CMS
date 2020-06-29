@@ -95,35 +95,84 @@ namespace Umbraco.Tests.Web.Validation
         }
 
         [Test]
-        public void TestSerializer()
+        public void Test_Serializer()
         {
             var nestedLevel2 = new ComplexEditorValidationResult();
-            var elementTypeResult2 = new ComplexEditorElementTypeValidationResult("type2");
-            var propertyTypeResult2 = new ComplexEditorPropertyTypeValidationResult("prop2");
-            propertyTypeResult2.ValidationResults.Add(new ValidationResult("error2-1", new[] { "level2" }));
-            propertyTypeResult2.ValidationResults.Add(new ValidationResult("error2-2", new[] { "level2" }));
-            elementTypeResult2.ValidationResults.Add(propertyTypeResult2);
-            nestedLevel2.ValidationResults.Add(elementTypeResult2);
+            var id1 = Guid.NewGuid();
+            var addressInfoElementTypeResult = new ComplexEditorElementTypeValidationResult("addressInfo", id1);
+            var cityPropertyTypeResult = new ComplexEditorPropertyTypeValidationResult("city");
+            cityPropertyTypeResult.AddValidationResult(new ValidationResult("City is invalid"));
+            cityPropertyTypeResult.AddValidationResult(new ValidationResult("City cannot be empty"));
+            cityPropertyTypeResult.AddValidationResult(new ValidationResult("City is not in Australia", new[] { "country" }));
+            cityPropertyTypeResult.AddValidationResult(new ValidationResult("Not a capital city", new[] { "capital" }));
+            addressInfoElementTypeResult.ValidationResults.Add(cityPropertyTypeResult);
+            nestedLevel2.ValidationResults.Add(addressInfoElementTypeResult);
 
             var nestedLevel1 = new ComplexEditorValidationResult();
-            var elementTypeResult1 = new ComplexEditorElementTypeValidationResult("type1");
-            var propertyTypeResult1 = new ComplexEditorPropertyTypeValidationResult("prop1");
-            propertyTypeResult1.ValidationResults.Add(new ValidationResult("error1-1", new[] { "level1" }));
-            propertyTypeResult1.ValidationResults.Add(nestedLevel2); // This is a nested result within the level 1
-            elementTypeResult1.ValidationResults.Add(propertyTypeResult1);
-            nestedLevel1.ValidationResults.Add(elementTypeResult1);
+            var id2 = Guid.NewGuid();
+            var addressBookElementTypeResult = new ComplexEditorElementTypeValidationResult("addressBook", id2);
+            var addressesPropertyTypeResult = new ComplexEditorPropertyTypeValidationResult("addresses");
+            addressesPropertyTypeResult.AddValidationResult(new ValidationResult("Must have at least 3 addresses", new[] { "counter" }));
+            addressesPropertyTypeResult.AddValidationResult(nestedLevel2); // This is a nested result within the level 1
+            addressBookElementTypeResult.ValidationResults.Add(addressesPropertyTypeResult);
+            var bookNamePropertyTypeResult = new ComplexEditorPropertyTypeValidationResult("bookName");
+            bookNamePropertyTypeResult.AddValidationResult(new ValidationResult("Invalid address book name", new[] { "book" }));
+            addressBookElementTypeResult.ValidationResults.Add(bookNamePropertyTypeResult);
+            nestedLevel1.ValidationResults.Add(addressBookElementTypeResult);
+
+            var id3 = Guid.NewGuid();
+            var addressBookElementTypeResult2 = new ComplexEditorElementTypeValidationResult("addressBook", id3);
+            var addressesPropertyTypeResult2 = new ComplexEditorPropertyTypeValidationResult("addresses");
+            addressesPropertyTypeResult2.AddValidationResult(new ValidationResult("Must have at least 2 addresses", new[] { "counter" }));
+            addressBookElementTypeResult2.ValidationResults.Add(addressesPropertyTypeResult);
+            var bookNamePropertyTypeResult2 = new ComplexEditorPropertyTypeValidationResult("bookName");
+            bookNamePropertyTypeResult2.AddValidationResult(new ValidationResult("Name is too long"));
+            addressBookElementTypeResult2.ValidationResults.Add(bookNamePropertyTypeResult2);
+            nestedLevel1.ValidationResults.Add(addressBookElementTypeResult2);
 
             var serialized = JsonConvert.SerializeObject(nestedLevel1, Formatting.Indented, new ValidationResultConverter());
             Console.WriteLine(serialized);
 
-            var jsonNestedError = JsonConvert.DeserializeObject<JObject>(serialized);
-            Assert.AreEqual(JTokenType.Array, jsonNestedError["nestedValidation"].Type);
-            var nestedValidation = (JArray)jsonNestedError["nestedValidation"];
-            AssertNestedValidation(nestedValidation);
+            var jsonError = JsonConvert.DeserializeObject<JArray>(serialized);
+
+            Assert.IsNotNull(jsonError.SelectToken("$[0]"));
+            Assert.AreEqual(id2.ToString(), jsonError.SelectToken("$[0].$id").Value<string>());
+            Assert.AreEqual("addressBook", jsonError.SelectToken("$[0].$elementTypeAlias").Value<string>());
+            Assert.IsNotNull(jsonError.SelectToken("$[0].ModelState"));            
+            var error1 = jsonError.SelectToken("$[0].ModelState['_Properties.addresses.invariant.null.counter']") as JArray;
+            Assert.IsNotNull(error1);
+            Assert.AreEqual(1, error1.Count);
+            var error2 = jsonError.SelectToken("$[0].ModelState['_Properties.bookName.invariant.null.book']") as JArray;
+            Assert.IsNotNull(error2);
+            Assert.AreEqual(1, error2.Count);
+
+            Assert.AreEqual(id3.ToString(), jsonError.SelectToken("$[1].$id").Value<string>());
+            Assert.AreEqual("addressBook", jsonError.SelectToken("$[1].$elementTypeAlias").Value<string>());
+            Assert.IsNotNull(jsonError.SelectToken("$[1].ModelState"));
+            var error6 = jsonError.SelectToken("$[1].ModelState['_Properties.addresses.invariant.null.counter']") as JArray;
+            Assert.IsNotNull(error6);
+            Assert.AreEqual(1, error6.Count);
+            var error7 = jsonError.SelectToken("$[1].ModelState['_Properties.bookName.invariant.null']") as JArray;
+            Assert.IsNotNull(error7);
+            Assert.AreEqual(1, error7.Count);
+
+            Assert.IsNotNull(jsonError.SelectToken("$[0].addresses"));
+            Assert.AreEqual(id1.ToString(), jsonError.SelectToken("$[0].addresses[0].$id").Value<string>());
+            Assert.AreEqual("addressInfo", jsonError.SelectToken("$[0].addresses[0].$elementTypeAlias").Value<string>());
+            Assert.IsNotNull(jsonError.SelectToken("$[0].addresses[0].ModelState"));
+            var error3 = jsonError.SelectToken("$[0].addresses[0].ModelState['_Properties.city.invariant.null.country']") as JArray;
+            Assert.IsNotNull(error3);
+            Assert.AreEqual(1, error3.Count);
+            var error4 = jsonError.SelectToken("$[0].addresses[0].ModelState['_Properties.city.invariant.null.capital']") as JArray;
+            Assert.IsNotNull(error4);
+            Assert.AreEqual(1, error4.Count);
+            var error5 = jsonError.SelectToken("$[0].addresses[0].ModelState['_Properties.city.invariant.null']") as JArray;
+            Assert.IsNotNull(error5);
+            Assert.AreEqual(2, error5.Count);
         }
 
         [Test]
-        public void Test()
+        public void Validating_ContentItemSave()
         {
             var validator = new ContentSaveModelValidator(
                 Factory.GetInstance<ILogger>(),
@@ -132,22 +181,26 @@ namespace Umbraco.Tests.Web.Validation
 
             var content = MockedContent.CreateTextpageContent(_contentType, "test", -1);
 
+            var id1 = new Guid("c8df5136-d606-41f0-9134-dea6ae0c2fd9");
+            var id2 = new Guid("f916104a-4082-48b2-a515-5c4bf2230f38");
+            var id3 = new Guid("77E15DE9-1C79-47B2-BC60-4913BC4D4C6A");
+
             // TODO: Ok now test with a 4th level complex nested editor
 
-            const string complexValue = @"[{
-            		""key"": ""c8df5136-d606-41f0-9134-dea6ae0c2fd9"",
+            var complexValue = @"[{
+            		""key"": """ + id1.ToString() + @""",
             		""name"": ""Hello world"",
             		""ncContentTypeAlias"": """ + ContentTypeAlias + @""",
             		""title"": ""Hello world"",
                     ""bodyText"": ""The world is round""
             	}, {
-            		""key"": ""f916104a-4082-48b2-a515-5c4bf2230f38"",
+            		""key"": """ + id2.ToString() + @""",
             		""name"": ""Super nested"",
             		""ncContentTypeAlias"": """ + ContentTypeAlias + @""",
             		""title"": ""Hi there!"",
                     ""bodyText"": ""Well hello there"",
                     ""complex"" : [{
-            		    ""key"": ""77E15DE9-1C79-47B2-BC60-4913BC4D4C6A"",
+            		    ""key"": """ + id3.ToString() + @""",
             		    ""name"": ""I am a sub nested content"",
             		    ""ncContentTypeAlias"": """ + ContentTypeAlias + @""",
             		    ""title"": ""Hello up there :)"",
@@ -224,49 +277,30 @@ namespace Umbraco.Tests.Web.Validation
             }
             var complexEditorErrors = modelState.Single(x => x.Key == complexPropertyKey).Value.Errors;
             Assert.AreEqual(1, complexEditorErrors.Count);
-            var nestedError = complexEditorErrors.Single(x => x.ErrorMessage.Contains("nestedValidation"));
-            var jsonNestedError = JsonConvert.DeserializeObject<JObject>(nestedError.ErrorMessage);
-            Assert.AreEqual(JTokenType.Array, jsonNestedError["nestedValidation"].Type);
-            var nestedValidation = (JArray)jsonNestedError["nestedValidation"];
-            AssertNestedValidation(nestedValidation);
+            var nestedError = complexEditorErrors[0];
+            var jsonError = JsonConvert.DeserializeObject<JArray>(nestedError.ErrorMessage);
+
+            var modelStateKeys = new[] { "_Properties.title.invariant.null.innerFieldId", "_Properties.title.invariant.null.value", "_Properties.bodyText.invariant.null.innerFieldId", "_Properties.bodyText.invariant.null.value" };
+            AssertNestedValidation(jsonError, 0, id1, modelStateKeys);
+            AssertNestedValidation(jsonError, 1, id2, modelStateKeys.Concat(new[] { "_Properties.complex.invariant.null.innerFieldId", "_Properties.complex.invariant.null.value" }).ToArray());
+            var nestedJsonError = jsonError.SelectToken("$[1].complex") as JArray;
+            Assert.IsNotNull(nestedJsonError);
+            AssertNestedValidation(nestedJsonError, 0, id3, modelStateKeys);
         }
 
-        private void AssertNestedValidation(JArray nestedValidation)
+        private void AssertNestedValidation(JArray jsonError, int index, Guid id, string[] modelStateKeys)
         {
-            Assert.Greater(nestedValidation.Count, 0); 
-            foreach (var rowErrors in nestedValidation)
+            Assert.IsNotNull(jsonError.SelectToken("$[" + index + "]"));
+            Assert.AreEqual(id.ToString(), jsonError.SelectToken("$[" + index + "].$id").Value<string>());
+            Assert.AreEqual("textPage", jsonError.SelectToken("$[" + index + "].$elementTypeAlias").Value<string>());
+            Assert.IsNotNull(jsonError.SelectToken("$[" + index + "].ModelState"));            
+            foreach (var key in modelStateKeys)
             {
-                Assert.AreEqual(JTokenType.Object, rowErrors.Type);
-                var elementTypeErrors = (JObject)rowErrors; // this is a dictionary of element type alias -> dictionary of errors -> prop alias -> array errors
-                Assert.AreEqual(1, elementTypeErrors.Count); // there is 1 element type in error
-                foreach (var elementTypeAliasToErrors in elementTypeErrors)
-                {
-                    Assert.IsNotEmpty(elementTypeAliasToErrors.Key);
-                    var propErrors = (JObject)elementTypeAliasToErrors.Value;
-
-                    foreach (var propAliasToErrors in propErrors)
-                    {
-                        Assert.AreEqual(JTokenType.Array, propAliasToErrors.Value.Type);
-                        var propTypeErrors = (JArray)propAliasToErrors.Value;
-                        
-                        foreach (var propError in propTypeErrors)
-                        {
-                            var nested = propError["nestedValidation"];
-                            if (nested != null)
-                            {
-                                // recurse
-                                AssertNestedValidation((JArray)nested);
-                                continue;
-                            }
-
-                            Assert.IsNotEmpty(propError["errorMessage"].Value<string>());
-                            Assert.AreEqual(1, propError["memberNames"].Value<JArray>().Count);
-                        }
-                    }
-                }
+                var error = jsonError.SelectToken("$[" + index + "].ModelState['" + key + "']") as JArray;
+                Assert.IsNotNull(error);
+                Assert.AreEqual(1, error.Count);
             }
         }
-
 
         [HideFromTypeFinder]
         [DataEditor("complexTest", "test", "test")]

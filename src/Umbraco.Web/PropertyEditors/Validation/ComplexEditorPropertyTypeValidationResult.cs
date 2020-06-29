@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Umbraco.Web.PropertyEditors.Validation
 {
@@ -14,7 +16,17 @@ namespace Umbraco.Web.PropertyEditors.Validation
             PropertyTypeAlias = propertyTypeAlias;
         }
 
-        public IList<ValidationResult> ValidationResults { get; } = new List<ValidationResult>();
+        private readonly List<ValidationResult> _validationResults = new List<ValidationResult>();
+
+        public void AddValidationResult(ValidationResult validationResult)
+        {
+            if (validationResult is ComplexEditorValidationResult && _validationResults.Any(x => x is ComplexEditorValidationResult))
+                throw new InvalidOperationException($"Cannot add more than one {typeof(ComplexEditorValidationResult)}");
+
+            _validationResults.Add(validationResult);
+        }
+
+        public IReadOnlyList<ValidationResult> ValidationResults => _validationResults;
         public string PropertyTypeAlias { get; }
     }
 }

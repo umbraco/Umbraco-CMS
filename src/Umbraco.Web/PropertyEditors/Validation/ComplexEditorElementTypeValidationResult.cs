@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Web.PropertyEditors.Validation
@@ -8,13 +9,15 @@ namespace Umbraco.Web.PropertyEditors.Validation
     /// </summary>
     public class ComplexEditorElementTypeValidationResult : ValidationResult
     {
-        public ComplexEditorElementTypeValidationResult(string elementTypeAlias)
+        public ComplexEditorElementTypeValidationResult(string elementTypeAlias, Guid blockId)
             : base(string.Empty)
         {
             ElementTypeAlias = elementTypeAlias;
+            BlockId = blockId;
         }
 
         public IList<ComplexEditorPropertyTypeValidationResult> ValidationResults { get; } = new List<ComplexEditorPropertyTypeValidationResult>();
         public string ElementTypeAlias { get; }
+        public Guid BlockId { get; }
     }
 }
