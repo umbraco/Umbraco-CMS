@@ -10,7 +10,6 @@ namespace Umbraco.Web.Common.Formatters
         {
             var property = base.CreateProperty(member, memberSerialization);
 
-
             property.Required = Required.Default;
 
             return property;
