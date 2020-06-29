@@ -1,71 +1,56 @@
 using System;
 using System.Linq;
-using Moq;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.Models.Mapping
 {
     [TestFixture]
-    [UmbracoTest(WithApplication = true)]
-    public class ContentTypeModelMappingTests : UmbracoTestBase
+    [UmbracoTest(Mapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class ContentTypeModelMappingTests : UmbracoIntegrationTest
     {
-        // mocks of services that can be setup on a test by test basis to return whatever we want
-        private readonly Mock<IContentTypeService> _contentTypeService = new Mock<IContentTypeService>();
-        private readonly Mock<IContentService> _contentService = new Mock<IContentService>();
-        private readonly Mock<IDataTypeService> _dataTypeService = new Mock<IDataTypeService>();
-        private readonly Mock<IEntityService> _entityService = new Mock<IEntityService>();
-        private readonly Mock<IFileService> _fileService = new Mock<IFileService>();
-        private readonly Mock<ILocalizationService> _localizationService = new Mock<ILocalizationService>();
-        private Mock<PropertyEditorCollection> _editorsMock;
+        private IDataTypeService _dataTypeService;
+        private UmbracoMapper _sut;
+        private IFileService _fileService;
+        private IEntityService _entityService;
 
-        protected override void Compose()
+
+        [SetUp]
+        public void Setup()
         {
-            base.Compose();
-
-            // create and register a fake property editor collection to return fake property editors
-            var editors = new DataEditor[] { new TextboxPropertyEditor(Mock.Of<ILogger>(), _dataTypeService.Object, _localizationService.Object, IOHelper, ShortStringHelper, LocalizedTextService), };
-            var dataEditors = new DataEditorCollection(editors);
-            _editorsMock = new Mock<PropertyEditorCollection>(dataEditors);
-            _editorsMock.Setup(x => x[It.IsAny<string>()]).Returns(editors[0]);
-            Composition.RegisterUnique(f => _editorsMock.Object);
-
-            Composition.RegisterUnique(_ => _contentTypeService.Object);
-            Composition.RegisterUnique(_ => _contentService.Object);
-            Composition.RegisterUnique(_ => _dataTypeService.Object);
-            Composition.RegisterUnique(_ => _entityService.Object);
-            Composition.RegisterUnique(_ => _fileService.Object);
+            _sut = Services.GetRequiredService<UmbracoMapper>();
+            _dataTypeService = Services.GetRequiredService<IDataTypeService>();
+            _fileService = Services.GetRequiredService<IFileService>();
+            _entityService = Services.GetRequiredService<IEntityService>();
         }
 
         [Test]
         public void MemberTypeSave_To_IMemberType()
         {
             //Arrange
+            //TODO use builder
+            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>())
+            {
+                Name = "TODO"
+            };
+            _dataTypeService.Save(dataType);
 
-            // setup the mocks to return the data we want to test against...
+            var display = CreateMemberTypeSave(dataType.Id);
 
-            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(Mock.Of<IDataType>(
-                    definition =>
-                        definition.Id == 555
-                        && definition.EditorAlias == "myPropertyType"
-                        && definition.DatabaseType == ValueStorageType.Nvarchar));
-
-            var display = CreateMemberTypeSave();
 
             //Act
 
-            var result = Mapper.Map<IMemberType>(display);
+            var result = _sut.Map<IMemberType>(display);
 
             //Assert
 
@@ -111,21 +96,18 @@ namespace Umbraco.Tests.Models.Mapping
         public void MediaTypeSave_To_IMediaType()
         {
             //Arrange
+            //TODO use builder
+            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>())
+            {
+                Name = "TODO"
+            };
+            _dataTypeService.Save(dataType);
 
-            // setup the mocks to return the data we want to test against...
-
-            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(Mock.Of<IDataType>(
-                    definition =>
-                        definition.Id == 555
-                        && definition.EditorAlias == "myPropertyType"
-                        && definition.DatabaseType == ValueStorageType.Nvarchar));
-
-            var display = CreateMediaTypeSave();
+            var display = CreateMediaTypeSave(dataType.Id);
 
             //Act
 
-            var result = Mapper.Map<IMediaType>(display);
+            var result = _sut.Map<IMediaType>(display);
 
             //Assert
 
@@ -168,28 +150,31 @@ namespace Umbraco.Tests.Models.Mapping
         public void ContentTypeSave_To_IContentType()
         {
             //Arrange
+            //TODO use builder
+            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>())
+            {
+                Name = "TODO"
+            };
+            _dataTypeService.Save(dataType);
 
-            // setup the mocks to return the data we want to test against...
+            var templates = new ITemplate[]
+            {
+                //Note the aliases is important - TODO use builder
+                new Template(Services.GetRequiredService<IShortStringHelper>(), "Name 1", "test"),
+                new Template(Services.GetRequiredService<IShortStringHelper>(), "Name 2", "template1"),
+                new Template(Services.GetRequiredService<IShortStringHelper>(), "Name 3", "template2"),
+            };
 
-            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(Mock.Of<IDataType>(
-                    definition =>
-                        definition.Id == 555
-                        && definition.EditorAlias == "myPropertyType"
-                        && definition.DatabaseType == ValueStorageType.Nvarchar));
+            foreach (var template in templates)
+            {
+                _fileService.SaveTemplate(template);
+            }
 
-
-            _fileService.Setup(x => x.GetTemplate(It.IsAny<string>()))
-                .Returns((string alias) => Mock.Of<ITemplate>(
-                    definition =>
-                        definition.Id == alias.GetHashCode() && definition.Alias == alias));
-
-
-            var display = CreateContentTypeSave();
+            var display = CreateContentTypeSave(dataType.Id);
 
             //Act
 
-            var result = Mapper.Map<IContentType>(display);
+            var result = _sut.Map<IContentType>(display);
 
             //Assert
 
@@ -242,22 +227,19 @@ namespace Umbraco.Tests.Models.Mapping
         public void MediaTypeSave_With_Composition_To_IMediaType()
         {
             //Arrange
-
-            // setup the mocks to return the data we want to test against...
-
-            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(Mock.Of<IDataType>(
-                    definition =>
-                        definition.Id == 555
-                        && definition.EditorAlias == "myPropertyType"
-                        && definition.DatabaseType == ValueStorageType.Nvarchar));
+            //TODO use builder
+            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>())
+            {
+                Name = "TODO"
+            };
+            _dataTypeService.Save(dataType);
 
 
-            var display = CreateCompositionMediaTypeSave();
+            var display = CreateCompositionMediaTypeSave(dataType.Id);
 
             //Act
 
-            var result = Mapper.Map<IMediaType>(display);
+            var result = _sut.Map<IMediaType>(display);
 
             //Assert
 
@@ -270,21 +252,18 @@ namespace Umbraco.Tests.Models.Mapping
         {
             //Arrange
 
-            // setup the mocks to return the data we want to test against...
+            //TODO use builder
+            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>())
+            {
+                Name = "TODO"
+            };
+            _dataTypeService.Save(dataType);
 
-            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(Mock.Of<IDataType>(
-                    definition =>
-                        definition.Id == 555
-                        && definition.EditorAlias == "myPropertyType"
-                        && definition.DatabaseType == ValueStorageType.Nvarchar));
-
-
-            var display = CreateCompositionContentTypeSave();
+            var display = CreateCompositionContentTypeSave(dataType.Id);
 
             //Act
 
-            var result = Mapper.Map<IContentType>(display);
+            var result = _sut.Map<IContentType>(display);
 
             //Assert
 
@@ -296,22 +275,16 @@ namespace Umbraco.Tests.Models.Mapping
         public void IMemberType_To_MemberTypeDisplay()
         {
             //Arrange
-            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
-
-            // setup the mocks to return the data we want to test against...
-
             var memberType = MockedContentTypes.CreateSimpleMemberType();
             var alias = memberType.PropertyTypes.Last().Alias;
             memberType.SetIsSensitiveProperty(alias, true);
             memberType.SetMemberCanEditProperty(alias, true);
             memberType.SetMemberCanViewProperty(alias, true);
-
             MockedContentTypes.EnsureAllIds(memberType, 8888);
 
             //Act
 
-            var result = Mapper.Map<MemberTypeDisplay>(memberType);
+            var result = _sut.Map<MemberTypeDisplay>(memberType);
 
             //Assert
 
@@ -355,21 +328,18 @@ namespace Umbraco.Tests.Models.Mapping
 
         }
 
+
         [Test]
         public void IMediaType_To_MediaTypeDisplay()
         {
             //Arrange
-            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
-
-            // setup the mocks to return the data we want to test against...
 
             var mediaType = MockedContentTypes.CreateImageMediaType();
             MockedContentTypes.EnsureAllIds(mediaType, 8888);
 
             //Act
 
-            var result = Mapper.Map<MediaTypeDisplay>(mediaType);
+            var result = _sut.Map<MediaTypeDisplay>(mediaType);
 
             //Assert
 
@@ -414,17 +384,17 @@ namespace Umbraco.Tests.Models.Mapping
         public void IContentType_To_ContentTypeDisplay()
         {
             //Arrange
-            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
-
-            // setup the mocks to return the data we want to test against...
+            // _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
+            //     .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
+            //
+            // // setup the mocks to return the data we want to test against...
 
             var contentType = MockedContentTypes.CreateTextPageContentType();
             MockedContentTypes.EnsureAllIds(contentType, 8888);
 
             //Act
 
-            var result = Mapper.Map<DocumentTypeDisplay>(contentType);
+            var result = _sut.Map<DocumentTypeDisplay>(contentType);
 
             //Assert
 
@@ -475,8 +445,12 @@ namespace Umbraco.Tests.Models.Mapping
         [Test]
         public void MemberPropertyGroupBasic_To_MemberPropertyGroup()
         {
-            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
+            //TODO use builder
+            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>())
+            {
+                Name = "TODO"
+            };
+            _dataTypeService.Save(dataType);
 
             var basic = new PropertyGroupBasic<MemberPropertyTypeBasic>
             {
@@ -494,7 +468,7 @@ namespace Umbraco.Tests.Models.Mapping
                         SortOrder = 1,
                         Alias = "prop1",
                         Description = "property 1",
-                        DataTypeId = 99,
+                        DataTypeId = dataType.Id,
                         GroupId = 222,
                         Label = "Prop 1",
                         Validation = new PropertyTypeValidation()
@@ -512,7 +486,7 @@ namespace Umbraco.Tests.Models.Mapping
                         SortOrder = 2,
                         Alias = "prop2",
                         Description = "property 2",
-                        DataTypeId = 99,
+                        DataTypeId = dataType.Id,
                         GroupId = 222,
                         Label = "Prop 2",
                         Validation = new PropertyTypeValidation()
@@ -535,7 +509,7 @@ namespace Umbraco.Tests.Models.Mapping
             // proper group properties mapping takes place when mapping the content type,
             // not when mapping the group - because of inherited properties and such
             //var result = Mapper.Map<PropertyGroup>(basic);
-            var result = Mapper.Map<IMemberType>(contentType).PropertyGroups[0];
+            var result = _sut.Map<IMemberType>(contentType).PropertyGroups[0];
 
             Assert.AreEqual(basic.Name, result.Name);
             Assert.AreEqual(basic.Id, result.Id);
@@ -546,8 +520,11 @@ namespace Umbraco.Tests.Models.Mapping
         [Test]
         public void PropertyGroupBasic_To_PropertyGroup()
         {
-            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
+            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>())
+            {
+                Name = "TODO"
+            };
+            _dataTypeService.Save(dataType);
 
             var basic = new PropertyGroupBasic<PropertyTypeBasic>
             {
@@ -562,7 +539,7 @@ namespace Umbraco.Tests.Models.Mapping
                         SortOrder = 1,
                         Alias = "prop1",
                         Description = "property 1",
-                        DataTypeId = 99,
+                        DataTypeId = dataType.Id,
                         GroupId = 222,
                         Label = "Prop 1",
                         Validation = new PropertyTypeValidation()
@@ -577,7 +554,7 @@ namespace Umbraco.Tests.Models.Mapping
                         SortOrder = 2,
                         Alias = "prop2",
                         Description = "property 2",
-                        DataTypeId = 99,
+                        DataTypeId = dataType.Id,
                         GroupId = 222,
                         Label = "Prop 2",
                         Validation = new PropertyTypeValidation()
@@ -601,7 +578,7 @@ namespace Umbraco.Tests.Models.Mapping
             // proper group properties mapping takes place when mapping the content type,
             // not when mapping the group - because of inherited properties and such
             //var result = Mapper.Map<PropertyGroup>(basic);
-            var result = Mapper.Map<IContentType>(contentType).PropertyGroups[0];
+            var result = _sut.Map<IContentType>(contentType).PropertyGroups[0];
 
             Assert.AreEqual(basic.Name, result.Name);
             Assert.AreEqual(basic.Id, result.Id);
@@ -612,16 +589,13 @@ namespace Umbraco.Tests.Models.Mapping
         [Test]
         public void MemberPropertyTypeBasic_To_PropertyType()
         {
-            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
-
             var basic = new MemberPropertyTypeBasic()
             {
                 Id = 33,
                 SortOrder = 1,
                 Alias = "prop1",
                 Description = "property 1",
-                DataTypeId = 99,
+                DataTypeId = -88,
                 GroupId = 222,
                 Label = "Prop 1",
                 Validation = new PropertyTypeValidation()
@@ -633,7 +607,7 @@ namespace Umbraco.Tests.Models.Mapping
                 }
             };
 
-            var result = Mapper.Map<IPropertyType>(basic);
+            var result = _sut.Map<IPropertyType>(basic);
 
             Assert.AreEqual(basic.Id, result.Id);
             Assert.AreEqual(basic.SortOrder, result.SortOrder);
@@ -650,8 +624,12 @@ namespace Umbraco.Tests.Models.Mapping
         [Test]
         public void PropertyTypeBasic_To_PropertyType()
         {
-            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
+            //TODO use builder
+            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>())
+            {
+                Name = "TODO"
+            };
+            _dataTypeService.Save(dataType);
 
             var basic = new PropertyTypeBasic()
             {
@@ -659,7 +637,7 @@ namespace Umbraco.Tests.Models.Mapping
                 SortOrder = 1,
                 Alias = "prop1",
                 Description = "property 1",
-                DataTypeId = 99,
+                DataTypeId = dataType.Id,
                 GroupId = 222,
                 Label = "Prop 1",
                 Validation = new PropertyTypeValidation()
@@ -671,7 +649,7 @@ namespace Umbraco.Tests.Models.Mapping
                 }
             };
 
-            var result = Mapper.Map<IPropertyType>(basic);
+            var result = _sut.Map<IPropertyType>(basic);
 
             Assert.AreEqual(basic.Id, result.Id);
             Assert.AreEqual(basic.SortOrder, result.SortOrder);
@@ -689,15 +667,7 @@ namespace Umbraco.Tests.Models.Mapping
         public void IMediaTypeComposition_To_MediaTypeDisplay()
         {
             //Arrange
-            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
-
-            // setup the mocks to return the data we want to test against...
-
-            _entityService.Setup(x => x.GetObjectType(It.IsAny<int>()))
-                .Returns(UmbracoObjectTypes.DocumentType);
-
-            var ctMain = MockedContentTypes.CreateSimpleMediaType("parent", "Parent");
+            var ctMain = CreateSimpleMediaType("parent", "Parent");
             //not assigned to tab
             ctMain.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
@@ -709,7 +679,7 @@ namespace Umbraco.Tests.Models.Mapping
                 DataTypeId = -88
             });
             MockedContentTypes.EnsureAllIds(ctMain, 8888);
-            var ctChild1 = MockedContentTypes.CreateSimpleMediaType("child1", "Child 1", ctMain, true);
+            var ctChild1 = CreateSimpleMediaType("child1", "Child 1", ctMain, true);
             ctChild1.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
                 Alias = "someProperty",
@@ -720,7 +690,7 @@ namespace Umbraco.Tests.Models.Mapping
                 DataTypeId = -88
             }, "Another tab");
             MockedContentTypes.EnsureAllIds(ctChild1, 7777);
-            var contentType = MockedContentTypes.CreateSimpleMediaType("child2", "Child 2", ctChild1, true, "CustomGroup");
+            var contentType = CreateSimpleMediaType("child2", "Child 2", ctChild1, true, "CustomGroup");
             //not assigned to tab
             contentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
@@ -736,7 +706,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             //Act
 
-            var result = Mapper.Map<MediaTypeDisplay>(contentType);
+            var result = _sut.Map<MediaTypeDisplay>(contentType);
 
             //Assert
 
@@ -778,17 +748,48 @@ namespace Umbraco.Tests.Models.Mapping
 
         }
 
+        public MediaType CreateSimpleMediaType(string alias, string name, IMediaType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content")
+        {
+            var shortStringHelper = Services.GetRequiredService<IShortStringHelper>();
+            var contentType = parent == null ? new MediaType(shortStringHelper, -1) : new MediaType(shortStringHelper, parent, alias);
+
+            contentType.Alias = alias;
+            contentType.Name = name;
+            contentType.Description = "ContentType used for simple text pages";
+            contentType.Icon = ".sprTreeDoc3";
+            contentType.Thumbnail = "doc2.png";
+            contentType.SortOrder = 1;
+            contentType.CreatorId = 0;
+            contentType.Trashed = false;
+
+            var contentCollection = new PropertyTypeCollection(false);
+            contentCollection.Add(new PropertyType(shortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) { Alias = RandomAlias("title", randomizeAliases), Name = "Title", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+            contentCollection.Add(new PropertyType(shortStringHelper, Constants.PropertyEditors.Aliases.TinyMce, ValueStorageType.Ntext) { Alias = RandomAlias("bodyText", randomizeAliases), Name = "Body Text", Description = "", Mandatory = false, SortOrder = 2, DataTypeId = -87 });
+            contentCollection.Add(new PropertyType(shortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) { Alias = RandomAlias("author", randomizeAliases), Name = "Author", Description = "Name of the author", Mandatory = false, SortOrder = 3, DataTypeId = -88 });
+
+            var pg = new PropertyGroup(contentCollection) { Name = propertyGroupName, SortOrder = 1 };
+            contentType.PropertyGroups.Add(pg);
+
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
+
+            return contentType;
+        }
+
+        private static string RandomAlias(string alias, bool randomizeAliases)
+        {
+            if (randomizeAliases)
+            {
+                return string.Concat(alias, Guid.NewGuid().ToString("N"));
+            }
+
+            return alias;
+        }
+
         [Test]
         public void IContentTypeComposition_To_ContentTypeDisplay()
         {
             //Arrange
-            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
-
-            // setup the mocks to return the data we want to test against...
-
-            _entityService.Setup(x => x.GetObjectType(It.IsAny<int>()))
-                .Returns(UmbracoObjectTypes.DocumentType);
 
             var ctMain = MockedContentTypes.CreateSimpleContentType();
             //not assigned to tab
@@ -819,7 +820,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             //Act
 
-            var result = Mapper.Map<DocumentTypeDisplay>(contentType);
+            var result = _sut.Map<DocumentTypeDisplay>(contentType);
 
             //Assert
 
@@ -870,16 +871,13 @@ namespace Umbraco.Tests.Models.Mapping
         [Test]
         public void MemberPropertyTypeBasic_To_MemberPropertyTypeDisplay()
         {
-            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
-
             var basic = new MemberPropertyTypeBasic()
             {
                 Id = 33,
                 SortOrder = 1,
                 Alias = "prop1",
                 Description = "property 1",
-                DataTypeId = 99,
+                DataTypeId = -88,
                 GroupId = 222,
                 Label = "Prop 1",
                 MemberCanViewProperty = true,
@@ -892,7 +890,7 @@ namespace Umbraco.Tests.Models.Mapping
                 }
             };
 
-            var result = Mapper.Map<MemberPropertyTypeDisplay>(basic);
+            var result = _sut.Map<MemberPropertyTypeDisplay>(basic);
 
             Assert.AreEqual(basic.Id, result.Id);
             Assert.AreEqual(basic.SortOrder, result.SortOrder);
@@ -910,8 +908,11 @@ namespace Umbraco.Tests.Models.Mapping
         [Test]
         public void PropertyTypeBasic_To_PropertyTypeDisplay()
         {
-            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
+            //TODO use builder
+            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>())
+            {
+                Name = "TODO"
+            };
 
             var basic = new PropertyTypeBasic()
             {
@@ -919,7 +920,7 @@ namespace Umbraco.Tests.Models.Mapping
                 SortOrder = 1,
                 Alias = "prop1",
                 Description = "property 1",
-                DataTypeId = 99,
+                DataTypeId = dataType.Id,
                 GroupId = 222,
                 Label = "Prop 1",
                 Validation = new PropertyTypeValidation()
@@ -929,7 +930,7 @@ namespace Umbraco.Tests.Models.Mapping
                 }
             };
 
-            var result = Mapper.Map<PropertyTypeDisplay>(basic);
+            var result = _sut.Map<PropertyTypeDisplay>(basic);
 
             Assert.AreEqual(basic.Id, result.Id);
             Assert.AreEqual(basic.SortOrder, result.SortOrder);
@@ -941,7 +942,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(basic.Validation, result.Validation);
         }
 
-        private MemberTypeSave CreateMemberTypeSave()
+        private MemberTypeSave CreateMemberTypeSave(int dataTypeId)
         {
             return new MemberTypeSave
             {
@@ -982,7 +983,7 @@ namespace Umbraco.Tests.Models.Mapping
                                     Pattern = string.Empty
                                 },
                                 SortOrder = 0,
-                                DataTypeId = 555
+                                DataTypeId = dataTypeId
                             }
                         }
                     }
@@ -990,7 +991,7 @@ namespace Umbraco.Tests.Models.Mapping
             };
         }
 
-        private MediaTypeSave CreateMediaTypeSave()
+        private MediaTypeSave CreateMediaTypeSave(int dataTypeId)
         {
             return new MediaTypeSave
             {
@@ -1028,7 +1029,7 @@ namespace Umbraco.Tests.Models.Mapping
                                     Pattern = string.Empty
                                 },
                                 SortOrder = 0,
-                                DataTypeId = 555
+                                DataTypeId = dataTypeId
                             }
                         }
                     }
@@ -1036,7 +1037,7 @@ namespace Umbraco.Tests.Models.Mapping
             };
         }
 
-        private DocumentTypeSave CreateContentTypeSave()
+        private DocumentTypeSave CreateContentTypeSave(int dataTypeId)
         {
             return new DocumentTypeSave
             {
@@ -1080,7 +1081,7 @@ namespace Umbraco.Tests.Models.Mapping
                                     Pattern = string.Empty
                                 },
                                 SortOrder = 0,
-                                DataTypeId = 555
+                                DataTypeId = dataTypeId
                             }
                         }
                     }
@@ -1088,7 +1089,7 @@ namespace Umbraco.Tests.Models.Mapping
             };
         }
 
-        private MediaTypeSave CreateCompositionMediaTypeSave()
+        private MediaTypeSave CreateCompositionMediaTypeSave(int dataTypeId)
         {
             return new MediaTypeSave
             {
@@ -1126,7 +1127,7 @@ namespace Umbraco.Tests.Models.Mapping
                                     Pattern = string.Empty
                                 },
                                 SortOrder = 0,
-                                DataTypeId = 555
+                                DataTypeId = dataTypeId
                             }
                         }
                     },
@@ -1150,7 +1151,7 @@ namespace Umbraco.Tests.Models.Mapping
                                     Pattern = string.Empty
                                 },
                                 SortOrder = 0,
-                                DataTypeId = 555
+                                DataTypeId = dataTypeId
                             }
                         }
 
@@ -1160,7 +1161,7 @@ namespace Umbraco.Tests.Models.Mapping
             };
         }
 
-        private DocumentTypeSave CreateCompositionContentTypeSave()
+        private DocumentTypeSave CreateCompositionContentTypeSave(int dataTypeId)
         {
             return new DocumentTypeSave
             {
@@ -1204,7 +1205,7 @@ namespace Umbraco.Tests.Models.Mapping
                                     Pattern = string.Empty
                                 },
                                 SortOrder = 0,
-                                DataTypeId = 555
+                                DataTypeId = dataTypeId
                             }
                         }
                     },
@@ -1228,7 +1229,7 @@ namespace Umbraco.Tests.Models.Mapping
                                     Pattern = string.Empty
                                 },
                                 SortOrder = 0,
-                                DataTypeId = 555
+                                DataTypeId = dataTypeId
                             }
                         }
 

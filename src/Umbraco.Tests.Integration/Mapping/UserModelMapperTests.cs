@@ -1,17 +1,27 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Tests.Models.Mapping
 {
     [TestFixture]
-    [UmbracoTest(Mapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-    public class UserModelMapperTests : TestWithDatabaseBase
+    [UmbracoTest(Mapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class UserModelMapperTests: UmbracoIntegrationTest
     {
+        private UmbracoMapper _sut;
+
+        [SetUp]
+        public void Setup()
+        {
+            _sut = Services.GetRequiredService<UmbracoMapper>();
+        }
+
         [Test]
         public void Map_UserGroupSave_To_IUserGroup()
         {
@@ -28,7 +38,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             // failed, AutoMapper complained, "Unable to cast object of type 'WhereSelectArrayIterator`2[System.Char,System.String]' to type 'System.Collections.IList'".
             // FIXME: added ToList() in UserGroupFactory
-            Mapper.Map(userGroupSave, userGroup);
+            _sut.Map(userGroupSave, userGroup);
         }
     }
 }
