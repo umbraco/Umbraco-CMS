@@ -17,7 +17,7 @@
             bindings: {
                 view: "@",
                 block: "=",
-                api: "=", // Should this be a one way bind?
+                api: "<",
                 index: "<"
             }
         }

@@ -16,10 +16,11 @@
         }
     }
 
-    function BlockConfigurationController($scope, elementTypeResource, overlayService, localizationService, editorService) {
+    function BlockConfigurationController($scope, elementTypeResource, overlayService, localizationService, editorService, eventsService) {
+
+        var unsubscribe = [];
 
         var vm = this;
-
         vm.openBlock = null;
 
         function onInit() {
@@ -37,6 +38,16 @@
                 vm.elementTypes = elementTypes;
             });
         }
+
+        function updateUsedElementTypes(event, args) {
+            var key = args.documentType.key;
+            for (var i = 0; i<vm.elementTypes.length; i++) {
+                if (vm.elementTypes[i].key === key) {
+                    vm.elementTypes[i] = args.documentType;
+                }
+            }
+        }
+        unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
 
         vm.requestRemoveBlockByIndex = function (index) {
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "blockEditor_confirmDeleteBlockNotice"]).then(function (data) {
@@ -77,9 +88,11 @@
         };
 
         vm.getElementTypeByKey = function(key) {
-            return _.find(vm.elementTypes, function (type) {
-                return type.key === key;
-            });
+            if (vm.elementTypes) {
+                return vm.elementTypes.find(function (type) {
+                    return type.key === key;
+                });
+            }
         };
 
         vm.openAddDialog = function ($event, entry) {
@@ -193,7 +206,9 @@
 
         };
 
-
+        $scope.$on('$destroy', function () {
+            unsubscribe.forEach(u => { u(); });
+        });
         
         onInit();
 

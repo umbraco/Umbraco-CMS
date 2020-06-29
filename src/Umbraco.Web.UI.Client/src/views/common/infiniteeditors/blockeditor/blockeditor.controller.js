@@ -1,12 +1,9 @@
-//used for the media picker dialog
 angular.module("umbraco")
 .controller("Umbraco.Editors.BlockEditorController",
     function ($scope, localizationService, formHelper) {
         var vm = this;
 
-        // TODO: Why are we assigning content/setting separately when we already have vm.model?
-        vm.content = $scope.model.content;
-        vm.settings = $scope.model.settings;        
+        vm.model = $scope.model;
         vm.model = $scope.model;
         vm.tabs = [];
         localizationService.localizeMany([
@@ -17,17 +14,16 @@ angular.module("umbraco")
             vm.submitLabel = data[1];
         });
 
-        if (vm.content && vm.content.variants) {
+        if ($scope.model.content && $scope.model.content.variants) {
 
-            var apps = vm.content.apps;
+            var apps = $scope.model.content.apps;
 
             vm.tabs = apps;
 
             // replace view of content app.
             var contentApp = apps.find(entry => entry.alias === "umbContent");
             if (contentApp) {
-                // TODO: This is strange, why does this render a view from somewhere else and this is the only place where that view is used?
-                contentApp.view = "views/common/infiniteeditors/elementeditor/elementeditor.content.html";
+                contentApp.view = "views/common/infiniteeditors/blockeditor/blockeditor.content.html";
                 if(vm.model.hideContent) {
                     apps.splice(apps.indexOf(contentApp), 1);
                 } else if (vm.model.openSettings !== true) {
@@ -41,15 +37,14 @@ angular.module("umbraco")
 
         }
 
-        if (vm.settings && vm.settings.variants) {
+        if (vm.model.settings && vm.model.settings.variants) {
             localizationService.localize("blockEditor_tabBlockSettings").then(
                 function (settingsName) {
                     var settingsTab = {
                         "name": settingsName,
                         "alias": "settings",
                         "icon": "icon-settings",
-                        // TODO: This is strange, why does this render a view from somewhere else and this is the only place where that view is used?
-                        "view": "views/common/infiniteeditors/elementeditor/elementeditor.settings.html"
+                        "view": "views/common/infiniteeditors/blockeditor/blockeditor.settings.html"
                     };
                     vm.tabs.push(settingsTab);
                     if (vm.model.openSettings) {
@@ -69,7 +64,7 @@ angular.module("umbraco")
 
         vm.close = function() {
             if (vm.model && vm.model.close) {
-                // TODO: If content has changed, we should notify user.
+                // TODO: check if content/settings has changed and ask user if they are sure.
                 vm.model.close(vm.model);
             }
         }

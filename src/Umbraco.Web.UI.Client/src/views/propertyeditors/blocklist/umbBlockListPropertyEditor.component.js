@@ -4,7 +4,7 @@
 
     /**
      * @ngdoc directive
-     * @name umbraco.directives.directive:blockListPropertyEditor
+     * @name umbraco.directives.directive:umbBlockListPropertyEditor
      * @function
      *
      * @description
@@ -12,8 +12,8 @@
      */
     angular
         .module("umbraco")
-        .component("blockListPropertyEditor", {
-            templateUrl: "views/propertyeditors/blocklist/blocklist.component.html",
+        .component("umbBlockListPropertyEditor", {
+            templateUrl: "views/propertyeditors/blocklist/umb-block-list-property-editor.html",
             controller: BlockListController,
             controllerAs: "vm",
             bindings: {
@@ -391,10 +391,6 @@
 
         };
 
-        function requestCopyBlock(block) {
-            clipboardService.copy("elementTypeArray", block.content.contentTypeAlias, block.content, block.label);
-        }
-
         var requestCopyAllBlocks = function() {
 
             var elementTypesToCopy = vm.layout.filter(entry => entry.$block.config.unsupported !== true).map(entry => entry.$block.content);
@@ -416,7 +412,7 @@
                 clipboardService.copyArray("elementTypeArray", aliases, elementTypesToCopy, localizedLabel, "icon-thumbnail-list", vm.model.id);
             });
         }
-        function requestCopyBlock(block) {
+        function copyBlock(block) {
             clipboardService.copy("elementType", block.content.contentTypeAlias, block.content, block.label);
         }
         function requestPasteFromClipboard(index, pasteEntry) {
@@ -487,7 +483,7 @@
 
         vm.blockEditorApi = {
             editBlock: editBlock,
-            requestCopyBlock: requestCopyBlock,
+            copyBlock: copyBlock,
             requestDeleteBlock: requestDeleteBlock,
             deleteBlock: deleteBlock,
             openSettingsForBlock: openSettingsForBlock 
