@@ -1841,8 +1841,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="addCustomView">Tilføj speciel visning</key>
     <key alias="addSettingsElementType">Tilføj instillinger</key>
     <key alias="labelTemplatePlaceholder">Overskriv label form</key>
-    <key alias="confirmDeleteBlockMessage"><![CDATA[Er du sikker på at du vil slette denne blog: <strong>%0%</strong>.]]></key>
-    <key alias="confirmDeleteBlockNotice">Indhold der benytter sig af denne blog vil gå bort.</key>
+    <key alias="confirmDeleteBlockMessage"><![CDATA[Er du sikker på at du vil slette denne blok: <strong>%0%</strong>.]]></key>
+    <key alias="confirmDeleteBlockNotice">Indhold der benytter sig af denne blok vil gå bort.</key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Konfiguration af '%0%']]></key>
     <key alias="thumbnail">Billede</key>
     <key alias="addThumbnail">Tilføj billede</key>
