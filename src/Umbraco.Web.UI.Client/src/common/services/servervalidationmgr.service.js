@@ -106,8 +106,25 @@ function serverValidationManager($timeout) {
             throw "Invalid JSON structure for complex property, missing 'nestedValidation'";
         }
 
+        nestedValidation.forEach((item, index) => {
+
+            var elementType = Object.keys(item)[0];
+
+
+            var key = "nestedValidation.[" + index + "].";
+
+            
+
+        });
+
+        for (var i = 0; i < nestedValidation.length; i++) {
+
+        }
+
         // each key represents an element type, the key is it's alias
         var keys = Object.keys(nestedValidation);
+
+        var asdf = keys;
 
         // TODO: Could we use an individual instance of serverValidationManager for each element type? It could/should work the way 
         // it does today since it currently manages all callbacks for all simple properties on a content item based on a content type. 
@@ -418,37 +435,39 @@ function serverValidationManager($timeout) {
 
             // if the error message is json it's a complex editor validation response that we need to parse
             if (errorMsg.startsWith("{")) {
-                parseComplexEditorError(errorMsg);
+
+                var parsed = parseComplexEditorError(errorMsg);
+
+                // reset to nothing because we will not display the json message but we still want to inform the 
+                // root properties of the error.
+                errorMsg = "Hello!";
             }
-            else {
 
-                //only add the item if it doesn't exist                
-                if (!this.hasPropertyError(propertyAlias, culture, fieldName, segment)) {
-                    this.items.push({
-                        propertyAlias: propertyAlias,
-                        culture: culture,
-                        segment: segment,
-                        fieldName: fieldName,
-                        errorMsg: errorMsg
-                    });
-                }
+            //only add the item if it doesn't exist                
+            if (!this.hasPropertyError(propertyAlias, culture, fieldName, segment)) {
+                this.items.push({
+                    propertyAlias: propertyAlias,
+                    culture: culture,
+                    segment: segment,
+                    fieldName: fieldName,
+                    errorMsg: errorMsg
+                });
+            }
 
-                //find all errors for this item
-                var errorsForCallback = getPropertyErrors(this, propertyAlias, culture, segment, fieldName);
-                //we should now call all of the call backs registered for this error
-                var cbs = this.getPropertyCallbacks(propertyAlias, culture, fieldName, segment);
-                //call each callback for this error
-                for (var cb in cbs) {
-                    executeCallback(this, errorsForCallback, cbs[cb].callback, culture, segment);
-                }
+            //find all errors for this item
+            var errorsForCallback = getPropertyErrors(this, propertyAlias, culture, segment, fieldName);
+            //we should now call all of the call backs registered for this error
+            var cbs = this.getPropertyCallbacks(propertyAlias, culture, fieldName, segment);
+            //call each callback for this error
+            for (var cb in cbs) {
+                executeCallback(this, errorsForCallback, cbs[cb].callback, culture, segment);
+            }
 
-                //execute variant specific callbacks here too when a propery error is added
-                var variantCbs = this.getVariantCallbacks(culture, segment);
-                //call each callback for this error
-                for (var cb in variantCbs) {
-                    executeCallback(this, errorsForCallback, variantCbs[cb].callback, culture, segment);
-                }
-
+            //execute variant specific callbacks here too when a propery error is added
+            var variantCbs = this.getVariantCallbacks(culture, segment);
+            //call each callback for this error
+            for (var cb in variantCbs) {
+                executeCallback(this, errorsForCallback, variantCbs[cb].callback, culture, segment);
             }
         },      
         

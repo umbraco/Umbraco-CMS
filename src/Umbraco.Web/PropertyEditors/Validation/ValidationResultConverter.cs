@@ -38,6 +38,9 @@ namespace Umbraco.Web.PropertyEditors.Validation
 
             if (validationResult is ComplexEditorValidationResult nestedResult && nestedResult.ValidationResults.Count > 0)
             {
+                // TODO: Change to the new validation structure
+
+
                 var jo = new JObject();
                 // recurse to write out an array of ValidationResultCollection
                 var obj = JArray.FromObject(nestedResult.ValidationResults, camelCaseSerializer);
@@ -50,7 +53,10 @@ namespace Umbraco.Web.PropertyEditors.Validation
                 var joPropertyType = new JObject();
                 // loop over property validations
                 foreach (var propTypeResult in elementTypeValidationResult.ValidationResults)
-                {                    
+                {
+
+                    // TODO: I think here we could do the ModelState thing? instead of recursing? We'd just have to
+                    // not recurse if it was the exact type of the base class ValidationResult and build up the ModelState values
                     var ja = new JArray();
                     foreach (var result in propTypeResult.ValidationResults)
                     {

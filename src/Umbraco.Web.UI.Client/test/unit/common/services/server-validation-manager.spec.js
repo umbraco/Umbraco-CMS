@@ -314,6 +314,26 @@
 
     });
 
+    describe('managing complex editor validation errors', function () {
+
+        it('can retrieve validation errors for the property', function () {
+
+            //arrange
+            var complexValidationMsg = '{"nestedValidation":[{"textPage":{"title":[{"errorMessage":"WRONG!","memberNames":["innerFieldId"]}]}}]}';
+            serverValidationManager.addPropertyError("myProperty", null, null, complexValidationMsg, null);
+            
+            //act 
+            var err1 = serverValidationManager.getPropertyError("myProperty", null, null, null);
+
+            //assert            
+            expect(err1).not.toBeUndefined();
+            expect(err1.propertyAlias).toEqual("myProperty");
+            expect(err1.errorMsg).toEqual(complexValidationMsg);
+
+        });
+
+    });
+
     describe('validation error subscriptions', function() {
 
         it('can subscribe to a field error', function() {
