@@ -150,15 +150,10 @@ namespace Umbraco.Web.Routing
         {
             // sanitize the list to have proper uris for comparison (scheme, path end with /)
             // we need to end with / because example.com/foo cannot match example.com/foobar
-            // we need to order so example.com/foo matches before example.com/
-            var domainsAndUris = domains
-                .Where(d => d.IsWildcard == false)
-                .Select(d => new DomainAndUri(d, uri))
-                .OrderByDescending(d => d.Uri.ToString())
-                .ToList();
+            var domainsAndUris = SelectDomains(domains, uri).ToArray();
 
             // nothing = no magic, return null
-            if (domainsAndUris.Count == 0)
+            if (domainsAndUris.Length == 0)
                 return null;
 
             // sanitize cultures
@@ -189,7 +184,8 @@ namespace Umbraco.Web.Routing
             }
 
             // look for domains that would be the base of the uri
-            var baseDomains = SelectByBase(considerForBaseDomains, uri);
+            // we need to order so example.com/foo matches before example.com/
+            var baseDomains = SelectByBase(considerForBaseDomains.OrderByDescending(d => d.Uri.ToString()).ToList(), uri);
             if (baseDomains.Count > 0) // found, return
                 return baseDomains.First();
 
@@ -220,9 +216,11 @@ namespace Umbraco.Web.Routing
 
             // if none matches, try again without the port
             // ie current is www.example.com:1234/foo/bar, look for domain www.example.com
-            var currentWithoutPort = currentWithSlash.WithoutPort();
             if (baseDomains.Count == 0)
+            {
+                var currentWithoutPort = currentWithSlash.WithoutPort();
                 baseDomains = domainsAndUris.Where(d => IsBaseOf(d, currentWithoutPort)).ToList();
+            }
 
             return baseDomains;
         }
@@ -264,7 +262,7 @@ namespace Umbraco.Web.Routing
                 if (domainAndUri != null) return domainAndUri;
             }
 
-            return domainsAndUris.First(); // what else?
+            return domainsAndUris.FirstOrDefault(); // what else?
         }
 
         /// <summary>
@@ -278,8 +276,7 @@ namespace Umbraco.Web.Routing
             // TODO: where are we matching ?!!?
             return domains
                 .Where(d => d.IsWildcard == false)
-                .Select(d => new DomainAndUri(d, uri))
-                .OrderByDescending(d => d.Uri.ToString());
+                .Select(d => new DomainAndUri(d, uri));
         }
 
         /// <summary>
@@ -295,6 +292,7 @@ namespace Umbraco.Web.Routing
                 ? currentUri.GetLeftPart(UriPartial.Authority) + domainName
                 : domainName;
             var scheme = currentUri?.Scheme ?? Uri.UriSchemeHttp;
+
             return new Uri(UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(name, scheme)));
         }
 
@@ -311,9 +309,7 @@ namespace Umbraco.Web.Routing
         /// <returns>A value indicating if there is another domain defined down in the path.</returns>
         /// <remarks>Looks _under_ rootNodeId but not _at_ rootNodeId.</remarks>
         internal static bool ExistsDomainInPath(IEnumerable<Domain> domains, string path, int? rootNodeId)
-        {
-            return FindDomainInPath(domains, path, rootNodeId) != null;
-        }
+            => FindDomainInPath(domains, path, rootNodeId) != null;
 
         /// <summary>
         /// Gets the deepest non-wildcard Domain, if any, from a group of Domains, in a node path.
@@ -324,17 +320,7 @@ namespace Umbraco.Web.Routing
         /// <returns>The deepest non-wildcard Domain in the path, or null.</returns>
         /// <remarks>Looks _under_ rootNodeId but not _at_ rootNodeId.</remarks>
         internal static Domain FindDomainInPath(IEnumerable<Domain> domains, string path, int? rootNodeId)
-        {
-            var stopNodeId = rootNodeId ?? -1;
-
-            return path.Split(',')
-                       .Reverse()
-                       .Select(int.Parse)
-                       .TakeWhile(id => id != stopNodeId)
-                       .Select(id => domains.FirstOrDefault(d => d.ContentId == id && d.IsWildcard == false))
-                       .SkipWhile(domain => domain == null)
-                       .FirstOrDefault();
-        }
+            => FindDomainInPath(domains, path, rootNodeId, false);
 
         /// <summary>
         /// Gets the deepest wildcard Domain, if any, from a group of Domains, in a node path.
@@ -345,6 +331,9 @@ namespace Umbraco.Web.Routing
         /// <returns>The deepest wildcard Domain in the path, or null.</returns>
         /// <remarks>Looks _under_ rootNodeId but not _at_ rootNodeId.</remarks>
         internal static Domain FindWildcardDomainInPath(IEnumerable<Domain> domains, string path, int? rootNodeId)
+            => FindDomainInPath(domains, path, rootNodeId, true);
+
+        private static Domain FindDomainInPath(IEnumerable<Domain> domains, string path, int? rootNodeId, bool isWildcard)
         {
             var stopNodeId = rootNodeId ?? -1;
 
@@ -352,7 +341,7 @@ namespace Umbraco.Web.Routing
                        .Reverse()
                        .Select(int.Parse)
                        .TakeWhile(id => id != stopNodeId)
-                       .Select(id => domains.FirstOrDefault(d => d.ContentId == id && d.IsWildcard))
+                       .Select(id => domains.FirstOrDefault(d => d.ContentId == id && d.IsWildcard == isWildcard))
                        .FirstOrDefault(domain => domain != null);
         }
 
