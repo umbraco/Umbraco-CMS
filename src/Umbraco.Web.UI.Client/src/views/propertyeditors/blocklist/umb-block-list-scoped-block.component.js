@@ -2,16 +2,18 @@
     "use strict";
 
     /**
-     * @ngdoc component
-     * @name umbraco.directives.directive:umbBlockListScopedBlockContent
+     * @ngdoc directive
+     * @name umbraco.directives.directive:umbBlockListScopedBlock
      * @description
      * The component for a style-scoped block of the block list property editor.
+     * Uses a ShadowDom to make a scoped element.
+     * This way the backoffice styling does not collide with the block style.
      */
     
     angular
         .module("umbraco")
-        .component("umbBlockListScopedBlockContent", {
-            controller: BlockListScopedBlockContentController,
+        .component("umbBlockListScopedBlock", {
+            controller: BlockListScopedBlockController,
             controllerAs: "model",
             bindings: {
                 stylesheet: "@",
@@ -23,7 +25,7 @@
         }
     );
 
-    function BlockListScopedBlockContentController($compile, $element, $scope) {
+    function BlockListScopedBlockController($compile, $element, $scope) {
         var model = this;
         model.$onInit = function() {
             $scope.block = model.block;

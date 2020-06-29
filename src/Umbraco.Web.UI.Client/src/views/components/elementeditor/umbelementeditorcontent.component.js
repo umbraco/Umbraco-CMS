@@ -4,7 +4,7 @@
     angular
         .module('umbraco.directives')
         .component('umbElementEditorContent', {
-            templateUrl: 'views/common/infiniteeditors/elementeditor/elementEditor.content.component.html',
+            templateUrl: 'views/components/elementeditor/umb-element-editor-content.component.html',
             controller: ElementEditorContentComponentController,
             controllerAs: 'vm',
             bindings: {
@@ -14,7 +14,7 @@
 
     function ElementEditorContentComponentController() {
 
-        // TODO: we might not need this..
+        // We need a controller for the component to work.
 
     }
 

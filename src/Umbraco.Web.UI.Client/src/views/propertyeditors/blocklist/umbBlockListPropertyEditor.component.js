@@ -3,8 +3,8 @@
 
 
     /**
-     * @ngdoc component
-     * @name umbraco.directives.directive:blockListPropertyEditor
+     * @ngdoc directive
+     * @name umbraco.directives.directive:umbBlockListPropertyEditor
      * @function
      *
      * @description
@@ -12,8 +12,8 @@
      */
     angular
         .module("umbraco")
-        .component("blockListPropertyEditor", {
-            templateUrl: "views/propertyeditors/blocklist/blocklist.component.html",
+        .component("umbBlockListPropertyEditor", {
+            templateUrl: "views/propertyeditors/blocklist/umb-block-list-property-editor.html",
             controller: BlockListController,
             controllerAs: "vm",
             bindings: {
@@ -23,7 +23,8 @@
             require: {
                 umbProperty: "?^umbProperty",
                 umbVariantContent: '?^^umbVariantContent',
-                umbVariantContentEditors: '?^^umbVariantContentEditors'
+                umbVariantContentEditors: '?^^umbVariantContentEditors',
+                umbElementEditorContent: '?^^umbElementEditorContent'
             }
         });
 
@@ -390,10 +391,6 @@
 
         };
 
-        function requestCopyBlock(block) {
-            clipboardService.copy("elementTypeArray", block.content.contentTypeAlias, block.content, block.label);
-        }
-
         var requestCopyAllBlocks = function() {
 
             var elementTypesToCopy = vm.layout.filter(entry => entry.$block.config.unsupported !== true).map(entry => entry.$block.content);
@@ -407,14 +404,15 @@
             var contentNodeName = "";
             if(vm.umbVariantContent) {
                 contentNodeName = vm.umbVariantContent.editor.content.name;
+            } else if (vm.umbElementEditorContent) {
+                contentNodeName = vm.umbElementEditorContent.model.documentType.name
             }
-            // TODO: check if we are in an overlay and then lets get the Label of this block.
 
             localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function(localizedLabel) {
                 clipboardService.copyArray("elementTypeArray", aliases, elementTypesToCopy, localizedLabel, "icon-thumbnail-list", vm.model.id);
             });
         }
-        function requestCopyBlock(block) {
+        function copyBlock(block) {
             clipboardService.copy("elementType", block.content.contentTypeAlias, block.content, block.label);
         }
         function requestPasteFromClipboard(index, pasteEntry) {
@@ -488,7 +486,7 @@
         vm.blockEditorApi = {
             activateBlock: activateBlock,
             editBlock: editBlock,
-            requestCopyBlock: requestCopyBlock,
+            copyBlock: copyBlock,
             requestDeleteBlock: requestDeleteBlock,
             deleteBlock: deleteBlock,
             openSettingsForBlock: openSettingsForBlock

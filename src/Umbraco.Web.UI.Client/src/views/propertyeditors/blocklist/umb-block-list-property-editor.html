@@ -1,6 +1,6 @@
 <div class="umb-block-list">
 
-    <umb-load-indicator style="margin-bottom:20px;" ng-if="vm.loading"></umb-load-indicator>
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
     <div class="umb-block-list__wrapper" ng-style="vm.listWrapperStyles">
 
@@ -20,10 +20,23 @@
 
                 <div class="umb-block-list__block" ng-class="{'--active':layout.$block.active}">
 
-                    <umb-block-list-scoped-block-content ng-if="layout.$block.config.stylesheet" class="umb-block-list__block--content blockelement__draggable-element" view="{{layout.$block.view}}" stylesheet="/{{::layout.$block.config.stylesheet}}" api="vm.blockEditorApi" block="layout.$block" index="$index">
-                    </umb-block-list-scoped-block-content>
-                    <umb-block-list-block-content ng-if="!layout.$block.config.stylesheet" class="umb-block-list__block--content" view="{{layout.$block.view}}" api="vm.blockEditorApi" block="layout.$block" index="$index">
-                    </umb-block-list-block-content>
+                    <umb-block-list-scoped-block
+                        ng-if="layout.$block.config.stylesheet"
+                        class="umb-block-list__block--content blockelement__draggable-element"
+                        view="{{layout.$block.view}}"
+                        stylesheet="/{{::layout.$block.config.stylesheet}}"
+                        api="vm.blockEditorApi"
+                        block="layout.$block"
+                        index="$index">
+                    </umb-block-list-scoped-block>
+                    <umb-block-list-block
+                        ng-if="!layout.$block.config.stylesheet"
+                        class="umb-block-list__block--content"
+                        view="{{layout.$block.view}}"
+                        api="vm.blockEditorApi"
+                        block="layout.$block"
+                        index="$index">
+                    </umb-block-list-block>
 
                     <div class="umb-block-list__block--actions">
                         <button type="button" class="btn-reset umb-outline action --settings" localize="title" title="actions_editSettings" ng-click="vm.blockEditorApi.openSettingsForBlock(layout.$block);" ng-if="layout.$block.showSettings === true">
@@ -32,7 +45,7 @@
                                 <localize key="general_settings">Settings</localize>
                             </span>
                         </button>
-                        <button type="button" class="btn-reset umb-outline action --copy" localize="title" title="actions_copy" ng-click="vm.blockEditorApi.requestCopyBlock(layout.$block);" ng-if="layout.$block.showCopy === true">
+                        <button type="button" class="btn-reset umb-outline action --copy" localize="title" title="actions_copy" ng-click="vm.blockEditorApi.copyBlock(layout.$block);" ng-if="layout.$block.showCopy === true">
                             <i class="icon icon-documents" aria-hidden="true"></i>
                             <span class="sr-only">
                                 <localize key="general_copy">Copy</localize>

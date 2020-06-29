@@ -45,7 +45,7 @@
         ]
     };
 
-    describe('init blockEditoModelObject', function () {
+    describe('init blockEditorModelObject', function () {
         
         it('fail if no model value', function () {
             function createWithNoModelValue() {
