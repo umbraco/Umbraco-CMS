@@ -36,6 +36,9 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 .Add<IdentityMapDefinition>()
                ;
 
+            composition.Register<CommonMapper>();
+            composition.Register<MemberTabsAndPropertiesMapper>();
+
             return composition;
         }
     }
