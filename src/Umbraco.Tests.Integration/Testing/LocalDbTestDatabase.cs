@@ -192,7 +192,7 @@ namespace Umbraco.Tests.Integration.Testing
             ";
 
             // rudimentary retry policy since a db can still be in use when we try to drop
-            Retry(5, () =>
+            Retry(10, () =>
             {
                 cmd.ExecuteNonQuery();
             });
@@ -237,13 +237,19 @@ namespace Umbraco.Tests.Integration.Testing
                     action();
                     return;
                 }
-                catch (SqlException)
+                catch (SqlException e)
                 {
+
+                    Console.Error.WriteLine($"SqlException occured, but we try again {i+1}/{maxIterations}.\n{e}");
                     // This can occur when there's a transaction deadlock which means (i think) that the database is still in use and hasn't been closed properly yet
                     // so we need to just wait a little bit
-                    Thread.Sleep(2000);
-                    if (i == maxIterations-1)
+                    Thread.Sleep(100 * i);
+                    if (i == maxIterations - 1)
+                    {
+                        Debugger.Launch();
                         throw;
+                    }
+
                 }
             }
         }
@@ -316,19 +322,20 @@ namespace Umbraco.Tests.Integration.Testing
 
             private void PrepareThread()
             {
-                while (_prepareQueue.IsCompleted == false)
+                Retry(10, () =>
                 {
-                    int i;
-                    try
+                    while (_prepareQueue.IsCompleted == false)
                     {
-                        i = _prepareQueue.Take();
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        continue;
-                    }
-                    Retry(5, () =>
-                    {
+                        int i;
+                        try
+                        {
+                            i = _prepareQueue.Take();
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            continue;
+                        }
+
                         using (var conn = new SqlConnection(ConnectionString(i)))
                         using (var cmd = conn.CreateCommand())
                         {
@@ -338,11 +345,11 @@ namespace Umbraco.Tests.Integration.Testing
                             _prepare?.Invoke(conn, cmd);
 
                         }
-                    });
 
-                    if (!_readyQueue.IsAddingCompleted)
-                        _readyQueue.Add(i);
-                }
+                        if (!_readyQueue.IsAddingCompleted)
+                            _readyQueue.Add(i);
+                    }
+                });
             }
 
             public void Stop()
