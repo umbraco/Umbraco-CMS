@@ -54,7 +54,7 @@ namespace Umbraco.Web.PropertyEditors
             {
                 _propertyEditors = propertyEditors;
                 _dataTypeService = dataTypeService;
-                _blockEditorValues = new BlockEditorValues(new BlocListEditorDataConverter(), contentTypeService);
+                _blockEditorValues = new BlockEditorValues(new BlockListEditorDataConverter(), contentTypeService);
                 Validators.Add(new BlockEditorValidator(_blockEditorValues, propertyEditors, dataTypeService, textService));
             }
 

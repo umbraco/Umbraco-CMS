@@ -4,7 +4,7 @@
 * @restrict E
 **/
 angular.module("umbraco.directives")
-    .directive('umbProperty', function (userService) {
+    .directive('umbProperty', function (userService, serverValidationManager, udiService) {
         return {
             scope: {
                 property: "=",                
@@ -28,6 +28,11 @@ angular.module("umbraco.directives")
                         }
                     });
                 }
+
+                if (scope.elementUdi && !scope.elementUdi.startsWith("umb://")) {
+                    scope.elementUdi = udiService.build("element", scope.elementUdi);
+                }
+
             },
             //Define a controller for this directive to expose APIs to other directives
             controller: function ($scope) {
@@ -48,9 +53,10 @@ angular.module("umbraco.directives")
 
                 // returns the unique Id for the property to be used as the validation key for server side validation logic
                 self.getValidationPath = function () {
+
                     // the elementUdi will be empty when this is not a nested property
                     var propAlias = $scope.propertyAlias ? $scope.propertyAlias : $scope.property.alias;
-                    return $scope.elementUdi ? ($scope.elementUdi + "/" + propAlias) : propAlias;
+                    return serverValidationManager.createPropertyValidationKey(propAlias, $scope.elementUdi);
                 }
                 $scope.getValidationPath = self.getValidationPath;
 

@@ -38,6 +38,8 @@ function valPropertyMsg(serverValidationManager, localizationService) {
             var currentProperty = umbPropCtrl.property;
             scope.currentProperty = currentProperty;
 
+            var propertyValidationKey = umbPropCtrl.getValidationPath();
+
             var currentCulture = currentProperty.culture;
             var currentSegment = currentProperty.segment;     
             
@@ -71,7 +73,7 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                 //this can be null if no property was assigned
                 if (scope.currentProperty) {
                     //first try to get the error msg from the server collection
-                    var err = serverValidationManager.getPropertyError(scope.currentProperty.alias, null, "", null);
+                    var err = serverValidationManager.getPropertyError(propertyValidationKey, null, "", null);
                     //if there's an error message use it
                     if (err && err.errorMsg) {
                         return err.errorMsg;
@@ -240,7 +242,7 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                     }
                 }
 
-                unsubscribe.push(serverValidationManager.subscribe(scope.currentProperty.alias,
+                unsubscribe.push(serverValidationManager.subscribe(propertyValidationKey,
                     currentCulture,
                     "",
                     serverValidationManagerCallback,

@@ -7,7 +7,7 @@
     **/
 function valServer(serverValidationManager) {
     return {
-        require: ['ngModel', '?^^umbProperty', '?^^umbVariantContent', '?^^umbNestedProperty'],
+        require: ['ngModel', '?^^umbProperty', '?^^umbVariantContent'],
         restrict: "A",
         scope: {},
         link: function (scope, element, attr, ctrls) {
@@ -21,7 +21,6 @@ function valServer(serverValidationManager) {
             
             // optional reference to the varaint-content-controller, needed to avoid validation when the field is invariant on non-default languages.
             var umbVariantCtrl = ctrls.length > 2 ? ctrls[2] : null;
-            var umbNestedPropertyCtrl = ctrls.length > 3 ? ctrls[3] : null;
 
             var currentProperty = umbPropCtrl.property;
             var currentCulture = currentProperty.culture;
@@ -56,6 +55,14 @@ function valServer(serverValidationManager) {
                 }
             }
 
+            function getPropertyValidationKey() {
+                // Get the property validation path if there is one, this is how wiring up any nested/virtual property validation works
+                var propertyValidationPath = umbPropCtrl ? umbPropCtrl.getValidationPath() : null;
+                // TODO: Is this going to break with nested content because it changes the alias?
+                // Hrm, don't think so because NC will use the property validation path
+                return propertyValidationPath ? propertyValidationPath : currentProperty.alias;
+            }
+
             //Need to watch the value model for it to change, previously we had  subscribed to 
             //modelCtrl.$viewChangeListeners but this is not good enough if you have an editor that
             // doesn't specifically have a 2 way ng binding. This is required because when we
@@ -78,9 +85,7 @@ function valServer(serverValidationManager) {
                             modelCtrl.$setValidity('valServer', true);
 
                             //clear the server validation entry
-                            // TODO: We'll need to handle this differently since this will need to target the actual 'fieldName' or validation
-                            // path if there is one
-                            serverValidationManager.removePropertyError(currentProperty.alias, currentCulture, fieldName, currentSegment);
+                            serverValidationManager.removePropertyError(getPropertyValidationKey(), currentCulture, fieldName, currentSegment);
                             stopWatch();
                         }
                     }, true);
@@ -110,21 +115,12 @@ function valServer(serverValidationManager) {
                 }
             }
 
-            // TODO: If this is a property/field within a complex editor which means it could be a nested/nested/nested property/field           
-            // TODO: We have a block $id to work with now so that is what we should be looking to use for the 'key'
-
-            var propertyValidationPath = umbNestedPropertyCtrl ? umbNestedPropertyCtrl.getValidationPath() : null;
+            
 
             unsubscribe.push(serverValidationManager.subscribe(
-                currentProperty.alias,
+                getPropertyValidationKey(),
                 currentCulture,
-                // use the propertyValidationPath for the fieldName value if there is one since if there is one it means it's a complex
-                // editor and as such the 'fieldName' will be empty. The serverValidationManager knows how to handle the jsonpath
-                // string as the fieldName.
-                // TODO: This isn't quite true! If there is a fieldName specified, then it will need to be added to the 
-                // validation path. We should pass in the fieldName to umbNestedPropertyCtrl.getValidationPath(); since this could very well be targeting a specific field
-
-                propertyValidationPath ? propertyValidationPath : fieldName,
+                fieldName,
                 serverValidationManagerCallback,
                 currentSegment)
             );

@@ -16,13 +16,17 @@
              * @function
              *
              * @description
-             * Generates a Udi string.
+             * Generates a Udi string with a new ID
              *
              * @param {string} entityType The entityType as a string.
              * @returns {string} The generated UDI
              */
             create: function(entityType) {
-                return "umb://" + entityType + "/" + (String.CreateGuid().replace(/-/g, ""));
+                return this.create(entityType, String.CreateGuid());
+            },
+
+            build: function (entityType, guid) {
+                return "umb://" + entityType + "/" + (guid.replace(/-/g, ""));
             }
         }
     }

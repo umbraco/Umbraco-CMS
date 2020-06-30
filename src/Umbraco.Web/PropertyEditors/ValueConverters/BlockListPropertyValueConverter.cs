@@ -61,7 +61,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 var value = (string)inter;
                 if (string.IsNullOrWhiteSpace(value)) return model;
 
-                var converter = new BlocListEditorDataConverter();
+                var converter = new BlockListEditorDataConverter();
                 var converted = converter.Convert(value);
                 if (converted.Blocks.Count == 0) return model;
 

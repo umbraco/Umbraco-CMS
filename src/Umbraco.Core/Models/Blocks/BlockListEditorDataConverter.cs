@@ -7,9 +7,9 @@ namespace Umbraco.Core.Models.Blocks
     /// <summary>
     /// Data converter for the block list property editor
     /// </summary>
-    public class BlocListEditorDataConverter : BlockEditorDataConverter
+    public class BlockListEditorDataConverter : BlockEditorDataConverter
     {
-        public BlocListEditorDataConverter() : base(Constants.PropertyEditors.Aliases.BlockList)
+        public BlockListEditorDataConverter() : base(Constants.PropertyEditors.Aliases.BlockList)
         {
         }
 

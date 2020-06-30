@@ -8,35 +8,55 @@
  * is for user defined properties (called Properties) and the other is for field properties which are attached to the native 
  * model objects (not user defined). The methods below are named according to these rules: Properties vs Fields.
  */
-function serverValidationManager($timeout) {
+function serverValidationManager($timeout, udiService) {
 
     var callbacks = [];
+
+    // The array of error messages
+    var items = [];
     
     /** calls the callback specified with the errors specified, used internally */
-    function executeCallback(self, errorsForCallback, callback, culture, segment) {
+    function executeCallback(errorsForCallback, callback, culture, segment) {
 
-        callback.apply(self, [
+        callback.apply(instance, [
                 false,                 // pass in a value indicating it is invalid
                 errorsForCallback,     // pass in the errors for this item
-                self.items,            // pass in all errors in total
+                items,                 // pass in all errors in total
                 culture,               // pass the culture that we are listing for.
                 segment                // pass the segment that we are listing for.
             ]
         );
     }
 
-    function getFieldErrors(self, fieldName) {
+    /**
+     * @ngdoc function
+     * @name notify
+     * @methodOf umbraco.services.serverValidationManager
+     * @function
+     *
+     * @description
+     * This method isn't used very often but can be used if all subscriptions need to be notified again. This can be
+     * handy if a view needs to be reloaded/rebuild like when switching variants in the content editor. This is also used
+     * when a new subscription occurs and there is already registered errors like dynamically created/shown editors.
+     */
+    function notify() {
+        $timeout(function () {
+            notifyCallbacks();
+        });
+    }
+
+    function getFieldErrors(fieldName) {
         if (!Utilities.isString(fieldName)) {
             throw "fieldName must be a string";
         }
 
         //find errors for this field name
-        return _.filter(self.items, function (item) {
+        return _.filter(items, function (item) {
             return (item.propertyAlias === null && item.culture === "invariant" && item.fieldName === fieldName);
         });
     }
     
-    function getPropertyErrors(self, propertyAlias, culture, segment, fieldName) {
+    function getPropertyErrors(propertyAlias, culture, segment, fieldName) {
         if (!Utilities.isString(propertyAlias)) {
             throw "propertyAlias must be a string";
         }
@@ -52,12 +72,12 @@ function serverValidationManager($timeout) {
         }
 
         //find all errors for this property
-        return _.filter(self.items, function (item) {
+        return _.filter(items, function (item) {
             return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
         });
     }
     
-    function getVariantErrors(self, culture, segment) {
+    function getVariantErrors(culture, segment) {
         
         if (!culture) {
             culture = "invariant";
@@ -67,32 +87,33 @@ function serverValidationManager($timeout) {
         }
         
         //find all errors for this property
-        return _.filter(self.items, function (item) {
+        return _.filter(items, function (item) {
             return (item.culture === culture && item.segment === segment);
         });
     }
 
-    function notifyCallbacks(self) {
-        for (var cb in callbacks) {
-            if (callbacks[cb].propertyAlias === null && callbacks[cb].fieldName !== null) {
+    function notifyCallbacks() {
+        for (var i = 0; i < callbacks.length; i++) {
+            var cb = callbacks[i];
+            if (cb.propertyAlias === null && cb.fieldName !== null) {
                 //its a field error callback
-                var fieldErrors = getFieldErrors(self, callbacks[cb].fieldName);
+                var fieldErrors = getFieldErrors(cb.fieldName);
                 if (fieldErrors.length > 0) {
-                    executeCallback(self, fieldErrors, callbacks[cb].callback, callbacks[cb].culture, callbacks[cb].segment);
+                    executeCallback(fieldErrors, cb.callback, cb.culture, cb.segment);
                 }
             }
-            else if (callbacks[cb].propertyAlias != null) {
+            else if (cb.propertyAlias != null) {
                 //its a property error
-                var propErrors = getPropertyErrors(self, callbacks[cb].propertyAlias, callbacks[cb].culture, callbacks[cb].segment, callbacks[cb].fieldName);
+                var propErrors = getPropertyErrors(cb.propertyAlias, cb.culture, cb.segment, cb.fieldName);
                 if (propErrors.length > 0) {
-                    executeCallback(self, propErrors, callbacks[cb].callback, callbacks[cb].culture, callbacks[cb].segment);
+                    executeCallback(propErrors, cb.callback, cb.culture, cb.segment);
                 }
             }
             else {
                 //its a variant error
-                var variantErrors = getVariantErrors(self, callbacks[cb].culture, callbacks[cb].segment);
+                var variantErrors = getVariantErrors(cb.culture, cb.segment);
                 if (variantErrors.length > 0) {
-                    executeCallback(self, variantErrors, callbacks[cb].callback, callbacks[cb].culture, callbacks[cb].segment);
+                    executeCallback(variantErrors, cb.callback, cb.culture, cb.segment);
                 }
             }
         }
@@ -132,9 +153,347 @@ function serverValidationManager($timeout) {
         return result;
     }
 
-    return {
+    /**
+     * @ngdoc function
+     * @name getPropertyCallbacks
+     * @methodOf umbraco.services.serverValidationManager
+     * @function
+     *
+     * @description
+     * Gets all callbacks that has been registered using the subscribe method for the propertyAlias + fieldName combo.
+     * This will always return any callbacks registered for just the property (i.e. field name is empty) and for ones with an
+     * explicit field name set.
+     */
+    function getPropertyCallbacks(propertyAlias, culture, fieldName, segment) {
 
+        //normalize culture to "invariant"
+        if (!culture) {
+            culture = "invariant";
+        }
+        //normalize segment to null
+        if (!segment) {
+            segment = null;
+        }
+
+        var found = _.filter(callbacks, function (item) {
+            //returns any callback that have been registered directly against the field and for only the property
+            return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (item.fieldName === undefined || item.fieldName === "")));
+        });
+        return found;
+    }
+
+    /**
+     * @ngdoc function
+     * @name getFieldCallbacks
+     * @methodOf umbraco.services.serverValidationManager
+     * @function
+     *
+     * @description
+     * Gets all callbacks that has been registered using the subscribe method for the field.
+     */
+    function getFieldCallbacks(fieldName) {
+        var found = _.filter(callbacks, function (item) {
+            //returns any callback that have been registered directly against the field
+            return (item.propertyAlias === null && item.culture === "invariant" && item.segment === null && item.fieldName === fieldName);
+        });
+        return found;
+    }
+
+    /**
+     * @ngdoc function
+     * @name getVariantCallbacks
+     * @methodOf umbraco.services.serverValidationManager
+     * @function
+     *
+     * @description
+     * Gets all callbacks that has been registered using the subscribe method for the culture and segment.
+     */
+    function getVariantCallbacks(culture, segment) {
+        var found = _.filter(callbacks, function (item) {
+            //returns any callback that have been registered directly against the given culture and given segment.
+            return (item.culture === culture && item.segment === segment && item.propertyAlias === null && item.fieldName === null);
+        });
+        return found;
+    }
+
+    /**
+     * @ngdoc function
+     * @name addFieldError
+     * @methodOf umbraco.services.serverValidationManager
+     * @function
+     *
+     * @description
+     * Adds an error message for a native content item field (not a user defined property, for Example, 'Name')
+     */
+    function addFieldError(fieldName, errorMsg) {
+        if (!fieldName) {
+            return;
+        }
+
+        //only add the item if it doesn't exist                
+        if (!hasFieldError(fieldName)) {
+            items.push({
+                propertyAlias: null,
+                culture: "invariant",
+                segment: null,
+                fieldName: fieldName,
+                errorMsg: errorMsg
+            });
+        }
+
+        //find all errors for this item
+        var errorsForCallback = getFieldErrors(fieldName);
+        //we should now call all of the call backs registered for this error
+        var cbs = getFieldCallbacks(fieldName);
+        //call each callback for this error
+        for (var cb in cbs) {
+            executeCallback(errorsForCallback, cbs[cb].callback, null, null);
+        }
+    }
+
+    /**
+     * @ngdoc function
+     * @name addPropertyError
+     * @methodOf umbraco.services.serverValidationManager
+     * @function
+     *
+     * @description
+     * Adds an error message for the content property
+     */
+    function addPropertyError(propertyAlias, culture, fieldName, errorMsg, segment) {
+
+        // TODO: We need to handle the errorMsg in a special way to check if this is a json structure. If it is we know we are dealing with
+        // a complex editor and in which case we'll need to adjust how everything works.
+
+        if (!propertyAlias) {
+            return;
+        }
+
+        //normalize culture to "invariant"
+        if (!culture) {
+            culture = "invariant";
+        }
+        //normalize segment to null
+        if (!segment) {
+            segment = null;
+        }
+
+        // if the error message is json it's a complex editor validation response that we need to parse
+        if (errorMsg.startsWith("[")) {
+
+            var idsToErrors = parseComplexEditorError(errorMsg);
+            for (const [key, value] of Object.entries(idsToErrors)) {
+                addErrorsForModelState(value, udiService.build("element", key));
+            }
+
+            // TODO: Make this the generic "Property has errors" but need to find the lang key for that
+            errorMsg = "Hello!";
+        }
+
+        //only add the item if it doesn't exist                
+        if (!hasPropertyError(propertyAlias, culture, fieldName, segment)) {
+            items.push({
+                propertyAlias: propertyAlias,
+                culture: culture,
+                segment: segment,
+                fieldName: fieldName,
+                errorMsg: errorMsg
+            });
+        }
+
+        //find all errors for this item
+        var errorsForCallback = getPropertyErrors(propertyAlias, culture, segment, fieldName);
+        //we should now call all of the call backs registered for this error
+        var cbs = getPropertyCallbacks(propertyAlias, culture, fieldName, segment);
+        //call each callback for this error
+        for (var cb in cbs) {
+            executeCallback(errorsForCallback, cbs[cb].callback, culture, segment);
+        }
+
+        //execute variant specific callbacks here too when a propery error is added
+        var variantCbs = getVariantCallbacks(culture, segment);
+        //call each callback for this error
+        for (var cb in variantCbs) {
+            executeCallback(errorsForCallback, variantCbs[cb].callback, culture, segment);
+        }
+    }
+
+    /**
+     * @ngdoc function
+     * @name hasPropertyError
+     * @methodOf umbraco.services.serverValidationManager
+     * @function
+     *
+     * @description
+     * Checks if the content property + culture + field name combo has an error
+     */
+    function hasPropertyError(propertyAlias, culture, fieldName, segment) {
+
+        //normalize culture to null
+        if (!culture) {
+            culture = "invariant";
+        }
+        //normalize segment to null
+        if (!segment) {
+            segment = null;
+        }
+
+        var err = _.find(items, function (item) {
+            //return true if the property alias matches and if an empty field name is specified or the field name matches
+            return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+        });
+        return err ? true : false;
+    }
+
+    /**
+     * @ngdoc function
+     * @name hasFieldError
+     * @methodOf umbraco.services.serverValidationManager
+     * @function
+     *
+     * @description
+     * Checks if a content field has an error
+     */
+    function hasFieldError(fieldName) {
+        var err = _.find(items, function (item) {
+            //return true if the property alias matches and if an empty field name is specified or the field name matches
+            return (item.propertyAlias === null && item.culture === "invariant" && item.segment === null && item.fieldName === fieldName);
+        });
+        return err ? true : false;
+    }
+
+    /**
+     * @ngdoc function
+     * @name addErrorsForModelState
+     * @methodOf umbraco.services.serverValidationManager
+     * @param {any} modelState
+     * @param {any} elementUdi optional parameter specifying a nested element's UDI for which this property belongs (for complex editors)
+     * @description
+     * This wires up all of the server validation model state so that valServer and valServerField directives work
+     */    
+    function addErrorsForModelState(modelState, elementUdi) {
+        for (var e in modelState) {
+
+            //This is where things get interesting....
+            // We need to support validation for all editor types such as both the content and content type editors.
+            // The Content editor ModelState is quite specific with the way that Properties are validated especially considering
+            // that each property is a User Developer property editor.
+            // The way that Content Type Editor ModelState is created is simply based on the ASP.Net validation data-annotations 
+            // system. 
+            // So, to do this there's some special ModelState syntax we need to know about.
+            // For Content Properties, which are user defined, we know that they will exist with a prefixed
+            // ModelState of "_Properties.", so if we detect this, then we know it's for a content Property.
+
+            //the alias in model state can be in dot notation which indicates
+            // * the first part is the content property alias
+            // * the second part is the field to which the valiation msg is associated with
+            //There will always be at least 4 parts for content properties since all model errors for properties are prefixed with "_Properties"
+            //If it is not prefixed with "_Properties" that means the error is for a field of the object directly.
+
+            // TODO: This 4 part dot notation isn't ideal and instead it would probably be nicer to have a json structure as the key (which could be converted
+            // to base64 if we cannot do that since it's a 'key'). That way the key can be flexible and 'future proof' since I'm sure something in the future
+            // will change for this. Another idea is to just have a single key for one property type and have the model error a json structure that handles 
+            // everything. This would probably be the 'nicest' way but would require quite a lot of work. We are part way there with how we are doing 
+            // validation for complex editors.
+
+            // Example: "_Properties.headerImage.en-US.mySegment.myField"
+            // * it's for a property since it has a _Properties prefix
+            // * it's for the headerImage property type
+            // * it's for the en-US culture
+            // * it's for the mySegment segment
+            // * it's for the myField html field (optional)
+
+            var parts = e.split(".");
+
+            //Check if this is for content properties - specific to content/media/member editors because those are special 
+            // user defined properties with custom controls.
+            if (parts.length > 1 && parts[0] === "_Properties") {
+
+                // create the validation key, might just be the prop alias but if it's nested will be a unique udi
+                var propertyAlias = createPropertyValidationKey(parts[1], elementUdi);
+
+                var culture = null;
+                if (parts.length > 2) {
+                    culture = parts[2];
+                    //special check in case the string is formatted this way
+                    if (culture === "null") {
+                        culture = null;
+                    }
+                }
+
+                var segment = null;
+                if (parts.length > 3) {
+                    segment = parts[3];
+                    //special check in case the string is formatted this way
+                    if (segment === "null") {
+                        segment = null;
+                    }
+                }
+
+                var htmlFieldReference = "";
+                if (parts.length > 4) {
+                    htmlFieldReference = parts[4] || "";
+                }
+
+                // add a generic error for the property
+                addPropertyError(propertyAlias, culture, htmlFieldReference, modelState[e][0], segment);
+
+            }
+            else {
+
+                //Everthing else is just a 'Field'... the field name could contain any level of 'parts' though, for example:
+                // Groups[0].Properties[2].Alias
+                addFieldError(e, modelState[e][0]);
+            }
+
+        }
+    }
+
+    // TODO: Write a test or two for this and probs a bunch of other things here too!
+    function createPropertyValidationKey(propertyAlias, elementUdi) {
+        return elementUdi ? (elementUdi + "/" + propertyAlias) : propertyAlias;
+    }
+
+    /**
+     * @ngdoc function
+     * @name reset
+     * @methodOf umbraco.services.serverValidationManager
+     * @function
+     *
+     * @description
+     * Clears all errors and notifies all callbacks that all server errros are now valid - used when submitting a form
+     */
+    function reset() {
+        clear();
+        for (var cb in callbacks) {
+            callbacks[cb].callback.apply(instance, [
+                true,       //pass in a value indicating it is VALID
+                [],         //pass in empty collection
+                [],
+                null,
+                null]
+            );
+        }
+    }
+
+    /**
+     * @ngdoc function
+     * @name clear
+     * @methodOf umbraco.services.serverValidationManager
+     * @function
+     *
+     * @description
+     * Clears all errors
+     */
+    function clear() {
+        items = [];
+    }
+
+    var instance = {
+
+        addErrorsForModelState: addErrorsForModelState,
         parseComplexEditorError: parseComplexEditorError,
+        createPropertyValidationKey: createPropertyValidationKey,
 
         /**
          * @ngdoc function
@@ -143,42 +502,27 @@ function serverValidationManager($timeout) {
          * @function
          *
          * @description
-         *  This method needs to be called once all field and property errors are wired up. 
+         *  This method can be called once all field and property errors are wired up. 
          * 
          *  In some scenarios where the error collection needs to be persisted over a route change 
          *   (i.e. when a content item (or any item) is created and the route redirects to the editor) 
          *   the controller should call this method once the data is bound to the scope
          *   so that any persisted validation errors are re-bound to their controls. Once they are re-binded this then clears the validation
          *   colleciton so that if another route change occurs, the previously persisted validation errors are not re-bound to the new item.
+         *   
+         *  In the case of content with complex editors, variants and different views, those editors don't call this method and instead 
+         *  manage the server validation manually by calling notify when necessary and clear/reset when necessary.
          */
         notifyAndClearAllSubscriptions: function() {
 
-            var self = this;
-
             $timeout(function () {
-                notifyCallbacks(self);
+                notifyCallbacks();
                 //now that they are all executed, we're gonna clear all of the errors we have
-                self.clear();
+                clear();
             });
         },
 
-        /**
-         * @ngdoc function
-         * @name notify
-         * @methodOf umbraco.services.serverValidationManager
-         * @function
-         *
-         * @description
-         * This method isn't used very often but can be used if all subscriptions need to be notified again. This can be
-         * handy if a view needs to be reloaded/rebuild like when switching variants in the content editor.
-         */
-        notify: function() {
-            var self = this;
-
-            $timeout(function () {
-                notifyCallbacks(self);
-            });
-        },
+        notify: notify,
 
         /**
          * @ngdoc function
@@ -209,14 +553,8 @@ function serverValidationManager($timeout) {
                 segment = null;
             }
 
-            // TODO: Check if the fieldName is a jsonpath, we will know this if it starts with $.
-            // in which case we need to handle this a little differently.
-            if (fieldName && fieldName.startsWith("$.")) {
-                // TODO: Or... Do we even need to deal with it differently? Maybe with some luck 
-                // we can just store that path and use it. Lets see how this goes.
-            }
-
             if (propertyAlias === null) {
+
                 callbacks.push({
                     propertyAlias: null,
                     culture: culture,
@@ -227,8 +565,7 @@ function serverValidationManager($timeout) {
                 });
             }
             else if (propertyAlias !== undefined) {
-                //normalize culture to null
-                
+                                
                 callbacks.push({
                     propertyAlias: propertyAlias,
                     culture: culture, 
@@ -245,6 +582,11 @@ function serverValidationManager($timeout) {
                     return item.id === id;
                 });
             }
+
+            // Now notify the registrations for this callback if we've previously been notified and we're not cleared.
+            // This will happen for dynamically shown editors, like complex editors that load in sub element types.
+            // TODO: We need to see what the repercussions of this are in other editors!
+            notify();
 
             //return a function to unsubscribe this subscription by uniqueId
             return unsubscribeId;
@@ -286,52 +628,8 @@ function serverValidationManager($timeout) {
             }
         },
         
-        
-        /**
-         * @ngdoc function
-         * @name getPropertyCallbacks
-         * @methodOf umbraco.services.serverValidationManager
-         * @function
-         *
-         * @description
-         * Gets all callbacks that has been registered using the subscribe method for the propertyAlias + fieldName combo.
-         * This will always return any callbacks registered for just the property (i.e. field name is empty) and for ones with an 
-         * explicit field name set.
-         */
-        getPropertyCallbacks: function (propertyAlias, culture, fieldName, segment) {
-
-            //normalize culture to "invariant"
-            if (!culture) {
-                culture = "invariant";
-            }
-            //normalize segment to null
-            if (!segment) {
-                segment = null;
-            }
-
-            var found = _.filter(callbacks, function (item) {
-                //returns any callback that have been registered directly against the field and for only the property
-                return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (item.fieldName === undefined || item.fieldName === "")));
-            });
-            return found;
-        },
-        
-        /**
-         * @ngdoc function
-         * @name getFieldCallbacks
-         * @methodOf umbraco.services.serverValidationManager
-         * @function
-         *
-         * @description
-         * Gets all callbacks that has been registered using the subscribe method for the field.         
-         */
-        getFieldCallbacks: function (fieldName) {
-            var found = _.filter(callbacks, function (item) {
-                //returns any callback that have been registered directly against the field
-                return (item.propertyAlias === null && item.culture === "invariant" && item.segment === null && item.fieldName === fieldName);
-            });
-            return found;
-        },
+        getPropertyCallbacks: getPropertyCallbacks,        
+        getFieldCallbacks: getFieldCallbacks,
         
         /**
          * @ngdoc function
@@ -350,121 +648,9 @@ function serverValidationManager($timeout) {
             return found;
         },
 
-        /**
-         * @ngdoc function
-         * @name getVariantCallbacks
-         * @methodOf umbraco.services.serverValidationManager
-         * @function
-         *
-         * @description
-         * Gets all callbacks that has been registered using the subscribe method for the culture and segment.         
-         */
-        getVariantCallbacks: function (culture, segment) {
-            var found = _.filter(callbacks, function (item) {
-                //returns any callback that have been registered directly against the given culture and given segment.
-                return (item.culture === culture && item.segment === segment && item.propertyAlias === null && item.fieldName === null);
-            });
-            return found;
-        },
-        
-        /**
-         * @ngdoc function
-         * @name addFieldError
-         * @methodOf umbraco.services.serverValidationManager
-         * @function
-         *
-         * @description
-         * Adds an error message for a native content item field (not a user defined property, for Example, 'Name')
-         */
-        addFieldError: function(fieldName, errorMsg) {
-            if (!fieldName) {
-                return;
-            }
-            
-            //only add the item if it doesn't exist                
-            if (!this.hasFieldError(fieldName)) {
-                this.items.push({
-                    propertyAlias: null,
-                    culture: "invariant",
-                    segment: null,
-                    fieldName: fieldName,
-                    errorMsg: errorMsg
-                });
-            }
-            
-            //find all errors for this item
-            var errorsForCallback = getFieldErrors(this, fieldName);
-            //we should now call all of the call backs registered for this error
-            var cbs = this.getFieldCallbacks(fieldName);
-            //call each callback for this error
-            for (var cb in cbs) {
-                executeCallback(this, errorsForCallback, cbs[cb].callback, null, null);
-            }
-        },
-
-        /**
-         * @ngdoc function
-         * @name addPropertyError
-         * @methodOf umbraco.services.serverValidationManager
-         * @function
-         *
-         * @description
-         * Adds an error message for the content property
-         */
-        addPropertyError: function (propertyAlias, culture, fieldName, errorMsg, segment) {
-
-            // TODO: We need to handle the errorMsg in a special way to check if this is a json structure. If it is we know we are dealing with
-            // a complex editor and in which case we'll need to adjust how everything works.
-
-            if (!propertyAlias) {
-                return;
-            }
-
-            //normalize culture to "invariant"
-            if (!culture) {
-                culture = "invariant";
-            }
-            //normalize segment to null
-            if (!segment) {
-                segment = null;
-            }
-
-            // if the error message is json it's a complex editor validation response that we need to parse
-            if (errorMsg.startsWith("[")) {
-
-                var idsToErrors = parseComplexEditorError(errorMsg);
-
-                // TODO: Make this the generic "Property has errors" but need to find the lang key for that
-                errorMsg = "Hello!";
-            }
-
-            //only add the item if it doesn't exist                
-            if (!this.hasPropertyError(propertyAlias, culture, fieldName, segment)) {
-                this.items.push({
-                    propertyAlias: propertyAlias,
-                    culture: culture,
-                    segment: segment,
-                    fieldName: fieldName,
-                    errorMsg: errorMsg
-                });
-            }
-
-            //find all errors for this item
-            var errorsForCallback = getPropertyErrors(this, propertyAlias, culture, segment, fieldName);
-            //we should now call all of the call backs registered for this error
-            var cbs = this.getPropertyCallbacks(propertyAlias, culture, fieldName, segment);
-            //call each callback for this error
-            for (var cb in cbs) {
-                executeCallback(this, errorsForCallback, cbs[cb].callback, culture, segment);
-            }
-
-            //execute variant specific callbacks here too when a propery error is added
-            var variantCbs = this.getVariantCallbacks(culture, segment);
-            //call each callback for this error
-            for (var cb in variantCbs) {
-                executeCallback(this, errorsForCallback, variantCbs[cb].callback, culture, segment);
-            }
-        },      
+        getVariantCallbacks: getVariantCallbacks,
+        addFieldError: addFieldError,        
+        addPropertyError: addPropertyError,      
         
         /**
          * @ngdoc function
@@ -491,45 +677,13 @@ function serverValidationManager($timeout) {
             }
 
             //remove the item
-            this.items = _.reject(this.items, function (item) {
+            items = _.reject(items, function (item) {
                 return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
             });
         },
         
-        /**
-         * @ngdoc function
-         * @name reset
-         * @methodOf umbraco.services.serverValidationManager
-         * @function
-         *
-         * @description
-         * Clears all errors and notifies all callbacks that all server errros are now valid - used when submitting a form
-         */
-        reset: function () {
-            this.clear();
-            for (var cb in callbacks) {
-                callbacks[cb].callback.apply(this, [
-                        true,       //pass in a value indicating it is VALID
-                        [],         //pass in empty collection
-                        [],
-                        null,
-                        null]
-                    );
-            }
-        },
-        
-        /**
-         * @ngdoc function
-         * @name clear
-         * @methodOf umbraco.services.serverValidationManager
-         * @function
-         *
-         * @description
-         * Clears all errors
-         */
-        clear: function() {
-            this.items = [];
-        },
+        reset: reset,
+        clear: clear,
         
         /**
          * @ngdoc function
@@ -551,7 +705,7 @@ function serverValidationManager($timeout) {
                 segment = null;
             }
 
-            var err = _.find(this.items, function (item) {
+            var err = _.find(items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
                 return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
             });
@@ -568,56 +722,15 @@ function serverValidationManager($timeout) {
          * Gets the error message for a content field
          */
         getFieldError: function (fieldName) {
-            var err = _.find(this.items, function (item) {
+            var err = _.find(items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
                 return (item.propertyAlias === null && item.culture === "invariant" && item.segment === null && item.fieldName === fieldName);
             });
             return err;
         },
         
-        /**
-         * @ngdoc function
-         * @name hasPropertyError
-         * @methodOf umbraco.services.serverValidationManager
-         * @function
-         *
-         * @description
-         * Checks if the content property + culture + field name combo has an error
-         */
-        hasPropertyError: function (propertyAlias, culture, fieldName, segment) {
-
-            //normalize culture to null
-            if (!culture) {
-                culture = "invariant";
-            }
-            //normalize segment to null
-            if (!segment) {
-                segment = null;
-            }
-
-            var err = _.find(this.items, function (item) {
-                //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
-            });
-            return err ? true : false;
-        },
-        
-        /**
-         * @ngdoc function
-         * @name hasFieldError
-         * @methodOf umbraco.services.serverValidationManager
-         * @function
-         *
-         * @description
-         * Checks if a content field has an error
-         */
-        hasFieldError: function (fieldName) {
-            var err = _.find(this.items, function (item) {
-                //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === null && item.culture === "invariant" && item.segment === null && item.fieldName === fieldName);
-            });
-            return err ? true : false;
-        },
+        hasPropertyError: hasPropertyError,        
+        hasFieldError: hasFieldError,
         
         /**
          * @ngdoc function
@@ -635,7 +748,7 @@ function serverValidationManager($timeout) {
                 culture = "invariant";
             }
 
-            var err = _.find(this.items, function (item) {
+            var err = _.find(items, function (item) {
                 return (item.culture === culture && item.segment === null);
             });
             return err ? true : false;
@@ -661,14 +774,25 @@ function serverValidationManager($timeout) {
                 segment = null;
             }
             
-            var err = _.find(this.items, function (item) {
+            var err = _.find(items, function (item) {
                 return (item.culture === culture && item.segment === segment);
             });
             return err ? true : false;
-        },
-        /** The array of error messages */
-        items: []
+        }
+
     };
+
+    // Used to return the 'items' array as a reference/getter
+    Object.defineProperty(instance, "items", {
+        get: function () {
+            return items;
+        },
+        set: function (value) {
+            throw "Cannot set the items array";
+        }
+    });
+
+    return instance;
 }
 
 angular.module('umbraco.services').factory('serverValidationManager', serverValidationManager);
