@@ -97,8 +97,8 @@
 
         vm.openAddDialog = function ($event, entry) {
 
-            //we have to add the 'alias' property to the objects, to make the data match the requirements of itempicker.
-            var selectedItems = _.each(Utilities.copy($scope.model.value), function (obj) {
+            //we have to add the 'alias' property to the objects, to meet the data requirements of itempicker.
+            var selectedItems = Utilities.copy($scope.model.value).forEach((obj) => {
                 obj.alias = vm.getElementTypeByKey(obj.contentTypeKey).alias;
                 return obj;
             });
