@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -191,23 +192,10 @@ namespace Umbraco.Tests.Integration.Testing
             ";
 
             // rudimentary retry policy since a db can still be in use when we try to drop
-            for (var i = 0; i < 5; i++)
+            Retry(5, () =>
             {
-                try
-                {
-                    cmd.ExecuteNonQuery();
-                    return;
-                }
-                catch (SqlException)
-                {
-                    // This can occur when there's a transaction deadlock which means (i think) that the database is still in use and hasn't been closed properly yet
-                    // so we need to just wait a little bit
-                    Thread.Sleep(1000);
-                    if (i == 4)
-                        throw;
-                }
-            }
-
+                cmd.ExecuteNonQuery();
+            });
         }
 
         public static void KillLocalDb()
@@ -236,6 +224,26 @@ namespace Umbraco.Tests.Integration.Testing
                 catch (IOException)
                 {
                     // ignore, must still be in use but nothing we can do
+                }
+            }
+        }
+
+        private static void Retry(int maxIterations, Action action)
+        {
+            for (var i = 0; i < maxIterations; i++)
+            {
+                try
+                {
+                    action();
+                    return;
+                }
+                catch (SqlException)
+                {
+                    // This can occur when there's a transaction deadlock which means (i think) that the database is still in use and hasn't been closed properly yet
+                    // so we need to just wait a little bit
+                    Thread.Sleep(2000);
+                    if (i == maxIterations-1)
+                        throw;
                 }
             }
         }
@@ -319,13 +327,19 @@ namespace Umbraco.Tests.Integration.Testing
                     {
                         continue;
                     }
-                    using (var conn = new SqlConnection(ConnectionString(i)))
-                    using (var cmd = conn.CreateCommand())
+                    Retry(5, () =>
                     {
-                        conn.Open();
-                        ResetLocalDb(cmd);
-                        _prepare?.Invoke(conn, cmd);
-                    }
+                        using (var conn = new SqlConnection(ConnectionString(i)))
+                        using (var cmd = conn.CreateCommand())
+                        {
+                            conn.Open();
+                            ResetLocalDb(cmd);
+
+                            _prepare?.Invoke(conn, cmd);
+
+                        }
+                    });
+
                     if (!_readyQueue.IsAddingCompleted)
                         _readyQueue.Add(i);
                 }
