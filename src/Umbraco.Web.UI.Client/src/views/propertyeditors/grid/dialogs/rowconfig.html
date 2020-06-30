@@ -60,13 +60,13 @@
 
                             <umb-control-group label="@general_width">
                                 <div class="grid-size-scaler">
-                                    <a href ng-click="scaleDown(currentCell)">
-                                        <i class="icon icon-remove"></i>
-                                    </a>
-                                    {{currentCell.grid}}
-                                    <a href ng-click="scaleUp(currentCell, availableRowSpace, true)">
-                                        <i class="icon icon-add"></i>
-                                    </a>
+                                    <button type="button" class="btn-link" ng-click="scaleDown(currentCell)">
+                                        <i class="icon icon-remove" aria-hidden="true"></i>
+                                    </button>
+                                    <span>{{currentCell.grid}}</span>
+                                    <button type="button" class="btn-link" ng-click="scaleUp(currentCell, availableRowSpace, true)">
+                                        <i class="icon icon-add" aria-hidden="true"></i>
+                                    </button>
                                 </div>
                             </umb-control-group>
 
@@ -75,10 +75,10 @@
                             </umb-control-group>
 
                             <umb-control-group hide-label="true">
-	  		                    <i class="icon-delete red"></i>
-	  		                    <a class="btn btn-small btn-link" href="" ng-click="deleteArea(currentCell, currentRow)">
+	  		                    <i class="icon-delete red" aria-hidden="true"></i>
+	  		                    <button type="button" class="btn btn-small btn-link" ng-click="deleteArea(currentCell, currentRow)">
 	  			                    <localize key="general_delete" class="ng-isolate-scope ng-scope">Delete</localize>
-	  		                    </a>
+	  		                    </button>
 	  	                    </umb-control-group>
 
                             <umb-control-group hide-label="true">
