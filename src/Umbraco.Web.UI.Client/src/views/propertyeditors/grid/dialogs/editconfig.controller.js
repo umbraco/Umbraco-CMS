@@ -18,7 +18,7 @@ function EditConfigController($scope, angularHelper) {
         onLoad: function (_editor) {
             vm.editor = _editor;
 
-            vm.configJson = JSON.stringify($scope.model.config, null, '\t');
+            vm.configJson = Utilities.toJson($scope.model.config, true);
 
             vm.editor.setValue(vm.configJson);
 
