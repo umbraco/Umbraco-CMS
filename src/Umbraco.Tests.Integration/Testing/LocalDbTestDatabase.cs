@@ -237,7 +237,7 @@ namespace Umbraco.Tests.Integration.Testing
                     action();
                     return;
                 }
-                catch (SqlException e)
+                catch (Exception e)
                 {
 
                     Console.Error.WriteLine($"SqlException occured, but we try again {i+1}/{maxIterations}.\n{e}");

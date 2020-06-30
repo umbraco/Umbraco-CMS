@@ -14,9 +14,7 @@ using Umbraco.Web.Models.TemplateQuery;
 
 namespace Umbraco.Tests.Integration.TestServerTest.Controllers
 {
-    [Explicit("We need to fix the tests on buildserver and when running multiple tests in one run")]
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class TemplateQueryControllerTests : UmbracoTestServerTestBase
     {
         [Test]
@@ -43,7 +41,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
                 {
                     var alias = nameof(ContentTypeModel.Alias);
                     var camelCaseAlias = alias.ToCamelCase();
-                    Assert.IsNotNull(jToken.Value<string>(camelCaseAlias), $"'{jToken}' do not contain the key '{camelCaseAlias}'");
+                    Assert.IsNotNull(jToken.Value<string>(camelCaseAlias), $"'{jToken}' do not contain the key '{camelCaseAlias}' in the expected casing");
                     Assert.IsNull(jToken.Value<string>(alias), $"'{jToken}' do contain the key '{alias}', which was not expect in that casing");
                 }
             });

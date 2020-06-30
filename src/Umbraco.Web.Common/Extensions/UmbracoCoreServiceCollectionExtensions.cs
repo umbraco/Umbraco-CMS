@@ -228,7 +228,7 @@ namespace Umbraco.Extensions
             factory = coreRuntime.Configure(container);
 
             return services;
-        }        
+        }
 
         private static ITypeFinder CreateTypeFinder(Core.Logging.ILogger logger, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, ITypeFinderSettings typeFinderSettings)
         {

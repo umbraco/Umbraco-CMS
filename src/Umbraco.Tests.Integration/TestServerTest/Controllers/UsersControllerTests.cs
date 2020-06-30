@@ -22,9 +22,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Tests.Integration.TestServerTest.Controllers
 {
-    [Explicit("We need to fix the tests on buildserver and when running multiple tests in one run")]
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class UsersControllerTests : UmbracoTestServerTestBase
     {
         [Test]

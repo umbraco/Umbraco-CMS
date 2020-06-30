@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <RootNamespace>Umbraco.Web.UI.NetCore</RootNamespace>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
     <ItemGroup>
       <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" />

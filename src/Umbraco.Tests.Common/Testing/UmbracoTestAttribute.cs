@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Testing
 
         // FIXME: to be completed
         /// <summary>
-        /// Gets or sets a value indicating ... 
+        /// Gets or sets a value indicating ...
         /// </summary>
         public bool PublishedRepositoryEvents { get => _publishedRepositoryEvents.ValueOrDefault(false); set => _publishedRepositoryEvents.Set(value); }
         private readonly Settable<bool> _publishedRepositoryEvents = new Settable<bool>();
@@ -50,6 +50,10 @@ namespace Umbraco.Tests.Testing
         /// </summary>
         /// <remarks>Default is to use the global tests plugin manager.</remarks>
         public UmbracoTestOptions.TypeLoader TypeLoader { get => _typeLoader.ValueOrDefault(UmbracoTestOptions.TypeLoader.Default); set => _typeLoader.Set(value); }
+        public bool Boot { get => _boot.ValueOrDefault(true); set => _boot.Set(value); }
+        private readonly Settable<bool> _boot = new Settable<bool>();
+
+
         private readonly Settable<UmbracoTestOptions.TypeLoader> _typeLoader = new Settable<UmbracoTestOptions.TypeLoader>();
 
         protected override TestOptionAttributeBase Merge(TestOptionAttributeBase other)
