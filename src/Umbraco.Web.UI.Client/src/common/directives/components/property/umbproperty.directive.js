@@ -7,7 +7,10 @@ angular.module("umbraco.directives")
     .directive('umbProperty', function (userService) {
         return {
             scope: {
-                property: "=",
+                property: "=",                
+                elementUdi: "@",
+                // optional, if set this will be used for the property alias validation path (hack required because NC changes the actual property.alias :/)
+                propertyAlias: "@", 
                 showInherit: "<",
                 inheritsFrom: "<"
             },
@@ -43,7 +46,13 @@ angular.module("umbraco.directives")
                     $scope.propertyActions = actions;
                 };
 
-                
+                // returns the unique Id for the property to be used as the validation key for server side validation logic
+                self.getValidationPath = function () {
+                    // the elementUdi will be empty when this is not a nested property
+                    var propAlias = $scope.propertyAlias ? $scope.propertyAlias : $scope.property.alias;
+                    return $scope.elementUdi ? ($scope.elementUdi + "/" + propAlias) : propAlias;
+                }
+                $scope.getValidationPath = self.getValidationPath;
 
             }
         };

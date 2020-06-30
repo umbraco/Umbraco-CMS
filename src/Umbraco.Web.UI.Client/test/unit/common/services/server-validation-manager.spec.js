@@ -316,19 +316,64 @@
 
     describe('managing complex editor validation errors', function () {
 
-        it('can retrieve validation errors for the property', function () {
+        it('create json paths for complex validation error', function () {
 
             //arrange
-            var complexValidationMsg = '{"nestedValidation":[{"textPage":{"title":[{"errorMessage":"WRONG!","memberNames":["innerFieldId"]}]}}]}';
-            serverValidationManager.addPropertyError("myProperty", null, null, complexValidationMsg, null);
+            var complexValidationMsg = `[
+    {
+        "$elementTypeAlias": "addressBook",
+		"$id": "34E3A26C-103D-4A05-AB9D-7E14032309C3",
+        "addresses":
+        [
+			{
+				"$elementTypeAlias": "addressInfo",
+				"$id": "FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1",
+				"ModelState":
+                {
+                    "_Properties.city.invariant.null.country": [
+                        "City is not in Australia"
+                    ],
+                    "_Properties.city.invariant.null.capital": [
+                        "Not a capital city"
+                    ]
+                }
+			},
+			{
+				"$elementTypeAlias": "addressInfo",
+				"$id": "7170A4DD-2441-4B1B-A8D3-437D75C4CBC9",
+				"ModelState":
+                {
+                    "_Properties.city.invariant.null.country": [
+                        "City is not in Australia"
+                    ],
+                    "_Properties.city.invariant.null.capital": [
+                        "Not a capital city"
+                    ]
+                }
+			}
+        ],
+        "ModelState":
+        {
+            "_Properties.addresses.invariant.null.counter": [
+                "Must have at least 3 addresses"
+            ],
+            "_Properties.bookName.invariant.null.book": [
+                "Invalid address book name"
+            ]
+        }
+    }
+]`;
             
             //act 
-            var err1 = serverValidationManager.getPropertyError("myProperty", null, null, null);
+            var ids = serverValidationManager.parseComplexEditorError(complexValidationMsg);
 
-            //assert            
-            expect(err1).not.toBeUndefined();
-            expect(err1.propertyAlias).toEqual("myProperty");
-            expect(err1.errorMsg).toEqual(complexValidationMsg);
+            //assert
+            var keys = Object.keys(ids); 
+
+            expect(keys.length).toEqual(3);
+            expect(keys[0]).toEqual("34E3A26C-103D-4A05-AB9D-7E14032309C3");
+            expect(keys[1]).toEqual("FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1");
+            expect(keys[2]).toEqual("7170A4DD-2441-4B1B-A8D3-437D75C4CBC9");
 
         });
 

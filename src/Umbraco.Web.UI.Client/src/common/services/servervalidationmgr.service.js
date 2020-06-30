@@ -98,48 +98,44 @@ function serverValidationManager($timeout) {
         }
     }
 
+    /**
+     * Returns a dictionary of id (of the block) and it's corresponding validation ModelState
+     * @param {any} errorMsg
+     */
     function parseComplexEditorError(errorMsg) {
+
         var json = JSON.parse(errorMsg);
 
-        var nestedValidation = json["nestedValidation"];
-        if (!nestedValidation) {
-            throw "Invalid JSON structure for complex property, missing 'nestedValidation'";
+        var result = {};
+
+        function extractModelState(validation) {
+            if (validation.$id && validation.ModelState) {
+                result[validation.$id] = validation.ModelState;
+            }
         }
 
-        nestedValidation.forEach((item, index) => {
-
-            var elementType = Object.keys(item)[0];
-
-
-            var key = "nestedValidation.[" + index + "].";
-
-            
-
-        });
-
-        for (var i = 0; i < nestedValidation.length; i++) {
-
+        function iterateErrorBlocks(blocks) {
+            for (var i = 0; i < blocks.length; i++) {
+                var validation = blocks[i];
+                extractModelState(validation);
+                var nested = _.omit(validation, "$id", "$elementTypeAlias", "ModelState");                
+                for (const [key, value] of Object.entries(nested)) {
+                    if (Array.isArray(value)) {
+                        iterateErrorBlocks(value); // recurse
+                    }
+                }
+            }
         }
 
-        // each key represents an element type, the key is it's alias
-        var keys = Object.keys(nestedValidation);
+        iterateErrorBlocks(json);
 
-        var asdf = keys;
-
-        // TODO: Could we use an individual instance of serverValidationManager for each element type? It could/should work the way 
-        // it does today since it currently manages all callbacks for all simple properties on a content item based on a content type. 
-        // Hrmmm... only thing is then how to dispose/cleanup of these instances?
-
-        // TODO: ... actually, because we are registering a JSONPath into the 'fieldName' for when complex editors subscribe, perhaps
-        // the only thing we need to do is build up all of the different JSONPath's and their errors here based on this object and then 
-        // execute callbacks for each? So I think we need to make a function recursively return all possible keys! ... we can even have tests
-        // for that :) 
-
-
+        return result;
     }
 
     return {
-        
+
+        parseComplexEditorError: parseComplexEditorError,
+
         /**
          * @ngdoc function
          * @name notifyAndClearAllSubscriptions
@@ -434,12 +430,11 @@ function serverValidationManager($timeout) {
             }
 
             // if the error message is json it's a complex editor validation response that we need to parse
-            if (errorMsg.startsWith("{")) {
+            if (errorMsg.startsWith("[")) {
 
-                var parsed = parseComplexEditorError(errorMsg);
+                var idsToErrors = parseComplexEditorError(errorMsg);
 
-                // reset to nothing because we will not display the json message but we still want to inform the 
-                // root properties of the error.
+                // TODO: Make this the generic "Property has errors" but need to find the lang key for that
                 errorMsg = "Hello!";
             }
 

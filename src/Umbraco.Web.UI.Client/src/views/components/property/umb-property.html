@@ -2,6 +2,8 @@
     <ng-form name="propertyForm">
         <div class="control-group umb-control-group" ng-class="{hidelabel:property.hideLabel, 'umb-control-group__listview': property.alias === '_umb_containerView'}">
 
+            <pre>{{ getValidationPath() }}</pre>
+
             <val-property-msg></val-property-msg>
 
             <div class="umb-el-wrap">

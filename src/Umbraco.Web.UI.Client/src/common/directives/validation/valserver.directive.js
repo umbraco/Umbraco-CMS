@@ -110,21 +110,8 @@ function valServer(serverValidationManager) {
                 }
             }
 
-            // TODO: If this is a property/field within a complex editor which means it could be a nested/nested/nested property/field
-            // we need to figure out a way to get it's "Path" (or jsonpath) which can be represented by something like:
-            // $.[nestedValidation].[0].[prop1].[nestedValidation].[0].[prop2]
-            // Or ... if we have names instead of indexes (which is seems like we do)
-            // $.nestedValidation.[type1].[prop1].[nestedValidation].[type2].[prop2]
-            // This would mean: 
-            //  - the first row/item in a complex editor
-            //      - within the property 'prop1'
-            //          - the first row/item in a complex editor
-            //              - within the property 'prop2'
-            // So how can we figure out this path? The only way is really by looking up our current hierarchy of items
-            // TODO: OK, so we thought we had it with umb-property being able to know the content type BUT this doesn't work 
-            // because the validation results could have a many rows for the same content type, we need to have the index available
-            // so the firest example above works much better.
-            // ... OK ... looks like we have an index to work with, but we'll need to update the block editor to support this too.
+            // TODO: If this is a property/field within a complex editor which means it could be a nested/nested/nested property/field           
+            // TODO: We have a block $id to work with now so that is what we should be looking to use for the 'key'
 
             var propertyValidationPath = umbNestedPropertyCtrl ? umbNestedPropertyCtrl.getValidationPath() : null;
 

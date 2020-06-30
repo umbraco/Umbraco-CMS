@@ -1,14 +1,13 @@
 ﻿<div class="umb-pane">
     <div ng-repeat="property in tab.properties" class="umb-nested-content-property-container">
 
-        <umb-property property="property"                      
+        <umb-property property="property"
+                      property-alias="{{property.propertyAlias}}"
+                      element-udi="{{'umb://element/' + model.key}}"
                       ng-class="{'umb-nested-content--not-supported': property.notSupported, 'umb-nested-content--mandatory': property.ncMandatory}"
                       data-element="property-{{property.alias}}">
 
-            <umb-nested-property property-type-alias="{{property.propertyAlias}}"
-                                 element-type-index="itemIndex">
-                <umb-property-editor model="property"></umb-property-editor>
-            </umb-nested-property>
+            <umb-property-editor model="property"></umb-property-editor>
 
         </umb-property>
 
