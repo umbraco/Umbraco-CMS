@@ -74,7 +74,7 @@ angular.module("umbraco")
     		
     		
             $scope.close = function() {
-                if($scope.model.close) {
+                if ($scope.model.close) {
                     $scope.model.close();
                 }
             }

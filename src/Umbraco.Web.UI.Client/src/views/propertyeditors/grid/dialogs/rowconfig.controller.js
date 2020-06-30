@@ -44,7 +44,7 @@ function RowConfigController($scope, localizationService) {
             delete $scope.currentCell;
         }
         else {
-            if (cell === undefined) {
+            if (cell === null) {
                 var available = $scope.availableRowSpace;
                 var space = 4;
 
@@ -74,14 +74,28 @@ function RowConfigController($scope, localizationService) {
 
     $scope.deleteArea = function (cell, row) {
     	if ($scope.currentCell === cell) {
-    		$scope.currentCell = undefined;
+    		$scope.currentCell = null;
     	}
     	var index = row.areas.indexOf(cell)
     	row.areas.splice(index, 1);
     };
 
     $scope.closeArea = function() {
-        $scope.currentCell = undefined;
+        $scope.currentCell = null;
+    };
+
+    $scope.selectEditor = function (cell, editor) {
+        cell.allowed = cell.allowed || [];
+
+        var index = cell.allowed.indexOf(editor.alias);
+        if (editor.allowed === true) {
+            if (index === -1) {
+                cell.allowed.push(editor.alias);
+            }
+        }
+        else {
+            cell.allowed.splice(index, 1);
+        }
     };
     
     $scope.close = function() {
@@ -118,11 +132,8 @@ function RowConfigController($scope, localizationService) {
             }
         }
     }, true);
-
     
     init();
-    
-
 }
 
 angular.module("umbraco").controller("Umbraco.PropertyEditors.GridPrevalueEditor.RowConfigController", RowConfigController);
