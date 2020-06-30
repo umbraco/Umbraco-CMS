@@ -91,13 +91,13 @@ angular.module("umbraco")
                 if($scope.model.close) {
                     $scope.model.close();
                 }
-            }
+            };
 
             $scope.submit = function () {
                 if ($scope.model.submit) {
                     $scope.model.submit($scope.currentLayout);
                 }
-            }
+            };
 
     		$scope.$watch("currentLayout", function(layout){
     		    if(layout){
