@@ -66,11 +66,11 @@ namespace Umbraco.Tests.Integration.Testing
             // there's probably a sweet spot to be found for size / parallel...
 
             var s = ConfigurationManager.AppSettings["Umbraco.Tests.LocalDbTestDatabase.EmptyPoolSize"];
-            var emptySize = s == null ? 2 : int.Parse(s);
+            var emptySize = s == null ? 1 : int.Parse(s);
             s = ConfigurationManager.AppSettings["Umbraco.Tests.LocalDbTestDatabase.EmptyPoolThreadCount"];
             var emptyParallel = s == null ? 1 : int.Parse(s);
             s = ConfigurationManager.AppSettings["Umbraco.Tests.LocalDbTestDatabase.SchemaPoolSize"];
-            var schemaSize = s == null ? 2 : int.Parse(s);
+            var schemaSize = s == null ? 1 : int.Parse(s);
             s = ConfigurationManager.AppSettings["Umbraco.Tests.LocalDbTestDatabase.SchemaPoolThreadCount"];
             var schemaParallel = s == null ? 1 : int.Parse(s);
 
@@ -347,7 +347,9 @@ namespace Umbraco.Tests.Integration.Testing
                         }
 
                         if (!_readyQueue.IsAddingCompleted)
+                        {
                             _readyQueue.Add(i);
+                        }
                     }
                 });
             }
