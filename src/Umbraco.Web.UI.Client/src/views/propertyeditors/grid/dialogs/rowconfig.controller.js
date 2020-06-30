@@ -13,10 +13,9 @@ function RowConfigController($scope, localizationService) {
         }
     }
     
-    
     $scope.currentRow = $scope.model.currentRow;
-    $scope.editors = $scope.model.editors;
     $scope.columns = $scope.model.columns;
+    $scope.editors = $scope.model.editors;
 
     $scope.scaleUp = function(section, max, overflow) {
         var add = 1;
@@ -58,6 +57,11 @@ function RowConfigController($scope, localizationService) {
 
                 row.areas.push(cell);
             }
+
+            cell.allowed = cell.allowed || [];
+
+            $scope.editors.forEach(function (e) { e.allowed = cell.allowed.indexOf(e.alias) !== -1 });
+
             $scope.currentCell = cell;
             $scope.currentCell.allowAll = cell.allowAll || !cell.allowed || !cell.allowed.length;
         }

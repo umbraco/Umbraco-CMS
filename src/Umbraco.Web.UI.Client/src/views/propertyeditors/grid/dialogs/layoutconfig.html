@@ -98,31 +98,36 @@
                           ui-sortable
                           ng-model="model.value.templates">
 
-                          <li ng-repeat="row in rows">
+                          <li ng-repeat="row in rows track by $id(row)">
 
-                              <label style="display: block">
-                                 <input type="checkbox"
-                                     checklist-model="currentSection.allowed"
-                                     checklist-value="row.name"
-                                     style="float: left; margin-right: 10px;">
+                              <div class="flex">
 
-                                  <div class="preview-rows columns" style="margin-top: 5px; float:left">
-                                      <div class="preview-row">
-                                          <div class="preview-col"
-                                              ng-class="{last:$last}"
-                                              ng-repeat="area in row.areas"
-                                              ng-style="{width: percentage(area.grid) + '%'}">
+                                  <umb-checkbox model="row.allowed"
+                                                input-id="rowconfig-{{$index}}"
+                                                on-change="selectRow(currentSection, row)">
+                                  </umb-checkbox>
 
-                                              <div class="preview-cell"></div>
+                                  <div ng-click="row.allowed = !row.allowed; selectRow(currentSection, row)" class="flex flex-auto cursor-pointer">
+
+                                      <div class="preview-rows columns" style="margin-top: auto;">
+                                          <div class="preview-row">
+                                              <div class="preview-col"
+                                                   ng-class="{last:$last}"
+                                                   ng-repeat="area in row.areas"
+                                                   ng-style="{width: percentage(area.grid) + '%'}">
+
+                                                  <div class="preview-cell"></div>
+                                              </div>
                                           </div>
+                                      </div>
+
+                                      <div>
+                                          {{row.name}}<br />
+                                          <small>{{row.areas.length}} cells</small>
                                       </div>
                                   </div>
 
-                                  <div>
-                                      {{row.name}}<br />
-                                      <small>{{row.areas.length}} cells</small><br />
-                                  </div>
-                              </label>
+                              </div>
 
                               <br style="clear: both" />
                           </li>

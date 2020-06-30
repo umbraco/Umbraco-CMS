@@ -103,13 +103,16 @@
              <div ng-if="currentCell.allowAll === false">
                   <hr />
                   <ul class="unstyled">
-                      <li ng-repeat="editor in editors">
-                          <label>
-                              <input type="checkbox"
-                                  checklist-model="currentCell.allowed"
-                                  checklist-value="editor.alias">
-                                   <i class="icon {{editor.icon}}"></i> {{editor.name}}
-                                   <small class="input-label--small">({{editor.alias}})</small>
+                      <li ng-repeat="editor in editors track by $id(editor)">
+
+                          <umb-checkbox model="editor.allowed"
+                                        input-id="editorconfig-{{$index}}"
+                                        on-change="selectEditor(currentCell, editor)">
+                          </umb-checkbox>
+
+                          <label for="editorconfig-{{$index}}" style="padding: 0; margin-left: -10px;">
+                              <i class="icon {{editor.icon}}" aria-hidden="true"></i> {{editor.name}}
+                              <small class="input-label--small">({{editor.alias}})</small>
                           </label>
                       </li>
                   </ul>
