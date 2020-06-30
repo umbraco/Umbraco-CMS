@@ -55,6 +55,17 @@ angular.module("umbraco")
     		    $scope.currentSection.allowAll = section.allowAll || !section.allowed || !section.allowed.length;
     		};
 
+            $scope.toggleAllowed = function (section) {
+                section.allowAll = !section.allowAll;
+
+                if (section.allowed) {
+                    delete section.allowed;
+                }
+                else {
+                    section.allowed = [];
+                }
+            };
+
     		$scope.deleteSection = function(section, template) {
     			if ($scope.currentSection === section) {
     				$scope.currentSection = undefined;
