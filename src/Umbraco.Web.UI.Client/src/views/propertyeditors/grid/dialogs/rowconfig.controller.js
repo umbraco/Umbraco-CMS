@@ -18,8 +18,6 @@ function RowConfigController($scope, localizationService) {
 
             setTitle(vm.labels.title);
         });
-
-        setTitle();
     }
 
     function setTitle(value) {
@@ -27,7 +25,6 @@ function RowConfigController($scope, localizationService) {
             $scope.model.title = value;
         }
     }
-    
     
     $scope.currentRow = $scope.model.currentRow;
     $scope.editors = $scope.model.editors;
