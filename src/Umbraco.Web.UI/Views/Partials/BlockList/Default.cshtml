@@ -1,0 +1,20 @@
+﻿@inherits UmbracoViewPage<BlockListModel>
+@using Umbraco.Core.Models.Blocks
+@{
+    if (Model?.Layout == null || !Model.Layout.Any()) { return; }
+}
+<div class="umb-block-list">
+    @foreach (var layout in Model.Layout)
+    {
+        if (layout?.Udi == null) { continue; }
+        var data = layout.Data;
+        try
+        {
+            @Html.Partial("BlockList/Components/" + data.ContentType.Alias, layout)
+        }
+        catch (Exception ex)
+        {
+            global::Umbraco.Core.Composing.Current.Logger.Error(typeof(BlockListModel), ex, "Could not display block list component for content type {0}", data?.ContentType?.Alias);
+        }
+    }
+</div>

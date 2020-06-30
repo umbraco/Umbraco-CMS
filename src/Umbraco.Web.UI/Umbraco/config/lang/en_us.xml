@@ -17,6 +17,7 @@
     <key alias="createGroup">Create group</key>
     <key alias="delete">Delete</key>
     <key alias="disable">Disable</key>
+    <key alias="editSettings">Edit settings</key>
     <key alias="emptyRecycleBin">Empty recycle bin</key>
     <key alias="enable">Enable</key>
     <key alias="exportDocumentType">Export Document Type</key>
@@ -31,6 +32,7 @@
     <key alias="unpublish">Unpublish</key>
     <key alias="refreshNode">Reload</key>
     <key alias="republish">Republish entire site</key>
+    <key alias="remove">Remove</key>
     <key alias="rename" version="7.3.0">Rename</key>
     <key alias="restore" version="7.3.0">Restore</key>
     <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
@@ -155,6 +157,8 @@
     <key alias="confirmActionCancel">Cancel</key>
     <key alias="confirmActionConfirm">Confirm</key>
 	<key alias="morePublishingOptions">More publishing options</key>
+    <key alias="submitChanges">Submit</key>
+    <key alias="submitChangesAndClose">Submit and close</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
@@ -433,6 +437,9 @@
     <key alias="closeThisWindow">Close this window</key>
     <key alias="confirmdelete">Are you sure you want to delete</key>
     <key alias="confirmdisable">Are you sure you want to disable</key>
+    <key alias="confirmremove">Are you sure you want to remove</key>
+    <key alias="confirmremoveusageof"><![CDATA[Are you sure you want to remove the usage of <b>%0%</b>]]></key>
+    <key alias="confirmremovereferenceto"><![CDATA[Are you sure you want to remove the reference to <b>%0%</b>]]></key>
     <key alias="confirmlogout">Are you sure?</key>
     <key alias="confirmSure">Are you sure?</key>
     <key alias="cut">Cut</key>
@@ -637,6 +644,7 @@
     <key alias="tableColMergeLeft">Please place cursor at the left of the two cells you wish to merge</key>
     <key alias="tableSplitNotSplittable">You cannot split a cell that hasn't been merged.</key>
     <key alias="propertyHasErrors">This property is invalid</key>
+    <key alias="errorPropertyEditorNotSupportedInElementTypes">Property '%0%' uses editor '%1%' which is not supported in Element Types.</key>
   </area>
   <area alias="general">
     <key alias="options">Options</key>
@@ -2323,6 +2331,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="labelForCopyAllEntries">Copy %0%</key>
     <key alias="labelForArrayOfItemsFrom">%0% from %1%</key>
     <key alias="labelForRemoveAllEntries">Remove all items</key>
+    <key alias="labelForClearClipboard">Clear clipboard</key>
   </area>
   <area alias="propertyActions">
     <key alias="tooltipForPropertyActionsMenu">Open Property Actions</key>
@@ -2445,6 +2454,37 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="formsDashboard">
     <key alias="formsHeadline">Umbraco Forms</key>
     <key alias="formsDescription">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</key>
+  </area>
+  <area alias="blockEditor">
+    <key alias="headlineCreateBlock">Create new block</key>
+    <key alias="headlineAddSettingsElementType">Attach a settings section</key>
+    <key alias="headlineAddCustomView">Select view</key>
+    <key alias="headlineAddCustomStylesheet">Select stylesheet</key>
+    <key alias="headlineAddThumbnail">Choose thumbnail</key>
+    <key alias="labelcreateNewElementType">Create new</key>
+    <key alias="labelCustomStylesheet">Custom stylesheet</key>
+    <key alias="addCustomStylesheet">Add stylesheet</key>
+    <key alias="headlineEditorAppearance">Editor apperance</key>
+    <key alias="headlineDataModels">Data models</key>
+    <key alias="headlineCatalogueAppearance">Catalogue appearance</key>
+    <key alias="labelBackgroundColor">Background color</key>
+    <key alias="labelIconColor">Icon color</key>
+    <key alias="labelContentElementType">Content model</key>
+    <key alias="labelLabelTemplate">Label</key>
+    <key alias="labelCustomView">Custom view</key>
+    <key alias="labelSettingsElementType">Settings model</key>
+    <key alias="labelEditorSize">Overlay editor size</key>
+    <key alias="addCustomView">Add custom view</key>
+    <key alias="addSettingsElementType">Add settings</key>
+    <key alias="labelTemplatePlaceholder">Overwrite label template</key>
+    <key alias="confirmDeleteBlockMessage"><![CDATA[Are you sure you want to delete block of <strong>%0%</strong>.]]></key>
+    <key alias="confirmDeleteBlockNotice">Content using this block will be lost.</key>
+    <key alias="blockConfigurationOverlayTitle"><![CDATA[Configuration of '%0%']]></key>
+    <key alias="thumbnail">Thumbnail</key>
+    <key alias="addThumbnail">Add thumbnail</key>
+    <key alias="tabCreateEmpty">Create empty</key>
+    <key alias="tabClipboard">Clipboard</key>
+    <key alias="tabBlockSettings">Settings</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>
