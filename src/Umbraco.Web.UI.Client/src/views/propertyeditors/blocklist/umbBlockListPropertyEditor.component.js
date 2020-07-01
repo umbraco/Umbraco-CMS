@@ -237,8 +237,7 @@
             var wasNotActiveBefore = blockObject.active !== true;
             activateBlock(blockObject);
 
-
-            if (inlineEditing === true && openSettings !== true) {	            // dont open the editor overlay if block has hidden its content editor in overlays and we are requesting to open content, not settings.
+	        // dont open the editor overlay if block has hidden its content editor in overlays and we are requesting to open content, not settings.
             if (openSettings !== true && blockObject.hideContentInOverlay === true) {
                 return;
             }
