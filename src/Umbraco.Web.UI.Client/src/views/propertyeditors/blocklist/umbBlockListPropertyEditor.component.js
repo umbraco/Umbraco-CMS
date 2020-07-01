@@ -135,7 +135,9 @@
 
             // Append the blockObjects to our layout.
             vm.layout.forEach(entry => {
-                if (entry.$block === undefined || entry.$block === null) {
+                // $block must have the data property to be a valid BlockObject, if not its concidered as a destroyed blockObject.
+                if (entry.$block === undefined || entry.$block === null || entry.$block.data === undefined) {
+
                     var block = getBlockObject(entry);
     
                     // If this entry was not supported by our property-editor it would return 'null'.
@@ -214,7 +216,7 @@
 
             var layoutIndex = vm.layout.findIndex(entry => entry.udi === block.content.udi);
             if(layoutIndex === -1) {
-                throw new Error("Could not find layout entry of block with udi: "+block.content.udi);
+                throw new Error("Could not find layout entry of block with udi: "+block.content.udi)
             }
             vm.layout.splice(layoutIndex, 1);
             modelObject.removeDataAndDestroyModel(block);

@@ -19,7 +19,7 @@
                 stylesheet: "@",
                 view: "@",
                 block: "=",
-                api: "=",
+                api: "<",
                 index: "<"
             }
         }
