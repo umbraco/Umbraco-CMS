@@ -1849,6 +1849,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="tabCreateEmpty">Opret ny</key>
     <key alias="tabClipboard">Udklipsholder</key>
     <key alias="tabBlockSettings">Indstillinger</key>
+    <key alias="headlineAdvanced">Avanceret</key>
+    <key alias="forceHideContentEditor">Skjuld indholds editoren</key>
   </area>
 
 </language>

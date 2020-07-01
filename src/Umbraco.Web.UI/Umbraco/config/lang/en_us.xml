@@ -2485,6 +2485,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="tabCreateEmpty">Create empty</key>
     <key alias="tabClipboard">Clipboard</key>
     <key alias="tabBlockSettings">Settings</key>
+    <key alias="headlineAdvanced">Advanced</key>
+    <key alias="forceHideContentEditor">Force hide content editor</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>
