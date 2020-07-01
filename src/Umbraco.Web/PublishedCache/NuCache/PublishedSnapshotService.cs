@@ -48,6 +48,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
+        private readonly IContentNestedDataSerializer _contentNestedDataSerializer;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -81,7 +82,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IDataSource dataSource, IGlobalSettings globalSettings,
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
-            UrlSegmentProviderCollection urlSegmentProviders)
+            UrlSegmentProviderCollection urlSegmentProviders, IContentNestedDataSerializer contentNestedDataSerializer)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -98,6 +99,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
             _urlSegmentProviders = urlSegmentProviders;
+            _contentNestedDataSerializer = contentNestedDataSerializer;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -1457,7 +1459,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // note that numeric values (which are Int32) are serialized without their
                 // type (eg "value":1234) and JsonConvert by default deserializes them as Int64
 
-                Data = JsonConvert.SerializeObject(nestedData)
+                Data = _contentNestedDataSerializer.Serialize(nestedData)
             };
 
             //Core.Composing.Current.Logger.Debug<PublishedSnapshotService>(dto.Data);
