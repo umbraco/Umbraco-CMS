@@ -254,8 +254,6 @@
             if (blockObject.config.settingsElementTypeKey) {
                 blockSettingsClone = Utilities.copy(blockObject.settings);
             }
-
-            var hideContent = (openSettings === true && inlineEditing === true);
             
             var blockEditorModel = {
                 hideContent: blockObject.hideContentInOverlay,
