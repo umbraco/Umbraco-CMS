@@ -5,6 +5,15 @@
 **/
 angular.module("umbraco.directives")
     .directive('umbProperty', function (userService, serverValidationManager, udiService) {
+
+        // if only a guid is passed in, we'll ensure a correct udi structure
+        function ensureUdi(udi) {
+            if (udi && !udi.startsWith("umb://")) {
+                udi = udiService.build("element", udi);
+            }
+            return udi;
+        }
+
         return {
             scope: {
                 property: "=",                
@@ -29,9 +38,7 @@ angular.module("umbraco.directives")
                     });
                 }
 
-                if (scope.elementUdi && !scope.elementUdi.startsWith("umb://")) {
-                    scope.elementUdi = udiService.build("element", scope.elementUdi);
-                }
+                scope.elementUdi = ensureUdi(scope.elementUdi);
 
             },
             //Define a controller for this directive to expose APIs to other directives
@@ -56,6 +63,7 @@ angular.module("umbraco.directives")
 
                     // the elementUdi will be empty when this is not a nested property
                     var propAlias = $scope.propertyAlias ? $scope.propertyAlias : $scope.property.alias;
+                    $scope.elementUdi = ensureUdi($scope.elementUdi);
                     return serverValidationManager.createPropertyValidationKey(propAlias, $scope.elementUdi);
                 }
                 $scope.getValidationPath = self.getValidationPath;
