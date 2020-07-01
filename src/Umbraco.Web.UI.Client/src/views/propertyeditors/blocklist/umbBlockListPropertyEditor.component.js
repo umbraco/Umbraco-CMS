@@ -242,6 +242,11 @@
                 return;
             }
 
+            // if requesting to open settings but we dont have settings then return.
+            if (openSettings === true && blockObject.config.settingsElementTypeKey) {
+                return;
+            }
+
             // make a clone to avoid editing model directly.
             var blockContentClone = Utilities.copy(blockObject.content);
             var blockSettingsClone = null;
