@@ -10,7 +10,7 @@
         var data = layout.Data;
         try
         {
-            @Html.Partial("BlockList/Components/" + data.ContentType.Alias, (data, layout.Settings))
+            @Html.Partial("BlockList/Components/" + data.ContentType.Alias, layout)
         }
         catch (Exception ex)
         {

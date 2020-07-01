@@ -8,11 +8,13 @@
 
             <div ng-repeat="layout in vm.layout track by layout.$block.key">
 
-                <button type="button"
-                        class="btn-reset umb-block-list__block--create-button"
-                        ng-click="vm.showCreateDialog($index, $event)"
-                        ng-controller="Umbraco.PropertyEditors.BlockListPropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
-                        ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)">
+                <button
+                    type="button"
+                    class="btn-reset umb-block-list__block--create-button"
+                    ng-click="vm.showCreateDialog($index, $event)"
+                    ng-controller="Umbraco.PropertyEditors.BlockListPropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
+                    ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)"
+                >
                     <div class="__plus" ng-style="{'left':inlineCreateButtonCtrl.plusPosX}">+</div>
                 </button>
 
@@ -63,12 +65,14 @@
             </div>
         </div>
 
-        <button ng-if="vm.loading !== true"
-                id="{{vm.model.alias}}"
-                type="button"
-                class="btn-reset umb-block-list__create-button umb-outline"
-                ng-class="{ '--disabled': vm.availableBlockTypes.length === 0 }"
-                ng-click="vm.showCreateDialog(vm.layout.length, $event)">
+        <button
+            ng-if="vm.loading !== true"
+            id="{{vm.model.alias}}"
+            type="button"
+            class="btn-reset umb-block-list__create-button umb-outline"
+            ng-class="{ '--disabled': vm.availableBlockTypes.length === 0 }"
+            ng-click="vm.showCreateDialog(vm.layout.length, $event)"
+        >
             <localize key="grid_addElement"></localize>
         </button>
 
@@ -87,11 +91,12 @@
 
     </div>
 
-    <umb-overlay ng-if="vm.blockTypePicker.show"
-                 position="target"
-                 size="vm.blockTypePicker.size"
-                 view="vm.blockTypePicker.view"
-                 model="vm.blockTypePicker">
+    <umb-overlay
+        ng-if="vm.blockTypePicker.show"
+        position="target"
+        size="vm.blockTypePicker.size"
+        view="vm.blockTypePicker.view"
+        model="vm.blockTypePicker">
     </umb-overlay>
 
 

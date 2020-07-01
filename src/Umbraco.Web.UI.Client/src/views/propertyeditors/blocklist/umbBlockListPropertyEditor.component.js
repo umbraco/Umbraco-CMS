@@ -63,6 +63,10 @@
             labels.content_createEmpty = data[1];
         });
 
+
+
+
+
         vm.$onInit = function() {
 
             inlineEditing = vm.model.config.useInlineEditingAsDefault;
@@ -131,8 +135,8 @@
 
             // Append the blockObjects to our layout.
             vm.layout.forEach(entry => {
-                if (entry.$block === undefined || entry.$block === null) {
-
+                // $block must have the data property to be a valid BlockObject, if not its concidered as a destroyed blockObject.
+                if (entry.$block === undefined || entry.$block === null || entry.$block.data === undefined) {
                     var block = getBlockObject(entry);
     
                     // If this entry was not supported by our property-editor it would return 'null'.

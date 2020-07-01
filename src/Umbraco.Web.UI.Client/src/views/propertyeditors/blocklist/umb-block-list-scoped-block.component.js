@@ -19,7 +19,7 @@
                 stylesheet: "@",
                 view: "@",
                 block: "=",
-                api: "=", // Should this be a one way bind?
+                api: "<",
                 index: "<"
             }
         }
@@ -27,7 +27,7 @@
 
     function BlockListScopedBlockController($compile, $element, $scope) {
         var model = this;
-        model.$onInit = function () {
+        model.$onInit = function() {
             // Ugh, due to the way we work with angularjs and property editors not being components and needing to use ng-include,
             // it means we need to expose things directly on the $scope so they can use them.
             

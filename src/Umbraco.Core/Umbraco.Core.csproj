@@ -139,6 +139,7 @@
     <Compile Include="Models\Blocks\BlockListLayoutItem.cs" />
     <Compile Include="Models\Blocks\BlockListEditorDataConverter.cs" />
     <Compile Include="Models\Blocks\IBlockReference.cs" />
+    <Compile Include="Models\Blocks\IBlockEditorDataHelper.cs" />
     <Compile Include="Models\ContentDataIntegrityReport.cs" />
     <Compile Include="Models\ContentDataIntegrityReportEntry.cs" />
     <Compile Include="Models\ContentDataIntegrityReportOptions.cs" />

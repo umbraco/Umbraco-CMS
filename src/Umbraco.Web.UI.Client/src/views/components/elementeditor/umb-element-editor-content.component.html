@@ -9,17 +9,18 @@
             </div>
 
             <div class="umb-group-panel__content">
-
-                <umb-property data-element="property-{{property.alias}}"
-                              ng-repeat="property in group.properties track by property.alias"
-                              property="property"
+                <umb-property
+                    data-element="property-{{property.alias}}"
+                    ng-repeat="property in group.properties track by property.alias"
+                    property="property"
                               element-udi="{{vm.model.udi}}"
-                              show-inherit="vm.model.variants.length > 1 && !property.culture && !activeVariant.language.isDefault"
-                              inherits-from="defaultVariant.language.name">
+                    show-inherit="vm.model.variants.length > 1 && !property.culture && !activeVariant.language.isDefault"
+                    inherits-from="defaultVariant.language.name">
 
                     <div ng-class="{'o-40 cursor-not-allowed': vm.model.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue}">
-                        <umb-property-editor model="property"
-                                             preview="vm.model.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue">
+                        <umb-property-editor
+                            model="property"
+                            preview="vm.model.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue">
                         </umb-property-editor>
                     </div>
 
@@ -28,8 +29,9 @@
 
         </div>
 
-        <umb-empty-state ng-if="vm.model.tabs.length === 0"
-                         position="center">
+        <umb-empty-state
+            ng-if="vm.model.tabs.length === 0"
+            position="center">
             <localize key="content_noProperties"></localize>
         </umb-empty-state>
 
