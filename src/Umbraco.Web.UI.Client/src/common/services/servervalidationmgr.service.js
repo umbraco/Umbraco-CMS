@@ -123,25 +123,52 @@ function serverValidationManager($timeout, udiService) {
      * Returns a dictionary of id (of the block) and it's corresponding validation ModelState
      * @param {any} errorMsg
      */
-    function parseComplexEditorError(errorMsg) {
+    function parseComplexEditorError(errorMsg, culture, segment) {
+
+        //normalize culture to "invariant"
+        if (!culture) {
+            culture = "invariant";
+        }
+        //normalize segment to "null" (as a string, in this case it's used for creating a key)
+        if (!segment) {
+            segment = "null";
+        }
 
         var json = JSON.parse(errorMsg);
 
         var result = {};
 
         function extractModelState(validation) {
-            if (validation.$id && validation.ModelState) {
-                result[validation.$id] = validation.ModelState;
+            if (validation.$id && validation.ModelState && Object.keys(validation.ModelState).length > 0) {
+                result[validation.$id] = validation.ModelState;                
             }
+            else {
+                // we'll still add the id in the dictionary with an empty result, this indicates that this element
+                // has nested errors but no errors itself
+                result[validation.$id] = {};
+            }
+            return result[validation.$id];
         }
 
         function iterateErrorBlocks(blocks) {
             for (var i = 0; i < blocks.length; i++) {
                 var validation = blocks[i];
-                extractModelState(validation);
+                var modelState = extractModelState(validation);
+                var hasModelState = Object.keys(modelState).length > 0;
                 var nested = _.omit(validation, "$id", "$elementTypeAlias", "ModelState");                
                 for (const [key, value] of Object.entries(nested)) {
+
                     if (Array.isArray(value)) {
+
+                        // The key here is the property type alias of the nested validation. 
+                        // If the extracted ModelState is empty it indicates that this element
+                        // has nested errors but no errors itself. In that case we need to manually populate the 
+                        // ModelState properties.
+                        if (!hasModelState) {
+                            var propertyKey = "_Properties." + key + "." + culture + "." + segment;
+                            modelState[propertyKey] = null;
+                        }
+
                         iterateErrorBlocks(value); // recurse
                     }
                 }
@@ -262,9 +289,6 @@ function serverValidationManager($timeout, udiService) {
      */
     function addPropertyError(propertyAlias, culture, fieldName, errorMsg, segment) {
 
-        // TODO: We need to handle the errorMsg in a special way to check if this is a json structure. If it is we know we are dealing with
-        // a complex editor and in which case we'll need to adjust how everything works.
-
         if (!propertyAlias) {
             return;
         }
@@ -277,17 +301,22 @@ function serverValidationManager($timeout, udiService) {
         if (!segment) {
             segment = null;
         }
+        //normalize errorMsg to empty
+        if (!errorMsg) {
+            errorMsg = "";
+        }
 
         // if the error message is json it's a complex editor validation response that we need to parse
         if (errorMsg.startsWith("[")) {
 
-            var idsToErrors = parseComplexEditorError(errorMsg);
+            var idsToErrors = parseComplexEditorError(errorMsg, culture, segment);
             for (const [key, value] of Object.entries(idsToErrors)) {
-                addErrorsForModelState(value, udiService.build("element", key));
+                const elementUdi = udiService.build("element", key);                
+                addErrorsForModelState(value, elementUdi);
             }
 
-            // TODO: Make this the generic "Property has errors" but need to find the lang key for that
-            errorMsg = "Hello!";
+            // We need to clear the error message else it will show up as a giant json block against the property
+             errorMsg = "";
         }
 
         //only add the item if it doesn't exist                
@@ -372,7 +401,7 @@ function serverValidationManager($timeout, udiService) {
      * This wires up all of the server validation model state so that valServer and valServerField directives work
      */    
     function addErrorsForModelState(modelState, elementUdi) {
-        for (var e in modelState) {
+        for (const [key, value] of Object.entries(modelState)) {
 
             //This is where things get interesting....
             // We need to support validation for all editor types such as both the content and content type editors.
@@ -403,14 +432,15 @@ function serverValidationManager($timeout, udiService) {
             // * it's for the mySegment segment
             // * it's for the myField html field (optional)
 
-            var parts = e.split(".");
+            var parts = key.split(".");
 
             //Check if this is for content properties - specific to content/media/member editors because those are special 
             // user defined properties with custom controls.
             if (parts.length > 1 && parts[0] === "_Properties") {
 
                 // create the validation key, might just be the prop alias but if it's nested will be a unique udi
-                var propertyAlias = createPropertyValidationKey(parts[1], elementUdi);
+                // like umb://element/GUID/propertyAlias
+                var propertyValidationKey = createPropertyValidationKey(parts[1], elementUdi);
 
                 var culture = null;
                 if (parts.length > 2) {
@@ -436,16 +466,14 @@ function serverValidationManager($timeout, udiService) {
                 }
 
                 // add a generic error for the property
-                addPropertyError(propertyAlias, culture, htmlFieldReference, modelState[e][0], segment);
-
+                addPropertyError(propertyValidationKey, culture, htmlFieldReference, value && Array.isArray(value) && value.length > 0 ? value[0] : null, segment);
             }
             else {
 
                 //Everthing else is just a 'Field'... the field name could contain any level of 'parts' though, for example:
                 // Groups[0].Properties[2].Alias
-                addFieldError(e, modelState[e][0]);
+                addFieldError(key, value[0]);
             }
-
         }
     }
 

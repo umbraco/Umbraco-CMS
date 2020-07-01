@@ -118,7 +118,8 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                                 || (formCtrl.$invalid && Utilities.isArray(formCtrl.$error.valServer))) {
                                 scope.errorMsg = "";
                                 formCtrl.$setValidity('valPropertyMsg', true);
-                            } else if (showValidation && scope.errorMsg === "") {
+                            }
+                            else if (showValidation && scope.errorMsg === "") {
                                 formCtrl.$setValidity('valPropertyMsg', false);
                                 scope.errorMsg = getErrorMsg();
                             }
@@ -229,7 +230,7 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                     hasError = !isValid;
                     if (hasError) {
                         //set the error message to the server message
-                        scope.errorMsg = propertyErrors[0].errorMsg;
+                        scope.errorMsg = propertyErrors[0].errorMsg ? propertyErrors[0].errorMsg : labels.propertyHasErrors;
                         //flag that the current validator is invalid
                         formCtrl.$setValidity('valPropertyMsg', false);
                         startWatch();
