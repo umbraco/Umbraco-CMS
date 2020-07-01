@@ -132,11 +132,11 @@
                     vm.elementTypes[i] = args.documentType;
                 }
             }
-            if (vm.contentPreview.key === key) {
+            if (vm.contentPreview && vm.contentPreview.key === key) {
                 vm.contentPreview = args.documentType;
                 $scope.$evalAsync();
             }
-            if (vm.settingsPreview.key === key) {
+            if (vm.settingsPreview && vm.settingsPreview.key === key) {
                 vm.settingsPreview = args.documentType;
                 $scope.$evalAsync();
             }
