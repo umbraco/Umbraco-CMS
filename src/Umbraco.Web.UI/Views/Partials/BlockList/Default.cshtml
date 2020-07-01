@@ -8,13 +8,6 @@
     {
         if (layout?.Udi == null) { continue; }
         var data = layout.Data;
-        try
-        {
-            @Html.Partial("BlockList/Components/" + data.ContentType.Alias, layout)
-        }
-        catch (Exception ex)
-        {
-            global::Umbraco.Core.Composing.Current.Logger.Error(typeof(BlockListModel), ex, "Could not display block list component for content type {0}", data?.ContentType?.Alias);
-        }
+        @Html.Partial("BlockList/Components/" + data.ContentType.Alias, layout)        
     }
 </div>
