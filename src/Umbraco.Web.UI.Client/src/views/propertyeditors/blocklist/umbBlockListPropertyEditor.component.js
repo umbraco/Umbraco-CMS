@@ -172,6 +172,7 @@
 
             block.view = (block.config.view ? "/" + block.config.view : getDefaultViewForBlock(block));
 
+            block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;
             block.showSettings = block.config.settingsElementTypeKey != null;
             block.showCopy = vm.supportCopy && block.config.contentTypeKey != null;// if we have content, otherwise it dosnt make sense to copy.
 
@@ -226,15 +227,26 @@
                 deleteBlock(entry.$block);
             });
         }
+        
+        function activateBlock(blockObject) {
+            blockObject.active = true;
+        }
 
         function editBlock(blockObject, openSettings) {
 
             var wasNotActiveBefore = blockObject.active !== true;
-            blockObject.active = true;
 
-            if (inlineEditing === true && openSettings !== true) {
+	        // dont open the editor overlay if block has hidden its content editor in overlays and we are requesting to open content, not settings.
+            if (openSettings !== true && blockObject.hideContentInOverlay === true) {
                 return;
             }
+
+            // if requesting to open settings but we dont have settings then return.
+            if (openSettings === true && !blockObject.config.settingsElementTypeKey) {
+                return;
+            }
+
+            activateBlock(blockObject);
 
             // make a clone to avoid editing model directly.
             var blockContentClone = Utilities.copy(blockObject.content);
@@ -243,11 +255,9 @@
             if (blockObject.config.settingsElementTypeKey) {
                 blockSettingsClone = Utilities.copy(blockObject.settings);
             }
-
-            var hideContent = (openSettings === true && inlineEditing === true);
             
             var blockEditorModel = {
-                hideContent: hideContent,
+                hideContent: blockObject.hideContentInOverlay,
                 openSettings: openSettings === true,
                 liveEditing: liveEditing,
                 title: blockObject.label,
@@ -332,7 +342,11 @@
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                         editorService.close();
                         if (added && vm.layout.length > createIndex) {
-                            editBlock(vm.layout[createIndex].$block);
+                            if (inlineEditing === true) {
+                                activateBlock(vm.layout[createIndex].$block);
+                            } else if (inlineEditing === false && vm.layout[createIndex].$block.hideContentInOverlay !== true) {
+                                editBlock(vm.layout[createIndex].$block);
+                            }
                         }
                     }
                 },
@@ -481,6 +495,7 @@
 
 
         vm.blockEditorApi = {
+            activateBlock: activateBlock,
             editBlock: editBlock,
             copyBlock: copyBlock,
             requestDeleteBlock: requestDeleteBlock,
