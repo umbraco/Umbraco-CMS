@@ -123,52 +123,25 @@ function serverValidationManager($timeout, udiService) {
      * Returns a dictionary of id (of the block) and it's corresponding validation ModelState
      * @param {any} errorMsg
      */
-    function parseComplexEditorError(errorMsg, culture, segment) {
-
-        //normalize culture to "invariant"
-        if (!culture) {
-            culture = "invariant";
-        }
-        //normalize segment to "null" (as a string, in this case it's used for creating a key)
-        if (!segment) {
-            segment = "null";
-        }
+    function parseComplexEditorError(errorMsg) {
 
         var json = JSON.parse(errorMsg);
 
         var result = {};
 
         function extractModelState(validation) {
-            if (validation.$id && validation.ModelState && Object.keys(validation.ModelState).length > 0) {
+            if (validation.$id && validation.ModelState) {
                 result[validation.$id] = validation.ModelState;                
             }
-            else {
-                // we'll still add the id in the dictionary with an empty result, this indicates that this element
-                // has nested errors but no errors itself
-                result[validation.$id] = {};
-            }
-            return result[validation.$id];
         }
 
         function iterateErrorBlocks(blocks) {
             for (var i = 0; i < blocks.length; i++) {
                 var validation = blocks[i];
-                var modelState = extractModelState(validation);
-                var hasModelState = Object.keys(modelState).length > 0;
+                extractModelState(validation);
                 var nested = _.omit(validation, "$id", "$elementTypeAlias", "ModelState");                
                 for (const [key, value] of Object.entries(nested)) {
-
                     if (Array.isArray(value)) {
-
-                        // The key here is the property type alias of the nested validation. 
-                        // If the extracted ModelState is empty it indicates that this element
-                        // has nested errors but no errors itself. In that case we need to manually populate the 
-                        // ModelState properties.
-                        if (!hasModelState) {
-                            var propertyKey = "_Properties." + key + "." + culture + "." + segment;
-                            modelState[propertyKey] = null;
-                        }
-
                         iterateErrorBlocks(value); // recurse
                     }
                 }
@@ -309,7 +282,7 @@ function serverValidationManager($timeout, udiService) {
         // if the error message is json it's a complex editor validation response that we need to parse
         if (errorMsg.startsWith("[")) {
 
-            var idsToErrors = parseComplexEditorError(errorMsg, culture, segment);
+            var idsToErrors = parseComplexEditorError(errorMsg);
             for (const [key, value] of Object.entries(idsToErrors)) {
                 const elementUdi = udiService.build("element", key);                
                 addErrorsForModelState(value, elementUdi);

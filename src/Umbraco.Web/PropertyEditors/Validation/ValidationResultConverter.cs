@@ -80,6 +80,13 @@ namespace Umbraco.Web.PropertyEditors.Validation
                                 // recurse to get the validation result object 
                                 var obj = JToken.FromObject(complexResult, camelCaseSerializer);
                                 joElementType.Add(propTypeResult.PropertyTypeAlias, obj);
+
+                                // For any nested property error we add the model state as empty state for that nested property
+                                // NOTE: Instead of the empty validation message we could put in the translated
+                                // "errors/propertyHasErrors" message, however I think that leaves for less flexibility since it could/should be
+                                // up to the front-end validator to show whatever message it wants (if any) for an error indicating a nested property error.
+                                // Will leave blank.
+                                modelState.AddPropertyValidationError(new ValidationResult(string.Empty), propTypeResult.PropertyTypeAlias);
                             }
                         }
                         else

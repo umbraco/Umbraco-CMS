@@ -316,7 +316,7 @@
 
     describe('managing complex editor validation errors', function () {
 
-        it('create json paths for complex validation error', function () {
+        it('create dictionary of id to ModelState', function () {
 
             //arrange
             var complexValidationMsg = `[
@@ -372,6 +372,71 @@
 
             expect(keys.length).toEqual(3);
             expect(keys[0]).toEqual("34E3A26C-103D-4A05-AB9D-7E14032309C3");
+            expect(keys[1]).toEqual("FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1");
+            expect(keys[2]).toEqual("7170A4DD-2441-4B1B-A8D3-437D75C4CBC9");
+
+        });
+
+        it('create dictionary of id to ModelState with inherited errors', function () {
+
+            // arrange
+            // this root element doesn't have it's own attached errors, instead it has model state just 
+            // showing that it has errors within it's nested properties. that ModelState is automatically
+            // added on the server side.
+            var complexValidationMsg = `[
+    {
+        "$elementTypeAlias": "addressBook",
+		"$id": "34E3A26C-103D-4A05-AB9D-7E14032309C3",
+        "addresses":
+        [
+			{
+				"$elementTypeAlias": "addressInfo",
+				"$id": "FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1",
+				"ModelState":
+                {
+                    "_Properties.city.invariant.null.country": [
+                        "City is not in Australia"
+                    ],
+                    "_Properties.city.invariant.null.capital": [
+                        "Not a capital city"
+                    ]
+                }
+			},
+			{
+				"$elementTypeAlias": "addressInfo",
+				"$id": "7170A4DD-2441-4B1B-A8D3-437D75C4CBC9",
+				"ModelState":
+                {
+                    "_Properties.city.invariant.null.country": [
+                        "City is not in Australia"
+                    ],
+                    "_Properties.city.invariant.null.capital": [
+                        "Not a capital city"
+                    ]
+                }
+			}
+        ],
+        "ModelState":
+        {
+            "_Properties.addresses.invariant.null": [
+                ""
+            ]
+        }
+    }
+]`;
+
+            //act 
+            var ids = serverValidationManager.parseComplexEditorError(complexValidationMsg);
+
+            //assert
+            var keys = Object.keys(ids);
+
+            expect(keys.length).toEqual(3);
+            expect(keys[0]).toEqual("34E3A26C-103D-4A05-AB9D-7E14032309C3");
+            var item0ModelState = ids["34E3A26C-103D-4A05-AB9D-7E14032309C3"];
+            expect(Object.keys(item0ModelState).length).toEqual(1);
+            expect(item0ModelState["_Properties.addresses.invariant.null"].length).toEqual(1);
+            expect(item0ModelState["_Properties.addresses.invariant.null"][0]).toEqual("");
             expect(keys[1]).toEqual("FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1");
             expect(keys[2]).toEqual("7170A4DD-2441-4B1B-A8D3-437D75C4CBC9");
 

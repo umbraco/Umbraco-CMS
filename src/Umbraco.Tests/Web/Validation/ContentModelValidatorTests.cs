@@ -130,43 +130,60 @@ namespace Umbraco.Tests.Web.Validation
             addressBookElementTypeResult2.ValidationResults.Add(bookNamePropertyTypeResult2);
             nestedLevel1.ValidationResults.Add(addressBookElementTypeResult2);
 
-            var serialized = JsonConvert.SerializeObject(nestedLevel1, Formatting.Indented, new ValidationResultConverter());
+            // books is the outer most validation result and doesn't have it's own direct ValidationResult errors
+            var outerError = new ComplexEditorValidationResult();
+            var id4 = Guid.NewGuid();
+            var addressBookCollectionElementTypeResult = new ComplexEditorElementTypeValidationResult("addressBookCollection", id4);
+            var booksPropertyTypeResult= new ComplexEditorPropertyTypeValidationResult("books");
+            booksPropertyTypeResult.AddValidationResult(nestedLevel1); // books is the outer most validation result
+            addressBookCollectionElementTypeResult.ValidationResults.Add(booksPropertyTypeResult);
+            outerError.ValidationResults.Add(addressBookCollectionElementTypeResult);
+
+            var serialized = JsonConvert.SerializeObject(outerError, Formatting.Indented, new ValidationResultConverter());
             Console.WriteLine(serialized);
 
             var jsonError = JsonConvert.DeserializeObject<JArray>(serialized);
 
             Assert.IsNotNull(jsonError.SelectToken("$[0]"));
-            Assert.AreEqual(id2.ToString(), jsonError.SelectToken("$[0].$id").Value<string>());
-            Assert.AreEqual("addressBook", jsonError.SelectToken("$[0].$elementTypeAlias").Value<string>());
-            Assert.IsNotNull(jsonError.SelectToken("$[0].ModelState"));            
-            var error1 = jsonError.SelectToken("$[0].ModelState['_Properties.addresses.invariant.null.counter']") as JArray;
+            Assert.AreEqual(id4.ToString(), jsonError.SelectToken("$[0].$id").Value<string>());
+            Assert.AreEqual("addressBookCollection", jsonError.SelectToken("$[0].$elementTypeAlias").Value<string>());
+            Assert.AreEqual(string.Empty, jsonError.SelectToken("$[0].ModelState['_Properties.books.invariant.null'][0]").Value<string>());
+
+            var error0 = jsonError.SelectToken("$[0].books") as JArray;
+            Assert.IsNotNull(error0);
+            Assert.AreEqual(id2.ToString(), error0.SelectToken("$[0].$id").Value<string>());
+            Assert.AreEqual("addressBook", error0.SelectToken("$[0].$elementTypeAlias").Value<string>());
+            Assert.IsNotNull(error0.SelectToken("$[0].ModelState"));
+            Assert.AreEqual(string.Empty, error0.SelectToken("$[0].ModelState['_Properties.addresses.invariant.null'][0]").Value<string>());
+            var error1 = error0.SelectToken("$[0].ModelState['_Properties.addresses.invariant.null.counter']") as JArray;
             Assert.IsNotNull(error1);
             Assert.AreEqual(1, error1.Count);
-            var error2 = jsonError.SelectToken("$[0].ModelState['_Properties.bookName.invariant.null.book']") as JArray;
+            var error2 = error0.SelectToken("$[0].ModelState['_Properties.bookName.invariant.null.book']") as JArray;
             Assert.IsNotNull(error2);
             Assert.AreEqual(1, error2.Count);
 
-            Assert.AreEqual(id3.ToString(), jsonError.SelectToken("$[1].$id").Value<string>());
-            Assert.AreEqual("addressBook", jsonError.SelectToken("$[1].$elementTypeAlias").Value<string>());
-            Assert.IsNotNull(jsonError.SelectToken("$[1].ModelState"));
-            var error6 = jsonError.SelectToken("$[1].ModelState['_Properties.addresses.invariant.null.counter']") as JArray;
+            Assert.AreEqual(id3.ToString(), error0.SelectToken("$[1].$id").Value<string>());
+            Assert.AreEqual("addressBook", error0.SelectToken("$[1].$elementTypeAlias").Value<string>());
+            Assert.IsNotNull(error0.SelectToken("$[1].ModelState"));
+            Assert.AreEqual(string.Empty, error0.SelectToken("$[1].ModelState['_Properties.addresses.invariant.null'][0]").Value<string>());
+            var error6 = error0.SelectToken("$[1].ModelState['_Properties.addresses.invariant.null.counter']") as JArray;
             Assert.IsNotNull(error6);
             Assert.AreEqual(1, error6.Count);
-            var error7 = jsonError.SelectToken("$[1].ModelState['_Properties.bookName.invariant.null']") as JArray;
+            var error7 = error0.SelectToken("$[1].ModelState['_Properties.bookName.invariant.null']") as JArray;
             Assert.IsNotNull(error7);
             Assert.AreEqual(1, error7.Count);
 
-            Assert.IsNotNull(jsonError.SelectToken("$[0].addresses"));
-            Assert.AreEqual(id1.ToString(), jsonError.SelectToken("$[0].addresses[0].$id").Value<string>());
-            Assert.AreEqual("addressInfo", jsonError.SelectToken("$[0].addresses[0].$elementTypeAlias").Value<string>());
-            Assert.IsNotNull(jsonError.SelectToken("$[0].addresses[0].ModelState"));
-            var error3 = jsonError.SelectToken("$[0].addresses[0].ModelState['_Properties.city.invariant.null.country']") as JArray;
+            Assert.IsNotNull(error0.SelectToken("$[0].addresses"));
+            Assert.AreEqual(id1.ToString(), error0.SelectToken("$[0].addresses[0].$id").Value<string>());
+            Assert.AreEqual("addressInfo", error0.SelectToken("$[0].addresses[0].$elementTypeAlias").Value<string>());
+            Assert.IsNotNull(error0.SelectToken("$[0].addresses[0].ModelState"));
+            var error3 = error0.SelectToken("$[0].addresses[0].ModelState['_Properties.city.invariant.null.country']") as JArray;
             Assert.IsNotNull(error3);
             Assert.AreEqual(1, error3.Count);
-            var error4 = jsonError.SelectToken("$[0].addresses[0].ModelState['_Properties.city.invariant.null.capital']") as JArray;
+            var error4 = error0.SelectToken("$[0].addresses[0].ModelState['_Properties.city.invariant.null.capital']") as JArray;
             Assert.IsNotNull(error4);
             Assert.AreEqual(1, error4.Count);
-            var error5 = jsonError.SelectToken("$[0].addresses[0].ModelState['_Properties.city.invariant.null']") as JArray;
+            var error5 = error0.SelectToken("$[0].addresses[0].ModelState['_Properties.city.invariant.null']") as JArray;
             Assert.IsNotNull(error5);
             Assert.AreEqual(2, error5.Count);
         }
