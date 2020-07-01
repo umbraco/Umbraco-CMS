@@ -235,7 +235,6 @@
         function editBlock(blockObject, openSettings) {
 
             var wasNotActiveBefore = blockObject.active !== true;
-            activateBlock(blockObject);
 
 	        // dont open the editor overlay if block has hidden its content editor in overlays and we are requesting to open content, not settings.
             if (openSettings !== true && blockObject.hideContentInOverlay === true) {
@@ -243,9 +242,11 @@
             }
 
             // if requesting to open settings but we dont have settings then return.
-            if (openSettings === true && blockObject.config.settingsElementTypeKey) {
+            if (openSettings === true && !blockObject.config.settingsElementTypeKey) {
                 return;
             }
+
+            activateBlock(blockObject);
 
             // make a clone to avoid editing model directly.
             var blockContentClone = Utilities.copy(blockObject.content);
@@ -341,7 +342,11 @@
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                         editorService.close();
                         if (added && vm.layout.length > createIndex) {
-                            editBlock(vm.layout[createIndex].$block);
+                            if (inlineEditing === true) {
+                                activateBlock(vm.layout[createIndex].$block);
+                            } else if (inlineEditing === false && vm.layout[createIndex].$block.hideContentInOverlay !== true) {
+                                editBlock(vm.layout[createIndex].$block);
+                            }
                         }
                     }
                 },
