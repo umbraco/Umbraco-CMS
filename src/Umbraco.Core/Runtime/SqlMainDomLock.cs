@@ -34,6 +34,7 @@ namespace Umbraco.Core.Runtime
             // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
             _lockId = Guid.NewGuid().ToString();
             _logger = logger;
+            
             _dbFactory = new UmbracoDatabaseFactory(
                Constants.System.UmbracoConnectionName,
                _logger,
@@ -42,6 +43,12 @@ namespace Umbraco.Core.Runtime
 
         public async Task<bool> AcquireLockAsync(int millisecondsTimeout)
         {
+            if (!_dbFactory.Configured)
+            {
+                // if we aren't configured, then we're in an install state, in which case we have no choice but to assume we can acquire
+                return true;
+            }
+
             if (!(_dbFactory.SqlContext.SqlSyntax is SqlServerSyntaxProvider sqlServerSyntaxProvider))
                 throw new NotSupportedException("SqlMainDomLock is only supported for Sql Server");
 
@@ -137,6 +144,12 @@ namespace Umbraco.Core.Runtime
             {
                 // poll every 1 second
                 Thread.Sleep(1000);
+
+                if (!_dbFactory.Configured)
+                {
+                    // if we aren't configured, we just keep looping since we can't query the db
+                    continue;
+                }
 
                 lock (_locker)
                 {
@@ -370,41 +383,44 @@ namespace Umbraco.Core.Runtime
                         _cancellationTokenSource.Cancel();
                         _cancellationTokenSource.Dispose();
 
-                        var db = GetDatabase();
-                        try
+                        if (_dbFactory.Configured)
                         {
-                            db.BeginTransaction(IsolationLevel.ReadCommitted);
-
-                            // get a write lock
-                            _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
-
-                            // When we are disposed, it means we have released the MainDom lock
-                            // and called all MainDom release callbacks, in this case
-                            // if another maindom is actually coming online we need
-                            // to signal to the MainDom coming online that we have shutdown.
-                            // To do that, we update the existing main dom DB record with a suffixed "_updated" string.
-                            // Otherwise, if we are just shutting down, we want to just delete the row.
-                            if (_mainDomChanging)
+                            var db = GetDatabase();
+                            try
                             {
-                                _logger.Debug<SqlMainDomLock>("Releasing MainDom, updating row, new application is booting.");
-                                db.Execute($"UPDATE umbracoKeyValue SET [value] = [value] + '{UpdatedSuffix}' WHERE [key] = @key", new { key = MainDomKey });
+                                db.BeginTransaction(IsolationLevel.ReadCommitted);
+
+                                // get a write lock
+                                _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
+
+                                // When we are disposed, it means we have released the MainDom lock
+                                // and called all MainDom release callbacks, in this case
+                                // if another maindom is actually coming online we need
+                                // to signal to the MainDom coming online that we have shutdown.
+                                // To do that, we update the existing main dom DB record with a suffixed "_updated" string.
+                                // Otherwise, if we are just shutting down, we want to just delete the row.
+                                if (_mainDomChanging)
+                                {
+                                    _logger.Debug<SqlMainDomLock>("Releasing MainDom, updating row, new application is booting.");
+                                    db.Execute($"UPDATE umbracoKeyValue SET [value] = [value] + '{UpdatedSuffix}' WHERE [key] = @key", new { key = MainDomKey });
+                                }
+                                else
+                                {
+                                    _logger.Debug<SqlMainDomLock>("Releasing MainDom, deleting row, application is shutting down.");
+                                    db.Execute("DELETE FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
+                                }
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                _logger.Debug<SqlMainDomLock>("Releasing MainDom, deleting row, application is shutting down.");
-                                db.Execute("DELETE FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
+                                ResetDatabase();
+                                _logger.Error<SqlMainDomLock>(ex, "Unexpected error during dipsose.");
+                                _hasError = true;
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            ResetDatabase();
-                            _logger.Error<SqlMainDomLock>(ex, "Unexpected error during dipsose.");
-                            _hasError = true;
-                        }
-                        finally
-                        {
-                            db?.CompleteTransaction();
-                            ResetDatabase();
+                            finally
+                            {
+                                db?.CompleteTransaction();
+                                ResetDatabase();
+                            }
                         }
                     }
                 }
