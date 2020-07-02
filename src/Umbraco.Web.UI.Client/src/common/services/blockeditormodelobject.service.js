@@ -396,7 +396,7 @@
                 if (blockConfiguration === null) {
                     console.error("The block entry of "+udi+" is not begin initialized cause its contentTypeKey is not allowed for this PropertyEditor");
                 } else {
-                    var contentScaffold = this.getScaffoldFromKey(blockConfiguration.contentTypeKey);
+                    contentScaffold = this.getScaffoldFromKey(blockConfiguration.contentTypeKey);
                     if(contentScaffold === null) {
                         console.error("The block entry of "+udi+" is not begin initialized cause its Element Type was not loaded.");
                     }

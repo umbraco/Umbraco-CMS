@@ -44,6 +44,9 @@ namespace Umbraco.Web.PropertyEditors
 
             [JsonProperty("editorSize")]
             public string EditorSize { get; set; }
+
+            [JsonProperty("forceHideContentEditorInOverlay")]
+            public bool ForceHideContentEditorInOverlay { get; set; }
         }
 
         [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of blocks")]

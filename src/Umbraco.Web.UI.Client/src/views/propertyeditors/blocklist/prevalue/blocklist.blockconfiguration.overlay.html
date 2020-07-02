@@ -196,6 +196,28 @@
 
                     </div>
 
+                    <div class="umb-group-panel">
+
+                        <div class="umb-group-panel__header">
+                            <localize key="blockEditor_headlineAdvanced">Advanced</localize>
+                        </div>
+
+                        <div class="umb-group-panel__content">
+
+                            <!-- forceHideContentEditorInOverlay -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="forceHideContentEditorInOverlay"><localize key="blockEditor_forceHideContentEditor">Force hide content editor</localize></label>
+                                    <div class="controls">
+                                        <umb-toggle checked="vm.block.forceHideContentEditorInOverlay" on-click="vm.block.forceHideContentEditorInOverlay = vm.block.forceHideContentEditorInOverlay != true"></umb-toggle>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
             </umb-editor-container>
 
