@@ -38,8 +38,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     //  the 'current' value, and string.Empty should be used to represent the invariant or
                     //  neutral values - PropertyData throws when getting nulls, so falling back to
                     //  string.Empty here - what else?
-                    pdata.Culture = string.Intern(ReadStringObject(stream)) ?? string.Empty;
-                    pdata.Segment = string.Intern(ReadStringObject(stream)) ?? string.Empty;
+                    pdata.Culture = ReadStringObject(stream, true) ?? string.Empty;
+                    pdata.Segment = ReadStringObject(stream, true) ?? string.Empty;
                     pdata.Value = ReadObject(stream);
                 }
 

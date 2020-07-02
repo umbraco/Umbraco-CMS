@@ -23,13 +23,15 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return read(stream);
         }
 
-        protected string ReadStringObject(Stream stream) // required 'cos string is not a struct
+        protected string ReadStringObject(Stream stream, bool intern = false) // required 'cos string is not a struct
         {
             var type = PrimitiveSerializer.Char.ReadFrom(stream);
             if (type == 'N') return null;
             if (type != 'S')
                 throw new NotSupportedException($"Cannot deserialize type '{type}', expected 'S'.");
-            return PrimitiveSerializer.String.ReadFrom(stream);
+            return intern
+                ? string.Intern(PrimitiveSerializer.String.ReadFrom(stream))
+                : PrimitiveSerializer.String.ReadFrom(stream);
         }
 
         protected int? ReadIntObject(Stream stream) => ReadObject(stream, 'I', ReadInt);

@@ -11,11 +11,11 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     {
         //dont serialize empty properties
         [JsonProperty("pd")]
-        [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<PropertyData[]>))]
+        [JsonConverter(typeof(AutoInterningStringKeyCaseInsensitiveDictionaryConverter<PropertyData[]>))]
         public Dictionary<string, PropertyData[]> PropertyData { get; set; }
 
         [JsonProperty("cd")]
-        [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<CultureVariation>))]
+        [JsonConverter(typeof(AutoInterningStringKeyCaseInsensitiveDictionaryConverter<CultureVariation>))]
         public Dictionary<string, CultureVariation> CultureData { get; set; }
 
         [JsonProperty("us")]

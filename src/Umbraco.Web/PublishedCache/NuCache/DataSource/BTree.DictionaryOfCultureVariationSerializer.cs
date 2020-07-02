@@ -18,8 +18,13 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             var dict = new Dictionary<string, CultureVariation>(StringComparer.InvariantCultureIgnoreCase);
             for (var i = 0; i < pcount; i++)
             {
-                var languageId = PrimitiveSerializer.String.ReadFrom(stream);
-                var cultureVariation = new CultureVariation { Name = ReadStringObject(stream), UrlSegment = ReadStringObject(stream), Date = ReadDateTime(stream) };
+                var languageId = string.Intern(PrimitiveSerializer.String.ReadFrom(stream));
+                var cultureVariation = new CultureVariation
+                {
+                    Name = ReadStringObject(stream),
+                    UrlSegment = ReadStringObject(stream),
+                    Date = ReadDateTime(stream)
+                };
                 dict[languageId] = cultureVariation;
             }
             return dict;

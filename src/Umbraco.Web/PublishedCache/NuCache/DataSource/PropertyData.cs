@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using Newtonsoft.Json;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
@@ -9,6 +10,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         private string _culture;
         private string _segment;
 
+        [JsonConverter(typeof(AutoInterningStringConverter))]
         [DefaultValue("")]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, PropertyName = "c")]
         public string Culture
@@ -17,6 +19,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             set => _culture = value ?? throw new ArgumentNullException(nameof(value)); // TODO: or fallback to string.Empty? CANNOT be null
         }
 
+        [JsonConverter(typeof(AutoInterningStringConverter))]
         [DefaultValue("")]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, PropertyName = "s")]
         public string Segment
@@ -27,7 +30,6 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         [JsonProperty("v")]
         public object Value { get; set; }
-
 
         //Legacy properties used to deserialize existing nucache db entries
         [JsonProperty("culture")]
