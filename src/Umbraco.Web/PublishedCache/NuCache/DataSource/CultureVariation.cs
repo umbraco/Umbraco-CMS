@@ -6,7 +6,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     /// <summary>
     /// Represents the culture variation information on a content item
     /// </summary>
-    internal class CultureVariation
+    public class CultureVariation
     {
         [JsonProperty("nm")]
         public string Name { get; set; }
