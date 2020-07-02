@@ -1920,15 +1920,15 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="content">The <see cref="IContent"/> to move</param>
         /// <param name="parentId">Id of the Content's new Parent</param>
         /// <param name="userId">Optional Id of the User moving the Content</param>
-        public void Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
+        public OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
         {
             // if moving to the recycle bin then use the proper method
             if (parentId == Constants.System.RecycleBinContent)
             {
-                MoveToRecycleBin(content, userId);
-                return;
+                return MoveToRecycleBin(content, userId);
             }
 
+            var evtMsgs = EventMessagesFactory.Get();
             var moves = new List<(IContent, string)>();
 
             using (var scope = ScopeProvider.CreateScope())
@@ -1940,11 +1940,11 @@ namespace Umbraco.Core.Services.Implement
                     throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
 
                 var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentId);
-                var moveEventArgs = new MoveEventArgs<IContent>(moveEventInfo);
+                var moveEventArgs = new MoveEventArgs<IContent>(evtMsgs, moveEventInfo);
                 if (scope.Events.DispatchCancelable(Moving, this, moveEventArgs, nameof(Moving)))
                 {
                     scope.Complete();
-                    return; // causes rollback
+                    return OperationResult.Cancel(evtMsgs); // causes rollback
                 }
 
                 // if content was trashed, and since we're not moving to the recycle bin,
@@ -1977,6 +1977,8 @@ namespace Umbraco.Core.Services.Implement
 
                 scope.Complete();
             }
+
+            return OperationResult.Succeed(evtMsgs);
         }
 
         // MUST be called from within WriteLock
