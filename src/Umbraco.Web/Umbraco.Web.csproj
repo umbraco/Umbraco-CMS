@@ -245,6 +245,8 @@
     <Compile Include="Compose\NestedContentPropertyComposer.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\IContentNestedDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\JsonContentNestedDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />

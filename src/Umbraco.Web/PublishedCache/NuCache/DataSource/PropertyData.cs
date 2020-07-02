@@ -5,7 +5,7 @@ using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    internal class PropertyData
+    public class PropertyData
     {
         private string _culture;
         private string _segment;
