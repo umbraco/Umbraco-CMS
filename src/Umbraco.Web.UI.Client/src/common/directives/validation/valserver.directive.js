@@ -58,8 +58,6 @@ function valServer(serverValidationManager) {
             function getPropertyValidationKey() {
                 // Get the property validation path if there is one, this is how wiring up any nested/virtual property validation works
                 var propertyValidationPath = umbPropCtrl ? umbPropCtrl.getValidationPath() : null;
-                // TODO: Is this going to break with nested content because it changes the alias?
-                // Hrm, don't think so because NC will use the property validation path
                 return propertyValidationPath ? propertyValidationPath : currentProperty.alias;
             }
 
