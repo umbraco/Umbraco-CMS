@@ -50,8 +50,11 @@ namespace Umbraco.Examine
                 index.CreateIndex(); // clear the index
             }
 
-            //run the populators in parallel against all indexes
-            Parallel.ForEach(_populators, populator => populator.Populate(indexes));
+            // run each populator over the indexes
+            foreach(var populator in _populators)
+            {
+                populator.Populate(indexes);
+            }
         }
 
     }
