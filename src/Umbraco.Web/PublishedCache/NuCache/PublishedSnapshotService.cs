@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -1469,6 +1470,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Rebuild Database PreCache
 
+        private const int DefaultSqlPagingSize = 1000;
+
+        private static int GetSqlPagingSize()
+        {
+            var appSetting = ConfigurationManager.AppSettings["Umbraco.Web.PublishedCache.NuCache.PublishedSnapshotService.SqlPageSize"];
+            return appSetting != null && int.TryParse(appSetting, out var size) ? size : DefaultSqlPagingSize;
+        }
+
         public override void Rebuild()
         {
             _logger.Debug<PublishedSnapshotService>("Rebuilding...");
@@ -1477,14 +1486,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 scope.ReadLock(Constants.Locks.ContentTree);
                 scope.ReadLock(Constants.Locks.MediaTree);
                 scope.ReadLock(Constants.Locks.MemberTree);
-                RebuildContentDbCacheLocked(scope, 5000, null);
-                RebuildMediaDbCacheLocked(scope, 5000, null);
-                RebuildMemberDbCacheLocked(scope, 5000, null);
+                RebuildContentDbCacheLocked(scope, GetSqlPagingSize(), null);
+                RebuildMediaDbCacheLocked(scope, GetSqlPagingSize(), null);
+                RebuildMemberDbCacheLocked(scope, GetSqlPagingSize(), null);
                 scope.Complete();
             }
         }
 
-        public void RebuildContentDbCache(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
+        public void RebuildContentDbCache(int groupSize = DefaultSqlPagingSize, IEnumerable<int> contentTypeIds = null)
         {
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
@@ -1556,7 +1565,7 @@ WHERE cmsContentNu.nodeId IN (
             } while (processed < total);
         }
 
-        public void RebuildMediaDbCache(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
+        public void RebuildMediaDbCache(int groupSize = DefaultSqlPagingSize, IEnumerable<int> contentTypeIds = null)
         {
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
@@ -1615,7 +1624,7 @@ WHERE cmsContentNu.nodeId IN (
             } while (processed < total);
         }
 
-        public void RebuildMemberDbCache(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
+        public void RebuildMemberDbCache(int groupSize = DefaultSqlPagingSize, IEnumerable<int> contentTypeIds = null)
         {
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
