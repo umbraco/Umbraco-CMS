@@ -10,6 +10,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         private const char PrefixString = 'S';
         private const char PrefixInt32 = 'I';
         private const char PrefixUInt16 = 'H';
+        private const char PrefixUInt32 = 'J';
         private const char PrefixLong = 'L';
         private const char PrefixFloat = 'F';
         private const char PrefixDouble = 'B';
@@ -68,6 +69,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     return PrimitiveSerializer.Int32.ReadFrom(stream);
                 case PrefixUInt16:
                     return PrimitiveSerializer.UInt16.ReadFrom(stream);
+                case PrefixUInt32:
+                    return PrimitiveSerializer.UInt32.ReadFrom(stream);
                 case PrefixByte:
                     return PrimitiveSerializer.Byte.ReadFrom(stream);
                 case PrefixLong:
@@ -128,6 +131,11 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             {
                 PrimitiveSerializer.Char.WriteTo(PrefixDateTime, stream);
                 PrimitiveSerializer.DateTime.WriteTo(dateValue, stream);
+            }
+            else if (value is uint uInt32Value)
+            {
+                PrimitiveSerializer.Char.WriteTo(PrefixUInt32, stream);
+                PrimitiveSerializer.UInt32.WriteTo(uInt32Value, stream);
             }
             else
                 throw new NotSupportedException("Value type " + value.GetType().FullName + " cannot be serialized.");
