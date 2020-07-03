@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    internal class MsgPackContentNestedDataSerializer : IContentNestedDataSerializer
+    internal class MsgPackContentNestedDataSerializer : IContentNestedDataByteSerializer
     {
         private MessagePackSerializerOptions _options;
 
@@ -39,8 +39,6 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return json;
         }
 
-        // TODO: Instead of returning base64 it would be more ideal to avoid that translation entirely and just store/retrieve raw bytes
-
         public ContentNestedData Deserialize(string data)
         {
             var bin = Convert.FromBase64String(data);
@@ -53,6 +51,10 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             var bin = MessagePackSerializer.Serialize(nestedData, _options);
             return Convert.ToBase64String(bin);
         }
+
+        public ContentNestedData DeserializeBytes(byte[] data) => MessagePackSerializer.Deserialize<ContentNestedData>(data, _options);
+
+        public byte[] SerializeBytes(ContentNestedData nestedData) => MessagePackSerializer.Serialize(nestedData, _options);
 
         //private class ContentNestedDataResolver : IFormatterResolver
         //{

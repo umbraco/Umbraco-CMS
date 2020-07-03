@@ -49,6 +49,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.Data, "EditData"))
                 .AndSelect<ContentNuDto>("nuPub", x => Alias(x.Data, "PubData"))
 
+                .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.RawData, "EditDataRaw"))
+                .AndSelect<ContentNuDto>("nuPub", x => Alias(x.RawData, "PubDataRaw"))
+
                 .From<NodeDto>();
 
             if (joins != null)
@@ -136,6 +139,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .AndSelect<ContentDto>(x => Alias(x.ContentTypeId, "ContentTypeId"))
                 .AndSelect<ContentVersionDto>(x => Alias(x.Id, "VersionId"), x => Alias(x.Text, "EditName"), x => Alias(x.VersionDate, "EditVersionDate"), x => Alias(x.UserId, "EditWriterId"))
                 .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.Data, "EditData"))
+                .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.RawData, "EditDataRaw"))
                 .From<NodeDto>();
 
             if (joins != null)
@@ -211,7 +215,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
             if (dto.Edited)
             {
-                if (dto.EditData == null)
+                if (dto.EditData == null && dto.EditDataRaw == null)
                 {
                     if (Debugger.IsAttached)
                         throw new Exception("Missing cmsContentNu edited content for node " + dto.Id + ", consider rebuilding.");
@@ -219,7 +223,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 }
                 else
                 {
-                    var nested = _contentNestedDataSerializer.Deserialize(dto.EditData);
+                    var nested = _contentNestedDataSerializer is IContentNestedDataByteSerializer byteSerializer
+                        ? byteSerializer.DeserializeBytes(dto.EditDataRaw)
+                        : _contentNestedDataSerializer.Deserialize(dto.EditData);
 
                     d = new ContentData
                     {
@@ -238,7 +244,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
             if (dto.Published)
             {
-                if (dto.PubData == null)
+                if (dto.PubData == null && dto.PubDataRaw == null)
                 {
                     if (Debugger.IsAttached)
                         throw new Exception("Missing cmsContentNu published content for node " + dto.Id + ", consider rebuilding.");
@@ -246,7 +252,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 }
                 else
                 {
-                    var nested = _contentNestedDataSerializer.Deserialize(dto.PubData);
+                    var nested = _contentNestedDataSerializer is IContentNestedDataByteSerializer byteSerializer
+                        ? byteSerializer.DeserializeBytes(dto.PubDataRaw)
+                        : _contentNestedDataSerializer.Deserialize(dto.PubData);
 
                     p = new ContentData
                     {
@@ -279,10 +287,12 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         private ContentNodeKit CreateMediaNodeKit(ContentSourceDto dto)
         {
-            if (dto.EditData == null)
+            if (dto.EditData == null && dto.EditDataRaw == null)
                 throw new Exception("No data for media " + dto.Id);
 
-            var nested = _contentNestedDataSerializer.Deserialize(dto.EditData);
+            var nested = _contentNestedDataSerializer is IContentNestedDataByteSerializer byteSerializer
+                ? byteSerializer.DeserializeBytes(dto.EditDataRaw)
+                : _contentNestedDataSerializer.Deserialize(dto.EditData);
 
             var p = new ContentData
             {

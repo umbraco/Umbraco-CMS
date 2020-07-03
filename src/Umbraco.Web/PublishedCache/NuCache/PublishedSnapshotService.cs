@@ -1322,9 +1322,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var dto = GetDto(content, published);
             db.InsertOrUpdate(dto,
-                "SET data=@data, rv=rv+1 WHERE nodeId=@id AND published=@published",
+                "SET data=@data, dataRaw=@dataRaw, rv=rv+1 WHERE nodeId=@id AND published=@published",
                 new
                 {
+                    dataRaw = dto.RawData,
                     data = dto.Data,
                     id = dto.NodeId,
                     published = dto.Published
@@ -1456,7 +1457,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 NodeId = content.Id,
                 Published = published,
-                Data = _contentNestedDataSerializer.Serialize(nestedData)
+                Data = !(_contentNestedDataSerializer is IContentNestedDataByteSerializer) ? _contentNestedDataSerializer.Serialize(nestedData) : null,
+                RawData = (_contentNestedDataSerializer is IContentNestedDataByteSerializer byteSerializer) ? byteSerializer.SerializeBytes(nestedData) : null
             };
 
             //Core.Composing.Current.Logger.Debug<PublishedSnapshotService>(dto.Data);
