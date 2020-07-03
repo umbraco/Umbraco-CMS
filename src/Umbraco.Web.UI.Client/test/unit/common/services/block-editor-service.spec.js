@@ -209,6 +209,9 @@
 
                 var blockObject = modelObject.getBlockObject(layout[0]);
 
+                expect(blockObject).not.toBeUndefined();
+                expect(blockObject).not.toBe(null);
+
                 // remove from layout;
                 layout.splice(0, 1);
 
