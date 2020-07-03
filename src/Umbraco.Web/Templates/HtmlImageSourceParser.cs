@@ -38,6 +38,17 @@ namespace Umbraco.Web.Templates
         /// Initializes a new instance of the <see cref="HtmlImageSourceParser" /> class.
         /// </summary>
         /// <param name="umbracoContextAccessor">The umbraco context accessor.</param>
+        /// <param name="imageUrlGenerator">The image URL generator.</param>
+        public HtmlImageSourceParser(IUmbracoContextAccessor umbracoContextAccessor, IImageUrlGenerator imageUrlGenerator)
+            : this(umbracoContextAccessor)
+        {
+            this._imageUrlGenerator = imageUrlGenerator;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HtmlImageSourceParser" /> class.
+        /// </summary>
+        /// <param name="umbracoContextAccessor">The umbraco context accessor.</param>
         public HtmlImageSourceParser(IUmbracoContextAccessor umbracoContextAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -76,17 +87,6 @@ namespace Umbraco.Web.Templates
                 if (match.Groups.Count == 2 && Udi.TryParse(match.Groups[1].Value, out var udi))
                     yield return udi;
             }
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="HtmlImageSourceParser" /> class.
-        /// </summary>
-        /// <param name="umbracoContextAccessor">The umbraco context accessor.</param>
-        /// <param name="imageUrlGenerator">The image URL generator.</param>
-        public HtmlImageSourceParser(IUmbracoContextAccessor umbracoContextAccessor, IImageUrlGenerator imageUrlGenerator)
-            : this(umbracoContextAccessor)
-        {
-            this._imageUrlGenerator = imageUrlGenerator;
         }
 
         /// <summary>
