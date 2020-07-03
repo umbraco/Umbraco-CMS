@@ -1456,10 +1456,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 NodeId = content.Id,
                 Published = published,
-
-                // note that numeric values (which are Int32) are serialized without their
-                // type (eg "value":1234) and JsonConvert by default deserializes them as Int64
-
                 Data = _contentNestedDataSerializer.Serialize(nestedData)
             };
 

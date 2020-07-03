@@ -11,7 +11,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             base.Compose(composition);
 
             // register the NuCache NestedContentData serializer
-            composition.Register<IContentNestedDataSerializer, JsonContentNestedDataSerializer>();
+            //composition.Register<IContentNestedDataSerializer, JsonContentNestedDataSerializer>();
+            composition.Register<IContentNestedDataSerializer, MsgPackContentNestedDataSerializer>();
 
             // register the NuCache database data source
             composition.Register<IDataSource, DatabaseDataSource>();

@@ -1,13 +1,14 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
+
     internal class JsonContentNestedDataSerializer : IContentNestedDataSerializer
     {
         public ContentNestedData Deserialize(string data)
@@ -17,7 +18,13 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
             var settings = new JsonSerializerSettings
             {
-                Converters = new List<JsonConverter> { new ForceInt32Converter() }
+                Converters = new List<JsonConverter> { new ForceInt32Converter() },
+
+                // Explicitly specify date handling so that it's consistent and follows the same date handling as MessagePack
+                DateParseHandling = DateParseHandling.DateTime,
+                DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                DateFormatString = "o"                
             };
 
             return JsonConvert.DeserializeObject<ContentNestedData>(data, settings);
@@ -25,6 +32,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         public string Serialize(ContentNestedData nestedData)
         {
+            // note that numeric values (which are Int32) are serialized without their
+            // type (eg "value":1234) and JsonConvert by default deserializes them as Int64
+
             return JsonConvert.SerializeObject(nestedData);
         }
     }

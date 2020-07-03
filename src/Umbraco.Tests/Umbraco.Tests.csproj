@@ -109,7 +109,7 @@
     <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
     <PackageReference Include="Semver" Version="2.0.4" />
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.2" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\DistributedCacheBinderTests.cs" />
@@ -149,6 +149,7 @@
     <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />
     <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionTests.cs" />
     <Compile Include="PropertyEditors\NestedContentPropertyComponentTests.cs" />
+    <Compile Include="PublishedContent\ContentSerializationTests.cs" />
     <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />
     <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />
     <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />
