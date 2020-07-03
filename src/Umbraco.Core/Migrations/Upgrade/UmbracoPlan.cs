@@ -191,8 +191,9 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<MissingContentVersionsIndexes>("{EE288A91-531B-4995-8179-1D62D9AA3E2E}");
             To<AddMainDomLock>("{2AB29964-02A1-474D-BD6B-72148D2A53A2}");
 
-
+            // to 8.7.0...
             To<MissingDictionaryIndex>("{a78e3369-8ea3-40ec-ad3f-5f76929d2b20}");
+            To<AddCmsContentNuByteColumn>("{8DDDCD0B-D7D5-4C97-BD6A-6B38CA65752F}");
 
             //FINAL
         }

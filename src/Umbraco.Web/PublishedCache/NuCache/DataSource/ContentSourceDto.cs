@@ -27,6 +27,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         public int EditWriterId { get; set; }
         public int EditTemplateId { get; set; }
         public string EditData { get; set; }
+        public byte[] EditDataRaw { get; set; }
 
         // published data
         public int PublishedVersionId { get; set; }
@@ -35,5 +36,6 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         public int PubWriterId { get; set; }
         public int PubTemplateId { get; set; }
         public string PubData { get; set; }
+        public byte[] PubDataRaw { get; set; }
     }
 }

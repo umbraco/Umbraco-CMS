@@ -29,17 +29,17 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         public string UrlSegment { get; set; }
 
         //Legacy properties used to deserialize existing nucache db entries
-        [DataMember(Order = 3)]
+        [IgnoreDataMember]
         [JsonProperty("properties")]
         [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<PropertyData[]>))]
         private Dictionary<string, PropertyData[]> LegacyPropertyData { set { PropertyData = value; } }
 
-        [DataMember(Order = 4)]
+        [IgnoreDataMember]
         [JsonProperty("cultureData")]
         [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<CultureVariation>))]
         private Dictionary<string, CultureVariation> LegacyCultureData { set { CultureData = value; } }
 
-        [DataMember(Order = 5)]
+        [IgnoreDataMember]
         [JsonProperty("urlSegment")]
         private string LegacyUrlSegment { set { UrlSegment = value; } }
     }
