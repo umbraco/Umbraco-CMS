@@ -205,7 +205,7 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
-                _contentNestedDataSerializer), publishedCachePropertyMapper);
+                _contentNestedDataSerializer, publishedCachePropertyMapper);
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

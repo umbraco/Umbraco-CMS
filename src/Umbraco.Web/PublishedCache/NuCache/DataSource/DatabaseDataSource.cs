@@ -66,8 +66,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcver")
 
                 .LeftJoin<ContentNuDto>("nuEdit").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && !right.Published, aliasRight: "nuEdit")
-                .LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published, aliasRight: "nuPub")
-                .InnerJoin<ContentNuDto>("nuArch").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published && !right.Archived, aliasRight: "nuArch");
+                .LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published, aliasRight: "nuPub");
 
 
 
@@ -147,8 +146,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             sql = sql
                 .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
                 .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
-                .LeftJoin<ContentNuDto>("nuEdit").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && !right.Published, aliasRight: "nuEdit")
-                .InnerJoin<ContentNuDto>("nuArch").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && !right.Archived, aliasRight: "nuArch");
+                .LeftJoin<ContentNuDto>("nuEdit").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && !right.Published, aliasRight: "nuEdit");
 
             return sql;
         }

@@ -29,8 +29,5 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("rv")]
         public long Rv { get; set; }
-
-        [Column("archived")]
-        public bool Archived { get; set; }
     }
 }
