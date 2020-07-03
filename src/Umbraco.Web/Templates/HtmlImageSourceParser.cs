@@ -1,32 +1,18 @@
-﻿namespace Umbraco.Web.Templates
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text.RegularExpressions;
+using HtmlAgilityPack;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+
+namespace Umbraco.Web.Templates
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Text.RegularExpressions;
-
-    using HtmlAgilityPack;
-
-    using Umbraco.Core;
-    using Umbraco.Core.Models;
-
     /// <summary>
     /// HTML image source parser.
     /// </summary>
     public class HtmlImageSourceParser
     {
-        /// <summary>
-        /// The data udi attribute regex.
-        /// </summary>
-        protected static readonly Regex DataUdiAttributeRegex = new Regex(@"data-udi=\\?(?:""|')(?<udi>umb://[A-z0-9\-]+/[A-z0-9]+)\\?(?:""|')",
-            RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
-
-        /// <summary>
-        /// The resolve img pattern.
-        /// </summary>
-        protected static readonly Regex ResolveImgPattern = new Regex(@"(<img[^>]*src="")([^""\?]*)((?:\?[^""]*)?""[^>]*data-udi="")([^""]*)(""[^>]*>)",
-            RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-
         /// <summary>
         /// The image URL generator.
         /// </summary>
@@ -61,6 +47,18 @@
         {
             _umbracoContextAccessor = umbracoContextAccessor;
         }
+
+        /// <summary>
+        /// The data udi attribute regex.
+        /// </summary>
+        protected static readonly Regex DataUdiAttributeRegex = new Regex(@"data-udi=\\?(?:""|')(?<udi>umb://[A-z0-9\-]+/[A-z0-9]+)\\?(?:""|')",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+
+        /// <summary>
+        /// The resolve img pattern.
+        /// </summary>
+        protected static readonly Regex ResolveImgPattern = new Regex(@"(<img[^>]*src="")([^""\?]*)((?:\?[^""]*)?""[^>]*data-udi="")([^""]*)(""[^>]*>)",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HtmlImageSourceParser" /> class.
