@@ -24,11 +24,6 @@ namespace Umbraco.Web.Templates
         protected readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
         /// <summary>
-        /// The get media URL.
-        /// </summary>
-        protected Func<Guid, string> _getMediaUrl;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="HtmlImageSourceParser" /> class.
         /// </summary>
         /// <param name="getMediaUrl">The get media URL.</param>
@@ -48,7 +43,6 @@ namespace Umbraco.Web.Templates
             _umbracoContextAccessor = umbracoContextAccessor;
         }
 
-
         /// <summary>
         /// The resolve img pattern.
         /// </summary>
@@ -60,6 +54,11 @@ namespace Umbraco.Web.Templates
         /// </summary>
         protected static readonly Regex DataUdiAttributeRegex = new Regex(@"data-udi=\\?(?:""|')(?<udi>umb://[A-z0-9\-]+/[A-z0-9]+)\\?(?:""|')",
             RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+
+        /// <summary>
+        /// The get media URL.
+        /// </summary>
+        protected Func<Guid, string> _getMediaUrl;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HtmlImageSourceParser" /> class.
