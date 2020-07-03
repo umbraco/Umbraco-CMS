@@ -61,6 +61,24 @@ namespace Umbraco.Web.Templates
         protected Func<Guid, string> _getMediaUrl;
 
         /// <summary>
+        /// Parses out media UDIs from an html string based on 'data-udi' html attributes
+        /// </summary>
+        /// <param name="text">The text.</param>
+        /// <returns></returns>
+        public virtual IEnumerable<Udi> FindUdisFromDataAttributes(string text)
+        {
+            var matches = DataUdiAttributeRegex.Matches(text);
+            if (matches.Count == 0)
+                yield break;
+
+            foreach (Match match in matches)
+            {
+                if (match.Groups.Count == 2 && Udi.TryParse(match.Groups[1].Value, out var udi))
+                    yield return udi;
+            }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="HtmlImageSourceParser" /> class.
         /// </summary>
         /// <param name="umbracoContextAccessor">The umbraco context accessor.</param>
@@ -120,24 +138,6 @@ namespace Umbraco.Web.Templates
 
                 return $"{match.Groups[1].Value}{mediaUrl}{attributes}{udi}{match.Groups[5].Value}";
             });
-        }
-
-        /// <summary>
-        /// Parses out media UDIs from an html string based on 'data-udi' html attributes
-        /// </summary>
-        /// <param name="text">The text.</param>
-        /// <returns></returns>
-        public virtual IEnumerable<Udi> FindUdisFromDataAttributes(string text)
-        {
-            var matches = DataUdiAttributeRegex.Matches(text);
-            if (matches.Count == 0)
-                yield break;
-
-            foreach (Match match in matches)
-            {
-                if (match.Groups.Count == 2 && Udi.TryParse(match.Groups[1].Value, out var udi))
-                    yield return udi;
-            }
         }
 
         /// <summary>
