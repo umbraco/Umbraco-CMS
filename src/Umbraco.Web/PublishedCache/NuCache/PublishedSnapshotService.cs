@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -48,6 +49,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
+        private readonly IContentNestedDataSerializer _contentNestedDataSerializer;
         private readonly IPublishedCachePropertyKeyMapper _publishedCachePropertyKeyMapper;
 
         // volatile because we read it with no lock
@@ -82,7 +84,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IDataSource dataSource, IGlobalSettings globalSettings,
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
-            UrlSegmentProviderCollection urlSegmentProviders, IPublishedCachePropertyKeyMapper publishedCachePropertyKeyMapper)
+            UrlSegmentProviderCollection urlSegmentProviders, 
+            IContentNestedDataSerializer contentNestedDataSerializer,
+            IPublishedCachePropertyKeyMapper publishedCachePropertyKeyMapper)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -99,6 +103,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
             _urlSegmentProviders = urlSegmentProviders;
+            _contentNestedDataSerializer = contentNestedDataSerializer;
             _publishedCachePropertyKeyMapper = publishedCachePropertyKeyMapper;
 
             // we need an Xml serializer here so that the member cache can support XPath,
@@ -884,22 +889,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // they require.
 
                 // These can be run side by side in parallel.
+                using (_contentStore.GetScopedWriteLock(_scopeProvider))
+                {
+                    NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _, out _);
+                }
 
-                Parallel.Invoke(
-                    () =>
-                    {
-                        using (_contentStore.GetScopedWriteLock(_scopeProvider))
-                        {
-                            NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _, out _);
-                        }
-                    },
-                    () =>
-                    {
-                        using (_mediaStore.GetScopedWriteLock(_scopeProvider))
-                        {
-                            NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _);
-                        }
-                    });
+                using (_mediaStore.GetScopedWriteLock(_scopeProvider))
+                {
+                    NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _);
+                }
             }
 
             ((PublishedSnapshot)CurrentPublishedSnapshot)?.Resync();
@@ -1462,11 +1460,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 NodeId = content.Id,
                 Published = published,
-
-                // note that numeric values (which are Int32) are serialized without their
-                // type (eg "value":1234) and JsonConvert by default deserializes them as Int64
-
-                Data = JsonConvert.SerializeObject(nestedData)
+                Data = _contentNestedDataSerializer.Serialize(nestedData)
             };
 
             //Core.Composing.Current.Logger.Debug<PublishedSnapshotService>(dto.Data);
@@ -1478,6 +1472,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Rebuild Database PreCache
 
+        private const int DefaultSqlPagingSize = 1000;
+
+        private static int GetSqlPagingSize()
+        {
+            var appSetting = ConfigurationManager.AppSettings["Umbraco.Web.PublishedCache.NuCache.PublishedSnapshotService.SqlPageSize"];
+            return appSetting != null && int.TryParse(appSetting, out var size) ? size : DefaultSqlPagingSize;
+        }
+
         public override void Rebuild()
         {
             _logger.Debug<PublishedSnapshotService>("Rebuilding...");
@@ -1486,14 +1488,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 scope.ReadLock(Constants.Locks.ContentTree);
                 scope.ReadLock(Constants.Locks.MediaTree);
                 scope.ReadLock(Constants.Locks.MemberTree);
-                RebuildContentDbCacheLocked(scope, 5000, null);
-                RebuildMediaDbCacheLocked(scope, 5000, null);
-                RebuildMemberDbCacheLocked(scope, 5000, null);
+                RebuildContentDbCacheLocked(scope, GetSqlPagingSize(), null);
+                RebuildMediaDbCacheLocked(scope, GetSqlPagingSize(), null);
+                RebuildMemberDbCacheLocked(scope, GetSqlPagingSize(), null);
                 scope.Complete();
             }
         }
 
-        public void RebuildContentDbCache(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
+        public void RebuildContentDbCache(int groupSize = DefaultSqlPagingSize, IEnumerable<int> contentTypeIds = null)
         {
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
@@ -1565,7 +1567,7 @@ WHERE cmsContentNu.nodeId IN (
             } while (processed < total);
         }
 
-        public void RebuildMediaDbCache(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
+        public void RebuildMediaDbCache(int groupSize = DefaultSqlPagingSize, IEnumerable<int> contentTypeIds = null)
         {
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
@@ -1624,7 +1626,7 @@ WHERE cmsContentNu.nodeId IN (
             } while (processed < total);
         }
 
-        public void RebuildMemberDbCache(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
+        public void RebuildMemberDbCache(int groupSize = DefaultSqlPagingSize, IEnumerable<int> contentTypeIds = null)
         {
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {

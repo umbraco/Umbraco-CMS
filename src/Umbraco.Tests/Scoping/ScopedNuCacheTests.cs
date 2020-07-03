@@ -83,6 +83,7 @@ namespace Umbraco.Tests.Scoping
             var memberRepository = Mock.Of<IMemberRepository>();
             var publishedCachePropertyMapper = new DefaultPublishedCachePropertyKeyMapper();
 
+            var nestedContentDataSerializer = new JsonContentNestedDataSerializer();
             return new PublishedSnapshotService(
                 options,
                 null,
@@ -96,11 +97,12 @@ namespace Umbraco.Tests.Scoping
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
-                new DatabaseDataSource(),
+                new DatabaseDataSource(nestedContentDataSerializer),
                 Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), publishedCachePropertyMapper);
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
+                nestedContentDataSerializer, publishedCachePropertyMapper);
         }
 
         protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)

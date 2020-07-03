@@ -21,6 +21,12 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     internal class DatabaseDataSource : IDataSource
     {
         private const int PageSize = 500;
+        private readonly IContentNestedDataSerializer _contentNestedDataSerializer;
+
+        public DatabaseDataSource(IContentNestedDataSerializer contentNestedDataSerializer)
+        {
+            _contentNestedDataSerializer = contentNestedDataSerializer;
+        }
 
         // we want arrays, we want them all loaded, not an enumerable
 
@@ -202,7 +208,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 yield return CreateMediaNodeKit(row);
         }
 
-        private static ContentNodeKit CreateContentNodeKit(ContentSourceDto dto)
+        private ContentNodeKit CreateContentNodeKit(ContentSourceDto dto)
         {
             ContentData d = null;
             ContentData p = null;
@@ -217,7 +223,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 }
                 else
                 {
-                    var nested = DeserializeNestedData(dto.EditData);
+                    var nested = _contentNestedDataSerializer.Deserialize(dto.EditData);
 
                     d = new ContentData
                     {
@@ -227,7 +233,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                         VersionId = dto.VersionId,
                         VersionDate = dto.EditVersionDate,
                         WriterId = dto.EditWriterId,
-                        Properties = nested.PropertyData,
+                        Properties = nested.PropertyData, // TODO: We don't want to allocate empty arrays
                         CultureInfos = nested.CultureData,
                         UrlSegment = nested.UrlSegment
                     };
@@ -244,7 +250,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 }
                 else
                 {
-                    var nested = DeserializeNestedData(dto.PubData);
+                    var nested = _contentNestedDataSerializer.Deserialize(dto.PubData);
 
                     p = new ContentData
                     {
@@ -255,7 +261,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                         VersionId = dto.VersionId,
                         VersionDate = dto.PubVersionDate,
                         WriterId = dto.PubWriterId,
-                        Properties = nested.PropertyData,
+                        Properties = nested.PropertyData, // TODO: We don't want to allocate empty arrays
                         CultureInfos = nested.CultureData
                     };
                 }
@@ -275,12 +281,12 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return s;
         }
 
-        private static ContentNodeKit CreateMediaNodeKit(ContentSourceDto dto)
+        private ContentNodeKit CreateMediaNodeKit(ContentSourceDto dto)
         {
             if (dto.EditData == null)
                 throw new Exception("No data for media " + dto.Id);
 
-            var nested = DeserializeNestedData(dto.EditData);
+            var nested = _contentNestedDataSerializer.Deserialize(dto.EditData);
 
             var p = new ContentData
             {
@@ -290,7 +296,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 VersionId = dto.VersionId,
                 VersionDate = dto.EditVersionDate,
                 WriterId = dto.CreatorId, // what-else?
-                Properties = nested.PropertyData,
+                Properties = nested.PropertyData, // TODO: We don't want to allocate empty arrays
                 CultureInfos = nested.CultureData
             };
 
@@ -307,17 +313,6 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return s;
         }
 
-        private static ContentNestedData DeserializeNestedData(string data)
-        {
-            // by default JsonConvert will deserialize our numeric values as Int64
-            // which is bad, because they were Int32 in the database - take care
-
-            var settings = new JsonSerializerSettings
-            {
-                Converters = new List<JsonConverter> { new ForceInt32Converter() }
-            };
-
-            return JsonConvert.DeserializeObject<ContentNestedData>(data, settings);
-        }
+        
     }
 }

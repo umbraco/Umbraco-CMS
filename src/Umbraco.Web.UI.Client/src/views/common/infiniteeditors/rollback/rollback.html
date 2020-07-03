@@ -31,8 +31,8 @@
 
                     <div>
 
-                        <h5><localize key="rollback_currentVersion"></localize></h5>
-                        <p>{{vm.currentVersion.name}} (Created: {{vm.currentVersion.createDate}})</p>
+                        <h5><localize key="rollback_currentVersion">Current version</localize></h5>
+                        <p>{{vm.currentVersion.name}} (<localize key="rollback_created">Created</localize>: {{vm.currentVersion.createDate}})</p>
 
                         <h5><localize key="rollback_rollbackTo"></localize></h5>
                         <select
@@ -44,9 +44,9 @@
                         </select>
                     </div>
 
-                    <div ng-if="vm.diff" class="diff" style="border-top: 1px solid #e9e9eb; margin-top: 30px;">
+                    <div ng-if="vm.diff && !vm.loading" class="diff" style="border-top: 1px solid #e9e9eb; margin-top: 30px;">
 
-                        <h5>Changes</h5>
+                        <h5><localize key="rollback_changes">Changes</localize></h5>
                         <small style="margin-bottom: 15px; display: block;"><localize key="rollback_diffHelp"></localize></small>
 
                         <table class="table table-condensed table-bordered">
@@ -54,7 +54,7 @@
                                 <tr>
                                     <td class="bold">Name</td>
                                     <td>
-                                        <span ng-repeat="part in vm.diff.name">
+                                        <span ng-repeat="part in vm.diff.name track by $id(part)">
                                             <ins ng-if="part.added">{{part.value}}</ins>
                                             <del ng-if="part.removed">{{part.value}}</del>
                                             <span ng-if="!part.added && !part.removed">{{part.value}}</span>
@@ -64,7 +64,7 @@
                                 <tr ng-repeat="property in vm.diff.properties track by property.alias">
                                     <td class="bold">{{property.label}}</td>
                                     <td ng-class="{'pre-line': property.isObject, 'word-wrap': !property.isObject}">
-                                        <span ng-repeat="part in property.diff">
+                                        <span ng-repeat="part in property.diff track by $id(part)">
                                             <ins ng-if="part.added">{{part.value}}</ins>
                                             <del ng-if="part.removed">{{part.value}}</del>
                                             <span ng-if="!part.added && !part.removed">{{part.value}}</span>

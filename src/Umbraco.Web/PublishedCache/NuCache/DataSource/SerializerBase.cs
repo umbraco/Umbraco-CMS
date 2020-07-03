@@ -6,6 +6,17 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     internal abstract class SerializerBase
     {
+        private const char PrefixNull = 'N';
+        private const char PrefixString = 'S';
+        private const char PrefixInt32 = 'I';
+        private const char PrefixUInt16 = 'H';
+        private const char PrefixUInt32 = 'J';
+        private const char PrefixLong = 'L';
+        private const char PrefixFloat = 'F';
+        private const char PrefixDouble = 'B';
+        private const char PrefixDateTime = 'D';
+        private const char PrefixByte = 'O';
+
         protected string ReadString(Stream stream) => PrimitiveSerializer.String.ReadFrom(stream);
         protected int ReadInt(Stream stream) => PrimitiveSerializer.Int32.ReadFrom(stream);
         protected long ReadLong(Stream stream) => PrimitiveSerializer.Int64.ReadFrom(stream);
@@ -17,47 +28,58 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             where T : struct
         {
             var type = PrimitiveSerializer.Char.ReadFrom(stream);
-            if (type == 'N') return null;
+            if (type == PrefixNull) return null;
             if (type != t)
                 throw new NotSupportedException($"Cannot deserialize type '{type}', expected '{t}'.");
             return read(stream);
         }
 
-        protected string ReadStringObject(Stream stream) // required 'cos string is not a struct
+        protected string ReadStringObject(Stream stream, bool intern = false) // required 'cos string is not a struct
         {
             var type = PrimitiveSerializer.Char.ReadFrom(stream);
-            if (type == 'N') return null;
-            if (type != 'S')
+            if (type == PrefixNull) return null;
+            if (type != PrefixString)
                 throw new NotSupportedException($"Cannot deserialize type '{type}', expected 'S'.");
-            return PrimitiveSerializer.String.ReadFrom(stream);
+            return intern
+                ? string.Intern(PrimitiveSerializer.String.ReadFrom(stream))
+                : PrimitiveSerializer.String.ReadFrom(stream);
         }
 
-        protected int? ReadIntObject(Stream stream) => ReadObject(stream, 'I', ReadInt);
-        protected long? ReadLongObject(Stream stream) => ReadObject(stream, 'L', ReadLong);
-        protected float? ReadFloatObject(Stream stream) => ReadObject(stream, 'F', ReadFloat);
-        protected double? ReadDoubleObject(Stream stream) => ReadObject(stream, 'B', ReadDouble);
-        protected DateTime? ReadDateTimeObject(Stream stream) => ReadObject(stream, 'D', ReadDateTime);
+        protected int? ReadIntObject(Stream stream) => ReadObject(stream, PrefixInt32, ReadInt);
+        protected long? ReadLongObject(Stream stream) => ReadObject(stream, PrefixLong, ReadLong);
+        protected float? ReadFloatObject(Stream stream) => ReadObject(stream, PrefixFloat, ReadFloat);
+        protected double? ReadDoubleObject(Stream stream) => ReadObject(stream, PrefixDouble, ReadDouble);
+        protected DateTime? ReadDateTimeObject(Stream stream) => ReadObject(stream, PrefixDateTime, ReadDateTime);
 
         protected object ReadObject(Stream stream)
             => ReadObject(PrimitiveSerializer.Char.ReadFrom(stream), stream);
 
         protected object ReadObject(char type, Stream stream)
         {
+            // NOTE: There is going to be a ton of boxing going on here, but i'm not sure we can avoid that because innevitably with our
+            // current model structure the value will need to end up being 'object' at some point anyways.
+
             switch (type)
             {
-                case 'N':
+                case PrefixNull:
                     return null;
-                case 'S':
+                case PrefixString:
                     return PrimitiveSerializer.String.ReadFrom(stream);
-                case 'I':
+                case PrefixInt32:
                     return PrimitiveSerializer.Int32.ReadFrom(stream);
-                case 'L':
+                case PrefixUInt16:
+                    return PrimitiveSerializer.UInt16.ReadFrom(stream);
+                case PrefixUInt32:
+                    return PrimitiveSerializer.UInt32.ReadFrom(stream);
+                case PrefixByte:
+                    return PrimitiveSerializer.Byte.ReadFrom(stream);
+                case PrefixLong:
                     return PrimitiveSerializer.Int64.ReadFrom(stream);
-                case 'F':
+                case PrefixFloat:
                     return PrimitiveSerializer.Float.ReadFrom(stream);
-                case 'B':
+                case PrefixDouble:
                     return PrimitiveSerializer.Double.ReadFrom(stream);
-                case 'D':
+                case PrefixDateTime:
                     return PrimitiveSerializer.DateTime.ReadFrom(stream);
                 default:
                     throw new NotSupportedException($"Cannot deserialize unknown type '{type}'.");
@@ -68,37 +90,52 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         {
             if (value == null)
             {
-                PrimitiveSerializer.Char.WriteTo('N', stream);
+                PrimitiveSerializer.Char.WriteTo(PrefixNull, stream);
             }
             else if (value is string stringValue)
             {
-                PrimitiveSerializer.Char.WriteTo('S', stream);
+                PrimitiveSerializer.Char.WriteTo(PrefixString, stream);
                 PrimitiveSerializer.String.WriteTo(stringValue, stream);
             }
             else if (value is int intValue)
             {
-                PrimitiveSerializer.Char.WriteTo('I', stream);
+                PrimitiveSerializer.Char.WriteTo(PrefixInt32, stream);
                 PrimitiveSerializer.Int32.WriteTo(intValue, stream);
+            }
+            else if (value is byte byteValue)
+            {
+                PrimitiveSerializer.Char.WriteTo(PrefixByte, stream);
+                PrimitiveSerializer.Byte.WriteTo(byteValue, stream);
+            }
+            else if (value is ushort ushortValue)
+            {
+                PrimitiveSerializer.Char.WriteTo(PrefixUInt16, stream);
+                PrimitiveSerializer.UInt16.WriteTo(ushortValue, stream);
             }
             else if (value is long longValue)
             {
-                PrimitiveSerializer.Char.WriteTo('L', stream);
+                PrimitiveSerializer.Char.WriteTo(PrefixLong, stream);
                 PrimitiveSerializer.Int64.WriteTo(longValue, stream);
             }
             else if (value is float floatValue)
             {
-                PrimitiveSerializer.Char.WriteTo('F', stream);
+                PrimitiveSerializer.Char.WriteTo(PrefixFloat, stream);
                 PrimitiveSerializer.Float.WriteTo(floatValue, stream);
             }
             else if (value is double doubleValue)
             {
-                PrimitiveSerializer.Char.WriteTo('B', stream);
+                PrimitiveSerializer.Char.WriteTo(PrefixDouble, stream);
                 PrimitiveSerializer.Double.WriteTo(doubleValue, stream);
             }
             else if (value is DateTime dateValue)
             {
-                PrimitiveSerializer.Char.WriteTo('D', stream);
+                PrimitiveSerializer.Char.WriteTo(PrefixDateTime, stream);
                 PrimitiveSerializer.DateTime.WriteTo(dateValue, stream);
+            }
+            else if (value is uint uInt32Value)
+            {
+                PrimitiveSerializer.Char.WriteTo(PrefixUInt32, stream);
+                PrimitiveSerializer.UInt32.WriteTo(uInt32Value, stream);
             }
             else
                 throw new NotSupportedException("Value type " + value.GetType().FullName + " cannot be serialized.");

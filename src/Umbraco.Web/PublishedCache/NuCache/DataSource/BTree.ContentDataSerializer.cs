@@ -19,8 +19,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 VersionDate = PrimitiveSerializer.DateTime.ReadFrom(stream),
                 WriterId = PrimitiveSerializer.Int32.ReadFrom(stream),
                 TemplateId = PrimitiveSerializer.Int32.ReadFrom(stream),
-                Properties = PropertiesSerializer.ReadFrom(stream),
-                CultureInfos = CultureVariationsSerializer.ReadFrom(stream)
+                Properties = PropertiesSerializer.ReadFrom(stream), // TODO: We don't want to allocate empty arrays
+                CultureInfos = CultureVariationsSerializer.ReadFrom(stream) // TODO: We don't want to allocate empty arrays
             };
         }
 

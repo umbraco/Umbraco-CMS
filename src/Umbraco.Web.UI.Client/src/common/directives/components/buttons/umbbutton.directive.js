@@ -99,7 +99,7 @@ Use this directive to render an umbraco button. The directive can be used to gen
                 alias: "@?",
                 addEllipsis: "@?",
                 showCaret: "@?",
-                autoFocus: "@?",
+                autoFocus: "<?",
                 hasPopup: "@?",
                 isExpanded: "<?"
             }

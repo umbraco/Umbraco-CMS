@@ -1,6 +1,58 @@
 ﻿(function () {
     'use strict';
 
+    /**
+     * When performing a copy, we do copy the ElementType Data Model, but each inner Nested Content property is still stored as the Nested Content Model, aka. each property is just storing its value. To handle this we need to ensure we handle both scenarios.
+     */
+
+
+    angular.module('umbraco').run(['clipboardService', function (clipboardService) {
+
+        function clearNestedContentPropertiesForStorage(prop, propClearingMethod) {
+
+            // if prop.editor is "Umbraco.NestedContent"
+            if ((typeof prop === 'object' && prop.editor === "Umbraco.NestedContent")) {
+
+                var value = prop.value;
+                for (var i = 0; i < value.length; i++) {
+                    var obj = value[i];
+
+                    // remove the key
+                    delete obj.key;
+
+                    // Loop through all inner properties:
+                    for (var k in obj) {
+                        propClearingMethod(obj[k]);
+                    }
+                }
+            }
+        }
+        
+        clipboardService.registrerClearPropertyResolver(clearNestedContentPropertiesForStorage)
+
+
+        function clearInnerNestedContentPropertiesForStorage(prop, propClearingMethod) {
+
+            // if we got an array, and it has a entry with ncContentTypeAlias this meants that we are dealing with a NestedContent property inside a NestedContent property.
+            if ((Array.isArray(prop) && prop.length > 0 && prop[0].ncContentTypeAlias !== undefined)) {
+
+                for (var i = 0; i < prop.length; i++) {
+                    var obj = prop[i];
+
+                    // remove the key
+                    delete obj.key;
+
+                    // Loop through all inner properties:
+                    for (var k in obj) {
+                        propClearingMethod(obj[k]);
+                    }
+                }
+            }
+        }
+        
+        clipboardService.registrerClearPropertyResolver(clearInnerNestedContentPropertiesForStorage)
+    }]);
+
     angular
         .module('umbraco')
         .component('nestedContentPropertyEditor', {
@@ -13,7 +65,7 @@
             }
         });
 
-    function NestedContentController($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService, $routeParams, editorState) {
+    function NestedContentController($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService) {
 
         var vm = this;
         var model = $scope.$parent.$parent.model;
@@ -76,7 +128,7 @@
             }
 
             localizationService.localize("clipboard_labelForArrayOfItemsFrom", [model.label, nodeName]).then(function (data) {
-                clipboardService.copyArray("elementTypeArray", aliases, vm.nodes, data, "icon-thumbnail-list", model.id);
+                clipboardService.copyArray("elementTypeArray", aliases, vm.nodes, data, "icon-thumbnail-list", model.id, clearNodeForCopy);
             });
         }
 
@@ -176,7 +228,8 @@
                 vm.overlayMenu.availableItems.push({
                     alias: scaffold.contentTypeAlias,
                     name: scaffold.contentTypeName,
-                    icon: iconHelper.convertFromLegacyIcon(scaffold.icon)
+                    icon: iconHelper.convertFromLegacyIcon(scaffold.icon),
+                    tooltip: scaffold.documentType.description
                 });
             });
 
@@ -385,6 +438,11 @@
             });
         }
 
+        function clearNodeForCopy(clonedData) {
+            delete clonedData.key;
+            delete clonedData.$$hashKey;
+        }
+
         vm.showCopy = clipboardService.isSupported();
         vm.showPaste = false;
 
@@ -392,7 +450,7 @@
 
             syncCurrentNode();
 
-            clipboardService.copy("elementType", node.contentTypeAlias, node);
+            clipboardService.copy("elementType", node.contentTypeAlias, node, null, null, null, clearNodeForCopy);
             $event.stopPropagation();
         }
 

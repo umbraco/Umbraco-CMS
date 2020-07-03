@@ -323,7 +323,7 @@ namespace Umbraco.Web.Trees
         private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool opensDialog = false)
             where TAction : IAction
         {
-            var menuItem = menu.Items.Add<TAction>(Services.TextService.Localize("actions", _actions.GetAction<TAction>().Alias), hasSeparator, opensDialog);
+            var menuItem = menu.Items.Add<TAction>(Services.TextService, hasSeparator, opensDialog);
         }
 
         public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)

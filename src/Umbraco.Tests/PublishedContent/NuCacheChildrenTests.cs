@@ -37,6 +37,7 @@ namespace Umbraco.Tests.PublishedContent
         private ContentType _contentTypeInvariant;
         private ContentType _contentTypeVariant;
         private TestDataSource _source;
+        private IContentNestedDataSerializer _contentNestedDataSerializer;
 
         [TearDown]
         public void Teardown()
@@ -134,6 +135,8 @@ namespace Umbraco.Tests.PublishedContent
 
             // create a data source for NuCache
             _source = new TestDataSource(kits());
+            _contentNestedDataSerializer = new JsonContentNestedDataSerializer();
+
             var publishedCachePropertyMapper = new DefaultPublishedCachePropertyKeyMapper();
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
@@ -155,7 +158,8 @@ namespace Umbraco.Tests.PublishedContent
                 globalSettings,
                 Mock.Of<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), publishedCachePropertyMapper);
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
+                _contentNestedDataSerializer, publishedCachePropertyMapper);
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

@@ -38,9 +38,13 @@
             <button class="umb-card-grid-item btn-reset" ng-click="selectItem(availableItem)">
                 <span>
                     <i class="{{ availableItem.icon }}"></i>
-                    {{ availableItem.name }}
+                    <span ng-mouseover="showTooltip(availableItem, $event)" ng-mouseleave="hideTooltip()">{{ availableItem.name }}</span>                    
                 </span>
             </button>
         </li>
     </ul>
+
+    <umb-tooltip ng-if="tooltip.show" event="tooltip.event">
+        {{ tooltip.text }}
+    </umb-tooltip>
 </div>

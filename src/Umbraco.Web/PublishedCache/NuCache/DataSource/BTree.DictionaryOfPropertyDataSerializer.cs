@@ -19,7 +19,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             for (var i = 0; i < pcount; i++)
             {
                 // read property alias
-                var key = PrimitiveSerializer.String.ReadFrom(stream);
+                var key = string.Intern(PrimitiveSerializer.String.ReadFrom(stream));
 
                 // read values count
                 var vcount = PrimitiveSerializer.Int32.ReadFrom(stream);
@@ -38,8 +38,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     //  the 'current' value, and string.Empty should be used to represent the invariant or
                     //  neutral values - PropertyData throws when getting nulls, so falling back to
                     //  string.Empty here - what else?
-                    pdata.Culture = ReadStringObject(stream) ?? string.Empty;
-                    pdata.Segment = ReadStringObject(stream) ?? string.Empty;
+                    pdata.Culture = ReadStringObject(stream, true) ?? string.Empty;
+                    pdata.Segment = ReadStringObject(stream, true) ?? string.Empty;
                     pdata.Value = ReadObject(stream);
                 }
 
