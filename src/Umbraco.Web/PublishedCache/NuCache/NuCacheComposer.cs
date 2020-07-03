@@ -1,4 +1,5 @@
-﻿using Umbraco.Core;
+﻿using System.Configuration;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
@@ -10,9 +11,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             base.Compose(composition);
 
-            // register the NuCache NestedContentData serializer
-            //composition.Register<IContentNestedDataSerializer, JsonContentNestedDataSerializer>();
-            composition.Register<IContentNestedDataSerializer, MsgPackContentNestedDataSerializer>();
+            var serializer = ConfigurationManager.AppSettings["Umbraco.Web.PublishedCache.NuCache.Serializer"];
+
+            if (serializer == "MsgPack")
+            {
+                composition.Register<IContentNestedDataSerializer, MsgPackContentNestedDataSerializer>();                
+            }
+            else
+            {
+                composition.Register<IContentNestedDataSerializer, JsonContentNestedDataSerializer>();
+            }
 
             // register the NuCache database data source
             composition.Register<IDataSource, DatabaseDataSource>();

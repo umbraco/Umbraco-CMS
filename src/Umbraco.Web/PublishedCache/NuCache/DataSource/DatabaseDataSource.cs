@@ -20,12 +20,10 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     // provides efficient database access for NuCache
     internal class DatabaseDataSource : IDataSource
     {
-       
-
         private const int PageSize = 500;
         private readonly IContentNestedDataSerializer _contentNestedDataSerializer;
 
-        internal DatabaseDataSource(IContentNestedDataSerializer contentNestedDataSerializer)
+        public DatabaseDataSource(IContentNestedDataSerializer contentNestedDataSerializer)
         {
             _contentNestedDataSerializer = contentNestedDataSerializer;
         }
@@ -231,7 +229,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                         VersionId = dto.VersionId,
                         VersionDate = dto.EditVersionDate,
                         WriterId = dto.EditWriterId,
-                        Properties = nested.PropertyData,
+                        Properties = nested.PropertyData, // TODO: We don't want to allocate empty arrays
                         CultureInfos = nested.CultureData,
                         UrlSegment = nested.UrlSegment
                     };
@@ -259,7 +257,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                         VersionId = dto.VersionId,
                         VersionDate = dto.PubVersionDate,
                         WriterId = dto.PubWriterId,
-                        Properties = nested.PropertyData,
+                        Properties = nested.PropertyData, // TODO: We don't want to allocate empty arrays
                         CultureInfos = nested.CultureData
                     };
                 }
@@ -294,7 +292,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 VersionId = dto.VersionId,
                 VersionDate = dto.EditVersionDate,
                 WriterId = dto.CreatorId, // what-else?
-                Properties = nested.PropertyData,
+                Properties = nested.PropertyData, // TODO: We don't want to allocate empty arrays
                 CultureInfos = nested.CultureData
             };
 
