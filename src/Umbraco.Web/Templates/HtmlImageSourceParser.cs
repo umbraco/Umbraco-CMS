@@ -48,17 +48,18 @@ namespace Umbraco.Web.Templates
             _umbracoContextAccessor = umbracoContextAccessor;
         }
 
-        /// <summary>
-        /// The data udi attribute regex.
-        /// </summary>
-        protected static readonly Regex DataUdiAttributeRegex = new Regex(@"data-udi=\\?(?:""|')(?<udi>umb://[A-z0-9\-]+/[A-z0-9]+)\\?(?:""|')",
-            RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
         /// <summary>
         /// The resolve img pattern.
         /// </summary>
         protected static readonly Regex ResolveImgPattern = new Regex(@"(<img[^>]*src="")([^""\?]*)((?:\?[^""]*)?""[^>]*data-udi="")([^""]*)(""[^>]*>)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+
+        /// <summary>
+        /// The data udi attribute regex.
+        /// </summary>
+        protected static readonly Regex DataUdiAttributeRegex = new Regex(@"data-udi=\\?(?:""|')(?<udi>umb://[A-z0-9\-]+/[A-z0-9]+)\\?(?:""|')",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HtmlImageSourceParser" /> class.
