@@ -36,11 +36,37 @@
                 }
             ]
         },
-        data: [
+        contentData: [
             {
                 udi: 1234,
                 contentTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB",
                 testproperty: "myTestValue"
+            }
+        ]
+    };
+
+    var blockWithSettingsConfigurationMock = { contentTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB", label:"Test label", settingsElementTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB", view: "testview.html"};
+    var propertyModelWithSettingsMock = {
+        layout: {
+            "Umbraco.TestBlockEditor": [
+                {
+                    udi: 1234,
+                    settingsUdi: 4567
+                }
+            ]
+        },
+        contentData: [
+            {
+                udi: 1234,
+                contentTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB",
+                testproperty: "myTestValue"
+            }
+        ],
+        settingsData: [
+            {
+                udi: 4567,
+                contentTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB",
+                testproperty: "myTestValueForSettings"
             }
         ]
     };
@@ -110,8 +136,8 @@
                 var blockObject = modelObject.getBlockObject(layout[0]);
 
                 expect(blockObject).not.toBeUndefined();
-                expect(blockObject.data.udi).toBe(propertyModelMock.data[0].udi);
-                expect(blockObject.content.variants[0].tabs[0].properties[0].value).toBe(propertyModelMock.data[0].testproperty);
+                expect(blockObject.data.udi).toBe(propertyModelMock.contentData[0].udi);
+                expect(blockObject.content.variants[0].tabs[0].properties[0].value).toBe(propertyModelMock.contentData[0].testproperty);
 
                 done();
             });
@@ -135,9 +161,9 @@
 
                 $rootScope.$digest();// invoke angularJS Store.
 
-                expect(blockObject.data).toBe(propertyModel.data[0]);
+                expect(blockObject.data).toEqual(propertyModel.contentData[0]);
                 expect(blockObject.data.testproperty).toBe("anotherTestValue");
-                expect(propertyModel.data[0].testproperty).toBe("anotherTestValue");
+                expect(propertyModel.contentData[0].testproperty).toBe("anotherTestValue");
 
                 //
 
@@ -152,7 +178,7 @@
             var propertyModel = angular.copy(propertyModelMock);
 
             var complexValue = {"list": ["A", "B", "C"]};
-            propertyModel.data[0].testproperty = complexValue;
+            propertyModel.contentData[0].testproperty = complexValue;
 
 
             var modelObject = blockEditorService.createModelObject(propertyModel, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope, $scope);
@@ -168,8 +194,8 @@
 
                 $rootScope.$digest();// invoke angularJS Store.
 
-                expect(propertyModel.data[0].testproperty.list[0]).toBe("AA");
-                expect(propertyModel.data[0].testproperty.list.length).toBe(4);
+                expect(propertyModel.contentData[0].testproperty.list[0]).toBe("AA");
+                expect(propertyModel.contentData[0].testproperty.list.length).toBe(4);
 
                 done();
             });
@@ -218,10 +244,108 @@
                 // remove from data;
                 modelObject.removeDataAndDestroyModel(blockObject);
 
-                expect(propertyModel.data.length).toBe(0);
-                expect(propertyModel.data[0]).toBeUndefined();
+                expect(propertyModel.contentData.length).toBe(0);
+                expect(propertyModel.contentData[0]).toBeUndefined();
                 expect(propertyModel.layout["Umbraco.TestBlockEditor"].length).toBe(0);
                 expect(propertyModel.layout["Umbraco.TestBlockEditor"][0]).toBeUndefined();
+
+                done();
+            });
+            
+        });
+
+
+
+
+
+
+
+        it('getBlockObject of block with settings has values', function (done) {
+
+            var propertyModel = angular.copy(propertyModelWithSettingsMock);
+            
+            var modelObject = blockEditorService.createModelObject(propertyModel, "Umbraco.TestBlockEditor", [blockWithSettingsConfigurationMock], $scope, $scope);
+            
+            modelObject.load().then(() => {
+                
+                var layout = modelObject.getLayout();
+
+                var blockObject = modelObject.getBlockObject(layout[0]);
+
+                expect(blockObject).not.toBeUndefined();
+                expect(blockObject.data.udi).toBe(propertyModel.contentData[0].udi);
+                expect(blockObject.content.variants[0].tabs[0].properties[0].value).toBe(propertyModel.contentData[0].testproperty);
+
+                done();
+            });
+            
+        });
+
+        
+        it('getBlockObject of block with settings syncs primative values', function (done) {
+
+            var propertyModel = angular.copy(propertyModelWithSettingsMock);
+
+            var modelObject = blockEditorService.createModelObject(propertyModel, "Umbraco.TestBlockEditor", [blockWithSettingsConfigurationMock], $scope, $scope);
+            
+            modelObject.load().then(() => {
+                
+                var layout = modelObject.getLayout();
+
+                var blockObject = modelObject.getBlockObject(layout[0]);
+
+                blockObject.content.variants[0].tabs[0].properties[0].value = "anotherTestValue";
+                blockObject.settings.variants[0].tabs[0].properties[0].value = "anotherTestValueForSettings";
+
+                $rootScope.$digest();// invoke angularJS Store.
+
+                expect(blockObject.data).toEqual(propertyModel.contentData[0]);
+                expect(blockObject.data.testproperty).toBe("anotherTestValue");
+                expect(propertyModel.contentData[0].testproperty).toBe("anotherTestValue");
+                
+                expect(blockObject.settingsData).toEqual(propertyModel.settingsData[0]);
+                expect(blockObject.settingsData.testproperty).toBe("anotherTestValueForSettings");
+                expect(propertyModel.settingsData[0].testproperty).toBe("anotherTestValueForSettings");
+
+                //
+
+                done();
+            });
+            
+        });
+
+        
+        it('getBlockObject of block with settings syncs values of object', function (done) {
+
+            var propertyModel = angular.copy(propertyModelWithSettingsMock);
+
+            var complexValue = {"list": ["A", "B", "C"]};
+            propertyModel.contentData[0].testproperty = complexValue;
+
+            var complexSettingsValue = {"list": ["A", "B", "C"]};
+            propertyModel.settingsData[0].testproperty = complexSettingsValue;
+
+            var modelObject = blockEditorService.createModelObject(propertyModel, "Umbraco.TestBlockEditor", [blockWithSettingsConfigurationMock], $scope, $scope);
+            
+            modelObject.load().then(() => {
+                
+                var layout = modelObject.getLayout();
+
+                var blockObject = modelObject.getBlockObject(layout[0]);
+
+                blockObject.content.variants[0].tabs[0].properties[0].value.list[0] = "AA";
+                blockObject.content.variants[0].tabs[0].properties[0].value.list.push("D");
+
+                blockObject.settings.variants[0].tabs[0].properties[0].value.list[0] = "settingsValue";
+                blockObject.settings.variants[0].tabs[0].properties[0].value.list.push("settingsNewValue");
+
+                $rootScope.$digest();// invoke angularJS Store.
+
+                expect(propertyModel.contentData[0].testproperty.list[0]).toBe("AA");
+                expect(propertyModel.contentData[0].testproperty.list.length).toBe(4);
+
+                expect(propertyModel.settingsData[0].testproperty.list[0]).toBe("settingsValue");
+                expect(propertyModel.settingsData[0].testproperty.list.length).toBe(4);
 
                 done();
             });

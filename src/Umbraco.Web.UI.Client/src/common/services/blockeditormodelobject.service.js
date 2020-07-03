@@ -136,7 +136,7 @@
                     
                     // We also like to watch our data model to be able to capture changes coming from other places.
                     if (forSettings === true) {
-                        blockObject.__watchers.push(isolatedScope.$watch("blockObjects._" + blockObject.key + "." + "layout.settings" + "." + prop.alias, createLayoutSettingsModelWatcher(blockObject, prop)));
+                        blockObject.__watchers.push(isolatedScope.$watch("blockObjects._" + blockObject.key + "." + "settingsData" + "." + prop.alias, createLayoutSettingsModelWatcher(blockObject, prop)));
                     } else {
                         blockObject.__watchers.push(isolatedScope.$watch("blockObjects._" + blockObject.key + "." + "data" + "." + prop.alias, createDataModelWatcher(blockObject, prop)));
                     }
@@ -167,9 +167,9 @@
          */
         function createLayoutSettingsModelWatcher(blockObject, prop)  {
             return function() {
-                if (prop.value !== blockObject.layout.settings[prop.alias]) {
+                if (prop.value !== blockObject.settingsData[prop.alias]) {
                     // sync data:
-                    prop.value = blockObject.layout.settings[prop.alias];
+                    prop.value = blockObject.settingsData[prop.alias];
                 }
             }
         }
@@ -193,9 +193,9 @@
          */
         function createSettingsModelPropWatcher(blockObject, prop)  {
             return function() {
-                if (blockObject.layout.settings[prop.alias] !== prop.value) {
+                if (blockObject.settingsData[prop.alias] !== prop.value) {
                     // sync data:
-                    blockObject.layout.settings[prop.alias] = prop.value;
+                    blockObject.settingsData[prop.alias] = prop.value;
                 }
             }
         }
@@ -245,7 +245,8 @@
             // ensure basic part of data-structure is in place:
             this.value = propertyModelValue;
             this.value.layout = this.value.layout || {};
-            this.value.data = this.value.data || [];
+            this.value.contentData = this.value.contentData || [];
+            this.value.settingsData = this.value.settingsData || [];
 
             this.propertyEditorAlias = propertyEditorAlias;
             this.blockConfigurations = blockConfigurations;
@@ -459,16 +460,25 @@
                     var settingsScaffold = this.getScaffoldFromKey(blockConfiguration.settingsElementTypeKey);
                     if (settingsScaffold !== null) {
 
-                        layoutEntry.settings = layoutEntry.settings || {};
-                        
-                        blockObject.settingsData = layoutEntry.settings;
+                        if (!layoutEntry.settingsUdi) {
+                            // if this block does not have settings data, then create it. This could happen because settings model has been added later than this content was created.
+                            layoutEntry.settingsUdi = this._createSettingsEntry(blockConfiguration.settingsElementTypeKey);
+                        }
+
+                        var settingsUdi = layoutEntry.settingsUdi;
+
+                        var settingsData = this._getSettingsByUdi(settingsUdi);
+                        if (settingsData === null) {
+                            console.error("Couldnt find content settings data of " + settingsUdi)
+                            return null;
+                        }
+
+                        blockObject.settingsData = settingsData;
 
                         // make basics from scaffold
                         blockObject.settings = Utilities.copy(settingsScaffold);
-                        layoutEntry.settings = layoutEntry.settings || {};
-                        if (!layoutEntry.settings.key) { layoutEntry.settings.key = String.CreateGuid(); }
-                        if (!layoutEntry.settings.contentTypeKey) { layoutEntry.settings.contentTypeKey = blockConfiguration.settingsElementTypeKey; }
-                        mapToElementModel(blockObject.settings, layoutEntry.settings);
+                        blockObject.settings.udi = settingsUdi;
+                        mapToElementModel(blockObject.settings, settingsData);
                     }
                 }
 
@@ -487,7 +497,7 @@
                         mapToPropertyModel(this.content, this.data);
                     }
                     if (this.config.settingsElementTypeKey !== null) {
-                        mapToPropertyModel(this.settings, this.layout.settings);
+                        mapToPropertyModel(this.settings, this.settingsData);
                     }
                 }
 
@@ -508,6 +518,7 @@
                     delete this.config;
                     delete this.layout;
                     delete this.data;
+                    delete this.settingsData;
                     delete this.content;
                     delete this.settings;
                     
@@ -536,8 +547,15 @@
              */
             removeDataAndDestroyModel: function (blockObject) {
                 var udi = blockObject.content.udi;
+                var settingsUdi = null;
+                if (blockObject.settings) {
+                    settingsUdi = blockObject.settings.udi;
+                }
                 this.destroyBlockObject(blockObject);
                 this.removeDataByUdi(udi);
+                if(settingsUdi) { 
+                    this.removeSettingsByUdi(settingsUdi);
+                }
             },
 
             /**
@@ -586,7 +604,7 @@
                 }
 
                 if (blockConfiguration.settingsElementTypeKey != null) {
-                    entry.settings = { key: String.CreateGuid(), contentTypeKey: blockConfiguration.settingsElementTypeKey };
+                    entry.settingsUdi = this._createSettingsEntry(blockConfiguration.settingsElementTypeKey)
                 }
                 
                 return entry;
@@ -641,26 +659,55 @@
                     contentTypeKey: elementTypeKey,
                     udi: udiService.create("element")
                 };
-                this.value.data.push(content);
+                this.value.contentData.push(content);
                 return content.udi;
             },
             // private
             _getDataByUdi: function(udi) {
-                return this.value.data.find(entry => entry.udi === udi) || null;
+                return this.value.contentData.find(entry => entry.udi === udi) || null;
             },
 
             /**
              * @ngdoc method
              * @name removeDataByUdi
              * @methodOf umbraco.services.blockEditorModelObject
-             * @description Removes the data of a given UDI.
+             * @description Removes the content data of a given UDI.
              * Notice this method does not remove the block from your layout, this will need to be handlede by the Property Editor since this services donst know about your layout structure.
-             * @param {string} udi The UDI of the data to be removed.
+             * @param {string} udi The UDI of the content data to be removed.
              */
             removeDataByUdi: function(udi) {
-                const index = this.value.data.findIndex(o => o.udi === udi);
+                const index = this.value.contentData.findIndex(o => o.udi === udi);
                 if (index !== -1) {
-                    this.value.data.splice(index, 1);
+                    this.value.contentData.splice(index, 1);
+                }
+            },
+
+            // private
+            _createSettingsEntry: function(elementTypeKey) {
+                var settings = {
+                    contentTypeKey: elementTypeKey,
+                    udi: udiService.create("element")
+                };
+                this.value.settingsData.push(settings);
+                return settings.udi;
+            },
+            // private
+            _getSettingsByUdi: function(udi) {
+                return this.value.settingsData.find(entry => entry.udi === udi) || null;
+            },
+
+            /**
+             * @ngdoc method
+             * @name removeSettingsByUdi
+             * @methodOf umbraco.services.blockEditorModelObject
+             * @description Removes the settings data of a given UDI.
+             * Notice this method does not remove the settingsUdi from your layout, this will need to be handlede by the Property Editor since this services donst know about your layout structure.
+             * @param {string} udi The UDI of the settings data to be removed.
+             */
+            removeSettingsByUdi: function(udi) {
+                const index = this.value.settingsData.findIndex(o => o.udi === udi);
+                if (index !== -1) {
+                    this.value.settingsData.splice(index, 1);
                 }
             },
 
