@@ -123,4 +123,10 @@
       <AdditionalFiles Include="Umbraco\PartialViewMacros\Templates\Empty.cshtml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="~\App_Data\packages\createdPackages.config" />
+      <_ContentIncludedByDefault Remove="~\App_Data\packages\installedPackages.config" />
+      <_ContentIncludedByDefault Remove="~\Web.config" />
+    </ItemGroup>
+
 </Project>

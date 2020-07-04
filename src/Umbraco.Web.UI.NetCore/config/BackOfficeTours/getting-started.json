@@ -1,0 +1,475 @@
+[
+    {
+        "name": "Email Marketing",
+        "alias": "umbEmailMarketing",
+        "group": "Email Marketing",
+        "groupOrder": 10,
+        "hidden": true,
+        "requiredSections": [
+            "content"
+        ],
+        "steps": [
+            {
+                "title": "Do you want to stay updated on everything Umbraco?",
+                "content": "<p>Thank you for using Umbraco! Would you like to stay up-to-date with Umbraco product updates, security advisories, community news and special offers? Sign up for our newsletter and never miss out on the latest Umbraco news.</p> <p class='notice'>By signing up, you agree that we can use your info according to our <a href='https://umbraco.com/about-us/privacy/'>privacy policy</a>.</p>",
+                "view": "emails",
+                "type": "promotion"
+            }
+        ]
+    },
+    {
+        "name": "Introduction",
+        "alias": "umbIntroIntroduction",
+        "group": "Getting Started",
+        "groupOrder": 100,
+        "allowDisable": true,
+        "requiredSections": [
+            "content"
+        ],
+        "steps": [
+            {
+                "title": "Welcome to Umbraco - The Friendly CMS",
+                "content": "<p>Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</p><p>In this quick tour we will introduce you to the main areas of Umbraco and show you how to best get started.</p><p><em>If you don't want to take the tour now you can always start it by opening the Help drawer in the top right corner.<em></p>",
+                "type": "intro"
+            },
+            {
+                "element": "[data-element='sections']",
+                "elementPreventClick": true,
+                "title": "Main Menu",
+                "content": "This is the main menu in Umbraco backoffice. Here you can navigate between the different sections, search for items, see your user profile and open the help drawer.",
+                "backdropOpacity": 0.6
+            },
+            {
+                "element": "[data-element='section-content']",
+                "elementPreventClick": true,
+                "title": "Sections",
+                "content": "Each area in Umbraco is called a <b>Section</b>. Right now you are in the Content section, when you want to go to another section simply click on the appropriate name in the main menu and you'll be there in no time.",
+                "backdropOpacity": 0.6
+            },
+            {
+                "element": "#tree",
+                "elementPreventClick": true,
+                "title": "The Tree",
+                "content": "<p>This is the <b>Tree</b> and it is the main navigation inside a section.</p><p>In the Content section the tree is called the <b>Content tree</b> and here you can navigate the content of your website.</p>"
+            },
+            {
+                "element": "[data-element='dashboard']",
+                "elementPreventClick": true,
+                "title": "Dashboards",
+                "content": "<p>A dashboard is the main view you are presented with when entering a section within the backoffice, and can be used to show valuable information to the users of the system.</p><p>Notice that some sections have multiple dashboards.</p>"
+            },
+            {
+                "element": "[data-element='global-search']",
+                "title": "Search",
+                "content": "The search allows you to quickly find whatever you're looking for across sections within Umbraco."
+            },
+            {
+                "element": "[data-element='global-user']",
+                "title": "User profile",
+                "content": "Now click on your <b>user avatar</b> to open the user profile dialog.",
+                "event": "click",
+                "backdropOpacity": 0.6
+            },
+            {
+                "element": "[data-element~='overlay-user']",
+                "elementPreventClick": true,
+                "title": "User profile",
+                "content": "<p>Here you can see details about your user, change your password and log out of Umbraco.</p><p>In the <b>User section</b> you will be able to do more advanced user management.</p>"
+            },
+            {
+                "element": "[data-element~='overlay-user'] [data-element='button-overlayClose']",
+                "title": "User profile",
+                "content": "Let's close the user profile again.",
+                "event": "click"
+            },
+            {
+                "element": "[data-element='global-help']",
+                "title": "Help",
+                "content": "If you ever find yourself in trouble click here to open the Help drawer.",
+                "event": "click",
+                "backdropOpacity": 0.6
+            },
+            {
+                "element": "[data-element='drawer']",
+                "elementPreventClick": true,
+                "title": "Help",
+                "content": "<p>In the help drawer you will find articles and videos related to the section you are using.</p><p>This is also where you will find the next tour on how to get started with Umbraco.</p>",
+                "backdropOpacity": 0.6
+            },
+            {
+                "element": "[data-element='drawer'] [data-element='help-tours']",
+                "title": "Tours",
+                "content": "To continue your journey on getting started with Umbraco, you can find more tours right here."
+            }
+        ]
+    },
+    {
+        "name": "Create document type",
+        "alias": "umbIntroCreateDocType",
+        "group": "Getting Started",
+        "groupOrder": 100,
+        "requiredSections": [
+            "settings"
+        ],
+        "steps": [
+            {
+                "title": "Create your first Document Type",
+                "content": "<p>Step 1 of any site is to create a <strong>Document Type</strong>.<br> A Document Type is a template for content. For each <em>type</em> of content you want to create you'll create a Document Type. This will define where content based on this Document Type can be created, how many properties it holds and what the input method should be for these properties.</p><p>When you have at least one Document Type in place you can start creating content and this content can then be used in a template.</p><p>In this tour you will learn how to set up a basic Document Type with a property to enter a short text.</p>",
+                "type": "intro"
+            },
+            {
+                "element": "#applications [data-element='section-settings']",
+                "title": "Navigate to the Settings sections",
+                "content": "In the <b>Settings section</b> you can create and manage Document types.",
+                "event": "click",
+                "backdropOpacity": 0.6
+            },
+            {
+                "element": "#tree [data-element='tree-item-documentTypes']",
+                "title": "Create Document Type",
+                "content": "<p>Hover over the Document Type tree and click the <b>three small dots</b> to open the <b>context menu</b>.</p>",
+                "event": "click",
+                "eventElement": "#tree [data-element='tree-item-documentTypes'] [data-element='tree-item-options']"
+            },
+            {
+                "element": "#dialog [data-element='action-documentType']",
+                "title": "Create Document Type",
+                "content": "<p>Click <b>Document Type</b> to create a new document type with a template. The template will be automatically created and set as the default template for this Document Type.</p><p>You will use the template in a later tour to render content.</p>",
+                "event": "click"
+            },
+            {
+                "element": "[data-element='editor-name-field']",
+                "title": "Enter a name",
+                "content": "<p>Your Document Type needs a name. Enter <code>Home Page</code> in the field and click <b>Next</b>.",
+                "view": "doctypename"
+            },
+            {
+                "element": "[data-element='editor-description']",
+                "title": "Enter a description",
+                "content": "<p>A description helps to pick the right document type when creating content.</p><p>Write a description for our Home page. It could be: <br/><pre>The home page of the website</pre></p>"
+            },
+            {
+                "element": "[data-element='group-add']",
+                "title": "Add group",
+                "content": "Group are used to organize properties on content in the Content section. Click <b>Add Group</b> to add a group.",
+                "event": "click"
+            },
+            {
+                "element": "[data-element='group-name-field']",
+                "title": "Name the group",
+                "content": "<p>Enter <code>Home</code> in the group name.</p><p><em>You can name a group anything you want and if you have a lot of properties it can be useful to add multiple groups.</em></p>",
+                "view": "tabName"
+            },
+            {
+                "element": "[data-element='property-add']",
+                "title": "Add a property",
+                "content": "<p>Properties are the different input fields on a content page.</p><p>On our Home Page we want to add a welcome text.</p><p>Click <b>Add property</b> to open the property dialog.</p>",
+                "event": "click"
+            },
+            {
+                "element": "[data-element='editor-property-settings'] [data-element='property-name']",
+                "title": "Name the property",
+                "content": "Enter <code>Welcome Text</code> as the name for the property.",
+                "view": "propertyname"
+            },
+            {
+                "element": "[data-element~='editor-property-settings'] [data-element='property-description']",
+                "title": "Enter a description",
+                "content": "<p>A description will help your editor fill in the right content.</p><p>Enter a description for the property editor. It could be:<br/> <pre>Write a nice introduction text so the visitors feel welcome</pre></p>"
+            },
+            {
+                "element": "[data-element~='editor-property-settings'] [data-element='editor-add']",
+                "title": "Add editor",
+                "content": "When you add an editor you choose what the input method for this property will be. Click <b>Add editor</b> to open the editor picker dialog.",
+                "event": "click"
+            },
+            {
+                "element": "[data-element~='editor-data-type-picker']",
+                "elementPreventClick": true,
+                "title": "Editor picker",
+                "content": "<p>In the editor picker dialog we can pick one of the many built-in editors.</p><p><em>You can choose from preconfigured data types (Reuse) or create a new configuration (Available editors)</em>.</p>"
+            },
+            {
+                "element": "[data-element~='editor-data-type-picker'] [data-element='editor-Textarea']",
+                "title": "Select editor",
+                "content": "Select the <b>Textarea</b> editor. This will add a textarea to the Welcome Text property.",
+                "event": "click"
+            },
+            {
+                "element": "[data-element~='editor-data-type-settings']",
+                "elementPreventClick": true,
+                "title": "Editor settings",
+                "content": "Each property editor can have individual settings. For the textarea editor you can set a character limit but in this case it is not needed."
+            },
+            {
+                "element": "[data-element~='editor-data-type-settings'] [data-element='button-submit']",
+                "title": "Save editor",
+                "content": "Click <b>Submit</b> to save the changes.",
+                "event": "click"
+            },
+            {
+                "element": "[data-element~='editor-property-settings'] [data-element='button-submit']",
+                "title": "Add property to document type",
+                "content": "Click <b>Submit</b> to add the property to the document type.",
+                "event": "click"
+            },
+            {
+                "element": "[data-element~='sub-view-permissions']",
+                "title": "Check the document type permissions",
+                "content": "Click <b>Permissions</b> to view the permissions page.",
+                "event": "click"
+            },
+            {
+                "element": "[data-element~='permissions-allow-as-root']",
+                "title": "Allow this document type to work at the root of your site",
+                "content": "Toggle the switch <b>Allow as root</b> to allow new content pages based on this document type to be created at the root of your site",
+                "event": "click"
+            },
+            {
+                "element": "[data-element='button-save']",
+                "title": "Save the document type",
+                "content": "All we need now is to save the document type. Click <b>Save</b> to create and save your new document type.",
+                "event": "click"
+            }
+        ]
+    },
+    {
+        "name": "Create Content",
+        "alias": "umbIntroCreateContent",
+        "group": "Getting Started",
+        "groupOrder": 100,
+        "requiredSections": [
+            "content"
+        ],
+        "steps": [
+            {
+                "title": "Creating your first content node",
+                "content": "<p>In this tour you will learn how to create the home page for your website. It will use the <b>Home Page</b> Document type you created in the previous tour.</p>",
+                "type": "intro"
+            },
+            {
+                "element": "#applications [data-element='section-content']",
+                "title": "Navigate to the Content section",
+                "content": "<p>In the <b>Content section</b> you can create and manage the content of the website.</p><p>The <b>Content section</b> contains the content of your website. Content is displayed as <b>nodes</b> in the content tree.</p>",
+                "event": "click",
+                "backdropOpacity": 0.6
+            },
+            {
+                "element": "[data-element='tree-root']",
+                "title": "Open context menu",
+                "content": "<p>Open the context menu by hovering over the root of the content section.</p><p>Now click the <b>three small dots</b> to the right.</p>",
+                "event": "click",
+                "eventElement": "#tree [data-element='tree-root'] [data-element='tree-item-options']"
+            },
+            {
+                "element": "[data-element='action-create-homePage']",
+                "title": "Create Home page",
+                "content": "<p>The context menu shows you all the actions that are available on a node</p><p>Click on <b>Home Page</b> to create a new page of type <b>Home Page</b>.</p>",
+                "event": "click"
+            },
+            {
+                "element": "[data-element='editor-content'] [data-element='editor-name-field']",
+                "title": "Give your new page a name",
+                "content": "<p>Our new page needs a name. Enter <code>Home</code> in the field and click <b>Next</b>.</p>",
+                "view": "nodename"
+            },
+            {
+                "element": "[data-element='editor-content'] [data-element='property-welcomeText']",
+                "title": "Add a welcome text",
+                "content": "<p>Add content to the <b>Welcome Text</b> field.</p><p>If you don't have any ideas here is a start:<br/> <pre>I am learning Umbraco. High Five I Rock #H5IR</pre>.</p>"
+            },
+            {
+                "element": "[data-element='editor-content'] [data-element='button-saveAndPublish']",
+                "title": "Publish",
+                "content": "<p>Now click the <b>Publish</b> button to publish your changes.</p>",
+                "event": "click"
+            }
+        ]
+    },
+    {
+        "name": "Render in template",
+        "alias": "umbIntroRenderInTemplate",
+        "group": "Getting Started",
+        "groupOrder": 100,
+        "requiredSections": [
+            "settings"
+        ],
+        "steps": [
+            {
+                "title": "Render your content in a template",
+                "content": "<p>Templating in Umbraco builds on the concept of <b>Razor Views</b> from ASP.NET MVC. This tour is a sneak peak on how to write templates in Umbraco.</p><p>In this tour you will learn how to render content from the <b>Home Page</b> document type so you can see the content added to our <b>Home</b> content page.</p>",
+                "type": "intro"
+            },
+            {
+                "element": "#applications [data-element='section-settings']",
+                "title": "Navigate to the Settings section",
+                "content": "<p>In the <b>Settings</b> section you will find all the templates.</p><p>It is of course also possible to edit all your code files in your favorite code editor.</p>",
+                "event": "click",
+                "backdropOpacity": 0.6
+            },
+            {
+                "element": "#tree [data-element='tree-item-templates']",
+                "title": "Expand the Templates node",
+                "content": "<p>To see all our templates click the <b>small triangle</b> to the left of the templates node.</p>",
+                "event": "click",
+                "eventElement": "#tree [data-element='tree-item-templates'] [data-element='tree-item-expand']",
+                "view": "templatetree"
+            },
+            {
+                "element": "#tree [data-element='tree-item-templates'] [data-element='tree-item-Home Page']",
+                "title": "Open Home template",
+                "content": "<p>Click the <b>Home Page</b> template to open and edit it.</p>",
+                "eventElement": "#tree [data-element='tree-item-templates'] [data-element='tree-item-Home Page'] a.umb-tree-item__label",
+                "event": "click"
+            },
+            {
+                "element": "[data-element='editor-templates'] [data-element='code-editor']",
+                "title": "Edit template",
+                "content": "<p>The template can be edited here or in your favorite code editor.</p><p>To render the field from the document type add the following to the template:<br/> <pre>&#60;h1&#62;@Model.Name&#60;/h1&#62;<br>&#60;p&#62;@Model.WelcomeText&#60;/p&#62;</pre></p>"
+            },
+            {
+                "element": "[data-element='editor-templates'] [data-element='button-save']",
+                "title": "Save the template",
+                "content": "Click the <b>Save button</b> and your template will be saved.",
+                "event": "click"
+            }
+        ]
+    },
+    {
+        "name": "View Home page",
+        "alias": "umbIntroViewHomePage",
+        "group": "Getting Started",
+        "groupOrder": 100,
+        "requiredSections": [
+            "content"
+        ],
+        "steps": [
+            {
+                "title": "View your Umbraco site",
+                "content": "<p>Our three main components for a page are done: <b>Document type, Template, and Content</b>. It is now time to see the result.</p><p>In this tour you will learn how to see your published website.</p>",
+                "type": "intro"
+            },
+            {
+                "element": "#applications [data-element='section-content']",
+                "title": "Navigate to the content sections",
+                "content": "In the <b>Content section</b> you will find the content of our website.",
+                "event": "click",
+                "backdropOpacity": 0.6
+            },
+            {
+                "element": "#tree [data-element='tree-item-Home']",
+                "title": "Open the Home page",
+                "content": "<p>Click the <b>Home</b> page to open it.</p>",
+                "event": "click",
+                "eventElement": "#tree [data-element='tree-item-Home'] a.umb-tree-item__label"
+            },
+            {
+                "element": "[data-element='editor-content'] [data-element='sub-view-umbInfo']",
+                "title": "Info",
+                "content": "<p>Under the Info-app you will find the default information about a content item.</p>",
+                "event": "click"
+            },
+            {
+                "element": "[data-element='editor-content'] [data-element='node-info-urls']",
+                "title": "Open page",
+                "content": "<p>Click the <b>Link to document</b> <i class='icon-out'></i> to view your page.</p><p>Tip: Click the preview button in the bottom right corner to preview changes without publishing them.</p>",
+                "event": "click",
+                "eventElement": "[data-element='editor-content'] [data-element='node-info-urls'] a[target='_blank']"
+            }
+        ]
+    },
+    {
+        "name": "The Media library",
+        "alias": "umbIntroMediaSection",
+        "group": "Getting Started",
+        "groupOrder": 100,
+        "requiredSections": [
+            "media"
+        ],
+        "steps": [
+            {
+                "title": "How to use the media library",
+                "content": "<p>A website would be boring without media content. In Umbraco you can manage all your images, documents, videos etc. in the <b>Media section</b>. Here you can upload and organise your media items and see details about each item.</p><p>In this tour you will learn how to upload and organise your Media library in Umbraco. It will also show you how to view details about a specific media item.</p>",
+                "type": "intro"
+            },
+            {
+                "element": "#applications [data-element='section-media']",
+                "title": "Navigate to the Media section",
+                "content": "The <b>media</b> section is where you manage all your media items.",
+                "event": "click",
+                "backdropOpacity": 0.6
+            },
+            {
+                "element": "#tree [data-element='tree-root']",
+                "title": "Create a new folder",
+                "content": "<p>First create a folder for your images. Hover over the media root node and click the <b>three small dots</b> on the right side of the item.</p>",
+                "event": "click",
+                "eventElement": "#tree [data-element='tree-root'] [data-element='tree-item-options']"
+            },
+            {
+                "element": "#dialog [data-element='action-Folder']",
+                "title": "Create a new folder",
+                "content": "<p>Select the <b>Folder</b> option to select the type folder.</p>",
+                "event": "click"
+            },
+            {
+                "element": "[data-element='editor-media'] [data-element='editor-name-field']",
+                "title": "Enter a name",
+                "content": "<p>Enter <code>My Images</code> in the field.</p>",
+                "view": "foldername"
+            },
+            {
+                "element": "[data-element='editor-media'] [data-element='button-save']",
+                "title": "Save the folder",
+                "content": "<p>Click the <b>Save</b> button to create the new folder.</p>",
+                "event": "click"
+            },
+            {
+                "element": "[data-element='editor-media'] [data-element='dropzone']",
+                "title": "Upload images",
+                "content": "<p>In the upload area you can upload your media items.</p><p>Click the <b>Click here to choose files</b> button and select a couple of images on your computer and upload them.</p>",
+                "view": "uploadimages"
+            },
+            {
+                "element": "[data-element='editor-media'] [data-element='media-grid-item-0']",
+                "title": "View media item details",
+                "content": "Hover over the media item and <b>Click the white bar</b> to view details about the media item.",
+                "event": "click",
+                "eventElement": "[data-element='editor-media'] [data-element='media-grid-item-0'] [data-element='media-grid-item-edit']"
+            },
+            {
+                "element": "[data-element='editor-media'] [data-element='property-umbracoFile']",
+                "elementPreventClick": true,
+                "title": "The uploaded image",
+                "content": "<p>Here you can see the image you have uploaded.</p>"
+            },
+            {
+                "element": "[data-element='editor-media'] [data-element='property-umbracoBytes']",
+                "title": "Image size",
+                "content": "<p>You will also find other details about the image, like the size.</p><p>Media items work in much the same way as content. So you can add extra properties to an image by creating or editing the <b>Media types</b> in the Settings section.</p>"
+            },
+            {
+                "element": "[data-element='editor-media'] [data-element='sub-view-umbInfo']",
+                "title": "Info",
+                "content": "Like the content section you can also find default information about the media item. You will find these under the info app.",
+                "event": "click"
+            },
+            {
+                "element": "[data-element='editor-media'] [data-element='node-info-urls']",
+                "title": "Link to media",
+                "content": "The path to the media item..."
+            },
+            {
+                "element": "[data-element='editor-media'] [data-element='node-info-update-date']",
+                "title": "Last edited",
+                "content": "...and information about when the media item has been created and edited."
+            },
+            {
+                "element": "[data-element='editor-container']",
+                "elementPreventClick": true,
+                "title": "Using media items",
+                "content": "You can reference a media item directly in a template by using the path or try adding a Media Picker to a document type property so you can select media items from the content section."
+            }
+        ]
+    }
+]

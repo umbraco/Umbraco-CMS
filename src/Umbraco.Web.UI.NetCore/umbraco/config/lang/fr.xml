@@ -1,0 +1,1857 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<language alias="fr" intName="French" localName="français" lcid="12" culture="fr-FR">
+  <creator>
+    <name>The Umbraco community</name>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+  </creator>
+  <area alias="actions">
+    <key alias="assignDomain">Culture et noms d'hôte</key>
+    <key alias="auditTrail">Informations d'audit</key>
+    <key alias="browse">Parcourir</key>
+    <key alias="changeDocType">Changer le type de document</key>
+    <key alias="copy">Copier</key>
+    <key alias="create">Créer</key>
+    <key alias="export">Exporter</key>
+    <key alias="createGroup">Créer un groupe</key>
+    <key alias="createPackage">Créer un package</key>
+    <key alias="delete">Supprimer</key>
+    <key alias="disable">Désactiver</key>
+    <key alias="emptyRecycleBin">Vider la corbeille</key>
+    <key alias="enable">Activer</key>
+    <key alias="exportDocumentType">Exporter le type de document</key>
+    <key alias="importDocumentType">Importer un type de document</key>
+    <key alias="importPackage">Importer un package</key>
+    <key alias="liveEdit">Editer dans Canvas</key>
+    <key alias="logout">Déconnexion</key>
+    <key alias="move">Déplacer</key>
+    <key alias="notify">Notifications</key>
+    <key alias="protect">Accès public</key>
+    <key alias="publish">Publier</key>
+    <key alias="unpublish">Dépublier</key>
+    <key alias="refreshNode">Rafraîchir</key>
+    <key alias="republish">Republier le site tout entier</key>
+    <key alias="restore" version="7.3.0">Récupérer</key>
+    <key alias="SetPermissionsForThePage">Spécifiez les permissions pour la page %0%</key>
+    <key alias="chooseWhereToMove">Choisissez où déplacer</key>
+    <key alias="toInTheTreeStructureBelow">dans l'arborescence ci-dessous</key>
+    <key alias="rights">Permissions</key>
+    <key alias="rollback">Version antérieure</key>
+    <key alias="sendtopublish">Envoyer pour publication</key>
+    <key alias="sendToTranslate">Envoyer pour traduction</key>
+    <key alias="setGroup">Spécifier le groupe</key>
+    <key alias="sort">Trier</key>
+    <key alias="toPublish">Envoyer pour publication</key>
+    <key alias="translate">Traduire</key>
+    <key alias="update">Mettre à jour</key>
+    <key alias="setPermissions">Spécifier les permissions</key>
+    <key alias="unlock">Débloquer</key>
+    <key alias="createblueprint">Créer un modèle de contenu</key>
+    <key alias="resendInvite">Envoyer à nouveau l'invitation</key>
+  </area>
+  <area alias="actionCategories">
+    <key alias="content">Contenu</key>
+    <key alias="administration">Administration</key>
+    <key alias="structure">Structure</key>
+    <key alias="other">Autre</key>
+  </area>
+  <area alias="actionDescriptions">
+    <key alias="assignDomain">Permettre d'attribuer la culture et des noms d'hôte</key>
+    <key alias="auditTrail">Permettre d'accéder au journal d'historique d'un noeud</key>
+    <key alias="browse">Permettre d'accéder à un noeud</key>
+    <key alias="changeDocType">Permettre de modifier le type de document d'un noeud</key>
+    <key alias="copy">Permettre de copier un noeud</key>
+    <key alias="create">Permettre de créer des noeuds</key>
+    <key alias="delete">Permettre de supprimer des noeuds</key>
+    <key alias="move">Permettre de déplacer un noeud</key>
+    <key alias="protect">Permettre de définir et modifier l'accès public à un noeud</key>
+    <key alias="publish">Permettre de publier un noeud</key>
+    <key alias="rights">Permettre de modifier les permissions pour un noeud</key>
+    <key alias="rollback">Permettre de revenir à une situation antérieure</key>
+    <key alias="sendtopublish">Permettre d'envoyer un noeud pour approbation avant publication</key>
+    <key alias="sendToTranslate">Permettre d'envoyer un noeud à la traduction</key>
+    <key alias="sort">Permettre de modifier l'ordonnancement des noeuds</key>
+    <key alias="translate">Permettre de traduire un noeud</key>
+    <key alias="update">Permettre de sauvegarder un noeud</key>
+    <key alias="createblueprint">Permettre la création d'un Modèle de Contenu</key>
+  </area>
+  <area alias="assignDomain">
+    <key alias="permissionDenied">Permission refusée.</key>
+    <key alias="addNew">Ajouter un nouveau domaine</key>
+    <key alias="remove">Supprimer</key>
+    <key alias="invalidNode">Noeud invalide.</key>
+    <key alias="invalidDomain">Domaine invalide.</key>
+    <key alias="duplicateDomain">Domaine déjà assigné.</key>
+    <key alias="language">Langue</key>
+    <key alias="domain">Domaine</key>
+    <key alias="domainCreated">Nouveau domaine '%0%' créé</key>
+    <key alias="domainDeleted">Domaine '%0%' supprimé</key>
+    <key alias="domainExists">Domaine '%0%' déjà assigné</key>
+    <key alias="domainUpdated">Domaine '%0%' mis à jour</key>
+    <key alias="orEdit">Editer les domaines actuels</key>
+    <key alias="inherit">Hériter</key>
+    <key alias="setLanguage">Culture</key>
+    <key alias="setLanguageHelp"><![CDATA[Définir la culture pour les noeuds enfants du noeud courant,<br /> ou hériter de la culture des noeuds parents. S'appliquera aussi<br />
+      au noeud courant, à moins qu'un domaine ci-dessous soit aussi d'application.]]></key>
+    <key alias="setDomains">Domaines</key>
+  </area>
+  <area alias="auditTrails">
+    <key alias="atViewingFor">Aperçu pour</key>
+  </area>
+  <area alias="buttons">
+    <key alias="clearSelection">Vider la sélection</key>
+    <key alias="select">Choisir</key>
+    <key alias="somethingElse">Faire autre chose</key>
+    <key alias="bold">Gras</key>
+    <key alias="deindent">Annuler l'indentation de paragraphe</key>
+    <key alias="formFieldInsert">Insérer un champ de formulaire</key>
+    <key alias="graphicHeadline">Insérer un entête graphique</key>
+    <key alias="htmlEdit">Editer le HTML</key>
+    <key alias="indent">Indenter le paragraphe</key>
+    <key alias="italic">Italique</key>
+    <key alias="justifyCenter">Centrer</key>
+    <key alias="justifyLeft">Justifier à gauche</key>
+    <key alias="justifyRight">Justifier à droite</key>
+    <key alias="linkInsert">Insérer un lien</key>
+    <key alias="linkLocal">Insérer un lien local (ancre)</key>
+    <key alias="listBullet">Liste à puces</key>
+    <key alias="listNumeric">Liste numérique</key>
+    <key alias="macroInsert">Insérer une macro</key>
+    <key alias="pictureInsert">Insérer une image</key>
+    <key alias="relations">Editer les relations</key>
+    <key alias="returnToList">Retourner à la liste</key>
+    <key alias="save">Sauver</key>
+    <key alias="saveAndPublish">Sauver et publier</key>
+    <key alias="saveAndSchedule">Sauver et planifier</key>
+    <key alias="saveToPublish">Sauver et envoyer pour approbation</key>
+    <key alias="saveListView">Sauver la mise en page de la liste</key>
+    <key alias="saveAndPreview">Prévisualiser</key>
+    <key alias="showPageDisabled">La prévisualisation est désactivée car aucun modèle n'a été assigné.</key>
+    <key alias="styleChoose">Choisir un style</key>
+    <key alias="styleShow">Afficher les styles</key>
+    <key alias="tableInsert">Insérer un tableau</key>
+    <key alias="saveAndGenerateModels">Sauver et générer les modèles</key>
+    <key alias="undo">Défaire</key>
+    <key alias="redo">Refaire</key>
+  </area>
+  <area alias="changeDocType">
+    <key alias="changeDocTypeInstruction">Pour changer le type de document du contenu séléctionné, faites d'abord un choix dans la liste des types valides à cet endroit.</key>
+    <key alias="changeDocTypeInstruction2">Puis modifiez si nécessaire la correspondance des propriétés du type actuel vers le nouveau, et cliquez sur Sauver.</key>
+    <key alias="contentRepublished">Le contenu a été republié.</key>
+    <key alias="currentProperty">Propriété actuelle</key>
+    <key alias="currentType">Type actuel</key>
+    <key alias="docTypeCannotBeChanged">Le type de document ne peut être changé car il n'y a pas d'alternative valide à cet endroit. Une alternative sera valide si elle est autorisée sous le parent du contenu sélectionné et si tous les éléments de contenu enfants existants peuvent être créés avec celle-ci.</key>
+    <key alias="docTypeChanged">Type de document modifié</key>
+    <key alias="mapProperties">Faire correspondre les propriétés</key>
+    <key alias="mapToProperty">Faire correspondre à la propriété</key>
+    <key alias="newTemplate">Nouveau modèle</key>
+    <key alias="newType">Nouveau type</key>
+    <key alias="none">aucun</key>
+    <key alias="selectedContent">Contenu</key>
+    <key alias="selectNewDocType">Choisir le nouveau Type de Document</key>
+    <key alias="successMessage">Le type de document du contenu séléctionné a bien été changé en [new type] et les correspondances de propriétés suivantes effectuées :</key>
+    <key alias="to">en</key>
+    <key alias="validationErrorPropertyWithMoreThanOneMapping">Impossible de terminer la correspondance des propriétés car une ou plusieurs propriétés ont plus d'une correspondance définie.</key>
+    <key alias="validDocTypesNote">Seuls les types de documents valides à cet endroit sont affichés.</key>
+  </area>
+  <area alias="content">
+    <key alias="isPublished" version="7.2">A été publié</key>
+    <key alias="about">A propos de cette page</key>
+    <key alias="alias">Alias</key>
+    <key alias="alternativeTextHelp">(comment décririez-vous l'image oralement)</key>
+    <key alias="alternativeUrls">Liens alternatifs</key>
+    <key alias="clickToEdit">Cliquez pour éditer cet élément</key>
+    <key alias="createBy">Créé par</key>
+    <key alias="createByDesc" version="7.0">Auteur original</key>
+    <key alias="updatedBy" version="7.0">Mis à jour par</key>
+    <key alias="createDate">Créé</key>
+    <key alias="createDateDesc" version="7.0">Date/heure à laquelle ce document a été créé</key>
+    <key alias="documentType">Type de Document</key>
+    <key alias="editing">Edition</key>
+    <key alias="expireDate">Expire le</key>
+    <key alias="itemChanged">Cet élément a été modifié après la publication</key>
+    <key alias="itemNotPublished">Cet élément n'est pas publié</key>
+    <key alias="lastPublished">Dernière publication</key>
+    <key alias="noItemsToShow">Il n'y a aucun élément à afficher</key>
+    <key alias="listViewNoItems" version="7.1.5">Il n'y a aucun élément à afficher dans cette liste.</key>
+    <key alias="listViewNoContent">Aucun contenu n'a encore été ajouté</key>
+    <key alias="listViewNoMembers">Aucun membre n'a encore été ajouté</key>
+    <key alias="mediatype">Type de Média</key>
+    <key alias="mediaLinks">Lien vers des média(s)</key>
+    <key alias="membergroup">Groupe de membres</key>
+    <key alias="memberrole">Rôle</key>
+    <key alias="membertype">Type de membre</key>
+    <key alias="noChanges">Aucune modification n'a été faite</key>
+    <key alias="noDate">Aucune date choisie</key>
+    <key alias="nodeName">Titre de la page</key>
+    <key alias="noMediaLink">Ce média n'a pas de lien</key>
+    <key alias="otherElements">Propriétés</key>
+    <key alias="parentNotPublished">Ce document est publié mais n'est pas visible car son parent '%0%' n'est pas publié</key>
+    <key alias="parentNotPublishedAnomaly">Oups : ce document est publié mais n'est pas présent dans le cache (erreur interne Umbraco)</key>
+    <key alias="getUrlException">Oups: impossible d'obtenir cet url (erreur interne - voir fichier log)</key>
+    <key alias="routeError">Oups: ce document est publié mais son url entrerait en collision avec le contenu %0%</key>
+    <key alias="publish">Publier</key>
+    <key alias="published">Publié</key>
+    <key alias="publishedPendingChanges">Publié (changements en cours)</key>
+    <key alias="publishStatus">Statut de publication</key>
+    <key alias="releaseDate">Publié le</key>
+    <key alias="unpublishDate">Dépublié le</key>
+    <key alias="removeDate">Supprimer la date</key>
+    <key alias="setDate">Défininir la date</key>
+    <key alias="sortDone">Ordre de tri mis à jour</key>
+    <key alias="sortHelp">Pour trier les noeuds, faites-les simplement glisser à l'aide de la souris ou cliquez sur les entêtes de colonne. Vous pouvez séléctionner plusieurs noeuds en gardant la touche "shift" ou "ctrl" enfoncée pendant votre séléction.</key>
+    <key alias="statistics">Statistiques</key>
+    <key alias="titleOptional">Titre (optionnel)</key>
+    <key alias="altTextOptional">Texte alternatif (optionnel)</key>
+    <key alias="type">Type</key>
+    <key alias="unpublish">Dépublier</key>
+    <key alias="unpublished">Dépublié</key>
+    <key alias="updateDate">Dernière édition</key>
+    <key alias="updateDateDesc" version="7.0">Date/heure à laquelle ce document a été édité</key>
+    <key alias="uploadClear">Supprimer le(s) fichier(s)</key>
+    <key alias="urls">Lien vers un document</key>
+    <key alias="memberof">Membre du/des groupe(s)</key>
+    <key alias="notmemberof">Pas membre du/des groupe(s)</key>
+    <key alias="childItems" version="7.0">Eléments enfants</key>
+    <key alias="target" version="7.0">Cible</key>
+    <key alias="scheduledPublishServerTime">Ceci se traduit par l'heure suivante sur le serveur :</key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Qu'est-ce que cela signifie?</a>]]></key>
+    <key alias="nestedContentDeleteItem">Etes-vous certain(e) de vouloir supprimer cet éléménent?</key>
+    <key alias="nestedContentEditorNotSupported">La propriété %0% utilise l'éditeur %1% qui n'est pas supporté par Nested Content.</key>
+    <key alias="addTextBox">Ajouter un autre champ texte</key>
+    <key alias="removeTextBox">Enlever ce champ texte</key>
+    <key alias="contentRoot">Racine du contenu</key>
+    <key alias="isSensitiveValue">Cette valeur est masquée. Si vous avez besoin de pouvoir accéder à cette valeur, veuillez prendre contact avec l'administrateur du site web.</key>
+    <key alias="isSensitiveValue_short">Cette valeur est masquée.</key>
+  </area>
+  <area alias="blueprints">
+    <key alias="createBlueprintFrom">Créer un nouveau Modèle de Contenu à partir de '%0%'</key>
+    <key alias="blankBlueprint">Vide</key>
+    <key alias="selectBlueprint">Sélectionner un Modèle de Contenu</key>
+    <key alias="createdBlueprintHeading">Modèle de Contenu créé</key>
+    <key alias="createdBlueprintMessage">Un modèle de Contenu a été créé à partir de '%0%'</key>
+    <key alias="duplicateBlueprintMessage">Un autre Modèle de Contenu existe déjà avec le même nom</key>
+    <key alias="blueprintDescription">Un Modèle de Contenu est du contenu pré-défini qu'un éditeur peut sélectionner et utiliser comme base pour la création de nouveau contenu</key>
+  </area>
+  <area alias="media">
+    <key alias="clickToUpload">Cliquez pour télécharger</key>
+    <key alias="orClickHereToUpload">ou cliquez ici pour choisir un fichier</key>
+    <key alias="disallowedFileType">Ce fichier ne peut pas ête chargé, il n'est pas d'un type de fichier autorisé.</key>
+    <key alias="maxFileSize">La taille maximum de fichier est</key>
+    <key alias="mediaRoot">Racine du média</key>
+  </area>
+  <area alias="member">
+    <key alias="createNewMember">Créer un nouveau membre</key>
+    <key alias="allMembers">Tous les membres</key>
+  </area>
+  <area alias="create">
+    <key alias="chooseNode">Où voulez-vous créer le nouveau %0%</key>
+    <key alias="createUnder">Créer un élément sous</key>
+    <key alias="createContentBlueprint">Sélectionnez le type de document pour lequel vous souhaitez créer un modèle de contenu</key>
+    <key alias="updateData">Choisissez un type et un titre</key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[Il n'y a aucun type de document disponible. Vous devez d'abord les activer dans la section Paramètres, dans <strong>"Types de documents"</strong>.]]></key>
+    <key alias="noMediaTypes" version="7.0"><![CDATA[Il n'y a aucun type de média disponible. Vous devez d'abord les activer dans la section Paramètres, dans <strong>"Types de médias"</strong>.]]></key>
+    <key alias="documentTypeWithoutTemplate">Type de document sans modèle</key>
+    <key alias="newFolder">Nouveau répertoire</key>
+    <key alias="newDataType">Nouveau type de données</key>
+    <key alias="newJavascriptFile">Nouveau fichier javascript</key>
+    <key alias="newEmptyPartialView">Nouvelle vue partielle vide</key>
+    <key alias="newPartialViewMacro">Nouvelle macro pour vue partielle</key>
+    <key alias="newPartialViewFromSnippet">Nouvelle vue partielle à partir d'un snippet</key>
+    <key alias="newPartialViewMacroFromSnippet">Nouvelle macro pour vue partielle à partir d'un snippet</key>
+    <key alias="newPartialViewMacroNoMacro">Nouvelle macro pour vue partielle (sans macro)</key>
+  </area>
+  <area alias="dashboard">
+    <key alias="browser">Parcourir votre site</key>
+    <key alias="dontShowAgain">- Cacher</key>
+    <key alias="nothinghappens">Si Umbraco ne s'ouvre pas, peut-être devez-vous autoriser l'ouverture des popups pour ce site.</key>
+    <key alias="openinnew">s'est ouvert dans une nouvelle fenêtre</key>
+    <key alias="restart">Redémarrer</key>
+    <key alias="visit">Visiter</key>
+    <key alias="welcome">Bienvenue</key>
+  </area>
+  <area alias="prompt">
+    <key alias="stay">Rester</key>
+    <key alias="discardChanges">Invalider les changements</key>
+    <key alias="unsavedChanges">Vous avez des changements en cours</key>
+    <key alias="unsavedChangesWarning">Etes-vous certain(e) de vouloir quitter cette page? - vous avez des changements en cours</key>
+    <key alias="confirmUnpublish">La dépublication va supprimer du site cette page ainsi que tous ses descendants.</key>
+  </area>
+  <area alias="bulk">
+    <key alias="done">Terminé</key>
+    <key alias="deletedItem">%0% élément supprimé</key>
+    <key alias="deletedItems">%0% éléments supprimés</key>
+    <key alias="deletedItemOfItem">%0% élément sur %1% supprimé</key>
+    <key alias="deletedItemOfItems">%0% éléments sur %1% supprimés</key>
+    <key alias="publishedItem">%0% élément publié</key>
+    <key alias="publishedItems">%0% éléments publiés</key>
+    <key alias="publishedItemOfItem">%0% élément sur %1% publié</key>
+    <key alias="publishedItemOfItems">%0% éléments sur %1% publiés</key>
+    <key alias="unpublishedItem">%0% élément dépublié</key>
+    <key alias="unpublishedItems">%0% éléments dépubliés</key>
+    <key alias="unpublishedItemOfItem">%0% élément sur %1% dépublié</key>
+    <key alias="unpublishedItemOfItems">%0% éléments sur %1% dépubliés</key>
+    <key alias="movedItem">%0% élément déplacé</key>
+    <key alias="movedItems">%0% éléments déplacés</key>
+    <key alias="movedItemOfItem">%0% élément sur %1% déplacé</key>
+    <key alias="movedItemOfItems">%0% éléments sur %1% déplacés</key>
+    <key alias="copiedItem">%0% élément copié</key>
+    <key alias="copiedItems">%0% éléments copiés</key>
+    <key alias="copiedItemOfItem">%0% élément sur %1% copié</key>
+    <key alias="copiedItemOfItems">%0% éléments sur %1% copiés</key>
+  </area>
+  <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Titre du lien</key>
+    <key alias="urlLinkPicker">Lien</key>
+    <key alias="anchorInsert">Nom</key>
+    <key alias="assignDomain">Gérer les noms d'hôtes</key>
+    <key alias="closeThisWindow">Fermer cette fenêtre</key>
+    <key alias="confirmdelete">Êtes-vous certain(e) de vouloir supprimer</key>
+    <key alias="confirmdisable">Êtes-vous certain(e) de vouloir désactiver</key>
+    <key alias="confirmlogout">Êtes-vous certain(e)?</key>
+    <key alias="confirmSure">Êtes-vous certain(e)?</key>
+    <key alias="cut">Couper</key>
+    <key alias="editdictionary">Editer une entrée du Dictionnaire</key>
+    <key alias="editlanguage">Modifier la langue</key>
+    <key alias="insertAnchor">Insérer un lien local (ancre)</key>
+    <key alias="insertCharacter">Insérer un caractère</key>
+    <key alias="insertgraphicheadline">Insérer un entête graphique</key>
+    <key alias="insertimage">Insérer une image</key>
+    <key alias="insertlink">Insérer un lien</key>
+    <key alias="insertMacro">Insérer une macro</key>
+    <key alias="inserttable">Insérer un tableau</key>
+    <key alias="lastEdited">Dernière modification</key>
+    <key alias="link">Lien</key>
+    <key alias="linkinternal">Lien interne :</key>
+    <key alias="linklocaltip">Si vous utilisez des ancres, insérez # au début du lien</key>
+    <key alias="linknewwindow">Ouvrir dans une nouvelle fenêtre?</key>
+    <key alias="macroDoesNotHaveProperties">Cette macro ne contient aucune propriété éditable</key>
+    <key alias="paste">Coller</key>
+    <key alias="permissionsEdit">Editer les permissions pour</key>
+    <key alias="permissionsSet">Définir les permissions pour</key>
+    <key alias="permissionsSetForGroup">Définir les permissions pour %0% pour le groupe d'utilisateurs %1%</key>
+    <key alias="permissionsHelp">Sélectionnez les groupes d'utilisateurs pour lesquels vous souhaitez définir les permissions</key>
+    <key alias="recycleBinDeleting">Les éléments dans la corbeille sont en cours de suppression. Ne fermez pas cette fenêtre avant que cette opération soit terminée.</key>
+    <key alias="recycleBinIsEmpty">La corbeille est maintenant vide</key>
+    <key alias="recycleBinWarning">Les éléments supprimés de la corbeille seront supprimés définitivement</key>
+    <key alias="regexSearchError"><![CDATA[Le webservice <a target='_blank' href='http://regexlib.com'>regexlib.com</a> rencontre actuellement des problèmes sur lesquels nous n'avons aucun contrôle. Nous sommes sincèrement désolés pour le désagrément.]]></key>
+    <key alias="regexSearchHelp">Rechercher une expression régulière à ajouter pour la validation d'un champ de formulaire. Exemple: 'email, 'zip-code', 'url'</key>
+    <key alias="removeMacro">Supprimer la macro</key>
+    <key alias="requiredField">Champ obligatoire</key>
+    <key alias="sitereindexed">Le site a été réindéxé</key>
+    <key alias="siterepublished">Le cache du site a été mis à jour. Tous les contenus publiés sont maintenant à jour. Et tous les contenus dépubliés sont restés invisibles.</key>
+    <key alias="siterepublishHelp">Le cache du site va être mis à jour. Tous les contenus publiés seront mis à jour. Et tous les contenus dépubliés resteront invisibles.</key>
+    <key alias="tableColumns">Nombre de colonnes</key>
+    <key alias="tableRows">Nombre de lignes</key>
+    <key alias="thumbnailimageclickfororiginal">Cliquez sur l'image pour la voir en taille réelle</key>
+    <key alias="treepicker">Sélectionner un élément</key>
+    <key alias="viewCacheItem">Voir l'élément de cache</key>
+    <key alias="relateToOriginalLabel">Lier à l'original</key>
+    <key alias="includeDescendants">Inclure les descendants</key>
+    <key alias="theFriendliestCommunity">La communauté la plus amicale</key>
+    <key alias="linkToPage">Lier à la page</key>
+    <key alias="openInNewWindow">Ouvre le document lié dans une nouvelle fenêtre ou un nouvel onglet</key>
+    <key alias="linkToMedia">Lier à un media</key>
+    <key alias="selectContentStartNode">Sélectionner le noeud de base du contenu</key>
+    <key alias="selectMedia">Sélectionner le media</key>
+    <key alias="selectIcon">Sélectionner l'icône</key>
+    <key alias="selectItem">Sélectionner l'élément</key>
+    <key alias="selectLink">Sélectionner le lien</key>
+    <key alias="selectMacro">Sélectionner la macro</key>
+    <key alias="selectContent">Sélectionner le contenu</key>
+    <key alias="selectMediaStartNode">Sélectionner le noeud de base des media</key>
+    <key alias="selectMember">Sélectionner le membre</key>
+    <key alias="selectMemberGroup">Sélectionner le groupe de membres</key>
+    <key alias="selectNode">Sélectionner le noeud</key>
+    <key alias="selectSections">Sélectionner les sections</key>
+    <key alias="selectUsers">Sélectionner les utilisateurs</key>
+    <key alias="noIconsFound">Aucune icone n'a été trouvée</key>
+    <key alias="noMacroParams">Il n'y a pas de paramètres pour cette macro</key>
+    <key alias="noMacros">Il n'y a pas de macro disponible à insérer</key>
+    <key alias="externalLoginProviders">Fournisseurs externes d'identification</key>
+    <key alias="exceptionDetail">Détails de l'exception</key>
+    <key alias="stacktrace">Trace d'exécution</key>
+    <key alias="innerException">Exception interne</key>
+    <key alias="linkYour">Liez votre</key>
+    <key alias="unLinkYour">Enlevez votre</key>
+    <key alias="account">compte</key>
+    <key alias="selectEditor">Sélectionner un éditeur</key>
+    <key alias="selectSnippet">Selectionner un snippet</key>
+  </area>
+  <area alias="dictionaryItem">
+    <key alias="description"><![CDATA[
+      Editez les différentes versions de langues pour l'élément de dictionaire '<em>%0%</em>' ci-dessous.
+   ]]></key>
+    <key alias="displayName">Nom de Culture</key>
+    <key alias="changeKeyError"><![CDATA[
+      La clé '%0%' existe déjà.
+   ]]></key>
+    <key alias="overviewTitle">Aperçu du dictionaire</key>
+  </area>
+  <area alias="placeholders">
+    <key alias="username">Votre nom d'utilisateur</key>
+    <key alias="password">Votre mot de passe</key>
+    <key alias="confirmPassword">Confirmation de votre mot de passe</key>
+    <key alias="nameentity">Nommer %0%...</key>
+    <key alias="entername">Entrez un nom...</key>
+    <key alias="enteremail">Entrez un email...</key>
+    <key alias="enterusername">Entrez un nom d'utilisateur...</key>
+    <key alias="label">Libellé...</key>
+    <key alias="enterDescription">Entrez une description...</key>
+    <key alias="search">Rechercher...</key>
+    <key alias="filter">Filtrer...</key>
+    <key alias="enterTags">Ajouter des tags (appuyer sur enter entre chaque tag)...</key>
+    <key alias="email">Entrez votre email</key>
+    <key alias="enterMessage">Entrez un message...</key>
+    <key alias="usernameHint">Votre nom d'utilisateur est généralement votre adresse email</key>
+  </area>
+  <area alias="editcontenttype">
+    <key alias="createListView" version="7.2">Créer une liste personnalisée</key>
+    <key alias="removeListView" version="7.2">Supprimer la liste personnalisée</key>
+  </area>
+  <area alias="renamecontainer">
+    <key alias="renamed">Renommé</key>
+    <key alias="enterNewFolderName">Entrez un nouveau nom de répertoire ici</key>
+    <key alias="folderWasRenamed">%0% a été renommé en %1%</key>
+  </area>
+  <area alias="editdatatype">
+    <key alias="addPrevalue">Ajouter une valeur de base</key>
+    <key alias="dataBaseDatatype">Type de donnée en base de donées</key>
+    <key alias="guid">GUID du Property Editor</key>
+    <key alias="renderControl">Property editor</key>
+    <key alias="rteButtons">Boutons</key>
+    <key alias="rteEnableAdvancedSettings">Activer les paramètres avancés pour</key>
+    <key alias="rteEnableContextMenu">Activer le menu contextuel</key>
+    <key alias="rteMaximumDefaultImgSize">Taille maximale par défaut des images insérées</key>
+    <key alias="rteRelatedStylesheets">CSS associées</key>
+    <key alias="rteShowLabel">Afficher le libellé</key>
+    <key alias="rteWidthAndHeight">Largeur et hauteur</key>
+    <key alias="allPropTypes">Tous les types de propriétés &amp; les données de propriétés</key>
+    <key alias="willBeDeleted">utilisant ce type de données seront supprimés définitivement, veuillez confirmer que vous voulez également les supprimer</key>
+    <key alias="yesDelete">Oui, supprimer</key>
+    <key alias="andAllRelated">et tous les types de propriétés &amp; les données de propriétés utilisant ce type de données</key>
+    <key alias="selectFolder">Sélectionnez le répertoire où déplacer</key>
+    <key alias="inTheTree">dans l'arborescence ci-dessous</key>
+    <key alias="wasMoved">a été déplacé sous</key>
+  </area>
+  <area alias="errorHandling">
+    <key alias="errorButDataWasSaved">Vos données ont été sauvegardées, mais avant de pouvoir publier votre page, il y a des erreurs que vous devez corriger :</key>
+    <key alias="errorChangingProviderPassword">Le Membership Provider n'autorise pas le changement des mots de passe (EnablePasswordRetrieval doit être défini à true)</key>
+    <key alias="errorExistsWithoutTab">%0% existe déjà</key>
+    <key alias="errorHeader">Des erreurs sont survenues :</key>
+    <key alias="errorHeaderWithoutTab">Des erreurs sont survenues :</key>
+    <key alias="errorInPasswordFormat">Le mot de passe doit contenir un minimum de %0% caractères et contenir au moins %1% caractère(s) non-alphanumerique</key>
+    <key alias="errorIntegerWithoutTab">%0% doit être un entier</key>
+    <key alias="errorMandatory">Le champ %0% dans l'onglet %1% est obligatoire</key>
+    <key alias="errorMandatoryWithoutTab">%0% est un champ obligatoire</key>
+    <key alias="errorRegExp">%0% dans %1% n'est pas correctement formaté</key>
+    <key alias="errorRegExpWithoutTab">%0% n'est pas correctement formaté</key>
+  </area>
+  <area alias="errors">
+    <key alias="receivedErrorFromServer">Le serveur a retourné une erreur</key>
+    <key alias="dissallowedMediaType">Le type de fichier spécifié n'est pas autorisé par l'administrateur</key>
+    <key alias="codemirroriewarning">NOTE ! Même si CodeMirror est activé dans la configuration, il est désactivé dans Internet Explorer car il n'est pas suffisamment stable dans ce navigateur.</key>
+    <key alias="contentTypeAliasAndNameNotNull">Veuillez remplir l'alias et le nom de la nouvelle propriété!</key>
+    <key alias="filePermissionsError">Il y a un problème de droits en lecture/écriture sur un fichier ou dossier spécifique</key>
+    <key alias="macroErrorLoadingPartialView">Erreur de chargement du script d'une Partial View (fichier : %0%)</key>
+    <key alias="missingTitle">Veuillez entrer un titre</key>
+    <key alias="missingType">Veuillez choisir un type</key>
+    <key alias="pictureResizeBiggerThanOrg">Vous allez définir une taille d'image supérieure à sa taille d'origine. Êtes-vous certain(e) de vouloir continuer?</key>
+    <key alias="startNodeDoesNotExists">Noeud de départ supprimé, contactez votre administrateur</key>
+    <key alias="stylesMustMarkBeforeSelect">Veuillez sélectionner du contenu avant de changer le style</key>
+    <key alias="stylesNoStylesOnPage">Aucun style actif disponible</key>
+    <key alias="tableColMergeLeft">Veuillez placer le curseur à gauche des deux cellules que vous voulez fusionner</key>
+    <key alias="tableSplitNotSplittable">Vous ne pouvez pas scinder une cellule qui n'a pas été fusionnée.</key>
+  </area>
+  <area alias="general">
+    <key alias="options">Options</key>
+    <key alias="about">A propos</key>
+    <key alias="action">Action</key>
+    <key alias="actions">Actions</key>
+    <key alias="add">Ajouter</key>
+    <key alias="alias">Alias</key>
+    <key alias="all">Tout</key>
+    <key alias="areyousure">Êtes-vous certain(e)?</key>
+    <key alias="back">Retour</key>
+    <key alias="border">Bord</key>
+    <key alias="by">par</key>
+    <key alias="cancel">Annuler</key>
+    <key alias="cellMargin">Marge de cellule</key>
+    <key alias="choose">Choisir</key>
+    <key alias="close">Fermer</key>
+    <key alias="closewindow">Fermer la fenêtre</key>
+    <key alias="comment">Commenter</key>
+    <key alias="confirm">Confirmer</key>
+    <key alias="constrain">Conserver</key>
+    <key alias="constrainProportions">Conserver les proportions</key>
+    <key alias="continue">Continuer</key>
+    <key alias="copy">Copier</key>
+    <key alias="create">Créer</key>
+    <key alias="database">Base de données</key>
+    <key alias="date">Date</key>
+    <key alias="default">Défaut</key>
+    <key alias="delete">Supprimer</key>
+    <key alias="deleted">Supprimé</key>
+    <key alias="deleting">Suppression...</key>
+    <key alias="design">Design</key>
+    <key alias="dictionary">Dictionnaire</key>
+    <key alias="dimensions">Dimensions</key>
+    <key alias="down">Bas</key>
+    <key alias="download">Télécharger</key>
+    <key alias="edit">Editer</key>
+    <key alias="edited">Edité</key>
+    <key alias="elements">Eléments</key>
+    <key alias="email">Email</key>
+    <key alias="error">Erreur</key>
+    <key alias="findDocument">Trouver</key>
+    <key alias="first">Premier</key>
+    <key alias="general">Général</key>
+    <key alias="groups">Groupes</key>
+    <key alias="height">Hauteur</key>
+    <key alias="help">Aide</key>
+    <key alias="hide">Cacher</key>
+    <key alias="history">Historique</key>
+    <key alias="icon">Icône</key>
+    <key alias="import">Importer</key>
+    <key alias="info">Info</key>
+    <key alias="innerMargin">Marge intérieure</key>
+    <key alias="insert">Insérer</key>
+    <key alias="install">Installer</key>
+    <key alias="invalid">Non valide</key>
+    <key alias="justify">Justifier</key>
+    <key alias="label">Libellé</key>
+    <key alias="language">Langue</key>
+    <key alias="last">Dernier</key>
+    <key alias="layout">Mise en page</key>
+    <key alias="links">Liens</key>
+    <key alias="loading">En cours de chargement</key>
+    <key alias="locked">Bloqué</key>
+    <key alias="login">Connexion</key>
+    <key alias="logoff">Déconnexion</key>
+    <key alias="logout">Déconnexion</key>
+    <key alias="macro">Macro</key>
+    <key alias="mandatory">Obligatoire</key>
+    <key alias="message">Message</key>
+    <key alias="move">Déplacer</key>
+    <key alias="name">Nom</key>
+    <key alias="new">Nouveau</key>
+    <key alias="next">Suivant</key>
+    <key alias="no">Non</key>
+    <key alias="of">de</key>
+    <key alias="off">Inactif</key>
+    <key alias="ok">OK</key>
+    <key alias="open">Ouvrir</key>
+    <key alias="on">Actif</key>
+    <key alias="or">ou</key>
+    <key alias="orderBy">Trier par</key>
+    <key alias="password">Mot de passe</key>
+    <key alias="path">Chemin</key>
+    <key alias="pleasewait">Un moment s'il vous plaît...</key>
+    <key alias="previous">Précédent</key>
+    <key alias="properties">Propriétés</key>
+    <key alias="reciept">Email de réception des données de formulaire</key>
+    <key alias="recycleBin">Corbeille</key>
+    <key alias="recycleBinEmpty">Votre corbeille est vide</key>
+    <key alias="remaining">Restant</key>
+    <key alias="remove">Enlever</key>
+    <key alias="rename">Renommer</key>
+    <key alias="renew">Renouveller</key>
+    <key alias="required" version="7.0">Requis</key>
+    <key alias="retrieve">Retrouver</key>
+    <key alias="retry">Réessayer</key>
+    <key alias="rights">Permissions</key>
+    <key alias="scheduledPublishing">Publication Programmée</key>
+    <key alias="search">Rechercher</key>
+    <key alias="searchNoResult">Désolé, nous ne pouvons pas trouver ce que vous recherchez</key>
+    <key alias="noItemsInList">Aucun élément n'a été ajouté</key>
+    <key alias="server">Serveur</key>
+    <key alias="show">Montrer</key>
+    <key alias="showPageOnSend">Afficher la page à l'envoi</key>
+    <key alias="size">Taille</key>
+    <key alias="sort">Trier</key>
+    <key alias="status">Statut</key>
+    <key alias="submit">Envoyer</key>
+    <key alias="type">Type</key>
+    <key alias="typeToSearch">Rechercher...</key>
+    <key alias="up">Haut</key>
+    <key alias="update">Mettre à jour</key>
+    <key alias="upgrade">Upgrader</key>
+    <key alias="upload">Télécharger</key>
+    <key alias="url">Url</key>
+    <key alias="user">Utilisateur</key>
+    <key alias="username">Nom d'utilisateur</key>
+    <key alias="value">Valeur</key>
+    <key alias="view">Voir</key>
+    <key alias="welcome">Bienvenue...</key>
+    <key alias="width">Largeur</key>
+    <key alias="yes">Oui</key>
+    <key alias="folder">Dossier</key>
+    <key alias="searchResults">Résultats de recherche</key>
+    <key alias="reorder">Réorganiser</key>
+    <key alias="reorderDone">J'ai fini de réorganiser</key>
+    <key alias="preview">Prévisualiser</key>
+    <key alias="changePassword">Modifier le mot de passe</key>
+    <key alias="to">vers</key>
+    <key alias="listView">Liste</key>
+    <key alias="saving">Sauvegarde...</key>
+    <key alias="current">actuel</key>
+    <key alias="embed">Intégrer</key>
+    <key alias="selected">sélectionné</key>
+  </area>
+  <area alias="colors">
+    <key alias="blue">Bleu</key>
+  </area>
+  <area alias="shortcuts">
+    <key alias="addGroup">Ajouter un onglet</key>
+    <key alias="addProperty">Ajouter une propriété</key>
+    <key alias="addEditor">Ajouter un éditeur</key>
+    <key alias="addTemplate">Ajouter un modèle</key>
+    <key alias="addChildNode">Ajouter un noeud enfant</key>
+    <key alias="addChild">Ajouter un enfant</key>
+    <key alias="editDataType">Editer le type de données</key>
+    <key alias="navigateSections">Parcourir les sections</key>
+    <key alias="shortcut">Raccourcis</key>
+    <key alias="showShortcuts">afficher les raccourcis</key>
+    <key alias="toggleListView">Passer à la vue en liste</key>
+    <key alias="toggleAllowAsRoot">Basculer vers l'autorisation comme racine</key>
+    <key alias="commentLine">Commenter/Décommenter les lignes</key>
+    <key alias="removeLine">Supprimer la ligne</key>
+    <key alias="copyLineUp">Copier les lignes vers le haut</key>
+    <key alias="copyLineDown">Copier les lignes vers le bas</key>
+    <key alias="moveLineUp">Déplacer les lignes vers le haut</key>
+    <key alias="moveLineDown">Déplacer les lignes vers le bas</key>
+    <key alias="generalHeader">Général</key>
+    <key alias="editorHeader">Editeur</key>
+  </area>
+  <area alias="graphicheadline">
+    <key alias="backgroundcolor">Couleur de fond</key>
+    <key alias="bold">Gras</key>
+    <key alias="color">Couleur de texte</key>
+    <key alias="font">Police</key>
+    <key alias="text">Texte</key>
+  </area>
+  <area alias="headers">
+    <key alias="page">Page</key>
+  </area>
+  <area alias="installer">
+    <key alias="databaseErrorCannotConnect">Le programme d'installation ne parvient pas à se connecter à la base de données.</key>
+    <key alias="databaseErrorWebConfig">Impossible de sauvegarder le fichier web.config. Veuillez modifier la "connection string" manuellement.</key>
+    <key alias="databaseFound">Votre base de données a été détectée et est identifiée comme étant</key>
+    <key alias="databaseHeader">Configuration de la base de données</key>
+    <key alias="databaseInstall"><![CDATA[
+      Appuyez sur le bouton <strong>installer</strong> pour installer la base de données Umbraco %0%
+    ]]></key>
+    <key alias="databaseInstallDone"><![CDATA[Umbraco %0% a été copié dans votre base de données. Appuyez sur <strong>Suivant</strong> pour poursuivre.]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>Base de données non trouvée ! Veuillez vérifier les informations de la "connection string" dans le fichier web.config.</p>
+              <p>Pour poursuivre, veuillez éditer le fichier "web.config" (avec Visual Studio ou votre éditeur de texte favori), scroller jusqu'en bas, ajouter le "connection string" pour votre base de données dans la ligne avec la clé "umbracoDbDSN" et sauvegarder le fichier.</p>
+              <p>
+              Cliquez sur le bouton <strong>Réessayer</strong> lorsque cela est fait.
+              <br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+			              Plus d'informations sur l'édition du fichier web.config ici.</a></p>]]></key>
+    <key alias="databaseText"><![CDATA[Pour réaliser cette étape, vous devez d'abord connaître des informations concernant votre serveur de base de données ("connection string").<br />
+        Veuillez contacter votre fournisseur de services internet si nécessaire.
+        Si vous installez Umbraco sur un ordinateur ou un serveur local, vous aurez peut-être besoin de consulter votre administrateur système.]]></key>
+    <key alias="databaseUpgrade"><![CDATA[
+      <p>
+      Appuyez sur le bouton <strong>Upgrader</strong> pour mettre à jour votre base de données vers Umbraco %0%</p>
+      <p>
+      N'ayez pas d'inquiétude : aucun contenu ne sera supprimé et tout continuera à fonctionner parfaitement par après !
+      </p>
+      ]]></key>
+    <key alias="databaseUpgradeDone"><![CDATA[Votre base de données a été mise à jour vers la version %0%.<br />Appuyez sur <strong>Suivant</strong> pour
+      poursuivre. ]]></key>
+    <key alias="databaseUpToDate"><![CDATA[Votre base de données est à jour ! Cliquez sur <strong>Suivant</strong> pour poursuivre la configuration]]></key>
+    <key alias="defaultUserChangePass"><![CDATA[<strong>Le mot de passe par défaut doit être modifié !</strong>]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>L'utilisateur par défaut a été désactivé ou n'a pas accès à Umbraco!</strong></p><p>Aucune autre action n'est requise. Cliquez sur <b>Suivant</b> pour poursuivre.]]></key>
+    <key alias="defaultUserPassChanged"><![CDATA[<strong>Le mot de passe par défaut a été modifié avec succès depuis l'installation!</strong></p><p>Aucune autre action n'est requise. Cliquez sur <strong>Suivant</strong> pour poursuivre.]]></key>
+    <key alias="defaultUserPasswordChanged">Le mot de passe a été modifié !</key>
+    <key alias="greatStart">Pour bien commencer, regardez nos vidéos d'introduction</key>
+    <key alias="licenseText">En cliquant sur le bouton "Suivant" (ou en modifiant umbracoConfigurationStatus dans le fichier web.config), vous acceptez la licence de ce logiciel telle que spécifiée dans le champ ci-dessous. Veuillez noter que cette distribution Umbraco consiste en deux licences différentes, la licence open source MIT pour le framework et la licence Umbraco freeware qui couvre l'UI.</key>
+    <key alias="None">Pas encore installé.</key>
+    <key alias="permissionsAffectedFolders">Fichiers et dossiers concernés</key>
+    <key alias="permissionsAffectedFoldersMoreInfo">Plus d'informations sur la configuration des permissions</key>
+    <key alias="permissionsAffectedFoldersText">Vous devez donner à ASP.NET les droits de modification sur les fichiers/dossiers suivants</key>
+    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Vos configurations de permissions sont presque parfaites !</strong><br /><br />
+        Vous pouvez faire fonctionner Umbraco sans problèmes, mais vous ne serez pas en mesure d'installer des packages, ce qui est hautement recommandé pour tirer pleinement profit d'Umbraco.]]></key>
+    <key alias="permissionsHowtoResolve">Comment résoudre</key>
+    <key alias="permissionsHowtoResolveLink">Cliquez ici pour lire la version texte</key>
+    <key alias="permissionsHowtoResolveText"><![CDATA[Regardez notre <strong>tutoriel vidéo</strong> sur la définition des permissions des répertoires pour Umbraco, ou lisez la version texte.]]></key>
+    <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Vos configurations de permissions pourraient poser problème !</strong>
+      <br/><br />
+      Vous pouvez faire fonctionner Umbraco sans problèmes, mais vous ne serez pas en mesure d'installer des packages, ce qui est hautement recommandé pour tirer pleinement profit d'Umbraco.]]></key>
+    <key alias="permissionsNotReady"><![CDATA[<strong>Vos configurations de permissions ne sont pas prêtes pour Umbraco !</strong>
+          <br /><br />
+          Pour faire fonctionner Umbraco, vous aurez besoin de mettre à jour les permissions sur les fichiers/dossiers.]]></key>
+    <key alias="permissionsPerfect"><![CDATA[<strong>Vos configurations de permissions sont parfaites !</strong><br /><br />
+              Vous êtes prêt(e) à faire fonctionner Umbraco et à installer des packages !]]></key>
+    <key alias="permissionsResolveFolderIssues">Résoudre un problème sur un dossier</key>
+    <key alias="permissionsResolveFolderIssuesLink">Suivez ce lien pour plus d'informations sur les problèmes avec ASP.NET et la création de dossiers</key>
+    <key alias="permissionsSettingUpPermissions">Définir les permissions de dossier</key>
+    <key alias="permissionsText"><![CDATA[
+      Umbraco nécessite des permissions d'écriture/modification sur certains dossiers pour pouvoir stocker des fichiers comme des images et des PDF.
+      Il stocke également des données temporaires (i.e : cache) pour améliorer les performances de votre site.
+    ]]></key>
+    <key alias="runwayFromScratch">Je veux démarrer "from scratch"</key>
+    <key alias="runwayFromScratchText"><![CDATA[
+        Votre site est vide pour le moment, ce qui est parfait si vous voulez commencer "from scratch" et créer vos propres types de documents et modèles d'affichage.
+        (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Apprenez comment</a>)
+        Vous pouvez toujours choisir d'installer Runway plus tard. Pour cela, allez dans la section "Développeur" et sélectionnez "Packages".
+      ]]></key>
+    <key alias="runwayHeader">Vous venez de mettre en place une plateforme Umbraco toute nette. Que voulez-vous faire ensuite ?</key>
+    <key alias="runwayInstalled">Runway est installé</key>
+    <key alias="runwayInstalledText"><![CDATA[
+      Les fondations en place. Choisissez les modules que vous souhaitez installer par-dessus<br />
+      Voici la liste des modules recommandés, cochez ceux que vous souhaitez installer, ou regardez la <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">liste complète des modules</a>
+      ]]></key>
+    <key alias="runwayOnlyProUsers">Recommandé uniquement pour les utilisateurs expérimentés</key>
+    <key alias="runwaySimpleSite">Je veux commencer avec un site simple</key>
+    <key alias="runwaySimpleSiteText"><![CDATA[
+      <p>
+      "Runway" est un site simple qui fournit des types de documents et des modèles de base. L'installateur peut mettre en place Runway automatiquement pour vous,
+        mais vous pouvez facilement l'éditer, l'enrichir, ou le supprimer par la suite. Il n'est pas nécessaire, et vous pouvez parfaitement vous en passer pour utiliser Umbraco. Cela étant dit,
+        Runway offre une base facile, fondée sur des bonnes pratiques, pour vous permettre de commencer plus rapidement que jamais.
+        Si vous choisissez d'installer Runway, vous pouvez sélectionner en option des blocs de base, appelés Runway Modules, pour enrichir les pages de votre site.
+        </p>
+        <small>
+        <em>Inclus avec Runway :</em> Home page, Getting Started page, Installing Modules page.<br />
+        <em>Modules optionnels :</em> Top Navigation, Sitemap, Contact, Gallery.
+        </small>
+      ]]></key>
+    <key alias="runwayWhatIsRunway">Qu'est-ce que Runway</key>
+    <key alias="step1">Etape 1/5 : Accepter la licence</key>
+    <key alias="step2">Etape 2/5 : Configuration de la base de données</key>
+    <key alias="step3">Etape 3/5 : Validation des permissions de fichiers</key>
+    <key alias="step4">Etape 4/5 : Sécurité Umbraco</key>
+    <key alias="step5">Etape 5/5 : Umbraco est prêt</key>
+    <key alias="thankYou">Merci d'avoir choisi Umbraco</key>
+    <key alias="theEndBrowseSite"><![CDATA[<h3>Parcourir votre nouveau site</h3>
+Vous avez installé Runway, alors pourquoi ne pas jeter un oeil au look de votre nouveau site ?]]></key>
+    <key alias="theEndFurtherHelp"><![CDATA[<h3>Aide et informations complémentaires</h3>
+Obtenez de l'aide de notre communauté "award winning", parcourez la documentation ou regardez quelques vidéos gratuites sur la manière de construire un site simple, d'utiliser les packages ainsi qu'un guide rapide sur la terminologie Umbraco]]></key>
+    <key alias="theEndHeader">Umbraco %0% est installé et prêt à être utilisé</key>
+    <key alias="theEndInstallFailed"><![CDATA[Pour terminer l'installation, vous allez devoir modifier manuellement le
+        <strong>fichier /web.config</strong> et mettre à jour le paramètre AppSetting  <strong>umbracoConfigurationStatus</strong> situé en bas à la valeur <strong>'%0%'</strong>.]]></key>
+    <key alias="theEndInstallSuccess"><![CDATA[Vous pouvez <strong>démarrer instantanément</strong> en cliquant sur le bouton "Lancer Umbraco" ci-dessous.<br />
+Si vous <strong>débutez avec Umbraco</strong>, vous pouvez trouver une foule de ressources dans nos pages "Getting Started".]]></key>
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Lancer Umbraco</h3>
+Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à ajouter du contenu, à mettre à jour les modèles d'affichage et feuilles de styles ou à ajouter de nouvelles fonctionnalités]]></key>
+    <key alias="Unavailable">La connexion à la base de données a échoué.</key>
+    <key alias="Version3">Umbraco Version 3</key>
+    <key alias="Version4">Umbraco Version 4</key>
+    <key alias="watch">Regarder</key>
+    <key alias="welcomeIntro"><![CDATA[Cet assistant vous guidera tout au long du processus de configuration d'<strong>Umbraco %0%</strong>, qu'il s'agisse d'une nouvelle installation ou d'une mise à jour à partir de la version 3.0
+      <br /><br />
+      Appuyez sur <strong>"suivant"</strong> pour commencer l'assistant.]]></key>
+  </area>
+  <area alias="language">
+    <key alias="cultureCode">Code de la Culture</key>
+    <key alias="displayName">Nom de la culture</key>
+  </area>
+  <area alias="lockout">
+    <key alias="lockoutWillOccur">Vous avez été inactif et la déconnexion aura lieu automatiquement dans</key>
+    <key alias="renewSession">Renouvellez votre session maintenant pour sauvegarder votre travail</key>
+  </area>
+  <area alias="login">
+    <key alias="greeting0">Joyeux dimanche détonnant</key>
+    <key alias="greeting1">Joyeux lundi lumineux</key>
+    <key alias="greeting2">Joyeux mardi magique</key>
+    <key alias="greeting3">Joyeux mercredi merveilleux</key>
+    <key alias="greeting4">Joyeux jeudi</key>
+    <key alias="greeting5">Joyeux vendredi</key>
+    <key alias="greeting6">Joyeux chamedi</key>
+    <key alias="instruction">Connectez-vous ci-dessous</key>
+    <key alias="signInWith">Identifiez-vous avec</key>
+    <key alias="timeout">La session a expiré</key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+    <key alias="forgottenPassword">Mot de passe oublié?</key>
+    <key alias="forgottenPasswordInstruction">Un email contenant un lien pour ré-initialiser votre mot de passe sera envoyé à l'adresse spécifiée</key>
+    <key alias="requestPasswordResetConfirmation">Un email contenant les instructions de ré-initialisation de votre mot de passe sera envoyée à l'adresse spécifiée si elle correspond à nos informations.</key>
+    <key alias="showPassword">Montrer le mot de passe</key>
+    <key alias="hidePassword">Cacher le mot de passe</key>
+    <key alias="returnToLogin">Revenir au formulaire de connexion</key>
+    <key alias="setPasswordInstruction">Veuillez fournir un nouveau mot de passe</key>
+    <key alias="setPasswordConfirmation">Votre mot de passe a été mis à jour</key>
+    <key alias="resetCodeExpired">Le lien sur lequel vous avez cliqué est non valide ou a expiré.</key>
+    <key alias="resetPasswordEmailCopySubject">Umbraco: Ré-initialiser le mot de passe</key>
+    <key alias="resetPasswordEmailCopyFormat"><![CDATA[
+        <html>
+			<head>
+				<meta name='viewport' content='width=device-width'>
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+			</head>
+			<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
+				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
+				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+					<tr>
+						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
+							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+								<tr>
+									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
+										<div> </div>
+										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+									</td>
+									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+					<tr>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+								<br>
+								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+									<tr>
+										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+												<tr>
+													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+															Une réinitialisation de votre mot de passe a été demandée
+														</h1>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Votre nom d'utilisateur pour vous connecter au back-office Umbraco est : <strong>%0%</strong>
+														</p>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+																<tbody>
+																	<tr>
+																		<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+																			<a href='%1%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																				Cliquez sur ce lien pour réinitialiser votre mot de passe
+																			</a>
+																		</td>
+																	</tr>
+																</tbody>
+															</table>
+														</p>
+														<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Si vous ne pouvez pas cliquer sur le lien, recopiez cet URL dans votre navigateur :</p>
+															<table border='0' cellpadding='0' cellspacing='0'>
+																<tr>
+																	<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
+																		<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
+																			<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%1%'>%1%</a>
+																		</font>
+																	</td>
+																</tr>
+															</table>
+														</p>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+								<br><br><br>
+							</div>
+						</td>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+					</tr>
+				</table>
+			</body>
+		</html>
+	]]></key>
+  </area>
+  <area alias="main">
+    <key alias="dashboard">Tableau de bord</key>
+    <key alias="sections">Sections</key>
+    <key alias="tree">Contenu</key>
+  </area>
+  <area alias="moveOrCopy">
+    <key alias="choose">Choisissez la page au-dessus...</key>
+    <key alias="copyDone">%0% a été copié dans %1%</key>
+    <key alias="copyTo">Choisissez ci-dessous l'endroit où le document %0% doit être copié</key>
+    <key alias="moveDone">%0% a été déplacé dans %1%</key>
+    <key alias="moveTo">Choisissez ci-dessous l'endroit où le document %0% doit être déplacé</key>
+    <key alias="nodeSelected">a été choisi comme racine de votre nouveau contenu, cliquez sur 'ok' ci-dessous.</key>
+    <key alias="noNodeSelected">Aucun noeud n'a encore été choisi, veuillez choisir un noeud dans la liste ci-dessus avant de cliquer sur 'ok'.</key>
+    <key alias="notAllowedByContentType">Le noeud actuel n'est pas autorisé sous le noeud choisi à cause de son type</key>
+    <key alias="notAllowedByPath">Le noeud actuel ne peut pas être déplacé dans une de ses propres sous-pages</key>
+    <key alias="notAllowedAtRoot">Le noeud actuel ne peut pas exister à la racine</key>
+    <key alias="notValid">L'action n'est pas autorisée car vous n'avez pas les droits suffisants sur un ou plusieurs noeuds enfants.</key>
+    <key alias="relateToOriginal">Relier les éléments copiés à l'original</key>
+  </area>
+  <area alias="notifications">
+    <key alias="editNotifications">Editez vos notifications pour %0%</key>
+    <key alias="mailBody"><![CDATA[
+      Hello %0%
+
+      Ceci est un email automatique pour vous informer que la tâche '%1%'
+      a été executée sur la page '%2%'
+      par l'utilisateur '%3%'
+
+      Allez sur http://%4%/#/content/content/edit/%5% pour éditer cette page.
+
+      Bonne journée !
+
+      Avec les salutations du Robot Umbraco
+    ]]></key>
+    <key alias="mailBodyHtml"><![CDATA[
+		<html>
+			<head>
+				<meta name='viewport' content='width=device-width'>
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+			</head>
+			<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
+				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
+				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+					<tr>
+						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
+							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+								<tr>
+									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
+										<div> </div>
+										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+									</td>
+									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+					<tr>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+								<br>
+								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+									<tr>
+										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+												<tr>
+													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+															Salut %0%,
+														</h1>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Ceci est un email automatique pour vous informer que la tâche <strong>'%1%'</strong> a été exécutée sur la page <a style="color: #392F54; text-decoration: none; -ms-word-break: break-all; word-break: break-all;" href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a> par l'utilisateur <strong>'%3%'</strong>
+														</p>
+														<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
+															<tbody>
+																<tr>
+																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
+																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr>
+																			<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>MODIFIER</a> </td> </tr></tbody></table>
+																	</td>
+																</tr>
+															</tbody>
+														</table>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															<h3>Résumé de la mise à jour :</h3>
+															<table style="width: 100%;">
+																 %6%
+															</table>
+														</p>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Bonne journée !<br /><br />
+															Avec les salutations du Robot Umbraco
+														</p>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+								<br><br><br>
+							</div>
+						</td>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+					</tr>
+				</table>
+			</body>
+		</html>
+		]]></key>
+    <key alias="mailSubject">La notification [%0%] à propos de %1% a été executée sur %2%</key>
+    <key alias="notifications">Notifications</key>
+  </area>
+  <area alias="packager">
+    <key alias="chooseLocalPackageText"><![CDATA[
+      Choisissez un package sur votre ordinateur en cliquant sur le bouton Parcourir <br />
+	et localisez le package. Les packages Umbraco ont généralement une extension ".umb" ou ".zip".
+      ]]></key>
+    <key alias="dropHere">Déposez pour uploader</key>
+    <key alias="orClickHereToUpload">ou cliquez ici pour choisir les fichiers</key>
+    <key alias="uploadPackage">Uploader un package</key>
+    <key alias="localPackageDescription">Installez un package local en le sélectionnant sur votre ordinateur. Installez uniquement des packages de sources fiables que vous connaissez</key>
+    <key alias="uploadAnother">Uploader un autre package</key>
+    <key alias="cancelAndUploadAnother">Annuler et uploader un autre package</key>
+    <key alias="packageLicense">Licence</key>
+    <key alias="accept">J'accepte</key>
+    <key alias="termsOfUse">les conditions d'utilisation</key>
+    <key alias="packageInstall">Installer le package</key>
+    <key alias="installFinish">Terminer</key>
+    <key alias="installedPackages">Packages installés</key>
+    <key alias="noPackages">Vous n'avez aucun package installé</key>
+    <key alias="noPackagesDescription"><![CDATA[Vous n'avez pas de package installé. Veuillez soit installer un package local en le sélectionnant sur votre ordinateur, soit naviguer dans la liste des packages disponibles en utilisant l'icone <strong>'Packages'</strong> en haut à droite de votre écran]]></key>
+    <key alias="packageSearch">Chercher des packages</key>
+    <key alias="packageSearchResults">Résultats pour</key>
+    <key alias="packageNoResults">Nous n'avons rien pu trouver pour</key>
+    <key alias="packageNoResultsDescription">Veuillez essayer de chercher un autre package ou naviguez à travers les catégories</key>
+    <key alias="packagesPopular">Populaires</key>
+    <key alias="packagesNew">Nouvelles releases</key>
+    <key alias="packageHas">a</key>
+    <key alias="packageKarmaPoints">points de karma</key>
+    <key alias="packageInfo">Information</key>
+    <key alias="packageOwner">Propriétaire</key>
+    <key alias="packageContrib">Contributeurs</key>
+    <key alias="packageCreated">Créé</key>
+    <key alias="packageCurrentVersion">Version actuelle</key>
+    <key alias="packageNetVersion">version .NET</key>
+    <key alias="packageDownloads">Téléchargements</key>
+    <key alias="packageLikes">Coups de coeur</key>
+    <key alias="packageCompatibility">Compatibilité</key>
+    <key alias="packageCompatibilityDescription">Ce package est compatible avec les versions suivantes de Umbraco, selon les rapports des membres de la communauté. Une compatibilité complète ne peut pas être garantie pour les versions rapportées sous 100%</key>
+    <key alias="packageExternalSources">Sources externes</key>
+    <key alias="packageAuthor">Auteur</key>
+    <key alias="packageDocumentation">Documentation</key>
+    <key alias="packageMetaData">Meta data du package</key>
+    <key alias="packageName">Nom du package</key>
+    <key alias="packageNoItemsHeader">Le package ne contient aucun élément</key>
+    <key alias="packageNoItemsText"><![CDATA[Ce fichier de package ne contient aucun élément à désinstaller.<br/><br/>
+      Vous pouvez supprimer tranquillement ce package de votre installation en cliquant sur "Désinstaller le package" ci-dessous.]]></key>
+    <key alias="packageOptions">Options du package</key>
+    <key alias="packageReadme">Package readme</key>
+    <key alias="packageRepository">Repository des packages</key>
+    <key alias="packageUninstallConfirm">Confirmation de désinstallation</key>
+    <key alias="packageUninstalledHeader">Le package a été désinstallé</key>
+    <key alias="packageUninstalledText">Le package a été désinstallé avec succès</key>
+    <key alias="packageUninstallHeader">Désinstaller le package</key>
+    <key alias="packageUninstallText"><![CDATA[Vous pouvez désélectionner ci-dessous les éléments que vous ne souhaitez pas supprimer pour le moment. Lorsque vous cliquerez sur "Confirmer la désinstallation", tous les éléments cochés seront supprimés.<br />
+      <span style="color: Red; font-weight: bold;">Remarque :</span> tous les documents, media etc. dépendant des éléments que vous supprimez vont cesser de fonctionner, ce qui peut provoquer une instabilité du système,
+      désinstallez donc avec prudence. En cas de doute, contactez l'auteur du package.]]></key>
+    <key alias="packageVersion">Version du package</key>
+    <key alias="packageAlreadyInstalled">Package déjà installé</key>
+    <key alias="targetVersionMismatch">Ce package ne peut pas être installé, il nécessite au minimum la version Umbraco %0%</key>
+    <key alias="installStateUninstalling">Désinstallation...</key>
+    <key alias="installStateDownloading">Téléchargement...</key>
+    <key alias="installStateImporting">Import...</key>
+    <key alias="installStateInstalling">Installation...</key>
+    <key alias="installStateRestarting">Redémarrage, veuillez patienter...</key>
+    <key alias="installStateComplete">Terminé, votre navigateur va être rafraîchi, veuillez patienter...</key>
+    <key alias="installStateCompleted">Veuillez cliquer sur terminer pour compléter l'installation et recharger la page.</key>
+    <key alias="installStateUploading">Package en cours de chargement...</key>
+  </area>
+  <area alias="paste">
+    <key alias="doNothing">Coller en conservant le formatage (non recommandé)</key>
+    <key alias="errorMessage">Le texte que vous tentez de coller contient des caractères spéciaux ou du formatage. Cela peut être dû à une copie d'un texte depuis Microsoft Word. Umbraco peut supprimer automatiquement les caractères spéciaux et le formatage, de manière à ce que le texte collé convienne mieux pour le Web.</key>
+    <key alias="removeAll">Coller en tant que texte brut sans aucun formatage</key>
+    <key alias="removeSpecialFormattering">Coller, mais supprimer le formatage (recommandé)</key>
+  </area>
+  <area alias="publicAccess">
+    <key alias="paAdvanced">Protection basée sur les rôles</key>
+    <key alias="paAdvancedHelp"><![CDATA[Si vous souhaitez contrôler l'accès à la page en utilisant l'authentification basée sur les rôles utilisateurs,<br /> via les groupes de membres Umbraco.]]></key>
+    <key alias="paAdvancedNoGroups">Vous devez créer un groupe avant de pouvoir utiliser l'authentification basée sur les rôles</key>
+    <key alias="paErrorPage">Page d'erreur</key>
+    <key alias="paErrorPageHelp">Utilisé pour les personnes connectées, mais qui n'ont pas accès</key>
+    <key alias="paHowWould">Choisissez comment restreindre l'accès à cette page</key>
+    <key alias="paIsProtected">%0% est maintenant protégée</key>
+    <key alias="paIsRemoved">Protection supprimée de %0%</key>
+    <key alias="paLoginPage">Page de connexion</key>
+    <key alias="paLoginPageHelp">Choisissez la page qui contient le formulaire de connexion</key>
+    <key alias="paRemoveProtection">Supprimer la protection</key>
+    <key alias="paSelectPages">Choisissez les pages qui contiennent le formulaire de connexion et les messages d'erreur</key>
+    <key alias="paSelectRoles">Choisissez les rôles qui ont accès à cette page</key>
+    <key alias="paSetLogin">Définissez l'identifiant et le mot de passe pour cette page</key>
+    <key alias="paSimple">Protection utilisateur unique</key>
+    <key alias="paSimpleHelp">Si vous souhaitez mettre en place une protection simple utilisant un identifiant et un mot de passe uniques</key>
+  </area>
+  <area alias="publish">
+    <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
+      %0% n'a pas pu être publié car cet élément est programmé pour être publié bientôt.
+    ]]></key>
+    <key alias="contentPublishedFailedExpired"><![CDATA[
+      %0% n'a pas pu être publié car cet élément a expiré.
+    ]]></key>
+    <key alias="contentPublishedFailedInvalid"><![CDATA[
+      %0% n'a pas pu être publié à cause des propriétés suivantes qui n'ont pas passé les règles de validation :  %1%.
+    ]]></key>
+    <key alias="contentPublishedFailedByEvent"><![CDATA[
+      %0% n'a pas pu être publié, l'action a été annulée par une extension tierce.
+    ]]></key>
+    <key alias="contentPublishedFailedByParent"><![CDATA[
+      %0% ne peut pas être publié car une page parente n'est pas publiée.
+    ]]></key>
+    <key alias="includeUnpublished">Inclure les pages enfant non publiées</key>
+    <key alias="inProgress">Publication en cours - veuillez patienter...</key>
+    <key alias="inProgressCounter">%0% pages sur %1% ont été publiées...</key>
+    <key alias="nodePublish">%0% a été publié</key>
+    <key alias="nodePublishAll">%0% et ses pages enfants ont été publiées</key>
+    <key alias="publishAll">Publier %0% et toutes ses pages enfant</key>
+    <key alias="publishHelp"><![CDATA[Cliquez sur <em>Publier</em> pour publier <strong>%0%</strong> et la rendre ainsi accessible publiquement.<br/><br />
+      Vous pouvez publier cette page et toutes ses sous-pages en cochant <em>Inclure les pages enfant non pubiées</em> ci-dessous.
+      ]]></key>
+  </area>
+  <area alias="colorpicker">
+    <key alias="noColors">Vous n'avez configuré aucune couleur approuvée</key>
+  </area>
+  <area alias="contentPicker">
+    <key alias="pickedTrashedItem">Vous avez choisi un élément de contenu actuellement supprimé ou dans la corbeille</key>
+    <key alias="pickedTrashedItems">Vous avez choisi des éléments de contenu actuellement supprimés ou dans la corbeille</key>
+  </area>
+  <area alias="mediaPicker">
+    <key alias="pickedTrashedItem">Vous avez choisi un élément media actuellement supprimé ou dans la corbeille</key>
+    <key alias="pickedTrashedItems">Vous avez choisi des éléments media actuellement supprimés ou dans la corbeille</key>
+  </area>
+  <area alias="relatedlinks">
+    <key alias="enterExternal">introduire un lien externe</key>
+    <key alias="chooseInternal">choisir une page interne</key>
+    <key alias="caption">Légende</key>
+    <key alias="link">Lien</key>
+    <key alias="newWindow">Ouvrir dans une nouvelle fenêtre</key>
+    <key alias="captionPlaceholder">introduisez la légende à afficher</key>
+    <key alias="externalLinkPlaceholder">Introduiser le lien</key>
+  </area>
+  <area alias="imagecropper">
+    <key alias="reset">Réinitialiser</key>
+    <key alias="defineCrop">Définir le recadrage</key>
+    <key alias="saveCrop">Sauvegarder le recadrage</key>
+    <key alias="addCrop">Ajouter un nouveau recadrage</key>
+  </area>
+  <area alias="rollback">
+    <key alias="currentVersion">Version actuelle</key>
+    <key alias="diffHelp"><![CDATA[Ceci affiche les différences entre la version actuelle et la version choisie<br />Le texte en <del>Rouge</del> signifie qu'il a été supprimé de la version choisie, <ins>vert signifie ajouté</ins>]]></key>
+    <key alias="documentRolledBack">Le document a été restauré à une version antérieure</key>
+    <key alias="htmlHelp">Ceci affiche la version choisie en tant que HTML, si vous souhaitez voir les différences entre les deux versions en même temps, utilisez la vue différentielle</key>
+    <key alias="rollbackTo">Revenir à</key>
+    <key alias="selectVersion">Choisissez une version</key>
+    <key alias="view">Voir</key>
+  </area>
+  <area alias="scripts">
+    <key alias="editscript">Editer le fichier de script</key>
+  </area>
+  <area alias="sections">
+    <key alias="concierge">Concierge</key>
+    <key alias="content">Contenu</key>
+    <key alias="courier">Courier</key>
+    <key alias="developer">Développeur</key>
+    <key alias="installer">Assistant de configuration Umbraco</key>
+    <key alias="media">Medias</key>
+    <key alias="member">Membres</key>
+    <key alias="newsletters">Newsletters</key>
+    <key alias="settings">Configuration</key>
+    <key alias="statistics">Statistiques</key>
+    <key alias="translation">Traduction</key>
+    <key alias="users">Utilisateurs</key>
+    <key alias="help" version="7.0">Aide</key>
+    <key alias="forms">Formulaires</key>
+  </area>
+  <area alias="help">
+    <key alias="theBestUmbracoVideoTutorials">Les meilleurs tutoriels vidéo Umbraco</key>
+  </area>
+  <area alias="settings">
+    <key alias="defaulttemplate">Modèle par défaut</key>
+    <key alias="importDocumentTypeHelp">Pour importer un type de document, trouvez le fichier ".udt" sur votre ordinateur en cliquant sur le bouton "Parcourir" et cliquez sur "Importer" (une confirmation vous sera demandée à l'écran suivant)</key>
+    <key alias="newtabname">Titre du nouvel onglet</key>
+    <key alias="nodetype">Type de noeud</key>
+    <key alias="objecttype">Type</key>
+    <key alias="stylesheet">Feuille de style</key>
+    <key alias="script">Script</key>
+    <key alias="tab">Onglet</key>
+    <key alias="tabname">Titre de l'onglet</key>
+    <key alias="tabs">Onglets</key>
+    <key alias="contentTypeEnabled">Type de contenu de base activé</key>
+    <key alias="contentTypeUses">Ce type de contenu utilise</key>
+    <key alias="asAContentMasterType">en tant que type de contenu de base. Les onglets du type de contenu de base ne sont pas affichés et peuvent seulement être modifiés à partir du type de contenu de base lui-même.</key>
+    <key alias="noPropertiesDefinedOnTab">Aucune propriété définie dans cet onglet. Cliquez sur le lien "Ajouter une nouvelle propriété" en-haut pour créer une nouvelle propriété.</key>
+    <key alias="addIcon">Ajouter une icône</key>
+  </area>
+  <area alias="sort">
+    <key alias="sortOrder">Ordre de tri</key>
+    <key alias="sortCreationDate">Date de création</key>
+    <key alias="sortDone">Tri achevé.</key>
+    <key alias="sortHelp">Faites glisser les différents éléments vers le haut ou vers le bas pour définir la manière dont ils doivent être organisés. Ou cliquez sur les entêtes de colonnes pour trier la collection complète d'éléments</key>
+    <key alias="sortPleaseWait"><![CDATA[Veuillez patienter. Les éléments sont en cours de tri, cela peut prendre un moment.]]></key>
+  </area>
+  <area alias="speechBubbles">
+    <key alias="validationFailedHeader">Validation</key>
+    <key alias="validationFailedMessage">Les erreurs de validation doivent être corrigées avant de pouvoir sauvegarder l'élément</key>
+    <key alias="operationFailedHeader">Echec</key>
+    <key alias="operationSavedHeader">Sauvegardé</key>
+    <key alias="invalidUserPermissionsText">Permissions utilisateur insuffisantes, l'opération n'a pas pu être complétée</key>
+    <key alias="operationCancelledHeader">Annulation</key>
+    <key alias="operationCancelledText">L'opération a été annulée par une extension tierce</key>
+    <key alias="contentPublishedFailedByEvent">La publication a été annulée par une extension tierce.</key>
+    <key alias="contentTypeDublicatePropertyType">Le type de propriété existe déjà</key>
+    <key alias="contentTypePropertyTypeCreated">Type de propriété créé</key>
+    <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Nom : %0% <br /> Type de données : %1%]]></key>
+    <key alias="contentTypePropertyTypeDeleted">Type de propriété supprimé</key>
+    <key alias="contentTypeSavedHeader">Type de document sauvegardé</key>
+    <key alias="contentTypeTabCreated">Onglet créé</key>
+    <key alias="contentTypeTabDeleted">Onglet supprimé</key>
+    <key alias="contentTypeTabDeletedText">Onglet avec l'ID : %0% supprimé</key>
+    <key alias="cssErrorHeader">Feuille de style non sauvegardée</key>
+    <key alias="cssSavedHeader">Feuille de style sauvegardée</key>
+    <key alias="cssSavedText">Feuille de style sauvegardée sans erreurs</key>
+    <key alias="dataTypeSaved">Type de données sauvegardé</key>
+    <key alias="dictionaryItemSaved">Elément de dictionnaire sauvegardé</key>
+    <key alias="editContentPublishedFailedByParent">La publication a échoué car la page parent n'est pas publiée</key>
+    <key alias="editContentPublishedHeader">Contenu publié</key>
+    <key alias="editContentPublishedText">et visible sur le site</key>
+    <key alias="editContentSavedHeader">Contenu sauvegardé</key>
+    <key alias="editContentSavedText">N'oubliez pas de publier pour rendre les modifications visibles</key>
+    <key alias="editContentSendToPublish">Envoyer pour approbation</key>
+    <key alias="editContentSendToPublishText">Les modifications ont été envoyées pour approbation</key>
+    <key alias="editMediaSaved">Media sauvegardé</key>
+    <key alias="editMediaSavedText">Media sauvegardé sans erreurs</key>
+    <key alias="editMemberSaved">Membre sauvegardé</key>
+    <key alias="editStylesheetPropertySaved">Propriété de feuille de style sauvegardée</key>
+    <key alias="editStylesheetSaved">Feuille de style sauvegardée</key>
+    <key alias="editTemplateSaved">Modèle sauvegardé</key>
+    <key alias="editUserError">Erreur lors de la sauvegarde de l'utilisateur (consultez les logs)</key>
+    <key alias="editUserSaved">Utilisateur sauvegardé</key>
+    <key alias="editUserTypeSaved">Type d'utilisateur sauvegardé</key>
+    <key alias="editUserGroupSaved">Groupe d'utilisateurs sauvegardé</key>
+    <key alias="fileErrorHeader">Fichier non sauvegardé</key>
+    <key alias="fileErrorText">Le fichier n'a pas pu être sauvegardé. Vérifiez les permissions de fichier.</key>
+    <key alias="fileSavedHeader">Fichier sauvegardé</key>
+    <key alias="fileSavedText">Fichier sauvegardé sans erreurs</key>
+    <key alias="languageSaved">Langue sauvegardée</key>
+    <key alias="mediaTypeSavedHeader">Type de média sauvegardé</key>
+    <key alias="memberTypeSavedHeader">Type de membre sauvegardé</key>
+    <key alias="templateErrorHeader">Modèle non sauvegardé</key>
+    <key alias="templateErrorText">Assurez-vous de ne pas avoir 2 modèles avec le même alias.</key>
+    <key alias="templateSavedHeader">Modèle sauvegardé</key>
+    <key alias="templateSavedText">Modèle sauvegardé sans aucune erreurs !</key>
+    <key alias="contentUnpublished">Contenu publié</key>
+    <key alias="partialViewSavedHeader">Vue partielle sauvegardée</key>
+    <key alias="partialViewSavedText">Vue partielle sauvegardée sans erreurs !</key>
+    <key alias="partialViewErrorHeader">Vue partielle non sauvegardée</key>
+    <key alias="partialViewErrorText">Une erreur est survenue lors de la sauvegarde du fichier.</key>
+    <key alias="permissionsSavedFor">Permissions sauvegardées pour</key>
+    <key alias="deleteUserGroupsSuccess">%0% groupes d'utilisateurs supprimés</key>
+    <key alias="deleteUserGroupSuccess">%0% a été supprimé</key>
+    <key alias="enableUsersSuccess">%0% utilisateurs activés</key>
+    <key alias="disableUsersSuccess">%0% utilisateurs désactivés</key>
+    <key alias="enableUserSuccess">%0% est à présent activé</key>
+    <key alias="disableUserSuccess">%0% est à présent désactivé</key>
+    <key alias="setUserGroupOnUsersSuccess">Les groupes d'utilisateurs ont été définis</key>
+    <key alias="unlockUsersSuccess">%0% utilisateurs débloqués</key>
+    <key alias="unlockUserSuccess">%0% est à présent débloqué</key>
+    <key alias="memberExportedSuccess">Le membre a été exporté vers le fichier</key>
+    <key alias="memberExportedError">Une erreur est survenue lors de l'export du membre</key>
+    <key alias="deleteUserSuccess">L'utilisateur %0% a été supprimé</key>
+    <key alias="resendInviteHeader">Inviter l'utilisateur</key>
+    <key alias="resendInviteSuccess">L'invitation a été envoyée à nouveau à %0%</key>
+  </area>
+  <area alias="stylesheet">
+    <key alias="aliasHelp">Utilise la syntaxe CSS. Ex : h1, .redHeader, .blueTex</key>
+    <key alias="editstylesheet">Editer la feuille de style</key>
+    <key alias="editstylesheetproperty">Editer la propriété de feuille de style</key>
+    <key alias="nameHelp">Donner un nom pour identifier la propriété dans le Rich Text Editor</key>
+    <key alias="preview">Prévisualiser</key>
+    <key alias="styles">Styles</key>
+  </area>
+  <area alias="template">
+    <key alias="edittemplate">Editer le modèle</key>
+    <key alias="insertSections">Sections</key>
+    <key alias="insertContentArea">Insérer une zone de contenu</key>
+    <key alias="insertContentAreaPlaceHolder">Insérer un placeholder de zone de contenu</key>
+    <key alias="insert">Insérer</key>
+    <key alias="insertDesc">Choisissez l'élément à insérer dans votre modèle</key>
+    <key alias="insertDictionaryItem">Elément de dictionnaire</key>
+    <key alias="insertDictionaryItemDesc">Un élément de dictionnaire est un espace pour un morceau de texte traduisible, ce qui facilite la création de designs pour des sites web multilangues.</key>
+    <key alias="insertMacro">Macro</key>
+    <key alias="insertMacroDesc">
+      Une Macro est un composant configurable, ce qui est génial pour les parties réutilisables de votre
+	  design où vous devez pouvoir fournir des paramètres,
+      comme les galeries, les formulaires et les listes.
+    </key>
+    <key alias="insertPageField">Valeur</key>
+    <key alias="insertPageFieldDesc">Affiche la valeur d'un des champs de la page en cours, avec des options pour modifier la valeur ou spécifier des valeurs alternatives.</key>
+    <key alias="insertPartialView">Vue partielle</key>
+    <key alias="insertPartialViewDesc">
+      Une vue partielle est un fichier modèle séparé qui peut être  à l'intérieur d'un aute modèle,
+      c'est génial pour réutiliser du markup ou pour séparer des modèles complexes en plusieurs fichiers.
+    </key>
+    <key alias="mastertemplate">Modèle de base</key>
+    <key alias="noMaster">Pas de modèle</key>
+    <key alias="renderBody">Afficher un modèle enfant</key>
+    <key alias="renderBodyDesc"><![CDATA[
+     Affiche le contenu d'un modèle enfant, en insérant un contenant
+     <code>@RenderBody()</code>.
+      ]]></key>
+    <key alias="defineSection">Définir une section nommée</key>
+    <key alias="defineSectionDesc"><![CDATA[
+         Définit une partie de votre modèle en tant que section nommée en l'entourant
+         de <code>@section { ... }</code>. Celle-ci peut être affichée dans une région
+          spécifique du parent de ce modèle, en utilisant <code>@RenderSection</code>.
+      ]]></key>
+    <key alias="renderSection">Afficher une section nommée</key>
+    <key alias="renderSectionDesc"><![CDATA[
+      Affiche une région nommée d'un modèle enfant, en insérant un contenant <code>@RenderSection(name)</code>.
+      Ceci affiche une région d'un modèle enfant qui est entourée d'une définition <code>@section [name]{ ... }</code> correspondante.
+      ]]></key>
+    <key alias="sectionName">Nom de la section</key>
+    <key alias="sectionMandatory">La section est obligatoire</key>
+    <key alias="sectionMandatoryDesc">
+      Si obligatoire, le modèle enfant doit contenir une définition <code>@section</code>, sinon une erreur est affichée.
+    </key>
+    <key alias="queryBuilder">Générateur de requêtes</key>
+    <key alias="itemsReturned">éléments trouvés, en</key>
+    <key alias="iWant">Je veux</key>
+    <key alias="allContent">tout le contenu</key>
+    <key alias="contentOfType">le contenu du type "%0%"</key>
+    <key alias="from">à partir de</key>
+    <key alias="websiteRoot">mon site web</key>
+    <key alias="where">où</key>
+    <key alias="and">et</key>
+    <key alias="is">est</key>
+    <key alias="isNot">n'est pas</key>
+    <key alias="before">avant</key>
+    <key alias="beforeIncDate">avant (incluant la date sélectionnée)</key>
+    <key alias="after">après</key>
+    <key alias="afterIncDate">après (incluant la date sélectionnée)</key>
+    <key alias="equals">égal</key>
+    <key alias="doesNotEqual">n'est pas égal</key>
+    <key alias="contains">contient</key>
+    <key alias="doesNotContain">ne contient pas</key>
+    <key alias="greaterThan">supérieur à</key>
+    <key alias="greaterThanEqual">supérieur ou égal à</key>
+    <key alias="lessThan">inférieur à</key>
+    <key alias="lessThanEqual">inférieur ou égal à</key>
+    <key alias="id">Id</key>
+    <key alias="name">Nom</key>
+    <key alias="createdDate">Date de Création</key>
+    <key alias="lastUpdatedDate">Date de Dernière Modification</key>
+    <key alias="orderBy">trier par</key>
+    <key alias="ascending">ascendant</key>
+    <key alias="descending">descendant</key>
+    <key alias="template">Modèle</key>
+  </area>
+  <area alias="grid">
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="insertControl">Choisissez le type de contenu</key>
+    <key alias="chooseLayout">Choisissez une mise en page</key>
+    <key alias="addRows">Ajouter une ligne</key>
+    <key alias="addElement">Ajouter du contenu</key>
+    <key alias="dropElement">Supprimer le contenu</key>
+    <key alias="settingsApplied">Paramètres appliqués</key>
+    <key alias="contentNotAllowed">Ce contenu n'est pas autorisé ici</key>
+    <key alias="contentAllowed">Ce contenu est autorisé ici</key>
+    <key alias="clickToEmbed">Cliquez pour intégrer</key>
+    <key alias="clickToInsertImage">Cliquez pour insérer une image</key>
+    <key alias="placeholderImageCaption">Légende de l'image...</key>
+    <key alias="placeholderWriteHere">Ecrivez ici...</key>
+    <key alias="gridLayouts">Mises en pages de la Grid</key>
+    <key alias="gridLayoutsDetail">Les mises en pages représentent la surface de travail globale pour l'éditeur de grille, en général, vous n'avez seulement besoin que d'une ou deux mises en pages différentes</key>
+    <key alias="addGridLayout">Ajouter une mise en page de grille</key>
+    <key alias="addGridLayoutDetail">Ajustez la mise en page en définissant la largeur des colonnes et en ajoutant des sections supplémentaires</key>
+    <key alias="rowConfigurations">Configurations des rangées</key>
+    <key alias="rowConfigurationsDetail">Les rangées sont des cellules prédéfinies disposées horizontalement</key>
+    <key alias="addRowConfiguration">Ajouter une configuration de rangée</key>
+    <key alias="addRowConfigurationDetail">Ajustez la rangée en réglant la largeur des cellules et en ajoutant des cellules supplémentaires</key>
+    <key alias="columns">Colonnes</key>
+    <key alias="columnsDetails">Nombre total combiné de colonnes dans la configuration de la grille</key>
+    <key alias="settings">Paramètres</key>
+    <key alias="settingsDetails">Configurez les paramètres qui peuvent être modifiés par les éditeurs</key>
+    <key alias="styles">Styles</key>
+    <key alias="stylesDetails">Configurez les effets de style qui peuvent être modifiés par les éditeurs</key>
+    <key alias="allowAllEditors">Autoriser tous les éditeurs</key>
+    <key alias="allowAllRowConfigurations">Autoriser toutes les configurations de rangées</key>
+    <key alias="maxItems">Eléments maximum</key>
+    <key alias="maxItemsDescription">Laisser vide ou mettre à 0 pour un nombre illimté</key>
+    <key alias="setAsDefault">Configurer comme défaut</key>
+    <key alias="chooseExtra">Choisir en plus</key>
+    <key alias="chooseDefault">Choisir le défaut</key>
+    <key alias="areAdded">ont été ajoutés</key>
+  </area>
+  <area alias="contentTypeEditor">
+    <key alias="compositions">Compositions</key>
+    <key alias="noGroups">Vous n'avez pas ajouté d'onglet</key>
+    <key alias="inheritedFrom">Hérité de</key>
+    <key alias="addProperty">Ajouter une propriété</key>
+    <key alias="requiredLabel">Label requis</key>
+    <key alias="enableListViewHeading">Activer la vue en liste</key>
+    <key alias="enableListViewDescription">Configure l'élément de contenu de manière à afficher ses éléments enfants sous forme d'une liste que l'on peut trier et filtrer, les enfants ne seront pas affichés dans l'arborescence</key>
+    <key alias="allowedTemplatesHeading">Modèles autorisés</key>
+    <key alias="allowedTemplatesDescription">Sélectionnez les modèles que les éditeurs sont autorisés à utiliser pour du contenu de ce type.</key>
+    <key alias="allowAsRootHeading">Autorisé comme racine</key>
+    <key alias="allowAsRootDescription">Autorisez les éditeurs à créer du contenu de ce type à la racine de l'arborescence de contenu.</key>
+    <key alias="childNodesHeading">Types de noeuds enfants autorisés</key>
+    <key alias="childNodesDescription">Autorisez la création de contenu des types spécifiés sous le contenu de ce type-ci</key>
+    <key alias="chooseChildNode">Choisissez les noeuds enfants</key>
+    <key alias="compositionsDescription">Hériter des onglets et propriétés d'un type de document existant. De nouveaux onglets seront ajoutés au type de document actuel, ou fusionnés s'il existe un onglet avec un nom sililaire.</key>
+    <key alias="compositionInUse">Ce type de contenu est utilisé dans une composition, et ne peut donc pas être lui-même un composé.</key>
+    <key alias="noAvailableCompositions">Il n'y a pas de type de contenu disponible à utiliser dans une composition.</key>
+    <key alias="availableEditors">Editeurs disponibles</key>
+    <key alias="reuse">Réutiliser</key>
+    <key alias="editorSettings">Configuration de l'éditeur</key>
+    <key alias="configuration">Configuration</key>
+    <key alias="yesDelete">Oui, supprimer</key>
+    <key alias="movedUnderneath">a été déplacé en-dessous</key>
+    <key alias="copiedUnderneath">a été copié en-dessous</key>
+    <key alias="folderToMove">Sélectionnez le répertoire à déplacer</key>
+    <key alias="folderToCopy">Sélectionnez le répertoire à copier</key>
+    <key alias="structureBelow">dans l'arborescence ci-dessous</key>
+    <key alias="allDocumentTypes">Tous les types de document</key>
+    <key alias="allDocuments">Tous les documents</key>
+    <key alias="allMediaItems">Tous les éléments media</key>
+    <key alias="usingThisDocument">utilisant ce type de document seront supprimés définitivement, veuillez confirmer que vous souhaitez les supprimer également.</key>
+    <key alias="usingThisMedia">utilisant ce type de media seront supprimés définitivement, veuillez confirmer que vous souhaitez les supprimer également.</key>
+    <key alias="usingThisMember">utilisant ce type de membre seront supprimés définitivement, veuillez confirmer que vous souhaitez les supprimer également</key>
+    <key alias="andAllDocuments">et tous les documents utilisant ce type</key>
+    <key alias="andAllMediaItems">et tous les éléments media utilisant ce type</key>
+    <key alias="andAllMembers">et tous les membres utilisant ce type</key>
+    <key alias="memberCanEdit">Le membre peut éditer</key>
+    <key alias="memberCanEditDescription">Autoriser la modification de la valeur de cette propriété par le membre à partir de sa page de profil</key>
+    <key alias="isSensitiveData">Est une donnée sensible</key>
+    <key alias="isSensitiveDataDescription">Cacher cette propriété aux éditeurs de contenu qui n'ont pas accès à la visualisation des données sensibles</key>
+    <key alias="showOnMemberProfile">Afficher dans le profil du membre</key>
+    <key alias="showOnMemberProfileDescription">Permettre d'afficher la valeur de cette propriété sur la page de profil du membre</key>
+    <key alias="tabHasNoSortOrder">l'onglet n'a pas d'ordre de tri</key>
+    <key alias="compositionUsageHeading">Où cette composition est-elle utilisée?</key>
+    <key alias="compositionUsageSpecification">Cette composition est actuellement utilisée dans la composition des types de contenu suivants :</key>
+  </area>
+  <area alias="modelsBuilder">
+    <key alias="buildingModels">Fabrication des modèles</key>
+    <key alias="waitingMessage">ceci peut prendre un peu de temps, ne vous inquiétez pas</key>
+    <key alias="modelsGenerated">Modèles générés</key>
+    <key alias="modelsGeneratedError">Les modèles n'ont pas pu être générés</key>
+    <key alias="modelsExceptionInUlog">La génération des modèles a échoué, voyez les exceptions dans les U log</key>
+  </area>
+  <area alias="templateEditor">
+    <key alias="addFallbackField">Ajouter un champ de rechange</key>
+    <key alias="fallbackField">Champ de rechange</key>
+    <key alias="addDefaultValue">Ajouter une valeur par défaut</key>
+    <key alias="defaultValue">Valeur par défaut</key>
+    <key alias="alternativeField">Champ alternatif</key>
+    <key alias="alternativeText">Texte alternatif</key>
+    <key alias="casing">Casse</key>
+    <key alias="encoding">Encodage</key>
+    <key alias="chooseField">Choisir un champ</key>
+    <key alias="convertLineBreaks">Convertir les sauts de ligne</key>
+    <key alias="convertLineBreaksDescription">Oui, convertir les sauts de ligne</key>
+    <key alias="convertLineBreaksHelp">Remplace les sauts de ligne avec des balises &amp;lt;br&amp;gt;</key>
+    <key alias="customFields">Champs particuliers</key>
+    <key alias="dateOnly">Oui, la date seulement</key>
+    <key alias="formatAndEncoding">Format et encodage</key>
+    <key alias="formatAsDate">Formater comme une date</key>
+    <key alias="formatAsDateDescr">Formate la valeur comme une date, ou une date avec l'heure, en fonction de la culture active</key>
+    <key alias="htmlEncode">Encoder en HTML</key>
+    <key alias="htmlEncodeHelp">Remplacera les caractères spéciaux par leur équivalent HTML.</key>
+    <key alias="insertedAfter">Sera inséré après la valeur du champ</key>
+    <key alias="insertedBefore">Sera inséré avant la valeur du champ</key>
+    <key alias="lowercase">Minuscules</key>
+    <key alias="modifyOutput">Modifier le résultat</key>
+    <key alias="none">Aucun</key>
+    <key alias="outputSample">Example de résultat</key>
+    <key alias="postContent">Insérer après le champ</key>
+    <key alias="preContent">Insérer avant le champ</key>
+    <key alias="recursive">Récursif</key>
+    <key alias="recursiveDescr">Oui, rendre récursif</key>
+    <key alias="separator">Séparateur</key>
+    <key alias="standardFields">Champs standards</key>
+    <key alias="uppercase">Majuscules</key>
+    <key alias="urlEncode">Encode pour URL</key>
+    <key alias="urlEncodeHelp">Formatera les caractères spéciaux de manière à ce qu'ils soient reconnus dans une URL</key>
+    <key alias="usedIfAllEmpty">Sera seulement utilisé si toutes les valeurs des champs ci-dessus sont vides</key>
+    <key alias="usedIfEmpty">Ce champ sera utilisé seulement si le champ initial est vide</key>
+    <key alias="withTime">Oui, avec l'heure. Séparateur: </key>
+  </area>
+  <area alias="translation">
+    <key alias="details">Détails</key>
+    <key alias="DownloadXmlDTD">Télécharger la DTD XML</key>
+    <key alias="fields">Champs</key>
+    <key alias="includeSubpages">Inclure les pages enfants</key>
+    <key alias="mailBody"><![CDATA[
+      Hello %0%
+
+      Ceci est un mail automatique pour vous informer que le document '%1%'
+      a été envoyé pour traduction en '%5%' par %2%.
+
+      Allez sur http://%3%/translation/details.aspx?id=%4% pour l'éditer.
+
+      Ou connectez-vous à Umbraco pour obtenir une vue d'ensemble des tâches de traduction qui vous sont assignées
+      http://%3%
+
+      Bonne journée !
+
+      Avec les salutations du Robot Umbraco
+    ]]></key>
+    <key alias="noTranslators">Aucun utilisateur traducteur trouvé. Veuillez créer un utilisateur traducteur avant d'envoyer du contenu pour traduction</key>
+    <key alias="pageHasBeenSendToTranslation">La page '%0%' a été envoyée pour traduction</key>
+    <key alias="sendToTranslate">Envoyer la page '%0%' pour traduction</key>
+    <key alias="totalWords">Nombre total de mots</key>
+    <key alias="translateTo">Traduire en</key>
+    <key alias="translationDone">Traduction complétée.</key>
+    <key alias="translationDoneHelp">Vous pouvez prévisualiser les pages que vous avez traduites en cliquant ci-dessous. Si la page originale est trouvée, vous verrez une comparaison entre les deux pages.</key>
+    <key alias="translationFailed">Traduction échouée, il se pourrait que fichier XML soit corrompu</key>
+    <key alias="translationOptions">Options de traduction</key>
+    <key alias="translator">Traducteur</key>
+    <key alias="uploadTranslationXml">Uploader le fichier de traduction XML</key>
+  </area>
+  <area alias="treeHeaders">
+    <key alias="content">Contenu</key>
+    <key alias="contentBlueprints">Types de contenu</key>
+    <key alias="media">Media</key>
+    <key alias="cacheBrowser">Navigateur de cache</key>
+    <key alias="contentRecycleBin">Corbeille</key>
+    <key alias="createdPackages">Packages créés</key>
+    <key alias="dataTypes">Types de données</key>
+    <key alias="dictionary">Dictionnaire</key>
+    <key alias="installedPackages">Packages installés</key>
+    <key alias="installSkin">Installer une skin</key>
+    <key alias="installStarterKit">Installer un starter kit</key>
+    <key alias="languages">Langues</key>
+    <key alias="localPackage">Installer un package local</key>
+    <key alias="macros">Macros</key>
+    <key alias="mediaTypes">Types de média</key>
+    <key alias="member">Membres</key>
+    <key alias="memberGroups">Groupes de membres</key>
+    <key alias="memberRoles">Rôles</key>
+    <key alias="memberTypes">Types de membres</key>
+    <key alias="documentTypes">Types de documents</key>
+    <key alias="relationTypes">Types de relations</key>
+    <key alias="packager">Packages</key>
+    <key alias="packages">Packages</key>
+    <key alias="partialViews">Vues Partielles</key>
+    <key alias="partialViewMacros">Vues Partielles pour les Fichiers Macro</key>
+    <key alias="repositories">Installer depuis le repository</key>
+    <key alias="runway">Installer Runway</key>
+    <key alias="runwayModules">Modules Runway</key>
+    <key alias="scripting">Fichiers de script</key>
+    <key alias="scripts">Scripts</key>
+    <key alias="stylesheets">Feuilles de style</key>
+    <key alias="templates">Modèles</key>
+    <key alias="users">Utilisateurs</key>
+    <key alias="analytics">Analytique</key>
+  </area>
+  <area alias="update">
+    <key alias="updateAvailable">Nouvelle mise à jour disponible</key>
+    <key alias="updateDownloadText">%0% est disponible, cliquez ici pour télécharger</key>
+    <key alias="updateNoServer">Aucune connexion au serveur</key>
+    <key alias="updateNoServerError">Erreur lors de la recherche de mises à jour. Veuillez vérifier le stack trace pour obtenir plus d'informations sur l'erreur.</key>
+  </area>
+  <area alias="user">
+    <key alias="access">Accès</key>
+    <key alias="accessHelp">Sur base des groupes et des noeuds de départ, l'utilisateur a accès aux noeuds suivants</key>
+    <key alias="assignAccess">Donner accès</key>
+    <key alias="administrators">Administrateur</key>
+    <key alias="categoryField">Champ catégorie</key>
+    <key alias="createDate">Utilisateur créé</key>
+    <key alias="changePassword">Changer le mot de passe</key>
+    <key alias="changePhoto">Changer la photo</key>
+    <key alias="newPassword">Nouveau mot de passe</key>
+    <key alias="noLockouts">n'a pas été bloqué</key>
+    <key alias="noPasswordChange">Le mot de passe n'a pas été modifié</key>
+    <key alias="confirmNewPassword">Confirmez votre nouveau mot de passe</key>
+    <key alias="changePasswordDescription">Vous pouvez changer votre mot de passe d'accès au Back Office Umbraco en remplissant le formulaire ci-dessous puis en cliquant sur le bouton "Changer le mot de passe"</key>
+    <key alias="contentChannel">Canal de contenu</key>
+    <key alias="createAnotherUser">Créer un autre utilisateur</key>
+    <key alias="createUserHelp">Créer de nouveaux utilisateurs pour leur donner accès à Umbraco. Lors de la création d'un nouvel utilisateur, un mot de passe est généré que vous pouvez partager avec ce dernier.</key>
+    <key alias="descriptionField">Champ description</key>
+    <key alias="disabled">Désactiver l'utilisateur</key>
+    <key alias="documentType">Type de document</key>
+    <key alias="editors">Editeur</key>
+    <key alias="excerptField">Champ extrait</key>
+    <key alias="failedPasswordAttempts">Tentatives de connexion échouées</key>
+    <key alias="goToProfile">Voir le profil de l'utilisateur</key>
+    <key alias="groupsHelp">Ajouter des groupes pour donner les accès et permissions</key>
+    <key alias="inviteAnotherUser">Inviter un autre utilisateur</key>
+    <key alias="inviteUserHelp">Inviter de nouveaux utilisateurs pour leur donner accès à Umbraco. Un email d'invitation sera envoyé à chaque utilisateur avec des informations concernant la connexion à Umbraco.</key>
+    <key alias="language">Langue</key>
+    <key alias="languageHelp">Spécifiez la langue dans laquelle vous souhaitez voir les menus et dialogues</key>
+    <key alias="lastLockoutDate">Date du dernier bloquage</key>
+    <key alias="lastLogin">Dernière connexion</key>
+    <key alias="lastPasswordChangeDate">Dernière modification du mot de passe</key>
+    <key alias="loginname">Identifiant</key>
+    <key alias="mediastartnode">Noeud de départ dans la librarie de média</key>
+    <key alias="mediastartnodehelp">Limiter la librairie média à un noeud de départ spécifique</key>
+    <key alias="mediastartnodes">Noeuds de départ dans la librairie de média</key>
+    <key alias="mediastartnodeshelp">Limiter la librairie média à des noeuds de départ spécifique</key>
+    <key alias="modules">Sections</key>
+    <key alias="noConsole">Désactiver l'accès Umbraco</key>
+    <key alias="noLogin">ne s'est pas encore connecté</key>
+    <key alias="oldPassword">Ancien mot de passe</key>
+    <key alias="password">Mot de passe</key>
+    <key alias="resetPassword">Réinitialiser le mot de passe</key>
+    <key alias="passwordChanged">Votre mot de passe a été modifié!</key>
+    <key alias="passwordConfirm">Veuillez confirmer votre nouveau mot de passe</key>
+    <key alias="passwordEnterNew">Introduisez votre nouveau mot de passe</key>
+    <key alias="passwordIsBlank">Votre nouveau mot de passe ne peut être vide !</key>
+    <key alias="passwordCurrent">Mot de passe actuel</key>
+    <key alias="passwordInvalid">Mot de passe actuel invalide</key>
+    <key alias="passwordIsDifferent">Il y a une différence entre le nouveau mot de passe et le mot de passe confirmé. Veuillez réessayer.</key>
+    <key alias="passwordMismatch">Le mot de passe confirmé ne correspond pas au nouveau mot de passe saisi!</key>
+    <key alias="permissionReplaceChildren">Remplacer les permissions sur les noeuds enfants</key>
+    <key alias="permissionSelectedPages">Vous êtes en train de modifiez les permissions pour les pages :</key>
+    <key alias="permissionSelectPages">Choisissez les pages dont les permissions doivent être modifiées</key>
+    <key alias="removePhoto">Supprimer la photo</key>
+    <key alias="permissionsDefault">Permissions par défaut</key>
+    <key alias="permissionsGranular">Permissions granulaires</key>
+    <key alias="permissionsGranularHelp">Définir les permissions sur des noeuds spécifiques</key>
+    <key alias="profile">Profil</key>
+    <key alias="searchAllChildren">Rechercher tous les enfants</key>
+    <key alias="sectionsHelp">Ajouter les sections auxquelles les utilisateurs peuvent accéder</key>
+    <key alias="selectUserGroups">Sélectionner les groupes d'utilisateurs</key>
+    <key alias="noStartNode">Aucun noeud de départ sélectionné</key>
+    <key alias="noStartNodes">Aucun noeud de départ sélectionné</key>
+    <key alias="startnode">Noeud de départ du contenu</key>
+    <key alias="startnodehelp">Limiter l'arborescence de contenu à un noeud de départ spécifique</key>
+    <key alias="startnodes">Noeuds de départ du contenu</key>
+    <key alias="startnodeshelp">Limiter l'arborescence de contenu à des noeuds de départ spécifiques</key>
+    <key alias="updateDate">Dernière mise à jour de l'utilisateur</key>
+    <key alias="userCreated">a été créé</key>
+    <key alias="userCreatedSuccessHelp">Le nouvel utilisateur a été créé avec succès. Utilisez le mot de passe ci-dessous pour la connexion à Umbraco.</key>
+    <key alias="userManagement">Gestion des utilisateurs</key>
+    <key alias="username">Nom d'utilisateur</key>
+    <key alias="userPermissions">Permissions de l'utilisateur</key>
+    <key alias="usergroup">Groupe d'utilisateurs</key>
+    <key alias="userInvited">a été invité</key>
+    <key alias="userInvitedSuccessHelp">Une invitation a été envoyée au nouvel utilisateur avec les détails concernant la connexion à Umbraco.</key>
+    <key alias="userinviteWelcomeMessage">Bien le bonjour et bienvenue dans Umbraco! Vous serez prêt.e dans moins d'1 minute, vous devez encore simplement configurer votre mot de passe et ajouter une photo pour votre avatar.</key>
+    <key alias="userinviteAvatarMessage">Chargez une photo afin que les autres utilisateurs puissent vous reconnaître facilement.</key>
+    <key alias="writer">Rédacteur</key>
+    <key alias="change">Modifier</key>
+    <key alias="yourProfile" version="7.0">Votre profil</key>
+    <key alias="yourHistory" version="7.0">Votre historique récent</key>
+    <key alias="sessionExpires" version="7.0">La session expire dans</key>
+    <key alias="inviteUser">Inviter un utilisateur</key>
+    <key alias="createUser">Créer un utilisateur</key>
+    <key alias="sendInvite">Envoyer l'invitation</key>
+    <key alias="backToUsers">Retour aux utilisateurs</key>
+    <key alias="inviteEmailCopySubject">Umbraco: Invitation</key>
+    <key alias="inviteEmailCopyFormat"><![CDATA[
+        <html>
+			<head>
+				<meta name='viewport' content='width=device-width'>
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+			</head>
+			<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
+				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
+				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+					<tr>
+						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
+							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+								<tr>
+									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
+										<div> </div>
+										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+									</td>
+									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+					<tr>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+								<br>
+								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+									<tr>
+										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+												<tr>
+													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+															Salut %0%,
+														</h1>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Vous avez été invité.e par <a href="mailto:%4%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> à accéder au Umbraco Back Office.
+														</p>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Message de <a href="mailto:%1%" style="text-decoration: none; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a>:
+															<br/>
+															<em>%2%</em>
+														</p>
+														<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
+															<tbody>
+																<tr>
+																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
+																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+																			<tbody>
+																				<tr>
+																					<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+																						<a href='%3%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																							Cliquez sur ce lien pour accepter l'invitation
+																						</a>
+																					</td>
+																				</tr>
+																			</tbody>
+																		</table>
+																	</td>
+																</tr>
+															</tbody>
+														</table>
+														<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Si vous ne pouvez pas cliquer sur le lien, copiez cet URL dans votre navigateur :</p>
+															<table border='0' cellpadding='0' cellspacing='0'>
+																<tr>
+																	<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
+																		<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
+																			<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%3%'>%3%</a>
+																		</font>
+																	</td>
+																</tr>
+															</table>
+														</p>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+								<br><br><br>
+							</div>
+						</td>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+					</tr>
+				</table>
+			</body>
+    </html>]]></key>
+    <key alias="invite">Inviter</key>
+    <key alias="defaultInvitationMessage">Nouvel envoi de l'invitation en cours...</key>
+    <key alias="deleteUser">Supprimer l'Utilisateur</key>
+    <key alias="deleteUserConfirmation">Etes-vous certain(e) de vouloir supprimer le compte de cet utilisateur?</key>
+  </area>
+  <area alias="validation">
+    <key alias="validation">Validation</key>
+    <key alias="validateAsEmail">Valider comme email</key>
+    <key alias="validateAsNumber">Valider comme nombre</key>
+    <key alias="validateAsUrl">Valider comme Url</key>
+    <key alias="enterCustomValidation">...ou introduisez une validation spécifique</key>
+    <key alias="fieldIsMandatory">Champ obligatoire</key>
+    <key alias="validationRegExp">Introduisez une expression régulière</key>
+    <key alias="minCount">Vous devez ajouter au moins</key>
+    <key alias="maxCount">Vous ne pouvez avoir que</key>
+    <key alias="items">éléments</key>
+    <key alias="itemsSelected">éléments sélectionnés</key>
+    <key alias="invalidDate">Date non valide</key>
+    <key alias="invalidNumber">Pas un nombre</key>
+    <key alias="invalidEmail">Email non valide</key>
+  </area>
+  <area alias="healthcheck">
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+		   2: XPath
+		   3: Configuration file path
+	  -->
+    <key alias="checkSuccessMessage">La valeur est égale à la valeur recommandée : '%0%'.</key>
+    <key alias="rectifySuccessMessage">La valeur du XPath '%2%' a été fixée à '%1%' dans le fichier de configuration '%3%'.</key>
+    <key alias="checkErrorMessageDifferentExpectedValue">La valeur attendue pour '%2%' dans le fichier de configuration '%3%' est '%1%', mais la valeur trouvée est '%0%'.</key>
+    <key alias="checkErrorMessageUnexpectedValue">La valeur inattendue '%0%' a été trouvée pour '%2%' dans le fichier de configuration '%3%'.</key>
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+	  -->
+    <key alias="customErrorsCheckSuccessMessage">Custom errors est fixé à la valeur '%0%'.</key>
+    <key alias="customErrorsCheckErrorMessage">Custom errors est pour la moment fixé à la valeur '%0%'. Il est recommandé de le fixer la valeur à '%1%' avant la mise en ligne.</key>
+    <key alias="customErrorsCheckRectifySuccessMessage">Custom errors a été rectifié avec succès à la valeur '%0%'.</key>
+    <key alias="macroErrorModeCheckSuccessMessage">MacroErrors est fixé à la valeur '%0%'.</key>
+    <key alias="macroErrorModeCheckErrorMessage">MacroErrors est fixé à la valeur '%0%', ce qui empêchera certaines ou même toutes les pages de votre site de se charger complètement en cas d'erreur dans les macros. La rectification de ceci fixera la valeur à '%1%'.</key>
+    <key alias="macroErrorModeCheckRectifySuccessMessage">MacroErrors est maintenant fixé à la valeur '%0%'.</key>
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+		   2: Server version
+	  -->
+    <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Try Skip IIS Custom Errors est fixé à la valeur '%0%' et vous utilisez IIS version '%1%'.</key>
+    <key alias="trySkipIisCustomErrorsCheckErrorMessage">Try Skip IIS Custom Errors est actuellement fixé à '%0%'. Il est recommandé de fixer la valeur à '%1%' pour votre version IIS (%2%).</key>
+    <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Try Skip IIS Custom Errors a été rectifié avec succès à la valeur '%0%'.</key>
+    <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
+    <key alias="configurationServiceFileNotFound">Le fichier n'existe pas : '%0%'.</key>
+    <key alias="configurationServiceNodeNotFound"><![CDATA[Impossible de trouver <strong>'%0%'</strong> dans le fichier config <strong>'%1%'</strong>.]]></key>
+    <key alias="configurationServiceError">Une erreur est survenue, consultez le log pour voir l'erreur complète : %0%.</key>
+    <key alias="databaseSchemaValidationCheckDatabaseOk">Base de données - Le schéma de la base de données est correct pour cette version de Umbraco</key>
+    <key alias="databaseSchemaValidationCheckDatabaseErrors">%0% problèmes ont été détectés avec le schéma de votre base de données (Voyez le fichier log pour les détails)</key>
+    <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Des erreurs ont été détectées lors de la validation du schéma de la base de données par rapport à la version actuelle de Umbraco.</key>
+    <key alias="httpsCheckValidCertificate">Le certificat de votre site a été marqué comme valide.</key>
+    <key alias="httpsCheckInvalidCertificate">Erreur de validation du certificat : '%0%'</key>
+    <key alias="httpsCheckExpiredCertificate">Le certificat SSL de votre site web a expiré.</key>
+    <key alias="httpsCheckExpiringCertificate">Le certificat SSL de votre site web va expirer dans %0% jours.</key>
+    <key alias="healthCheckInvalidUrl">Erreur en essayant de contacter l'URL %0% - '%1%'</key>
+    <key alias="httpsCheckIsCurrentSchemeHttps">Vous êtes actuellement %0% à voir le site via le schéma HTTPS.</key>
+    <key alias="httpsCheckConfigurationRectifyNotPossible">La valeur appSetting 'Umbraco.Core.UseHttps' est fixée à 'false' dans votre fichier web.config. Une fois que vous donnerez accès à ce site en utilisant le schéma HTTPS, cette valeur devra être mise à 'true'.</key>
+    <key alias="httpsCheckConfigurationCheckResult">La valeur appSetting 'Umbraco.Core.UseHttps' est fixée à '%0%' dans votre fichier web.config, vos cookies sont %1% marqués comme étant sécurisés.</key>
+    <key alias="httpsCheckEnableHttpsError">Impossible de mettre à jour la configuration 'Umbraco.Core.UseHttps' dans votre fichier web.config. Erreur : %0%</key>
+    <!-- The following keys don't get tokens passed in -->
+    <key alias="httpsCheckEnableHttpsButton">Activer HTTPS</key>
+    <key alias="httpsCheckEnableHttpsDescription">Fixe la configuration 'umbracoSSL' à 'true' dans la section appSettings du fichier web.config.</key>
+    <key alias="httpsCheckEnableHttpsSuccess">La configuration appSetting 'Umbraco.Core.UseHttps' est maintenant fixée à 'true' dans votre fichier web.config, vos cookies seront marqués comme étant sécurisés.</key>
+    <key alias="rectifyButton">Corriger</key>
+    <key alias="cannotRectifyShouldNotEqual">Impossible de corriger une vérification avec un type de comparaison 'ShouldNotEqual'.</key>
+    <key alias="cannotRectifyShouldEqualWithValue">Impossible de corriger une vérification avec un type de comparaison 'ShouldEqual' avec une valeur spécifiée.</key>
+    <key alias="valueToRectifyNotProvided">La valeur de correction n'est pas fournie.</key>
+    <key alias="compilationDebugCheckSuccessMessage">Le mode de compilation Debug est désactivé.</key>
+    <key alias="compilationDebugCheckErrorMessage">Le mode de compilation Debug est actuellement activé. Il est recommandé de désactiver ce paramètre avant la mise en ligne.</key>
+    <key alias="compilationDebugCheckRectifySuccessMessage">Le mode de compilation Debug a été désactivé avec succès.</key>
+    <key alias="traceModeCheckSuccessMessage">Le mode tracing est désactivé.</key>
+    <key alias="traceModeCheckErrorMessage">Le mode tracing est actuellement activé. Il est recommandé de désactiver cette configuration avant la mise en ligne.</key>
+    <key alias="traceModeCheckRectifySuccessMessage">Le mode tracing a été désactivé avec succès.</key>
+    <key alias="folderPermissionsCheckMessage">Tous les répertoires ont les configurations de permissions adéquates.</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Comma delimitted list of failed folder paths
+  	-->
+    <key alias="requiredFolderPermissionFailed"><![CDATA[Les répertoires suivants doivent être configurés avec les permissions "modifier" mais n'ont pas pu être accédés : <strong>%0%</strong>.]]></key>
+    <key alias="optionalFolderPermissionFailed"><![CDATA[Les répertoires suivants doivent être configurés avec les permissions "modifier" afin que certaines opérations Umbraco puissent fonctionner correctement, mais ils n'ont pas pu être accédés : <strong>%0%</strong>. Aucune action n'est requise s'il n'y a pas de nécessité d'y écrire.]]></key>
+    <key alias="filePermissionsCheckMessage">Tous les fichiers ont les configurations de permissions adéquates.</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Comma delimitted list of failed folder paths
+  	-->
+    <key alias="requiredFilePermissionFailed"><![CDATA[Les fichiers suivants doivent être configurés avec des permissions d'écriture mais n'ont pas pu être accédés : <strong>%0%</strong>.]]></key>
+    <key alias="optionalFilePermissionFailed"><![CDATA[Les fichiers suivants doivent être configurés avec des permissions d'écriture afin que certaines opérations Umbraco puissent fonctionner correctement, mais ils n'ont pas pu être accédés : <strong>%0%</strong>. Aucune action n'est requise s'il n'y a pas de nécessité d'y écrire.]]></key>
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[Le header ou meta-tag <strong>X-Frame-Options</strong>, utilisé pour contrôler si un site peut être intégré dans un autre via IFRAME, a été trouvé.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Le header ou meta-tag <strong>X-Frame-Options</strong> , utilisé pour contrôler si un site peut être intégré dans un autre via IFRAME, n'a pas été trouvé.]]></key>
+    <key alias="setHeaderInConfig">Configurez le Header dans le fichier Config</key>
+    <key alias="clickJackingSetHeaderInConfigDescription">Ajoute une valeur dans la section httpProtocol/customHeaders du fichier web.config afin d'éviter que le site ne soit intégré dans d'autres sites via IFRAME.</key>
+    <key alias="clickJackingSetHeaderInConfigSuccess">Une configuration générant un header qui empêche l'intégration du site par d'autres sites via IFRAME a été ajoutée à votre fichier web.config.</key>
+    <key alias="setHeaderInConfigError">Impossible de modifier le fichier web.config. Erreur : %0%</key>
+    <key alias="noSniffCheckHeaderFound"><![CDATA[L'en-tête ou le meta-tag <strong>X-Content-Type-Options</strong> utilisé pour la protection contre les vulnérabilités de MIME sniffing a été trouvé.]]></key>
+    <key alias="noSniffCheckHeaderNotFound"><![CDATA[L'en-tête ou le meta-tag <strong>X-Content-Type-Options</strong> utilisé pour la protection contre les vulnérabilités de MIME sniffing n'a pas été trouvé.]]></key>
+    <key alias="noSniffSetHeaderInConfigDescription">Ajoute une valeur dans la section httpProtocol/customHeaders du fichier web.config pour protéger contre les vulnérabilités de MIME sniffing.</key>
+    <key alias="noSniffSetHeaderInConfigSuccess">Une configuration a été ajoutée dans votre fichier web.config pour créer un header protégeant contre les vulnérabilités de MIME sniffing.</key>
+    <key alias="hSTSCheckHeaderFound"><![CDATA[L'en-tête <strong>Strict-Transport-Security</strong>, aussi connu sous le nom de HSTS-header, a été trouvé.]]></key>
+    <key alias="hSTSCheckHeaderNotFound"><![CDATA[L'en-tête <strong>Strict-Transport-Security</strong>, aussi connu sous le nom de HSTS-header, n'a pas été trouvé.]]></key>
+    <key alias="hSTSSetHeaderInConfigDescription">Ajoute l'en-tête 'Strict-Transport-Security' avec la valeur 'max-age=10886400' à la section httpProtocol/customHeaders du fichier web.config. Utilisez cette correction uniquement si vos domaines vont fonctionner en https pour les 18 prochaines semaines (minimum).</key>
+    <key alias="hSTSSetHeaderInConfigSuccess">L'en-tête HSTS a été ajouté dans votre fichier web.config.</key>
+    <key alias="xssProtectionCheckHeaderFound"><![CDATA[L'en-tête <strong>X-XSS-Protection</strong> a été trouvé.]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[L'en-tête <strong>X-XSS-Protection</strong> n'a pas été trouvé.]]></key>
+    <key alias="xssProtectionSetHeaderInConfigDescription">Ajoute l'en-tête 'X-XSS-Protection' avec la valeur '1; mode=block' à la section httpProtocol/customHeaders du fichier web.config. </key>
+    <key alias="xssProtectionSetHeaderInConfigSuccess">L'en-tête X-XSS-Protection a été ajouté dans votre fichier web.config.</key>
+    <!-- The following key get these tokens passed in:
+	    0: Comma delimitted list of headers found
+  	-->
+    <key alias="excessiveHeadersFound"><![CDATA[Les headers suivants révélant des informations à propos de la technologie du site web ont été trouvés  : <strong>%0%</strong>.]]></key>
+    <key alias="excessiveHeadersNotFound">Aucun header révélant des informations à propos de la technologie du site web n'a été trouvé.</key>
+    <key alias="smtpMailSettingsNotFound">La section system.net/mailsettings n'a pas pu être trouvée dans le fichier Web.config.</key>
+    <key alias="smtpMailSettingsHostNotConfigured">Dans la section system.net/mailsettings du fichier Web.config, le "host" n'est pas configuré.</key>
+    <key alias="smtpMailSettingsConnectionSuccess">La configuration SMTP est correcte et le service fonctionne comme prévu.</key>
+    <key alias="smtpMailSettingsConnectionFail">Le serveur SMTP configuré avec le host '%0%' et le port '%1%' n'a pas pu être contacté. Veuillez vérifier et vous assurer que la configuration SMTP est correcte dans la section system.net/mailsettings du fichier Web.config.</key>
+    <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Un email de notification a été envoyé à <strong>%0%</strong>.]]></key>
+    <key alias="notificationEmailsCheckErrorMessage"><![CDATA[L'adresse email de notification est toujours à sa valeur par défaut : <strong>%0%</strong>.]]></key>
+    <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Les résultats de l'exécution du Umbraco Health Checks planifiée le %0% à %1% sont les suivants :</p>%2%</body></html>]]></key>
+    <key alias="scheduledHealthCheckEmailSubject">Statut du Umbraco Health Check: %0%</key>
+  </area>
+  <area alias="redirectUrls">
+    <key alias="disableUrlTracker">Désactiver URL tracker</key>
+    <key alias="enableUrlTracker">Activer URL tracker</key>
+    <key alias="originalUrl">URL original</key>
+    <key alias="redirectedTo">Redirigé Vers</key>
+    <key alias="noRedirects">Aucune redirection n'a été créée</key>
+    <key alias="noRedirectsDescription">Lorsqu'une page publiée est renommée ou déplacée, une redirection sera automatiquement créée vers la nouvelle page.</key>
+    <key alias="confirmRemove">Etes-vous certain(e) de vouloir supprimer la redirection de '%0%' vers '%1%'?</key>
+    <key alias="redirectRemoved">Redirection d'URL supprimée.</key>
+    <key alias="redirectRemoveError">Erreur lors de la suppression de la redirection d'URL.</key>
+    <key alias="confirmDisable">Etes-vous certain(e) de vouloir désactiver le URL tracker?</key>
+    <key alias="disabledConfirm">URL tracker est maintenant désactivé.</key>
+    <key alias="disableError">Erreur lors de la désactivation de l'URL tracker, plus d'information disponible dans votre fichier log.</key>
+    <key alias="enabledConfirm">URL tracker est maintenant activé.</key>
+    <key alias="enableError">Erreur lors de l'activation de l'URL tracker, plus d'information disponible dans votre fichier log.</key>
+  </area>
+  <area alias="emptyStates">
+    <key alias="emptyDictionaryTree">Pas d'élément de dictionaire à choisir</key>
+  </area>
+  <area alias="textbox">
+    <key alias="characters_left">caractères restant</key>
+  </area>
+</language>
