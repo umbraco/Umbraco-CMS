@@ -1,4 +1,5 @@
 ﻿[
+    
     'lib/jquery/jquery.min.js',
     'lib/jquery-ui/jquery-ui.min.js',
     'lib/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js',
@@ -25,7 +26,7 @@
     'lib/ng-file-upload/ng-file-upload.min.js',
     'lib/angular-local-storage/angular-local-storage.min.js',
 
-    'lib/chart.js/chart.min.js',
+    'lib/chart.js/Chart.min.js',
     'lib/angular-chart.js/angular-chart.min.js',
 
     'lib/umbraco/Extensions.js',

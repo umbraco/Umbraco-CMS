@@ -27,7 +27,7 @@ module.exports = function (config) {
             'node_modules/underscore/underscore-min.js',
             'node_modules/moment/min/moment-with-locales.js',
             'lib/umbraco/Extensions.js',
-            'node_modules/lazyload-js/lazyload.min.js',
+            'node_modules/lazyload-js/LazyLoad.min.js',
             'node_modules/angular-dynamic-locale/dist/tmhDynamicLocale.min.js',
 
             //app bootstrap and loader

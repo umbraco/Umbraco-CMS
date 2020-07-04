@@ -130,7 +130,7 @@ function dependencies() {
         },
         {
             "name": "chart.js",
-            "src":  ["./node_modules/chart.js/dist/chart.min.js"],
+            "src":  ["./node_modules/chart.js/dist/Chart.min.js"],
             "base": "./node_modules/chart.js/dist"
         },
         {
@@ -180,7 +180,7 @@ function dependencies() {
         },
         {
             "name": "lazyload-js",
-            "src":  ["./node_modules/lazyload-js/lazyload.min.js"],
+            "src":  ["./node_modules/lazyload-js/LazyLoad.min.js"],
             "base": "./node_modules/lazyload-js"
         },
         {
@@ -243,6 +243,7 @@ function dependencies() {
 
     // add streams for node modules
     nodeModules.forEach(module => {
+        debugger;
         var task = gulp.src(module.src, { base: module.base, allowEmpty: true });
         
         _.forEach(config.roots, function(root){
@@ -256,6 +257,7 @@ function dependencies() {
     var libTask = gulp.src(config.sources.globs.lib, { allowEmpty: true });
 
     _.forEach(config.roots, function(root){
+        debugger;
         libTask = libTask.pipe(gulp.dest(root + config.targets.lib))
     });
     

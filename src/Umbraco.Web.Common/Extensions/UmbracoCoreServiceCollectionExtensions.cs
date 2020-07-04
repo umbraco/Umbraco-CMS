@@ -138,9 +138,9 @@ namespace Umbraco.Extensions
             var umbContainer = UmbracoServiceProviderFactory.UmbracoContainer;
 
             var loggingConfig = new LoggingConfiguration(
-                Path.Combine(webHostEnvironment.ContentRootPath, "App_Data\\Logs"),
-                Path.Combine(webHostEnvironment.ContentRootPath, "config\\serilog.config"),
-                Path.Combine(webHostEnvironment.ContentRootPath, "config\\serilog.user.config"));
+                Path.Combine(webHostEnvironment.ContentRootPath, "App_Data", "Logs"),
+                Path.Combine(webHostEnvironment.ContentRootPath, "config", "serilog.config"),
+                Path.Combine(webHostEnvironment.ContentRootPath, "config", "serilog.user.config"));
 
             IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
             services.AddSingleton<IHttpContextAccessor>(httpContextAccessor);

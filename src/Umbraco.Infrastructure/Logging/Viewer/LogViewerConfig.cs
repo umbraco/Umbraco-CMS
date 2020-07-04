@@ -10,7 +10,7 @@ namespace Umbraco.Core.Logging.Viewer
     public class LogViewerConfig : ILogViewerConfig
     {
         private readonly IHostingEnvironment _hostingEnvironment;
-        private const string _pathToSearches = "~/Config/logviewer.searches.config.js";
+        private static readonly string _pathToSearches = Path.Combine(Constants.SystemDirectories.Config, "logviewer.searches.config.js");
         private readonly FileInfo _searchesConfig;
 
         public LogViewerConfig(IHostingEnvironment hostingEnvironment)
@@ -65,7 +65,7 @@ namespace Umbraco.Core.Logging.Viewer
             //Serialize to JSON string
             var rawJson = JsonConvert.SerializeObject(searches, Formatting.Indented);
 
-            //Write it back down to file            
+            //Write it back down to file
             System.IO.File.WriteAllText(_searchesConfig.FullName, rawJson);
 
             //Return the updated object - so we can instantly reset the entire array from the API response

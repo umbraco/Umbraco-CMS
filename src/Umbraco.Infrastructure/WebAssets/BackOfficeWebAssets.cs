@@ -107,7 +107,9 @@ namespace Umbraco.Web.WebAssets
         /// <returns></returns>
         private IEnumerable<string> GetInitBackOfficeScripts()
         {
-            var resources = JsonConvert.DeserializeObject<JArray>(Resources.JsInitialize);
+
+            var fileContent = Resources.JsInitialize;
+            var resources = JsonConvert.DeserializeObject<JArray>(fileContent);
             return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString());
         }
 

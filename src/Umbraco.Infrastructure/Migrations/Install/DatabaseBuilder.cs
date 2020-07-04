@@ -149,7 +149,7 @@ namespace Umbraco.Core.Migrations.Install
         {
             _configManipulator.SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
 
-            var path = _hostingEnvironment.MapPathContentRoot("App_Data\\Umbraco.sdf");
+            var path = _hostingEnvironment.MapPathContentRoot(Path.Combine("App_Data", "Umbraco.sdf"));
             if (File.Exists(path) == false)
             {
                 // this should probably be in a "using (new SqlCeEngine)" clause but not sure

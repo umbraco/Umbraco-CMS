@@ -100,9 +100,9 @@ namespace Umbraco.Core.Composing.CompositionExtensions
         {
             var hostingEnvironment = container.GetInstance<IHostingEnvironment>();
             var globalSettings = container.GetInstance<IGlobalSettings>();
-            var mainLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(globalSettings.UmbracoPath + "/config/lang/"));
+            var mainLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(Path.Combine(globalSettings.UmbracoPath , "config","lang")));
             var appPlugins = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.AppPlugins));
-            var configLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Config + "/lang/"));
+            var configLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.Config  ,"lang")));
 
             var pluginLangFolders = appPlugins.Exists == false
                 ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()
