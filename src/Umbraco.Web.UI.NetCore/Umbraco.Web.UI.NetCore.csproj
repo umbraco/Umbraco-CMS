@@ -28,11 +28,11 @@
 
     <ItemGroup>
         <None Remove="App_Data\**" />
-        <None Include="Config\tinyMceConfig.Release.config">
+        <None Include="config\tinyMceConfig.Release.config">
           <DependentUpon>tinyMceConfig.config</DependentUpon>
           <SubType>Designer</SubType>
         </None>
-        <None Include="Config\umbracoSettings.Release.config">
+        <None Include="config\umbracoSettings.Release.config">
           <DependentUpon>umbracoSettings.config</DependentUpon>
           <SubType>Designer</SubType>
         </None>
@@ -53,10 +53,10 @@
           <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
           <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>
-        <Content Update="Config\tinyMceConfig.config">
+        <Content Update="config\tinyMceConfig.config">
           <SubType>Designer</SubType>
         </Content>
-        <Content Update="Config\umbracoSettings.config">
+        <Content Update="config\umbracoSettings.config">
           <SubType>Designer</SubType>
         </Content>
         <Content Remove="wwwroot\Web.config" />
@@ -86,41 +86,37 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Remove="Config\serilog.Release.config" />
-      <Content Remove="Config\serilog.user.Release.config" />
+      <Content Remove="config\serilog.Release.config" />
+      <Content Remove="config\serilog.user.Release.config" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Config\logviewer.searches.config.js" />
+      <None Remove="config\logviewer.searches.config.js" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="Config\grid.editors.config.js" />
-      <Content Include="Config\logviewer.searches.config.js" />
+      <Content Include="config\grid.editors.config.js" />
+      <Content Include="config\logviewer.searches.config.js" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Include="Config\serilog.Release.config">
+      <None Include="config\serilog.Release.config">
         <SubType>Designer</SubType>
         <DependentUpon>serilog.config</DependentUpon>
       </None>
-      <None Include="Config\serilog.user.Release.config">
+      <None Include="config\serilog.user.Release.config">
         <SubType>Designer</SubType>
         <DependentUpon>serilog.user.config</DependentUpon>
       </None>
     </ItemGroup>
 
     <ItemGroup>
-      <Content Update="Config\serilog.config">
+      <Content Update="config\serilog.config">
         <SubType>Designer</SubType>
       </Content>
-      <Content Update="Config\serilog.user.config">
+      <Content Update="config\serilog.user.config">
         <SubType>Designer</SubType>
       </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-      <AdditionalFiles Include="Umbraco\PartialViewMacros\Templates\Empty.cshtml" />
     </ItemGroup>
 
     <ItemGroup>
