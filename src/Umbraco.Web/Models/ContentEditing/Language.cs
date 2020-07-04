@@ -15,7 +15,6 @@ namespace Umbraco.Web.Models.ContentEditing
         public string IsoCode { get; set; }
 
         [DataMember(Name = "name")]
-        [ReadOnly(true)]
         public string Name { get; set; }
 
         [DataMember(Name = "isDefault")]
