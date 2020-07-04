@@ -23,7 +23,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
                 .Build();
 
             // Assert
-            Assert.AreEqual(Path.Combine("css", "styles.css"), stylesheet.Path);
+            Assert.AreEqual(testPath, stylesheet.Path);
             Assert.AreEqual(testContent, stylesheet.Content);
         }
     }
