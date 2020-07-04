@@ -135,7 +135,7 @@ namespace Umbraco.Web.Editors
                 // create it (creating a new language cannot create a fallback cycle)
                 var newLang = new Core.Models.Language(culture.Name)
                 {
-                    CultureName = culture.DisplayName,
+                    CultureName = language.Name,
                     IsDefault = language.IsDefault,
                     IsMandatory = language.IsMandatory,
                     FallbackLanguageId = language.FallbackLanguageId
@@ -145,7 +145,8 @@ namespace Umbraco.Web.Editors
                 return Mapper.Map<Language>(newLang);
             }
 
-            existingById.IsMandatory = language.IsMandatory;
+            existingById.IsoCode = language.IsoCode;
+            existingById.CultureName = language.Name;
 
             // note that the service will prevent the default language from being "un-defaulted"
             // but does not hurt to test here - though the UI should prevent it too
@@ -156,8 +157,8 @@ namespace Umbraco.Web.Editors
             }
 
             existingById.IsDefault = language.IsDefault;
+            existingById.IsMandatory = language.IsMandatory;
             existingById.FallbackLanguageId = language.FallbackLanguageId;
-            existingById.IsoCode = language.IsoCode;
 
             // modifying an existing language can create a fallback, verify
             // note that the service will check again, dealing with race conditions
