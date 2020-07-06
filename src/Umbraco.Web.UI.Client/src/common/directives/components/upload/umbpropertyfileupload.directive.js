@@ -232,18 +232,20 @@
                 var isImage = mediaHelper.detectIfImageByExtension(files[i].name);
                 var extension = getExtension(files[i].name);
 
-                //save the file object to the files collection
-                vm.files.push({
+                var f = {
                     isImage: isImage,
                     extension: extension,
                     fileName: files[i].name,
                     isClientSide: true
-                });
+                };
+
+                // Save the file object to the files collection
+                vm.files.push(f);
 
                 //special check for a comma in the name
                 newVal += files[i].name.split(',').join('-') + ",";
 
-                if (isImage) {
+                if (isImage || extension === "svg") {
 
                     var deferred = $q.defer();
 
