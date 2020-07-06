@@ -88,6 +88,8 @@
             var scopeOfExistence = $scope;
             if(vm.umbVariantContentEditors && vm.umbVariantContentEditors.getScope) {
                 scopeOfExistence = vm.umbVariantContentEditors.getScope();
+            } else if(vm.umbElementEditorContent && vm.umbElementEditorContent.getScope) {
+                scopeOfExistence = vm.umbElementEditorContent.getScope();
             }
             
             // Create Model Object, to manage our data for this Block Editor.

@@ -153,10 +153,13 @@
          */
         function createDataModelWatcher(blockObject, prop)  {
             return function() {
-                // sync data:
-                prop.value = blockObject.data[prop.alias];
+                if (prop.value !== blockObject.data[prop.alias]) {
 
-                blockObject.updateLabel();
+                    // sync data:
+                    prop.value = blockObject.data[prop.alias];
+
+                    blockObject.updateLabel();
+                }
             }
         }
         /**
@@ -164,8 +167,10 @@
          */
         function createLayoutSettingsModelWatcher(blockObject, prop)  {
             return function() {
-                // sync data:
-                prop.value = blockObject.layout.settings[prop.alias];
+                if (prop.value !== blockObject.layout.settings[prop.alias]) {
+                    // sync data:
+                    prop.value = blockObject.layout.settings[prop.alias];
+                }
             }
         }
 
@@ -174,8 +179,10 @@
          */
         function createContentModelPropWatcher(blockObject, prop)  {
             return function() {
-                // sync data:
-                blockObject.data[prop.alias] = prop.value;
+                if (blockObject.data[prop.alias] !== prop.value) {
+                    // sync data:
+                    blockObject.data[prop.alias] = prop.value;
+                }
 
                 blockObject.updateLabel();
             }
@@ -186,8 +193,10 @@
          */
         function createSettingsModelPropWatcher(blockObject, prop)  {
             return function() {
-                // sync data:
-                blockObject.layout.settings[prop.alias] = prop.value;
+                if (blockObject.layout.settings[prop.alias] !== prop.value) {
+                    // sync data:
+                    blockObject.layout.settings[prop.alias] = prop.value;
+                }
             }
         }
 
@@ -291,7 +300,10 @@
 
                 scaffoldKeys.forEach((contentTypeKey => {
                     tasks.push(contentResource.getScaffoldByKey(-20, contentTypeKey).then(scaffold => {
-                        this.scaffolds.push(replaceUnsupportedProperties(scaffold));
+                        // this.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
+                        if (this.scaffolds) {
+                            this.scaffolds.push(replaceUnsupportedProperties(scaffold));
+                        }
                     }));
                 }));
 
@@ -423,9 +435,15 @@
                     blockObject.labelInterpolator = $interpolate(blockObject.config.label);
                 }
                 blockObject.__scope = this.isolatedScope;
-                blockObject.updateLabel = _.debounce(function () {this.__scope.$evalAsync(function() {
-                    this.label = getBlockLabel(this);
-                }.bind(this))}.bind(blockObject), 10);
+                blockObject.updateLabel = _.debounce(
+                    function () {
+                        // Check wether scope still exists, maybe object was destoyed in these seconds.
+                        if (this.__scope) {
+                            this.label = getBlockLabel(this);
+                            this.__scope.$evalAsync();
+                        }
+                    }.bind(blockObject)
+                , 10);
 
                 // make basics from scaffold
                 blockObject.content = Utilities.copy(contentScaffold);
@@ -487,8 +505,11 @@
                     delete this.__watchers;
 
                     // help carbage collector:
+                    delete this.config;
                     delete this.layout;
                     delete this.data;
+                    delete this.content;
+                    delete this.settings;
                     
                     // remove model from isolatedScope.
                     delete this.__scope.blockObjects["_" + this.key];
@@ -496,6 +517,9 @@
 
                     // removes this method, making it unposible to destroy again.
                     delete this.destroy;
+                    
+                    // lets remove the key to make things blow up if this is still referenced:
+                    delete this.key;
                 }
 
                 return blockObject;
@@ -511,8 +535,9 @@
              * @param {Object} blockObject The BlockObject to be removed and destroyed.
              */
             removeDataAndDestroyModel: function (blockObject) {
+                var udi = blockObject.content.udi;
                 this.destroyBlockObject(blockObject);
-                this.removeDataByUdi(blockObject.content.udi);
+                this.removeDataByUdi(udi);
             },
 
             /**
