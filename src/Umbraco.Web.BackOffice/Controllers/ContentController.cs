@@ -1733,7 +1733,7 @@ namespace Umbraco.Web.Editors
             {
                 try
                 {
-                    var uri = DomainUtilities.ParseUriFromDomainName(domain.Name, new Uri(Request.GetEncodedUrl(), UriKind.RelativeOrAbsolute));
+                    var uri = DomainUtilities.ParseUriFromDomainName(domain.Name, new Uri(Request.GetEncodedUrl()));
                 }
                 catch (UriFormatException)
                 {
