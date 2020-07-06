@@ -13,7 +13,6 @@ namespace Umbraco.Web.Common.Filters
     {
         public AngularJsonOnlyConfigurationAttribute() : base(typeof(AngularJsonOnlyConfigurationFilter))
         {
-            Order = -2400;
         }
 
         private class AngularJsonOnlyConfigurationFilter : IResultFilter

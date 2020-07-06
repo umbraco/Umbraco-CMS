@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
+    /// <summary>
+    /// Applying this attribute to any controller will ensure that the parameter name (prefix) is not part of the validation error keys.
+    /// </summary>
     public class PrefixlessBodyModelValidatorAttribute : TypeFilterAttribute
     {
         public PrefixlessBodyModelValidatorAttribute() : base(typeof(PrefixlessBodyModelValidatorFilter))

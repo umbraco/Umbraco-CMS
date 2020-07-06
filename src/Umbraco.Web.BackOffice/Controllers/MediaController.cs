@@ -215,7 +215,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        //[FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))] // TODO introduce when moved to .NET Core
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))]
         public IEnumerable<MediaItemDisplay> GetByIds([FromQuery]int[] ids)
         {
             var foundMedia = _mediaService.GetByIds(ids);
@@ -259,7 +259,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Returns the root media objects
         /// </summary>
-        //[FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>))] // TODO introduce when moved to .NET Core
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>))]
         public IEnumerable<ContentItemBasic<ContentPropertyBasic>> GetRootMedia()
         {
             // TODO: Add permissions check!

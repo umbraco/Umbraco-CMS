@@ -15,6 +15,12 @@ using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
+    /// <summary>
+    /// This method determine ambiguous controller actions by making a tryparse of the string (from request) into the type of the argument.
+    /// </summary>
+    /// <remarks>
+    /// By using this methods you are allowed to to have multiple controller actions named equally. E.g. GetById(Guid id), GetById(int id),...
+    /// </remarks>
     public class DetermineAmbiguousActionByPassingParameters : ActionMethodSelectorAttribute
     {
         private string _requestBody = null;

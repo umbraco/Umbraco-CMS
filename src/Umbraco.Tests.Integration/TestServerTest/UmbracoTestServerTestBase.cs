@@ -32,7 +32,16 @@ namespace Umbraco.Tests.Integration.TestServerTest
 
         }
 
+        /// <summary>
+        /// Get the service from the underlying container that is also used by the <see cref="Client"/>.
+        /// </summary>
         protected T GetRequiredService<T>() => Factory.Services.GetRequiredService<T>();
+
+        /// <summary>
+        /// Prepare a url before using <see cref="Client"/>.
+        /// This returns the url but also sets the HttpContext.request into to use this url.
+        /// </summary>
+        /// <returns>The string URL of the controller action.</returns>
         protected string PrepareUrl<T>(Expression<Func<T, object>> methodSelector)
             where T : UmbracoApiController
         {
