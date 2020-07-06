@@ -78,6 +78,8 @@
         /** Called when the component initializes */
         function onInit() {
             $scope.$on("filesSelected", onFilesSelected);
+            $scope.$on("isDragover", isDragover);
+
             initialize();
         }
 
@@ -293,6 +295,11 @@
             }
         }
 
+        function isDragover(e, args) {
+            vm.dragover = args.value;
+            angularHelper.safeApply($scope);
+        }
+
     };
 
     var umbPropertyFileUploadComponent = {
@@ -303,6 +310,7 @@
             propertyAlias: "@",
             value: "<",
             hideSelection: "<",
+            dragover: "<",
             /**
              * Called when a file is selected on this instance
              */
