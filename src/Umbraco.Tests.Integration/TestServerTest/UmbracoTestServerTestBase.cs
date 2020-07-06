@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
 
             if (Current.IsInitialized)
             {
-                typeof(Current).GetProperty(nameof(Current.IsInitialized), BindingFlags.Public | BindingFlags.Static).SetValue(null, false);
+                Current.IsInitialized = false;
             }
 
         }
