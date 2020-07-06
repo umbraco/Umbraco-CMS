@@ -116,9 +116,10 @@
                     var f = {
                         fileName: file,
                         isImage: mediaHelper.detectIfImageByExtension(file),
-                        extension: getExtension(file)
+                        extension: getExtension(file),
+                        fileSrc: getThumbnail(file)
                     };
-                    f.fileSrc = getThumbnail(f);
+
                     return f;
                 });
 
