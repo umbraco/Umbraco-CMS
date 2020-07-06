@@ -10,6 +10,7 @@ using Umbraco.Core.Persistence.FaultHandling;
 
 namespace Umbraco.Core.Persistence
 {
+
     /// <summary>
     /// Extends NPoco Database for Umbraco.
     /// </summary>
@@ -38,14 +39,10 @@ namespace Umbraco.Core.Persistence
             : base(connectionString, sqlContext.DatabaseType, provider, sqlContext.SqlSyntax.DefaultIsolationLevel)
         {
             SqlContext = sqlContext;
-
             _logger = logger;
             _connectionRetryPolicy = connectionRetryPolicy;
             _commandRetryPolicy = commandRetryPolicy;
-
-            EnableSqlTrace = EnableSqlTraceDefault;
-
-            NPocoDatabaseExtensions.ConfigureNPocoBulkExtensions();
+            Init();
         }
 
         /// <summary>
@@ -57,10 +54,17 @@ namespace Umbraco.Core.Persistence
         {
             SqlContext = sqlContext;
             _logger = logger;
+            Init();
+        }
 
+        private void Init()
+        {
             EnableSqlTrace = EnableSqlTraceDefault;
-
             NPocoDatabaseExtensions.ConfigureNPocoBulkExtensions();
+            if (SqlContext.DatabaseType == DatabaseType.SQLCe)
+            {
+                Mappers.Add(new SqlCeImageMapper());
+            }
         }
 
         #endregion
@@ -257,5 +261,6 @@ namespace Umbraco.Core.Persistence
         }
 
         #endregion
+
     }
 }
