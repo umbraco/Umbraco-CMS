@@ -573,6 +573,16 @@ namespace Umbraco.Web
             switch (id)
             {
                 case string s:
+                    //could be a Udi string and not a pure Guid
+                    if (Udi.TryParse(s, out Udi udi))
+                    {
+                        var guidUdi = udi as GuidUdi;
+                        if (guidUdi != null)
+                        {
+                            guidId = guidUdi.Guid;
+                            return true;
+                        }
+                    }               
                     return Guid.TryParse(s, out guidId);
 
                 case Guid g:
