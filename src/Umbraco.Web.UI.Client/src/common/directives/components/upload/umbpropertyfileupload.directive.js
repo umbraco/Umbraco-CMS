@@ -229,11 +229,12 @@
                 var index = i; //capture
 
                 var isImage = mediaHelper.detectIfImageByExtension(files[i].name);
+                var extension = getExtension(files[i].name);
 
                 //save the file object to the files collection
                 vm.files.push({
                     isImage: isImage,
-                    extension: getExtension(files[i].name),
+                    extension: extension,
                     fileName: files[i].name,
                     isClientSide: true
                 });
