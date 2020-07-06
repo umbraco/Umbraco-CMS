@@ -22,6 +22,7 @@ namespace Umbraco.Web.PropertyEditors.ParameterEditors
             : base(logger)
         {
             DefaultConfiguration.Add("multiPicker", "1");
+            DefaultConfiguration.Add("idType", "udi");
         }
     }
 }
