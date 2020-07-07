@@ -61,22 +61,26 @@ namespace Umbraco.Extensions
         {
             request.Body.Seek(0, SeekOrigin.Begin);
 
-            var reader = new StreamReader(request.Body, encoding ?? Encoding.UTF8);
+            using (var reader = new StreamReader(request.Body, encoding ?? Encoding.UTF8, leaveOpen: true))
+            {
+                var result = reader.ReadToEnd();
+                request.Body.Seek(0, SeekOrigin.Begin);
+                return result;
+            }
 
-            var result = reader.ReadToEnd();
-            request.Body.Seek(0, SeekOrigin.Begin);
-            return result;
+
         }
 
         public static async Task<string> GetRawBodyStringAsync(this HttpRequest request, Encoding encoding = null)
         {
             request.Body.Seek(0, SeekOrigin.Begin);
 
-            var reader = new StreamReader(request.Body, encoding ?? Encoding.UTF8);
-
-            var result = await reader.ReadToEndAsync();
-            request.Body.Seek(0, SeekOrigin.Begin);
-            return result;
+            using (var reader = new StreamReader(request.Body, encoding ?? Encoding.UTF8, leaveOpen: true))
+            {
+                var result = await reader.ReadToEndAsync();
+                request.Body.Seek(0, SeekOrigin.Begin);
+                return result;
+            }
         }
     }
 }
