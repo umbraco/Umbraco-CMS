@@ -18,10 +18,16 @@ namespace Umbraco.Core.Models
         private bool _mandatory;
         private int? _fallbackLanguageId;
 
-        public Language(string isoCode)
+        public Language(string isoCode, string cultureName)
         {
             IsoCode = isoCode;
+            CultureName = cultureName;
         }
+
+        [Obsolete("Use the constructor also specifying the culture name instead.")]
+        public Language(string isoCode)
+            : this(isoCode, isoCode)
+        { }
 
         /// <inheritdoc />
         [DataMember]
