@@ -24,7 +24,7 @@ namespace Umbraco.Composing
         public static IBackOfficeInfo BackOfficeInfo => EnsureInitialized(_backOfficeInfo);
         public static IProfiler Profiler => EnsureInitialized(_profiler);
 
-        public static bool IsInitialized { get; private set; }
+        public static bool IsInitialized { get; internal set; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static T EnsureInitialized<T>(T returnValue)

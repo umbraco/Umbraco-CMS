@@ -1,13 +1,18 @@
-using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
+    /// <summary>
+    /// Applying this attribute to any controller will ensure that the parameter name (prefix) is not part of the validation error keys.
+    /// </summary>
     public class PrefixlessBodyModelValidatorAttribute : TypeFilterAttribute
     {
+        //TODO: Could be a better solution to replace the IModelValidatorProvider and ensure the errors are created
+        //without the prefix, instead of removing it afterwards. But I couldn't find any way to do this for only some
+        //of the controllers. IObjectModelValidator seems to be the interface to implement and replace in the container
+        //to handle it for the entire solution.
         public PrefixlessBodyModelValidatorAttribute() : base(typeof(PrefixlessBodyModelValidatorFilter))
         {
         }
@@ -23,8 +28,6 @@ namespace Umbraco.Web.BackOffice.Filters
                 if (context.ModelState.IsValid) return;
 
                 //Remove prefix from errors
-
-
                 foreach (var modelStateItem in context.ModelState)
                 {
                     foreach (var prefix in context.ActionArguments.Keys)
