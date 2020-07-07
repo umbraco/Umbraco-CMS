@@ -14,6 +14,14 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// </summary>
     public class SqlCeSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlCeSyntaxProvider>
     {
+        public SqlCeSyntaxProvider()
+        {
+            BlobColumnDefinition = "IMAGE";
+            // This is silly to have to do this but the way these inherited classes are structured it's the easiest
+            // way without an overhaul in type map initialization
+            DbTypeMap.Set<byte[]>(DbType.Binary, BlobColumnDefinition);
+        }
+
         public override Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top)
         {
             return new Sql<ISqlContext>(sql.SqlContext, sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
@@ -226,8 +234,6 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
                 return "ALTER TABLE {0} ALTER COLUMN {1} DROP DEFAULT";
             }
         }
-
-
 
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
 

@@ -1325,7 +1325,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 "SET data=@data, dataRaw=@dataRaw, rv=rv+1 WHERE nodeId=@id AND published=@published",
                 new
                 {
-                    dataRaw = dto.RawData,
+                    dataRaw = dto.RawData ?? Array.Empty<byte>(),
                     data = dto.Data,
                     id = dto.NodeId,
                     published = dto.Published
