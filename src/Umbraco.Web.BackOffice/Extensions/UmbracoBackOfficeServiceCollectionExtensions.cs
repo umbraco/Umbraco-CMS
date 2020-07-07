@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Core;
@@ -7,6 +8,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 using Umbraco.Net;
+using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Security;
@@ -26,6 +28,7 @@ namespace Umbraco.Extensions
             // TODO: We had this check in v8 where we don't enable these unless we can run...
             //if (runtimeState.Level != RuntimeLevel.Upgrade && runtimeState.Level != RuntimeLevel.Run) return app;
 
+            services.AddSingleton<IFilterProvider, OverrideAuthorizationFilterProvider>();
             services
                 .AddAuthentication(Constants.Security.BackOfficeAuthenticationType)
                 .AddCookie(Constants.Security.BackOfficeAuthenticationType);

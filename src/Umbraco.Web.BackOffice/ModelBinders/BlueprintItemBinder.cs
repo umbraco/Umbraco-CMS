@@ -10,11 +10,11 @@ namespace Umbraco.Web.BackOffice.ModelBinders
 {
     internal class BlueprintItemBinder : ContentItemBinder
     {
-        private readonly ContentService _contentService;
+        private readonly IContentService _contentService;
 
-        public BlueprintItemBinder(IJsonSerializer jsonSerializer, UmbracoMapper umbracoMapper, IContentService contentService, IContentTypeService contentTypeService, IHostingEnvironment hostingEnvironment, ContentService contentService2) : base(jsonSerializer, umbracoMapper, contentService, contentTypeService, hostingEnvironment)
+        public BlueprintItemBinder(IJsonSerializer jsonSerializer, UmbracoMapper umbracoMapper, IContentService contentService, IContentTypeService contentTypeService, IHostingEnvironment hostingEnvironment) : base(jsonSerializer, umbracoMapper, contentService, contentTypeService, hostingEnvironment)
         {
-            _contentService = contentService2;
+            _contentService = contentService;
         }
 
         protected override IContent GetExisting(ContentItemSave model)
