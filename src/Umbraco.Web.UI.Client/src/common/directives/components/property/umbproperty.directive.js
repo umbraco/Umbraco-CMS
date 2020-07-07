@@ -14,7 +14,8 @@
             controllerAs: 'vm',
             transclude: true,
             require: {
-                parentUmbProperty: '?^^umbProperty'
+                parentUmbProperty: '?^^umbProperty',
+                parentForm: '?^^form'
             },
             bindings: {
                 property: "=",

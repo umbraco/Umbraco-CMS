@@ -92,29 +92,27 @@ function serverValidationManager($timeout, udiService) {
         });
     }
 
+    /** Call all registered callbacks indicating if the data they are subscribed to is valid or invalid */
     function notifyCallbacks() {
         for (var i = 0; i < callbacks.length; i++) {
             var cb = callbacks[i];
             if (cb.propertyAlias === null && cb.fieldName !== null) {
                 //its a field error callback
                 var fieldErrors = getFieldErrors(cb.fieldName);
-                if (fieldErrors.length > 0) {
-                    executeCallback(fieldErrors, cb.callback, cb.culture, cb.segment, false);
-                }
+                const valid = fieldErrors.length === 0;
+                executeCallback(fieldErrors, cb.callback, cb.culture, cb.segment, valid);
             }
             else if (cb.propertyAlias != null) {
                 //its a property error
                 var propErrors = getPropertyErrors(cb.propertyAlias, cb.culture, cb.segment, cb.fieldName);
-                if (propErrors.length > 0) {
-                    executeCallback(propErrors, cb.callback, cb.culture, cb.segment, false);
-                }
+                const valid = propErrors.length === 0;
+                executeCallback(propErrors, cb.callback, cb.culture, cb.segment, valid);
             }
             else {
                 //its a variant error
                 var variantErrors = getVariantErrors(cb.culture, cb.segment);
-                if (variantErrors.length > 0) {
-                    executeCallback(variantErrors, cb.callback, cb.culture, cb.segment, false);
-                }
+                const valid = variantErrors.length === 0;
+                executeCallback(variantErrors, cb.callback, cb.culture, cb.segment, valid);
             }
         }
     }
@@ -678,20 +676,15 @@ function serverValidationManager($timeout, udiService) {
             }
 
             //remove the item
+            var count = items.length;
             items = _.reject(items, function (item) {
-                var found = (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
-                if (found) {
-                    //find all errors for this item
-                    var errorsForCallback = getPropertyErrors(propertyAlias, culture, segment, fieldName);
-                    //we should now call all of the call backs registered for this error
-                    var cbs = getPropertyCallbacks(propertyAlias, culture, fieldName, segment);
-                    //call each callback for this error to tell them it is now valid
-                    for (var cb in cbs) {
-                        executeCallback(errorsForCallback, cbs[cb].callback, culture, segment, true);
-                    }
-                }
-                return found;
+                return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));                
             });
+
+            if (items.length !== count) {
+                // removal was successful, re-notify all subscribers
+                notify();
+            }
         },
         
         reset: reset,

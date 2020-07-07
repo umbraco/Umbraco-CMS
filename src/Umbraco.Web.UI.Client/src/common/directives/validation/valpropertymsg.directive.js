@@ -158,19 +158,53 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                 if (hadError) {
                     scope.$evalAsync(function () {
 
-                        // we need to navigate the parentForm here, unfortunately there's no real alternative unless we create our own directive
-                        // of some sort but that would also get messy. This works though since in this case we're always going to be in the property
-                        // form and the parent form about this will contain any invalid flags for all the other sibling properties. So when that is
-                        // no longer invalid, we can check if we have a parent validation key (meaning we'd be nested inside of umb-property) and 
-                        // we can clear that server error. 
-                        // TODO: If there is another server error for this property though this might clear it inadvertently, at this time I'm unsure how to deal with that.
-                        var parentValidationKey = umbPropCtrl.getParentValidationPath();
-                        if (parentValidationKey) {
-                            var parentForm = formCtrl.$$parentForm;
-                            if (parentForm && !parentForm.$invalid) {
+                        // TODO: This does not work :( :( :( 
+                        // We cannot clear a val-property-msg because another nested child might have server validation errors too. 
+                        // I 'think' we might be able to set the UI validation of this val-property-msg based on the child validators as well 
+                        // as the server validator so it can 'just' unset itself if all child validators are cleared. Can it be done?
+
+                        // Here we loop over the umbProperty hierarchy to see if we should clear the val-property-msg server validation key.
+                        // we will clear the key if the parent for is valid, or if the parent form is only invalid due to a single val-property-msg error.
+                        var currUmbProperty = umbPropCtrl;
+                        var parentValidationKey = currUmbProperty.getParentValidationPath();
+                        while (currUmbProperty && parentValidationKey) {
+
+                            if (!currUmbProperty.parentForm.$invalid || (_.keys(currUmbProperty.parentForm.$error).length === 1 && currUmbProperty.parentForm.$error.valPropertyMsg)) {
                                 serverValidationManager.removePropertyError(parentValidationKey, currentCulture, "", currentSegment);
+
+                                // re-assign and loop
+                                if (currUmbProperty !== umbPropCtrl.parentUmbProperty) {
+                                    currUmbProperty = umbPropCtrl.parentUmbProperty;
+                                    parentValidationKey = currUmbProperty ? currUmbProperty.getParentValidationPath() : null;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            else {
+                                break;
                             }
                         }
+
+                        //// we need to navigate the parentForm here, unfortunately there's no real alternative unless we create our own directive
+                        //// of some sort but that would also get messy. This works though since in this case we're always going to be in the property
+                        //// form and the parent form about this will contain any invalid flags for all the other sibling properties. So when that is
+                        //// no longer invalid, we can check if we have a parent validation key (meaning we'd be nested inside of umb-property) and 
+                        //// we can clear that server error. 
+                        //// TODO: If there is another server error for this property though this might clear it inadvertently, at this time I'm unsure how to deal with that.
+                        //var parentValidationKey = umbPropCtrl.getParentValidationPath();
+                        //if (parentValidationKey) {
+                        //    // TODO: Instead of using the parent form, can we 'just' use umbProperty again which itself can check if it's 
+                        //    // parent form is valid? then below we can call in a loop each parent umb property check if it has a parent validation
+                        //    // path and check if it's form is valid, this will recursively perform this logic up the chain.
+                        //    var parentForm = formCtrl.$$parentForm;
+                        //    if (parentForm && !parentForm.$invalid) {
+                        //        // TODO: Though this works for one level, if you have errors at level 1 and 2, clear errors at level when 
+                        //        // and then level 2, then only the val-property-msg is cleared at level 1 and not also at level 0.
+                        //        // So we still need to recurse up the chain to deal with this
+                        //        serverValidationManager.removePropertyError(parentValidationKey, currentCulture, "", currentSegment);
+                        //    }
+                        //}
                         
                     });
                     
