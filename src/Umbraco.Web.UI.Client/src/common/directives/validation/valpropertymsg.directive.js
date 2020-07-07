@@ -157,15 +157,21 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                 // where we have nested umb-property components.
                 if (hadError) {
                     scope.$evalAsync(function () {
-                        if (valFormManager.isValid()) {
-                            // TODO: I think we might have to use formCtrl.$$parentForm here since when using inline editing like
-                            // nestedcontent style, there won't be a 'parent' valFormManager, or will there? i'm unsure
-                            var parentValidationKey = umbPropCtrl.getParentValidationPath();
-                            if (parentValidationKey) {
-                                var parentForm = formCtrl.$$parentForm;
+
+                        // we need to navigate the parentForm here, unfortunately there's no real alternative unless we create our own directive
+                        // of some sort but that would also get messy. This works though since in this case we're always going to be in the property
+                        // form and the parent form about this will contain any invalid flags for all the other sibling properties. So when that is
+                        // no longer invalid, we can check if we have a parent validation key (meaning we'd be nested inside of umb-property) and 
+                        // we can clear that server error. 
+                        // TODO: If there is another server error for this property though this might clear it inadvertently, at this time I'm unsure how to deal with that.
+                        var parentValidationKey = umbPropCtrl.getParentValidationPath();
+                        if (parentValidationKey) {
+                            var parentForm = formCtrl.$$parentForm;
+                            if (parentForm && !parentForm.$invalid) {
                                 serverValidationManager.removePropertyError(parentValidationKey, currentCulture, "", currentSegment);
                             }
                         }
+                        
                     });
                     
                     
