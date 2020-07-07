@@ -14,6 +14,7 @@ namespace Umbraco.Web.BackOffice.Filters
     {
         public JsonCamelCaseFormatterAttribute() : base(typeof(JsonCamelCaseFormatterFilter))
         {
+            Order = 2; //must be higher than AngularJsonOnlyConfigurationAttribute.Order
         }
 
         private class JsonCamelCaseFormatterFilter : IResultFilter
