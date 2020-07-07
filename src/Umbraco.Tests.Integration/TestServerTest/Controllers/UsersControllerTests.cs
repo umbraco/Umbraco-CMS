@@ -208,14 +208,6 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
         [Test]
         public async Task PostUnlockUsers_When_Multiple_UserIds_Supplied_Expect_User_Locked_Out_With_Correct_Response_Message()
         {
-
-            var xxx = new UserBuilder()
-                .WithUsername("Admin")
-                .AddUserGroup()
-                .WithAlias("writer")
-                .Done()
-                .Build();
-
             var numberOfUsers = 3;
             var userService = GetRequiredService<IUserService>();
 
