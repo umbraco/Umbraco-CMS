@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Services
         public void Can_Export_Languages()
         {
             // Arrange
-            var languageNbNo = new Language("nb-NO", "Norwegian");
+            var languageNbNo = new Language("nb-NO", "Norwegian Bokmål (Norway)");
             ServiceContext.LocalizationService.Save(languageNbNo);
 
             var languageEnGb = new Language("en-GB", "English (United Kingdom)");
