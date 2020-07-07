@@ -17,7 +17,7 @@ namespace Umbraco.Web.Common.Filters
     {
         public JsonDateTimeFormatAttribute() : base(typeof(JsonDateTimeFormatFilter))
         {
-            Order = -2000;
+            Order = 2; //must be higher than AngularJsonOnlyConfigurationAttribute.Order
         }
 
         private class JsonDateTimeFormatFilter : IResultFilter

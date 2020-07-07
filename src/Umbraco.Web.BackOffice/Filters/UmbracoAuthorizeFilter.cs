@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using System;
@@ -44,6 +43,14 @@ namespace Umbraco.Web.BackOffice.Filters
             _requireApproval = requireApproval;
         }
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="hostingEnvironment"></param>
+        /// <param name="umbracoContext"></param>
+        /// <param name="runtimeState"></param>
+        /// <param name="linkGenerator"></param>
+        /// <param name="redirectUrl"></param>
         public UmbracoAuthorizeFilter(
             IHostingEnvironment hostingEnvironment,
             IUmbracoContextAccessor umbracoContext,
