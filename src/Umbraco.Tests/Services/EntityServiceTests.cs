@@ -31,8 +31,8 @@ namespace Umbraco.Tests.Services
 
             if (_langFr == null && _langEs == null)
             {
-                _langFr = new Language("fr-FR");
-                _langEs = new Language("es-ES");
+                _langFr = new Language("fr-FR", "French (France)");
+                _langEs = new Language("es-ES", "Spanish (Spain)");
                 ServiceContext.LocalizationService.Save(_langFr);
                 ServiceContext.LocalizationService.Save(_langEs);
             }

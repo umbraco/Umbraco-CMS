@@ -140,7 +140,7 @@ namespace Umbraco.Tests.Scoping
             var service = Current.Services.LocalizationService;
             var globalCache = Current.AppCaches.IsolatedCaches.GetOrCreate(typeof (ILanguage));
 
-            var lang = (ILanguage) new Language("fr-FR");
+            var lang = (ILanguage) new Language("fr-FR", "French (France)");
             service.Save(lang);
 
             // global cache has been flushed, reload
@@ -232,7 +232,7 @@ namespace Umbraco.Tests.Scoping
             var service = Current.Services.LocalizationService;
             var globalCache = Current.AppCaches.IsolatedCaches.GetOrCreate(typeof (IDictionaryItem));
 
-            var lang = (ILanguage)new Language("fr-FR");
+            var lang = (ILanguage)new Language("fr-FR", "French (France)");
             service.Save(lang);
 
             var item = (IDictionaryItem) new DictionaryItem("item-key");

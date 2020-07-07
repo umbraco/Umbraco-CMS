@@ -29,9 +29,8 @@ namespace Umbraco.Tests.Routing
         {
             var allLangs = isoCodes
                 .Select(CultureInfo.GetCultureInfo)
-                .Select(culture => new Language(culture.Name)
+                .Select(culture => new Language(culture.Name, culture.DisplayName)
                 {
-                    CultureName = culture.DisplayName,
                     IsDefault = true,
                     IsMandatory = true
                 }).ToArray();

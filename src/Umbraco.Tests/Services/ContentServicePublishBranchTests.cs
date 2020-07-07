@@ -425,11 +425,11 @@ namespace Umbraco.Tests.Services
 
         private void CreateTypes(out IContentType iContentType, out IContentType vContentType)
         {
-            var langDe = new Language("de") { IsDefault = true };
+            var langDe = new Language("de", "German") { IsDefault = true };
             ServiceContext.LocalizationService.Save(langDe);
-            var langRu = new Language("ru");
+            var langRu = new Language("ru", "Russian");
             ServiceContext.LocalizationService.Save(langRu);
-            var langEs = new Language("es");
+            var langEs = new Language("es", "Spanish");
             ServiceContext.LocalizationService.Save(langEs);
 
             iContentType = new ContentType(-1)

@@ -172,8 +172,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Perform_Scheduled_Publishing()
         {
-            var langUk = new Language("en-GB") { IsDefault = true };
-            var langFr = new Language("fr-FR");
+            var langUk = new Language("en-GB", "English (United Kingdom)") { IsDefault = true };
+            var langFr = new Language("fr-FR", "French (France)");
 
             ServiceContext.LocalizationService.Save(langFr);
             ServiceContext.LocalizationService.Save(langUk);
@@ -876,8 +876,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Unpublishing_Mandatory_Language_Unpublishes_Document()
         {
-            var langUk = new Language("en-GB") { IsDefault = true, IsMandatory = true };
-            var langFr = new Language("fr-FR");
+            var langUk = new Language("en-GB", "English (United Kingdom)") { IsDefault = true, IsMandatory = true };
+            var langFr = new Language("fr-FR", "French (France)");
 
             ServiceContext.LocalizationService.Save(langFr);
             ServiceContext.LocalizationService.Save(langUk);
@@ -973,8 +973,8 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
 
-            var langGB = new Language("en-GB") { IsDefault = true };
-            var langFr = new Language("fr-FR");
+            var langGB = new Language("en-GB", "English (United Kingdom)") { IsDefault = true };
+            var langFr = new Language("fr-FR", "French (France)");
 
             ServiceContext.LocalizationService.Save(langFr);
             ServiceContext.LocalizationService.Save(langGB);
@@ -1041,8 +1041,8 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
 
-            var langGB = new Language("en-GB") { IsDefault = true, IsMandatory = true };
-            var langFr = new Language("fr-FR");
+            var langGB = new Language("en-GB", "English (United Kingdom)") { IsDefault = true, IsMandatory = true };
+            var langFr = new Language("fr-FR", "French (France)");
 
             ServiceContext.LocalizationService.Save(langFr);
             ServiceContext.LocalizationService.Save(langGB);
@@ -1220,8 +1220,8 @@ namespace Umbraco.Tests.Services
         {
             //TODO: This is using an internal API - we aren't exposing this publicly (at least for now) but we'll keep the test around
 
-            var langFr = new Language("fr");
-            var langDa = new Language("da");
+            var langFr = new Language("fr", "French");
+            var langDa = new Language("da", "Danish");
             ServiceContext.LocalizationService.Save(langFr);
             ServiceContext.LocalizationService.Save(langDa);
 
@@ -2156,8 +2156,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Rollback_Version_On_Multilingual()
         {
-            var langFr = new Language("fr");
-            var langDa = new Language("da");
+            var langFr = new Language("fr", "French");
+            var langDa = new Language("da", "Danish");
             ServiceContext.LocalizationService.Save(langFr);
             ServiceContext.LocalizationService.Save(langDa);
 
@@ -2685,8 +2685,8 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            var langUk = new Language("en-GB") { IsDefault = true };
-            var langFr = new Language("fr-FR");
+            var langUk = new Language("en-GB", "English (United Kingdom)") { IsDefault = true };
+            var langFr = new Language("fr-FR", "French (France)");
 
             languageService.Save(langFr);
             languageService.Save(langUk);
@@ -2720,8 +2720,8 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            var langUk = new Language("en-GB") { IsDefault = true };
-            var langFr = new Language("fr-FR");
+            var langUk = new Language("en-GB", "English (United Kingdom)") { IsDefault = true };
+            var langFr = new Language("fr-FR", "French (France)");
 
             languageService.Save(langFr);
             languageService.Save(langUk);
@@ -2757,9 +2757,9 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            var langUk = new Language("en-GB") { IsDefault = true };
-            var langFr = new Language("fr-FR");
-            var langDa = new Language("da-DK");
+            var langUk = new Language("en-GB", "English (United Kingdom)") { IsDefault = true };
+            var langFr = new Language("fr-FR", "French (France)");
+            var langDa = new Language("da-DK", "Danish (Denmark)");
 
             languageService.Save(langFr);
             languageService.Save(langUk);
@@ -2859,10 +2859,10 @@ namespace Umbraco.Tests.Services
             var languageService = ServiceContext.LocalizationService;
 
             //var langFr = new Language("fr-FR") { IsDefaultVariantLanguage = true };
-            var langXx = new Language("pt-PT") { IsDefault = true };
-            var langFr = new Language("fr-FR");
-            var langUk = new Language("en-GB");
-            var langDe = new Language("de-DE");
+            var langXx = new Language("pt-PT", "Portuguese (Portugal)") { IsDefault = true };
+            var langFr = new Language("fr-FR", "French (France)");
+            var langUk = new Language("en-GB", "English (United Kingdom)");
+            var langDe = new Language("de-DE", "German (Germany)");
 
             languageService.Save(langFr);
             languageService.Save(langUk);
@@ -3261,8 +3261,8 @@ namespace Umbraco.Tests.Services
 
         private void CreateEnglishAndFrenchDocumentType(out Language langUk, out Language langFr, out ContentType contentType)
         {
-            langUk = new Language("en-GB") { IsDefault = true };
-            langFr = new Language("fr-FR");
+            langUk = new Language("en-GB", "English (United Kingdom)") { IsDefault = true };
+            langFr = new Language("fr-FR", "French (France)");
             ServiceContext.LocalizationService.Save(langFr);
             ServiceContext.LocalizationService.Save(langUk);
 

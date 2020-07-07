@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            languageService.Save(new Language("fr-FR"));
+            languageService.Save(new Language("fr-FR", "French (France)"));
 
             var contentTypeService = ServiceContext.ContentTypeService;
 
@@ -146,7 +146,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            languageService.Save(new Language("fr-FR"));
+            languageService.Save(new Language("fr-FR", "French (France)"));
 
             var contentTypeService = ServiceContext.ContentTypeService;
 
@@ -312,7 +312,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            languageService.Save(new Language("fr-FR"));
+            languageService.Save(new Language("fr-FR", "French (France)"));
 
             var contentTypeService = ServiceContext.ContentTypeService;
 

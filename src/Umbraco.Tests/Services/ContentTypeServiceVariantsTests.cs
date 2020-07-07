@@ -299,7 +299,7 @@ namespace Umbraco.Tests.Services
             var nlContentName = "Content nl-NL";
             var nlCulture = "nl-NL";
 
-            ServiceContext.LocalizationService.Save(new Language(nlCulture));
+            ServiceContext.LocalizationService.Save(new Language(nlCulture, "Dutch (Netherlands)"));
 
             var includeCultureNames = contentType.Variations.HasFlag(ContentVariation.Culture);
 
@@ -655,9 +655,9 @@ namespace Umbraco.Tests.Services
             // can change it to variant and back
             // can then switch one property to variant
 
-            var languageEn = new Language("en") { IsDefault = true };
+            var languageEn = new Language("en", "English") { IsDefault = true };
             ServiceContext.LocalizationService.Save(languageEn);
-            var languageFr = new Language("fr");
+            var languageFr = new Language("fr", "French");
             ServiceContext.LocalizationService.Save(languageFr);
 
             var contentType = CreateContentType(ContentVariation.Nothing);
@@ -1248,9 +1248,9 @@ namespace Umbraco.Tests.Services
 
         private void CreateFrenchAndEnglishLangs()
         {
-            var languageEn = new Language("en") { IsDefault = true };
+            var languageEn = new Language("en", "English") { IsDefault = true };
             ServiceContext.LocalizationService.Save(languageEn);
-            var languageFr = new Language("fr");
+            var languageFr = new Language("fr", "French");
             ServiceContext.LocalizationService.Save(languageFr);
         }
 

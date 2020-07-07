@@ -710,8 +710,8 @@ namespace Umbraco.Tests.Packaging
 
         private void AddLanguages()
         {
-            var norwegian = new Core.Models.Language("nb-NO");
-            var english = new Core.Models.Language("en-GB");
+            var norwegian = new Core.Models.Language("nb-NO", "Norwegian Bokmål (Norway)");
+            var english = new Core.Models.Language("en-GB", "English (United Kingdom)");
             ServiceContext.LocalizationService.Save(norwegian, 0);
             ServiceContext.LocalizationService.Save(english, 0);
         }

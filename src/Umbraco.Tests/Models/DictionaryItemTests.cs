@@ -23,12 +23,10 @@ namespace Umbraco.Tests.Models
                 UpdateDate = DateTime.Now,
                 Translations = new[]
                 {
-                    new DictionaryTranslation(new Language("en-AU")
+                    new DictionaryTranslation(new Language("en-AU", "English (Australia)")
                     {
                         CreateDate = DateTime.Now,
-                        CultureName = "en",
                         Id = 11,
-                        IsoCode = "AU",
                         Key = Guid.NewGuid(),
                         UpdateDate = DateTime.Now
                     }, "colour")
@@ -38,12 +36,10 @@ namespace Umbraco.Tests.Models
                         Key = Guid.NewGuid(),
                         UpdateDate = DateTime.Now
                     },
-                    new DictionaryTranslation(new Language("en-US")
+                    new DictionaryTranslation(new Language("en-US", "English (United States)")
                     {
                         CreateDate = DateTime.Now,
-                        CultureName = "en",
                         Id = 12,
-                        IsoCode = "US",
                         Key = Guid.NewGuid(),
                         UpdateDate = DateTime.Now
                     }, "color")
@@ -96,12 +92,10 @@ namespace Umbraco.Tests.Models
                 UpdateDate = DateTime.Now,
                 Translations = new[]
                 {
-                    new DictionaryTranslation(new Language("en-AU")
+                    new DictionaryTranslation(new Language("en-AU", "English (Australia)")
                     {
                         CreateDate = DateTime.Now,
-                        CultureName = "en",
                         Id = 11,
-                        IsoCode = "AU",
                         Key = Guid.NewGuid(),
                         UpdateDate = DateTime.Now
                     }, "colour")
@@ -111,12 +105,10 @@ namespace Umbraco.Tests.Models
                         Key = Guid.NewGuid(),
                         UpdateDate = DateTime.Now
                     },
-                    new DictionaryTranslation(new Language("en-US")
+                    new DictionaryTranslation(new Language("en-US", "English (United States)")
                     {
                         CreateDate = DateTime.Now,
-                        CultureName = "en",
                         Id = 12,
-                        IsoCode = "US",
                         Key = Guid.NewGuid(),
                         UpdateDate = DateTime.Now
                     }, "color")

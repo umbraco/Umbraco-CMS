@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             return domainRepository;
         }
 
-        private int CreateTestData(string isoName, out ContentType ct)
+        private int CreateTestData(string isoName, string cultureName, out ContentType ct)
         {
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var repo = CreateRepository(provider, out contentTypeRepo, out documentRepo, out langRepo);
 
-                var lang = new Language(isoName);
+                var lang = new Language(isoName, cultureName);
                 langRepo.Save(lang);
 
                 ct = MockedContentTypes.CreateBasicContentType("test", "Test");
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Create_And_Get_By_Id()
         {
             ContentType ct;
-            var contentId = CreateTestData("en-AU", out ct);
+            var contentId = CreateTestData("en-AU", "English (Australia)", out ct);
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
@@ -98,7 +98,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Create_And_Get_By_Id_Empty_lang()
         {
             ContentType ct;
-            var contentId = CreateTestData("en-AU", out ct);
+            var contentId = CreateTestData("en-AU", "English (Australia)", out ct);
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
@@ -130,7 +130,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Cant_Create_Duplicate_Domain_Name()
         {
             ContentType ct;
-            var contentId = CreateTestData("en-AU", out ct);
+            var contentId = CreateTestData("en-AU", "English (Australia)", out ct);
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
@@ -157,7 +157,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Delete()
         {
             ContentType ct;
-            var contentId = CreateTestData("en-AU", out ct);
+            var contentId = CreateTestData("en-AU", "English (Australia)", out ct);
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
@@ -188,7 +188,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Update()
         {
             ContentType ct;
-            var contentId1 = CreateTestData("en-AU", out ct);
+            var contentId1 = CreateTestData("en-AU", "English (Australia)", out ct);
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
@@ -203,7 +203,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //more test data
                 var lang1 = langRepo.GetByIsoCode("en-AU");
-                var lang2 = new Language("es");
+                var lang2 = new Language("es", "Spanish");
                 langRepo.Save(lang2);
                 var content2 = new Content("test", -1, ct) { CreatorId = 0, WriterId = 0 };
                 documentRepo.Save(content2);
@@ -235,7 +235,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Exists()
         {
             ContentType ct;
-            var contentId = CreateTestData("en-AU", out ct);
+            var contentId = CreateTestData("en-AU", "English (Australia)", out ct);
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
@@ -265,7 +265,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Get_By_Name()
         {
             ContentType ct;
-            var contentId = CreateTestData("en-AU", out ct);
+            var contentId = CreateTestData("en-AU", "English (Australia)", out ct);
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
@@ -295,7 +295,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Get_All()
         {
             ContentType ct;
-            var contentId = CreateTestData("en-AU", out ct);
+            var contentId = CreateTestData("en-AU", "English (Australia)", out ct);
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
@@ -325,7 +325,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Get_All_Ids()
         {
             ContentType ct;
-            var contentId = CreateTestData("en-AU", out ct);
+            var contentId = CreateTestData("en-AU", "English (Australia)", out ct);
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
@@ -357,7 +357,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Get_All_Without_Wildcards()
         {
             ContentType ct;
-            var contentId = CreateTestData("en-AU", out ct);
+            var contentId = CreateTestData("en-AU", "English (Australia)", out ct);
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
@@ -391,7 +391,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Get_All_For_Content()
         {
             ContentType ct;
-            var contentId = CreateTestData("en-AU", out ct);
+            var contentId = CreateTestData("en-AU", "English (Australia)", out ct);
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
@@ -440,7 +440,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Get_All_For_Content_Without_Wildcards()
         {
             ContentType ct;
-            var contentId = CreateTestData("en-AU", out ct);
+            var contentId = CreateTestData("en-AU", "English (Australia)", out ct);
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())

@@ -56,10 +56,10 @@ namespace Umbraco.Tests.Services
         public void Can_Export_Languages()
         {
             // Arrange
-            var languageNbNo = new Language("nb-NO") { CultureName = "Norwegian" };
+            var languageNbNo = new Language("nb-NO", "Norwegian");
             ServiceContext.LocalizationService.Save(languageNbNo);
 
-            var languageEnGb = new Language("en-GB") { CultureName = "English (United Kingdom)" };
+            var languageEnGb = new Language("en-GB", "English (United Kingdom)");
             ServiceContext.LocalizationService.Save(languageEnGb);
 
             var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
@@ -74,10 +74,10 @@ namespace Umbraco.Tests.Services
 
         private void CreateDictionaryData()
         {
-            var languageNbNo = new Language("nb-NO") { CultureName = "nb-NO" };
+            var languageNbNo = new Language("nb-NO", "Norwegian Bokmål (Norway)");
             ServiceContext.LocalizationService.Save(languageNbNo);
 
-            var languageEnGb = new Language("en-GB") { CultureName = "en-GB" };
+            var languageEnGb = new Language("en-GB", "English (United Kingdom)");
             ServiceContext.LocalizationService.Save(languageEnGb);
 
             var parentItem = new DictionaryItem("Parent");

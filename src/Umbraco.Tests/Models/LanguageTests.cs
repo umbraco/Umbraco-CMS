@@ -12,12 +12,10 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Deep_Clone()
         {
-            var item = new Language("en-AU")
+            var item = new Language("en-AU", "English (Australia)")
             {
                 CreateDate = DateTime.Now,
-                CultureName = "AU",
                 Id = 11,
-                IsoCode = "en",
                 Key = Guid.NewGuid(),
                 UpdateDate = DateTime.Now
             };
@@ -45,12 +43,10 @@ namespace Umbraco.Tests.Models
         {
             var ss = new SerializationService(new JsonNetSerializer());
 
-            var item = new Language("en-AU")
+            var item = new Language("en-AU", "English (Australia)")
             {
                 CreateDate = DateTime.Now,
-                CultureName = "AU",
                 Id = 11,
-                IsoCode = "en",
                 Key = Guid.NewGuid(),
                 UpdateDate = DateTime.Now
             };
