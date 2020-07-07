@@ -130,7 +130,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [UmbracoAuthorize]
+        [UmbracoAuthorize, OverrideAuthorization]
         public bool AllowsCultureVariation()
         {
             var contentTypes = _contentTypeService.GetAll();

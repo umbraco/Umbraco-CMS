@@ -159,6 +159,8 @@
     <Compile Include="Security\IdentityFactoryMiddleware.cs" />
     <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="Trees\ITreeNodeController.cs" />
+    <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
+    <Compile Include="WebApi\Filters\OverridableAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoTreeAuthorizeAttribute.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyRuntimeMinifier.cs" />
     <Compile Include="Models\NoNodesViewModel.cs" />
@@ -314,9 +316,7 @@
     <Compile Include="WebApi\AngularJsonOnlyConfigurationAttribute.cs" />
     <Compile Include="WebApi\Filters\AngularAntiForgeryHelper.cs" />
     <Compile Include="WebApi\Filters\DisableBrowserCacheAttribute.cs" />
-    <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterGrouping.cs" />
-    <Compile Include="WebApi\Filters\OverridableAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\SetAngularAntiForgeryTokensAttribute.cs" />
     <Compile Include="WebApi\Filters\ValidateAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="WebApi\HttpControllerContextExtensions.cs" />
