@@ -1085,10 +1085,7 @@ namespace Umbraco.Core.Packaging
                 var isoCode = languageElement.AttributeValue<string>("CultureAlias");
                 var existingLanguage = _localizationService.GetLanguageByIsoCode(isoCode);
                 if (existingLanguage != null) continue;
-                var langauge = new Language(isoCode)
-                {
-                    CultureName = languageElement.AttributeValue<string>("FriendlyName")
-                };
+                var langauge = new Language(isoCode, languageElement.AttributeValue<string>("FriendlyName"));
                 _localizationService.Save(langauge, userId);
                 list.Add(langauge);
             }

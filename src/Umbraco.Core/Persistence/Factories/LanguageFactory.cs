@@ -8,9 +8,8 @@ namespace Umbraco.Core.Persistence.Factories
     {
         public static ILanguage BuildEntity(LanguageDto dto)
         {
-            var lang = new Language(dto.IsoCode)
+            var lang = new Language(dto.IsoCode, dto.CultureName)
             {
-                CultureName = dto.CultureName,
                 Id = dto.Id,
                 IsDefault = dto.IsDefault,
                 IsMandatory = dto.IsMandatory,
