@@ -4,6 +4,10 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <RootNamespace>Umbraco.Web.UI.NetCore</RootNamespace>
     </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DocumentationFile>bin\Release\Umbraco.Web.UI.NetCore.xml</DocumentationFile>
+    </PropertyGroup>
     <ItemGroup>
       <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" />
       <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
