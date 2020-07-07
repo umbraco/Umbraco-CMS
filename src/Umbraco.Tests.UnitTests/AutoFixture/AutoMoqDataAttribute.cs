@@ -4,13 +4,12 @@ using AutoFixture.AutoMoq;
 using AutoFixture.Kernel;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.BackOffice.Controllers;
 
-namespace Umbraco.Tests.Common.AutoFixture
+namespace Umbraco.Tests.UnitTests.AutoFixture
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor)]
     public class AutoMoqDataAttribute : AutoDataAttribute

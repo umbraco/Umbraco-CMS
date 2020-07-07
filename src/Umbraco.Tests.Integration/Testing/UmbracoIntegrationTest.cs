@@ -144,6 +144,8 @@ namespace Umbraco.Tests.Integration.Testing
 
         }
 
+        protected T GetRequiredService<T>() => Services.GetRequiredService<T>();
+
         #region Common services
 
         protected string TestDBConnectionString { get; private set; }
