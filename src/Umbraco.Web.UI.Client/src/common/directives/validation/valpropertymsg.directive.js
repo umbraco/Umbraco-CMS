@@ -8,24 +8,26 @@
 * We will listen for server side validation changes
 * and when an error is detected for this property we'll show the error message.
 * In order for this directive to work, the valFormManager directive must be placed on the containing form.
+* We don't set the validity of this validator to false when client side validation fails, only when server side
+* validation fails however we do respond to the client side validation changes to display error and adjust UI state.
 **/
-function valPropertyMsg(serverValidationManager, localizationService) {
+function valPropertyMsg(serverValidationManager, localizationService, angularHelper) {
 
     return {
-        require: ['^^form', '^^valFormManager', '^^umbProperty', '?^^umbVariantContent'],
+        require: ['^^form', '^^valFormManager', '^^umbProperty', '?^^umbVariantContent', '?^^valPropertyMsg'],
         replace: true,
         restrict: "E",
         template: "<div ng-show=\"errorMsg != ''\" class='alert alert-error property-error' >{{errorMsg}}</div>",
         scope: {},
         link: function (scope, element, attrs, ctrl) {
-            
+
             var unsubscribe = [];
             var watcher = null;
             var hasError = false;
 
             //create properties on our custom scope so we can use it in our template
-            scope.errorMsg = "";            
-            
+            scope.errorMsg = "";
+
             //the property form controller api
             var formCtrl = ctrl[0];
             //the valFormManager controller api
@@ -33,16 +35,16 @@ function valPropertyMsg(serverValidationManager, localizationService) {
             //the property controller api
             var umbPropCtrl = ctrl[2];
             //the variants controller api
-            var umbVariantCtrl = ctrl[3];            
-            
+            var umbVariantCtrl = ctrl[3];
+
             var currentProperty = umbPropCtrl.property;
             scope.currentProperty = currentProperty;
 
             var propertyValidationKey = umbPropCtrl.getValidationPath();
 
             var currentCulture = currentProperty.culture;
-            var currentSegment = currentProperty.segment;     
-            
+            var currentSegment = currentProperty.segment;
+
             // validation object won't exist when editor loads outside the content form (ie in settings section when modifying a content type)
             var isMandatory = currentProperty.validation ? currentProperty.validation.mandatory : undefined;
 
@@ -63,10 +65,10 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                     return;
                 }
             }
-            
+
             // if we have reached this part, and there is no culture, then lets fallback to invariant. To get the validation feedback for invariant language.
             currentCulture = currentCulture || "invariant";
-            
+
 
             // Gets the error message to display
             function getErrorMsg() {
@@ -93,7 +95,14 @@ function valPropertyMsg(serverValidationManager, localizationService) {
             // we need to re-validate it for the server side validator so the user can resubmit
             // the form. Of course normal client-side validators will continue to execute. 
             function startWatch() {
+
+                // TODO: Can we watch on something other than the value?? This doesn't work for complex editors especially once that have a 
+                // viewmodel/model setup the value that this is watching doesn't actually get updated by a sub-editor in all cases.
+                // we can probably watch the formCtrl view value? But then we also don't want this to watch complex values that have sub editors anyways
+                // since that might end up clearing the whole chain of valPropertyMsg when a sub value is changed (in some cases, not with the block editor).
+
                 //if there's not already a watch
+
                 if (!watcher) {
                     watcher = scope.$watch("currentProperty.value",
                         function (newValue, oldValue) {
@@ -107,20 +116,19 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                                 if (Utilities.isArray(formCtrl.$error[e])) {
                                     errCount++;
                                 }
-                            }         
+                            }
 
                             //we are explicitly checking for valServer errors here, since we shouldn't auto clear
                             // based on other errors. We'll also check if there's no other validation errors apart from valPropertyMsg, if valPropertyMsg
                             // is the only one, then we'll clear.
 
-                            if (errCount === 0 
-                                || (errCount === 1 && Utilities.isArray(formCtrl.$error.valPropertyMsg)) 
+                            if (errCount === 0
+                                || (errCount === 1 && Utilities.isArray(formCtrl.$error.valPropertyMsg))
                                 || (formCtrl.$invalid && Utilities.isArray(formCtrl.$error.valServer))) {
-                                scope.errorMsg = "";
-                                formCtrl.$setValidity('valPropertyMsg', true);
+                                resetError();
                             }
                             else if (showValidation && scope.errorMsg === "") {
-                                formCtrl.$setValidity('valPropertyMsg', false);
+                                formCtrl.$setValidity('valPropertyMsg', false, formCtrl);
                                 scope.errorMsg = getErrorMsg();
                             }
                         }, true);
@@ -135,6 +143,35 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                 }
             }
 
+            function resetError() {
+                var hadError = hasError;
+                hasError = false;
+                formCtrl.$setValidity('valPropertyMsg', true, formCtrl);
+                scope.errorMsg = "";
+                stopWatch();
+
+                // if we had an error, then check on the current valFormManager to see if it's 
+                // now valid, if it is it means that the containing form (i.e. the form rendering)
+                // properties for an element/content type) is now valid which means we can clear 
+                // the parent's valPropertyMsg if there is one. This will only occur with complex editors
+                // where we have nested umb-property components.
+                if (hadError) {
+                    scope.$evalAsync(function () {
+                        if (valFormManager.isValid()) {
+                            // TODO: I think we might have to use formCtrl.$$parentForm here since when using inline editing like
+                            // nestedcontent style, there won't be a 'parent' valFormManager, or will there? i'm unsure
+                            var parentValidationKey = umbPropCtrl.getParentValidationPath();
+                            if (parentValidationKey) {
+                                var parentForm = formCtrl.$$parentForm;
+                                serverValidationManager.removePropertyError(parentValidationKey, currentCulture, "", currentSegment);
+                            }
+                        }
+                    });
+                    
+                    
+                }                
+            }
+
             function checkValidationStatus() {
                 if (formCtrl.$invalid) {
                     //first we need to check if the valPropertyMsg validity is invalid
@@ -145,12 +182,11 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                     }
                     //if there are any errors in the current property form that are not valPropertyMsg
                     else if (_.without(_.keys(formCtrl.$error), "valPropertyMsg").length > 0) {
-                        
+
                         // errors exist, but if the property is NOT mandatory and has no value, the errors should be cleared
                         if (isMandatory !== undefined && isMandatory === false && !currentProperty.value) {
-                            hasError = false;
-                            showValidation = false;
-                            scope.errorMsg = "";
+
+                            resetError();
 
                             // if there's no value, the controls can be reset, which clears the error state on formCtrl
                             for (let control of formCtrl.$getControls()) {
@@ -167,13 +203,11 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                         }
                     }
                     else {
-                        hasError = false;
-                        scope.errorMsg = "";
+                        resetError();
                     }
                 }
                 else {
-                    hasError = false;
-                    scope.errorMsg = "";
+                    resetError();
                 }
             }
 
@@ -203,17 +237,14 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                     startWatch();
                 }
                 else if (!hasError) {
-                    scope.errorMsg = "";
-                    stopWatch();
+                    resetError();
                 }
             }));
 
             //listen for the forms saved event
             unsubscribe.push(scope.$on("formSubmitted", function (ev, args) {
                 showValidation = false;
-                scope.errorMsg = "";
-                formCtrl.$setValidity('valPropertyMsg', true);
-                stopWatch();
+                resetError();
             }));
 
             //listen for server validation changes
@@ -224,7 +255,7 @@ function valPropertyMsg(serverValidationManager, localizationService) {
             // indicate that a content property is invalid at the property level since developers may not actually implement
             // the correct field validation in their property editors.
 
-            if (scope.currentProperty) { //this can be null if no property was assigned
+            if (scope.currentProperty) { //this can be null if no property was assigned, TODO: I don't believe it can? If it was null we'd get errors above
 
                 function serverValidationManagerCallback(isValid, propertyErrors, allErrors) {
                     hasError = !isValid;
@@ -232,14 +263,11 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                         //set the error message to the server message
                         scope.errorMsg = propertyErrors[0].errorMsg ? propertyErrors[0].errorMsg : labels.propertyHasErrors;
                         //flag that the current validator is invalid
-                        formCtrl.$setValidity('valPropertyMsg', false);
+                        formCtrl.$setValidity('valPropertyMsg', false, formCtrl);
                         startWatch();
                     }
                     else {
-                        scope.errorMsg = "";
-                        //flag that the current validator is valid
-                        formCtrl.$setValidity('valPropertyMsg', true);
-                        stopWatch();
+                        resetError();
                     }
                 }
 
@@ -248,9 +276,8 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                     "",
                     serverValidationManagerCallback,
                     currentSegment
-                    )
+                )
                 );
-
             }
 
             //when the scope is disposed we need to unsubscribe

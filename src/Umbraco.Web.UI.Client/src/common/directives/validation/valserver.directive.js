@@ -61,8 +61,8 @@ function valServer(serverValidationManager) {
                 return propertyValidationPath ? propertyValidationPath : currentProperty.alias;
             }
 
-            //Need to watch the value model for it to change, previously we had  subscribed to 
-            //modelCtrl.$viewChangeListeners but this is not good enough if you have an editor that
+            // Need to watch the value model for it to change, previously we had  subscribed to 
+            // modelCtrl.$viewChangeListeners but this is not good enough if you have an editor that
             // doesn't specifically have a 2 way ng binding. This is required because when we
             // have a server error we actually invalidate the form which means it cannot be 
             // resubmitted. So once a field is changed that has a server error assigned to it
@@ -81,6 +81,7 @@ function valServer(serverValidationManager) {
 
                         if (modelCtrl.$invalid) {
                             modelCtrl.$setValidity('valServer', true);
+                            console.log("valServer cleared (watch)");
 
                             //clear the server validation entry
                             serverValidationManager.removePropertyError(getPropertyValidationKey(), currentCulture, fieldName, currentSegment);
@@ -101,12 +102,14 @@ function valServer(serverValidationManager) {
             function serverValidationManagerCallback(isValid, propertyErrors, allErrors) {
                 if (!isValid) {
                     modelCtrl.$setValidity('valServer', false);
+                    console.log("valServer error");
                     //assign an error msg property to the current validator
                     modelCtrl.errorMsg = propertyErrors[0].errorMsg;
                     startWatch();
                 }
                 else {
                     modelCtrl.$setValidity('valServer', true);
+                    console.log("valServer cleared");
                     //reset the error message
                     modelCtrl.errorMsg = "";
                     stopWatch();

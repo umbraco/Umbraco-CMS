@@ -16,10 +16,10 @@ function serverValidationManager($timeout, udiService) {
     var items = [];
     
     /** calls the callback specified with the errors specified, used internally */
-    function executeCallback(errorsForCallback, callback, culture, segment) {
+    function executeCallback(errorsForCallback, callback, culture, segment, isValid) {
 
         callback.apply(instance, [
-                false,                 // pass in a value indicating it is invalid
+                isValid,               // pass in a value indicating it is invalid
                 errorsForCallback,     // pass in the errors for this item
                 items,                 // pass in all errors in total
                 culture,               // pass the culture that we are listing for.
@@ -99,21 +99,21 @@ function serverValidationManager($timeout, udiService) {
                 //its a field error callback
                 var fieldErrors = getFieldErrors(cb.fieldName);
                 if (fieldErrors.length > 0) {
-                    executeCallback(fieldErrors, cb.callback, cb.culture, cb.segment);
+                    executeCallback(fieldErrors, cb.callback, cb.culture, cb.segment, false);
                 }
             }
             else if (cb.propertyAlias != null) {
                 //its a property error
                 var propErrors = getPropertyErrors(cb.propertyAlias, cb.culture, cb.segment, cb.fieldName);
                 if (propErrors.length > 0) {
-                    executeCallback(propErrors, cb.callback, cb.culture, cb.segment);
+                    executeCallback(propErrors, cb.callback, cb.culture, cb.segment, false);
                 }
             }
             else {
                 //its a variant error
                 var variantErrors = getVariantErrors(cb.culture, cb.segment);
                 if (variantErrors.length > 0) {
-                    executeCallback(variantErrors, cb.callback, cb.culture, cb.segment);
+                    executeCallback(variantErrors, cb.callback, cb.culture, cb.segment, false);
                 }
             }
         }
@@ -247,7 +247,7 @@ function serverValidationManager($timeout, udiService) {
         var cbs = getFieldCallbacks(fieldName);
         //call each callback for this error
         for (var cb in cbs) {
-            executeCallback(errorsForCallback, cbs[cb].callback, null, null);
+            executeCallback(errorsForCallback, cbs[cb].callback, null, null, false);
         }
     }
 
@@ -309,14 +309,14 @@ function serverValidationManager($timeout, udiService) {
         var cbs = getPropertyCallbacks(propertyAlias, culture, fieldName, segment);
         //call each callback for this error
         for (var cb in cbs) {
-            executeCallback(errorsForCallback, cbs[cb].callback, culture, segment);
+            executeCallback(errorsForCallback, cbs[cb].callback, culture, segment, false);
         }
 
         //execute variant specific callbacks here too when a propery error is added
         var variantCbs = getVariantCallbacks(culture, segment);
         //call each callback for this error
         for (var cb in variantCbs) {
-            executeCallback(errorsForCallback, variantCbs[cb].callback, culture, segment);
+            executeCallback(errorsForCallback, variantCbs[cb].callback, culture, segment, false);
         }
     }
 
@@ -679,7 +679,18 @@ function serverValidationManager($timeout, udiService) {
 
             //remove the item
             items = _.reject(items, function (item) {
-                return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+                var found = (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+                if (found) {
+                    //find all errors for this item
+                    var errorsForCallback = getPropertyErrors(propertyAlias, culture, segment, fieldName);
+                    //we should now call all of the call backs registered for this error
+                    var cbs = getPropertyCallbacks(propertyAlias, culture, fieldName, segment);
+                    //call each callback for this error to tell them it is now valid
+                    for (var cb in cbs) {
+                        executeCallback(errorsForCallback, cbs[cb].callback, culture, segment, true);
+                    }
+                }
+                return found;
             });
         },
         

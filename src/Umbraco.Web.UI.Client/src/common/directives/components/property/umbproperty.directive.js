@@ -3,8 +3,81 @@
 * @name umbraco.directives.directive:umbProperty
 * @restrict E
 **/
-angular.module("umbraco.directives")
-    .directive('umbProperty', function (userService, serverValidationManager, udiService) {
+(function () {
+    'use strict';
+
+    angular
+        .module("umbraco.directives")
+        .component('umbProperty', {
+            templateUrl: 'views/components/property/umb-property.html',
+            controller: UmbPropertyController,
+            controllerAs: 'vm',
+            transclude: true,
+            require: {
+                parentUmbProperty: '?^^umbProperty'
+            },
+            bindings: {
+                property: "=",
+                elementUdi: "@",
+                // optional, if set this will be used for the property alias validation path (hack required because NC changes the actual property.alias :/)
+                propertyAlias: "@",
+                showInherit: "<",
+                inheritsFrom: "<"
+            }
+        });
+
+    
+
+    function UmbPropertyController($scope, userService, serverValidationManager, udiService, angularHelper) {
+
+        const vm = this;
+
+        vm.$onInit = onInit;
+
+        vm.setPropertyError = function (errorMsg) {
+            vm.property.propertyErrorMessage = errorMsg;
+        };
+
+        vm.propertyActions = [];
+        vm.setPropertyActions = function (actions) {
+            vm.propertyActions = actions;
+        };
+
+        // returns the unique Id for the property to be used as the validation key for server side validation logic
+        vm.getValidationPath = function () {
+
+            // the elementUdi will be empty when this is not a nested property
+            var propAlias = vm.propertyAlias ? vm.propertyAlias : vm.property.alias;
+            vm.elementUdi = ensureUdi(vm.elementUdi);
+            return serverValidationManager.createPropertyValidationKey(propAlias, vm.elementUdi);
+        }
+
+        vm.getParentValidationPath = function () {
+            if (!vm.parentUmbProperty) {
+                return null;
+            }
+            return vm.parentUmbProperty.getValidationPath();
+        }
+
+        function onInit() {
+            vm.controlLabelTitle = null;
+            if (Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
+                userService.getCurrentUser().then(function (u) {
+                    if (u.allowedSections.indexOf("settings") !== -1 ? true : false) {
+                        vm.controlLabelTitle = vm.property.alias;
+                    }
+                });
+            }
+
+            vm.elementUdi = ensureUdi(vm.elementUdi);
+
+            if (!vm.parentUmbProperty) {
+                // not found, then fallback to searching the scope chain, this may be needed when DOM inheritance isn't maintained but scope
+                // inheritance is (i.e.infinite editing)
+                var found = angularHelper.traverseScopeChain($scope, s => s && s.vm && s.vm.constructor.name === "UmbPropertyController");
+                vm.parentUmbProperty = found ? found.vm : null;
+            }
+        }
 
         // if only a guid is passed in, we'll ensure a correct udi structure
         function ensureUdi(udi) {
@@ -13,61 +86,6 @@ angular.module("umbraco.directives")
             }
             return udi;
         }
+    }
 
-        return {
-            scope: {
-                property: "=",                
-                elementUdi: "@",
-                // optional, if set this will be used for the property alias validation path (hack required because NC changes the actual property.alias :/)
-                propertyAlias: "@", 
-                showInherit: "<",
-                inheritsFrom: "<"
-            },
-            transclude: true,
-            restrict: 'E',
-            replace: true,
-            templateUrl: 'views/components/property/umb-property.html',
-            link: function (scope, element, attr, ctrls) {
-
-                scope.controlLabelTitle = null;
-                if(Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
-                    userService.getCurrentUser().then(function (u) {
-                        if(u.allowedSections.indexOf("settings") !== -1 ? true : false) {
-                            scope.controlLabelTitle = scope.property.alias;
-                        }
-                    });
-                }
-
-                scope.elementUdi = ensureUdi(scope.elementUdi);
-
-            },
-            //Define a controller for this directive to expose APIs to other directives
-            controller: function ($scope) {
-
-                var self = this;
-                
-                //set the API properties/methods
-
-                self.property = $scope.property;
-                self.setPropertyError = function (errorMsg) {
-                    $scope.property.propertyErrorMessage = errorMsg;
-                };
-
-                $scope.propertyActions = [];
-                self.setPropertyActions = function(actions) {
-                    $scope.propertyActions = actions;
-                };
-
-                // returns the unique Id for the property to be used as the validation key for server side validation logic
-                self.getValidationPath = function () {
-
-                    // the elementUdi will be empty when this is not a nested property
-                    var propAlias = $scope.propertyAlias ? $scope.propertyAlias : $scope.property.alias;
-                    $scope.elementUdi = ensureUdi($scope.elementUdi);
-                    return serverValidationManager.createPropertyValidationKey(propAlias, $scope.elementUdi);
-                }
-                $scope.getValidationPath = self.getValidationPath;
-
-            }
-        };
-    });
+})();
