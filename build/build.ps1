@@ -247,6 +247,9 @@
       /p:UmbracoBuild=True `
       > $log
 
+      # copy Umbraco.Persistance.SqlCe files into WebApp
+      Copy-Item "$($this.BuildTemp)\tests\Umbraco.Persistance.SqlCe.*" "$($this.BuildTemp)\WebApp\bin"
+
     if (-not $?) { throw "Failed to compile tests." }
 
     # /p:UmbracoBuild tells the csproj that we are building from PS
@@ -419,6 +422,12 @@
         -Version "$($this.Version.Semver.ToString())" `
         -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cms.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms." }
+
+    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.SqlCe.nuspec" `
+        -Properties BuildTmp="$($this.BuildTemp)" `
+        -Version "$($this.Version.Semver.ToString())" `
+        -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmssqlce.log"
+    if (-not $?) { throw "Failed to pack NuGet UmbracoCms.SqlCe." }
 
     # run hook
     if ($this.HasMethod("PostPackageNuGet"))
