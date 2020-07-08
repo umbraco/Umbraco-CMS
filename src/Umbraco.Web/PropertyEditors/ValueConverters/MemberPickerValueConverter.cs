@@ -31,6 +31,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
+            if (source == null) return null;
+        
             var attemptConvertInt = source.TryConvertTo<int>();
             if (attemptConvertInt.Success)
                 return attemptConvertInt.Result;
@@ -40,15 +42,15 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return null;
         }
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
+        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object inter, bool preview)
         {
-            if (source == null)
+            if (inter == null)
                 return null;
 
             if (Current.UmbracoContext != null)
             {
                 IPublishedContent member;
-                if (source is int id)
+                if (inter is int id)
                 {
                     member = _publishedSnapshotAccessor.PublishedSnapshot.Members.GetById(id);
                     if (member != null)
@@ -56,7 +58,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 }
                 else
                 {
-                    var sourceUdi = source as GuidUdi;
+                    var sourceUdi = inter as GuidUdi;
                     if (sourceUdi == null) return null;
                     member = _publishedSnapshotAccessor.PublishedSnapshot.Members.GetByProviderKey(sourceUdi.Guid);
                     if (member != null)
@@ -64,7 +66,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 }
             }
 
-            return source;
+            return inter;
         }
     }
 }
