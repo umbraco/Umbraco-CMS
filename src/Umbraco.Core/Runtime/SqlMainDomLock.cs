@@ -201,7 +201,6 @@ namespace Umbraco.Core.Runtime
 
             return Task.Run(() =>
             {
-
                 using var db = _dbFactory.CreateDatabase();
 
                 var watch = new Stopwatch();
@@ -212,101 +211,114 @@ namespace Umbraco.Core.Runtime
                     // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
                     Thread.Sleep(1000);
 
-                    using (var transaction = db.GetTransaction(IsolationLevel.ReadCommitted))
-                    {
-                        try
-                        {
-                            // get a read lock
-                            _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
-
-                            // the row 
-                            var mainDomRows = db.Fetch<KeyValueDto>("SELECT * FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
-
-                            if (mainDomRows.Count == 0 || mainDomRows[0].Value == updatedTempId)
-                            {
-                                // the other main dom has updated our record
-                                // Or the other maindom shutdown super fast and just deleted the record
-                                // which indicates that we
-                                // can acquire it and it has shutdown.
-
-                                _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
-
-                                // so now we update the row with our appdomain id
-                                InsertLockRecord(_lockId, db);
-                                _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);                                
-                                return true;
-                            }
-                            else if (mainDomRows.Count == 1 && !mainDomRows[0].Value.StartsWith(tempId))
-                            {
-                                // in this case, the prefixed ID is different which  means
-                                // another new AppDomain has come online and is wanting to take over. In that case, we will not
-                                // acquire.
-
-                                _logger.Debug<SqlMainDomLock>("Cannot acquire, another booting application detected.");
-                                return false;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            if (IsLockTimeoutException(ex as SqlException))
-                            {
-                                _logger.Error<SqlMainDomLock>(ex, "Sql timeout occurred, waiting for existing MainDom is canceled.");
-                                _errorDuringAcquiring = true;
-                                return false;
-                            }
-                            // unexpected
-                            _logger.Error<SqlMainDomLock>(ex, "Unexpected error, waiting for existing MainDom is canceled.");
-                            _errorDuringAcquiring = true;
-                            return false;
-                        }
-                        finally
-                        {
-                            transaction.Complete();
-                        }
-                    }
+                    var acquired = TryAcquire(db, tempId, updatedTempId);
+                    if (acquired.HasValue)
+                        return acquired.Value;
 
                     if (watch.ElapsedMilliseconds >= millisecondsTimeout)
                     {
-                        // if the timeout has elapsed, it either means that the other main dom is taking too long to shutdown,
-                        // or it could mean that the previous appdomain was terminated and didn't clear out the main dom SQL row
-                        // and it's just been left as an orphan row.
-                        // There's really know way of knowing unless we are constantly updating the row for the current maindom
-                        // which isn't ideal.
-                        // So... we're going to 'just' take over, if the writelock works then we'll assume we're ok
-
-                        _logger.Debug<SqlMainDomLock>("Timeout elapsed, assuming orphan row, acquiring MainDom.");
-
-                        using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
-
-                        try
-                        {
-                            _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
-
-                            // so now we update the row with our appdomain id
-                            InsertLockRecord(_lockId, db);
-                            _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
-                            return true;
-                        }
-                        catch (Exception ex)
-                        {
-                            if (IsLockTimeoutException(ex as SqlException))
-                            {
-                                // something is wrong, we cannot acquire, not much we can do
-                                _logger.Error<SqlMainDomLock>(ex, "Sql timeout occurred, could not forcibly acquire MainDom.");
-                                _errorDuringAcquiring = true;
-                                return false;
-                            }
-                            _logger.Error<SqlMainDomLock>(ex, "Unexpected error, could not forcibly acquire MainDom.");
-                            _errorDuringAcquiring = true;
-                            return false;
-                        }
-                        finally
-                        {
-                            transaction.Complete();
-                        }
+                        return AcquireWhenMaxWaitTimeElapsed(db);
                     }
                 }
             }, _cancellationTokenSource.Token);
+        }
+
+        private bool? TryAcquire(IUmbracoDatabase db, string tempId, string updatedTempId)
+        {
+            using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
+
+            try
+            {
+                // get a read lock
+                _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
+
+                // the row 
+                var mainDomRows = db.Fetch<KeyValueDto>("SELECT * FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
+
+                if (mainDomRows.Count == 0 || mainDomRows[0].Value == updatedTempId)
+                {
+                    // the other main dom has updated our record
+                    // Or the other maindom shutdown super fast and just deleted the record
+                    // which indicates that we
+                    // can acquire it and it has shutdown.
+
+                    _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
+
+                    // so now we update the row with our appdomain id
+                    InsertLockRecord(_lockId, db);
+                    _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
+                    return true;
+                }
+                else if (mainDomRows.Count == 1 && !mainDomRows[0].Value.StartsWith(tempId))
+                {
+                    // in this case, the prefixed ID is different which  means
+                    // another new AppDomain has come online and is wanting to take over. In that case, we will not
+                    // acquire.
+
+                    _logger.Debug<SqlMainDomLock>("Cannot acquire, another booting application detected.");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (IsLockTimeoutException(ex as SqlException))
+                {
+                    _logger.Error<SqlMainDomLock>(ex, "Sql timeout occurred, waiting for existing MainDom is canceled.");
+                    _errorDuringAcquiring = true;
+                    return false;
+                }
+                // unexpected
+                _logger.Error<SqlMainDomLock>(ex, "Unexpected error, waiting for existing MainDom is canceled.");
+                _errorDuringAcquiring = true;
+                return false;
+            }
+            finally
+            {
+                transaction.Complete();
+            }
+
+            return null; // continue
+        }
+
+        private bool AcquireWhenMaxWaitTimeElapsed(IUmbracoDatabase db)
+        {
+            // if the timeout has elapsed, it either means that the other main dom is taking too long to shutdown,
+            // or it could mean that the previous appdomain was terminated and didn't clear out the main dom SQL row
+            // and it's just been left as an orphan row.
+            // There's really know way of knowing unless we are constantly updating the row for the current maindom
+            // which isn't ideal.
+            // So... we're going to 'just' take over, if the writelock works then we'll assume we're ok
+
+            _logger.Debug<SqlMainDomLock>("Timeout elapsed, assuming orphan row, acquiring MainDom.");
+
+            using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
+
+            try
+            {
+                _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
+
+                // so now we update the row with our appdomain id
+                InsertLockRecord(_lockId, db);
+                _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                if (IsLockTimeoutException(ex as SqlException))
+                {
+                    // something is wrong, we cannot acquire, not much we can do
+                    _logger.Error<SqlMainDomLock>(ex, "Sql timeout occurred, could not forcibly acquire MainDom.");
+                    _errorDuringAcquiring = true;
+                    return false;
+                }
+                _logger.Error<SqlMainDomLock>(ex, "Unexpected error, could not forcibly acquire MainDom.");
+                _errorDuringAcquiring = true;
+                return false;
+            }
+            finally
+            {
+                transaction.Complete();
+            }
         }
 
         /// <summary>
