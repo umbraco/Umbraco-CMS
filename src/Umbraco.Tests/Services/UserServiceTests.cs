@@ -968,13 +968,61 @@ namespace Umbraco.Tests.Services
             Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(originalUser.AllowedSections.Count()));
         }
 
+        [Test]
+        public void Can_Get_Assigned_StartNodes_For_User()
+        {
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            var startContent = new[]
+            {
+                MockedContent.CreateSimpleContent(contentType),
+                MockedContent.CreateSimpleContent(contentType),
+                MockedContent.CreateSimpleContent(contentType)
+            };
+
+            ServiceContext.ContentService.Save(startContent);
+
+            var testUserGroup = CreateTestUserGroup();
+
+            int userGroupId = testUserGroup.Id;
+
+            CreateTestUser(startContent.Select(x => x.Id).ToArray(),testUserGroup);
+
+            //act
+            var usersInGroup = ServiceContext.UserService.GetAllInGroup(userGroupId);
+
+            var sut = usersInGroup.FirstOrDefault();
+
+            Assert.AreEqual(sut.StartContentIds.Length, startContent.Length);
+
+        }
+
         private IUser CreateTestUser(out IUserGroup userGroup)
         {
             userGroup = CreateTestUserGroup();
 
             var user = ServiceContext.UserService.CreateUserWithIdentity("test1", "test1@test.com");
+
             user.AddGroup(userGroup.ToReadOnlyGroup());
+
             ServiceContext.UserService.Save(user);
+
+            return user;
+        }
+
+        private IUser CreateTestUser(int[] contentIds,IUserGroup userGroup)
+        {
+
+            var user = ServiceContext.UserService.CreateUserWithIdentity("test1", "test1@test.com");
+
+            user.AddGroup(userGroup.ToReadOnlyGroup());
+            var updateTable = (User) user;
+
+            updateTable.StartContentIds = contentIds;
+
+            ServiceContext.UserService.Save(user);
+
             return user;
         }
 
