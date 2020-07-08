@@ -58,9 +58,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 }
                 else
                 {
-                    var sourceUdi = inter as GuidUdi;
-                    if (sourceUdi == null) return null;
-                    member = _publishedSnapshotAccessor.PublishedSnapshot.Members.GetByProviderKey(sourceUdi.Guid);
+                    var interUdi = inter as GuidUdi;
+                    if (interUdi == null) return null;
+                    member = _publishedSnapshotAccessor.PublishedSnapshot.Members.GetByProviderKey(interUdi.Guid);
                     if (member != null)
                         return member;
                 }
