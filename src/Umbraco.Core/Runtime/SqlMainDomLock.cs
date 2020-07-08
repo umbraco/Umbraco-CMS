@@ -172,7 +172,6 @@ namespace Umbraco.Core.Runtime
                     }
                     catch (Exception ex)
                     {
-                        // unexpected, if this occurs MainDom will be shutdown!
                         _logger.Error<SqlMainDomLock>(ex, "Unexpected error during listening.");
 
                         // We need to keep on listening unless we've been notified by our own AppDomain to shutdown since
