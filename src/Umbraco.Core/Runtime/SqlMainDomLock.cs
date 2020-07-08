@@ -103,6 +103,10 @@ namespace Umbraco.Core.Runtime
                 _hasError = true;
                 return false;
             }
+            finally
+            {
+                transaction.Complete();
+            }
             
 
             return await WaitForExistingAsync(tempId, millisecondsTimeout);
@@ -237,8 +241,7 @@ namespace Umbraco.Core.Runtime
 
                                 // so now we update the row with our appdomain id
                                 InsertLockRecord(_lockId, db);
-                                _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
-                                transaction.Complete();
+                                _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);                                
                                 return true;
                             }
                             else if (mainDomRows.Count == 1 && !mainDomRows[0].Value.StartsWith(tempId))
@@ -264,6 +267,10 @@ namespace Umbraco.Core.Runtime
                             _hasError = true;
                             return false;
                         }
+                        finally
+                        {
+                            transaction.Complete();
+                        }
                     }
 
                     if (watch.ElapsedMilliseconds >= millisecondsTimeout)
@@ -286,9 +293,6 @@ namespace Umbraco.Core.Runtime
                             // so now we update the row with our appdomain id
                             InsertLockRecord(_lockId, db);
                             _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
-
-                            transaction.Complete();
-
                             return true;
                         }
                         catch (Exception ex)
@@ -303,6 +307,10 @@ namespace Umbraco.Core.Runtime
                             _logger.Error<SqlMainDomLock>(ex, "Unexpected error, could not forcibly acquire MainDom.");
                             _hasError = true;
                             return false;
+                        }
+                        finally
+                        {
+                            transaction.Complete();
                         }
                     }
                 }
@@ -362,8 +370,6 @@ namespace Umbraco.Core.Runtime
 
                             try
                             {
-                                db.BeginTransaction(IsolationLevel.ReadCommitted);
-
                                 // get a write lock
                                 _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
 
@@ -376,12 +382,12 @@ namespace Umbraco.Core.Runtime
                                 if (_mainDomChanging)
                                 {
                                     _logger.Debug<SqlMainDomLock>("Releasing MainDom, updating row, new application is booting.");
-                                    db.Execute($"UPDATE umbracoKeyValue SET [value] = [value] + '{UpdatedSuffix}' WHERE [key] = @key", new { key = MainDomKey });
+                                    var count = db.Execute($"UPDATE umbracoKeyValue SET [value] = [value] + '{UpdatedSuffix}' WHERE [key] = @key", new { key = MainDomKey });
                                 }
                                 else
                                 {
                                     _logger.Debug<SqlMainDomLock>("Releasing MainDom, deleting row, application is shutting down.");
-                                    db.Execute("DELETE FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
+                                    var count = db.Execute("DELETE FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
                                 }
                             }
                             catch (Exception ex)
