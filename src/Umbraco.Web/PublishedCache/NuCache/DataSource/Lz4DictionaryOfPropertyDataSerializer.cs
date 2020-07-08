@@ -39,9 +39,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         public Lz4DictionaryOfPropertyDataSerializer(NucachePropertyOptions nucachePropertyOptions)
         {
-            _compressProperties = nucachePropertyOptions.PropertyMap.ToList().ToDictionary(x => string.Intern(x.Value.mappedAlias), x => (x.Value.compress,x.Value.decompressionLevel, string.Intern(x.Value.mappedAlias)));
+            _compressProperties = nucachePropertyOptions.PropertyMap.ToList().ToDictionary(x => string.Intern(x.Key), x => (x.Value.compress,x.Value.decompressionLevel, string.Intern(x.Value.mappedAlias)));
             _minimumStringLengthForCompression = nucachePropertyOptions.MinimumCompressibleStringLength;
-            _uncompressProperties = _compressProperties.ToList().ToDictionary(x => x.Value.mappedAlias, x => (x.Value.compress, x.Value.decompressionLevel, x.Value.mappedAlias));
+            _uncompressProperties = _compressProperties.ToList().ToDictionary(x => x.Value.mappedAlias, x => (x.Value.compress, x.Value.decompressionLevel, x.Key));
 
             _compressionLevel = nucachePropertyOptions.LZ4CompressionLevel;
         }
