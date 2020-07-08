@@ -201,7 +201,7 @@ namespace Umbraco.Core.Runtime
 
             return Task.Run(() =>
             {
-                // ensure this is disposed when this thread ends
+
                 using var db = _dbFactory.CreateDatabase();
 
                 var watch = new Stopwatch();
@@ -356,7 +356,6 @@ namespace Umbraco.Core.Runtime
 
                         if (_dbFactory.Configured)
                         {
-                            // ensure this is disposed when this thread ends
                             using var db = _dbFactory.CreateDatabase();
                             using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
 
