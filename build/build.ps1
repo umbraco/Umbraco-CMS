@@ -319,10 +319,10 @@
 
     # copy Belle
     Write-Host "Copy Belle"
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\umbraco\wwwroot\assets", "*", "$tmp\WebApp\wwwroot\umbraco\assets")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\umbraco\wwwroot\js", "*", "$tmp\WebApp\wwwroot\umbraco\js")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\umbraco\wwwroot\lib", "*", "$tmp\WebApp\wwwroot\umbraco\lib")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\umbraco\wwwroot\views", "*", "$tmp\WebApp\wwwroot\umbraco\views")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\assets", "*", "$tmp\WebApp\wwwroot\umbraco\assets")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\js", "*", "$tmp\WebApp\wwwroot\umbraco\js")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\lib", "*", "$tmp\WebApp\wwwroot\umbraco\lib")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\views", "*", "$tmp\WebApp\wwwroot\umbraco\views")
   })
 
   $ubuild.DefineMethod("PackageZip",
