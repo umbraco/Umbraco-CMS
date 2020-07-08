@@ -17,6 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="css" />
       <Folder Include="Umbraco" />
       <Folder Include="Views\" />
       <Folder Include="wwwroot\Media" />
@@ -54,14 +55,10 @@
         <Content Remove="wwwroot\Umbraco\views\install\continueinstall.html" />
         <Content Remove="wwwroot\Umbraco\views\install\database.html" />
         <Content Remove="wwwroot\Umbraco\views\install\error.html" />
-        <Content Update="Areas\UmbracoInstall\Views\Install\Index.cshtml">
-          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-          <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
-        <Content Update="Config\tinyMceConfig.config">
+        <Content Update="config\tinyMceConfig.config">
           <SubType>Designer</SubType>
         </Content>
-        <Content Update="Config\umbracoSettings.config">
+        <Content Update="config\umbracoSettings.config">
           <SubType>Designer</SubType>
         </Content>
         <Content Remove="wwwroot\Web.config" />
