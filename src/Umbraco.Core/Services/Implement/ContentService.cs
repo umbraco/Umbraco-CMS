@@ -1359,13 +1359,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishResult> PerformScheduledPublish(DateTime date)
-            => PerformScheduledPublishInternal(date).ToList();
-
-        // beware! this method yields results, so the returned IEnumerable *must* be
-        // enumerated for anything to happen - dangerous, so private + exposed via
-        // the public method above, which forces ToList().
-        private IEnumerable<PublishResult> PerformScheduledPublishInternal(DateTime date)
+        public IEnumerable<PublishResult> PerformScheduledPublish(DateTime date)            
         {
             var evtMsgs = EventMessagesFactory.Get();
 
