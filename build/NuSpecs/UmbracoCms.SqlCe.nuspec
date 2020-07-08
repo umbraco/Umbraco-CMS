@@ -3,7 +3,7 @@
     <metadata minClientVersion="4.1.0">
         <id>UmbracoCms.SqlCe</id>
         <version>9.0.0</version>
-        <title>Umbraco Cms Core Binaries</title>
+        <title>Umbraco Cms Sql Ce Add-on</title>
         <authors>Umbraco HQ</authors>
         <owners>Umbraco HQ</owners>
         <license type="expression">MIT</license>
@@ -17,13 +17,15 @@
         <repository type="git" url="https://github.com/umbraco/umbraco-cms" />
         <dependencies>
 
-            <group targetFramework="net472">
+            <group targetFramework="netstandard2.0">
                 <!--
                   note: dependencies are specified as [x.y.z,x.999999) eg [2.1.0,2.999999) and NOT [2.1.0,3.0.0) because
                   the latter would pick anything below 3.0.0 and that includes prereleases such as 3.0.0-alpha, and we do
                   not want this to happen as the alpha of the next major is, really, the next major already.
                 -->
                 <dependency id="UmbracoCms.Core" version="[$version$]" />
+            </group>
+            <group targetFramework="net472">
                 <dependency id="Umbraco.SqlServerCE" version="[4.0.0.1,4.999999)" />
             </group>
 
