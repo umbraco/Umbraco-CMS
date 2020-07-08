@@ -180,9 +180,9 @@
     $this.RemoveFile($excludeFiles)
 
     # copy rest of the files into WebApp
-    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Config", "*", "$($this.BuildTemp)\WebApp\Config")
+    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Config", "*", "$($this.BuildTemp)\WebApp\config")
     $this.RemoveFile("$($this.BuildTemp)\WebApp\Config\*.Release.*")
-    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Umbraco", "*", "$($this.BuildTemp)\WebApp\Umbraco")
+    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Umbraco", "*", "$($this.BuildTemp)\WebApp\umbraco")
     $excludeUmbracoDirs = @("$($this.BuildTemp)\WebApp\Umbraco\config","$($this.BuildTemp)\WebApp\Umbraco\lib")
     $this.RemoveDirectory($excludeUmbracoDirs)
     $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Views", "*", "$($this.BuildTemp)\WebApp\Views")
