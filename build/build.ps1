@@ -504,7 +504,6 @@
     $this.PackageZip()
     if ($this.OnError()) { return }
     $this.VerifyNuGet()
-    $this.VerifyNuGet()
     if ($this.OnError()) { return }
     $this.PackageNuGet()
     if ($this.OnError()) { return }
