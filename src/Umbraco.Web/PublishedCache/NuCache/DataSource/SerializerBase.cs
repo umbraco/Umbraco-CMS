@@ -16,6 +16,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         private const char PrefixDouble = 'B';
         private const char PrefixDateTime = 'D';
         private const char PrefixByte = 'O';
+        private const char PrefixByteArray = 'A';
 
         protected string ReadString(Stream stream) => PrimitiveSerializer.String.ReadFrom(stream);
         protected int ReadInt(Stream stream) => PrimitiveSerializer.Int32.ReadFrom(stream);
@@ -23,6 +24,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         protected float ReadFloat(Stream stream) => PrimitiveSerializer.Float.ReadFrom(stream);
         protected double ReadDouble(Stream stream) => PrimitiveSerializer.Double.ReadFrom(stream);
         protected DateTime ReadDateTime(Stream stream) => PrimitiveSerializer.DateTime.ReadFrom(stream);
+        protected byte[] ReadByteArray(Stream stream) => PrimitiveSerializer.Bytes.ReadFrom(stream);
 
         private T? ReadObject<T>(Stream stream, char t, Func<Stream, T> read)
             where T : struct
@@ -39,7 +41,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             var type = PrimitiveSerializer.Char.ReadFrom(stream);
             if (type == PrefixNull) return null;
             if (type != PrefixString)
-                throw new NotSupportedException($"Cannot deserialize type '{type}', expected 'S'.");
+                throw new NotSupportedException($"Cannot deserialize type '{type}', expected '{PrefixString}'.");
             return intern
                 ? string.Intern(PrimitiveSerializer.String.ReadFrom(stream))
                 : PrimitiveSerializer.String.ReadFrom(stream);
@@ -50,6 +52,16 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         protected float? ReadFloatObject(Stream stream) => ReadObject(stream, PrefixFloat, ReadFloat);
         protected double? ReadDoubleObject(Stream stream) => ReadObject(stream, PrefixDouble, ReadDouble);
         protected DateTime? ReadDateTimeObject(Stream stream) => ReadObject(stream, PrefixDateTime, ReadDateTime);
+
+        protected byte[] ReadByteArrayObject(Stream stream) // required 'cos byte[] is not a struct
+        {
+            var type = PrimitiveSerializer.Char.ReadFrom(stream);
+            if (type == PrefixNull) return null;
+            if (type != PrefixByteArray)
+                throw new NotSupportedException($"Cannot deserialize type '{type}', expected '{PrefixByteArray}'.");
+            return PrimitiveSerializer.Bytes.ReadFrom(stream);
+        }
+
 
         protected object ReadObject(Stream stream)
             => ReadObject(PrimitiveSerializer.Char.ReadFrom(stream), stream);
@@ -81,6 +93,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     return PrimitiveSerializer.Double.ReadFrom(stream);
                 case PrefixDateTime:
                     return PrimitiveSerializer.DateTime.ReadFrom(stream);
+                case PrefixByteArray:
+                    return PrimitiveSerializer.Bytes.ReadFrom(stream);
                 default:
                     throw new NotSupportedException($"Cannot deserialize unknown type '{type}'.");
             }
@@ -136,6 +150,11 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             {
                 PrimitiveSerializer.Char.WriteTo(PrefixUInt32, stream);
                 PrimitiveSerializer.UInt32.WriteTo(uInt32Value, stream);
+            }
+            else if (value is byte[] byteArrayValue)
+            {
+                PrimitiveSerializer.Char.WriteTo(PrefixByteArray, stream);
+                PrimitiveSerializer.Bytes.WriteTo(byteArrayValue, stream);
             }
             else
                 throw new NotSupportedException("Value type " + value.GetType().FullName + " cannot be serialized.");
