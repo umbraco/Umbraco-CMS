@@ -1369,6 +1369,8 @@ namespace Umbraco.Core.Services.Implement
         {
             var evtMsgs = EventMessagesFactory.Get();
 
+            var results = new List<PublishResult>();
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
@@ -1377,7 +1379,6 @@ namespace Umbraco.Core.Services.Implement
 
                 foreach (var d in _documentRepository.GetContentForRelease(date))
                 {
-                    PublishResult result;
                     if (d.ContentType.VariesByCulture())
                     {
                         //find which cultures have pending schedules
@@ -1391,7 +1392,10 @@ namespace Umbraco.Core.Services.Implement
 
                         var saveEventArgs = new ContentSavingEventArgs(d, evtMsgs);
                         if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Saving)))
-                            yield return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d);
+                        {
+                            results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
+                            continue;
+                        }
 
                         var publishing = true;
                         foreach (var culture in pendingCultures)
@@ -1413,6 +1417,8 @@ namespace Umbraco.Core.Services.Implement
                             if (!publishing) break; // no point continuing
                         }
 
+                        PublishResult result;
+
                         if (d.Trashed)
                             result = new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, d);
                         else if (!publishing)
@@ -1420,31 +1426,30 @@ namespace Umbraco.Core.Services.Implement
                         else
                             result = CommitDocumentChangesInternal(scope, d, saveEventArgs, allLangs, d.WriterId);
 
-
                         if (result.Success == false)
                             Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
 
-                        yield return result;
+                        results.Add(result);
                     }
                     else
                     {
                         //Clear this schedule
                         d.ContentSchedule.Clear(ContentScheduleAction.Release, date);
 
-                        result = d.Trashed
+                        var result = d.Trashed
                             ? new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, d)
                             : SaveAndPublish(d, userId: d.WriterId);
 
                         if (result.Success == false)
                             Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
 
-                        yield return result;
+                        results.Add(result);
                     }
                 }
 
                 foreach (var d in _documentRepository.GetContentForExpiration(date))
                 {
-                    PublishResult result;
+                    
                     if (d.ContentType.VariesByCulture())
                     {
                         //find which cultures have pending schedules
@@ -1458,7 +1463,10 @@ namespace Umbraco.Core.Services.Implement
 
                         var saveEventArgs = new ContentSavingEventArgs(d, evtMsgs);
                         if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Saving)))
-                            yield return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d);
+                        {
+                            results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
+                            continue;
+                        }   
 
                         foreach (var c in pendingCultures)
                         {
@@ -1468,20 +1476,20 @@ namespace Umbraco.Core.Services.Implement
                             d.UnpublishCulture(c);
                         }
 
-                        result = CommitDocumentChangesInternal(scope, d, saveEventArgs, allLangs, d.WriterId);
+                        var result = CommitDocumentChangesInternal(scope, d, saveEventArgs, allLangs, d.WriterId);
                         if (result.Success == false)
                             Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
-                        yield return result;
+                        results.Add(result);
 
                     }
                     else
                     {
                         //Clear this schedule
                         d.ContentSchedule.Clear(ContentScheduleAction.Expire, date);
-                        result = Unpublish(d, userId: d.WriterId);
+                        var result = Unpublish(d, userId: d.WriterId);
                         if (result.Success == false)
                             Logger.Error<ContentService>(null, "Failed to unpublish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
-                        yield return result;
+                        results.Add(result);
                     }
 
 
@@ -1491,6 +1499,8 @@ namespace Umbraco.Core.Services.Implement
 
                 scope.Complete();
             }
+
+            return results;
         }
 
         // utility 'PublishCultures' func used by SaveAndPublishBranch
