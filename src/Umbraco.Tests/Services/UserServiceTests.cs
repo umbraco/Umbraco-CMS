@@ -7,6 +7,7 @@ using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -971,31 +972,38 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Get_Assigned_StartNodes_For_User()
         {
-            var contentType = MockedContentTypes.CreateSimpleContentType();
-            ServiceContext.ContentTypeService.Save(contentType);
-
-            var startContent = new[]
-            {
-                MockedContent.CreateSimpleContent(contentType),
-                MockedContent.CreateSimpleContent(contentType),
-                MockedContent.CreateSimpleContent(contentType)
-            };
-
-            ServiceContext.ContentService.Save(startContent);
+            var startContentItems = BuildContentItems(3);
 
             var testUserGroup = CreateTestUserGroup();
 
             int userGroupId = testUserGroup.Id;
 
-            CreateTestUser(startContent.Select(x => x.Id).ToArray(),testUserGroup);
+            CreateTestUser(startContentItems.Select(x => x.Id).ToArray(),testUserGroup);
 
-            //act
             var usersInGroup = ServiceContext.UserService.GetAllInGroup(userGroupId);
 
             var sut = usersInGroup.FirstOrDefault();
 
-            Assert.AreEqual(sut.StartContentIds.Length, startContent.Length);
+            Assert.AreEqual(sut.StartContentIds.Length, startContentItems.Length);
 
+        }
+
+        private Content[] BuildContentItems(int noToCreate)
+        {
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            var startContentItems = new List<Content>();
+
+            for (int i = 0; i < noToCreate; i++)
+            {
+                startContentItems.Add(MockedContent.CreateSimpleContent(contentType));
+            }
+
+            ServiceContext.ContentService.Save(startContentItems);
+
+            return startContentItems.ToArray();
         }
 
         private IUser CreateTestUser(out IUserGroup userGroup)
@@ -1011,15 +1019,16 @@ namespace Umbraco.Tests.Services
             return user;
         }
 
-        private IUser CreateTestUser(int[] contentIds,IUserGroup userGroup)
+        private IUser CreateTestUser(int[] startContentIds,IUserGroup userGroup)
         {
 
             var user = ServiceContext.UserService.CreateUserWithIdentity("test1", "test1@test.com");
 
             user.AddGroup(userGroup.ToReadOnlyGroup());
-            var updateTable = (User) user;
 
-            updateTable.StartContentIds = contentIds;
+            var updateable = (User)user;
+
+            updateable.StartContentIds = startContentIds;
 
             ServiceContext.UserService.Save(user);
 
