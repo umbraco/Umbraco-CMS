@@ -469,7 +469,7 @@
     $src = "$($this.SolutionRoot)\src"
     $out = $this.BuildOutput
 
-    # Check if the solution has been built		
+    # Check if the solution has been built
     if (!(Test-Path "$src\Umbraco.Web.UI.Client\node_modules")) {throw "Umbraco needs to be built before generating the Angular Docs"}
 
     "Moving to Umbraco.Web.UI.Docs folder"
@@ -480,7 +480,7 @@
     & npx gulp docs
 
     Pop-Location
-    
+
     # change baseUrl
     $BaseUrl = "https://our.umbraco.com/apidocs/v8/ui/"
     $IndexPath = "./api/index.html"
