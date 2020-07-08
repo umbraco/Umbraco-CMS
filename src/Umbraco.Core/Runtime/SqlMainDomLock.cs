@@ -6,7 +6,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -21,12 +20,11 @@ namespace Umbraco.Core.Runtime
         private const string MainDomKeyPrefix = "Umbraco.Core.Runtime.SqlMainDom";
         private const string UpdatedSuffix = "_updated";
         private readonly ILogger _logger;
-        private IUmbracoDatabase _db;
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private SqlServerSyntaxProvider _sqlServerSyntax = new SqlServerSyntaxProvider();
         private bool _mainDomChanging = false;
         private readonly UmbracoDatabaseFactory _dbFactory;
-        private bool _hasError;
+        private bool _errorDuringAcquiring;
         private object _locker = new object();
 
         public SqlMainDomLock(ILogger logger)
@@ -68,14 +66,12 @@ namespace Umbraco.Core.Runtime
                     // wait to get a write lock
                     _sqlServerSyntax.WriteLock(db, TimeSpan.FromMilliseconds(millisecondsTimeout), Constants.Locks.MainDom);                    
                 }
-                catch (Exception ex)
+                catch(SqlException ex)
                 {
                     if (IsLockTimeoutException(ex))
                     {
-                        // TODO: Do we want to retry? We haven't seen any timeout exceptions here so not sure it's important at this stage
-
                         _logger.Error<SqlMainDomLock>(ex, "Sql timeout occurred, could not acquire MainDom.");
-                        _hasError = true;
+                        _errorDuringAcquiring = true;
                         return false;
                     }
 
@@ -100,7 +96,7 @@ namespace Umbraco.Core.Runtime
             {
                 // unexpected
                 _logger.Error<SqlMainDomLock>(ex, "Unexpected error, cannot acquire MainDom");
-                _hasError = true;
+                _errorDuringAcquiring = true;
                 return false;
             }
             finally
@@ -114,7 +110,7 @@ namespace Umbraco.Core.Runtime
 
         public Task ListenAsync()
         {
-            if (_hasError)
+            if (_errorDuringAcquiring)
             {
                 _logger.Warn<SqlMainDomLock>("Could not acquire MainDom, listening is canceled.");
                 return Task.CompletedTask;
@@ -140,8 +136,9 @@ namespace Umbraco.Core.Runtime
         {
             while (true)
             {
-                // poll every 1 second
-                Thread.Sleep(1000);
+                // poll every 1.5 second
+                // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
+                Thread.Sleep(2000);
 
                 if (!_dbFactory.Configured)
                 {
@@ -165,10 +162,6 @@ namespace Umbraco.Core.Runtime
                         // get a read lock
                         _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
 
-                        // TODO: We could in theory just check if the main dom row doesn't exist, that could indicate that
-                        // we are still the maindom. An empty value might be better because then we won't have any orphan rows
-                        // if the app is terminated. Could that work?
-
                         if (!IsMainDomValue(_lockId, db))
                         {
                             // we are no longer main dom, another one has come online, exit
@@ -179,15 +172,14 @@ namespace Umbraco.Core.Runtime
                     }
                     catch (Exception ex)
                     {
-                        // TODO: We need to make this more resilient to Azure Sql and timeout issues and not just exit causing the
-                        // app to restart. We don't wan to restart unless we know there's another appdomain online
+                        // unexpected, if this occurs MainDom will be shutdown!
+                        _logger.Error<SqlMainDomLock>(ex, "Unexpected error during listening.");
 
-                        //ResetDatabase();
+                        // We need to keep on listening unless we've been notified by our own AppDomain to shutdown since
+                        // we don't want to shutdown resources controlled by MainDom inadvertently. We'll just keep listening otherwise.
+                        if (_cancellationTokenSource.IsCancellationRequested)
+                            return;
 
-                        // unexpected
-                        _logger.Error<SqlMainDomLock>(ex, "Unexpected error, listening is canceled.");
-                        _hasError = true;
-                        return;
                     }
                     finally
                     {
@@ -218,7 +210,8 @@ namespace Umbraco.Core.Runtime
                 while (true)
                 {
                     // poll very often, we need to take over as fast as we can
-                    Thread.Sleep(500);
+                    // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
+                    Thread.Sleep(1000);
 
                     using (var transaction = db.GetTransaction(IsolationLevel.ReadCommitted))
                     {
@@ -256,15 +249,15 @@ namespace Umbraco.Core.Runtime
                         }
                         catch (Exception ex)
                         {
-                            if (IsLockTimeoutException(ex))
+                            if (IsLockTimeoutException(ex as SqlException))
                             {
                                 _logger.Error<SqlMainDomLock>(ex, "Sql timeout occurred, waiting for existing MainDom is canceled.");
-                                _hasError = true;
+                                _errorDuringAcquiring = true;
                                 return false;
                             }
                             // unexpected
                             _logger.Error<SqlMainDomLock>(ex, "Unexpected error, waiting for existing MainDom is canceled.");
-                            _hasError = true;
+                            _errorDuringAcquiring = true;
                             return false;
                         }
                         finally
@@ -297,15 +290,15 @@ namespace Umbraco.Core.Runtime
                         }
                         catch (Exception ex)
                         {
-                            if (IsLockTimeoutException(ex))
+                            if (IsLockTimeoutException(ex as SqlException))
                             {
                                 // something is wrong, we cannot acquire, not much we can do
                                 _logger.Error<SqlMainDomLock>(ex, "Sql timeout occurred, could not forcibly acquire MainDom.");
-                                _hasError = true;
+                                _errorDuringAcquiring = true;
                                 return false;
                             }
                             _logger.Error<SqlMainDomLock>(ex, "Unexpected error, could not forcibly acquire MainDom.");
-                            _hasError = true;
+                            _errorDuringAcquiring = true;
                             return false;
                         }
                         finally
@@ -345,7 +338,7 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         /// <param name="exception"></param>
         /// <returns></returns>
-        private bool IsLockTimeoutException(Exception exception) => exception is SqlException sqlException && sqlException.Number == 1222;
+        private bool IsLockTimeoutException(SqlException sqlException) => sqlException?.Number == 1222;
 
         #region IDisposable Support
         private bool _disposedValue = false; // To detect redundant calls
@@ -393,7 +386,6 @@ namespace Umbraco.Core.Runtime
                             catch (Exception ex)
                             {
                                 _logger.Error<SqlMainDomLock>(ex, "Unexpected error during dipsose.");
-                                _hasError = true;
                             }
                             finally
                             {
