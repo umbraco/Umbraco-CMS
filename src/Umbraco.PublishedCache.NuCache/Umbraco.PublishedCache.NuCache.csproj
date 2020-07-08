@@ -6,6 +6,10 @@
         <LangVersion>8</LangVersion>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DocumentationFile>bin\Release\Umbraco.PublishedCache.NuCache.xml</DocumentationFile>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="CSharpTest.Net.Collections-NetStd2" Version="14.906.1403.1084" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />

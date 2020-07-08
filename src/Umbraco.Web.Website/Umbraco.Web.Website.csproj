@@ -4,6 +4,10 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <OutputType>Library</OutputType>
     </PropertyGroup>
+	
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DocumentationFile>bin\Release\Umbraco.Web.Website.xml</DocumentationFile>
+    </PropertyGroup>
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />

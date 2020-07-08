@@ -180,10 +180,10 @@
     $this.RemoveFile($excludeFiles)
 
     # copy rest of the files into WebApp
-    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Config", "*", "$($this.BuildTemp)\WebApp\Config")
+    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Config", "*", "$($this.BuildTemp)\WebApp\config")
     $this.RemoveFile("$($this.BuildTemp)\WebApp\Config\*.Release.*")
-    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Umbraco", "*", "$($this.BuildTemp)\WebApp\Umbraco")
-    $excludeUmbracoDirs = @("$($this.BuildTemp)\WebApp\Umbraco\config","$($this.BuildTemp)\WebApp\Umbraco\lib")
+    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Umbraco", "*", "$($this.BuildTemp)\WebApp\umbraco")
+    $excludeUmbracoDirs = @("$($this.BuildTemp)\WebApp\umbraco\config","$($this.BuildTemp)\WebApp\umbraco\lib")
     $this.RemoveDirectory($excludeUmbracoDirs)
     $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Views", "*", "$($this.BuildTemp)\WebApp\Views")
     Copy-Item "$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\appsettings.json" "$($this.BuildTemp)\WebApp"
@@ -322,10 +322,10 @@
 
     # copy Belle
     Write-Host "Copy Belle"
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\umbraco\assets", "*", "$tmp\WebApp\umbraco\assets")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\umbraco\js", "*", "$tmp\WebApp\umbraco\js")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\umbraco\lib", "*", "$tmp\WebApp\umbraco\lib")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\umbraco\views", "*", "$tmp\WebApp\umbraco\views")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\assets", "*", "$tmp\WebApp\wwwroot\umbraco\assets")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\js", "*", "$tmp\WebApp\wwwroot\umbraco\js")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\lib", "*", "$tmp\WebApp\wwwroot\umbraco\lib")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\views", "*", "$tmp\WebApp\wwwroot\umbraco\views")
   })
 
   $ubuild.DefineMethod("PackageZip",
@@ -376,16 +376,6 @@
 
       Write-Host ("##vso[task.setvariable variable=UMBRACO_TMP;]$($this.SolutionRoot)\build.tmp")
     }
-  })
-
-  $ubuild.DefineMethod("PrepareNuGet",
-  {
-    Write-Host "Prepare NuGet"
-
-    # add Web.config transform files to the NuGet package
-    Write-Host "Add web.config transforms to NuGet package"
-    mv "$($this.BuildTemp)\WebApp\Views\Web.config" "$($this.BuildTemp)\WebApp\Views\Web.config.transform"
-
   })
 
   $nugetsourceUmbraco = "https://api.nuget.org/v3/index.json"
@@ -522,8 +512,6 @@
     $this.PackageZip()
     if ($this.OnError()) { return }
     $this.VerifyNuGet()
-    if ($this.OnError()) { return }
-    $this.PrepareNuGet()
     if ($this.OnError()) { return }
     $this.PackageNuGet()
     if ($this.OnError()) { return }
