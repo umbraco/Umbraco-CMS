@@ -14,6 +14,11 @@ namespace Umbraco.Tests.UnitTests.AutoFixture
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor)]
     public class AutoMoqDataAttribute : AutoDataAttribute
     {
+        /// <summary>
+        /// Uses AutoFixture to automatically mock (using Moq) the injected types. E.g when injecting interfaces.
+        /// AutoFixture is used to generate concrete types. If the concrete type required some types injected, the
+        /// [Frozen] can be used to ensure the same variable is injected and available as parameter for the test
+        /// </summary>
         public AutoMoqDataAttribute() : base(() => AutoMockCustomizations.Default)
         {
         }
@@ -34,6 +39,7 @@ namespace Umbraco.Tests.UnitTests.AutoFixture
                         .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()))
                         .Customize(new AutoMoqCustomization());
 
+                    // When requesting an IUserStore ensure we actually uses a IUserLockoutStore
                     fixture.Customize<IUserStore<BackOfficeIdentityUser>>(cc => cc.FromFactory(() => Mock.Of<IUserLockoutStore<BackOfficeIdentityUser>>()));
 
 
