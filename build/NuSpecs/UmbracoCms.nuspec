@@ -16,43 +16,27 @@
         <tags>umbraco</tags>
         <repository type="git" url="https://github.com/umbraco/umbraco-cms" />
         <dependencies>
-
             <group targetFramework="netcoreapp3.1">
-
                 <dependency id="UmbracoCms.Web" version="9.0.0" />
-
             </group>
-
         </dependencies>
+        <!--
+        We can't use content files, as the files need to be copied into the solution, links/shortcuts to the files
+        are not good enough
+        -->
+        <contentFiles />
     </metadata>
     <files>
-        <!-- files -->
-        <file src="$BuildTmp$\Configs\**" target="Content\Config" exclude="$BuildTmp$\Configs\Web.config.transform" />
-        <!--Don't have them <file src="$BuildTmp$\WebApp\Views\**" target="Content\Views" exclude="$BuildTmp$\WebApp\Views\Web.config" />-->
-        <!--Don't have them file src="$BuildTmp$\WebApp\Global.asax" target="Content\Global.asax" />-->
-        <file src="$BuildTmp$\WebApp\config\BackOfficeTours\**" target="Content\Config\BackOfficeTours" />
-        <!--<file src="$BuildTmp$\WebApp\Media\Web.config" target="Content\Media\Web.config" />-->
+        <!-- Content -->
+        <file src="$BuildTmp$\WebApp\wwwroot\umbraco\**\*.*" target="content\wwwroot\umbraco" />
+        <file src="$BuildTmp$\WebApp\umbraco\**\*.*" target="content\umbraco" />
+        <file src="$BuildTmp$\WebApp\config\**\*.*" target="content\config" />
 
-        <!-- these files are copied by install.ps1 -->
-        <!--<file src="$BuildTmp$\WebApp\Web.config" target="UmbracoFiles\Web.config" />
-        <file src="$BuildTmp$\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
-        <file src="$BuildTmp$\WebApp\config\splashes\**" target="UmbracoFiles\Config\splashes" />-->
+        <!-- Readme -->
+        <file src="tools\Readme.txt" target="Readme.txt" />
+        <file src="tools\ReadmeUpgrade.txt" target="ReadmeUpgrade.txt" />
 
-        <!-- tools -->
-        <!-- beware! install.ps1 not supported by PackageReference -->
-        <!--<file src="tools\install.ps1" target="tools\install.ps1" />-->
-        <file src="tools\Readme.txt" target="tools\Readme.txt" />
-        <file src="tools\ReadmeUpgrade.txt" target="tools\ReadmeUpgrade.txt" />
-
-        <!-- config transforms -->
-        <!-- beware! config transforms not supported by PackageReference -->
-        <!--<file src="tools\Web.config.install.xdt" target="Content\Web.config.install.xdt" />
-        <file src="tools\serilog.config.install.xdt" target="Content\config\serilog.config.install.xdt" />
-        <file src="tools\ClientDependency.config.install.xdt" target="Content\config\ClientDependency.config.install.xdt" />
-        <file src="tools\umbracoSettings.config.install.xdt" target="Content\config\umbracoSettings.config.install.xdt" />
-        <file src="tools\Views.Web.config.install.xdt" target="Views\Web.config.install.xdt" /> --><!-- FIXME: Content\ !! and then... transform?! -->
-
-        <!-- UmbracoCms props and targets -->
-        <file src="build\**" target="build" />
+        <!-- UmbracoCms props and targets used to copy the content into the solution -->
+        <file src="build\**" target="build\" />
     </files>
 </package>
