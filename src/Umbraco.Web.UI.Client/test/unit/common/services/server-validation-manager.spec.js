@@ -4,7 +4,8 @@
     beforeEach(module('umbraco.services'));
     
     beforeEach(inject(function ($injector) {
-        serverValidationManager = $injector.get('serverValidationManager');        
+        serverValidationManager = $injector.get('serverValidationManager');
+        serverValidationManager.clear();
     }));
 
     describe('managing field validation errors', function () {
@@ -316,6 +317,51 @@
 
     describe('managing complex editor validation errors', function () {
 
+        // this root element doesn't have it's own attached errors, instead it has model state just 
+        // showing that it has errors within it's nested properties. that ModelState is automatically
+        // added on the server side.
+        var nonRootLevelComplexValidationMsg = `[
+    {
+        "$elementTypeAlias": "addressBook",
+		"$id": "34E3A26C-103D-4A05-AB9D-7E14032309C3",
+        "addresses":
+        [
+			{
+				"$elementTypeAlias": "addressInfo",
+				"$id": "FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1",
+				"ModelState":
+                {
+                    "_Properties.city.invariant.null.country": [
+                        "City is not in Australia"
+                    ],
+                    "_Properties.city.invariant.null.capital": [
+                        "Not a capital city"
+                    ]
+                }
+			},
+			{
+				"$elementTypeAlias": "addressInfo",
+				"$id": "7170A4DD-2441-4B1B-A8D3-437D75C4CBC9",
+				"ModelState":
+                {
+                    "_Properties.city.invariant.null.country": [
+                        "City is not in Australia"
+                    ],
+                    "_Properties.city.invariant.null.capital": [
+                        "Not a capital city"
+                    ]
+                }
+			}
+        ],
+        "ModelState":
+        {
+            "_Properties.addresses.invariant.null": [
+                ""
+            ]
+        }
+    }
+]`;
+
         it('create dictionary of id to ModelState', function () {
 
             //arrange
@@ -365,80 +411,52 @@
 ]`;
             
             //act 
-            var ids = serverValidationManager.parseComplexEditorError(complexValidationMsg);
+            var ms = serverValidationManager.parseComplexEditorError(complexValidationMsg);
 
             //assert
-            var keys = Object.keys(ids); 
-
-            expect(keys.length).toEqual(3);
-            expect(keys[0]).toEqual("34E3A26C-103D-4A05-AB9D-7E14032309C3");
-            expect(keys[1]).toEqual("FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1");
-            expect(keys[2]).toEqual("7170A4DD-2441-4B1B-A8D3-437D75C4CBC9");
+            expect(ms.length).toEqual(3);
+            expect(ms[0].id).toEqual("34E3A26C-103D-4A05-AB9D-7E14032309C3");
+            expect(ms[1].id).toEqual("FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1");
+            expect(ms[2].id).toEqual("7170A4DD-2441-4B1B-A8D3-437D75C4CBC9");
 
         });
 
         it('create dictionary of id to ModelState with inherited errors', function () {
 
-            // arrange
-            // this root element doesn't have it's own attached errors, instead it has model state just 
-            // showing that it has errors within it's nested properties. that ModelState is automatically
-            // added on the server side.
-            var complexValidationMsg = `[
-    {
-        "$elementTypeAlias": "addressBook",
-		"$id": "34E3A26C-103D-4A05-AB9D-7E14032309C3",
-        "addresses":
-        [
-			{
-				"$elementTypeAlias": "addressInfo",
-				"$id": "FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1",
-				"ModelState":
-                {
-                    "_Properties.city.invariant.null.country": [
-                        "City is not in Australia"
-                    ],
-                    "_Properties.city.invariant.null.capital": [
-                        "Not a capital city"
-                    ]
-                }
-			},
-			{
-				"$elementTypeAlias": "addressInfo",
-				"$id": "7170A4DD-2441-4B1B-A8D3-437D75C4CBC9",
-				"ModelState":
-                {
-                    "_Properties.city.invariant.null.country": [
-                        "City is not in Australia"
-                    ],
-                    "_Properties.city.invariant.null.capital": [
-                        "Not a capital city"
-                    ]
-                }
-			}
-        ],
-        "ModelState":
-        {
-            "_Properties.addresses.invariant.null": [
-                ""
-            ]
-        }
-    }
-]`;
-
             //act 
-            var ids = serverValidationManager.parseComplexEditorError(complexValidationMsg);
+            var ms = serverValidationManager.parseComplexEditorError(nonRootLevelComplexValidationMsg);
 
             //assert
-            var keys = Object.keys(ids);
-
-            expect(keys.length).toEqual(3);
-            expect(keys[0]).toEqual("34E3A26C-103D-4A05-AB9D-7E14032309C3");
-            var item0ModelState = ids["34E3A26C-103D-4A05-AB9D-7E14032309C3"];
+            expect(ms.length).toEqual(3);
+            expect(ms[0].id).toEqual("34E3A26C-103D-4A05-AB9D-7E14032309C3");
+            var item0ModelState = ms[0].modelState;
             expect(Object.keys(item0ModelState).length).toEqual(1);
             expect(item0ModelState["_Properties.addresses.invariant.null"].length).toEqual(1);
             expect(item0ModelState["_Properties.addresses.invariant.null"][0]).toEqual("");
-            expect(keys[1]).toEqual("FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1");
-            expect(keys[2]).toEqual("7170A4DD-2441-4B1B-A8D3-437D75C4CBC9");
+            expect(ms[1].id).toEqual("FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1");
+            expect(ms[2].id).toEqual("7170A4DD-2441-4B1B-A8D3-437D75C4CBC9");
+
+        });
+
+        it('add errors for ModelState with inherited errors', function () {
+
+            //act 
+            let modelState = {
+                "_Properties.blockFeatures.invariant.null": [
+                    nonRootLevelComplexValidationMsg
+                ]
+            };
+            serverValidationManager.addErrorsForModelState(modelState);
+
+            //assert
+            console.log(JSON.stringify(serverValidationManager.items));
+            let propError = serverValidationManager.getPropertyError("umb://element/FBEAEE8F4BC943EE8B81FCA8978850F1/city");
+            expect(propError).toBeDefined();
+            console.log(JSON.stringify(propError));
+            expect(propError.parentId).toBeDefined();
+            let parentError = serverValidationManager.getPropertyErrorById(propError.parentId);
+            expect(parentError).toBeDefined();
+            expect(parentError.propertyAlias).toEqual("umb://element/34E3A26C103D4A05AB9D7E14032309C3/addresses");
 
         });
 

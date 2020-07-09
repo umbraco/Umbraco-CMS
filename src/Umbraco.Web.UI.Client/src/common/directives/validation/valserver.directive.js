@@ -55,11 +55,8 @@ function valServer(serverValidationManager) {
                 }
             }
 
-            function getPropertyValidationKey() {
-                // Get the property validation path if there is one, this is how wiring up any nested/virtual property validation works
-                var propertyValidationPath = umbPropCtrl ? umbPropCtrl.getValidationPath() : null;
-                return propertyValidationPath ? propertyValidationPath : currentProperty.alias;
-            }
+            // Get the property validation path if there is one, this is how wiring up any nested/virtual property validation works
+            var propertyValidationPath = umbPropCtrl ? umbPropCtrl.getValidationPath() : currentProperty.alias;
 
             // Need to watch the value model for it to change, previously we had  subscribed to 
             // modelCtrl.$viewChangeListeners but this is not good enough if you have an editor that
@@ -81,10 +78,10 @@ function valServer(serverValidationManager) {
 
                         if (modelCtrl.$invalid) {
                             modelCtrl.$setValidity('valServer', true);
-                            console.log("valServer cleared (watch)");
+                            console.log("valServer cleared (watch) " + propertyValidationPath);
 
                             //clear the server validation entry
-                            serverValidationManager.removePropertyError(getPropertyValidationKey(), currentCulture, fieldName, currentSegment);
+                            serverValidationManager.removePropertyError(propertyValidationPath, currentCulture, fieldName, currentSegment);
                             stopWatch();
                         }
                     }, true);
@@ -102,14 +99,14 @@ function valServer(serverValidationManager) {
             function serverValidationManagerCallback(isValid, propertyErrors, allErrors) {
                 if (!isValid) {
                     modelCtrl.$setValidity('valServer', false);
-                    console.log("valServer error");
+                    console.log("valServer error " + propertyValidationPath);
                     //assign an error msg property to the current validator
                     modelCtrl.errorMsg = propertyErrors[0].errorMsg;
                     startWatch();
                 }
                 else {
                     modelCtrl.$setValidity('valServer', true);
-                    console.log("valServer cleared");
+                    console.log("valServer cleared " + propertyValidationPath);
                     //reset the error message
                     modelCtrl.errorMsg = "";
                     stopWatch();
@@ -119,7 +116,7 @@ function valServer(serverValidationManager) {
             
 
             unsubscribe.push(serverValidationManager.subscribe(
-                getPropertyValidationKey(),
+                propertyValidationPath,
                 currentCulture,
                 fieldName,
                 serverValidationManagerCallback,

@@ -56,7 +56,8 @@ angular.module("umbraco")
 
         vm.submitAndClose = function () {
             if (vm.model && vm.model.submit) {
-                if (formHelper.submitForm({ scope: $scope })) {
+                // always keep server validations since this will be a nested editor and server validations are global
+                if (formHelper.submitForm({ scope: $scope, formCtrl: vm.blockForm, keepServerValidation: true })) {
                     vm.model.submit(vm.model);
                 }
             }

@@ -7,6 +7,9 @@
  * Some angular helper/extension methods
  */
 function angularHelper($q) {
+
+    var requiredFormProps = ["$error", "$name", "$dirty", "$pristine", "$valid", "$submitted", "$pending"];
+
     return {
 
         /**
@@ -100,6 +103,28 @@ function angularHelper($q) {
             }
         },
 
+
+        isForm: function (obj) {
+
+            // a method to check that the collection of object prop names contains the property name expected
+            function allPropertiesExist(objectPropNames) {
+                //ensure that every required property name exists on the current object
+                return _.every(requiredFormProps, function (item) {
+                    return _.contains(objectPropNames, item);
+                });
+            }
+
+            //get the keys of the property names for the current object
+            var props = _.keys(obj);
+            //if the length isn't correct, try the next prop
+            if (props.length < requiredFormProps.length) {
+                return false;
+            }
+
+            //ensure that every required property name exists on the current scope property
+            return allPropertiesExist(props);
+        },
+
         /**
          * @ngdoc function
          * @name getCurrentForm
@@ -121,31 +146,10 @@ function angularHelper($q) {
             // is to inject the $element object and use: $element.inheritedData('$formController');
 
             var form = null;
-            var requiredFormProps = ["$error", "$name", "$dirty", "$pristine", "$valid", "$submitted", "$pending"];
-
-            // a method to check that the collection of object prop names contains the property name expected
-            function propertyExists(objectPropNames) {
-                //ensure that every required property name exists on the current scope property
-                return _.every(requiredFormProps, function (item) {
-
-                    return _.contains(objectPropNames, item);
-                });
-            }
 
             for (var p in scope) {
-
                 if (_.isObject(scope[p]) && p !== "this" && p.substr(0, 1) !== "$") {
-                    //get the keys of the property names for the current property
-                    var props = _.keys(scope[p]);
-                    //if the length isn't correct, try the next prop
-                    if (props.length < requiredFormProps.length) {
-                        continue;
-                    }
-
-                    //ensure that every required property name exists on the current scope property
-                    var containProperty = propertyExists(props);
-
-                    if (containProperty) {
+                    if (this.isForm(scope[p])) {
                         form = scope[p];
                         break;
                     }

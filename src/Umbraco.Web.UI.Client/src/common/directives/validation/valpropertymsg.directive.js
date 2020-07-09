@@ -158,33 +158,33 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                 if (hadError) {
                     scope.$evalAsync(function () {
 
-                        // TODO: This does not work :( :( :( 
-                        // We cannot clear a val-property-msg because another nested child might have server validation errors too. 
-                        // I 'think' we might be able to set the UI validation of this val-property-msg based on the child validators as well 
-                        // as the server validator so it can 'just' unset itself if all child validators are cleared. Can it be done?
+                        //// TODO: This does not work :( :( :( 
+                        //// We cannot clear a val-property-msg because another nested child might have server validation errors too. 
+                        //// I 'think' we might be able to set the UI validation of this val-property-msg based on the child validators as well 
+                        //// as the server validator so it can 'just' unset itself if all child validators are cleared. Can it be done?
 
-                        // Here we loop over the umbProperty hierarchy to see if we should clear the val-property-msg server validation key.
-                        // we will clear the key if the parent for is valid, or if the parent form is only invalid due to a single val-property-msg error.
-                        var currUmbProperty = umbPropCtrl;
-                        var parentValidationKey = currUmbProperty.getParentValidationPath();
-                        while (currUmbProperty && parentValidationKey) {
+                        //// Here we loop over the umbProperty hierarchy to see if we should clear the val-property-msg server validation key.
+                        //// we will clear the key if the parent for is valid, or if the parent form is only invalid due to a single val-property-msg error.
+                        //var currUmbProperty = umbPropCtrl;
+                        //var parentValidationKey = currUmbProperty.getParentValidationPath();
+                        //while (currUmbProperty && parentValidationKey) {
 
-                            if (!currUmbProperty.parentForm.$invalid || (_.keys(currUmbProperty.parentForm.$error).length === 1 && currUmbProperty.parentForm.$error.valPropertyMsg)) {
-                                serverValidationManager.removePropertyError(parentValidationKey, currentCulture, "", currentSegment);
+                        //    if (!currUmbProperty.parentForm.$invalid || (_.keys(currUmbProperty.parentForm.$error).length === 1 && currUmbProperty.parentForm.$error.valPropertyMsg)) {
+                        //        serverValidationManager.removePropertyError(parentValidationKey, currentCulture, "", currentSegment);
 
-                                // re-assign and loop
-                                if (currUmbProperty !== umbPropCtrl.parentUmbProperty) {
-                                    currUmbProperty = umbPropCtrl.parentUmbProperty;
-                                    parentValidationKey = currUmbProperty ? currUmbProperty.getParentValidationPath() : null;
-                                }
-                                else {
-                                    break;
-                                }
-                            }
-                            else {
-                                break;
-                            }
-                        }
+                        //        // re-assign and loop
+                        //        if (currUmbProperty !== umbPropCtrl.parentUmbProperty) {
+                        //            currUmbProperty = umbPropCtrl.parentUmbProperty;
+                        //            parentValidationKey = currUmbProperty ? currUmbProperty.getParentValidationPath() : null;
+                        //        }
+                        //        else {
+                        //            break;
+                        //        }
+                        //    }
+                        //    else {
+                        //        break;
+                        //    }
+                        //}
 
                         //// we need to navigate the parentForm here, unfortunately there's no real alternative unless we create our own directive
                         //// of some sort but that would also get messy. This works though since in this case we're always going to be in the property
@@ -205,12 +205,25 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                         //        serverValidationManager.removePropertyError(parentValidationKey, currentCulture, "", currentSegment);
                         //    }
                         //}
-                        
+
                     });
-                    
-                    
-                }                
+
+
+                }
             }
+
+            //function checkFormValidation(f) {
+
+            //    if (!angularHelper.isForm(f)) {
+            //        throw "The object is not an angular Form";
+            //    }
+
+            //    // if there's no value, the controls can be reset, which clears the error state on formCtrl
+            //    for (let control of formCtrl.$getControls()) {
+            //        control.$setValidity();
+            //    }
+
+            //}
 
             function checkValidationStatus() {
                 if (formCtrl.$invalid) {
@@ -218,6 +231,17 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                     if (formCtrl.$error.valPropertyMsg && formCtrl.$error.valPropertyMsg.length > 0) {
                         //since we already have an error we'll just return since this means we've already set the 
                         // hasError and errorMsg properties which occurs below in the serverValidationManager.subscribe
+
+                        // TODO: This does not work! we cannot just clear if there are no errors in child controls because child controls
+                        // won't even have been loaded yet so this will just instantly clear them
+                        //// At this stage we might have an error assigned because it was assigned based on validation hierarchy from the server,
+                        //// BUT one or ALL of the child server (and client) validations may be cleared at this point. We will know if we have an 
+                        //// explicitly assigned error based on the error message assigned, if it is a non-explicit error (meaning that the error
+                        //// was assigned because it has child errors) then the message will just be: labels.propertyHasErrors
+                        //if (scope.errorMsg === labels.propertyHasErrors && _.every(formCtrl.$getControls(), c => c.$valid)) {
+                        //    resetError();
+                        //}
+
                         return;
                     }
                     //if there are any errors in the current property form that are not valPropertyMsg
@@ -295,7 +319,7 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
             // indicate that a content property is invalid at the property level since developers may not actually implement
             // the correct field validation in their property editors.
 
-            if (scope.currentProperty) { //this can be null if no property was assigned, TODO: I don't believe it can? If it was null we'd get errors above
+            if (scope.currentProperty) { //this can be null if no property was assigned
 
                 function serverValidationManagerCallback(isValid, propertyErrors, allErrors) {
                     hasError = !isValid;
@@ -311,13 +335,13 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                     }
                 }
 
-                unsubscribe.push(serverValidationManager.subscribe(propertyValidationKey,
+                unsubscribe.push(serverValidationManager.subscribe(
+                    propertyValidationKey,
                     currentCulture,
                     "",
                     serverValidationManagerCallback,
                     currentSegment
-                )
-                );
+                ));
             }
 
             //when the scope is disposed we need to unsubscribe

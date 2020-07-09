@@ -54,8 +54,13 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                 }
             }
 
-            //reset the server validations
-            serverValidationManager.reset();
+            //reset the server validations if required (default is true), otherwise notify existing ones of changes
+            if (!args.keepServerValidation) {
+                serverValidationManager.reset();
+            }
+            else {
+                serverValidationManager.notify();
+            }
 
             return true;
         },

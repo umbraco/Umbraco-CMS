@@ -614,6 +614,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                     formHelper.handleServerValidation(args.err.data.ModelState);
 
                     //add model state errors to notifications
+                    // TODO: Need to ignore complex messages
                     if (args.showNotifications) {
                         for (var e in args.err.data.ModelState) {
                             notificationsService.error("Validation", args.err.data.ModelState[e][0]);

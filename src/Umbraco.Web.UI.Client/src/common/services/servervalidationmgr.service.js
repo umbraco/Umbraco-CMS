@@ -10,9 +10,29 @@
  */
 function serverValidationManager($timeout, udiService) {
 
+    // TODO: It would be nicer to just SHA1 hash these 'keys' instead of having the keys be compound values 
+    // It would be another lib dependency or we could embed this https://github.com/emn178/js-sha1
+    // this would remove the need for the auto-generated 'id' values since the hash would be the actual id value.
+
+    // The array of callback objects, each object 'key' is:
+    // - propertyAlias
+    // - culture
+    // - fieldName
+    // - segment
+    // The object also contains:
+    // - callback (function)
+    // - id (unique identifier, auto-generated, used internally for unsubscribing the callback)
     var callbacks = [];
 
-    // The array of error messages
+    // The array of error message objects, each object 'key' is:    
+    // - propertyAlias
+    // - culture
+    // - fieldName
+    // - segment
+    // The object also contains:
+    // - errorMsg
+    // - id  (unique identifier, auto-generated, used internally for mapping parent/child property validation messages)
+    // - parentId (used to map parent/child property validation messages)
     var items = [];
     
     /** calls the callback specified with the errors specified, used internally */
@@ -41,6 +61,13 @@ function serverValidationManager($timeout, udiService) {
      */
     function notify() {
         $timeout(function () {
+
+            console.log(`VAL-ERROR-COUNT: ${items.length}`);
+            for (var i = 0; i < items.length; i++) {
+                var item = items[i];
+                console.log(`VAL-ERROR [${item.propertyAlias}] [${item.culture}] [${item.fieldName}] [${item.segment}]`)
+            }
+
             notifyCallbacks();
         });
     }
@@ -76,7 +103,14 @@ function serverValidationManager($timeout, udiService) {
             return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
         });
     }
-    
+
+    function getPropertyErrorById(id) {
+        //find all errors for this id
+        return _.find(items, function (item) {
+            return (item.id === id);
+        });
+    }
+
     function getVariantErrors(culture, segment) {
         
         if (!culture) {
@@ -118,35 +152,47 @@ function serverValidationManager($timeout, udiService) {
     }
 
     /**
-     * Returns a dictionary of id (of the block) and it's corresponding validation ModelState
+     * Flattens the complex errror result json into an array of the block's id/parent id and it's corresponding validation ModelState
      * @param {any} errorMsg
+     * @param {any} the id of the parentId (if any)
      */
-    function parseComplexEditorError(errorMsg) {
+    function parseComplexEditorError(errorMsg, parentId) {
 
-        var json = JSON.parse(errorMsg);
+        var json = Utilities.isArray(errorMsg) ? errorMsg : JSON.parse(errorMsg);
 
-        var result = {};
+        var result = [];
 
-        function extractModelState(validation) {
+        function extractModelState(validation, pid) {
             if (validation.$id && validation.ModelState) {
-                result[validation.$id] = validation.ModelState;                
+                var ms = {
+                    id: validation.$id,
+                    elementUdi: udiService.build("element", validation.$id),
+                    parentId: pid,
+                    modelState: validation.ModelState
+                };
+                result.push(ms);
+                return ms;
             }
+            return null;
         }
 
-        function iterateErrorBlocks(blocks) {
+        function iterateErrorBlocks(blocks, pid) {
             for (var i = 0; i < blocks.length; i++) {
                 var validation = blocks[i];
-                extractModelState(validation);
+                var ms = extractModelState(validation, pid);
+                if (!ms) {
+                    continue;
+                }
                 var nested = _.omit(validation, "$id", "$elementTypeAlias", "ModelState");                
                 for (const [key, value] of Object.entries(nested)) {
                     if (Array.isArray(value)) {
-                        iterateErrorBlocks(value); // recurse
+                        iterateErrorBlocks(value, ms.id); // recurse
                     }
                 }
             }
         }
 
-        iterateErrorBlocks(json);
+        iterateErrorBlocks(json, parentId);
 
         return result;
     }
@@ -258,7 +304,7 @@ function serverValidationManager($timeout, udiService) {
      * @description
      * Adds an error message for the content property
      */
-    function addPropertyError(propertyAlias, culture, fieldName, errorMsg, segment) {
+    function addPropertyError(propertyAlias, culture, fieldName, errorMsg, segment, parentId) {
 
         if (!propertyAlias) {
             return;
@@ -277,14 +323,19 @@ function serverValidationManager($timeout, udiService) {
             errorMsg = "";
         }
 
-        // if the error message is json it's a complex editor validation response that we need to parse
-        if (errorMsg.startsWith("[")) {
+        var id = String.CreateGuid();
 
-            var idsToErrors = parseComplexEditorError(errorMsg);
-            for (const [key, value] of Object.entries(idsToErrors)) {
-                const elementUdi = udiService.build("element", key);                
-                addErrorsForModelState(value, elementUdi);
-            }
+        // remove all non printable chars and whitespace from the string
+        if (Utilities.isString(errorMsg)) {
+            errorMsg = errorMsg.trimStartSpecial().trim();
+        }
+
+        // if the error message is json it's a complex editor validation response that we need to parse
+        if ((Utilities.isString(errorMsg) && errorMsg.startsWith("[")) || Utilities.isArray(errorMsg)) {
+
+            var idsToErrors = parseComplexEditorError(errorMsg, id);
+            console.log("idsToErrors = " + JSON.stringify(idsToErrors));
+            idsToErrors.forEach(x => addErrorsForModelState(x.modelState, x.elementUdi, x.parentId));
 
             // We need to clear the error message else it will show up as a giant json block against the property
              errorMsg = "";
@@ -293,6 +344,8 @@ function serverValidationManager($timeout, udiService) {
         //only add the item if it doesn't exist                
         if (!hasPropertyError(propertyAlias, culture, fieldName, segment)) {
             items.push({
+                id: id,
+                parentId: parentId,
                 propertyAlias: propertyAlias,
                 culture: culture,
                 segment: segment,
@@ -368,10 +421,16 @@ function serverValidationManager($timeout, udiService) {
      * @methodOf umbraco.services.serverValidationManager
      * @param {any} modelState
      * @param {any} elementUdi optional parameter specifying a nested element's UDI for which this property belongs (for complex editors)
+     * @param {any} parentId optional parameter specifying the parentId validation item object (for complex editors)
      * @description
      * This wires up all of the server validation model state so that valServer and valServerField directives work
      */    
-    function addErrorsForModelState(modelState, elementUdi) {
+    function addErrorsForModelState(modelState, elementUdi, parentId) {
+
+        if (!Utilities.isObject(modelState)) {
+            throw "modelState is not an object";
+        }
+
         for (const [key, value] of Object.entries(modelState)) {
 
             //This is where things get interesting....
@@ -437,7 +496,7 @@ function serverValidationManager($timeout, udiService) {
                 }
 
                 // add a generic error for the property
-                addPropertyError(propertyValidationKey, culture, htmlFieldReference, value && Array.isArray(value) && value.length > 0 ? value[0] : null, segment);
+                addPropertyError(propertyValidationKey, culture, htmlFieldReference, value && Array.isArray(value) && value.length > 0 ? value[0] : null, segment, parentId);
             }
             else {
 
@@ -540,6 +599,8 @@ function serverValidationManager($timeout, udiService) {
             if (!callback) {
                 return;
             }
+
+            console.log(`serverValidationMgr subscribed [${propertyAlias}] [${culture}] [${fieldName}] [${segment}]`);
 
             var id = String.CreateGuid();
 
@@ -700,23 +761,15 @@ function serverValidationManager($timeout, udiService) {
          * Gets the error message for the content property
          */
         getPropertyError: function (propertyAlias, culture, fieldName, segment) {
-
-            //normalize culture to "invariant"
-            if (!culture) {
-                culture = "invariant";
+            var errors = getPropertyErrors(propertyAlias, culture, segment, fieldName);
+            if (errors.length > 0) { // should only ever contain one
+                return errors[0];
             }
-            //normalize segment to null
-            if (!segment) {
-                segment = null;
-            }
-
-            var err = _.find(items, function (item) {
-                //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
-            });
-            return err;
+            return undefined;
         },
-        
+
+        getPropertyErrorById: getPropertyErrorById,
+
         /**
          * @ngdoc function
          * @name getFieldError
