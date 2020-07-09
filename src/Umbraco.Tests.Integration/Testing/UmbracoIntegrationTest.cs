@@ -126,13 +126,16 @@ namespace Umbraco.Tests.Integration.Testing
 
             Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
             // This will create a db, install the schema and ensure the app is configured to run
-            app.UseTestLocalDb(testHelper.WorkingDirectory, this);
+            app.UseTestLocalDb(testHelper.WorkingDirectory, this, out var connectionString);
+            TestDBConnectionString = connectionString;
 
             app.UseUmbracoCore();
 
         }
 
         #region Common services
+
+        protected string TestDBConnectionString { get; private set; }
 
         protected virtual Action<IServiceCollection> CustomTestSetup => services => { };
 

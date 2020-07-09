@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
+using Microsoft.AspNetCore.Http.Features;
 using Umbraco.Core.BackOffice;
 
 namespace Umbraco.Extensions
@@ -15,10 +16,22 @@ namespace Umbraco.Extensions
             context.User = principal;
         }
 
+
+        public static void SetReasonPhrase(this HttpContext httpContext, string reasonPhrase)
+        {
+            //TODO we should update this behavior, as HTTP2 do not have ReasonPhrase. Could as well be returned in body
+            // https://github.com/aspnet/HttpAbstractions/issues/395
+            var httpResponseFeature = httpContext.Features.Get<IHttpResponseFeature>();
+            if (!(httpResponseFeature is null))
+            {
+                httpResponseFeature.ReasonPhrase = reasonPhrase;
+            }
+        }
+
         /// <summary>
         /// This will return the current back office identity.
         /// </summary>
-        /// <param name="http"></param>        
+        /// <param name="http"></param>
         /// <returns>
         /// Returns the current back office identity if an admin is authenticated otherwise null
         /// </returns>

@@ -78,6 +78,7 @@ namespace Umbraco.Tests.Common.Builders
                 CreatorId = GetCreatorId(),
                 Trashed = GetTrashed(),
                 IsContainer = GetIsContainer(),
+                Variations = GetContentVariation(),
             };
 
             contentType.NoGroupPropertyTypes =  _noGroupPropertyTypeBuilders.Select(x => x.Build());
@@ -99,10 +100,17 @@ namespace Umbraco.Tests.Common.Builders
             return contentType;
         }
 
+        public ContentTypeBuilder WithContentVariation(ContentVariation contentVariation)
+        {
+            ContentVariation = contentVariation;
+            return this;
+        }
+
         int? IWithPropertyTypeIdsIncrementingFrom.PropertyTypeIdsIncrementingFrom
         {
             get => _propertyTypeIdsIncrementingFrom;
             set => _propertyTypeIdsIncrementingFrom = value;
         }
+
     }
 }

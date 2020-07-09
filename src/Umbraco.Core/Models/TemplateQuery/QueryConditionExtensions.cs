@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Umbraco.Web.Models.TemplateQuery
 {
-    internal static class QueryConditionExtensions
+    public static class QueryConditionExtensions
     {
         private static Lazy<MethodInfo> StringContainsMethodInfo =>
             new Lazy<MethodInfo>(() => typeof(string).GetMethod("Contains", new[] {typeof(string)}));

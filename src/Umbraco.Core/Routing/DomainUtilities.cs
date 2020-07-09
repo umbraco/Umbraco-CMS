@@ -288,7 +288,7 @@ namespace Umbraco.Web.Routing
         /// <param name="domainName">The domain name to parse</param>
         /// <param name="currentUri">The currently requested URI. If the domain name is relative, the authority of URI will be used.</param>
         /// <returns>The domain name as a URI</returns>
-        internal static Uri ParseUriFromDomainName(string domainName, Uri currentUri)
+        public static Uri ParseUriFromDomainName(string domainName, Uri currentUri)
         {
             // turn "/en" into "http://whatever.com/en" so it becomes a parseable uri
             var name = domainName.StartsWith("/") && currentUri != null

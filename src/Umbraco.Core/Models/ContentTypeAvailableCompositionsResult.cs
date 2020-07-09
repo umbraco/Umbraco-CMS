@@ -3,7 +3,7 @@
     /// <summary>
     /// Used when determining available compositions for a given content type
     /// </summary>
-    internal class ContentTypeAvailableCompositionsResult
+    public class ContentTypeAvailableCompositionsResult
     {
         public ContentTypeAvailableCompositionsResult(IContentTypeComposition composition, bool allowed)
         {

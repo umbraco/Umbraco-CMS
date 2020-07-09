@@ -92,7 +92,7 @@ namespace Umbraco.Core.Composing
                     _container.GetInstance<IBackOfficeInfo>(),
                     _container.GetInstance<Umbraco.Core.Logging.IProfiler>());
             }
-            
+
 
             return provider;
         }

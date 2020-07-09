@@ -159,37 +159,22 @@ namespace Umbraco.Web.Editors
                             "userGroupsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<UserGroupsController>(
                                 controller => controller.PostSaveUserGroup(null))
                         },
-                        {
-                            "contentApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentController>(
-                                controller => controller.PostSave(null))
-                        },
-                        {
-                            "mediaApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MediaController>(
-                                controller => controller.GetRootMedia())
-                        },
-                        //TODO reintroduce
+                      //TODO reintroduce
                         // {
                         //     "imagesApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImagesController>(
                         //         controller => controller.GetBigThumbnail(""))
                         // },
 
-                        {
-                            "contentTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
-                                controller => controller.GetAllowedChildren(0))
-                        },
-                        {
-                            "mediaTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MediaTypeController>(
-                                controller => controller.GetAllowedChildren(0))
-                        },
+                        // {
+                        //     "contentTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
+                        //         controller => controller.GetAllowedChildren(0))
+                        // },
 
                         {
                             "currentUserApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
                                 controller => controller.PostChangePassword(null))
                         },
-                        {
-                            "entityApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<EntityController>(
-                                controller => controller.GetById(0, UmbracoEntityTypes.Media))
-                        },
+
                         // {
                         //     "dataTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DataTypeController>(
                         //         controller => controller.GetById(0))
@@ -203,10 +188,10 @@ namespace Umbraco.Web.Editors
                         //     "logApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogController>(
                         //         controller => controller.GetPagedEntityLog(0, 0, 0, Direction.Ascending, null))
                         // },
-                        {
-                            "memberApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberController>(
-                                controller => controller.GetByKey(Guid.Empty))
-                        },
+                        // {
+                        //     "memberApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberController>(
+                        //         controller => controller.GetByKey(Guid.Empty))
+                        // },
                         // {
                         //     "packageInstallApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageInstallController>(
                         //         controller => controller.Fetch(string.Empty))
@@ -227,10 +212,10 @@ namespace Umbraco.Web.Editors
                         //     "stylesheetApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<StylesheetController>(
                         //         controller => controller.GetAll())
                         // },
-                        {
-                            "memberTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberTypeController>(
-                                controller => controller.GetAllTypes())
-                        },
+                        // {
+                        //     "memberTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberTypeController>(
+                        //         controller => controller.GetAllTypes())
+                        // },
                         {
                             "memberGroupApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberGroupController>(
                                 controller => controller.GetAllGroups())

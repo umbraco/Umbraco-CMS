@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
 {
@@ -19,7 +20,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
         [Test]
         public void Can_Deep_Clone()
         {
-            var item = _builder.Build();
+            var item = _builder
+                .WithId(1)
+                .Build();
 
             var clone = (Language) item.DeepClone();
             Assert.AreNotSame(clone, item);

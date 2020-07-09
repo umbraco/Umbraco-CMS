@@ -23,11 +23,13 @@ namespace Umbraco.Tests.Integration.Extensions
         /// <param name="app"></param>
         /// <param name="workingDirectory"></param>
         /// <param name="integrationTest"></param>
+        /// <param name="connectionString"></param>
         /// <returns></returns>
         public static IApplicationBuilder UseTestLocalDb(this IApplicationBuilder app,
             string workingDirectory,
-            UmbracoIntegrationTest integrationTest)
+            UmbracoIntegrationTest integrationTest, out string connectionString)
         {
+            connectionString = null;
             var dbFilePath = Path.Combine(workingDirectory, "LocalDb");
 
             // get the currently set db options
@@ -46,6 +48,7 @@ namespace Umbraco.Tests.Integration.Extensions
                 app.ApplicationServices.GetRequiredService<ILogger>(),
                 app.ApplicationServices.GetRequiredService<IGlobalSettings>(),
                 app.ApplicationServices.GetRequiredService<IUmbracoDatabaseFactory>());
+
 
             switch (testOptions.Database)
             {
@@ -113,10 +116,9 @@ namespace Umbraco.Tests.Integration.Extensions
                 default:
                     throw new ArgumentOutOfRangeException(nameof(testOptions), testOptions, null);
             }
-
+            connectionString = db.ConnectionString;
             return app;
         }
-
     }
 
 

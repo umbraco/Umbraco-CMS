@@ -92,7 +92,17 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             // register the IFileSystem supporting the IMediaFileSystem
             // THIS IS THE ONLY THING THAT NEEDS TO CHANGE, IN ORDER TO REPLACE THE UNDERLYING FILESYSTEM
             // and, SupportingFileSystem.For<IMediaFileSystem>() returns the underlying filesystem
-            composition.SetMediaFileSystem(factory => new PhysicalFileSystem(factory.GetInstance<IIOHelper>(),factory.GetInstance<IHostingEnvironment>(), factory.GetInstance<ILogger>(), factory.GetInstance<IGlobalSettings>().UmbracoMediaPath));
+            composition.SetMediaFileSystem(factory =>
+            {
+                var ioHelper = factory.GetInstance<IIOHelper>();
+                var hostingEnvironment = factory.GetInstance<IHostingEnvironment>();
+                var logger = factory.GetInstance<ILogger>();
+                var globalSettings = factory.GetInstance<IGlobalSettings>();
+
+                var rootPath = hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPath);
+                var rootUrl = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);
+                return new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, rootPath, rootUrl);
+            });
 
             return composition;
         }

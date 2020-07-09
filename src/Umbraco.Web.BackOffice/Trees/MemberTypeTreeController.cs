@@ -6,6 +6,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Search;
@@ -16,6 +17,7 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
     [Tree(Constants.Applications.Settings, Constants.Trees.MemberTypes, SortOrder = 2, TreeGroup = Constants.Trees.Groups.Settings)]
+    [PluginController("UmbracoTrees")]
     public class MemberTypeTreeController : MemberTypeAndGroupTreeControllerBase, ISearchableTree
     {
         private readonly UmbracoTreeSearcher _treeSearcher;

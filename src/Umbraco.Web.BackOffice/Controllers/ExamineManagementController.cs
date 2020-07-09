@@ -165,7 +165,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 _logger.Error<ExamineManagementController>(ex, "An error occurred rebuilding index");
                 var response = new ConflictObjectResult("The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {ex}");
 
-                SetReasonPhrase(response, "Could Not Rebuild");
+                HttpContext.SetReasonPhrase("Could Not Rebuild");
                 return response;
             }
         }
@@ -212,7 +212,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return new OkResult();
 
             var response1 = new BadRequestObjectResult($"No searcher found with name = {searcherName}");
-            SetReasonPhrase(response1, "Searcher Not Found");
+            HttpContext.SetReasonPhrase("Searcher Not Found");
             return response1;
         }
 
@@ -222,7 +222,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return new OkResult();
 
             var response = new BadRequestObjectResult($"The index {index.Name} cannot be rebuilt because it does not have an associated {typeof(IIndexPopulator)}");
-            SetReasonPhrase(response, "Index cannot be rebuilt");
+            HttpContext.SetReasonPhrase("Index cannot be rebuilt");
             return response;
         }
 
@@ -237,19 +237,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             var response = new BadRequestObjectResult($"No index found with name = {indexName}");
-            SetReasonPhrase(response, "Index Not Found");
+            HttpContext.SetReasonPhrase("Index Not Found");
             return response;
-        }
-
-        private void SetReasonPhrase(IActionResult response, string reasonPhrase)
-        {
-            //TODO we should update this behavior, as HTTP2 do not have ReasonPhrase. Could as well be returned in body
-            // https://github.com/aspnet/HttpAbstractions/issues/395
-            var httpResponseFeature = HttpContext.Features.Get<IHttpResponseFeature>();
-            if (!(httpResponseFeature is null))
-            {
-                httpResponseFeature.ReasonPhrase = reasonPhrase;
-            }
         }
 
         private void Indexer_IndexOperationComplete(object sender, EventArgs e)
