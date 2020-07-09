@@ -206,7 +206,7 @@ function umbSessionStorage($window) {
     return {
 
         get: function (key) {
-            return JSON.parse(storage["umb_" + key]);
+            return Utilities.fromJson(storage["umb_" + key]);
         },
 
         set: function (key, value) {

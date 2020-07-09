@@ -13,13 +13,14 @@ function serverValidationManager($timeout) {
     var callbacks = [];
     
     /** calls the callback specified with the errors specified, used internally */
-    function executeCallback(self, errorsForCallback, callback, culture) {
+    function executeCallback(self, errorsForCallback, callback, culture, segment) {
 
         callback.apply(self, [
                 false,                 // pass in a value indicating it is invalid
                 errorsForCallback,     // pass in the errors for this item
                 self.items,            // pass in all errors in total
-                culture                // pass the culture that we are listing for.
+                culture,               // pass the culture that we are listing for.
+                segment                // pass the segment that we are listing for.
             ]
         );
     }
@@ -35,7 +36,8 @@ function serverValidationManager($timeout) {
         });
     }
     
-    function getPropertyErrors(self, propertyAlias, culture, fieldName) {
+
+    function getPropertyErrors(self, propertyAlias, culture, segment, fieldName) {
         if (!Utilities.isString(propertyAlias)) {
             throw "propertyAlias must be a string";
         }
@@ -46,22 +48,28 @@ function serverValidationManager($timeout) {
         if (!culture) {
             culture = "invariant";
         }
+        if (!segment) {
+            segment = null;
+        }
 
         //find all errors for this property
         return _.filter(self.items, function (item) {
-            return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+            return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
         });
     }
     
-    function getCultureErrors(self, culture) {
+    function getVariantErrors(self, culture, segment) {
         
         if (!culture) {
             culture = "invariant";
         }
+        if (!segment) {
+            segment = null;
+        }
         
         //find all errors for this property
         return _.filter(self.items, function (item) {
-            return (item.culture === culture);
+            return (item.culture === culture && item.segment === segment);
         });
     }
 
@@ -71,21 +79,21 @@ function serverValidationManager($timeout) {
                 //its a field error callback
                 var fieldErrors = getFieldErrors(self, callbacks[cb].fieldName);
                 if (fieldErrors.length > 0) {
-                    executeCallback(self, fieldErrors, callbacks[cb].callback, callbacks[cb].culture);
+                    executeCallback(self, fieldErrors, callbacks[cb].callback, callbacks[cb].culture, callbacks[cb].segment);
                 }
             }
             else if (callbacks[cb].propertyAlias != null) {
                 //its a property error
-                var propErrors = getPropertyErrors(self, callbacks[cb].propertyAlias, callbacks[cb].culture, callbacks[cb].fieldName);
+                var propErrors = getPropertyErrors(self, callbacks[cb].propertyAlias, callbacks[cb].culture, callbacks[cb].segment, callbacks[cb].fieldName);
                 if (propErrors.length > 0) {
-                    executeCallback(self, propErrors, callbacks[cb].callback, callbacks[cb].culture);
+                    executeCallback(self, propErrors, callbacks[cb].callback, callbacks[cb].culture, callbacks[cb].segment);
                 }
             }
             else {
-                //its a culture error
-                var cultureErrors = getCultureErrors(self, callbacks[cb].culture);
-                if (cultureErrors.length > 0) {
-                    executeCallback(self, cultureErrors, callbacks[cb].callback, callbacks[cb].culture);
+                //its a variant error
+                var variantErrors = getVariantErrors(self, callbacks[cb].culture, callbacks[cb].segment);
+                if (variantErrors.length > 0) {
+                    executeCallback(self, variantErrors, callbacks[cb].callback, callbacks[cb].culture, callbacks[cb].segment);
                 }
             }
         }
@@ -150,20 +158,27 @@ function serverValidationManager($timeout) {
          *  field alias to listen for.
          *  If propertyAlias is null, then this subscription is for a field property (not a user defined property).
          */
-        subscribe: function (propertyAlias, culture, fieldName, callback) {
+        subscribe: function (propertyAlias, culture, fieldName, callback, segment) {
             if (!callback) {
                 return;
             }
 
             var id = String.CreateGuid();
+
+            //normalize culture to "invariant"
             if (!culture) {
                 culture = "invariant";
+            }
+            //normalize segment to null
+            if (!segment) {
+                segment = null;
             }
             
             if (propertyAlias === null) {
                 callbacks.push({
                     propertyAlias: null,
                     culture: culture,
+                    segment: segment,
                     fieldName: fieldName,
                     callback: callback,
                     id: id
@@ -175,6 +190,7 @@ function serverValidationManager($timeout) {
                 callbacks.push({
                     propertyAlias: propertyAlias,
                     culture: culture, 
+                    segment: segment,
                     fieldName: fieldName,
                     callback: callback,
                     id: id
@@ -199,25 +215,29 @@ function serverValidationManager($timeout) {
          * @param {} fieldName 
          * @returns {} 
          */
-        unsubscribe: function (propertyAlias, culture, fieldName) {
+        unsubscribe: function (propertyAlias, culture, fieldName, segment) {
             
-            //normalize culture to null
+            //normalize culture to "invariant"
             if (!culture) {
                 culture = "invariant";
+            }
+            //normalize segment to null
+            if (!segment) {
+                segment = null;
             }
             
             if (propertyAlias === null) {
 
                 //remove all callbacks for the content field
                 callbacks = _.reject(callbacks, function (item) {
-                    return item.propertyAlias === null && item.culture === culture && item.fieldName === fieldName;
+                    return item.propertyAlias === null && item.culture === culture && item.segment === segment && item.fieldName === fieldName;
                 });
 
             }
             else if (propertyAlias !== undefined) {
                 //remove all callbacks for the content property
                 callbacks = _.reject(callbacks, function (item) {
-                    return item.propertyAlias === propertyAlias && item.culture === culture &&
+                    return item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment &&
                     (item.fieldName === fieldName ||
                         ((item.fieldName === undefined || item.fieldName === "") && (fieldName === undefined || fieldName === "")));
                 });
@@ -236,16 +256,20 @@ function serverValidationManager($timeout) {
          * This will always return any callbacks registered for just the property (i.e. field name is empty) and for ones with an 
          * explicit field name set.
          */
-        getPropertyCallbacks: function (propertyAlias, culture, fieldName) {
+        getPropertyCallbacks: function (propertyAlias, culture, fieldName, segment) {
 
-            //normalize culture to null
+            //normalize culture to "invariant"
             if (!culture) {
                 culture = "invariant";
+            }
+            //normalize segment to null
+            if (!segment) {
+                segment = null;
             }
 
             var found = _.filter(callbacks, function (item) {
                 //returns any callback that have been registered directly against the field and for only the property
-                return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (item.fieldName === undefined || item.fieldName === "")));
+                return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (item.fieldName === undefined || item.fieldName === "")));
             });
             return found;
         },
@@ -262,7 +286,7 @@ function serverValidationManager($timeout) {
         getFieldCallbacks: function (fieldName) {
             var found = _.filter(callbacks, function (item) {
                 //returns any callback that have been registered directly against the field
-                return (item.propertyAlias === null && item.culture === "invariant" && item.fieldName === fieldName);
+                return (item.propertyAlias === null && item.culture === "invariant" && item.segment === null && item.fieldName === fieldName);
             });
             return found;
         },
@@ -274,12 +298,29 @@ function serverValidationManager($timeout) {
          * @function
          *
          * @description
-         * Gets all callbacks that has been registered using the subscribe method for the culture.         
+         * Gets all callbacks that has been registered using the subscribe method for the culture. Not including segments.
          */
         getCultureCallbacks: function (culture) {
             var found = _.filter(callbacks, function (item) {
                 //returns any callback that have been registered directly/ONLY against the culture
-                return (item.culture === culture && item.propertyAlias === null && item.fieldName === null);
+                return (item.culture === culture && item.segment === null && item.propertyAlias === null && item.fieldName === null);
+            });
+            return found;
+        },
+
+        /**
+         * @ngdoc function
+         * @name getVariantCallbacks
+         * @methodOf umbraco.services.serverValidationManager
+         * @function
+         *
+         * @description
+         * Gets all callbacks that has been registered using the subscribe method for the culture and segment.         
+         */
+        getVariantCallbacks: function (culture, segment) {
+            var found = _.filter(callbacks, function (item) {
+                //returns any callback that have been registered directly against the given culture and given segment.
+                return (item.culture === culture && item.segment === segment && item.propertyAlias === null && item.fieldName === null);
             });
             return found;
         },
@@ -303,6 +344,7 @@ function serverValidationManager($timeout) {
                 this.items.push({
                     propertyAlias: null,
                     culture: "invariant",
+                    segment: null,
                     fieldName: fieldName,
                     errorMsg: errorMsg
                 });
@@ -314,7 +356,7 @@ function serverValidationManager($timeout) {
             var cbs = this.getFieldCallbacks(fieldName);
             //call each callback for this error
             for (var cb in cbs) {
-                executeCallback(this, errorsForCallback, cbs[cb].callback, null);
+                executeCallback(this, errorsForCallback, cbs[cb].callback, null, null);
             }
         },
 
@@ -327,7 +369,7 @@ function serverValidationManager($timeout) {
          * @description
          * Adds an error message for the content property
          */
-        addPropertyError: function (propertyAlias, culture, fieldName, errorMsg) {
+        addPropertyError: function (propertyAlias, culture, fieldName, errorMsg, segment) {
             if (!propertyAlias) {
                 return;
             }
@@ -336,31 +378,36 @@ function serverValidationManager($timeout) {
             if (!culture) {
                 culture = "invariant";
             }
+            //normalize segment to null
+            if (!segment) {
+                segment = null;
+            }
 
             //only add the item if it doesn't exist                
-            if (!this.hasPropertyError(propertyAlias, culture, fieldName)) {
+            if (!this.hasPropertyError(propertyAlias, culture, fieldName, segment)) {
                 this.items.push({
                     propertyAlias: propertyAlias,
                     culture: culture,
+                    segment: segment,
                     fieldName: fieldName,
                     errorMsg: errorMsg
                 });
             }
             
             //find all errors for this item
-            var errorsForCallback = getPropertyErrors(this, propertyAlias, culture, fieldName);
+            var errorsForCallback = getPropertyErrors(this, propertyAlias, culture, segment, fieldName);
             //we should now call all of the call backs registered for this error
-            var cbs = this.getPropertyCallbacks(propertyAlias, culture, fieldName);
+            var cbs = this.getPropertyCallbacks(propertyAlias, culture, fieldName, segment);
             //call each callback for this error
             for (var cb in cbs) {
-                executeCallback(this, errorsForCallback, cbs[cb].callback, culture);
+                executeCallback(this, errorsForCallback, cbs[cb].callback, culture, segment);
             }
 
-            //execute culture specific callbacks here too when a propery error is added
-            var cultureCbs = this.getCultureCallbacks(culture);
+            //execute variant specific callbacks here too when a propery error is added
+            var variantCbs = this.getVariantCallbacks(culture, segment);
             //call each callback for this error
-            for (var cb in cultureCbs) {
-                executeCallback(this, errorsForCallback, cultureCbs[cb].callback, culture);
+            for (var cb in variantCbs) {
+                executeCallback(this, errorsForCallback, variantCbs[cb].callback, culture, segment);
             }
         },      
         
@@ -373,7 +420,7 @@ function serverValidationManager($timeout) {
          * @description
          * Removes an error message for the content property
          */
-        removePropertyError: function (propertyAlias, culture, fieldName) {
+        removePropertyError: function (propertyAlias, culture, fieldName, segment) {
 
             if (!propertyAlias) {
                 return;
@@ -383,10 +430,14 @@ function serverValidationManager($timeout) {
             if (!culture) {
                 culture = "invariant";
             }
+            //normalize segment to null
+            if (!segment) {
+                segment = null;
+            }
 
             //remove the item
             this.items = _.reject(this.items, function (item) {
-                return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+                return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
             });
         },
         
@@ -405,7 +456,10 @@ function serverValidationManager($timeout) {
                 callbacks[cb].callback.apply(this, [
                         true,       //pass in a value indicating it is VALID
                         [],         //pass in empty collection
-                        []]);       //pass in empty collection
+                        [],
+                        null,
+                        null]
+                    );
             }
         },
         
@@ -431,16 +485,20 @@ function serverValidationManager($timeout) {
          * @description
          * Gets the error message for the content property
          */
-        getPropertyError: function (propertyAlias, culture, fieldName) {
+        getPropertyError: function (propertyAlias, culture, fieldName, segment) {
 
-            //normalize culture to null
+            //normalize culture to "invariant"
             if (!culture) {
                 culture = "invariant";
+            }
+            //normalize segment to null
+            if (!segment) {
+                segment = null;
             }
 
             var err = _.find(this.items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+                return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
             });
             return err;
         },
@@ -457,7 +515,7 @@ function serverValidationManager($timeout) {
         getFieldError: function (fieldName) {
             var err = _.find(this.items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === null && item.culture === "invariant" && item.fieldName === fieldName);
+                return (item.propertyAlias === null && item.culture === "invariant" && item.segment === null && item.fieldName === fieldName);
             });
             return err;
         },
@@ -471,16 +529,20 @@ function serverValidationManager($timeout) {
          * @description
          * Checks if the content property + culture + field name combo has an error
          */
-        hasPropertyError: function (propertyAlias, culture, fieldName) {
+        hasPropertyError: function (propertyAlias, culture, fieldName, segment) {
 
             //normalize culture to null
             if (!culture) {
                 culture = "invariant";
             }
+            //normalize segment to null
+            if (!segment) {
+                segment = null;
+            }
 
             var err = _.find(this.items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+                return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
             });
             return err ? true : false;
         },
@@ -497,11 +559,10 @@ function serverValidationManager($timeout) {
         hasFieldError: function (fieldName) {
             var err = _.find(this.items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === null && item.culture === "invariant" && item.fieldName === fieldName);
+                return (item.propertyAlias === null && item.culture === "invariant" && item.segment === null && item.fieldName === fieldName);
             });
             return err ? true : false;
         },
-        
         
         /**
          * @ngdoc function
@@ -513,14 +574,40 @@ function serverValidationManager($timeout) {
          * Checks if the given culture has an error
          */
         hasCultureError: function (culture) {
-            
-            //normalize culture to null
+
+            //normalize culture to "invariant"
             if (!culture) {
                 culture = "invariant";
             }
+
+            var err = _.find(this.items, function (item) {
+                return (item.culture === culture && item.segment === null);
+            });
+            return err ? true : false;
+        },
+        
+        /**
+         * @ngdoc function
+         * @name hasVariantError
+         * @methodOf umbraco.services.serverValidationManager
+         * @function
+         *
+         * @description
+         * Checks if the given culture has an error
+         */
+        hasVariantError: function (culture, segment) {
+            
+            //normalize culture to "invariant"
+            if (!culture) {
+                culture = "invariant";
+            }
+            //normalize segment to null
+            if (!segment) {
+                segment = null;
+            }
             
             var err = _.find(this.items, function (item) {
-                return item.culture === culture;
+                return (item.culture === culture && item.segment === segment);
             });
             return err ? true : false;
         },

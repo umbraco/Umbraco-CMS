@@ -8,7 +8,8 @@
     <key alias="assignDomain">Tilføj domæne</key>
     <key alias="auditTrail">Revisionsspor</key>
     <key alias="browse">Gennemse elementer</key>
-    <key alias="changeDocType">Skift dokumenttype</key>
+    <key alias="changeDocType">Skift Dokument Type</key>
+    <key alias="changeDataType">Skift Input Type</key>
     <key alias="copy">Kopier</key>
     <key alias="create">Opret</key>
     <key alias="export">Eksportér</key>
@@ -246,7 +247,7 @@
     <key alias="routeErrorCannotRoute">Dette dokument er udgivet, men dets URL kan ikke dirigeres</key>
     <key alias="publish">Udgiv</key>
     <key alias="published">Udgivet</key>
-    <key alias="publishedPendingChanges">Udgivet (Afventende ændringer)</key>
+    <key alias="publishedPendingChanges">Udgivet (Ventede ændringer)</key>
     <key alias="publishStatus">Udgivelsesstatus</key>
     <key alias="publishDescendantsHelp"><![CDATA[Klik <em>Udgiv med undersider</em> for at udgive <strong>%0%</strong> og alle sider under og dermed gøre deres indhold offentligt tilgængelige.]]></key>
     <key alias="publishDescendantsWithVariantsHelp"><![CDATA[Klik <em>Udgiv med undersider</em> for at udgive <strong>de valgte sprog</strong> og de samme sprog for sider under og dermed gøre deres indhold offentligt tilgængelige.]]></key>
@@ -425,6 +426,7 @@
     <key alias="linkinternal">Internt link:</key>
     <key alias="linklocaltip">Ved lokalt link, indsæt da en "#" foran linket</key>
     <key alias="linknewwindow">Åben i nyt vindue?</key>
+    <key alias="macroContainerSettings">Makroindstillinger</key>
     <key alias="macroDoesNotHaveProperties">Denne makro har ingen egenskaber du kan redigere</key>
     <key alias="paste">Indsæt tekst</key>
     <key alias="permissionsEdit">Rediger rettigheder for</key>
@@ -479,6 +481,7 @@
     <key alias="unLinkYour">Fjern link fra dit</key>
     <key alias="account">konto</key>
     <key alias="selectEditor">Vælg editor</key>
+    <key alias="selectEditorConfiguration">Vælg konfiguration</key>
     <key alias="selectSnippet">Vælg snippet</key>
     <key alias="variantdeletewarning">Dette vil slette noden og alle dets sprog. Hvis du kun vil slette et sprog, så afpublicér det i stedet.</key>
   </area>
@@ -661,6 +664,7 @@
     <key alias="icon">Ikon</key>
     <key alias="id">Id</key>
     <key alias="import">Importer</key>
+    <key alias="includeFromsubFolders">Inkludér undermapper i søgning</key>
     <key alias="excludeFromSubFolders">Søg kun i denne mappe</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Indre margen</key>
@@ -780,6 +784,7 @@
     <key alias="generalHeader">Generelt</key>
     <key alias="editorHeader">Editor</key>
     <key alias="toggleAllowCultureVariants">Skift tillad sprogvarianter</key>
+    <key alias="toggleAllowSegmentVariants">Skift tillad segmentering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Baggrundsfarve</key>
@@ -1089,10 +1094,13 @@ Mange hilsner fra Umbraco robotten
     <key alias="customCrop">Brugerdefineret</key>
   </area>
   <area alias="rollback">
+    <key alias="changes">Ændringer</key>
+    <key alias="created">Oprettet</key>
     <key alias="headline">Vælg en version at sammenligne med den nuværende version</key>
     <key alias="currentVersion">Nuværende version</key>
     <key alias="diffHelp"><![CDATA[Her vises forskellene mellem den nuværende version og den valgte version<br /><del>Rød</del> tekst vil ikke blive vist i den valgte version. <ins>Grøn betyder tilføjet</ins>]]></key>
     <key alias="documentRolledBack">Dokument tilbagerullet</key>
+    <key alias="headline">Vælg en version at sammenligne med den nuværende version</key>
     <key alias="htmlHelp">Her vises den valgte version som html. Hvis du ønsker at se forskellen mellem de 2 versioner på samme tid, brug 'diff'-oversigten</key>
     <key alias="rollbackTo">Tilbagerulning til</key>
     <key alias="selectVersion">Vælg version</key>
@@ -1378,9 +1386,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="compositionInUse">Indholdstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som komposition</key>
     <key alias="noAvailableCompositions">Der er ingen indholdstyper tilgængelige at bruge som komposition</key>
     <key alias="compositionRemoveWarning">Når du fjerner en komposition vil alle associerede indholdsdata blive slettet. Når først dokumenttypen er gemt, er der ingen vej tilbage.</key>
-    <key alias="availableEditors">Tilgængelige editors</key>
+    <key alias="availableEditors">Opret ny indstilling</key>
     <key alias="reuse">Genbrug</key>
-    <key alias="editorSettings">Editor indstillinger</key>
+    <key alias="editorSettings">Input indstillinger</key>
+    <key alias="searchResultSettings">Tilgængelige indstillinger</key>
+    <key alias="searchResultEditors">Opret ny indstilling</key>
     <key alias="configuration">Konfiguration</key>
     <key alias="yesDelete">Ja, slet</key>
     <key alias="movedUnderneath">blev flyttet til</key>
@@ -1406,9 +1416,16 @@ Mange hilsner fra Umbraco robotten
     <key alias="tabHasNoSortOrder">fane har ingen sorteringsrækkefølge</key>
     <key alias="compositionUsageHeading">Hvor er denne komposition brugt?</key>
     <key alias="compositionUsageSpecification">Denne komposition brugt i kompositionen af de følgende indholdstyper:</key>
-    <key alias="variantsHeading">Tillad sprogvariation</key>
+    <key alias="variantsHeading">Tillad variationer</key>
+    <key alias="cultureVariantHeading">Tillad sprogvariation</key>
+    <key alias="segmentVariantHeading">Tillad segmentering</key>
+    <key alias="cultureVariantLabel">Tillader sprogvariationer</key>
+    <key alias="segmentVariantLabel">Tillader segmentering</key>
     <key alias="variantsDescription">Tillad at redaktører kan oprette indhold af denne type på flere sprog.</key>
+    <key alias="cultureVariantDescription">Tillad at redaktører kan oprette dette indhold på flere sprog.</key>
+    <key alias="segmentVariantDescription">Tillad at redaktører kan oprette flere udgaver af denne type indhold.</key>
     <key alias="allowVaryByCulture">Tillad sprogvariation</key>
+    <key alias="allowVaryBySegment">Tillad segmentering</key>
     <key alias="elementType">Element-type</key>
     <key alias="elementHeading">Er en Element-type</key>
     <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet.</key>
@@ -1737,6 +1754,12 @@ Mange hilsner fra Umbraco robotten
     <key alias="openBackofficeSearch">Åben backoffice søgning</key>
     <key alias="openCloseBackofficeHelp">Åben/Luk backoffice hjælp</key>
     <key alias="openCloseBackofficeProfileOptions">Åben/Luk dine profil indstillinger</key>
+    <key alias="assignDomainDescription">Tilføj domæne på %0%</key>
+    <key alias="createDescription">Opret ny node under %0%</key>
+    <key alias="protectDescription">Opsæt offentlig adgang på %0%</key>
+    <key alias="rightsDescription">Opsæt rettigheder på %0%</key>
+    <key alias="sortDescription">Juster soterings rækkefølgen for %0%</key>
+    <key alias="createblueprintDescription">Opret indholds skabelon baseret på %0%</key>
     <key alias="currentLanguage">Aktivt sprog</key>
     <key alias="switchLanguage">Skift sprog til</key>
     <key alias="createNewFolder">Opret ny mappe</key>

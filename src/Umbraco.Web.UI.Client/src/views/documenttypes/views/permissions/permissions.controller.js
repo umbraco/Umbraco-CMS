@@ -17,12 +17,14 @@
 
         vm.contentTypes = [];
         vm.selectedChildren = [];
+        vm.showAllowSegmentationOption = Umbraco.Sys.ServerVariables.umbracoSettings.showAllowSegmentationForDocumentTypes || false;
 
         vm.addChild = addChild;
         vm.removeChild = removeChild;
         vm.sortChildren = sortChildren;
         vm.toggleAllowAsRoot = toggleAllowAsRoot;
         vm.toggleAllowCultureVariants = toggleAllowCultureVariants;
+        vm.toggleAllowSegmentVariants = toggleAllowSegmentVariants;
         vm.canToggleIsElement = false;
         vm.toggleIsElement = toggleIsElement;
 
@@ -31,6 +33,10 @@
         init();
 
         function init() {
+
+            localizationService.localize("contentTypeEditor_chooseChildNode").then(function(value){
+                childNodeSelectorOverlayTitle = value;
+            });
 
             contentTypeResource.getAll().then(function(contentTypes){
                 vm.contentTypes = _.where(contentTypes, {isElement: false});
@@ -105,6 +111,10 @@
 
         function toggleAllowCultureVariants() {
             $scope.model.allowCultureVariant = $scope.model.allowCultureVariant ? false : true;
+        }
+
+        function toggleAllowSegmentVariants() {
+            $scope.model.allowSegmentVariant = $scope.model.allowSegmentVariant ? false : true;
         }
 
         function toggleIsElement() {
