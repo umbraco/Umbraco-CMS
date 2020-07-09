@@ -34,10 +34,6 @@
 
         function init() {
 
-            localizationService.localize("contentTypeEditor_chooseChildNode").then(function(value){
-                childNodeSelectorOverlayTitle = value;
-            });
-
             contentTypeResource.getAll().then(function(contentTypes){
                 vm.contentTypes = _.where(contentTypes, {isElement: false});
 
