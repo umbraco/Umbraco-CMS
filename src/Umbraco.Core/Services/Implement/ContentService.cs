@@ -1392,7 +1392,7 @@ namespace Umbraco.Core.Services.Implement
                             .ToList();
 
                         if (pendingCultures.Count == 0)
-                            continue; //shouldn't happen but no point in continuing if there's nothing there
+                            continue; //shouldn't happen but no point in processing this document if there's nothing there
 
                         var saveEventArgs = new ContentSavingEventArgs(d, evtMsgs);
                         if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Saving)))
@@ -1453,7 +1453,7 @@ namespace Umbraco.Core.Services.Implement
                             .ToList();
 
                         if (pendingCultures.Count == 0)
-                            continue; //shouldn't happen but no point in continuing if there's nothing there
+                            continue; //shouldn't happen but no point in processing this document if there's nothing there
 
                         var saveEventArgs = new ContentSavingEventArgs(d, evtMsgs);
                         if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Saving)))
@@ -1479,7 +1479,7 @@ namespace Umbraco.Core.Services.Implement
                                     d.Id, culture, string.Join(",", invalidProperties.Select(x => x.Alias)));
 
                             publishing &= tryPublish; //set the culture to be published
-                            if (!publishing) continue; // no point continuing
+                            if (!publishing) continue; // move to next document
                         }
 
                         PublishResult result;
