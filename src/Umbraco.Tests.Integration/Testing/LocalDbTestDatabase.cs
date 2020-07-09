@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -65,11 +66,11 @@ namespace Umbraco.Tests.Integration.Testing
             // there's probably a sweet spot to be found for size / parallel...
 
             var s = ConfigurationManager.AppSettings["Umbraco.Tests.LocalDbTestDatabase.EmptyPoolSize"];
-            var emptySize = s == null ? 2 : int.Parse(s);
+            var emptySize = s == null ? 1 : int.Parse(s);
             s = ConfigurationManager.AppSettings["Umbraco.Tests.LocalDbTestDatabase.EmptyPoolThreadCount"];
             var emptyParallel = s == null ? 1 : int.Parse(s);
             s = ConfigurationManager.AppSettings["Umbraco.Tests.LocalDbTestDatabase.SchemaPoolSize"];
-            var schemaSize = s == null ? 2 : int.Parse(s);
+            var schemaSize = s == null ? 1 : int.Parse(s);
             s = ConfigurationManager.AppSettings["Umbraco.Tests.LocalDbTestDatabase.SchemaPoolThreadCount"];
             var schemaParallel = s == null ? 1 : int.Parse(s);
 
@@ -191,23 +192,10 @@ namespace Umbraco.Tests.Integration.Testing
             ";
 
             // rudimentary retry policy since a db can still be in use when we try to drop
-            for (var i = 0; i < 5; i++)
+            Retry(10, () =>
             {
-                try
-                {
-                    cmd.ExecuteNonQuery();
-                    return;
-                }
-                catch (SqlException)
-                {
-                    // This can occur when there's a transaction deadlock which means (i think) that the database is still in use and hasn't been closed properly yet
-                    // so we need to just wait a little bit
-                    Thread.Sleep(1000);
-                    if (i == 4)
-                        throw;
-                }
-            }
-
+                cmd.ExecuteNonQuery();
+            });
         }
 
         public static void KillLocalDb()
@@ -236,6 +224,32 @@ namespace Umbraco.Tests.Integration.Testing
                 catch (IOException)
                 {
                     // ignore, must still be in use but nothing we can do
+                }
+            }
+        }
+
+        private static void Retry(int maxIterations, Action action)
+        {
+            for (var i = 0; i < maxIterations; i++)
+            {
+                try
+                {
+                    action();
+                    return;
+                }
+                catch (SqlException e)
+                {
+
+                    Console.Error.WriteLine($"SqlException occured, but we try again {i+1}/{maxIterations}.\n{e}");
+                    // This can occur when there's a transaction deadlock which means (i think) that the database is still in use and hasn't been closed properly yet
+                    // so we need to just wait a little bit
+                    Thread.Sleep(100 * i);
+                    if (i == maxIterations - 1)
+                    {
+                        Debugger.Launch();
+                        throw;
+                    }
+
                 }
             }
         }
@@ -308,27 +322,36 @@ namespace Umbraco.Tests.Integration.Testing
 
             private void PrepareThread()
             {
-                while (_prepareQueue.IsCompleted == false)
+                Retry(10, () =>
                 {
-                    int i;
-                    try
+                    while (_prepareQueue.IsCompleted == false)
                     {
-                        i = _prepareQueue.Take();
+                        int i;
+                        try
+                        {
+                            i = _prepareQueue.Take();
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            continue;
+                        }
+
+                        using (var conn = new SqlConnection(ConnectionString(i)))
+                        using (var cmd = conn.CreateCommand())
+                        {
+                            conn.Open();
+                            ResetLocalDb(cmd);
+
+                            _prepare?.Invoke(conn, cmd);
+
+                        }
+
+                        if (!_readyQueue.IsAddingCompleted)
+                        {
+                            _readyQueue.Add(i);
+                        }
                     }
-                    catch (InvalidOperationException)
-                    {
-                        continue;
-                    }
-                    using (var conn = new SqlConnection(ConnectionString(i)))
-                    using (var cmd = conn.CreateCommand())
-                    {
-                        conn.Open();
-                        ResetLocalDb(cmd);
-                        _prepare?.Invoke(conn, cmd);
-                    }
-                    if (!_readyQueue.IsAddingCompleted)
-                        _readyQueue.Add(i);
-                }
+                });
             }
 
             public void Stop()

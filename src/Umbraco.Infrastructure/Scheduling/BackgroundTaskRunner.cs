@@ -81,7 +81,7 @@ namespace Umbraco.Web.Scheduling
         private readonly string _logPrefix;
         private readonly BackgroundTaskRunnerOptions _options;
         private readonly ILogger _logger;
-        private readonly IApplicationShutdownRegistry _hostingEnvironment;
+        private readonly IApplicationShutdownRegistry _applicationShutdownRegistry;
         private readonly object _locker = new object();
 
         private readonly BufferBlock<T> _tasks = new BufferBlock<T>(new DataflowBlockOptions());
@@ -103,10 +103,10 @@ namespace Umbraco.Web.Scheduling
         /// Initializes a new instance of the <see cref="BackgroundTaskRunner{T}"/> class.
         /// </summary>
         /// <param name="logger">A logger.</param>
-        /// <param name="hostingEnvironment">The hosting environment</param>
+        /// <param name="applicationShutdownRegistry">The application shutdown registry</param>
         /// <param name="hook">An optional main domain hook.</param>
-        public BackgroundTaskRunner(ILogger logger, IApplicationShutdownRegistry hostingEnvironment, MainDomHook hook = null)
-            : this(typeof(T).FullName, new BackgroundTaskRunnerOptions(), logger, hostingEnvironment, hook)
+        public BackgroundTaskRunner(ILogger logger, IApplicationShutdownRegistry applicationShutdownRegistry, MainDomHook hook = null)
+            : this(typeof(T).FullName, new BackgroundTaskRunnerOptions(), logger, applicationShutdownRegistry, hook)
         { }
 
         /// <summary>
@@ -114,10 +114,10 @@ namespace Umbraco.Web.Scheduling
         /// </summary>
         /// <param name="name">The name of the runner.</param>
         /// <param name="logger">A logger.</param>
-        /// <param name="hostingEnvironment">The hosting environment</param>
+        /// <param name="applicationShutdownRegistry">The application shutdown registry</param>
         /// <param name="hook">An optional main domain hook.</param>
-        public BackgroundTaskRunner(string name, ILogger logger, IApplicationShutdownRegistry hostingEnvironment, MainDomHook hook = null)
-            : this(name, new BackgroundTaskRunnerOptions(), logger, hostingEnvironment, hook)
+        public BackgroundTaskRunner(string name, ILogger logger, IApplicationShutdownRegistry applicationShutdownRegistry, MainDomHook hook = null)
+            : this(name, new BackgroundTaskRunnerOptions(), logger, applicationShutdownRegistry, hook)
         { }
 
         /// <summary>
@@ -125,10 +125,10 @@ namespace Umbraco.Web.Scheduling
         /// </summary>
         /// <param name="options">The set of options.</param>
         /// <param name="logger">A logger.</param>
-        /// <param name="hostingEnvironment">The hosting environment</param>
+        /// <param name="applicationShutdownRegistry">The application shutdown registry</param>
         /// <param name="hook">An optional main domain hook.</param>
-        public BackgroundTaskRunner(BackgroundTaskRunnerOptions options, ILogger logger, IApplicationShutdownRegistry hostingEnvironment, MainDomHook hook = null)
-            : this(typeof(T).FullName, options, logger, hostingEnvironment, hook)
+        public BackgroundTaskRunner(BackgroundTaskRunnerOptions options, ILogger logger, IApplicationShutdownRegistry applicationShutdownRegistry, MainDomHook hook = null)
+            : this(typeof(T).FullName, options, logger, applicationShutdownRegistry, hook)
         { }
 
         /// <summary>
@@ -137,17 +137,17 @@ namespace Umbraco.Web.Scheduling
         /// <param name="name">The name of the runner.</param>
         /// <param name="options">The set of options.</param>
         /// <param name="logger">A logger.</param>
-        /// <param name="hostingEnvironment">The hosting environment</param>
+        /// <param name="applicationShutdownRegistry">The application shutdown registry</param>
         /// <param name="hook">An optional main domain hook.</param>
-        public BackgroundTaskRunner(string name, BackgroundTaskRunnerOptions options, ILogger logger, IApplicationShutdownRegistry hostingEnvironment, MainDomHook hook = null)
+        public BackgroundTaskRunner(string name, BackgroundTaskRunnerOptions options, ILogger logger, IApplicationShutdownRegistry applicationShutdownRegistry, MainDomHook hook = null)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _hostingEnvironment = hostingEnvironment;
+            _applicationShutdownRegistry = applicationShutdownRegistry;
             _logPrefix = "[" + name + "] ";
 
             if (options.Hosted)
-                _hostingEnvironment.RegisterObject(this);
+                _applicationShutdownRegistry.RegisterObject(this);
 
             if (hook != null)
                 _completed = _terminated = hook.Register() == false;
@@ -736,7 +736,7 @@ namespace Umbraco.Web.Scheduling
         /// <remarks>
         /// <para>"When the application manager needs to stop a registered object, it will call the Stop method."</para>
         /// <para>The application manager will call the Stop method to ask a registered object to un-register. During
-        /// processing of the Stop method, the registered object must call the HostingEnvironment.UnregisterObject method.</para>
+        /// processing of the Stop method, the registered object must call the applicationShutdownRegistry.UnregisterObject method.</para>
         /// </remarks>
         public void Stop(bool immediate) => StopInternal(immediate);
 
@@ -811,7 +811,7 @@ namespace Umbraco.Web.Scheduling
             if (immediate)
             {
                 //only unregister when it's the final call, else we won't be notified of the final call
-                _hostingEnvironment.UnregisterObject(this);
+                _applicationShutdownRegistry.UnregisterObject(this);
             }
 
             if (_terminated) return; // already taken care of

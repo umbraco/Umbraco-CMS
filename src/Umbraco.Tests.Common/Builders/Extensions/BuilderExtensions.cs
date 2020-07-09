@@ -197,7 +197,7 @@ namespace Umbraco.Tests.Common.Builders.Extensions
         public static T WithCultureInfo<T>(this T builder, string name)
             where T : IWithCultureInfoBuilder
         {
-            builder.CultureInfo = new CultureInfo(name);
+            builder.CultureInfo = CultureInfo.GetCultureInfo(name);
             return builder;
         }
     }

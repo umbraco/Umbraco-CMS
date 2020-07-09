@@ -72,7 +72,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _viewEngines = viewEngines;
         }
 
-        [UmbracoAuthorize(redirectToUmbracoLogin: true)]
+        [UmbracoAuthorize(redirectToUmbracoLogin: true, requireApproval : false)]
         [DisableBrowserCache]
         public ActionResult Index()
         {

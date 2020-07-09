@@ -10,6 +10,6 @@ namespace Umbraco.Web.Models.ContentEditing
         public IEnumerable<DomainDisplay> Domains { get; set; }
 
         [DataMember(Name = "language")]
-        public string Language { get; internal set; }
+        public string Language { get;  set; }
     }
 }

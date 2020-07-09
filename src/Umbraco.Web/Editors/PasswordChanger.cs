@@ -9,6 +9,7 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Security;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 
+//Migrated to .NET CORE
 namespace Umbraco.Web.Editors
 {
     internal class PasswordChanger

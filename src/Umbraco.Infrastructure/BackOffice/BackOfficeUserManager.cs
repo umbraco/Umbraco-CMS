@@ -25,8 +25,9 @@ namespace Umbraco.Core.BackOffice
             BackOfficeLookupNormalizer keyNormalizer,
             BackOfficeIdentityErrorDescriber errors,
             IServiceProvider services,
-            ILogger<UserManager<BackOfficeIdentityUser>> logger)
-            : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
+            ILogger<UserManager<BackOfficeIdentityUser>> logger,
+            IUserPasswordConfiguration passwordConfiguration)
+            : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger, passwordConfiguration)
         {
         }
     }
@@ -35,7 +36,7 @@ namespace Umbraco.Core.BackOffice
         where T : BackOfficeIdentityUser
     {
         private PasswordGenerator _passwordGenerator;
-        
+
         public BackOfficeUserManager(
             IIpResolver ipResolver,
             IUserStore<T> store,
@@ -46,17 +47,19 @@ namespace Umbraco.Core.BackOffice
             BackOfficeLookupNormalizer keyNormalizer,
             BackOfficeIdentityErrorDescriber errors,
             IServiceProvider services,
-            ILogger<UserManager<T>> logger)
+            ILogger<UserManager<T>> logger,
+            IUserPasswordConfiguration passwordConfiguration)
             : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
         {
             IpResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));
+            PasswordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         }
 
         #region What we do not currently support
 
         // We don't support an IUserClaimStore and don't need to (at least currently)
         public override bool SupportsUserClaim => false;
-        
+
         // It would be nice to support this but we don't need to currently and that would require IQueryable support for our user service/repository
         public override bool SupportsQueryableUsers => false;
 
@@ -103,7 +106,7 @@ namespace Umbraco.Core.BackOffice
             //we can use the user aware password hasher (which will be the default and preferred way)
             return new PasswordHasher<T>();
         }
-        
+
         /// <summary>
         /// Gets/sets the default back office user password checker
         /// </summary>
@@ -186,7 +189,7 @@ namespace Umbraco.Core.BackOffice
             //use the default behavior
             return await base.CheckPasswordAsync(user, password);
         }
-        
+
         /// <summary>
         /// This is a special method that will reset the password but will raise the Password Changed event instead of the reset event
         /// </summary>
@@ -216,7 +219,7 @@ namespace Umbraco.Core.BackOffice
                 RaisePasswordChangedEvent(null, user.Id); // TODO: How can we get the current user? we have not HttpContext (netstandard), we can make our own IPrincipalAccessor?
             return result;
         }
-        
+
         /// <summary>
         /// Override to determine how to hash the password
         /// </summary>
@@ -361,7 +364,7 @@ namespace Umbraco.Core.BackOffice
         private IdentityAuditEventArgs CreateArgs(AuditEvent auditEvent, IPrincipal currentUser, int affectedUserId, string affectedUsername)
         {
             var umbIdentity = currentUser?.GetUmbracoIdentity();
-            var currentUserId = umbIdentity?.GetUserId<int?>() ?? Constants.Security.SuperUserId;            
+            var currentUserId = umbIdentity?.GetUserId<int?>() ?? Constants.Security.SuperUserId;
             var ip = IpResolver.GetCurrentRequestIpAddress();
             return new IdentityAuditEventArgs(auditEvent, ip, currentUserId, string.Empty, affectedUserId, affectedUsername);
         }

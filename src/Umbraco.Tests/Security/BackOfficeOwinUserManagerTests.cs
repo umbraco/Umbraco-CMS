@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Security
             const string v7Hash = "7Uob6fMTTxDIhWGebYiSxg==P+hgvWlXLbDd4cFLADn811KOaVI/9pg1PNvTuG5NklY=";
             const string plaintext = "4XxzH3s3&J";
 
-            var mockPasswordConfiguration = new Mock<IPasswordConfiguration>();
+            var mockPasswordConfiguration = new Mock<IUserPasswordConfiguration>();
             var mockIpResolver = new Mock<IIpResolver>();
             var mockUserStore = new Mock<IUserPasswordStore<BackOfficeIdentityUser>>();
             var mockDataProtectionProvider = new Mock<IDataProtectionProvider>();

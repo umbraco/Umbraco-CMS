@@ -45,9 +45,14 @@ namespace Umbraco.Configuration.Models
                 }
             }
 
-            if (builder.TryGetValue("Server", out var s) && s is string server && builder.TryGetValue("Database", out var db) && db is string database)
+            if (builder.TryGetValue("Server", out var s) && s is string server && !string.IsNullOrEmpty(server))
             {
-                if (!string.IsNullOrEmpty(server) && !string.IsNullOrEmpty(database))
+                if (builder.TryGetValue("Database", out var db) && db is string database && !string.IsNullOrEmpty(database))
+                {
+                    return Constants.DbProviderNames.SqlServer;
+                }
+
+                if (builder.TryGetValue("AttachDbFileName", out var a) && a is string attachDbFileName && !string.IsNullOrEmpty(attachDbFileName))
                 {
                     return Constants.DbProviderNames.SqlServer;
                 }

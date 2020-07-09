@@ -20,15 +20,12 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 .Add<IdentityMapDefinition>()
                 .Add<AuditMapDefinition>()
                 .Add<CodeFileMapDefinition>()
-                //.Add<ContentMapDefinition>() //TODO Add these
                 .Add<ContentPropertyMapDefinition>()
                 .Add<ContentTypeMapDefinition>()
                 .Add<DataTypeMapDefinition>()
                 .Add<EntityMapDefinition>()
                 .Add<DictionaryMapDefinition>()
                 .Add<MacroMapDefinition>()
-               // .Add<MediaMapDefinition>() //TODO Add these
-              //  .Add<MemberMapDefinition>() //TODO Add these
                 .Add<RedirectUrlMapDefinition>()
                 .Add<RelationMapDefinition>()
                 .Add<SectionMapDefinition>()
@@ -36,8 +33,11 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 .Add<TemplateMapDefinition>()
                 .Add<UserMapDefinition>()
                 .Add<LanguageMapDefinition>()
-               // .Add<IdentityMapDefinition>() //TODO Add these
+                .Add<IdentityMapDefinition>()
                ;
+
+            composition.Register<CommonMapper>();
+            composition.Register<MemberTabsAndPropertiesMapper>();
 
             return composition;
         }

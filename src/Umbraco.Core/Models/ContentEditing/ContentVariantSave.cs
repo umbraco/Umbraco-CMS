@@ -69,6 +69,6 @@ namespace Umbraco.Web.Models.ContentEditing
         /// This is not used for outgoing model information.
         /// </remarks>
         [IgnoreDataMember]
-        internal ContentPropertyCollectionDto PropertyCollectionDto { get; set; }
+        public ContentPropertyCollectionDto PropertyCollectionDto { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -30,17 +31,17 @@ namespace Umbraco.Web.Scheduling
         private readonly IContentService _contentService;
         private readonly IAuditService _auditService;
         private readonly IProfilingLogger _logger;
-        private readonly IApplicationShutdownRegistry _hostingEnvironment;
+        private readonly IApplicationShutdownRegistry _applicationShutdownRegistry;
         private readonly IScopeProvider _scopeProvider;
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly IHealthChecksSettings _healthChecksSettingsConfig;
-        private readonly IIOHelper _ioHelper;
         private readonly IServerMessenger _serverMessenger;
         private readonly IRequestAccessor _requestAccessor;
         private readonly ILoggingSettings _loggingSettings;
         private readonly IKeepAliveSettings _keepAliveSettings;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         private BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
         private BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
@@ -56,9 +57,10 @@ namespace Umbraco.Web.Scheduling
             IContentService contentService, IAuditService auditService,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger logger,
-            IApplicationShutdownRegistry hostingEnvironment, IHealthChecksSettings healthChecksSettingsConfig,
-            IIOHelper ioHelper, IServerMessenger serverMessenger, IRequestAccessor requestAccessor,
-            ILoggingSettings loggingSettings, IKeepAliveSettings keepAliveSettings)
+            IApplicationShutdownRegistry applicationShutdownRegistry, IHealthChecksSettings healthChecksSettingsConfig,
+            IServerMessenger serverMessenger, IRequestAccessor requestAccessor,
+            ILoggingSettings loggingSettings, IKeepAliveSettings keepAliveSettings,
+            IHostingEnvironment hostingEnvironment)
         {
             _runtime = runtime;
             _mainDom = mainDom;
@@ -67,27 +69,27 @@ namespace Umbraco.Web.Scheduling
             _auditService = auditService;
             _scopeProvider = scopeProvider;
             _logger = logger;
-            _hostingEnvironment = hostingEnvironment;
+            _applicationShutdownRegistry = applicationShutdownRegistry;
             _umbracoContextFactory = umbracoContextFactory;
 
             _healthChecks = healthChecks;
             _notifications = notifications;
             _healthChecksSettingsConfig = healthChecksSettingsConfig ?? throw new ArgumentNullException(nameof(healthChecksSettingsConfig));
-            _ioHelper = ioHelper;
             _serverMessenger = serverMessenger;
             _requestAccessor = requestAccessor;
             _loggingSettings = loggingSettings;
             _keepAliveSettings = keepAliveSettings;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public void Initialize()
         {
             // backgrounds runners are web aware, if the app domain dies, these tasks will wind down correctly
-            _keepAliveRunner = new BackgroundTaskRunner<IBackgroundTask>("KeepAlive", _logger, _hostingEnvironment);
-            _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing", _logger, _hostingEnvironment);
-            _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber", _logger, _hostingEnvironment);
-            _fileCleanupRunner = new BackgroundTaskRunner<IBackgroundTask>("TempFileCleanup", _logger, _hostingEnvironment);
-            _healthCheckRunner = new BackgroundTaskRunner<IBackgroundTask>("HealthCheckNotifier", _logger, _hostingEnvironment);
+            _keepAliveRunner = new BackgroundTaskRunner<IBackgroundTask>("KeepAlive", _logger, _applicationShutdownRegistry);
+            _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing", _logger, _applicationShutdownRegistry);
+            _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber", _logger, _applicationShutdownRegistry);
+            _fileCleanupRunner = new BackgroundTaskRunner<IBackgroundTask>("TempFileCleanup", _logger, _applicationShutdownRegistry);
+            _healthCheckRunner = new BackgroundTaskRunner<IBackgroundTask>("HealthCheckNotifier", _logger, _applicationShutdownRegistry);
 
             // we will start the whole process when a successful request is made
             _requestAccessor.RouteAttempt += RegisterBackgroundTasksOnce;
@@ -190,10 +192,22 @@ namespace Umbraco.Web.Scheduling
 
         private IBackgroundTask RegisterTempFileCleanup()
         {
+
+            var tempFolderPaths = new[]
+            {
+                _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads)
+            };
+
+            foreach (var tempFolderPath in tempFolderPaths)
+            {
+                //ensure it exists
+                Directory.CreateDirectory(tempFolderPath);
+            }
+
             // temp file cleanup, will run on all servers - even though file upload should only be handled on the master, this will
             // ensure that in the case it happes on replicas that they are cleaned up.
             var task = new TempFileCleanup(_fileCleanupRunner, DefaultDelayMilliseconds, OneHourMilliseconds,
-                new[] { new DirectoryInfo(_ioHelper.MapPath(Constants.SystemDirectories.TempFileUploads)) },
+                tempFolderPaths.Select(x=>new DirectoryInfo(x)),
                 TimeSpan.FromDays(1), //files that are over a day old
                 _mainDom, _logger);
             _scrubberRunner.TryAdd(task);

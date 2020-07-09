@@ -12,6 +12,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// </remarks>
     [ValidateAngularAntiForgeryToken]
     [AngularJsonOnlyConfiguration] // TODO: This could be applied with our Application Model conventions
+    [JsonExceptionFilter]
     public abstract class UmbracoAuthorizedJsonController : UmbracoAuthorizedApiController
     {
     }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace Umbraco.Web.Common.Formatters
 {
@@ -21,6 +22,7 @@ namespace Umbraco.Web.Common.Formatters
             : base(serializerSettings, charPool, mvcOptions)
         {
             serializerSettings.Converters.Add(new VersionConverter());
+            serializerSettings.ContractResolver = new DefaultContractResolver();
         }
 
         protected override JsonWriter CreateJsonWriter(TextWriter writer)

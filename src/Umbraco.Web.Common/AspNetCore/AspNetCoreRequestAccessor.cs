@@ -44,7 +44,12 @@ namespace Umbraco.Web.Common.AspNetCore
 
 
         public string GetRequestValue(string name) => GetFormValue(name) ?? GetQueryStringValue(name);
-        public string GetFormValue(string name) => _httpContextAccessor.GetRequiredHttpContext().Request.Form[name];
+        public string GetFormValue(string name)
+        {
+            var request = _httpContextAccessor.GetRequiredHttpContext().Request;
+            if (!request.HasFormContentType) return null;
+            return request.Form[name];
+        }
 
         public string GetQueryStringValue(string name) => _httpContextAccessor.GetRequiredHttpContext().Request.Query[name];
 

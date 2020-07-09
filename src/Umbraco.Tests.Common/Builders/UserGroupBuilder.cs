@@ -92,7 +92,7 @@ namespace Umbraco.Tests.Common.Builders
 
         public override IUserGroup Build()
         {
-            var id = _id ?? 1;
+            var id = _id ?? 0;
             var name = _name ?? ("TestUserGroup" + _suffix);
             var alias = _alias ?? ("testUserGroup" + _suffix);
             var userCount = _userCount ?? 0;

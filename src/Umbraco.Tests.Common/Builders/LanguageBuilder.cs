@@ -68,9 +68,9 @@ namespace Umbraco.Tests.Common.Builders
 
             return new Language(Mock.Of<IGlobalSettings>(), cultureInfo.Name)
             {
-                Id = _id ?? 1,
-                CultureName = cultureInfo.TwoLetterISOLanguageName,
-                IsoCode = new RegionInfo(cultureInfo.LCID).Name,
+                Id = _id ?? 0,
+                CultureName = cultureInfo.EnglishName,
+                IsoCode = cultureInfo.Name,
                 Key = key,
                 CreateDate = createDate,
                 UpdateDate = updateDate,

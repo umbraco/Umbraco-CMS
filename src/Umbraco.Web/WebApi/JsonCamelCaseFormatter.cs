@@ -24,10 +24,11 @@ namespace Umbraco.Web.WebApi
             {
                 SerializerSettings =
                 {
-                    ContractResolver = new CamelCasePropertyNamesContractResolver() 
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
                 }
             };
             controllerSettings.Formatters.Add(jsonFormatter);
         }
+
     }
 }

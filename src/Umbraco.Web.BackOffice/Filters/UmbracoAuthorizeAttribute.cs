@@ -10,7 +10,7 @@ namespace Umbraco.Web.BackOffice.Filters
         /// <summary>
         /// Default constructor
         /// </summary>
-        public UmbracoAuthorizeAttribute() : base(typeof(UmbracoAuthorizeFilter))
+        public UmbracoAuthorizeAttribute() : this(false, false)
         {
         }
 
@@ -18,9 +18,11 @@ namespace Umbraco.Web.BackOffice.Filters
         /// Constructor with redirect umbraco login behavior
         /// </summary>
         /// <param name="redirectToUmbracoLogin"></param>
-        public UmbracoAuthorizeAttribute(bool redirectToUmbracoLogin) : base(typeof(UmbracoAuthorizeFilter))
+        /// <param name="requireApproval"></param>
+
+        public UmbracoAuthorizeAttribute(bool redirectToUmbracoLogin, bool requireApproval) : base(typeof(UmbracoAuthorizeFilter))
         {
-            Arguments = new object[] { redirectToUmbracoLogin };
+            Arguments = new object[] { redirectToUmbracoLogin, requireApproval };
         }
 
         /// <summary>

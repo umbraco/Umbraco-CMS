@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Globalization;
+using NUnit.Framework;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
@@ -13,14 +14,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             // Arrange
             var builder = new LanguageBuilder();
 
+            var expected = CultureInfo.GetCultureInfo("en-GB");
             // Act
             var language = builder
-                .WithCultureInfo("en-GB")
+                .WithCultureInfo(expected.Name)
                 .Build();
 
             // Assert
-            Assert.AreEqual("GB", language.IsoCode);
-            Assert.AreEqual("en", language.CultureName);
+            Assert.AreEqual(expected.Name, language.IsoCode);
+            Assert.AreEqual(expected.EnglishName, language.CultureName);
         }
     }
 }

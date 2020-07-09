@@ -15,9 +15,7 @@ namespace Umbraco.Extensions
                 .Add<MediaMapDefinition>()
                 .Add<MemberMapDefinition>();
 
-            composition.Register<CommonMapper>();
             composition.Register<CommonTreeNodeMapper>();
-            composition.Register<MemberTabsAndPropertiesMapper>();
 
             return composition;
         }

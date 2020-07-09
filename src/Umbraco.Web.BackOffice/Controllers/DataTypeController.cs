@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Net;
+using System.Net.Mime;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -316,7 +317,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var result = _dataTypeService.Move(toMove, move.ParentId);
             if (result.Success)
             {
-                return Content(toMove.Path,"text/plain", Encoding.UTF8);
+                return Content(toMove.Path,MediaTypeNames.Text.Plain, Encoding.UTF8);
             }
 
             switch (result.Result.Result)

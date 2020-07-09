@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Interfaces;
 
@@ -17,7 +19,8 @@ namespace Umbraco.Tests.Common.Builders
             IWithTrashedBuilder,
             IWithLevelBuilder,
             IWithPathBuilder,
-            IWithSortOrderBuilder
+            IWithSortOrderBuilder,
+            IWithCultureInfoBuilder
     {
         private ContentTypeBuilder _contentTypeBuilder;
         private GenericDictionaryBuilder<ContentBuilder, string, object> _propertyDataBuilder;
@@ -33,7 +36,9 @@ namespace Umbraco.Tests.Common.Builders
         private string _path;
         private int? _sortOrder;
         private bool? _trashed;
+        private CultureInfo _cultureInfo;
         private IContentType _contentType;
+        private IDictionary<string, string> _cultureNames = new Dictionary<string, string>();
 
         public ContentTypeBuilder AddContentType()
         {
@@ -56,6 +61,7 @@ namespace Umbraco.Tests.Common.Builders
             var path = _path ?? $"-1,{id}";
             var sortOrder = _sortOrder ?? 0;
             var trashed = _trashed ?? false;
+            var culture = _cultureInfo?.Name ?? null;
 
             if (_contentTypeBuilder is null && _contentType is null)
             {
@@ -64,7 +70,7 @@ namespace Umbraco.Tests.Common.Builders
 
             var contentType = _contentType ?? _contentTypeBuilder.Build();
 
-            var content = new Content(name, parentId, contentType)
+            var content = new Content(name, parentId, contentType, culture)
             {
                 Id = id,
                 Key = key,
@@ -76,6 +82,12 @@ namespace Umbraco.Tests.Common.Builders
                 SortOrder = sortOrder,
                 Trashed = trashed,
             };
+
+            foreach (var cultureName in _cultureNames)
+            {
+                content.SetCultureName(cultureName.Value, cultureName.Key);
+            }
+
 
             if (_propertyDataBuilder != null)
             {
@@ -97,6 +109,30 @@ namespace Umbraco.Tests.Common.Builders
             _contentType = contentType;
 
             return this;
+        }
+
+        public ContentBuilder WithCultureName(string culture, string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                if (_cultureNames.TryGetValue(culture, out _))
+                {
+                    _cultureNames.Remove(culture);
+                }
+            }
+            else
+            {
+                _cultureNames[culture] = name;
+            }
+
+            return this;
+        }
+
+        public GenericDictionaryBuilder<ContentBuilder, string, object> AddPropertyData()
+        {
+            var builder = new GenericDictionaryBuilder<ContentBuilder, string, object>(this);
+            _propertyDataBuilder = builder;
+            return builder;
         }
 
         int? IWithIdBuilder.Id
@@ -163,7 +199,10 @@ namespace Umbraco.Tests.Common.Builders
             get => _parentId;
             set => _parentId = value;
         }
-
-
+        CultureInfo IWithCultureInfoBuilder.CultureInfo
+        {
+            get => _cultureInfo;
+            set => _cultureInfo = value;
+        }
     }
 }
