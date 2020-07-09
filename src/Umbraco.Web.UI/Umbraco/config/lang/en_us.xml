@@ -9,6 +9,7 @@
     <key alias="auditTrail">Audit Trail</key>
     <key alias="browse">Browse Node</key>
     <key alias="changeDocType">Change Document Type</key>
+    <key alias="changeDataType">Change Data Type</key>
     <key alias="copy">Copy</key>
     <key alias="create">Create</key>
     <key alias="export">Export</key>
@@ -139,6 +140,7 @@
     <key alias="saveToPublish">Send for approval</key>
     <key alias="saveListView">Save list view</key>
     <key alias="schedulePublish">Schedule</key>
+    <key alias="showPage">Preview</key>
     <key alias="saveAndPreview">Save and preview</key>
     <key alias="showPageDisabled">Preview is disabled because there's no template assigned</key>
     <key alias="styleChoose">Choose style</key>
@@ -169,6 +171,7 @@
     <key alias="sendtopublish">Content sent for publishing</key>
     <key alias="sendtopublishvariant">Content sent for publishing for languages: %0%</key>
     <key alias="sort">Sort child items performed by user</key>
+    <key alias="custom">%0%</key>
     <key alias="smallCopy">Copy</key>
     <key alias="smallPublish">Publish</key>
     <key alias="smallPublishVariant">Publish</key>
@@ -182,6 +185,7 @@
     <key alias="smallSendToPublish">Send To Publish</key>
     <key alias="smallSendToPublishVariant">Send To Publish</key>
     <key alias="smallSort">Sort</key>
+    <key alias="smallCustom">Custom</key>
     <key alias="historyIncludingVariants">History (all variants)</key>
   </area>
   <area alias="changeDocType">
@@ -253,8 +257,8 @@
     <key alias="published">Published</key>
     <key alias="publishedPendingChanges">Published (pending changes)</key>&gt;
     <key alias="publishStatus">Publication Status</key>
-    <key alias="publishDescendantsHelp"><![CDATA[Click <em>Publish with descendants</em> to publish <strong>%0%</strong> and all content items underneath and thereby making their content publicly available.]]></key>
-    <key alias="publishDescendantsWithVariantsHelp"><![CDATA[Click <em>Publish with descendants</em> to publish <strong>the selected languages</strong> and the same languages of content items underneath and thereby making their content publicly available.]]></key>
+    <key alias="publishDescendantsHelp"><![CDATA[Publish <strong>%0%</strong> and all content items underneath and thereby making their content publicly available.]]></key>
+    <key alias="publishDescendantsWithVariantsHelp"><![CDATA[Publish variants and variants of same type underneath and thereby making their content publicly available.]]></key>
     <key alias="releaseDate">Publish at</key>
     <key alias="unpublishDate">Unpublish at</key>
     <key alias="removeDate">Clear Date</key>
@@ -292,7 +296,7 @@
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
-    <key alias="includeUnpublished">Include drafts: also publish unpublished content items.</key>
+    <key alias="includeUnpublished">Include drafts and unpublished content items.</key>
     <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key>
     <key alias="isSensitiveValue_short">This value is hidden.</key>
     <key alias="languagesToPublishForFirstTime">What languages would you like to publish? All languages with content are saved!</key>
@@ -306,7 +310,17 @@
     <key alias="unpublishedLanguages">Unpublished Languages</key>
     <key alias="unmodifiedLanguages">Unmodified Languages</key>
     <key alias="untouchedLanguagesForFirstTime">These languages haven't been created</key>
-    <key alias="readyToPublish">Ready to Publish?</key>
+
+    <key alias="variantsWillBeSaved">All new variants will be saved.</key>
+    <key alias="variantsToPublish">Which variants you would like to publish?</key>
+    <key alias="variantsToSave">Choose which variants to be saved.</key>
+    <key alias="variantsToSendForApproval">Pick variants to send for approval.</key>
+    <key alias="variantsToSchedule">Set scheduled publishing...</key>
+    <key alias="variantsToUnpublish">Select the variants to unpublish. Unpublishing a mandatory language will unpublish all variants.</key>
+    <key alias="publishRequiresVariants">The following variants is required for publishing to take place:</key>
+
+    <key alias="notReadyToPublish">We are not ready to Publish</key>
+    <key alias="readyToPublish">Ready to publish?</key>
     <key alias="readyToSave">Ready to Save?</key>
     <key alias="sendForApproval">Send for approval</key>
     <key alias="schedulePublishHelp">Select the date and time to publish and/or unpublish the content item.</key>
@@ -356,7 +370,8 @@
     <key alias="noDocumentTypesAllowedAtRoot"><![CDATA[There are no allowed document types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Permissions</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available for creating media here. You must enable these in <strong>Media Types Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.]]></key>
     <key alias="noMediaTypesWithNoSettingsAccess">The selected media in the tree doesn't allow for any other media to be created below it.</key>
-    <key alias="noMediaTypesEditPermissions">Edit permissions for this media type</key>    <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
+    <key alias="noMediaTypesEditPermissions">Edit permissions for this media type</key>
+    <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
     <key alias="newFolder">New folder</key>
     <key alias="newDataType">New data type</key>
     <key alias="newJavascriptFile">New JavaScript file</key>
@@ -493,6 +508,7 @@
     <key alias="unLinkYour">Un-link your</key>
     <key alias="account">account</key>
     <key alias="selectEditor">Select editor</key>
+    <key alias="selectEditorConfiguration">Select configuration</key>
     <key alias="selectSnippet">Select snippet</key>
     <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language, you should unpublish the node in that language instead.</key>
   </area>
@@ -556,6 +572,9 @@
     <key alias="anchor">#value or ?key=value</key>
     <key alias="enterAlias">Enter alias...</key>
     <key alias="generatingAlias">Generating alias...</key>
+    <key alias="a11yCreateItem">Create item</key>
+    <key alias="a11yEdit">Edit</key>
+    <key alias="a11yName">Name</key>
   </area>
   <area alias="editcontenttype">
     <key alias="createListView" version="7.2">Create custom list view</key>
@@ -676,6 +695,7 @@
     <key alias="icon">Icon</key>
     <key alias="id">Id</key>
     <key alias="import">Import</key>
+    <key alias="includeFromsubFolders">Include subfolders in search</key>
     <key alias="excludeFromSubFolders">Search only this folder</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Inner margin</key>
@@ -797,6 +817,7 @@
     <key alias="generalHeader">General</key>
     <key alias="editorHeader">Editor</key>
     <key alias="toggleAllowCultureVariants">Toggle allow culture variants</key>
+    <key alias="toggleAllowSegmentVariants">Toggle allow segmentation</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Background color</key>
@@ -1324,10 +1345,13 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="customCrop">User defined</key>
   </area>
   <area alias="rollback">
+    <key alias="changes">Changes</key>
+    <key alias="created">Created</key>
     <key alias="headline">Select a version to compare with the current version</key>
     <key alias="currentVersion">Current version</key>
     <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
     <key alias="documentRolledBack">Document has been rolled back</key>
+    <key alias="headline">Select a version to compare with the current version</key>
     <key alias="htmlHelp">This displays the selected version as HTML, if you wish to see the difference between 2 versions at the same time, use the diff view</key>
     <key alias="rollbackTo">Rollback to</key>
     <key alias="selectVersion">Select version</key>
@@ -1631,6 +1655,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="availableEditors">Create new</key>
     <key alias="reuse">Use existing</key>
     <key alias="editorSettings">Editor settings</key>
+    <key alias="searchResultSettings">Available configurations</key>
+    <key alias="searchResultEditors">Create a new configuration</key>
     <key alias="configuration">Configuration</key>
     <key alias="yesDelete">Yes, delete</key>
     <key alias="movedUnderneath">was moved underneath</key>
@@ -1656,9 +1682,16 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="tabHasNoSortOrder">tab has no sort order</key>
     <key alias="compositionUsageHeading">Where is this composition used?</key>
     <key alias="compositionUsageSpecification">This composition is currently used in the composition of the following content types:</key>
-    <key alias="variantsHeading">Allow varying by culture</key>
+    <key alias="variantsHeading">Allow variations</key>
+    <key alias="cultureVariantHeading">Allow vary by culture</key>
+    <key alias="segmentVariantHeading">Allow segmentation</key>
+    <key alias="cultureVariantLabel">Vary by culture</key>
+    <key alias="segmentVariantLabel">Vary by segments</key>
     <key alias="variantsDescription">Allow editors to create content of this type in different languages.</key>
+    <key alias="cultureVariantDescription">Allow editors to create content of different languages.</key>
+    <key alias="segmentVariantDescription">Allow editors to create segments of this content.</key>
     <key alias="allowVaryByCulture">Allow varying by culture</key>
+    <key alias="allowVaryBySegment">Allow segmentation</key>
     <key alias="elementType">Element type</key>
     <key alias="elementHeading">Is an element type</key>
     <key alias="elementDescription">An element type is meant to be used for instance in Nested Content, and not in the tree.</key>
@@ -2220,6 +2253,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="openBackofficeSearch">Open backoffice search</key>
     <key alias="openCloseBackofficeHelp">Open/Close backoffice help</key>
     <key alias="openCloseBackofficeProfileOptions">Open/Close your profile options</key>
+    <key alias="assignDomainDescription">Setup Culture and Hostnames for %0%</key>
+    <key alias="createDescription">Create new node under %0%</key>
+    <key alias="protectDescription">Setup Public access on %0%</key>
+    <key alias="rightsDescription">Setup Permissions on %0%</key>
+    <key alias="sortDescription">Change sort order for %0%</key>
+    <key alias="createblueprintDescription">Create Content Template based on %0%</key>
     <key alias="openContextMenu">Open context menu for</key>
     <key alias="currentLanguage">Current language</key>
     <key alias="switchLanguage">Switch language to</key>
@@ -2406,5 +2445,22 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="formsDashboard">
     <key alias="formsHeadline">Umbraco Forms</key>
     <key alias="formsDescription">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</key>
+  </area>
+  <area alias="contentTemplatesDashboard">
+    <key alias="whatHeadline">What are Content Templates?</key>
+    <key alias="whatDescription">Content Templates are pre-defined content that can be selected when creating a new content node.</key>
+    <key alias="createHeadline">How do I create a Content Template?</key>
+    <key alias="createDescription">
+        <![CDATA[
+            <p>There are two ways to create a Content Template:</p>
+            <ul>
+                <li>Right-click a content node and select "Create Content Template" to create a new Content Template.</li>
+                <li>Right-click the Content Templates tree in the Settings section and select the Document Type you want to create a Content Template for.</li>
+            </ul>
+            <p>Once given a name, editors can start using the Content Template as a foundation for their new page.</p>
+        ]]>
+    </key>
+    <key alias="manageHeadline">How do I manage Content Templates?</key>
+    <key alias="manageDescription">You can edit and delete Content Templates from the "Content Templates" tree in the Settings section. Expand the Document Type which the Content Template is based on and click it to edit or delete it.</key>
   </area>
 </language>

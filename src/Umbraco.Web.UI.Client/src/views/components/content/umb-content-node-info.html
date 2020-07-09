@@ -5,18 +5,16 @@
         <umb-box ng-if="currentUrls" data-element="node-info-urls">
             <umb-box-header title-key="general_links"></umb-box-header>
             <umb-box-content class="block-form">
-                <ul class="nav nav-stacked" style="margin-bottom: 0;">
+                <ul class="nav nav-stacked mb0">
                     <li ng-repeat="url in currentUrls">
                         <a href="{{url.text}}" target="_blank" ng-if="url.isUrl">
                             <span ng-if="currentUrlsHaveMultipleCultures && url.culture" style="font-size: 13px; color: #cccccc; width: 50px;display: inline-block">{{url.culture}}</span>
-                            <i class="icon icon-out"></i>
+                            <i class="icon icon-out" aria-hidden="true"></i>
                             <span>{{url.text}}</span>
                         </a>
                         <div ng-if="!url.isUrl" style="margin-top: 4px;">
-
                             <span ng-if="currentUrlsHaveMultipleCultures && url.culture" style="font-size: 13px; color: #cccccc; width: 50px;display: inline-block">{{url.culture}}</span>
                             <em>{{url.text}}</em>
-
                         </div>
                     </li>
                 </ul>
@@ -32,7 +30,10 @@
                         <p><localize key="redirectUrls_panelInformation" class="ng-isolate-scope ng-scope">The following URLs redirect to this content item:</localize></p>
                         <ul class="nav nav-stacked" style="margin-bottom: 0;">
                             <li ng-repeat="redirectUrl in redirectUrls">
-                                <a href="{{redirectUrl.originalUrl}}" target="_blank"><i ng-class="value.icon" class="icon-out"></i> {{redirectUrl.originalUrl}}</a>
+                                <a href="{{redirectUrl.originalUrl}}" target="_blank">
+                                    <i ng-class="value.icon" class="icon-out" aria-hidden="true"></i>
+                                    {{redirectUrl.originalUrl}}
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -42,8 +43,7 @@
 
         <umb-box data-element="node-info-history">
 
-            <umb-box-header
-                title="{{historyLabel}}">
+            <umb-box-header title="{{historyLabel}}"> 
                 
                 <umb-button
                     ng-hide="node.trashed"
@@ -64,7 +64,7 @@
                     <umb-load-indicator ng-show="loadingAuditTrail"></umb-load-indicator>
 
                     <div ng-show="auditTrail.length === 0" style="padding: 10px;">
-                        <umb-empty-state 
+                        <umb-empty-state
                             position="center"
                             size="small">
                             <localize key="content_noChanges"></localize>
@@ -79,7 +79,7 @@
 
                             <div class="history-item__break">
                                 <div class="history-item__avatar">
-                                    <umb-avatar 
+                                    <umb-avatar
                                         color="secondary"
                                         size="xs"
                                         name="{{item.userName}}"
@@ -104,7 +104,6 @@
                                 <span>
                                     <localize key="auditTrails_{{ item.logType | lowercase }}" tokens="[item.parameters]">{{ item.comment }}</localize>
                                 </span>
-
                                 
                             </div>
 
@@ -126,7 +125,7 @@
     </div>
 
     <div class="umb-package-details__sidebar">
-        
+
         <umb-box data-element="node-info-general">
             <umb-box-header title-key="general_general"></umb-box-header>
             <umb-box-content class="block-form">

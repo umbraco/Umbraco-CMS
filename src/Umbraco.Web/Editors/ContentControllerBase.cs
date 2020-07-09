@@ -76,7 +76,7 @@ namespace Umbraco.Web.Editors
 
                 // prepare files, if any matching property and culture
                 var files = contentItem.UploadedFiles
-                    .Where(x => x.PropertyAlias == propertyDto.Alias && x.Culture == propertyDto.Culture)
+                    .Where(x => x.PropertyAlias == propertyDto.Alias && x.Culture == propertyDto.Culture && x.Segment == propertyDto.Segment)
                     .ToArray();
 
                 foreach (var file in files)

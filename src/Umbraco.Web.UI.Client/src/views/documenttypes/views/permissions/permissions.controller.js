@@ -14,18 +14,17 @@
         /* ----------- SCOPE VARIABLES ----------- */
 
         var vm = this;
-        var childNodeSelectorOverlayTitle = "";
 
         vm.contentTypes = [];
         vm.selectedChildren = [];
-
-        vm.overlayTitle = "";
+        vm.showAllowSegmentationOption = Umbraco.Sys.ServerVariables.umbracoSettings.showAllowSegmentationForDocumentTypes || false;
 
         vm.addChild = addChild;
         vm.removeChild = removeChild;
         vm.sortChildren = sortChildren;
         vm.toggleAllowAsRoot = toggleAllowAsRoot;
         vm.toggleAllowCultureVariants = toggleAllowCultureVariants;
+        vm.toggleAllowSegmentVariants = toggleAllowSegmentVariants;
         vm.canToggleIsElement = false;
         vm.toggleIsElement = toggleIsElement;
 
@@ -63,16 +62,18 @@
         }
 
         function addChild($event) {
-            var childNodeSelectorOverlay = {
+            
+            const dialog = {
                 view: "itempicker",
-                title: childNodeSelectorOverlayTitle,
                 availableItems: vm.contentTypes,
                 selectedItems: vm.selectedChildren,
                 position: "target",
                 event: $event,
-                submit: function(model) {
-                    vm.selectedChildren.push(model.selectedItem);
-                    $scope.model.allowedContentTypes.push(model.selectedItem.id);
+                submit: function (model) {
+                    if (model.selectedItem) {
+                        vm.selectedChildren.push(model.selectedItem);
+                        $scope.model.allowedContentTypes.push(model.selectedItem.id);
+                    }
                     overlayService.close();
                 },
                 close: function() {
@@ -80,8 +81,10 @@
                 }
             };
 
-            overlayService.open(childNodeSelectorOverlay);
-
+            localizationService.localize("contentTypeEditor_chooseChildNode").then(value => {
+                dialog.title = value;
+                overlayService.open(dialog);
+            });
         }
 
         function removeChild(selectedChild, index) {
@@ -108,6 +111,10 @@
 
         function toggleAllowCultureVariants() {
             $scope.model.allowCultureVariant = $scope.model.allowCultureVariant ? false : true;
+        }
+
+        function toggleAllowSegmentVariants() {
+            $scope.model.allowSegmentVariant = $scope.model.allowSegmentVariant ? false : true;
         }
 
         function toggleIsElement() {
