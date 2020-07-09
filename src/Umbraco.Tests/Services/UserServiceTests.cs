@@ -976,19 +976,17 @@ namespace Umbraco.Tests.Services
 
             var testUserGroup = CreateTestUserGroup();
 
-            int userGroupId = testUserGroup.Id;
+            var userGroupId = testUserGroup.Id;
 
-            CreateTestUser(startContentItems.Select(x => x.Id).ToArray(),testUserGroup);
+            CreateTestUsers(startContentItems.Select(x => x.Id).ToArray(), testUserGroup, 3);
 
             var usersInGroup = ServiceContext.UserService.GetAllInGroup(userGroupId);
 
-            var sut = usersInGroup.FirstOrDefault();
-
-            Assert.AreEqual(sut.StartContentIds.Length, startContentItems.Length);
-
+            foreach (var user in usersInGroup)
+                Assert.AreEqual(user.StartContentIds.Length, startContentItems.Length);
         }
 
-        private Content[] BuildContentItems(int noToCreate)
+        private Content[] BuildContentItems(int numberToCreate)
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
 
@@ -996,10 +994,8 @@ namespace Umbraco.Tests.Services
 
             var startContentItems = new List<Content>();
 
-            for (int i = 0; i < noToCreate; i++)
-            {
+            for (var i = 0; i < numberToCreate; i++)
                 startContentItems.Add(MockedContent.CreateSimpleContent(contentType));
-            }
 
             ServiceContext.ContentService.Save(startContentItems);
 
@@ -1019,20 +1015,24 @@ namespace Umbraco.Tests.Services
             return user;
         }
 
-        private IUser CreateTestUser(int[] startContentIds,IUserGroup userGroup)
+        private List<IUser> CreateTestUsers(int[] startContentIds, IUserGroup userGroup, int numberToCreate)
         {
+            var users = new List<IUser>();
 
-            var user = ServiceContext.UserService.CreateUserWithIdentity("test1", "test1@test.com");
+            for (var i = 0; i < numberToCreate; i++)
+            {
+                var user = ServiceContext.UserService.CreateUserWithIdentity($"test{i}", $"test{i}@test.com");
+                user.AddGroup(userGroup.ToReadOnlyGroup());
 
-            user.AddGroup(userGroup.ToReadOnlyGroup());
+                var updateable = (User)user;
+                updateable.StartContentIds = startContentIds;
 
-            var updateable = (User)user;
+                ServiceContext.UserService.Save(user);
 
-            updateable.StartContentIds = startContentIds;
+                users.Add(user);
+            }
 
-            ServiceContext.UserService.Save(user);
-
-            return user;
+            return users;
         }
 
         private UserGroup CreateTestUserGroup(string alias = "testGroup", string name = "Test Group")
