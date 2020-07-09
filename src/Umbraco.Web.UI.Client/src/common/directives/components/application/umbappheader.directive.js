@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function AppHeaderDirective(eventsService, appState, userService, focusService, backdropService) {
+    function AppHeaderDirective(eventsService, appState, userService, focusService, backdropService, overlayService) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -71,21 +71,17 @@
             };
 
             scope.avatarClick = function () {
-                if (!scope.userDialog) {
-                    backdropService.open();
-                    scope.userDialog = {
-                        view: "user",
-                        show: true,
-                        close: function (oldModel) {
-                            scope.userDialog.show = false;
-                            scope.userDialog = null;
-                            backdropService.close();
-                        }
-                    };
-                } else {
-                    scope.userDialog.show = false;
-                    scope.userDialog = null;
-                }
+
+                const dialog = {
+                    view: "user",
+                    position: "right",
+                    name: "overlay-user",
+                    close: function () {
+                        overlayService.close();
+                    }
+                };
+
+                overlayService.open(dialog);
             };
 
         }
