@@ -50,7 +50,19 @@ namespace Umbraco.Web.Editors.Binders
                     }
                 }
 
-                // TODO: anything after 3 parts we can put in metadata
+                //if there are 4 parts part 4 is always segment
+                string segment = null;
+                if (parts.Length > 3)
+                {
+                    segment = parts[3];
+                    //normalize to null if empty
+                    if (segment.IsNullOrWhiteSpace())
+                    {
+                        segment = null;
+                    }
+                }
+
+                // TODO: anything after 4 parts we can put in metadata
 
                 var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
 
@@ -59,6 +71,7 @@ namespace Umbraco.Web.Editors.Binders
                     TempFilePath = file.LocalFileName,
                     PropertyAlias = propAlias,
                     Culture = culture,
+                    Segment = segment,
                     FileName = fileName
                 });
             }

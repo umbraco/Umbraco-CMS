@@ -5,193 +5,171 @@
 
         var vm = this;
         vm.loading = true;
-        vm.hasPristineVariants = false;
         vm.isNew = true;
 
         vm.changeSelection = changeSelection;
-        vm.dirtyVariantFilter = dirtyVariantFilter;
-        vm.pristineVariantFilter = pristineVariantFilter;
 
-        /** Returns true if publishing is possible based on if there are un-published mandatory languages */
+        /** Returns true if publish meets the requirements of mandatory languages */
         function canPublish() {
             
-            var possible = false;
+            var hasSomethingToPublish = false;
+
             for (var i = 0; i < vm.variants.length; i++) {
                 var variant = vm.variants[i];
-                var state = canVariantPublish(variant);
-                if (state === true) {
-                    possible = true;
-                }
-                if (state === false) {
+
+                // if varaint is mandatory and not already published:
+                if (variant.publish === false && notPublishedMandatoryFilter(variant)) {
                     return false;
                 }
+                if (variant.publish === true) {
+                    hasSomethingToPublish = true;
+                }
+
             }
-            return possible;
-        }
-        
-        /** Returns true if publishing is possible based on if the variant is a un-published mandatory language */
-        function canVariantPublish(variant) {
-            
-            //if this variant will show up in the publish-able list
-            var publishable = dirtyVariantFilter(variant);
-            var published = !(variant.state === "NotCreated" || variant.state === "Draft");
-            
-            // is this variant mandatory:
-            if (variant.language.isMandatory && !published && !variant.publish) {
-                //if a mandatory variant isn't published or set to be published
-                //then we cannot continue
-                
-                return false;
-            }
-            
-            // is this variant selected for publish:
-            if (variant.publish === true) {
-                return publishable;
-            }
-            
-            return null;
+            return hasSomethingToPublish;
         }
 
         function changeSelection(variant) {
-            
+            // update submit button state:
             $scope.model.disableSubmitButton = !canPublish();
-            //need to set the Save state to true if publish is true
+            //need to set the Save state to same as publish.
             variant.save = variant.publish;
-            
-            variant.willPublish = canVariantPublish(variant);
         }
 
-        function dirtyVariantFilter(variant) {
-            //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
-            // * the active one
-            // * it's editor is in a $dirty state
-            // * it has pending saves
-            // * it is unpublished
-            // * it is in NotCreated state
-            return (variant.active || variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges" || variant.state === "NotCreated");
-        }
 
-        function hasAnyData(variant) {
+        function hasAnyDataFilter(variant) {
 
             if (variant.name == null || variant.name.length === 0) {
                 return false;
             }
 
-            var result = variant.isDirty != null;
-
-            if(result) return true;
+            if(variant.isDirty === true) {
+                return true;
+            }
 
             for (var t=0; t < variant.tabs.length; t++){
                 for (var p=0; p < variant.tabs[t].properties.length; p++){
-
                     var property = variant.tabs[t].properties[p];
-
-                    if(property.culture == null) continue;
-
-                    result = result ||  (property.value != null && property.value.length > 0);
-
-                    if(result) return true;
+                    if (property.value != null && property.value.length > 0) {
+                        return true;
+                    }
                 }
             }
 
-            return result;
+            return false;
         }
 
-        function pristineVariantFilter(variant) {
-            return !(dirtyVariantFilter(variant));
+        function dirtyVariantFilter(variant) {
+            //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
+            // * it's editor is in a $dirty state
+            // * it has pending saves
+            // * it is unpublished
+            return (variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges");
+        }
+
+        function publishableVariantFilter(variant) {
+            //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
+            // * variant is active
+            // * it's editor is in a $dirty state
+            // * it has pending saves
+            // * it is unpublished
+            return (variant.active || variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges");
+        }
+
+        function notPublishedMandatoryFilter(variant) {
+            return variant.state !== "Published" && isMandatoryFilter(variant);
+        }
+        function isMandatoryFilter(variant) {
+            //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
+            // * has a mandatory language
+            // * without having a segment, segments cant be mandatory at current state of code.
+            return (variant.language && variant.language.isMandatory === true && variant.segment == null);
+        }
+        function notPublishableButMandatoryFilter(variant) {
+            //determine a variant is needed, but not already a choice.
+            // * publishable — aka. displayed as a publish option.
+            // * published — its already published and everything is then fine.
+            // * mandatory — this is needed, and thats why we highlight it.
+            return !publishableVariantFilter(variant) && variant.state !== "Published" && variant.isMandatory === true;
         }
 
         function onInit() {
 
-
-
             vm.variants = $scope.model.variants;
 
-            if (!$scope.model.title) {
-                localizationService.localize("content_readyToPublish").then(function (value) {
-                    $scope.model.title = value;
-                });
-            }
+            _.each(vm.variants, (variant) => {
+                
+                // reset to not be published
+                variant.publish = false;
+                variant.save = false;
+                
+                variant.isMandatory = isMandatoryFilter(variant);
 
-            vm.hasPristineVariants = false;
-
-            _.each(vm.variants,
-                function (variant) {
-                    if(variant.state === "NotCreated") {
-                        vm.isNew = true;
-                    }
+                // If we have a variant thats not in the state of NotCreated, then we know we have adata and its not a new content node.
+                if(variant.state !== "NotCreated") {
+                    vm.isNew = false;
                 }
-            );
-
-            _.each(vm.variants,
-                function (variant) {
-                    variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
-                    variant.htmlId = "_content_variant_" + variant.compositeId;
-                    
-                    // reset to not be published
-                    variant.publish = false;
-                    variant.save = false;
-
-                    //check for pristine variants
-                    if (!vm.hasPristineVariants) {
-                        vm.hasPristineVariants = pristineVariantFilter(variant);
-                    }
-                    
-                    // If the variant havent been created jet.
-                    if(variant.state === "NotCreated") {
-                        // If the variant is mandatory, then set the variant to be published.
-                        if (variant.language.isMandatory === true) {
-                            variant.publish = true;
-                            variant.save = true;
-                        }
-                    }
-                    
-                    variant.canPublish = dirtyVariantFilter(variant);
-                    
-                    // if we have data on this variant.
-                    if(variant.canPublish && hasAnyData(variant)) {
-                        // and if some varaints havent been saved before, or they dont have a publishing date set, then we set it for publishing.
-                        if(vm.isNew || variant.publishDate == null){
-                            variant.publish = true;
-                            variant.save = true;
-                        }
-                    }
-                    
-                    variant.willPublish = canVariantPublish(variant);
-                }
-            );
-
-            if (vm.variants.length !== 0) {
-                //now sort it so that the current one is at the top
-                vm.variants = _.sortBy(vm.variants, function (v) {
-                    return v.active ? 0 : 1;
-                });
-
-                var active = _.find(vm.variants, function (v) {
-                    return v.active;
-                });
-
-                if (active) {
-                    //ensure that the current one is selected
-                    active.publish = true;
-                    active.save = true;
-                }
-
-                $scope.model.disableSubmitButton = !canPublish();
-
-            } else {
-                //disable Publish button if we have nothing to publish, should not happen
-                $scope.model.disableSubmitButton = true;
-            }
-
-            var labelKey =  vm.isNew ? "content_languagesToPublishForFirstTime" : "content_languagesToPublish";
-
-            localizationService.localize(labelKey).then(function (value) {
-                vm.headline = value;
-                vm.loading = false;
             });
 
+            _.each(vm.variants, (variant) => {
+                
+                // if this is a new node and we have data on this variant.
+                if(vm.isNew === true && hasAnyDataFilter(variant)) {
+                    variant.save = true;
+                }
+                
+            });
 
+            vm.availableVariants = vm.variants.filter(publishableVariantFilter);
+            vm.missingMandatoryVariants = vm.variants.filter(notPublishableButMandatoryFilter);
+
+            // if any active varaiant that is available for publish, we set it to be published:
+            _.each(vm.availableVariants, (v) => {
+                if(v.active) {
+                    v.save = v.publish = true;
+                }
+            });
+
+            if (vm.availableVariants.length !== 0) {
+                vm.availableVariants.sort(function (a, b) {
+                    if (a.language && b.language) {
+                        if (a.language.name > b.language.name) {
+                            return -1;
+                        }
+                        if (a.language.name < b.language.name) {
+                            return 1;
+                        }
+                    } 
+                    if (a.segment && b.segment) {
+                        if (a.segment > b.segment) {
+                            return -1;
+                        }
+                        if (a.segment < b.segment) {
+                            return 1;
+                        }
+                    }
+                    return 0;
+                });
+            }
+
+
+            $scope.model.disableSubmitButton = !canPublish();
+
+            if (vm.missingMandatoryVariants.length > 0) {
+                localizationService.localize("content_notReadyToPublish").then(function (value) {
+                    $scope.model.title = value;
+                    vm.loading = false;
+                });
+            } else {
+                if (!$scope.model.title) {
+                    localizationService.localize("content_readyToPublish").then(function (value) {
+                        $scope.model.title = value;
+                        vm.loading = false;
+                    });
+                } else {
+                    vm.loading = false;
+                }
+            }
 
         }
 
