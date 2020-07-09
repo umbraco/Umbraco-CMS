@@ -8,14 +8,14 @@
  * is for user defined properties (called Properties) and the other is for field properties which are attached to the native 
  * model objects (not user defined). The methods below are named according to these rules: Properties vs Fields.
  */
-function serverValidationManager($timeout, udiService) {
+function serverValidationManager($timeout) {
 
     // TODO: It would be nicer to just SHA1 hash these 'keys' instead of having the keys be compound values 
     // It would be another lib dependency or we could embed this https://github.com/emn178/js-sha1
     // this would remove the need for the auto-generated 'id' values since the hash would be the actual id value.
 
     // The array of callback objects, each object 'key' is:
-    // - propertyAlias
+    // - propertyAlias (this is the property's 'path' if it's a nested error)
     // - culture
     // - fieldName
     // - segment
@@ -25,14 +25,12 @@ function serverValidationManager($timeout, udiService) {
     var callbacks = [];
 
     // The array of error message objects, each object 'key' is:    
-    // - propertyAlias
+    // - propertyAlias (this is the property's 'path' if it's a nested error)
     // - culture
     // - fieldName
     // - segment
     // The object also contains:
     // - errorMsg
-    // - id  (unique identifier, auto-generated, used internally for mapping parent/child property validation messages)
-    // - parentId (used to map parent/child property validation messages)
     var items = [];
     
     /** calls the callback specified with the errors specified, used internally */
@@ -104,13 +102,6 @@ function serverValidationManager($timeout, udiService) {
         });
     }
 
-    function getPropertyErrorById(id) {
-        //find all errors for this id
-        return _.find(items, function (item) {
-            return (item.id === id);
-        });
-    }
-
     function getVariantErrors(culture, segment) {
         
         if (!culture) {
@@ -154,20 +145,18 @@ function serverValidationManager($timeout, udiService) {
     /**
      * Flattens the complex errror result json into an array of the block's id/parent id and it's corresponding validation ModelState
      * @param {any} errorMsg
-     * @param {any} the id of the parentId (if any)
+     * @param {any} parentPropertyAlias The parent property alias for the json error 
      */
-    function parseComplexEditorError(errorMsg, parentId) {
+    function parseComplexEditorError(errorMsg, parentPropertyAlias) {
 
         var json = Utilities.isArray(errorMsg) ? errorMsg : JSON.parse(errorMsg);
 
         var result = [];
 
-        function extractModelState(validation, pid) {
+        function extractModelState(validation, parentPath) {
             if (validation.$id && validation.ModelState) {
                 var ms = {
-                    id: validation.$id,
-                    elementUdi: udiService.build("element", validation.$id),
-                    parentId: pid,
+                    validationPath: `${parentPath}/${validation.$id}`,
                     modelState: validation.ModelState
                 };
                 result.push(ms);
@@ -176,23 +165,23 @@ function serverValidationManager($timeout, udiService) {
             return null;
         }
 
-        function iterateErrorBlocks(blocks, pid) {
+        function iterateErrorBlocks(blocks, parentPath) {
             for (var i = 0; i < blocks.length; i++) {
                 var validation = blocks[i];
-                var ms = extractModelState(validation, pid);
+                var ms = extractModelState(validation, parentPath);
                 if (!ms) {
                     continue;
                 }
                 var nested = _.omit(validation, "$id", "$elementTypeAlias", "ModelState");                
                 for (const [key, value] of Object.entries(nested)) {
                     if (Array.isArray(value)) {
-                        iterateErrorBlocks(value, ms.id); // recurse
+                        iterateErrorBlocks(value, `${ms.validationPath}/${key}`); // recurse
                     }
                 }
             }
         }
 
-        iterateErrorBlocks(json, parentId);
+        iterateErrorBlocks(json, parentPropertyAlias);
 
         return result;
     }
@@ -304,7 +293,7 @@ function serverValidationManager($timeout, udiService) {
      * @description
      * Adds an error message for the content property
      */
-    function addPropertyError(propertyAlias, culture, fieldName, errorMsg, segment, parentId) {
+    function addPropertyError(propertyAlias, culture, fieldName, errorMsg, segment) {
 
         if (!propertyAlias) {
             return;
@@ -323,9 +312,8 @@ function serverValidationManager($timeout, udiService) {
             errorMsg = "";
         }
 
-        var id = String.CreateGuid();
-
         // remove all non printable chars and whitespace from the string
+        // (this can be a json string for complex errors and in some test cases contains odd whitespace)
         if (Utilities.isString(errorMsg)) {
             errorMsg = errorMsg.trimStartSpecial().trim();
         }
@@ -333,9 +321,9 @@ function serverValidationManager($timeout, udiService) {
         // if the error message is json it's a complex editor validation response that we need to parse
         if ((Utilities.isString(errorMsg) && errorMsg.startsWith("[")) || Utilities.isArray(errorMsg)) {
 
-            var idsToErrors = parseComplexEditorError(errorMsg, id);
-            console.log("idsToErrors = " + JSON.stringify(idsToErrors));
-            idsToErrors.forEach(x => addErrorsForModelState(x.modelState, x.elementUdi, x.parentId));
+            // flatten the json structure, create validation paths for each property and add each as a property error
+            var idsToErrors = parseComplexEditorError(errorMsg, propertyAlias);
+            idsToErrors.forEach(x => addErrorsForModelState(x.modelState, x.validationPath));
 
             // We need to clear the error message else it will show up as a giant json block against the property
              errorMsg = "";
@@ -344,8 +332,6 @@ function serverValidationManager($timeout, udiService) {
         //only add the item if it doesn't exist                
         if (!hasPropertyError(propertyAlias, culture, fieldName, segment)) {
             items.push({
-                id: id,
-                parentId: parentId,
                 propertyAlias: propertyAlias,
                 culture: culture,
                 segment: segment,
@@ -420,12 +406,11 @@ function serverValidationManager($timeout, udiService) {
      * @name addErrorsForModelState
      * @methodOf umbraco.services.serverValidationManager
      * @param {any} modelState
-     * @param {any} elementUdi optional parameter specifying a nested element's UDI for which this property belongs (for complex editors)
-     * @param {any} parentId optional parameter specifying the parentId validation item object (for complex editors)
+     * @param {any} parentValidationPath optional parameter specifying a nested element's UDI for which this property belongs (for complex editors)
      * @description
      * This wires up all of the server validation model state so that valServer and valServerField directives work
      */    
-    function addErrorsForModelState(modelState, elementUdi, parentId) {
+    function addErrorsForModelState(modelState, parentValidationPath) {
 
         if (!Utilities.isObject(modelState)) {
             throw "modelState is not an object";
@@ -449,12 +434,6 @@ function serverValidationManager($timeout, udiService) {
             //There will always be at least 4 parts for content properties since all model errors for properties are prefixed with "_Properties"
             //If it is not prefixed with "_Properties" that means the error is for a field of the object directly.
 
-            // TODO: This 4 part dot notation isn't ideal and instead it would probably be nicer to have a json structure as the key (which could be converted
-            // to base64 if we cannot do that since it's a 'key'). That way the key can be flexible and 'future proof' since I'm sure something in the future
-            // will change for this. Another idea is to just have a single key for one property type and have the model error a json structure that handles 
-            // everything. This would probably be the 'nicest' way but would require quite a lot of work. We are part way there with how we are doing 
-            // validation for complex editors.
-
             // Example: "_Properties.headerImage.en-US.mySegment.myField"
             // * it's for a property since it has a _Properties prefix
             // * it's for the headerImage property type
@@ -468,9 +447,9 @@ function serverValidationManager($timeout, udiService) {
             // user defined properties with custom controls.
             if (parts.length > 1 && parts[0] === "_Properties") {
 
-                // create the validation key, might just be the prop alias but if it's nested will be a unique udi
-                // like umb://element/GUID/propertyAlias
-                var propertyValidationKey = createPropertyValidationKey(parts[1], elementUdi);
+                // create the validation key, might just be the prop alias but if it's nested will be validation path
+                // like "myBlockEditor/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/7170A4DD-2441-4B1B-A8D3-437D75C4CBC9/city"
+                var propertyValidationKey = createPropertyValidationKey(parts[1], parentValidationPath);
 
                 var culture = null;
                 if (parts.length > 2) {
@@ -496,7 +475,7 @@ function serverValidationManager($timeout, udiService) {
                 }
 
                 // add a generic error for the property
-                addPropertyError(propertyValidationKey, culture, htmlFieldReference, value && Array.isArray(value) && value.length > 0 ? value[0] : null, segment, parentId);
+                addPropertyError(propertyValidationKey, culture, htmlFieldReference, value && Array.isArray(value) && value.length > 0 ? value[0] : null, segment);
             }
             else {
 
@@ -507,9 +486,8 @@ function serverValidationManager($timeout, udiService) {
         }
     }
 
-    // TODO: Write a test or two for this and probs a bunch of other things here too!
-    function createPropertyValidationKey(propertyAlias, elementUdi) {
-        return elementUdi ? (elementUdi + "/" + propertyAlias) : propertyAlias;
+    function createPropertyValidationKey(propertyAlias, parentValidationPath) {
+        return parentValidationPath ? (parentValidationPath + "/" + propertyAlias) : propertyAlias;
     }
 
     /**
@@ -645,7 +623,6 @@ function serverValidationManager($timeout, udiService) {
 
             // Now notify the registrations for this callback if we've previously been notified and we're not cleared.
             // This will happen for dynamically shown editors, like complex editors that load in sub element types.
-            // TODO: We need to see what the repercussions of this are in other editors!
             notify();
 
             //return a function to unsubscribe this subscription by uniqueId
@@ -767,8 +744,6 @@ function serverValidationManager($timeout, udiService) {
             }
             return undefined;
         },
-
-        getPropertyErrorById: getPropertyErrorById,
 
         /**
          * @ngdoc function

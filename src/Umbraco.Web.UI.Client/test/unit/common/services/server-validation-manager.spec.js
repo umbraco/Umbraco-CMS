@@ -411,30 +411,30 @@
 ]`;
             
             //act 
-            var ms = serverValidationManager.parseComplexEditorError(complexValidationMsg);
+            var ms = serverValidationManager.parseComplexEditorError(complexValidationMsg, "myBlockEditor");
 
             //assert
             expect(ms.length).toEqual(3);
-            expect(ms[0].id).toEqual("34E3A26C-103D-4A05-AB9D-7E14032309C3");
-            expect(ms[1].id).toEqual("FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1");
-            expect(ms[2].id).toEqual("7170A4DD-2441-4B1B-A8D3-437D75C4CBC9");
+            expect(ms[0].validationPath).toEqual("myBlockEditor/34E3A26C-103D-4A05-AB9D-7E14032309C3");
+            expect(ms[1].validationPath).toEqual("myBlockEditor/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1");
+            expect(ms[2].validationPath).toEqual("myBlockEditor/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/7170A4DD-2441-4B1B-A8D3-437D75C4CBC9");
 
         });
 
         it('create dictionary of id to ModelState with inherited errors', function () {
 
             //act 
-            var ms = serverValidationManager.parseComplexEditorError(nonRootLevelComplexValidationMsg);
+            var ms = serverValidationManager.parseComplexEditorError(nonRootLevelComplexValidationMsg, "myBlockEditor");
 
             //assert
             expect(ms.length).toEqual(3);
-            expect(ms[0].id).toEqual("34E3A26C-103D-4A05-AB9D-7E14032309C3");
+            expect(ms[0].validationPath).toEqual("myBlockEditor/34E3A26C-103D-4A05-AB9D-7E14032309C3");
             var item0ModelState = ms[0].modelState;
             expect(Object.keys(item0ModelState).length).toEqual(1);
             expect(item0ModelState["_Properties.addresses.invariant.null"].length).toEqual(1);
             expect(item0ModelState["_Properties.addresses.invariant.null"][0]).toEqual("");
-            expect(ms[1].id).toEqual("FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1");
-            expect(ms[2].id).toEqual("7170A4DD-2441-4B1B-A8D3-437D75C4CBC9");
+            expect(ms[1].validationPath).toEqual("myBlockEditor/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1");
+            expect(ms[2].validationPath).toEqual("myBlockEditor/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/7170A4DD-2441-4B1B-A8D3-437D75C4CBC9");
 
         });
 
@@ -449,15 +449,20 @@
             serverValidationManager.addErrorsForModelState(modelState);
 
             //assert
-            console.log(JSON.stringify(serverValidationManager.items));
-            let propError = serverValidationManager.getPropertyError("umb://element/FBEAEE8F4BC943EE8B81FCA8978850F1/city");
-            expect(propError).toBeDefined();
-            console.log(JSON.stringify(propError));
-            expect(propError.parentId).toBeDefined();
-            let parentError = serverValidationManager.getPropertyErrorById(propError.parentId);
-            expect(parentError).toBeDefined();
-            expect(parentError.propertyAlias).toEqual("umb://element/34E3A26C103D4A05AB9D7E14032309C3/addresses");
+            var propertyErrors = [
+                "blockFeatures",
+                "blockFeatures/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses",
+                "blockFeatures/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1/city",
+                "blockFeatures/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/7170A4DD-2441-4B1B-A8D3-437D75C4CBC9/city"
+            ]
+            // These will all exist
+            propertyErrors.forEach(x => expect(serverValidationManager.getPropertyError(x)).toBeDefined());
 
+            // These field errors also exist
+            expect(serverValidationManager.getPropertyError(propertyErrors[2], null, "country")).toBeDefined();
+            expect(serverValidationManager.getPropertyError(propertyErrors[2], null, "capital")).toBeDefined();
+            expect(serverValidationManager.getPropertyError(propertyErrors[3], null, "country")).toBeDefined();
+            expect(serverValidationManager.getPropertyError(propertyErrors[3], null, "capital")).toBeDefined();
         });
 
     });

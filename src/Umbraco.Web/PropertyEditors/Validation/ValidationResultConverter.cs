@@ -56,6 +56,8 @@ namespace Umbraco.Web.PropertyEditors.Validation
                 var joElementType = new JObject
                 {
                     { "$id", elementTypeValidationResult.BlockId },
+
+                    // TODO: We don't use this anywhere, though it's nice for debugging
                     { "$elementTypeAlias", elementTypeValidationResult.ElementTypeAlias }
                 };
 

@@ -17,6 +17,8 @@ namespace Umbraco.Web.PropertyEditors.Validation
         }
 
         public IList<ComplexEditorPropertyTypeValidationResult> ValidationResults { get; } = new List<ComplexEditorPropertyTypeValidationResult>();
+
+        // TODO: We don't use this anywhere, though it's nice for debugging
         public string ElementTypeAlias { get; }
         public Guid BlockId { get; }
     }
