@@ -107,7 +107,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
         /// <returns></returns>
-        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
+        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
         public MediaItemDisplay GetEmpty(string contentTypeAlias, int parentId)
         {
             var contentType = _mediaTypeService.Get(contentTypeAlias);
@@ -155,7 +155,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
+        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
         [EnsureUserPermissionForMedia("id")]
         [DetermineAmbiguousActionByPassingParameters]
         public MediaItemDisplay GetById(int id)
@@ -176,7 +176,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
+        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
         [EnsureUserPermissionForMedia("id")]
         [DetermineAmbiguousActionByPassingParameters]
         public MediaItemDisplay GetById(Guid id)
@@ -197,7 +197,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        // [OutgoingEditorModelEvent] // TODO introduce when moved to .NET Core
+        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
         [EnsureUserPermissionForMedia("id")]
         [DetermineAmbiguousActionByPassingParameters]
         public MediaItemDisplay GetById(Udi id)

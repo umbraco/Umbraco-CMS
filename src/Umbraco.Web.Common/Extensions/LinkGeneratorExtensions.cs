@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using Umbraco.Core;
 using Microsoft.AspNetCore.Routing;
@@ -56,10 +58,17 @@ namespace Umbraco.Extensions
         public static string GetUmbracoApiService<T>(this LinkGenerator linkGenerator, string actionName, object id = null)
             where T : UmbracoApiControllerBase
         {
-            return linkGenerator.GetUmbracoApiService(actionName, typeof(T), id);
+            return linkGenerator.GetUmbracoApiService(actionName, typeof(T), new Dictionary<string, object>()
+            {
+                ["id"] = id
+            });
         }
 
-
+        public static string GetUmbracoApiService<T>(this LinkGenerator linkGenerator, string actionName, IDictionary<string, object> values)
+            where T : UmbracoApiControllerBase
+        {
+            return linkGenerator.GetUmbracoApiService(actionName, typeof(T), values);
+        }
 
         public static string GetUmbracoApiServiceBaseUrl<T>(this LinkGenerator linkGenerator, Expression<Func<T, object>> methodSelector)
             where T : UmbracoApiControllerBase
@@ -81,35 +90,30 @@ namespace Umbraco.Extensions
         /// <param name="area"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static string GetUmbracoApiService(this LinkGenerator linkGenerator, string actionName, string controllerName, string area, object id = null)
+        public static string GetUmbracoApiService(this LinkGenerator linkGenerator, string actionName, string controllerName, string area, IDictionary<string,object> dict = null)
         {
             if (actionName == null) throw new ArgumentNullException(nameof(actionName));
             if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(actionName));
             if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
             if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
 
-            if (area.IsNullOrWhiteSpace())
+            if (dict is null)
             {
-                if (id == null)
-                {
-                    return linkGenerator.GetPathByAction(actionName, controllerName);
-                }
-                else
-                {
-                    return linkGenerator.GetPathByAction(actionName, controllerName, new { id = id });
-                }
+                dict = new Dictionary<string, object>();
             }
-            else
+
+
+
+            if (!area.IsNullOrWhiteSpace())
             {
-                if (id == null)
-                {
-                    return linkGenerator.GetPathByAction(actionName, controllerName, new { area = area });
-                }
-                else
-                {
-                    return linkGenerator.GetPathByAction(actionName, controllerName, new { area = area, id = id });
-                }
+                dict["area"] = area;
             }
+
+
+            var values = dict.Aggregate(new ExpandoObject() as IDictionary<string, object>,
+                (a, p) => { a.Add(p.Key, p.Value); return a; });
+
+            return linkGenerator.GetPathByAction(actionName, controllerName, values);
         }
 
         /// <summary>
@@ -120,7 +124,7 @@ namespace Umbraco.Extensions
         /// <param name="apiControllerType"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static string GetUmbracoApiService(this LinkGenerator linkGenerator, string actionName, Type apiControllerType, object id = null)
+        public static string GetUmbracoApiService(this LinkGenerator linkGenerator, string actionName, Type apiControllerType, IDictionary<string,object> values = null)
         {
             if (actionName == null) throw new ArgumentNullException(nameof(actionName));
             if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(actionName));
@@ -137,7 +141,7 @@ namespace Umbraco.Extensions
                 //set the area to the plugin area
                 area = metaData.AreaName;
             }
-            return linkGenerator.GetUmbracoApiService(actionName, ControllerExtensions.GetControllerName(apiControllerType), area, id);
+            return linkGenerator.GetUmbracoApiService(actionName, ControllerExtensions.GetControllerName(apiControllerType), area, values);
         }
 
         public static string GetUmbracoApiService<T>(this LinkGenerator linkGenerator, Expression<Func<T, object>> methodSelector)
@@ -155,7 +159,7 @@ namespace Umbraco.Extensions
             {
                 return linkGenerator.GetUmbracoApiService<T>(method.Name);
             }
-            return linkGenerator.GetUmbracoApiService<T>(method.Name, methodParams.Values.First());
+            return linkGenerator.GetUmbracoApiService<T>(method.Name, methodParams);
         }
     }
 }

@@ -69,7 +69,7 @@ namespace Umbraco.Core.IO
             // either
             // @inherits Umbraco.Web.Mvc.UmbracoViewPage
             // @inherits Umbraco.Web.Mvc.UmbracoViewPage<ModelClass>
-            content.Append("@inherits Umbraco.Web.Mvc.UmbracoViewPage");
+            content.Append("@inherits Umbraco.Web.Common.AspNetCore.UmbracoViewPage");
             if (modelClassName.IsNullOrWhiteSpace() == false)
             {
                 content.Append("<");

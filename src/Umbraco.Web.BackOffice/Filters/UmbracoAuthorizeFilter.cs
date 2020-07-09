@@ -32,7 +32,7 @@ namespace Umbraco.Web.BackOffice.Filters
             IHostingEnvironment hostingEnvironment,
             IUmbracoContextAccessor umbracoContext,
             IRuntimeState runtimeState, LinkGenerator linkGenerator,
-            bool redirectToUmbracoLogin, string redirectUrl)
+            bool redirectToUmbracoLogin, bool requireApproval, string redirectUrl)
         {
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
@@ -40,6 +40,7 @@ namespace Umbraco.Web.BackOffice.Filters
             _linkGenerator = linkGenerator ?? throw new ArgumentNullException(nameof(linkGenerator));
             _redirectToUmbracoLogin = redirectToUmbracoLogin;
             _redirectUrl = redirectUrl;
+            _requireApproval = requireApproval;
         }
 
         /// <summary>
@@ -49,9 +50,20 @@ namespace Umbraco.Web.BackOffice.Filters
         /// <param name="umbracoContext"></param>
         /// <param name="runtimeState"></param>
         /// <param name="linkGenerator"></param>
+        /// <param name="redirectUrl"></param>
         public UmbracoAuthorizeFilter(
-            IHostingEnvironment hostingEnvironment, IUmbracoContextAccessor umbracoContext, IRuntimeState runtimeState, LinkGenerator linkGenerator)
-            : this(hostingEnvironment, umbracoContext, runtimeState, linkGenerator, false, null)
+            IHostingEnvironment hostingEnvironment,
+            IUmbracoContextAccessor umbracoContext,
+            IRuntimeState runtimeState, LinkGenerator linkGenerator,
+            string redirectUrl) : this(hostingEnvironment, umbracoContext, runtimeState, linkGenerator, false, false, redirectUrl)
+        {
+        }
+
+        public UmbracoAuthorizeFilter(
+            IHostingEnvironment hostingEnvironment,
+            IUmbracoContextAccessor umbracoContext,
+            IRuntimeState runtimeState, LinkGenerator linkGenerator,
+            bool redirectToUmbracoLogin, bool requireApproval) : this(hostingEnvironment, umbracoContext, runtimeState, linkGenerator, redirectToUmbracoLogin, requireApproval, null)
         {
         }
 

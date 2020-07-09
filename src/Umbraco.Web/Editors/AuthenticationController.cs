@@ -81,15 +81,7 @@ namespace Umbraco.Web.Editors
         protected BackOfficeSignInManager SignInManager => _signInManager
             ?? (_signInManager = TryGetOwinContext().Result.GetBackOfficeSignInManager());
 
-        /// <summary>
-        /// Returns the configuration for the backoffice user membership provider - used to configure the change password dialog
-        /// </summary>
-        /// <returns></returns>
-        [WebApi.UmbracoAuthorize(requireApproval: false)]
-        public IDictionary<string, object> GetPasswordConfig(int userId)
-        {
-            return _passwordConfiguration.GetConfiguration(userId != Security.CurrentUser.Id);
-        }
+
 
         /// <summary>
         /// Checks if a valid token is specified for an invited user and if so logs the user in and returns the user object
@@ -386,7 +378,7 @@ namespace Umbraco.Web.Editors
         }
 
 
-        
+
 
         // NOTE: This has been migrated to netcore, but in netcore we don't explicitly set the principal in this method, that's done in ConfigureUmbracoBackOfficeCookieOptions so don't worry about that
         private HttpResponseMessage SetPrincipalAndReturnUserDetail(IUser user, IPrincipal principal)

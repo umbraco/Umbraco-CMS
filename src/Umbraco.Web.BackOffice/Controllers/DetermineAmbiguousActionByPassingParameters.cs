@@ -42,37 +42,45 @@ namespace Umbraco.Web.BackOffice.Controllers
                         type = type.GetElementType();
                     }
 
-                    foreach (var value in values)
+                    if (values is null )
                     {
-                        if (type == typeof(Udi))
+                        canUse &= Nullable.GetUnderlyingType(type) != null;
+                    }
+                    else
+                    {
+                        foreach (var value in values)
                         {
-                            canUse &= UdiParser.TryParse(value.ToString(), out _);
-                        }
-                        else if (type == typeof(int))
-                        {
-                            canUse &= int.TryParse(value.ToString(), out _);
-                        }
-                        else if (type == typeof(Guid))
-                        {
-                            canUse &= Guid.TryParse(value.ToString(), out _);
-                        }
-                        else if (type == typeof(string))
-                        {
-                            canUse &= true;
-                        }
-                        else if (type == typeof(bool))
-                        {
-                            canUse &= bool.TryParse(value, out _);
-                        }
-                        else if (type == typeof(Direction))
-                        {
-                            canUse &= Enum<Direction>.TryParse(value, out _);
-                        }
-                        else
-                        {
-                            canUse &= true;
+                            if (type == typeof(Udi))
+                            {
+                                canUse &= UdiParser.TryParse(value.ToString(), out _);
+                            }
+                            else if (type == typeof(int))
+                            {
+                                canUse &= int.TryParse(value.ToString(), out _);
+                            }
+                            else if (type == typeof(Guid))
+                            {
+                                canUse &= Guid.TryParse(value.ToString(), out _);
+                            }
+                            else if (type == typeof(string))
+                            {
+                                canUse &= true;
+                            }
+                            else if (type == typeof(bool))
+                            {
+                                canUse &= bool.TryParse(value, out _);
+                            }
+                            else if (type == typeof(Direction))
+                            {
+                                canUse &= Enum<Direction>.TryParse(value, out _);
+                            }
+                            else
+                            {
+                                canUse &= true;
+                            }
                         }
                     }
+
                 }
 
                 return canUse;

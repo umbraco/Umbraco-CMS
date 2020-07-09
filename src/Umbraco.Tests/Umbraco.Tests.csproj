@@ -136,7 +136,6 @@
     <Compile Include="ModelsBuilder\UmbracoApplicationTests.cs" />
     <Compile Include="Models\ContentXmlTest.cs" />
     <Compile Include="Models\ImageProcessorImageUrlGeneratorTest.cs" />
-    <Compile Include="Models\Mapping\UserModelMapperTests.cs" />
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
@@ -147,7 +146,6 @@
     <Compile Include="Services\KeyValueServiceTests.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="TestHelpers\Entities\MockedContent.cs" />
-    <Compile Include="TestHelpers\Entities\MockedContentTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
     <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
     <Compile Include="TestHelpers\Entities\MockedMember.cs" />
@@ -245,7 +243,6 @@
     <Compile Include="Web\AngularIntegration\JsInitializationTests.cs" />
     <Compile Include="Web\AngularIntegration\ServerVariablesParserTests.cs" />
     <Compile Include="Migrations\Stubs\DropForeignKeyMigrationStub.cs" />
-    <Compile Include="Models\Mapping\ContentTypeModelMappingTests.cs" />
     <Compile Include="Cache\DeepCloneAppCacheTests.cs" />
     <Compile Include="Cache\DefaultCachePolicyTests.cs" />
     <Compile Include="Cache\FullDataSetCachePolicyTests.cs" />
@@ -253,7 +250,6 @@
     <Compile Include="Web\Controllers\AuthenticationControllerTests.cs" />
     <Compile Include="Web\Controllers\BackOfficeControllerUnitTests.cs" />
     <Compile Include="Web\Controllers\UserEditorAuthorizationHelperTests.cs" />
-    <Compile Include="Web\Controllers\UsersControllerTests.cs" />
     <Compile Include="Web\HealthChecks\HealthCheckResultsTests.cs" />
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
     <Compile Include="Templates\HtmlImageSourceParserTests.cs" />
@@ -565,7 +561,9 @@
     <Content Include="Services\Importing\uBlogsy-Package.xml" />
     <Content Include="Services\Importing\XsltSearch-Package.xml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Models\Mapping" />
+  </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>

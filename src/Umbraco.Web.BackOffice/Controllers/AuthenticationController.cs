@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Umbraco.Core;
@@ -39,6 +40,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IGlobalSettings _globalSettings;
         private readonly ILogger _logger;
         private readonly IIpResolver _ipResolver;
+        private readonly IUserPasswordConfiguration _passwordConfiguration;
 
         // TODO: We need to import the logic from Umbraco.Web.Editors.AuthenticationController
         // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
@@ -50,7 +52,9 @@ namespace Umbraco.Web.BackOffice.Controllers
             IUserService userService,
             UmbracoMapper umbracoMapper,
             IGlobalSettings globalSettings,
-            ILogger logger, IIpResolver ipResolver)
+            ILogger logger,
+            IIpResolver ipResolver,
+            IUserPasswordConfiguration passwordConfiguration)
         {
             _webSecurity = webSecurity;
             _userManager = backOfficeUserManager;
@@ -60,6 +64,17 @@ namespace Umbraco.Web.BackOffice.Controllers
             _globalSettings = globalSettings;
             _logger = logger;
             _ipResolver = ipResolver;
+            _passwordConfiguration = passwordConfiguration;
+        }
+
+        /// <summary>
+        /// Returns the configuration for the backoffice user membership provider - used to configure the change password dialog
+        /// </summary>
+        /// <returns></returns>
+        [UmbracoAuthorize]
+        public IDictionary<string, object> GetPasswordConfig(int userId)
+        {
+            return _passwordConfiguration.GetConfiguration(userId != _webSecurity.CurrentUser.Id);
         }
 
         [HttpGet]

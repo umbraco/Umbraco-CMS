@@ -31,7 +31,6 @@ namespace Umbraco.Web.Runtime
 
             composition.Register<UmbracoInjectedModule>();
 
-            composition.ComposeWebMappingProfiles();
 
             // register membership stuff
             composition.Register(factory => MembershipProviderExtensions.GetMembersMembershipProvider());

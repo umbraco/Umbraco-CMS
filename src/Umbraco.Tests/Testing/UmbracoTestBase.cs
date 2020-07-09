@@ -366,8 +366,7 @@ namespace Umbraco.Tests.Testing
             if (configure == false) return;
 
             Composition
-                .ComposeCoreMappingProfiles()
-                .ComposeWebMappingProfiles();
+                .ComposeCoreMappingProfiles();
         }
 
         protected virtual TypeLoader GetTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IHostingEnvironment hostingEnvironment, IProfilingLogger logger, UmbracoTestOptions.TypeLoader option)

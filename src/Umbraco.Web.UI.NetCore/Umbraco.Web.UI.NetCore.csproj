@@ -6,6 +6,7 @@
     </PropertyGroup>
     <ItemGroup>
       <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" />
+      <ProjectReference Include="..\Umbraco.Persistance.SqlCe\Umbraco.Persistance.SqlCe.csproj" />
       <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
       <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
       <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
@@ -13,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Umbraco" />
+      <Folder Include="Views" />
       <Folder Include="Views\" />
       <Folder Include="wwwroot\Media" />
       <Folder Include="wwwroot\Umbraco\views\install" />
@@ -61,6 +62,23 @@
           <SubType>Designer</SubType>
         </Content>
         <Content Remove="wwwroot\Web.config" />
+        <Content Remove="Umbraco\PartialViewMacros\Templates\Gallery.cshtml" />
+        <Content Remove="Umbraco\PartialViewMacros\Templates\ListAncestorsFromCurrentPage.cshtml" />
+        <Content Remove="Umbraco\PartialViewMacros\Templates\ListChildPagesFromChangeableSource.cshtml" />
+        <Content Remove="Umbraco\PartialViewMacros\Templates\ListChildPagesFromCurrentPage.cshtml" />
+        <Content Remove="Umbraco\PartialViewMacros\Templates\ListChildPagesOrderedByDate.cshtml" />
+        <Content Remove="Umbraco\PartialViewMacros\Templates\ListChildPagesOrderedByName.cshtml" />
+        <Content Remove="Umbraco\PartialViewMacros\Templates\ListChildPagesOrderedByProperty.cshtml" />
+        <Content Remove="Umbraco\PartialViewMacros\Templates\ListChildPagesWithDoctype.cshtml" />
+        <Content Remove="Umbraco\PartialViewMacros\Templates\ListDescendantsFromCurrentPage.cshtml" />
+        <Content Remove="Umbraco\PartialViewMacros\Templates\ListImagesFromMediaFolder.cshtml" />
+        <Content Remove="Umbraco\PartialViewMacros\Templates\Login.cshtml" />
+        <Content Remove="Umbraco\PartialViewMacros\Templates\LoginStatus.cshtml" />
+        <Content Remove="Umbraco\PartialViewMacros\Templates\MultinodeTree-picker.cshtml" />
+        <Content Remove="Umbraco\PartialViewMacros\Templates\Navigation.cshtml" />
+        <Content Remove="Umbraco\PartialViewMacros\Templates\RegisterMember.cshtml" />
+        <Content Remove="Umbraco\PartialViewMacros\Templates\SiteMap.cshtml" />
+        <Content Remove="Umbraco\PartialViewMacros\Templates\EditProfile.cshtml" />
     </ItemGroup>
 
     <ItemGroup>
@@ -101,6 +119,10 @@
       <Content Update="Config\serilog.user.config">
         <SubType>Designer</SubType>
       </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Umbraco\PartialViewMacros\Templates\Empty.cshtml" />
     </ItemGroup>
 
 </Project>

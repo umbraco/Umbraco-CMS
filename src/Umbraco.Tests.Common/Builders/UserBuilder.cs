@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.Common.Builders.Interfaces;
 
@@ -41,6 +43,7 @@ namespace Umbraco.Tests.Common.Builders
         private int? _sessionTimeout;
         private int[] _startContentIds;
         private int[] _startMediaIds;
+        private readonly List<UserGroupBuilder<UserBuilder<TParent>>> _userGroupBuilders = new List<UserGroupBuilder<UserBuilder<TParent>>>();
 
         public UserBuilder(TParent parentBuilder) : base(parentBuilder)
         {
@@ -76,11 +79,19 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
+        public UserBuilder<TParent> WithUsername(string username)
+        {
+            _username = username;
+            return this;
+        }
+
         public UserBuilder<TParent> WithComments(string comments)
         {
             _comments = comments;
             return this;
         }
+
+
 
         public UserBuilder<TParent> WithSessionTimeout(int sessionTimeout)
         {
@@ -113,7 +124,7 @@ namespace Umbraco.Tests.Common.Builders
 
         public override User Build()
         {
-            var id = _id ?? 1;
+            var id = _id ?? 0;
             var defaultLang = _defaultLang ?? "en";
             var globalSettings = new GlobalSettingsBuilder().WithDefaultUiLanguage(defaultLang).Build();
             var key = _key ?? Guid.NewGuid();
@@ -134,8 +145,9 @@ namespace Umbraco.Tests.Common.Builders
             var sessionTimeout = _sessionTimeout ?? 0;
             var startContentIds = _startContentIds ?? new int[0];
             var startMediaIds = _startMediaIds ?? new int[0];
+            var groups = _userGroupBuilders.Select(x => x.Build());
 
-            return new User(
+            var result = new User(
                 globalSettings,
                 name,
                 email,
@@ -158,7 +170,24 @@ namespace Umbraco.Tests.Common.Builders
                 StartContentIds = startContentIds,
                 StartMediaIds = startMediaIds,
             };
+            foreach (var readOnlyUserGroup in groups)
+            {
+                result.AddGroup(readOnlyUserGroup.ToReadOnlyGroup());
+            }
+
+
+            return result;
         }
+
+        public UserGroupBuilder<UserBuilder<TParent>> AddUserGroup()
+        {
+            var builder = new UserGroupBuilder<UserBuilder<TParent>>(this);
+
+            _userGroupBuilders.Add(builder);
+
+            return builder;
+        }
+
 
         int? IWithIdBuilder.Id
         {
