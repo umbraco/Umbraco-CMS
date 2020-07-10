@@ -16,7 +16,7 @@ namespace Umbraco.Web.Common.Filters
     {
         public AngularJsonOnlyConfigurationAttribute() : base(typeof(AngularJsonOnlyConfigurationFilter))
         {
-            Order = -2400;
+            Order = 1; // Must be low, to be overridden by other custom formatters, but higher then all framework stuff.
         }
 
         private class AngularJsonOnlyConfigurationFilter : IResultFilter

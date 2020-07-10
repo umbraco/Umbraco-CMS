@@ -26,7 +26,7 @@
                 <dependency id="Microsoft.Extensions.Configuration" version="[3.1.2,3.999999)" />
                 <dependency id="Microsoft.Extensions.Configuration.Binder" version="[3.1.2,3.999999)" />
                 <dependency id="Microsoft.Extensions.Configuration.Json" version="[3.1.2,3.999999)" />
-                <dependency id="System.Configuration.ConfigurationManager" version="[4.6.0,4.999999)" />
+                <dependency id="System.Configuration.ConfigurationManager" version="[4.7.0,4.999999)" />
                 <dependency id="System.ComponentModel.Annotations" version="[4.7.0,4.999999)" />
                 <dependency id="System.Reflection.Emit.Lightweight" version="[4.3.0,4.999999)" />
                 <dependency id="System.Runtime.Caching" version="[4.6.0,4.999999)" />
@@ -61,19 +61,16 @@
                 <dependency id="System.Threading.Tasks.Dataflow" version="[4.9.0,4.999999)" />
                 <dependency id="Examine.Core" version="[2.0.0-alpha.20200128.15,2.999999)" />
                 <dependency id="CSharpTest.Net.Collections-NetStd2" version="[14.906.1403.1084,14.999999)" />
-            </group>
-            <!-- Umbraco.Examine.Lucene -->
-            <group targetFramework="net472">
-                <dependency id="Examine.Lucene" version="[2.0.0-alpha.20200128.15,2.999999)" />
-                <dependency id="Microsoft.SourceLink.GitHub" version="[1.0.0,1.999999)" />
-                <dependency id="Newtonsoft.Json" version="[12.0.3,12.999999)" />
-                <dependency id="NPoco" version="[4.0.2,4.999999)" />
                 <dependency id="SecurityCodeScan" version="[3.4.0,3.999999)" />
             </group>
 
         </dependencies>
     </metadata>
     <files>
+        <!-- Umbraco.Examine.Lucene HACK remove this when Examine lucene is a real netstandard dependency -->
+        <file src="$BuildTmp$\WebApp\bin\Examine.Lucene.dll" target="lib\netstandard2.0\Examine.Lucene.dll" />
+        <file src="$BuildTmp$\WebApp\bin\Lucene.Net.dll" target="lib\netstandard2.0\Lucene.Net.dll" />
+
         <!-- libs -->
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Configuration.dll" target="lib\netstandard2.0\Umbraco.Configuration.dll" />
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Core.dll" target="lib\netstandard2.0\Umbraco.Core.dll" />
@@ -81,7 +78,7 @@
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.Lucene.dll" target="lib\netstandard2.0\Umbraco.Examine.Lucene.dll" />
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Infrastructure.dll" target="lib\netstandard2.0\Umbraco.Infrastructure.dll" />
         <file src="$BuildTmp$\WebApp\bin\Umbraco.PublishedCache.NuCache.dll" target="lib\netstandard2.0\Umbraco.PublishedCache.NuCache.dll" />
-       
+
         <!-- docs -->
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Configuration.xml" target="lib\netstandard2.0\Umbraco.Configuration.xml" />
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Core.xml" target="lib\netstandard2.0\Umbraco.Core.xml" />

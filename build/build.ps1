@@ -180,10 +180,10 @@
     $this.RemoveFile($excludeFiles)
 
     # copy rest of the files into WebApp
-    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Config", "*", "$($this.BuildTemp)\WebApp\Config")
+    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Config", "*", "$($this.BuildTemp)\WebApp\config")
     $this.RemoveFile("$($this.BuildTemp)\WebApp\Config\*.Release.*")
-    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Umbraco", "*", "$($this.BuildTemp)\WebApp\Umbraco")
-    $excludeUmbracoDirs = @("$($this.BuildTemp)\WebApp\Umbraco\config","$($this.BuildTemp)\WebApp\Umbraco\lib")
+    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Umbraco", "*", "$($this.BuildTemp)\WebApp\umbraco")
+    $excludeUmbracoDirs = @("$($this.BuildTemp)\WebApp\umbraco\config","$($this.BuildTemp)\WebApp\umbraco\lib")
     $this.RemoveDirectory($excludeUmbracoDirs)
     $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Views", "*", "$($this.BuildTemp)\WebApp\Views")
     Copy-Item "$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\appsettings.json" "$($this.BuildTemp)\WebApp"
@@ -246,6 +246,9 @@
       /tv:"$($this.BuildEnv.VisualStudio.ToolsVersion)" `
       /p:UmbracoBuild=True `
       > $log
+
+      # copy Umbraco.Persistance.SqlCe files into WebApp
+      Copy-Item "$($this.BuildTemp)\tests\Umbraco.Persistance.SqlCe.*" "$($this.BuildTemp)\WebApp\bin"
 
     if (-not $?) { throw "Failed to compile tests." }
 
@@ -319,10 +322,10 @@
 
     # copy Belle
     Write-Host "Copy Belle"
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\umbraco\assets", "*", "$tmp\WebApp\umbraco\assets")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\umbraco\js", "*", "$tmp\WebApp\umbraco\js")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\umbraco\lib", "*", "$tmp\WebApp\umbraco\lib")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\umbraco\views", "*", "$tmp\WebApp\umbraco\views")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\assets", "*", "$tmp\WebApp\wwwroot\umbraco\assets")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\js", "*", "$tmp\WebApp\wwwroot\umbraco\js")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\lib", "*", "$tmp\WebApp\wwwroot\umbraco\lib")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\views", "*", "$tmp\WebApp\wwwroot\umbraco\views")
   })
 
   $ubuild.DefineMethod("PackageZip",
@@ -375,16 +378,6 @@
     }
   })
 
-  $ubuild.DefineMethod("PrepareNuGet",
-  {
-    Write-Host "Prepare NuGet"
-
-    # add Web.config transform files to the NuGet package
-    Write-Host "Add web.config transforms to NuGet package"
-    mv "$($this.BuildTemp)\WebApp\Views\Web.config" "$($this.BuildTemp)\WebApp\Views\Web.config.transform"
-
-  })
-
   $nugetsourceUmbraco = "https://api.nuget.org/v3/index.json"
 
   $ubuild.DefineMethod("RestoreNuGet",
@@ -419,6 +412,12 @@
         -Version "$($this.Version.Semver.ToString())" `
         -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cms.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms." }
+
+    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.SqlCe.nuspec" `
+        -Properties BuildTmp="$($this.BuildTemp)" `
+        -Version "$($this.Version.Semver.ToString())" `
+        -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmssqlce.log"
+    if (-not $?) { throw "Failed to pack NuGet UmbracoCms.SqlCe." }
 
     # run hook
     if ($this.HasMethod("PostPackageNuGet"))
@@ -470,7 +469,7 @@
     $src = "$($this.SolutionRoot)\src"
     $out = $this.BuildOutput
 
-    # Check if the solution has been built		
+    # Check if the solution has been built
     if (!(Test-Path "$src\Umbraco.Web.UI.Client\node_modules")) {throw "Umbraco needs to be built before generating the Angular Docs"}
 
     "Moving to Umbraco.Web.UI.Docs folder"
@@ -481,7 +480,7 @@
     & npx gulp docs
 
     Pop-Location
-    
+
     # change baseUrl
     $BaseUrl = "https://our.umbraco.com/apidocs/v8/ui/"
     $IndexPath = "./api/index.html"
@@ -513,8 +512,6 @@
     $this.PackageZip()
     if ($this.OnError()) { return }
     $this.VerifyNuGet()
-    if ($this.OnError()) { return }
-    $this.PrepareNuGet()
     if ($this.OnError()) { return }
     $this.PackageNuGet()
     if ($this.OnError()) { return }

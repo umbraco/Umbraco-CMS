@@ -16,7 +16,7 @@ namespace Umbraco.Web.Common.Filters
     {
         public OutgoingNoHyphenGuidFormatAttribute() : base(typeof(OutgoingNoHyphenGuidFormatFilter))
         {
-            Order = -2000;
+            Order = 2; //must be higher than AngularJsonOnlyConfigurationAttribute.Order
         }
 
         private class OutgoingNoHyphenGuidFormatFilter : IResultFilter

@@ -112,16 +112,16 @@ namespace Umbraco.Web.Media
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (autoFillConfig == null) throw new ArgumentNullException(nameof(autoFillConfig));
 
-            if (!string.IsNullOrEmpty(autoFillConfig.WidthFieldAlias) && content.Properties.Contains(autoFillConfig.WidthFieldAlias))
+            if (!string.IsNullOrWhiteSpace(autoFillConfig.WidthFieldAlias) && content.Properties.Contains(autoFillConfig.WidthFieldAlias))
                 content.Properties[autoFillConfig.WidthFieldAlias].SetValue(size.HasValue ? size.Value.Width.ToInvariantString() : string.Empty, culture, segment);
 
-            if (!string.IsNullOrEmpty(autoFillConfig.HeightFieldAlias) && content.Properties.Contains(autoFillConfig.HeightFieldAlias))
+            if (!string.IsNullOrWhiteSpace(autoFillConfig.HeightFieldAlias) && content.Properties.Contains(autoFillConfig.HeightFieldAlias))
                 content.Properties[autoFillConfig.HeightFieldAlias].SetValue(size.HasValue ? size.Value.Height.ToInvariantString() : string.Empty, culture, segment);
 
-            if (!string.IsNullOrEmpty(autoFillConfig.LengthFieldAlias) && content.Properties.Contains(autoFillConfig.LengthFieldAlias))
+            if (!string.IsNullOrWhiteSpace(autoFillConfig.LengthFieldAlias) && content.Properties.Contains(autoFillConfig.LengthFieldAlias))
                 content.Properties[autoFillConfig.LengthFieldAlias].SetValue(length, culture, segment);
 
-            if (!string.IsNullOrEmpty(autoFillConfig.ExtensionFieldAlias) && content.Properties.Contains(autoFillConfig.ExtensionFieldAlias))
+            if (!string.IsNullOrWhiteSpace(autoFillConfig.ExtensionFieldAlias) && content.Properties.Contains(autoFillConfig.ExtensionFieldAlias))
                 content.Properties[autoFillConfig.ExtensionFieldAlias].SetValue(extension, culture, segment);
         }
 

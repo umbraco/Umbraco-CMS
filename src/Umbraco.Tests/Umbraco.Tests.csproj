@@ -248,9 +248,7 @@
     <Compile Include="Cache\SingleItemsOnlyCachePolicyTests.cs" />
     <Compile Include="Web\Controllers\AuthenticationControllerTests.cs" />
     <Compile Include="Web\Controllers\BackOfficeControllerUnitTests.cs" />
-    <Compile Include="Web\Controllers\ContentControllerTests.cs" />
     <Compile Include="Web\Controllers\UserEditorAuthorizationHelperTests.cs" />
-    <Compile Include="Web\Controllers\UsersControllerTests.cs" />
     <Compile Include="Web\HealthChecks\HealthCheckResultsTests.cs" />
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
     <Compile Include="Templates\HtmlImageSourceParserTests.cs" />
@@ -468,9 +466,6 @@
   <ItemGroup>
     <None Include="App.config">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="Logging\UmbracoTraceLog.UNITTEST.20181112.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Packaging\Packages\Document_Type_Picker_1.1.umb" />
     <None Include="UmbracoExamine\TestFiles\umbraco-sort.config">

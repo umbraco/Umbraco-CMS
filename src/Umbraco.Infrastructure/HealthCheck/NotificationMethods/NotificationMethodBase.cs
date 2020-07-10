@@ -19,8 +19,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             }
 
             var notificationMethods = healthCheckSettingsConfig.NotificationSettings.NotificationMethods;
-            var notificationMethod = notificationMethods[attribute.Alias];
-            if (notificationMethod == null)
+            if(!notificationMethods.TryGetValue(attribute.Alias, out var notificationMethod))
             {
                 Enabled = false;
                 return;
