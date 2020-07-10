@@ -10,18 +10,14 @@
  */
 function serverValidationManager($timeout) {
 
-    // TODO: It would be nicer to just SHA1 hash these 'keys' instead of having the keys be compound values 
-    // It would be another lib dependency or we could embed this https://github.com/emn178/js-sha1
-    // this would remove the need for the auto-generated 'id' values since the hash would be the actual id value.
-
-    // The array of callback objects, each object 'key' is:
+    // The array of callback objects, each object is:
     // - propertyAlias (this is the property's 'path' if it's a nested error)
     // - culture
     // - fieldName
     // - segment
-    // The object also contains:
     // - callback (function)
     // - id (unique identifier, auto-generated, used internally for unsubscribing the callback)
+    // - matchPrefix (used for complex properties, default is false, if set to true the callback will fire for any item with this propertyAlias prefix)
     var callbacks = [];
 
     // The array of error message objects, each object 'key' is:    
@@ -53,9 +49,7 @@ function serverValidationManager($timeout) {
      * @function
      *
      * @description
-     * This method isn't used very often but can be used if all subscriptions need to be notified again. This can be
-     * handy if a view needs to be reloaded/rebuild like when switching variants in the content editor. This is also used
-     * when a new subscription occurs and there is already registered errors like dynamically created/shown editors.
+     * Notifies all subscriptions again. Called when there are changes to subscriptions or errors. 
      */
     function notify() {
         $timeout(function () {
@@ -81,7 +75,7 @@ function serverValidationManager($timeout) {
         });
     }
     
-    function getPropertyErrors(propertyAlias, culture, segment, fieldName) {
+    function getPropertyErrors(propertyAlias, culture, segment, fieldName, matchPrefixValidationPath) {
         if (!Utilities.isString(propertyAlias)) {
             throw "propertyAlias must be a string";
         }
@@ -98,7 +92,11 @@ function serverValidationManager($timeout) {
 
         //find all errors for this property
         return _.filter(items, function (item) {
-            return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+            return ((matchPrefixValidationPath ? (item.propertyAlias === propertyAlias || propertyAlias.startsWith(item.propertyAlias + '/')) : item.propertyAlias === propertyAlias)
+                && item.culture === culture
+                && item.segment === segment
+                // ignore field matching if 
+                && (matchPrefixValidationPath || (item.fieldName === fieldName || (fieldName === undefined || fieldName === ""))));
         });
     }
 
@@ -119,27 +117,27 @@ function serverValidationManager($timeout) {
 
     /** Call all registered callbacks indicating if the data they are subscribed to is valid or invalid */
     function notifyCallbacks() {
-        for (var i = 0; i < callbacks.length; i++) {
-            var cb = callbacks[i];
+
+        callbacks.forEach(cb => {
             if (cb.propertyAlias === null && cb.fieldName !== null) {
                 //its a field error callback
-                var fieldErrors = getFieldErrors(cb.fieldName);
+                const fieldErrors = getFieldErrors(cb.fieldName);
                 const valid = fieldErrors.length === 0;
                 executeCallback(fieldErrors, cb.callback, cb.culture, cb.segment, valid);
             }
             else if (cb.propertyAlias != null) {
                 //its a property error
-                var propErrors = getPropertyErrors(cb.propertyAlias, cb.culture, cb.segment, cb.fieldName);
+                const propErrors = getPropertyErrors(cb.propertyAlias, cb.culture, cb.segment, cb.fieldName, cb.matchPrefix);
                 const valid = propErrors.length === 0;
                 executeCallback(propErrors, cb.callback, cb.culture, cb.segment, valid);
             }
             else {
                 //its a variant error
-                var variantErrors = getVariantErrors(cb.culture, cb.segment);
+                const variantErrors = getVariantErrors(cb.culture, cb.segment);
                 const valid = variantErrors.length === 0;
                 executeCallback(variantErrors, cb.callback, cb.culture, cb.segment, valid);
             }
-        }
+        });
     }
 
     /**
@@ -208,9 +206,14 @@ function serverValidationManager($timeout) {
             segment = null;
         }
 
-        var found = _.filter(callbacks, function (item) {
+        var found = _.filter(callbacks, function (cb) {
+
             //returns any callback that have been registered directly against the field and for only the property
-            return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (item.fieldName === undefined || item.fieldName === "")));
+            return ((cb.matchPrefix ? (cb.propertyAlias === propertyAlias || propertyAlias.startsWith(cb.propertyAlias + '/')) : cb.propertyAlias === propertyAlias)
+                && cb.culture === culture
+                && cb.segment === segment
+                // if the callback is configured to patch prefix then we ignore the field value
+                && (cb.matchPrefix || (cb.fieldName === fieldName || (cb.fieldName === undefined || cb.fieldName === ""))));
         });
         return found;
     }
@@ -341,20 +344,28 @@ function serverValidationManager($timeout) {
         }
 
         //find all errors for this item
-        var errorsForCallback = getPropertyErrors(propertyAlias, culture, segment, fieldName);
-        //we should now call all of the call backs registered for this error
+        var propertyErrors = getPropertyErrors(propertyAlias, culture, segment, fieldName);
+        var propertyPrefixErrors = getPropertyErrors(propertyAlias, culture, segment, fieldName, true);
+
+        //now call all of the call backs registered for this error
         var cbs = getPropertyCallbacks(propertyAlias, culture, fieldName, segment);
+
         //call each callback for this error
-        for (var cb in cbs) {
-            executeCallback(errorsForCallback, cbs[cb].callback, culture, segment, false);
-        }
+        cbs.forEach(cb => {
+            if (cb.matchPrefix) {
+                executeCallback(propertyPrefixErrors, cb.callback, culture, segment, false);
+            }
+            else {
+                executeCallback(propertyErrors, cb.callback, culture, segment, false);
+            }
+        });
 
         //execute variant specific callbacks here too when a propery error is added
         var variantCbs = getVariantCallbacks(culture, segment);
         //call each callback for this error
-        for (var cb in variantCbs) {
-            executeCallback(errorsForCallback, variantCbs[cb].callback, culture, segment, false);
-        }
+        variantCbs.forEach(cb => {
+            executeCallback(propertyErrors, cb.callback, culture, segment, false);
+        });
     }
 
     /**
@@ -573,12 +584,12 @@ function serverValidationManager($timeout) {
          *  field alias to listen for.
          *  If propertyAlias is null, then this subscription is for a field property (not a user defined property).
          */
-        subscribe: function (propertyAlias, culture, fieldName, callback, segment) {
+        subscribe: function (propertyAlias, culture, fieldName, callback, segment, matchValidationPathPrefix) {
             if (!callback) {
                 return;
             }
 
-            console.log(`serverValidationMgr subscribed [${propertyAlias}] [${culture}] [${fieldName}] [${segment}]`);
+            console.log(`serverValidationMgr subscribe [${propertyAlias}] [${culture}] [${fieldName}] [${segment}]`);
 
             var id = String.CreateGuid();
 
@@ -610,7 +621,8 @@ function serverValidationManager($timeout) {
                     segment: segment,
                     fieldName: fieldName,
                     callback: callback,
-                    id: id
+                    id: id,
+                    matchPrefix: matchValidationPathPrefix
                 });
             }
 

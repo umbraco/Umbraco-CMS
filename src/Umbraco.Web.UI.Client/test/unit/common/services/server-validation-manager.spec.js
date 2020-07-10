@@ -611,7 +611,33 @@
 
             expect(numCalled).toEqual(2);
         });
-        
+
+        it('can subscribe to a property validation path prefix', function () {
+            var numCalled = 0;
+
+            //arrange
+            serverValidationManager.subscribe("myProperty", null, null, function (isValid, propertyErrors, allErrors) {
+                numCalled++;
+                // since this is matching on prefix, there should be as many property errors as numCalled
+                expect(propertyErrors.length).toEqual(numCalled);
+            }, null, true);
+
+            //act
+            // will match:
+            serverValidationManager.addPropertyError("myProperty", null, null, "property error", null);
+            serverValidationManager.addPropertyError("myProperty", null, "value1", "value error", null);
+            serverValidationManager.addPropertyError("myProperty/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1/city", null, null, "property error", null);
+            serverValidationManager.addPropertyError("myProperty/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1/city", null, "value1", "value error", null);
+            // won't match:
+            serverValidationManager.addPropertyError("myProperty", "en-US", null, "property error", null);
+            serverValidationManager.addPropertyError("myProperty/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1/city", "en-US", null, "property error", null);
+            serverValidationManager.addPropertyError("otherProperty", null, null, "property error", null);
+            serverValidationManager.addPropertyError("otherProperty", null, "value1", "value error", null);
+
+            //assert
+            expect(numCalled).toEqual(4);
+        });
+
         // TODO: Finish testing the rest!
 
     });
