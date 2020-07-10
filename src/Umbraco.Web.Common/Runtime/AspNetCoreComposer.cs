@@ -17,6 +17,7 @@ using Umbraco.Web.Common.Profiler;
 using Umbraco.Web.Common.Install;
 using Umbraco.Extensions;
 using System.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Middleware;
 using Umbraco.Web.Common.ModelBinding;
@@ -95,6 +96,7 @@ namespace Umbraco.Web.Common.Runtime
 
             composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
             composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
+            composition.RegisterUnique<LegacyPasswordSecurity>(factory => new LegacyPasswordSecurity(factory.GetInstance<IUserPasswordConfiguration>()));
 
 
         }
