@@ -20,7 +20,7 @@
 
     <ul class="umb-card-grid" ng-class="{'-three-in-row': model.availableItems.length < 7, '-four-in-row': model.availableItems.length >= 7}">
         <li ng-repeat="pasteItem in model.pasteItems | filter:searchTerm">
-            <button class="umb-card-grid-item btn-reset" ng-click="model.clickPasteItem(pasteItem)">
+            <button type="button" class="umb-card-grid-item btn-reset" ng-click="model.clickPasteItem(pasteItem)">
                 <span>
                     <i class="{{ pasteItem.icon }}"></i>
                     {{ pasteItem.name | truncate:true:36 }}
@@ -35,7 +35,7 @@
 
     <ul class="umb-card-grid" ng-class="{'-three-in-row': model.availableItems.length < 7, '-four-in-row': model.availableItems.length >= 7}">
         <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:model.orderBy | filter:searchTerm">
-            <button class="umb-card-grid-item btn-reset" ng-click="selectItem(availableItem)">
+            <button type="button" class="umb-card-grid-item btn-reset" ng-click="selectItem(availableItem)">
                 <span ng-mouseover="showTooltip(availableItem, $event)" ng-mouseleave="hideTooltip()">
                     <i class="{{ availableItem.icon }}"></i>
                     <span>{{ availableItem.name }}</span>
