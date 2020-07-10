@@ -36,9 +36,9 @@
     <ul class="umb-card-grid" ng-class="{'-three-in-row': model.availableItems.length < 7, '-four-in-row': model.availableItems.length >= 7}">
         <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:model.orderBy | filter:searchTerm">
             <button class="umb-card-grid-item btn-reset" ng-click="selectItem(availableItem)">
-                <span>
+                <span ng-mouseover="showTooltip(availableItem, $event)" ng-mouseleave="hideTooltip()">
                     <i class="{{ availableItem.icon }}"></i>
-                    <span ng-mouseover="showTooltip(availableItem, $event)" ng-mouseleave="hideTooltip()">{{ availableItem.name }}</span>                    
+                    <span>{{ availableItem.name }}</span>
                 </span>
             </button>
         </li>
