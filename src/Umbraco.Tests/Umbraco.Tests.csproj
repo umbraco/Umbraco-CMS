@@ -535,6 +535,9 @@
     <Content Include="Logging\logviewer.searches.config.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Logging\UmbracoTraceLog.UNITTEST.20181112.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Migrations\SqlScripts\MySqlTotal-480.sql" />
     <Content Include="Migrations\SqlScripts\SqlCe-SchemaAndData-4110.sql" />
     <Content Include="Migrations\SqlScripts\SqlCeTotal-480.sql" />
