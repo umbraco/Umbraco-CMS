@@ -183,7 +183,7 @@
     $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Config", "*", "$($this.BuildTemp)\WebApp\config")
     $this.RemoveFile("$($this.BuildTemp)\WebApp\Config\*.Release.*")
     $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Umbraco", "*", "$($this.BuildTemp)\WebApp\umbraco")
-    $excludeUmbracoDirs = @("$($this.BuildTemp)\WebApp\Umbraco\config","$($this.BuildTemp)\WebApp\Umbraco\lib")
+    $excludeUmbracoDirs = @("$($this.BuildTemp)\WebApp\umbraco\config","$($this.BuildTemp)\WebApp\umbraco\lib")
     $this.RemoveDirectory($excludeUmbracoDirs)
     $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Views", "*", "$($this.BuildTemp)\WebApp\Views")
     Copy-Item "$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\appsettings.json" "$($this.BuildTemp)\WebApp"
@@ -246,6 +246,9 @@
       /tv:"$($this.BuildEnv.VisualStudio.ToolsVersion)" `
       /p:UmbracoBuild=True `
       > $log
+
+      # copy Umbraco.Persistance.SqlCe files into WebApp
+      Copy-Item "$($this.BuildTemp)\tests\Umbraco.Persistance.SqlCe.*" "$($this.BuildTemp)\WebApp\bin"
 
     if (-not $?) { throw "Failed to compile tests." }
 
@@ -375,7 +378,6 @@
     }
   })
 
-
   $nugetsourceUmbraco = "https://api.nuget.org/v3/index.json"
 
   $ubuild.DefineMethod("RestoreNuGet",
@@ -410,6 +412,12 @@
         -Version "$($this.Version.Semver.ToString())" `
         -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cms.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms." }
+
+    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.SqlCe.nuspec" `
+        -Properties BuildTmp="$($this.BuildTemp)" `
+        -Version "$($this.Version.Semver.ToString())" `
+        -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmssqlce.log"
+    if (-not $?) { throw "Failed to pack NuGet UmbracoCms.SqlCe." }
 
     # run hook
     if ($this.HasMethod("PostPackageNuGet"))

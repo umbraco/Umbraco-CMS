@@ -6,8 +6,9 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <DocumentationFile>bin\Release\Umbraco.Web.UI.NetCore.xml</DocumentationFile>
+        <DocumentationFile>bin\Release\Umbraco.Web.UI.NetCore.xml</DocumentationFile>
     </PropertyGroup>
+
     <ItemGroup>
       <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" />
       <ProjectReference Include="..\Umbraco.Persistance.SqlCe\Umbraco.Persistance.SqlCe.csproj" />
