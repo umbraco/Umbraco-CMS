@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.Extensions;
+﻿using System.IO;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System.Threading.Tasks;
@@ -83,13 +84,14 @@ namespace Umbraco.Web.Common.Install
             ViewData.SetInstallApiBaseUrl(Url.GetInstallerApiUrl());
 
             // get the base umbraco folder
-            ViewData.SetUmbracoBaseFolder(_hostingEnvironment.ToAbsolute(_globalSettings.UmbracoPath));
+            var baseFolder = _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoPath);
+            ViewData.SetUmbracoBaseFolder(baseFolder);
 
             ViewData.SetUmbracoVersion(_umbracoVersion.SemanticVersion);
 
             await _installHelper.SetInstallStatusAsync(false, "");
 
-            return View();
+            return View(Path.Combine(baseFolder , Umbraco.Core.Constants.Web.Mvc.InstallArea, nameof(Index) + ".cshtml"));
         }
 
         /// <summary>
@@ -100,7 +102,7 @@ namespace Umbraco.Web.Common.Install
         public ActionResult Redirect()
         {
             var uri = HttpContext.Request.GetEncodedUrl();
-            
+
             // redirect to install
             ReportRuntime(_logger, _runtime.Level, "Umbraco must install or upgrade.");
 

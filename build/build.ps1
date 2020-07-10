@@ -152,7 +152,7 @@
     $buildConfiguration = "Release"
 
     $src = "$($this.SolutionRoot)\src"
-    $log = "$($this.BuildTemp)\msbuild.umbraco.log"
+    $log = "$($this.BuildTemp)\build.umbraco.log"
 
     if ($this.BuildEnv.VisualStudio -eq $null)
     {
@@ -162,23 +162,33 @@
     Write-Host "Compile Umbraco"
     Write-Host "Logging to $log"
 
-    # beware of the weird double \\ at the end of paths
-    # see http://edgylogic.com/blog/powershell-and-external-commands-done-right/
-    &$this.BuildEnv.VisualStudio.MsBuild "$src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" `
-      /p:WarningLevel=0 `
-      /p:Configuration=$buildConfiguration `
-      /p:Platform=AnyCPU `
-      /p:UseWPP_CopyWebApplication=True `
-      /p:PipelineDependsOnBuild=False `
-      /p:OutDir="$($this.BuildTemp)\bin\\" `
-      /p:WebProjectOutputDir="$($this.BuildTemp)\WebApp\\" `
-      /p:Verbosity=minimal `
-      /t:Clean`;Rebuild `
-      /tv:"$($this.BuildEnv.VisualStudio.ToolsVersion)" `
-      /p:UmbracoBuild=True `
+   & dotnet build "$src\Umbraco.Web.UI.NetCore\Umbraco.Web.UI.NetCore.csproj" `
+      --configuration $buildConfiguration `
+      --output "$($this.BuildTemp)\bin\\" `
       > $log
 
-    if (-not $?) { throw "Failed to compile Umbraco.Web.UI." }
+   # get files into WebApp\bin
+   & dotnet publish "$src\Umbraco.Web.UI.NetCore\Umbraco.Web.UI.NetCore.csproj" `
+      --output "$($this.BuildTemp)\WebApp\bin\\" `
+      > $log
+
+    # remove extra files
+    $webAppBin = "$($this.BuildTemp)\WebApp\bin"
+    $excludeDirs = @("$($webAppBin)\Config","$($webAppBin)\refs","$($webAppBin)\runtimes","$($webAppBin)\Umbraco","$($webAppBin)\wwwroot")
+    $excludeFiles = @("$($webAppBin)\appsettings.*","$($webAppBin)\*.deps.json","$($webAppBin)\*.exe","$($webAppBin)\*.config","$($webAppBin)\*.runtimeconfig.json")
+    $this.RemoveDirectory($excludeDirs)
+    $this.RemoveFile($excludeFiles)
+
+    # copy rest of the files into WebApp
+    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Config", "*", "$($this.BuildTemp)\WebApp\config")
+    $this.RemoveFile("$($this.BuildTemp)\WebApp\Config\*.Release.*")
+    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Umbraco", "*", "$($this.BuildTemp)\WebApp\umbraco")
+    $excludeUmbracoDirs = @("$($this.BuildTemp)\WebApp\Umbraco\config","$($this.BuildTemp)\WebApp\Umbraco\lib")
+    $this.RemoveDirectory($excludeUmbracoDirs)
+    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Views", "*", "$($this.BuildTemp)\WebApp\Views")
+    Copy-Item "$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\appsettings.json" "$($this.BuildTemp)\WebApp"
+
+    if (-not $?) { throw "Failed to compile Umbraco.Web.UI.NetCore." }
 
     # /p:UmbracoBuild tells the csproj that we are building from PS, not VS
   })
@@ -253,7 +263,7 @@
     $buildConfiguration = "Release"
 
     # restore web.config
-    $this.TempRestoreFile("$src\Umbraco.Web.UI\web.config")
+    #$this.TempRestoreFile("$src\Umbraco.Web.UI\web.config")
 
     # cleanup build
     Write-Host "Clean build"
@@ -282,10 +292,10 @@
       { -not $_.RelativeName.StartsWith("imageprocessor") })
     $this.CopyFiles("$tmp\WebApp\config", "*.js", "$tmp\Configs")
     $this.CopyFiles("$tmp\WebApp\config\lang", "*.xml", "$tmp\Configs\Lang")
-    $this.CopyFile("$tmp\WebApp\web.config", "$tmp\Configs\web.config.transform")
+    #$this.CopyFile("$tmp\WebApp\web.config", "$tmp\Configs\web.config.transform")
 
-    Write-Host "Copy transformed web.config"
-    $this.CopyFile("$src\Umbraco.Web.UI\web.$buildConfiguration.Config.transformed", "$tmp\WebApp\web.config")
+    # Write-Host "Copy transformed web.config"
+    # $this.CopyFile("$src\Umbraco.Web.UI\web.$buildConfiguration.Config.transformed", "$tmp\WebApp\web.config")
 
     # offset the modified timestamps on all umbraco dlls, as WebResources
     # break if date is in the future, which, due to timezone offsets can happen.
@@ -302,17 +312,17 @@
     {
       $nugetPackages = [System.Environment]::ExpandEnvironmentVariables("%userprofile%\.nuget\packages")
     }
-    $this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x86\native", "*.*", "$tmp\bin\x86")
-    $this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x64\native", "*.*", "$tmp\bin\amd64")
-    $this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x86\native", "*.*", "$tmp\WebApp\bin\x86")
-    $this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x64\native", "*.*", "$tmp\WebApp\bin\amd64")
+    #$this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x86\native", "*.*", "$tmp\bin\x86")
+    #$this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x64\native", "*.*", "$tmp\bin\amd64")
+    #$this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x86\native", "*.*", "$tmp\WebApp\bin\x86")
+    #$this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x64\native", "*.*", "$tmp\WebApp\bin\amd64")
 
     # copy Belle
     Write-Host "Copy Belle"
-    $this.CopyFiles("$src\Umbraco.Web.UI\umbraco\assets", "*", "$tmp\WebApp\umbraco\assets")
-    $this.CopyFiles("$src\Umbraco.Web.UI\umbraco\js", "*", "$tmp\WebApp\umbraco\js")
-    $this.CopyFiles("$src\Umbraco.Web.UI\umbraco\lib", "*", "$tmp\WebApp\umbraco\lib")
-    $this.CopyFiles("$src\Umbraco.Web.UI\umbraco\views", "*", "$tmp\WebApp\umbraco\views")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\assets", "*", "$tmp\WebApp\wwwroot\umbraco\assets")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\js", "*", "$tmp\WebApp\wwwroot\umbraco\js")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\lib", "*", "$tmp\WebApp\wwwroot\umbraco\lib")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\views", "*", "$tmp\WebApp\wwwroot\umbraco\views")
   })
 
   $ubuild.DefineMethod("PackageZip",
@@ -365,15 +375,6 @@
     }
   })
 
-  $ubuild.DefineMethod("PrepareNuGet",
-  {
-    Write-Host "Prepare NuGet"
-
-    # add Web.config transform files to the NuGet package
-    Write-Host "Add web.config transforms to NuGet package"
-    mv "$($this.BuildTemp)\WebApp\Views\Web.config" "$($this.BuildTemp)\WebApp\Views\Web.config.transform"
-
-  })
 
   $nugetsourceUmbraco = "https://api.nuget.org/v3/index.json"
 
@@ -460,7 +461,7 @@
     $src = "$($this.SolutionRoot)\src"
     $out = $this.BuildOutput
 
-    # Check if the solution has been built		
+    # Check if the solution has been built
     if (!(Test-Path "$src\Umbraco.Web.UI.Client\node_modules")) {throw "Umbraco needs to be built before generating the Angular Docs"}
 
     "Moving to Umbraco.Web.UI.Docs folder"
@@ -471,7 +472,7 @@
     & npx gulp docs
 
     Pop-Location
-    
+
     # change baseUrl
     $BaseUrl = "https://our.umbraco.com/apidocs/v8/ui/"
     $IndexPath = "./api/index.html"
@@ -503,8 +504,6 @@
     $this.PackageZip()
     if ($this.OnError()) { return }
     $this.VerifyNuGet()
-    if ($this.OnError()) { return }
-    $this.PrepareNuGet()
     if ($this.OnError()) { return }
     $this.PackageNuGet()
     if ($this.OnError()) { return }

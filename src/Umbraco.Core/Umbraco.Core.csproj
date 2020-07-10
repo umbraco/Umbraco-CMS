@@ -10,6 +10,10 @@
         <Product>Umbraco CMS</Product>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DocumentationFile>bin\Release\Umbraco.Core.xml</DocumentationFile>
+    </PropertyGroup>
+
     <ItemGroup>
       <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
       <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.6.0" />

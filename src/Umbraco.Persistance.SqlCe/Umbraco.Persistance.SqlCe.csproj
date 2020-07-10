@@ -5,6 +5,10 @@
         <TargetFramework>net472</TargetFramework>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DocumentationFile>bin\Release\Umbraco.Persistance.SqlCe.xml</DocumentationFile>
+    </PropertyGroup>
+
     <ItemGroup>
       <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
     </ItemGroup>

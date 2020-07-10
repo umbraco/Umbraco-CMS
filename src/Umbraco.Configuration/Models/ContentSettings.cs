@@ -73,7 +73,7 @@ namespace Umbraco.Configuration.Models
             _configuration.GetValue(Prefix+"ShowDeprecatedPropertyEditors", false);
 
         public string LoginBackgroundImage =>
-            _configuration.GetValue(Prefix+"LoginBackgroundImage", string.Empty);
+            _configuration.GetValue(Prefix+"LoginBackgroundImage", "assets/img/login.jpg");
 
         private class ContentErrorPage : IContentErrorPage
         {

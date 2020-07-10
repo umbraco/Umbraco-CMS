@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -67,9 +68,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         public async Task<IActionResult> Default()
         {
+            var viewPath = Path.Combine(_globalSettings.UmbracoPath , Umbraco.Core.Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml");
             return await RenderDefaultOrProcessExternalLoginAsync(
-                () => View(),
-                () => View());
+                () => View(viewPath),
+                () => View(viewPath));
         }
 
         /// <summary>
