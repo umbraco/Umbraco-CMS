@@ -27,6 +27,8 @@
               ng-model="$parent.tagToAdd"
               ng-keydown="$parent.addTagOnEnter($event)"
               on-blur="$parent.addTag()"
+              ng-maxlength="200"
+              maxlength="200"
               localize="placeholder"
               placeholder="@placeholders_enterTags" />
 
