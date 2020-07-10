@@ -2,17 +2,17 @@ name: "Code scanning - action"
 
 on:
   push:
-    branches: [v8/contrib]
+    branches: [v8/contrib,v8/codeql]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [v8/contrib]
+    branches: [v8/contrib,v8/codeql]
   schedule:
     - cron: '0 7 * * 2'
 
 jobs:
   CodeQL-Build:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - name: Checkout repository
@@ -36,9 +36,7 @@ jobs:
 
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
-
+    
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 https://git.io/JvXDl
 
@@ -46,9 +44,9 @@ jobs:
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
 
-    #- run: |
-    #   make bootstrap
-    #   make release
+    - run: |
+        echo "Run Umbraco-CMS build"
+        .\build\build.ps1"
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
