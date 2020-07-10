@@ -62,7 +62,7 @@ namespace Umbraco.Core.Composing
 
                     // don't include this item if it's Umbraco
                     // TODO: We should maybe pass an explicit list of these names in?
-                    if (assemblyName.FullName.StartsWith("Umbraco."))
+                    if (assemblyName.FullName.StartsWith("Umbraco.") || assemblyName.Name.EndsWith(".Views"))
                         continue;
 
                     var assembly = Assembly.Load(assemblyName);
