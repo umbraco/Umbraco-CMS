@@ -15,7 +15,6 @@
 
     <ItemGroup>
       <Folder Include="Views" />
-      <Folder Include="Views\" />
       <Folder Include="wwwroot\Media" />
       <Folder Include="wwwroot\Umbraco\views\install" />
     </ItemGroup>
