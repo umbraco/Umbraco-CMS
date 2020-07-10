@@ -82,6 +82,7 @@ function valServer(serverValidationManager) {
 
                             //clear the server validation entry
                             serverValidationManager.removePropertyError(propertyValidationPath, currentCulture, fieldName, currentSegment);
+
                             stopWatch();
                         }
                     }, true);

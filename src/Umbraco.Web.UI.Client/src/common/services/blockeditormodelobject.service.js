@@ -375,7 +375,7 @@
              * @name getBlockObject
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Retrieve a Block Object for the given layout entry.
-             * The Block Object offers the nesecary data to display and edit a block.
+             * The Block Object offers the necessary data to display and edit a block.
              * The Block Object setups live syncronization of content and settings models back to the data of your Property Editor model.
              * The returned object, named ´BlockObject´, contains several usefull models to make editing of this block happen.
              * The ´BlockObject´ contains the following properties:
@@ -448,6 +448,8 @@
                 // make basics from scaffold
                 blockObject.content = Utilities.copy(contentScaffold);
                 blockObject.content.udi = udi;
+                // Change the content.key to the GUID part of the udi, else it's just random which we don't want, it should be consistent
+                blockObject.content.key = udiService.getKey(udi);
 
                 mapToElementModel(blockObject.content, dataModel);
 

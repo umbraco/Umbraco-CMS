@@ -19,7 +19,7 @@
             },
             bindings: {
                 property: "=",
-                elementUdi: "@",
+                elementKey: "@",
                 // optional, if set this will be used for the property alias validation path (hack required because NC changes the actual property.alias :/)
                 propertyAlias: "@",
                 showInherit: "<",
@@ -44,20 +44,14 @@
             vm.propertyActions = actions;
         };
 
-        // returns the unique Id for the property to be used as the validation key for server side validation logic
+        // returns the validation path for the property to be used as the validation key for server side validation logic
         vm.getValidationPath = function () {
 
-            // the elementUdi will be empty when this is not a nested property
+            var parentValidationPath = vm.parentUmbProperty ? vm.parentUmbProperty.getValidationPath() : null;            
             var propAlias = vm.propertyAlias ? vm.propertyAlias : vm.property.alias;
-            vm.elementUdi = ensureUdi(vm.elementUdi);
-            return serverValidationManager.createPropertyValidationKey(propAlias, vm.elementUdi);
-        }
-
-        vm.getParentValidationPath = function () {
-            if (!vm.parentUmbProperty) {
-                return null;
-            }
-            return vm.parentUmbProperty.getValidationPath();
+            // the elementKey will be empty when this is not a nested property
+            var valPath = vm.elementKey ? vm.elementKey + "/" + propAlias : propAlias;
+            return serverValidationManager.createPropertyValidationKey(valPath, parentValidationPath);
         }
 
         function onInit() {
@@ -70,8 +64,6 @@
                 });
             }
 
-            vm.elementUdi = ensureUdi(vm.elementUdi);
-
             if (!vm.parentUmbProperty) {
                 // not found, then fallback to searching the scope chain, this may be needed when DOM inheritance isn't maintained but scope
                 // inheritance is (i.e.infinite editing)
@@ -80,13 +72,6 @@
             }
         }
 
-        // if only a guid is passed in, we'll ensure a correct udi structure
-        function ensureUdi(udi) {
-            if (udi && !udi.startsWith("umb://")) {
-                udi = udiService.build("element", udi);
-            }
-            return udi;
-        }
     }
 
 })();

@@ -52,6 +52,9 @@ function serverValidationManager($timeout) {
      * Notifies all subscriptions again. Called when there are changes to subscriptions or errors. 
      */
     function notify() {
+
+        console.log("NOTIFY!");
+
         $timeout(function () {
 
             console.log(`VAL-ERROR-COUNT: ${items.length}`);
@@ -92,7 +95,8 @@ function serverValidationManager($timeout) {
 
         //find all errors for this property
         return _.filter(items, function (item) {
-            return ((matchPrefixValidationPath ? (item.propertyAlias === propertyAlias || propertyAlias.startsWith(item.propertyAlias + '/')) : item.propertyAlias === propertyAlias)
+            return ((matchPrefixValidationPath ? (item.propertyAlias === propertyAlias || (item.propertyAlias && item.propertyAlias.startsWith(propertyAlias + '/'))) : item.propertyAlias === propertyAlias)
+            //return ((matchPrefixValidationPath ? (item.propertyAlias === propertyAlias || propertyAlias.startsWith(item.propertyAlias + '/')) : item.propertyAlias === propertyAlias)
                 && item.culture === culture
                 && item.segment === segment
                 // ignore field matching if 
@@ -115,29 +119,36 @@ function serverValidationManager($timeout) {
         });
     }
 
+    function notifyCallback(cb) {
+        if (cb.propertyAlias === null && cb.fieldName !== null) {
+            //its a field error callback
+            const fieldErrors = getFieldErrors(cb.fieldName);
+            const valid = fieldErrors.length === 0;
+            executeCallback(fieldErrors, cb.callback, cb.culture, cb.segment, valid);
+        }
+        else if (cb.propertyAlias != null) {
+            //its a property error
+            const propErrors = getPropertyErrors(cb.propertyAlias, cb.culture, cb.segment, cb.fieldName, cb.matchPrefix);
+            const valid = propErrors.length === 0;
+            executeCallback(propErrors, cb.callback, cb.culture, cb.segment, valid);
+        }
+        else {
+            //its a variant error
+            const variantErrors = getVariantErrors(cb.culture, cb.segment);
+            const valid = variantErrors.length === 0;
+            executeCallback(variantErrors, cb.callback, cb.culture, cb.segment, valid);
+        }
+    }
+
     /** Call all registered callbacks indicating if the data they are subscribed to is valid or invalid */
     function notifyCallbacks() {
 
-        callbacks.forEach(cb => {
-            if (cb.propertyAlias === null && cb.fieldName !== null) {
-                //its a field error callback
-                const fieldErrors = getFieldErrors(cb.fieldName);
-                const valid = fieldErrors.length === 0;
-                executeCallback(fieldErrors, cb.callback, cb.culture, cb.segment, valid);
-            }
-            else if (cb.propertyAlias != null) {
-                //its a property error
-                const propErrors = getPropertyErrors(cb.propertyAlias, cb.culture, cb.segment, cb.fieldName, cb.matchPrefix);
-                const valid = propErrors.length === 0;
-                executeCallback(propErrors, cb.callback, cb.culture, cb.segment, valid);
-            }
-            else {
-                //its a variant error
-                const variantErrors = getVariantErrors(cb.culture, cb.segment);
-                const valid = variantErrors.length === 0;
-                executeCallback(variantErrors, cb.callback, cb.culture, cb.segment, valid);
-            }
-        });
+        // nothing to call
+        if (items.length === 0) {
+            return;
+        }
+
+        callbacks.forEach(cb => notifyCallback(cb));
     }
 
     /**
@@ -343,29 +354,7 @@ function serverValidationManager($timeout) {
             });
         }
 
-        //find all errors for this item
-        var propertyErrors = getPropertyErrors(propertyAlias, culture, segment, fieldName);
-        var propertyPrefixErrors = getPropertyErrors(propertyAlias, culture, segment, fieldName, true);
-
-        //now call all of the call backs registered for this error
-        var cbs = getPropertyCallbacks(propertyAlias, culture, fieldName, segment);
-
-        //call each callback for this error
-        cbs.forEach(cb => {
-            if (cb.matchPrefix) {
-                executeCallback(propertyPrefixErrors, cb.callback, culture, segment, false);
-            }
-            else {
-                executeCallback(propertyErrors, cb.callback, culture, segment, false);
-            }
-        });
-
-        //execute variant specific callbacks here too when a propery error is added
-        var variantCbs = getVariantCallbacks(culture, segment);
-        //call each callback for this error
-        variantCbs.forEach(cb => {
-            executeCallback(propertyErrors, cb.callback, culture, segment, false);
-        });
+        notifyCallbacks();
     }
 
     /**
@@ -602,29 +591,32 @@ function serverValidationManager($timeout) {
                 segment = null;
             }
 
-            if (propertyAlias === null) {
+            let cb = null;
 
-                callbacks.push({
+            if (propertyAlias === null) {
+                cb = {
                     propertyAlias: null,
                     culture: culture,
                     segment: segment,
                     fieldName: fieldName,
                     callback: callback,
                     id: id
-                });
+                };
             }
             else if (propertyAlias !== undefined) {
                                 
-                callbacks.push({
+                cb = {
                     propertyAlias: propertyAlias,
-                    culture: culture, 
+                    culture: culture,
                     segment: segment,
                     fieldName: fieldName,
                     callback: callback,
                     id: id,
                     matchPrefix: matchValidationPathPrefix
-                });
+                };
             }
+
+            callbacks.push(cb);
 
             function unsubscribeId() {
                 //remove all callbacks for the content field
@@ -633,9 +625,8 @@ function serverValidationManager($timeout) {
                 });
             }
 
-            // Now notify the registrations for this callback if we've previously been notified and we're not cleared.
-            // This will happen for dynamically shown editors, like complex editors that load in sub element types.
-            notify();
+            // Notify the new callback            
+            notifyCallback(cb);
 
             //return a function to unsubscribe this subscription by uniqueId
             return unsubscribeId;
@@ -733,7 +724,7 @@ function serverValidationManager($timeout) {
 
             if (items.length !== count) {
                 // removal was successful, re-notify all subscribers
-                notify();
+                notifyCallbacks();
             }
         },
         
@@ -755,6 +746,10 @@ function serverValidationManager($timeout) {
                 return errors[0];
             }
             return undefined;
+        },
+
+        getPropertyErrorsByValidationPath: function (propertyAlias, culture, segment) {
+            return getPropertyErrors(propertyAlias, culture, segment, "", true);
         },
 
         /**
