@@ -46,7 +46,7 @@ jobs:
 
     - run: |
         echo "Run Umbraco-CMS build"
-        .\build\build.ps1"
+        pwsh -command .\build\build.ps1
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
