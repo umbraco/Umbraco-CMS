@@ -31,7 +31,8 @@
                </div>
 
                <div>
-                   <umb-checkbox ng-if="layout.isSystem === 1" model="layout.selected" />
+                   <umb-checkbox ng-if="layout.isSystem === 1" model="layout.selected"></umb-checkbox>
+
                    <div class="list-view-layout__remove" ng-if="layout.isSystem !== 1">
                        <i class="icon-trash" ng-click="vm.showPrompt(layout)" aria-hidden="true"></i>
                        <umb-confirm-action ng-if="layout.deletePrompt"

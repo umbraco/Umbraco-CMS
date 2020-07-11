@@ -43,7 +43,6 @@
          };
 
          $scope.model.value.push(layout);
-
       }
 
       function showPrompt(layout) {
