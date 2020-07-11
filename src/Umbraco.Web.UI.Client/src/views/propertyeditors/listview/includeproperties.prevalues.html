@@ -1,10 +1,12 @@
 ﻿<div class="umb-property-editor" ng-controller="Umbraco.PrevalueEditors.IncludePropertiesListViewController">
     <div class="control-group">
-
         <select ng-model="selectedField" ng-change="changeField()" val-highlight="{{hasError}}">
-            <option ng-repeat="field in systemFields" value="_system_{{field.value}}" ng-bind="field.name"></option>
-            <option class="select-dash" disabled="disabled">----</option>
-            <option ng-repeat="alias in propertyAliases" value="{{alias}}" ng-bind="alias"></option>
+            <optgroup label="System Fields">
+                <option ng-repeat="field in systemFields" value="_system_{{field.value}}" ng-bind="field.name"></option>
+            </optgroup>
+            <optgroup label="Custom Fields">
+                <option ng-repeat="alias in propertyAliases" value="{{alias}}" ng-bind="alias"></option>
+            </optgroup>
         </select>
         <button type="button" class="btn" ng-click="addField()">
             <localize key="general_add">Add</localize>
