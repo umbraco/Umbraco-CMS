@@ -11,7 +11,7 @@ You can easily add you own tours to the Help-drawer or show and start tours from
 anywhere in the Umbraco backoffice. To see a real world example of a custom tour implementation, install <a href="https://our.umbraco.com/projects/starter-kits/the-starter-kit/">The Starter Kit</a> in Umbraco 7.8
 
 <h1><b>Extending the help drawer with custom tours</b></h1>
-The easiet way to add new tours to Umbraco is through the Help-drawer. All it requires is a my-tour.json file. 
+The easiest way to add new tours to Umbraco is through the Help-drawer. All it requires is a my-tour.json file. 
 Place the file in <i>App_Plugins/{MyPackage}/backoffice/tours/{my-tour}.json</i> and it will automatically be 
 picked up by Umbraco and shown in the Help-drawer.
 

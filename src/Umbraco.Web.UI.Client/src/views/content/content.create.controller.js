@@ -92,6 +92,8 @@ function contentCreateController($scope,
         } else {
             createBlank(docType);
         }
+
+        navigationService.hideDialog();
     }
 
     function createFromBlueprint(blueprintId) {
