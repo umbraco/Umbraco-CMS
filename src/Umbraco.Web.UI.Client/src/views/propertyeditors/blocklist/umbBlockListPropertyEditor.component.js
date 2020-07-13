@@ -53,8 +53,8 @@
         }
         vm.supportCopy = clipboardService.isSupported();
 
-        vm.layout = [];// The layout object specific to this Block Editor, will be a direct reference from Property Model.
-        vm.availableBlockTypes = [];// Available block entries of this property editor.
+        vm.layout = []; // The layout object specific to this Block Editor, will be a direct reference from Property Model.
+        vm.availableBlockTypes = []; // Available block entries of this property editor.
 
         var labels = {};
         vm.labels = labels;
@@ -63,11 +63,11 @@
             labels.content_createEmpty = data[1];
         });
 
-
-
-
-
         vm.$onInit = function() {
+
+            // set the onValueChanged callback, this will tell us if the block list model changed on the server
+            // once the data is submitted. If so we need to re-initialize
+            vm.model.onValueChanged = onServerValueChanged;
 
             inlineEditing = vm.model.config.useInlineEditingAsDefault;
             liveEditing = vm.model.config.useLiveEditing;
@@ -121,8 +121,12 @@
             }
         };
 
-        
-
+        // Called when we save the value, the server may return an updated data and our value is re-synced
+        // we need to deal with that here so that our model values are all in sync so we basically re-initialize.
+        function onServerValueChanged(newVal, oldVal) {            
+            modelObject.update(newVal, $scope);
+            onLoaded();
+        }
         
         function setDirty() {
             if (vm.propertyForm) {
@@ -137,7 +141,7 @@
 
             // Append the blockObjects to our layout.
             vm.layout.forEach(entry => {
-                // $block must have the data property to be a valid BlockObject, if not its concidered as a destroyed blockObject.
+                // $block must have the data property to be a valid BlockObject, if not its considered as a destroyed blockObject.
                 if (entry.$block === undefined || entry.$block === null || entry.$block.data === undefined) {
                     var block = getBlockObject(entry);
     
@@ -176,7 +180,7 @@
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;
             block.showSettings = block.config.settingsElementTypeKey != null;
-            block.showCopy = vm.supportCopy && block.config.contentTypeKey != null;// if we have content, otherwise it dosnt make sense to copy.
+            block.showCopy = vm.supportCopy && block.config.contentTypeKey != null;// if we have content, otherwise it doesn't make sense to copy.
 
             return block;
         }
@@ -210,8 +214,6 @@
             return true;
 
         }
-
-        
 
         function deleteBlock(block) {
 
@@ -276,7 +278,7 @@
 
                     if (liveEditing === false) {
                         // transfer values when submitting in none-liveediting mode.
-                        blockObject.retriveValuesFrom(blockEditorModel.content, blockEditorModel.settings);
+                        blockObject.retrieveValuesFrom(blockEditorModel.content, blockEditorModel.settings);
                     }
 
                     blockObject.active = false;
@@ -286,7 +288,7 @@
 
                     if (liveEditing === true) {
                         // revert values when closing in liveediting mode.
-                        blockObject.retriveValuesFrom(blockContentClone, blockSettingsClone);
+                        blockObject.retrieveValuesFrom(blockContentClone, blockSettingsClone);
                     }
 
                     if (wasNotActiveBefore === true) {
