@@ -407,11 +407,15 @@ Opens an overlay to show a custom YSOD. </br>
 
             function setTargetPosition() {
 
-                var container = $("#contentwrapper");
-                var containerLeft = container[0].offsetLeft;
-                var containerRight = containerLeft + container[0].offsetWidth;
-                var containerTop = container[0].offsetTop;
-                var containerBottom = containerTop + container[0].offsetHeight;
+                var overlay = $(scope.model.event.target).closest('.umb-overlay');
+                var container = overlay.length > 0 ? overlay : $("#contentwrapper");
+
+                let rect = container[0].getBoundingClientRect();
+
+                var containerLeft = rect.left;
+                var containerRight = containerLeft + rect.width;
+                var containerTop = rect.top;
+                var containerBottom = containerTop + rect.height;
 
                 var mousePositionClickX = null;
                 var mousePositionClickY = null;
