@@ -74,6 +74,8 @@ namespace Umbraco.Web.PublishedModels
 	[PublishedModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
 	{
+		private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
@@ -82,16 +84,18 @@ namespace Umbraco.Web.PublishedModels
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
 		public new static IPublishedContentType GetModelContentType()
-			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+			=> PublishedModelUtility.GetModelContentType(_publishedSnapshotAccessor, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
 		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
 		// ctor
-		public Type1(IPublishedContent content)
+		public Type1(IPublishedContent content, IPublishedSnapshotAccessor publishedSnapshotAccessor)
 			: base(content)
-		{ }
+		{
+			_publishedSnapshotAccessor = publishedSnapshotAccessor;
+		}
 
 		// properties
 
@@ -189,6 +193,8 @@ namespace Umbraco.Web.PublishedModels
 	[PublishedModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
 	{
+		private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
@@ -197,16 +203,18 @@ namespace Umbraco.Web.PublishedModels
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
 		public new static IPublishedContentType GetModelContentType()
-			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+			=> PublishedModelUtility.GetModelContentType(_publishedSnapshotAccessor, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
 		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
 		// ctor
-		public Type1(IPublishedContent content)
+		public Type1(IPublishedContent content, IPublishedSnapshotAccessor publishedSnapshotAccessor)
 			: base(content)
-		{ }
+		{
+			_publishedSnapshotAccessor = publishedSnapshotAccessor;
+		}
 
 		// properties
 
