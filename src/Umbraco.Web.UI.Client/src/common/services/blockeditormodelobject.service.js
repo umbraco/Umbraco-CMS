@@ -256,12 +256,33 @@
             this.isolatedScope.blockObjects = {};
             
             this.__watchers.push(this.isolatedScope.$on("$destroy", this.destroy.bind(this)));
-
             this.__watchers.push(propertyEditorScope.$on("postFormSubmitting", this.sync.bind(this)));
 
         };
         
         BlockEditorModelObject.prototype = {
+
+            update: function (propertyModelValue, propertyEditorScope) {
+                // clear watchers
+                this.__watchers.forEach(w => { w(); });                
+                delete this.__watchers;
+
+                // clear block objects
+                for (const key in this.isolatedScope.blockObjects) {
+                    this.destroyBlockObject(this.isolatedScope.blockObjects[key]);
+                }
+                this.isolatedScope.blockObjects = {};
+
+                // update our values
+                this.value = propertyModelValue;
+                this.value.layout = this.value.layout || {};
+                this.value.data = this.value.data || [];
+
+                // re-create the watchers
+                this.__watchers = [];
+                this.__watchers.push(this.isolatedScope.$on("$destroy", this.destroy.bind(this)));
+                this.__watchers.push(propertyEditorScope.$on("postFormSubmitting", this.sync.bind(this)));
+            },
 
             /**
              * @ngdoc method
@@ -279,8 +300,8 @@
              * @ngdoc method
              * @name load
              * @methodOf umbraco.services.blockEditorModelObject
-             * @description Load the scaffolding models for the given configuration, these are needed to provide usefull models for each block.
-             * @param {Object} blockObject BlockObject to recive data values from.
+             * @description Load the scaffolding models for the given configuration, these are needed to provide useful models for each block.
+             * @param {Object} blockObject BlockObject to receive data values from.
              * @returns {Promise} A Promise object which resolves when all scaffold models are loaded.
              */
             load: function() {
@@ -295,7 +316,7 @@
                     }
                 });
 
-                // removing dublicates.
+                // removing duplicates.
                 scaffoldKeys = scaffoldKeys.filter((value, index, self) => self.indexOf(value) === index);
 
                 scaffoldKeys.forEach((contentTypeKey => {
@@ -472,7 +493,7 @@
                     }
                 }
 
-                blockObject.retriveValuesFrom = function(content, settings) {
+                blockObject.retrieveValuesFrom = function(content, settings) {
                     if (this.content !== null) {
                         mapElementValues(content, this.content);
                     }
@@ -482,7 +503,7 @@
                 }
 
 
-                blockObject.sync = function() {
+                blockObject.sync = function () {
                     if (this.content !== null) {
                         mapToPropertyModel(this.content, this.data);
                     }
@@ -499,13 +520,14 @@
                 addWatchers(blockObject, this.isolatedScope);
                 addWatchers(blockObject, this.isolatedScope, true);
 
-                blockObject.destroy = function() {
+                blockObject.destroy = function () {
                     // remove property value watchers:
                     this.__watchers.forEach(w => { w(); });
                     delete this.__watchers;
 
                     // help carbage collector:
                     delete this.config;
+
                     delete this.layout;
                     delete this.data;
                     delete this.content;
@@ -513,9 +535,12 @@
                     
                     // remove model from isolatedScope.
                     delete this.__scope.blockObjects["_" + this.key];
+                    // NOTE: It seems like we should call this.__scope.$destroy(); since that is the only way to remove a scope from it's parent, 
+                    // however that is not the case since __scope is actually this.isolatedScope which gets cleaned up when the outer scope is
+                    // destroyed. If we do that here it breaks the scope chain and validation.
                     delete this.__scope;
 
-                    // removes this method, making it unposible to destroy again.
+                    // removes this method, making it impossible to destroy again.
                     delete this.destroy;
                     
                     // lets remove the key to make things blow up if this is still referenced:
@@ -621,8 +646,6 @@
 
             },
 
-
-
             /**
              * @ngdoc method
              * @name sync
@@ -636,6 +659,7 @@
             },
 
             // private
+            // TODO: Then this can just be a method in the outer scope
             _createDataEntry: function(elementTypeKey) {
                 var content = {
                     contentTypeKey: elementTypeKey,
@@ -645,6 +669,7 @@
                 return content.udi;
             },
             // private
+            // TODO: Then this can just be a method in the outer scope
             _getDataByUdi: function(udi) {
                 return this.value.data.find(entry => entry.udi === udi) || null;
             },
