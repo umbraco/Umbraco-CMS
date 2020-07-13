@@ -438,8 +438,9 @@ Opens an overlay to show a custom YSOD. </br>
                 elementWidth = el[0].clientWidth;
 
                 // move element to this position
-                position.left = mousePositionClickX - (elementWidth / 2);
-                position.top = mousePositionClickY - (elementHeight / 2);
+                // when using hotkey it fallback to center of container
+                position.left = mousePositionClickX ? mousePositionClickX - (elementWidth / 2) : (containerLeft + containerRight) / 2 - (elementWidth / 2);
+                position.top = mousePositionClickY ? mousePositionClickY - (elementHeight / 2) : (containerTop + containerBottom) / 2 - (elementHeight / 2);
 
                 // check to see if element is outside screen
                 // outside right
