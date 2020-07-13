@@ -468,6 +468,7 @@ Opens an overlay to show a custom YSOD. </br>
                 }
 
                 el.css(position);
+                el.css("visibility", "visible");
             }
 
             scope.submitForm = function (model) {
