@@ -18,9 +18,6 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
     /// </summary>
     internal abstract class Builder
     {
-
-
-
         private readonly IList<TypeModel> _typeModels;
 
         protected Dictionary<string, string> ModelsMap { get; } = new Dictionary<string, string>();

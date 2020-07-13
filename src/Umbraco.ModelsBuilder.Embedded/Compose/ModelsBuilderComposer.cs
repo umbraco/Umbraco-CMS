@@ -9,8 +9,6 @@ using Umbraco.ModelsBuilder.Embedded.Building;
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
-
-
     [ComposeBefore(typeof(IPublishedCacheComposer))]
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class ModelsBuilderComposer : ICoreComposer

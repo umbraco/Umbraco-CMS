@@ -15,5 +15,4 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         public IAccessRule[] AccessRules => Array.Empty<IAccessRule>();
     }
-
 }

@@ -1,14 +1,13 @@
 using System;
-using System.Net;
-using System.Net.Http;
 using System.Runtime.Serialization;
-using System.Web.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Configuration;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Hosting;
 using Umbraco.ModelsBuilder.Embedded.Building;
-using Umbraco.Web.Editors;
-using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.BackOffice.Filters;
 
 namespace Umbraco.ModelsBuilder.Embedded.BackOffice
 {
@@ -28,8 +27,9 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
         private readonly OutOfDateModelsStatus _outOfDateModels;
         private readonly ModelsGenerationError _mbErrors;
         private readonly DashboardReport _dashboardReport;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public ModelsBuilderDashboardController(IModelsBuilderConfig config, ModelsGenerator modelsGenerator, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors)
+        public ModelsBuilderDashboardController(IModelsBuilderConfig config, ModelsGenerator modelsGenerator, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors, IHostingEnvironment hostingEnvironment)
         {
             //_umbracoServices = umbracoServices;
             _config = config;
@@ -37,13 +37,14 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
             _outOfDateModels = outOfDateModels;
             _mbErrors = mbErrors;
             _dashboardReport = new DashboardReport(config, outOfDateModels, mbErrors);
+            _hostingEnvironment = hostingEnvironment;
         }
 
         // invoked by the dashboard
         // requires that the user is logged into the backoffice and has access to the settings section
         // beware! the name of the method appears in modelsbuilder.controller.js
-        [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
-        public HttpResponseMessage BuildModels()
+        [HttpPost] // use the http one, not mvc, with api controllers!
+        public IActionResult BuildModels()
         {
             try
             {
@@ -52,10 +53,10 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
                 if (!config.ModelsMode.SupportsExplicitGeneration())
                 {
                     var result2 = new BuildResult { Success = false, Message = "Models generation is not enabled." };
-                    return Request.CreateResponse(HttpStatusCode.OK, result2, Configuration.Formatters.JsonFormatter);
+                    return Ok(result2);
                 }
 
-                var bin = HostingEnvironment.MapPath("~/bin");
+                var bin = _hostingEnvironment.MapPathContentRoot("~/bin");
                 if (bin == null)
                     throw new PanicException("bin is null.");
 
@@ -68,13 +69,13 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
                 _mbErrors.Report("Failed to build models.", e);
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, GetDashboardResult(), Configuration.Formatters.JsonFormatter);
+            return Ok(GetDashboardResult());
         }
 
         // invoked by the back-office
         // requires that the user is logged into the backoffice and has access to the settings section
-        [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
-        public HttpResponseMessage GetModelsOutOfDateStatus()
+        [HttpGet] // use the http one, not mvc, with api controllers!
+        public ActionResult<OutOfDateStatus> GetModelsOutOfDateStatus()
         {
             var status = _outOfDateModels.IsEnabled
                 ? _outOfDateModels.IsOutOfDate
@@ -82,16 +83,16 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
                     : new OutOfDateStatus { Status = OutOfDateType.Current }
                 : new OutOfDateStatus { Status = OutOfDateType.Unknown };
 
-            return Request.CreateResponse(HttpStatusCode.OK, status, Configuration.Formatters.JsonFormatter);
+            return status;
         }
 
         // invoked by the back-office
         // requires that the user is logged into the backoffice and has access to the settings section
         // beware! the name of the method appears in modelsbuilder.controller.js
-        [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
-        public HttpResponseMessage GetDashboard()
+        [HttpGet] // use the http one, not mvc, with api controllers!
+        public ActionResult<Dashboard> GetDashboard()
         {
-            return Request.CreateResponse(HttpStatusCode.OK, GetDashboardResult(), Configuration.Formatters.JsonFormatter);
+            return GetDashboardResult();
         }
 
         private Dashboard GetDashboardResult()
@@ -107,7 +108,7 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
         }
 
         [DataContract]
-        internal class BuildResult
+        public class BuildResult
         {
             [DataMember(Name = "success")]
             public bool Success;
@@ -116,7 +117,7 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
         }
 
         [DataContract]
-        internal class Dashboard
+        public class Dashboard
         {
             [DataMember(Name = "enable")]
             public bool Enable;
@@ -130,7 +131,7 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
             public string LastError;
         }
 
-        internal enum OutOfDateType
+        public enum OutOfDateType
         {
             OutOfDate,
             Current,
@@ -138,7 +139,7 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
         }
 
         [DataContract]
-        internal class OutOfDateStatus
+        public class OutOfDateStatus
         {
             [DataMember(Name = "status")]
             public OutOfDateType Status { get; set; }
