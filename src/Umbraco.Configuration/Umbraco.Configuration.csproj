@@ -5,6 +5,10 @@
         <LangVersion>8</LangVersion>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DocumentationFile>bin\Release\Umbraco.Configuration.xml</DocumentationFile>
+    </PropertyGroup>
+
     <ItemGroup>
       <Compile Remove="obj\**" />
     </ItemGroup>

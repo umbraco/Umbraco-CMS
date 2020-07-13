@@ -667,7 +667,7 @@ namespace Umbraco.Tests.Models.Mapping
         public void IMediaTypeComposition_To_MediaTypeDisplay()
         {
             //Arrange
-            var ctMain = CreateSimpleMediaType("parent", "Parent");
+            var ctMain = MockedContentTypes.CreateSimpleMediaType("parent", "Parent");
             //not assigned to tab
             ctMain.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
@@ -679,7 +679,7 @@ namespace Umbraco.Tests.Models.Mapping
                 DataTypeId = -88
             });
             MockedContentTypes.EnsureAllIds(ctMain, 8888);
-            var ctChild1 = CreateSimpleMediaType("child1", "Child 1", ctMain, true);
+            var ctChild1 = MockedContentTypes.CreateSimpleMediaType("child1", "Child 1", ctMain, true);
             ctChild1.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
                 Alias = "someProperty",
@@ -690,7 +690,7 @@ namespace Umbraco.Tests.Models.Mapping
                 DataTypeId = -88
             }, "Another tab");
             MockedContentTypes.EnsureAllIds(ctChild1, 7777);
-            var contentType = CreateSimpleMediaType("child2", "Child 2", ctChild1, true, "CustomGroup");
+            var contentType = MockedContentTypes.CreateSimpleMediaType("child2", "Child 2", ctChild1, true, "CustomGroup");
             //not assigned to tab
             contentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
@@ -748,43 +748,6 @@ namespace Umbraco.Tests.Models.Mapping
 
         }
 
-        public MediaType CreateSimpleMediaType(string alias, string name, IMediaType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content")
-        {
-            var shortStringHelper = Services.GetRequiredService<IShortStringHelper>();
-            var contentType = parent == null ? new MediaType(shortStringHelper, -1) : new MediaType(shortStringHelper, parent, alias);
-
-            contentType.Alias = alias;
-            contentType.Name = name;
-            contentType.Description = "ContentType used for simple text pages";
-            contentType.Icon = ".sprTreeDoc3";
-            contentType.Thumbnail = "doc2.png";
-            contentType.SortOrder = 1;
-            contentType.CreatorId = 0;
-            contentType.Trashed = false;
-
-            var contentCollection = new PropertyTypeCollection(false);
-            contentCollection.Add(new PropertyType(shortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) { Alias = RandomAlias("title", randomizeAliases), Name = "Title", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
-            contentCollection.Add(new PropertyType(shortStringHelper, Constants.PropertyEditors.Aliases.TinyMce, ValueStorageType.Ntext) { Alias = RandomAlias("bodyText", randomizeAliases), Name = "Body Text", Description = "", Mandatory = false, SortOrder = 2, DataTypeId = -87 });
-            contentCollection.Add(new PropertyType(shortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) { Alias = RandomAlias("author", randomizeAliases), Name = "Author", Description = "Name of the author", Mandatory = false, SortOrder = 3, DataTypeId = -88 });
-
-            var pg = new PropertyGroup(contentCollection) { Name = propertyGroupName, SortOrder = 1 };
-            contentType.PropertyGroups.Add(pg);
-
-            //ensure that nothing is marked as dirty
-            contentType.ResetDirtyProperties(false);
-
-            return contentType;
-        }
-
-        private static string RandomAlias(string alias, bool randomizeAliases)
-        {
-            if (randomizeAliases)
-            {
-                return string.Concat(alias, Guid.NewGuid().ToString("N"));
-            }
-
-            return alias;
-        }
 
         [Test]
         public void IContentTypeComposition_To_ContentTypeDisplay()

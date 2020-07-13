@@ -80,7 +80,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Umbraco\PartialViewMacros\Templates" />
     <Folder Include="Views\MacroPartials\" />
   </ItemGroup>
   <ItemGroup>
@@ -139,24 +138,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Content Include="Config\Lang\cs-CZ.user.xml" />
-    <Content Include="Config\Lang\da-DK.user.xml" />
-    <Content Include="Config\Lang\de-DE.user.xml" />
-    <Content Include="Config\Lang\en-GB.user.xml" />
-    <Content Include="Config\Lang\en-US.user.xml" />
-    <Content Include="Config\Lang\es-ES.user.xml" />
-    <Content Include="Config\Lang\fr-FR.user.xml" />
-    <Content Include="Config\Lang\he-IL.user.xml" />
-    <Content Include="Config\Lang\it-IT.user.xml" />
-    <Content Include="Config\Lang\ja-JP.user.xml" />
-    <Content Include="Config\Lang\ko-KR.user.xml" />
-    <Content Include="Config\Lang\nl-NL.user.xml" />
-    <Content Include="Config\Lang\nb-NO.user.xml" />
-    <Content Include="Config\Lang\pl-PL.user.xml" />
-    <Content Include="Config\Lang\pt-BR.user.xml" />
-    <Content Include="Config\Lang\ru-RU.user.xml" />
-    <Content Include="Config\Lang\sv-SE.user.xml" />
-    <Content Include="Config\Lang\zh-CN.user.xml" />
     <None Include="Config\splashes\NoNodes.cshtml" />
     <Content Include="Umbraco\Install\Views\Web.config" />
     <None Include="Config\ClientDependency.Release.config">
@@ -200,6 +181,74 @@
     <Content Include="Umbraco\Js\UmbracoSpeechBubbleBackEnd.js" />
     <Content Include="Config\ClientDependency.config">
       <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\EditProfile.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\Gallery.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListAncestorsFromCurrentPage.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListChildPagesFromChangeableSource.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListChildPagesFromCurrentPage.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListChildPagesOrderedByDate.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListChildPagesOrderedByName.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListChildPagesOrderedByProperty.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListChildPagesWithDoctype.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListDescendantsFromCurrentPage.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListImagesFromMediaFolder.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\Login.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\LoginStatus.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\MultinodeTree-picker.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\Navigation.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\RegisterMember.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\SiteMap.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
     <Content Include="Umbraco\Views\Default.cshtml" />
     <Content Include="Umbraco\Views\AuthorizeUpgrade.cshtml" />
