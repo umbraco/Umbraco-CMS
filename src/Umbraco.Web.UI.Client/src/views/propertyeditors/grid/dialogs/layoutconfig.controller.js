@@ -71,10 +71,23 @@ angular.module("umbraco")
     			var index = template.sections.indexOf(section)
     			template.sections.splice(index, 1);
     		};
-    		
+
+            $scope.selectRow = function (section, row) {
+                section.allowed = section.allowed || [];
+
+                var index = section.allowed.indexOf(row.name);
+                if (row.allowed === true) {
+                    if (index === -1) {
+                        section.allowed.push(row.name); 
+                    }
+                }
+                else {
+                    section.allowed.splice(index, 1);
+                }
+            };
     		
             $scope.close = function() {
-                if($scope.model.close) {
+                if ($scope.model.close) {
                     $scope.model.close();
                 }
             }
