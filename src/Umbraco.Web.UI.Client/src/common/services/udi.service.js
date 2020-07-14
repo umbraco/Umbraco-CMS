@@ -22,7 +22,7 @@
              * @returns {string} The generated UDI
              */
             create: function(entityType) {
-                return this.create(entityType, String.CreateGuid());
+                return this.build(entityType, String.CreateGuid());
             },
 
             build: function (entityType, guid) {
