@@ -2542,6 +2542,14 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
 
+            if (content.HasChildren())
+            {
+                foreach (var subcontent in content.Ancestors())
+                {
+                    UnPublishDo(subcontent, false, userId);
+                }
+
+            }
             return Attempt.Succeed(new UnPublishStatus(content, UnPublishedStatusType.Success, evtMsgs));
         }
 
