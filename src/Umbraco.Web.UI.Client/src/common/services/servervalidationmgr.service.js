@@ -53,16 +53,10 @@ function serverValidationManager($timeout) {
      */
     function notify() {
 
-        console.log("NOTIFY!");
-
         $timeout(function () {
-
-            console.log(`VAL-ERROR-COUNT: ${items.length}`);
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
-                console.log(`VAL-ERROR [${item.propertyAlias}] [${item.culture}] [${item.fieldName}] [${item.segment}]`)
             }
-
             notifyCallbacks();
         });
     }
@@ -577,8 +571,6 @@ function serverValidationManager($timeout) {
             if (!callback) {
                 return;
             }
-
-            console.log(`serverValidationMgr subscribe [${propertyAlias}] [${culture}] [${fieldName}] [${segment}]`);
 
             var id = String.CreateGuid();
 

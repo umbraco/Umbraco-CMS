@@ -78,8 +78,7 @@ function valServer(serverValidationManager) {
 
                         if (modelCtrl.$invalid) {
                             modelCtrl.$setValidity('valServer', true);
-                            console.log("valServer cleared (watch) " + propertyValidationPath);
-
+                            
                             //clear the server validation entry
                             serverValidationManager.removePropertyError(propertyValidationPath, currentCulture, fieldName, currentSegment);
 
@@ -100,14 +99,12 @@ function valServer(serverValidationManager) {
             function serverValidationManagerCallback(isValid, propertyErrors, allErrors) {
                 if (!isValid) {
                     modelCtrl.$setValidity('valServer', false);
-                    console.log("valServer error " + propertyValidationPath);
                     //assign an error msg property to the current validator
                     modelCtrl.errorMsg = propertyErrors[0].errorMsg;
                     startWatch();
                 }
                 else {
                     modelCtrl.$setValidity('valServer', true);
-                    console.log("valServer cleared " + propertyValidationPath);
                     //reset the error message
                     modelCtrl.errorMsg = "";
                     stopWatch();
