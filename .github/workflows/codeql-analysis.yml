@@ -2,10 +2,11 @@ name: "Code scanning - action"
 
 on:
   push:
-    branches: [v8/contrib,v8/codeql]
+    branches: [v8/contrib]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [v8/contrib]
+    # SJ: Don't run on PR branches for now
+    # branches: [v8/contrib]
   schedule:
     - cron: '0 7 * * 2'
 
