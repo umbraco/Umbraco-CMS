@@ -32,6 +32,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
             "Umbraco.Core.Models",
             "Umbraco.Core.Models.PublishedContent",
             "Umbraco.Web",
+            "Umbraco.Web.PublishedCache",
             "Umbraco.ModelsBuilder.Embedded"
         };
 

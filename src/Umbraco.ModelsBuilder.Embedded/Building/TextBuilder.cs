@@ -174,6 +174,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
 
             // write the constants & static methods
             // as 'new' since parent has its own - or maybe not - disable warning
+            sb.Append("\t\tprivate static IPublishedSnapshotAccessor _publishedSnapshotAccessor;\n\n");
             sb.Append("\t\t// helpers\n");
             sb.Append("#pragma warning disable 0109 // new is redundant\n");
             WriteGeneratedCodeAttribute(sb, "\t\t");
@@ -185,7 +186,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
                 itemType);
             WriteGeneratedCodeAttribute(sb, "\t\t");
             sb.Append("\t\tpublic new static IPublishedContentType GetModelContentType()\n");
-            sb.Append("\t\t\t=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);\n");
+            sb.Append("\t\t\t=> PublishedModelUtility.GetModelContentType(_publishedSnapshotAccessor, ModelItemType, ModelTypeAlias);\n");
             WriteGeneratedCodeAttribute(sb, "\t\t");
             sb.AppendFormat("\t\tpublic static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<{0}, TValue>> selector)\n",
                 type.ClrName);
@@ -193,7 +194,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
             sb.Append("#pragma warning restore 0109\n\n");
 
             // write the ctor
-            sb.AppendFormat("\t\t// ctor\n\t\tpublic {0}(IPublished{1} content)\n\t\t\t: base(content)\n\t\t{{ }}\n\n",
+            sb.AppendFormat("\t\t// ctor\n\t\tpublic {0}(IPublished{1} content, IPublishedSnapshotAccessor publishedSnapshotAccessor)\n\t\t\t: base(content)\n\t\t{{\n\t\t\t_publishedSnapshotAccessor = publishedSnapshotAccessor;\n\t\t}}\n\n",
                 type.ClrName, type.IsElement ? "Element" : "Content");
 
             // write the properties
