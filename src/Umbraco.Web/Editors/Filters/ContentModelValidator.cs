@@ -198,7 +198,7 @@ namespace Umbraco.Web.Editors.Filters
                     r.ErrorMessage = property.ValidationRegExpMessage;
                 }
 
-                modelState.AddPropertyError(r, property.Alias, property.Culture);
+                modelState.AddPropertyError(r, property.Alias, property.Culture, property.Segment);
             }
         }
     }

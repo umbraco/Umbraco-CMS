@@ -314,7 +314,7 @@ Use this directive to generate a thumbnail grid of media items.
             };
             
             var unbindItemsWatcher = scope.$watch('items', function(newValue, oldValue) {
-                if (angular.isArray(newValue)) {
+                if (Utilities.isArray(newValue)) {
                     activate();
                 }
             });

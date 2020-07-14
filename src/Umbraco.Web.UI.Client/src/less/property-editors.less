@@ -707,8 +707,9 @@
             margin-top: 0;
         }
     }
+
 //
-// folder-browser
+// Folder browser
 // --------------------------------------------------
 .umb-folderbrowser .add-link {
   display: inline-block;
@@ -724,6 +725,7 @@
 // --------------------------------------------------
 .umb-fileupload {
     display: flex;
+    flex-direction: column;
 }
 
 .umb-fileupload .preview {
@@ -806,6 +808,13 @@
 
 
 //
+// Slider
+// --------------------------------------------------
+.umb-slider {
+    .umb-property-editor--limit-width();
+}
+
+//
 // Tags
 // --------------------------------------------------
 .umb-tags {
@@ -863,11 +872,11 @@
 .bootstrap-datetimepicker-widget .picker-switch .btn{ background: none; border: none;}
 .umb-datepicker .input-append .add-on{cursor: pointer;}
 .umb-datepicker .input-append .on-top {
+    border: 0 none;
     position: absolute;
     margin-left: -31px;
     margin-top: 1px;
     display: inline-block;
-    height: 22px;
     padding: 5px 6px 3px 6px;
     font-size: @baseFontSize;
     font-weight: normal;

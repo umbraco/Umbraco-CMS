@@ -110,8 +110,8 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("Test", rt.Name);
             Assert.AreEqual("repeatedEventOccurence", rt.Alias);
             Assert.AreEqual(false, rt.IsBidirectional);
-            Assert.AreEqual(Constants.ObjectTypes.Document, rt.ChildObjectType.Value);
-            Assert.AreEqual(Constants.ObjectTypes.Media, rt.ParentObjectType.Value);
+            Assert.AreEqual(Constants.ObjectTypes.Document, rt.ParentObjectType.Value);
+            Assert.AreEqual(Constants.ObjectTypes.Media, rt.ChildObjectType.Value);
         }
 
         [Test]

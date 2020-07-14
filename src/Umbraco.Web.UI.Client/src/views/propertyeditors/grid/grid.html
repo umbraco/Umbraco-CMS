@@ -251,12 +251,14 @@
 
                        <button
                           class="iconBox btn-reset"
-                          ng-click="toggleAddRow()"
+                          type="button"
+                          title="{{ section.$allowedLayouts.length == 1 ? section.$allowedLayouts[0].label || section.$allowedLayouts[0].name : '' }}"
+                          ng-click="section.$allowedLayouts.length == 1 ? addRow(section, section.$allowedLayouts[0]) : toggleAddRow()"
                           ng-if="!showRowConfigurations">
 
                           <i class="icon icon-add" ></i>
                           <span class="sr-only">
-                            <localize key="visuallyHiddenTexts_addNewRow">Add new role</localize>
+                            <localize key="visuallyHiddenTexts_addNewRow">Add new row</localize>
                           </span>
                         </button>
 
