@@ -288,7 +288,7 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                             "",
                             serverValidationManagerCallback,
                             currentSegment,
-                            true // match property validation path prefix
+                            { matchPrefix: true } // match property validation path prefix
                         ));
                     }
 

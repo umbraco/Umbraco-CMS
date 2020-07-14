@@ -17,7 +17,7 @@ function serverValidationManager($timeout) {
     // - segment
     // - callback (function)
     // - id (unique identifier, auto-generated, used internally for unsubscribing the callback)
-    // - matchPrefix (used for complex properties, default is false, if set to true the callback will fire for any item with this propertyAlias prefix)
+    // - options (used for complex properties, can contain options.matchPrefix options.matchSuffix if either are set to true the callback will fire for any item with this propertyAlias prefix or suffix)
     var callbacks = [];
 
     // The array of error message objects, each object 'key' is:    
@@ -28,7 +28,12 @@ function serverValidationManager($timeout) {
     // The object also contains:
     // - errorMsg
     var items = [];
-    
+
+    var defaultMatchOptions = {
+        matchPrefix: false,
+        matchSuffix: false
+    }
+
     /** calls the callback specified with the errors specified, used internally */
     function executeCallback(errorsForCallback, callback, culture, segment, isValid) {
 
@@ -72,7 +77,7 @@ function serverValidationManager($timeout) {
         });
     }
     
-    function getPropertyErrors(propertyAlias, culture, segment, fieldName, matchPrefixValidationPath) {
+    function getPropertyErrors(propertyAlias, culture, segment, fieldName, options) {
         if (!Utilities.isString(propertyAlias)) {
             throw "propertyAlias must be a string";
         }
@@ -87,14 +92,26 @@ function serverValidationManager($timeout) {
             segment = null;
         }
 
+        if (!options) {
+            options = defaultMatchOptions;
+        }
+
         //find all errors for this property
         return _.filter(items, function (item) {
-            return ((matchPrefixValidationPath ? (item.propertyAlias === propertyAlias || (item.propertyAlias && item.propertyAlias.startsWith(propertyAlias + '/'))) : item.propertyAlias === propertyAlias)
-            //return ((matchPrefixValidationPath ? (item.propertyAlias === propertyAlias || propertyAlias.startsWith(item.propertyAlias + '/')) : item.propertyAlias === propertyAlias)
+
+            var matchProp = options.matchPrefix
+                ? (item.propertyAlias === propertyAlias || (item.propertyAlias && item.propertyAlias.startsWith(propertyAlias + '/')))
+                : options.matchSuffix
+                    ? (item.propertyAlias === propertyAlias || (item.propertyAlias && item.propertyAlias.endsWith('/' + propertyAlias)))
+                    : item.propertyAlias === propertyAlias;
+
+            var ignoreField = options.matchPrefix || options.matchSuffix;
+
+            return matchProp
                 && item.culture === culture
                 && item.segment === segment
-                // ignore field matching if 
-                && (matchPrefixValidationPath || (item.fieldName === fieldName || (fieldName === undefined || fieldName === ""))));
+                // ignore field matching if match options are used
+                && (ignoreField || (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
         });
     }
 
@@ -122,7 +139,7 @@ function serverValidationManager($timeout) {
         }
         else if (cb.propertyAlias != null) {
             //its a property error
-            const propErrors = getPropertyErrors(cb.propertyAlias, cb.culture, cb.segment, cb.fieldName, cb.matchPrefix);
+            const propErrors = getPropertyErrors(cb.propertyAlias, cb.culture, cb.segment, cb.fieldName, cb.options);
             const valid = propErrors.length === 0;
             executeCallback(propErrors, cb.callback, cb.culture, cb.segment, valid);
         }
@@ -213,12 +230,24 @@ function serverValidationManager($timeout) {
 
         var found = _.filter(callbacks, function (cb) {
 
+            if (!cb.options) {
+                cb.options = defaultMatchOptions;
+            }
+
+            var matchProp = cb.options.matchPrefix
+                ? (cb.propertyAlias === propertyAlias || propertyAlias.startsWith(cb.propertyAlias + '/'))
+                : cb.options.matchSuffix
+                    ? (cb.propertyAlias === propertyAlias || propertyAlias.endsWith(cb.propertyAlias + '/'))
+                    : cb.propertyAlias === propertyAlias;
+
+            var ignoreField = cb.options.matchPrefix || cb.options.matchSuffix;
+
             //returns any callback that have been registered directly against the field and for only the property
-            return ((cb.matchPrefix ? (cb.propertyAlias === propertyAlias || propertyAlias.startsWith(cb.propertyAlias + '/')) : cb.propertyAlias === propertyAlias)
+            return matchProp
                 && cb.culture === culture
                 && cb.segment === segment
                 // if the callback is configured to patch prefix then we ignore the field value
-                && (cb.matchPrefix || (cb.fieldName === fieldName || (cb.fieldName === undefined || cb.fieldName === ""))));
+                && (ignoreField || (cb.fieldName === fieldName || (cb.fieldName === undefined || cb.fieldName === "")));
         });
         return found;
     }
@@ -567,7 +596,7 @@ function serverValidationManager($timeout) {
          *  field alias to listen for.
          *  If propertyAlias is null, then this subscription is for a field property (not a user defined property).
          */
-        subscribe: function (propertyAlias, culture, fieldName, callback, segment, matchValidationPathPrefix) {
+        subscribe: function (propertyAlias, culture, fieldName, callback, segment, options) {
             if (!callback) {
                 return;
             }
@@ -604,7 +633,7 @@ function serverValidationManager($timeout) {
                     fieldName: fieldName,
                     callback: callback,
                     id: id,
-                    matchPrefix: matchValidationPathPrefix
+                    options: options
                 };
             }
 
@@ -740,8 +769,8 @@ function serverValidationManager($timeout) {
             return undefined;
         },
 
-        getPropertyErrorsByValidationPath: function (propertyAlias, culture, segment) {
-            return getPropertyErrors(propertyAlias, culture, segment, "", true);
+        getPropertyErrorsByValidationPath: function (propertyAlias, culture, segment, options) {
+            return getPropertyErrors(propertyAlias, culture, segment, "", options);
         },
 
         /**

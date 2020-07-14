@@ -111,8 +111,6 @@ function valServer(serverValidationManager) {
                 }
             }
 
-            
-
             unsubscribe.push(serverValidationManager.subscribe(
                 propertyValidationPath,
                 currentCulture,

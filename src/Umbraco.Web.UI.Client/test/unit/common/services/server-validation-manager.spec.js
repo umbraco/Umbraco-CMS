@@ -533,6 +533,7 @@
             var args1;
             var args2;
             var numCalled = 0;
+            var numCalledWithErrors = 0;
 
             //arrange
             serverValidationManager.subscribe("myProperty", null, "value1", function (isValid, propertyErrors, allErrors) {
@@ -546,6 +547,9 @@
             
             serverValidationManager.subscribe("myProperty", null, "", function (isValid, propertyErrors, allErrors) {
                 numCalled++;
+                if (propertyErrors.length > 0) {
+                    numCalledWithErrors++;
+                }
                 args2 = {
                     isValid: isValid,
                     propertyErrors: propertyErrors,
@@ -553,9 +557,6 @@
                 };
             }, null);
             
-
-            console.log("NOW ADDING ERRORS " + numCalled);
-
             //act
             serverValidationManager.addPropertyError("myProperty", null, "value1", "Some value 1", null);
             serverValidationManager.addPropertyError("myProperty", null, "value2", "Some value 2", null);
@@ -578,19 +579,23 @@
             expect(args2.propertyErrors[0].errorMsg).toEqual("Some value 1");
             expect(args2.propertyErrors[1].errorMsg).toEqual("Some value 2");
             expect(args2.allErrors.length).toEqual(2);
-            //Even though only 2 errors are added, the callback is called 3 times because any call to addPropertyError will invoke the callback
-            // if the property has errors existing.
-            expect(numCalled).toEqual(3);
+            //3 errors are added but a call to subscribe also calls the callback
+            expect(numCalled).toEqual(4);
+            expect(numCalledWithErrors).toEqual(3);
         });
 
         it('can subscribe to a culture error for both a property and its sub field', function () {
             var args1;
             var args2;
             var numCalled = 0;
+            var numCalledWithErrors = 0;
 
             //arrange
             serverValidationManager.subscribe(null, "en-US", null, function (isValid, propertyErrors, allErrors) {
                 numCalled++;
+                if (propertyErrors.length > 0) {
+                    numCalledWithErrors++;
+                }
                 args1 = {
                     isValid: isValid,
                     propertyErrors: propertyErrors,
@@ -601,25 +606,28 @@
 
             serverValidationManager.subscribe(null, "es-ES", null, function (isValid, propertyErrors, allErrors) {
                 numCalled++;
+                if (propertyErrors.length > 0) {
+                    numCalledWithErrors++;
+                }
                 args2 = {
                     isValid: isValid,
                     propertyErrors: propertyErrors,
                     allErrors: allErrors
                 };
             }, null);
-            
 
             //act
-            serverValidationManager.addPropertyError("myProperty", null, "value1", "Some value 1", null);
-            serverValidationManager.addPropertyError("myProperty", "en-US", "value1", "Some value 1", null);
-            serverValidationManager.addPropertyError("myProperty", "en-US", "value2", "Some value 2", null);
-            serverValidationManager.addPropertyError("myProperty", "fr-FR", "", "Some value 3", null);
+            serverValidationManager.addPropertyError("myProperty", null, "value1", "Some value 1", null);       // doesn't match
+            serverValidationManager.addPropertyError("myProperty", "en-US", "value1", "Some value 1", null);    // matches callback 1
+            serverValidationManager.addPropertyError("myProperty", "en-US", "value2", "Some value 2", null);    // matches callback 1
+            serverValidationManager.addPropertyError("myProperty", "fr-FR", "", "Some value 3", null);          // doesn't match - but all callbacks still execute
 
             //assert
             expect(args1.isValid).toBe(false);
             expect(args2.isValid).toBe(true); // no errors registered for this callback
 
-            expect(numCalled).toEqual(8); // both subscriptions will be called once per addPropertyError
+            expect(numCalled).toEqual(10); // both subscriptions will be called once per addPropertyError and also called on subscribe
+            expect(numCalledWithErrors).toEqual(3); // the first subscription is called 3 times with errors because the 4th time we call addPropertyError all callbacks still execute
         });
 
         it('can subscribe to a property validation path prefix', function () {
@@ -628,12 +636,16 @@
 
             //arrange
             serverValidationManager.subscribe("myProperty", null, null, function (isValid, propertyErrors, allErrors) {
-                callbackA.push(propertyErrors);
-            }, null, true);
+                if (propertyErrors.length > 0) {
+                    callbackA.push(propertyErrors);
+                }
+            }, null, { matchPrefix: true });
 
             serverValidationManager.subscribe("myProperty/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses", null, null, function (isValid, propertyErrors, allErrors) {
-                callbackB.push(propertyErrors);
-            }, null, true);
+                if (propertyErrors.length > 0) {
+                    callbackB.push(propertyErrors);
+                }
+            }, null, { matchPrefix: true });
 
             //act
             // will match A:
@@ -652,7 +664,7 @@
 
             // both will be called each time addPropertyError is called
             expect(callbackA.length).toEqual(8);
-            expect(callbackB.length).toEqual(8);
+            expect(callbackB.length).toEqual(6); // B - will only be called 6 times with errors because the first 2 calls to addPropertyError haven't added errors for B yet
             expect(callbackA[callbackA.length - 1].length).toEqual(4); // 4 errors for A
             expect(callbackB[callbackB.length - 1].length).toEqual(2); // 2 errors for B
 
