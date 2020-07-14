@@ -1,5 +1,5 @@
 <label class="radio umb-form-check umb-form-check--radiobutton" ng-class="{ 'umb-form-check--disabled': vm.disabled }">
-    <div class="umb-form-check__symbol">
+    <span class="umb-form-check__symbol">
         <input type="radio"
             id="{{vm.inputId}}"
             name="{{vm.name}}"
@@ -13,8 +13,8 @@
         <span class="umb-form-check__state" aria-hidden="true">
             <span class="umb-form-check__check"></span>
         </span>
-    </div>
-    <div class="umb-form-check__info" ng-transclude>
+    </span>
+    <span class="umb-form-check__info" ng-transclude>
         <span class="umb-form-check__text">{{vm.text}}</span>
-    </div>
+    </span>
 </label>
