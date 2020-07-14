@@ -48,7 +48,7 @@
                                     </a>
 
                                     <a class="td uSky-templates-column add"
-                                        ng-click="configureCell(undefined, currentRow)"
+                       ng-click="configureCell(null, currentRow)"
                                         ng-style="{width: percentage(availableRowSpace) + '%'}">
                                         <i class="icon icon-add"></i>
                                     </a>
@@ -96,13 +96,16 @@
                                 <div ng-if="currentCell.allowAll === false">
                                     <hr />
                                     <ul class="unstyled">
-                                        <li ng-repeat="editor in editors">
-                                            <label>
-                                                <input type="checkbox"
-                                                       checklist-model="currentCell.allowed"
-                                                       checklist-value="editor.alias">
+                      <li ng-repeat="editor in editors track by $id(editor)">
+
+                          <umb-checkbox model="editor.allowed"
+                                        input-id="editorconfig-{{$index}}"
+                                        on-change="selectEditor(currentCell, editor)">
+                          </umb-checkbox>
+
+                          <label for="editorconfig-{{$index}}" style="padding: 0; margin-left: -10px;">
                                                 <i class="icon {{editor.icon}}" aria-hidden="true"></i> {{editor.name}}
-                                                <small class="input-label--small">({{editor.alias}})</small>
+                                   <small class="input-label--small">({{editor.alias}})</small>
                                             </label>
                                         </li>
                                     </ul>
