@@ -272,7 +272,7 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                             hasError = !isValid;
                             if (hasError) {
                                 //set the error message to the server message
-                                scope.errorMsg = propertyErrors[0].errorMsg ? propertyErrors[0].errorMsg : labels.propertyHasErrors;
+                                scope.errorMsg = propertyErrors.length > 0 ? labels.propertyHasErrors : propertyErrors[0].errorMsg || labels.propertyHasErrors;
                                 //flag that the current validator is invalid
                                 formCtrl.$setValidity('valPropertyMsg', false, formCtrl);
                                 startWatch();
