@@ -27,7 +27,7 @@
             <tbody ui-sortable="sortableOptions" ng-model="model.value">
                 <tr ng-repeat="val in model.value">
                     <td>
-                        <i class="icon icon-navigation handle"></i>
+                        <i class="icon icon-navigation handle" aria-hidden="true" aria-label="Sort"></i>
                     </td>
                     <td>
                        <div class="list-view-layout__name flex-column content-start">
@@ -53,7 +53,9 @@
                         </ng-form>
                     </td>
                     <td>
-                        <button type="button" class="btn-icon icon-trash" ng-click="removeField(val)" aria-label="Remove"></button>
+                        <button type="button" class="btn-icon" ng-click="removeField(val)" aria-label="Remove">
+                            <i class="icon-trash" aria-hidden="true"></i>
+                        </button>
                     </td>
                 </tr>
             </tbody>
