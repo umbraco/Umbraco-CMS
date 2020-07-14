@@ -4,7 +4,8 @@
     function ContentEditController($rootScope, $scope, $routeParams, $q, $window,
         appState, contentResource, entityResource, navigationService, notificationsService,
         serverValidationManager, contentEditingHelper, localizationService, formHelper, umbRequestHelper,
-        editorState, $http, eventsService, overlayService, $location, localStorageService, treeService) {
+        editorState, $http, eventsService, overlayService, $location, localStorageService, treeService,
+        $exceptionHandler) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -620,8 +621,7 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
-                                    //don't reject, we've handled the error
-                                    return $q.when(err);
+                                    $exceptionHandler(err);
                                 });
                         },
                         close: function () {
@@ -642,8 +642,9 @@
                     action: "sendToPublish"
                 }).then(function () {
                     $scope.page.buttonGroupState = "success";
-                }, function () {
+                }, function (err) {
                     $scope.page.buttonGroupState = "error";
+                    $exceptionHandler(err);
                 });;
             }
         };
@@ -679,8 +680,7 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
-                                    //don't reject, we've handled the error
-                                    return $q.when(err);
+                                    $exceptionHandler(err);
                                 });
                         },
                         close: function () {
@@ -703,8 +703,9 @@
                     action: "publish"
                 }).then(function () {
                     $scope.page.buttonGroupState = "success";
-                }, function () {
+                }, function (err) {
                     $scope.page.buttonGroupState = "error";
+                    $exceptionHandler(err);
                 });
             }
         };
@@ -742,8 +743,7 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
-                                    //don't reject, we've handled the error
-                                    return $q.when(err);
+                                    $exceptionHandler(err);
                                 });
                         },
                         close: function (oldModel) {
@@ -766,8 +766,9 @@
                     action: "save"
                 }).then(function () {
                     $scope.page.saveButtonState = "success";
-                }, function () {
+                }, function (err) {
                     $scope.page.saveButtonState = "error";
+                    $exceptionHandler(err);
                 });
             }
 
@@ -820,8 +821,7 @@
                             model.submitButtonState = "error";
                             //re-map the dialog model since we've re-bound the properties
                             dialog.variants = Utilities.copy($scope.content.variants);
-                            //don't reject, we've handled the error
-                            return $q.when(err);
+                            $exceptionHandler(err);
                         });
 
                     },
@@ -880,8 +880,7 @@
                             model.submitButtonState = "error";
                             //re-map the dialog model since we've re-bound the properties
                             dialog.variants = $scope.content.variants;
-                            //don't reject, we've handled the error
-                            return $q.when(err);
+                            $exceptionHandler(err);
                         });
 
                     },
