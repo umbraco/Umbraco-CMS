@@ -13,14 +13,14 @@ function valServer(serverValidationManager) {
         link: function (scope, element, attr, ctrls) {
 
             var modelCtrl = ctrls[0];
-            var umbPropCtrl = ctrls.length > 1 ? ctrls[1] : null;
+            var umbPropCtrl = ctrls[1];
             if (!umbPropCtrl) {
                 //we cannot proceed, this validator will be disabled
                 return;
             }
             
             // optional reference to the varaint-content-controller, needed to avoid validation when the field is invariant on non-default languages.
-            var umbVariantCtrl = ctrls.length > 2 ? ctrls[2] : null;
+            var umbVariantCtrl = ctrls[2];
 
             var currentProperty = umbPropCtrl.property;
             var currentCulture = currentProperty.culture;
@@ -121,9 +121,7 @@ function valServer(serverValidationManager) {
 
             scope.$on('$destroy', function () {
                 stopWatch();
-                for (var u in unsubscribe) {
-                    unsubscribe[u]();
-                }
+                unsubscribe.forEach(u => u());
             });
         }
     };

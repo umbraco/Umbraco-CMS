@@ -129,9 +129,9 @@
                     var prop = tab.properties[p];
 
                     // Watch value of property since this is the only value we want to keep synced.
-                    // Do notice that it is not performing a deep watch, meaning that we are only watching primatives and changes directly to the object of property-value.
-                    // But we like to sync non-primative values as well! Yes, and this does happen, just not through this code, but through the nature of JavaScript. 
-                    // Non-primative values act as references to the same data and are therefor synced.
+                    // Do notice that it is not performing a deep watch, meaning that we are only watching primitive and changes directly to the object of property-value.
+                    // But we like to sync non-primitive values as well! Yes, and this does happen, just not through this code, but through the nature of JavaScript.
+                    // Non-primitive values act as references to the same data and are therefor synced.
                     blockObject.__watchers.push(isolatedScope.$watch("blockObjects._" + blockObject.key + "." + field + ".variants[0].tabs[" + t + "].properties[" + p + "].value", watcherCreator(blockObject, prop)));
                     
                     // We also like to watch our data model to be able to capture changes coming from other places.

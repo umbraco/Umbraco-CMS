@@ -288,7 +288,7 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                             "",
                             serverValidationManagerCallback,
                             currentSegment,
-                            { matchPrefix: true } // match property validation path prefix
+                            { matchType: "suffix" } // match property validation path prefix
                         ));
                     }
 
@@ -298,9 +298,7 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
             //when the scope is disposed we need to unsubscribe
             scope.$on('$destroy', function () {
                 stopWatch();
-                for (var u in unsubscribe) {
-                    unsubscribe[u]();
-                }
+                unsubscribe.forEach(u => u());
             });
 
             onInit();
