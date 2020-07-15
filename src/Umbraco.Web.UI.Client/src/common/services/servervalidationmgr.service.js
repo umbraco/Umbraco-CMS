@@ -17,7 +17,7 @@ function serverValidationManager($timeout) {
     // - segment
     // - callback (function)
     // - id (unique identifier, auto-generated, used internally for unsubscribing the callback)
-    // - options (used for complex properties, can contain options.matchPrefix options.matchSuffix if either are set to true the callback will fire for any item with this propertyAlias prefix or suffix)
+    // - options (used for complex properties, can contain options.matchType which can be either "suffix" or "prefix" or "contains")
     var callbacks = [];
 
     // The array of error message objects, each object 'key' is:    
@@ -30,8 +30,7 @@ function serverValidationManager($timeout) {
     var items = [];
 
     var defaultMatchOptions = {
-        matchPrefix: false,
-        matchSuffix: false
+        matchType: null
     }
 
     /** calls the callback specified with the errors specified, used internally */
@@ -99,19 +98,25 @@ function serverValidationManager($timeout) {
         //find all errors for this property
         return _.filter(items, function (item) {
 
-            var matchProp = options.matchPrefix
-                ? (item.propertyAlias === propertyAlias || (item.propertyAlias && item.propertyAlias.startsWith(propertyAlias + '/')))
-                : options.matchSuffix
-                    ? (item.propertyAlias === propertyAlias || (item.propertyAlias && item.propertyAlias.endsWith('/' + propertyAlias)))
-                    : item.propertyAlias === propertyAlias;
+            if (!item.propertyAlias) {
+                return false;
+            }
 
-            var ignoreField = options.matchPrefix || options.matchSuffix;
+            var matchProp = item.propertyAlias === propertyAlias
+                ? true
+                : options.matchType === "prefix"
+                    ? item.propertyAlias.startsWith(propertyAlias + '/')
+                    : options.matchType === "suffix"
+                        ? item.propertyAlias.endsWith('/' + propertyAlias)
+                        : options.matchType === "contains"
+                            ? item.propertyAlias.includes('/' + propertyAlias + '/')
+                            : false;
 
             return matchProp
                 && item.culture === culture
                 && item.segment === segment
                 // ignore field matching if match options are used
-                && (ignoreField || (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+                && (options.matchType || (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
         });
     }
 
@@ -234,20 +239,22 @@ function serverValidationManager($timeout) {
                 cb.options = defaultMatchOptions;
             }
 
-            var matchProp = cb.options.matchPrefix
-                ? (cb.propertyAlias === propertyAlias || propertyAlias.startsWith(cb.propertyAlias + '/'))
-                : cb.options.matchSuffix
-                    ? (cb.propertyAlias === propertyAlias || propertyAlias.endsWith(cb.propertyAlias + '/'))
-                    : cb.propertyAlias === propertyAlias;
-
-            var ignoreField = cb.options.matchPrefix || cb.options.matchSuffix;
+            var matchProp = cb.propertyAlias === propertyAlias
+                ? true
+                : cb.options.matchType === "prefix"
+                    ? propertyAlias.startsWith(cb.propertyAlias + '/')
+                    : cb.options.matchType === "suffix"
+                        ? propertyAlias.endsWith('/' + cb.propertyAlias)
+                        : cb.options.matchType === "contains"
+                            ? propertyAlias.includes('/' + cb.propertyAlias + '/')
+                            : false;
 
             //returns any callback that have been registered directly against the field and for only the property
             return matchProp
                 && cb.culture === culture
                 && cb.segment === segment
-                // if the callback is configured to patch prefix then we ignore the field value
-                && (ignoreField || (cb.fieldName === fieldName || (cb.fieldName === undefined || cb.fieldName === "")));
+                // ignore field matching if match options are used
+                && (cb.options.matchType || (cb.fieldName === fieldName || (cb.fieldName === undefined || cb.fieldName === "")));
         });
         return found;
     }
