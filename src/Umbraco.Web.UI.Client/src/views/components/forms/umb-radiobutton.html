@@ -15,6 +15,7 @@
         </span>
     </span>
     <span class="umb-form-check__info" ng-transclude>
-        <span class="umb-form-check__text">{{vm.text}}</span>
+        <i ng-if="vm.iconClass.length" class="{{vm.iconClass}}" aria-hidden="true"></i>
+        <span ng-if="vm.text.length" class="umb-form-check__text">{{vm.text}}</span>
     </span>
 </label>

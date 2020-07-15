@@ -79,7 +79,8 @@
             labelKey: "@?",
             disabled: "<",
             required: "<",
-            onChange: "&?"
+            onChange: "&?",
+            iconClass: "@?"
         }
     };
 
