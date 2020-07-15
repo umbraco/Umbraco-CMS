@@ -1920,7 +1920,77 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="content">The <see cref="IContent"/> to move</param>
         /// <param name="parentId">Id of the Content's new Parent</param>
         /// <param name="userId">Optional Id of the User moving the Content</param>
-        public OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
+        public void Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
+        {
+            // if moving to the recycle bin then use the proper method
+            if (parentId == Constants.System.RecycleBinContent)
+            {
+                MoveToRecycleBin(content, userId);
+                return;
+            }
+
+            var moves = new List<(IContent, string)>();
+
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                scope.WriteLock(Constants.Locks.ContentTree);
+
+                var parent = parentId == Constants.System.Root ? null : GetById(parentId);
+                if (parentId != Constants.System.Root && (parent == null || parent.Trashed))
+                    throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
+
+                var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentId);
+                var moveEventArgs = new MoveEventArgs<IContent>(moveEventInfo);
+                if (scope.Events.DispatchCancelable(Moving, this, moveEventArgs, nameof(Moving)))
+                {
+                    scope.Complete();
+                    return; // causes rollback
+                }
+
+                // if content was trashed, and since we're not moving to the recycle bin,
+                // indicate that the trashed status should be changed to false, else just
+                // leave it unchanged
+                var trashed = content.Trashed ? false : (bool?)null;
+
+                // if the content was trashed under another content, and so has a published version,
+                // it cannot move back as published but has to be unpublished first - that's for the
+                // root content, everything underneath will retain its published status
+                if (content.Trashed && content.Published)
+                {
+                    // however, it had been masked when being trashed, so there's no need for
+                    // any special event here - just change its state
+                    content.PublishedState = PublishedState.Unpublishing;
+                }
+
+                PerformMoveLocked(content, parentId, parent, userId, moves, trashed);
+
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
+
+                var moveInfo = moves //changes
+                    .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
+                    .ToArray();
+
+                moveEventArgs.MoveInfoCollection = moveInfo;
+                moveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(Moved, this, moveEventArgs, nameof(Moved));
+                Audit(AuditType.Move, userId, content.Id);
+
+                scope.Complete();
+            }
+        }
+
+        /// <summary>
+        /// Moves an <see cref="IContent"/> object to a new location by changing its parent id and displays an event message (if any) in the back office.
+        /// </summary>
+        /// <remarks>
+        /// If the <see cref="IContent"/> object is already published it will be
+        /// published after being moved to its new location. Otherwise it'll just
+        /// be saved with a new parent id.
+        /// </remarks>
+        /// <param name="content">The <see cref="IContent"/> to move</param>
+        /// <param name="parentId">Id of the Content's new Parent</param>
+        /// <param name="userId">Optional Id of the User moving the Content</param>
+        public OperationResult MoveWithResult(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
         {
             // if moving to the recycle bin then use the proper method
             if (parentId == Constants.System.RecycleBinContent)

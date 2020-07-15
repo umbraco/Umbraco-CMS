@@ -1585,7 +1585,7 @@ namespace Umbraco.Web.Editors
         {
             var toMove = ValidateMoveOrCopy(move);
 
-            var moveResult = Services.ContentService.Move(toMove, move.ParentId, Security.GetUserId().ResultOr(0));
+            var moveResult = Services.ContentService.MoveWithResult(toMove, move.ParentId, Security.GetUserId().ResultOr(0));
 
             if (moveResult.Success == false)
             {
