@@ -33,6 +33,7 @@
 @param {callback} onChange Callback when the value of the radiobutton change by interaction.
 @param {string} cssClass Set a css class modifier.
 @param {string} iconClass Set an icon next to radiobutton.
+@param {boolean} disableDirtyCheck Disable checking if the model is dirty.
 
 **/
 
@@ -85,7 +86,8 @@
             required: "<",
             onChange: "&?",
             cssClass: "@?",
-            iconClass: "@?"
+            iconClass: "@?",
+            disableDirtyCheck: "=?"
         }
     };
 

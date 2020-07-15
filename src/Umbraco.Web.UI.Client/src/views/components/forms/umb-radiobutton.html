@@ -1,6 +1,20 @@
 <label class="radio umb-form-check umb-form-check--radiobutton {{vm.cssClass}}" ng-class="{ 'umb-form-check--disabled': vm.disabled }">
     <span class="umb-form-check__symbol">
-        <input type="radio"
+        <input ng-if="vm.disableDirtyCheck"
+            type="radio"
+            id="{{vm.inputId}}"
+            name="{{vm.name}}"
+            value="{{vm.value}}"
+            class="umb-form-check__input"
+            val-server-field="{{vm.serverValidationField}}"
+            ng-model="vm.model"
+            ng-disabled="vm.disabled"
+            ng-required="vm.required"
+            ng-change="vm.change()"
+            no-dirty-check />
+
+        <input ng-if="!vm.disableDirtyCheck"
+            type="radio"
             id="{{vm.inputId}}"
             name="{{vm.name}}"
             value="{{vm.value}}"
