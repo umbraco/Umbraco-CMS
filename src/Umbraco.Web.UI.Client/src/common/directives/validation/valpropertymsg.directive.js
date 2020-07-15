@@ -40,8 +40,6 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
             var currentProperty = umbPropCtrl.property;
             scope.currentProperty = currentProperty;
 
-            var propertyValidationKey = umbPropCtrl.getValidationPath();
-
             var currentCulture = currentProperty.culture;
             var currentSegment = currentProperty.segment;
 
@@ -72,7 +70,7 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                 //this can be null if no property was assigned
                 if (scope.currentProperty) {
                     //first try to get the error msg from the server collection
-                    var err = serverValidationManager.getPropertyError(propertyValidationKey, null, "", null);
+                    var err = serverValidationManager.getPropertyError(umbPropCtrl.getValidationPath(), null, "", null);
                     //if there's an error message use it
                     if (err && err.errorMsg) {
                         return err.errorMsg;
@@ -115,7 +113,7 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
             }
 
             // returns true if there is only a single server validation error for this property validation key in it's validation path
-            function isLastServerError() {
+            function isLastServerError(propertyValidationKey) {
                 var nestedErrs = serverValidationManager.getPropertyErrorsByValidationPath(
                     propertyValidationKey,
                     currentCulture,
@@ -147,9 +145,9 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                             }
 
                             if (shouldClearError()) {
-
+                                var propertyValidationKey = umbPropCtrl.getValidationPath();
                                 // check if we can clear it based on child server errors, if we are the only explicit one remaining we can clear ourselves
-                                if (isLastServerError()) {                                
+                                if (isLastServerError(propertyValidationKey)) {                                
                                     serverValidationManager.removePropertyError(propertyValidationKey, currentCulture, "", currentSegment);
                                 }
 
@@ -283,7 +281,7 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                         }
 
                         unsubscribe.push(serverValidationManager.subscribe(
-                            propertyValidationKey,
+                            umbPropCtrl.getValidationPath(),
                             currentCulture,
                             "",
                             serverValidationManagerCallback,
