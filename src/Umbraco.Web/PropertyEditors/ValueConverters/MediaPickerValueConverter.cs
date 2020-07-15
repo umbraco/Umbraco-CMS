@@ -79,8 +79,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             PropertyCacheLevel cacheLevel, object source, bool preview)
         {
             var config = GetConfiguration(propertyType.DataType);
-            var isMultiple = config.Multiple;
-            var isImagesOnly = config.OnlyImages;
+            var isMultiple = IsMultipleDataType(config);
+            var isImagesOnly = IsImagesOnlyDataType(config);
 
             var udis = (Udi[])source;
             var mediaItems = isImagesOnly
