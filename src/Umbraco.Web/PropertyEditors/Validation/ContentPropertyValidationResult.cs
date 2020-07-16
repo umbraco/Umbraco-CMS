@@ -11,10 +11,15 @@ namespace Umbraco.Web.PropertyEditors.Validation
     /// </remarks>
     public class ContentPropertyValidationResult : ValidationResult
     {
-        public ContentPropertyValidationResult(ValidationResult nested)
+        private readonly string _culture;
+        private readonly string _segment;
+
+        public ContentPropertyValidationResult(ValidationResult nested, string culture, string segment)
             : base(nested.ErrorMessage, nested.MemberNames)
         {
             ComplexEditorResults = nested as ComplexEditorValidationResult;
+            _culture = culture;
+            _segment = segment;
         }
 
         /// <summary>
@@ -35,7 +40,7 @@ namespace Umbraco.Web.PropertyEditors.Validation
             if (ComplexEditorResults == null)
                 return base.ToString();
 
-            var json = JsonConvert.SerializeObject(this, new ValidationResultConverter());
+            var json = JsonConvert.SerializeObject(this, new ValidationResultConverter(_culture, _segment));
             return json;
         }
     }

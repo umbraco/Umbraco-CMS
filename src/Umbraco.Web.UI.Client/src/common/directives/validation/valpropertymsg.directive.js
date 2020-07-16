@@ -89,7 +89,6 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                 var errCount = angularHelper.countAllFormErrors(formCtrl);
 
                 if (errCount === 0) {
-                    resetError();
                     return true;
                 }
 

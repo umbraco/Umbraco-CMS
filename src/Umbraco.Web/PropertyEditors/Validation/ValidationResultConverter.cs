@@ -18,6 +18,20 @@ namespace Umbraco.Web.PropertyEditors.Validation
     /// </remarks>
     internal class ValidationResultConverter : JsonConverter
     {
+        private readonly string _culture;
+        private readonly string _segment;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="culture">The culture of the containing property which will be transfered to all child model state</param>
+        /// <param name="segment">The segment of the containing property which will be transfered to all child model state</param>
+        public ValidationResultConverter(string culture = "", string segment = "")
+        {
+            _culture = culture;
+            _segment = segment;
+        }
+
         public override bool CanConvert(Type objectType) => typeof(ValidationResult).IsAssignableFrom(objectType);
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -88,14 +102,14 @@ namespace Umbraco.Web.PropertyEditors.Validation
                                 // "errors/propertyHasErrors" message, however I think that leaves for less flexibility since it could/should be
                                 // up to the front-end validator to show whatever message it wants (if any) for an error indicating a nested property error.
                                 // Will leave blank.
-                                modelState.AddPropertyValidationError(new ValidationResult(string.Empty), propTypeResult.PropertyTypeAlias);
+                                modelState.AddPropertyValidationError(new ValidationResult(string.Empty), propTypeResult.PropertyTypeAlias, _culture, _segment);
                             }
                         }
                         else
                         {
                             foreach (var v in result)
                             {
-                                modelState.AddPropertyValidationError(v, propTypeResult.PropertyTypeAlias);
+                                modelState.AddPropertyValidationError(v, propTypeResult.PropertyTypeAlias, _culture, _segment);
                             }
                         }
                     }

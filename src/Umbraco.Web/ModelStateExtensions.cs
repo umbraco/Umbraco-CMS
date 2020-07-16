@@ -53,7 +53,7 @@ namespace Umbraco.Web
         internal static void AddPropertyError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
             ValidationResult result, string propertyAlias, string culture = "", string segment = "")
         {
-            modelState.AddPropertyValidationError(new ContentPropertyValidationResult(result), propertyAlias, culture, segment);
+            modelState.AddPropertyValidationError(new ContentPropertyValidationResult(result, culture, segment), propertyAlias, culture, segment);
         }
 
         /// <summary>

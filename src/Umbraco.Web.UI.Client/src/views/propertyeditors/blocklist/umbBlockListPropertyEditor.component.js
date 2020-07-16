@@ -176,6 +176,19 @@
 
             if (block === null) return null;
 
+            // ensure that the containing content variant language/culture is transfered along
+            // to the scaffolded content object representing this block. This is required for validation 
+            // along with ensuring that the umb-property inheritance is constently maintained.            
+            if (vm.umbVariantContent.editor.content.language) {
+                block.content.language = vm.umbVariantContent.editor.content.language;
+                // currently we only ever deal with invariant content for blocks so there's only one
+                block.content.variants[0].tabs.forEach(tab => {
+                    tab.properties.forEach(prop => {
+                        prop.culture = vm.umbVariantContent.editor.content.language.culture;
+                    });
+                });
+            }
+            
             block.view = (block.config.view ? "/" + block.config.view : getDefaultViewForBlock(block));
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;
