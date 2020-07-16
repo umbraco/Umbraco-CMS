@@ -18,8 +18,13 @@ function angularHelper($q) {
         }
         keys.forEach(validationKey => {
             var ctrls = formCtrl.$error[validationKey];
-            ctrls.forEach(ctrl => {                
-                if (isForm(ctrl)) {
+            ctrls.forEach(ctrl => {
+                if (!ctrl) {
+                    // this happens when $setValidity('err', true) is called on a form controller without specifying the 3rd parameter for the control/form
+                    // which just means that this is an error on the formCtrl itself
+                    allErrors.push(formCtrl); // add the error
+                }
+                else if (isForm(ctrl)) {
                     // sometimes the control in error is the same form so we cannot recurse else we'll cause an infinite loop
                     // and in this case it means the error is assigned directly to the form, not a control
                     if (ctrl === formCtrl) {

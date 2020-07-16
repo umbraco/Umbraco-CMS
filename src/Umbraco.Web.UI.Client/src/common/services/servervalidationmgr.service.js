@@ -382,9 +382,7 @@ function serverValidationManager($timeout) {
                 fieldName: fieldName,
                 errorMsg: errorMsg
             });
-        }
-
-        notifyCallbacks();
+        }        
     }
 
     /**
@@ -446,6 +444,7 @@ function serverValidationManager($timeout) {
             throw "modelState is not an object";
         }
 
+        var hasPropertyErrors = false;
         for (const [key, value] of Object.entries(modelState)) {
 
             //This is where things get interesting....
@@ -506,6 +505,7 @@ function serverValidationManager($timeout) {
 
                 // add a generic error for the property
                 addPropertyError(propertyValidationKey, culture, htmlFieldReference, value && Array.isArray(value) && value.length > 0 ? value[0] : null, segment);
+                hasPropertyErrors = true;
             }
             else {
 
@@ -513,6 +513,11 @@ function serverValidationManager($timeout) {
                 // Groups[0].Properties[2].Alias
                 addFieldError(key, value[0]);
             }
+        }
+
+        if (hasPropertyError) {
+            // ensure all callbacks are called after property errors are added
+            notifyCallbacks(); 
         }
     }
 
@@ -718,7 +723,11 @@ function serverValidationManager($timeout) {
 
         getVariantCallbacks: getVariantCallbacks,
         addFieldError: addFieldError,        
-        addPropertyError: addPropertyError,      
+
+        addPropertyError: function (propertyAlias, culture, fieldName, errorMsg, segment) {
+            addPropertyError(propertyAlias, culture, fieldName, errorMsg, segment);
+            notifyCallbacks(); // ensure all callbacks are called
+        },      
         
         /**
          * @ngdoc function

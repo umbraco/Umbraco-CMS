@@ -43,10 +43,10 @@ function valServerMatch(serverValidationManager) {
             //subscribe to the server validation changes
             function serverValidationManagerCallback(isValid, propertyErrors, allErrors) {
                 if (!isValid) {
-                    formCtrl.$setValidity('valServerMatch', false, formCtrl);                    
+                    formCtrl.$setValidity('valServerMatch', false);                    
                 }
                 else {
-                    formCtrl.$setValidity('valServerMatch', true, formCtrl);                    
+                    formCtrl.$setValidity('valServerMatch', true);                    
                 }
             }
 

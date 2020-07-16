@@ -83,7 +83,8 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                 return labels.propertyHasErrors;
             }
 
-            // return true if there is only a single error left on the property form of either valPropertyMsg or valServer
+            // check the current errors in the form (and recursive sub forms), if there is 1 or 2 errors
+            // we can check if those are valPropertyMsg or valServer and can clear our error in those cases.
             function checkAndClearError() {
 
                 var errCount = angularHelper.countAllFormErrors(formCtrl);
@@ -135,31 +136,55 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                 return false;
             }
 
-            // We need to subscribe to any changes to our model (based on user input)
-            // This is required because when we have a server error we actually invalidate 
-            // the form which means it cannot be resubmitted. 
-            // So once a field is changed that has a server error assigned to it
-            // we need to re-validate it for the server side validator so the user can resubmit
-            // the form. Of course normal client-side validators will continue to execute. 
+            // a custom $validator function called on when each child ngModelController changes a value.
+            function resetServerValidityValidator(fieldController) {
+                const storedFieldController = fieldController; // pin a reference to this
+                return (modelValue, viewValue) => {
+                    // if the ngModelController value has changed, then we can check and clear the error
+                    if (storedFieldController.$dirty) {
+                        if (checkAndClearError()) {
+                            resetError();
+                        }
+                    }
+                    return true; // this validator is always 'valid'
+                };
+            }
+
+            // collect all ng-model controllers recursively within the umbProperty form 
+            // until it reaches the next nested umbProperty form
+            function collectAllNgModelControllersRecursively(controls, ngModels) {
+                controls.forEach(ctrl => {
+                    if (angularHelper.isForm(ctrl)) {
+                        // if it's not another umbProperty form then recurse
+                        if (ctrl.$name !== formCtrl.$name) {
+                            collectAllNgModelControllersRecursively(ctrl.$getControls(), ngModels);
+                        }
+                    }
+                    else if (ctrl.hasOwnProperty('$modelValue') && Utilities.isObject(ctrl.$validators)) {
+                        ngModels.push(ctrl);
+                    }
+                });
+            }
+
+            // We start the watch when there's server validation errors detected.
+            // We watch on the current form's properties and on first watch or if they are dynamically changed
+            // we find all ngModel controls recursively on this form (but stop recursing before we get to the next)
+            // umbProperty form). Then for each ngModelController we assign a new $validator. This $validator 
+            // will execute whenever the value is changed which allows us to check and reset the server validator
             function startWatch() {
-
-                //if there's not already a watch
-
                 if (!watcher) {
-                    watcher = scope.$watch("currentProperty.value",
-                        function (newValue, oldValue) {
-                            if (angular.equals(newValue, oldValue)) {
-                                return;
-                            }
 
-                            if (checkAndClearError()) {
-                                resetError();
-                            }
-                            else if (showValidation && scope.errorMsg === "") {
-                                formCtrl.$setValidity('valPropertyMsg', false, formCtrl);
-                                scope.errorMsg = getErrorMsg();
-                            }
-                        }, true);
+                    watcher = scope.$watchCollection(
+                        () => formCtrl,
+                        function (updatedFormController) {
+                            var ngModels = [];
+                            collectAllNgModelControllersRecursively(updatedFormController.$getControls(), ngModels);
+                            ngModels.forEach(x => {
+                                if (!x.$validators.serverValidityResetter) {
+                                    x.$validators.serverValidityResetter = resetServerValidityValidator(x);
+                                }
+                            });
+                        });
                 }
             }
 
@@ -174,11 +199,13 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
             function resetError() {
                 stopWatch();
                 hasError = false;
-                formCtrl.$setValidity('valPropertyMsg', true, formCtrl);
+                formCtrl.$setValidity('valPropertyMsg', true);
                 scope.errorMsg = "";
                 
             }
 
+            // This deals with client side validation changes and is executed anytime validators change on the containing 
+            // valFormManager. This allows us to know when to display or clear the property error data for non-server side errors.
             function checkValidationStatus() {
                 if (formCtrl.$invalid) {
                     //first we need to check if the valPropertyMsg validity is invalid
@@ -270,13 +297,22 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                         // the correct field validation in their property editors.
 
                         function serverValidationManagerCallback(isValid, propertyErrors, allErrors) {
+                            var hadError = hasError;
                             hasError = !isValid;
                             if (hasError) {
                                 //set the error message to the server message
                                 scope.errorMsg = propertyErrors.length > 1 ? labels.propertyHasErrors : propertyErrors[0].errorMsg || labels.propertyHasErrors;
                                 //flag that the current validator is invalid
-                                formCtrl.$setValidity('valPropertyMsg', false, formCtrl);
+                                formCtrl.$setValidity('valPropertyMsg', false);
                                 startWatch();
+
+                                
+                                if (propertyErrors.length === 1 && hadError && !formCtrl.$pristine) {
+                                    var propertyValidationPath = umbPropCtrl.getValidationPath();
+                                    console.log("only 1 left, clearing! " + propertyValidationPath);
+                                    serverValidationManager.removePropertyError(propertyValidationPath, currentCulture, "", currentSegment);
+                                    resetError();
+                                }
                             }
                             else {
                                 resetError();
@@ -289,7 +325,7 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                             "",
                             serverValidationManagerCallback,
                             currentSegment,
-                            { matchType: "suffix" } // match property validation path prefix
+                            { matchType: "prefix" } // match property validation path prefix
                         ));
                     }
 
