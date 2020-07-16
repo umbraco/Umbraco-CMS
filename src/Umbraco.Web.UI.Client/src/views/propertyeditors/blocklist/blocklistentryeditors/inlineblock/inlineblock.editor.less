@@ -1,5 +1,4 @@
 .blockelement-inlineblock-editor {
-
     display: block;
     margin-bottom: 4px;
     margin-top: 4px;
@@ -14,25 +13,24 @@
     > button {
         width: 100%;
         min-height: 48px;
-        
         cursor: pointer;
         color: @ui-action-discreet-type;
-
         text-align: left;
         padding-left: 10px;
         padding-bottom: 2px;
-
         user-select: none;
-        
+
         .caret {
             transform: rotate(-90deg);
             transition: transform 80ms ease-out;
         }
+
         i {
             font-size: 22px;
             display: inline-block;
             vertical-align: middle;
         }
+
         span {
             display: inline-block;
             vertical-align: middle;
@@ -47,11 +45,18 @@
     .umb-block-list__block.--active & {
         border-color: @gray-8;
         box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.05);
+
         > button {
             > .caret {
                 transform: rotate(0deg);
             }
         }
+    }
+
+    &.--error {
+        color: @ui-active-type;
+        border-color: @ui-active;
+        background-color: @ui-active;
     }
 }
 .blockelement-inlineblock-editor__inner {

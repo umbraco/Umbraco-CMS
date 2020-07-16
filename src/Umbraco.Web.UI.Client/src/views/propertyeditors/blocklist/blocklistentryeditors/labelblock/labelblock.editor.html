@@ -2,7 +2,7 @@
     <button type="button" class="btn-reset umb-outline blockelement-labelblock-editor blockelement__draggable-element"
             ng-click="api.editBlock(block, block.hideContentInOverlay, index)"
             ng-focus="block.focus"
-            ng-class="{ '--active': block.active || blockRowForm.$invalid }"
+            ng-class="{ '--active': block.active, '--error': blockRowForm.$invalid }"
             val-server-property-class="">
         <i class="icon {{block.content.icon}}"></i>
         <span>{{block.label}}</span>
