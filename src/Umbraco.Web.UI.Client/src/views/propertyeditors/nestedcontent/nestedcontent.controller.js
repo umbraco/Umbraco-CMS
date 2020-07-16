@@ -65,7 +65,7 @@
             }
         });
 
-    function NestedContentController($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService) {
+    function NestedContentController($scope, $interpolate, $filter, serverValidationManager, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService) {
 
         var vm = this;
         var model = $scope.$parent.$parent.model;
@@ -298,8 +298,15 @@
         }
 
         function deleteNode(idx) {
-            vm.nodes.splice(idx, 1);
+            var removed = vm.nodes.splice(idx, 1);
+
             setDirty();
+
+            removed.forEach(x => {
+                // remove any server validation errors associated
+                serverValidationManager.removePropertyError(x.key, vm.umbProperty.property.culture, vm.umbProperty.property.segment, "", { matchType: "contains" });
+            });
+
             updateModel();
             validate();
         };
@@ -670,8 +677,8 @@
         ];
 
         this.$onInit = function () {
-            if (this.umbProperty) {
-                this.umbProperty.setPropertyActions(propertyActions);
+            if (vm.umbProperty) {
+                vm.umbProperty.setPropertyActions(propertyActions);
             }
         };
 

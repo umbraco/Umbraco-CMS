@@ -44,7 +44,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             //the first thing any form must do is broadcast the formSubmitting event
             args.scope.$broadcast("formSubmitting", { scope: args.scope, action: args.action });
 
-            // Some property editors need to performe an action after all property editors have reacted to the formSubmitting.
+            // Some property editors need to perform an action after all property editors have reacted to the formSubmitting.
             args.scope.$broadcast("postFormSubmitting", { scope: args.scope, action: args.action });
 
             //then check if the form is valid

@@ -28,7 +28,7 @@
             }
         });
 
-    function BlockListController($scope, editorService, clipboardService, localizationService, overlayService, blockEditorService) {
+    function BlockListController($scope, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager) {
         
         var unsubscribe = [];
         var modelObject;
@@ -231,10 +231,19 @@
         function deleteBlock(block) {
 
             var layoutIndex = vm.layout.findIndex(entry => entry.udi === block.content.udi);
-            if(layoutIndex === -1) {
+            if (layoutIndex === -1) {
                 throw new Error("Could not find layout entry of block with udi: "+block.content.udi)
             }
-            vm.layout.splice(layoutIndex, 1);
+
+            setDirty();
+
+            var removed = vm.layout.splice(layoutIndex, 1);
+            removed.forEach(x => {
+                // remove any server validation errors associated
+                var guid = udiService.getKey(x.udi);                
+                serverValidationManager.removePropertyError(guid, vm.umbProperty.property.culture, vm.umbProperty.property.segment, "", { matchType: "contains" });
+            });
+
             modelObject.removeDataAndDestroyModel(block);
 
         }

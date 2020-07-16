@@ -738,28 +738,12 @@ function serverValidationManager($timeout) {
          * @description
          * Removes an error message for the content property
          */
-        removePropertyError: function (propertyAlias, culture, fieldName, segment) {
+        removePropertyError: function (propertyAlias, culture, fieldName, segment, options) {
 
-            if (!propertyAlias) {
-                return;
-            }
+            var errors = getPropertyErrors(propertyAlias, culture, segment, fieldName, options);
+            items = items.filter(v => errors.indexOf(v) === -1);
 
-            //normalize culture to null
-            if (!culture) {
-                culture = "invariant";
-            }
-            //normalize segment to null
-            if (!segment) {
-                segment = null;
-            }
-
-            //remove the item
-            var count = items.length;
-            items = _.reject(items, function (item) {
-                return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));                
-            });
-
-            if (items.length !== count) {
+            if (errors.length > 0) {
                 // removal was successful, re-notify all subscribers
                 notifyCallbacks();
             }

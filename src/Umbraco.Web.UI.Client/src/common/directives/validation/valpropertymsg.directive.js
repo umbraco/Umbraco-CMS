@@ -309,7 +309,6 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                                 
                                 if (propertyErrors.length === 1 && hadError && !formCtrl.$pristine) {
                                     var propertyValidationPath = umbPropCtrl.getValidationPath();
-                                    console.log("only 1 left, clearing! " + propertyValidationPath);
                                     serverValidationManager.removePropertyError(propertyValidationPath, currentCulture, "", currentSegment);
                                     resetError();
                                 }
