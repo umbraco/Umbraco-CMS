@@ -776,8 +776,8 @@ function serverValidationManager($timeout) {
             return undefined;
         },
 
-        getPropertyErrorsByValidationPath: function (propertyAlias, culture, segment, options) {
-            return getPropertyErrors(propertyAlias, culture, segment, "", options);
+        getPropertyErrorsByValidationPath: function (propertyValidationPath, culture, segment, options) {
+            return getPropertyErrors(propertyValidationPath, culture, segment, "", options);
         },
 
         /**

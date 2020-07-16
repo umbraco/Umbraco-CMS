@@ -112,46 +112,22 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
             });
 
             //watch the list of validation errors to notify the application of any validation changes
-            scope.$watch(function () {
-                //the validators are in the $error collection: https://docs.angularjs.org/api/ng/type/form.FormController#$error
-                //since each key is the validator name (i.e. 'required') we can't just watch the number of keys, we need to watch
-                //the sum of the items inside of each key
+            scope.$watch(() => angularHelper.countAllFormErrors(formCtrl),
+                function (e) {
 
-                //get the lengths of each array for each key in the $error collection
-                var validatorLengths = _.map(formCtrl.$error, function (val, key) {
-                    // if there are child ng-forms, include the $error collections in those as well
-                    var innerErrorCount = _.reduce(
-                        _.map(val, v =>
-                            _.reduce(
-                                _.map(v.$error, e => e.length),
-                                (m, n) => m + n
-                            )
-                        ),
-                        (memo, num) => memo + num
-                    );
-                    return val.length + innerErrorCount;
+                    notify(scope);
+
+                    notifySubView();
+
+                    //find all invalid elements' .control-group's and apply the error class
+                    var inError = element.find(".control-group .ng-invalid").closest(".control-group");
+                    inError.addClass("error");
+
+                    //find all control group's that have no error and ensure the class is removed
+                    var noInError = element.find(".control-group .ng-valid").closest(".control-group").not(inError);
+                    noInError.removeClass("error");
+
                 });
-                //sum up all numbers in the resulting array
-                var sum = _.reduce(validatorLengths, function (memo, num) {
-                    return memo + num;
-                }, 0);
-                //this is the value we watch to notify of any validation changes on the form
-                return sum;
-            }, function (e) {
-
-                notify(scope);
-                
-                notifySubView();
-
-                //find all invalid elements' .control-group's and apply the error class
-                var inError = element.find(".control-group .ng-invalid").closest(".control-group");
-                inError.addClass("error");
-
-                //find all control group's that have no error and ensure the class is removed
-                var noInError = element.find(".control-group .ng-valid").closest(".control-group").not(inError);
-                noInError.removeClass("error");
-
-            });
 
             //This tracks if the user is currently saving a new item, we use this to determine
             // if we should display the warning dialog that they are leaving the page - if a new item

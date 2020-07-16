@@ -516,6 +516,12 @@
             }
         }
 
+        function handleHttpException(err) {
+            if (!err.status) {
+                $exceptionHandler(err);
+            }
+        }
+
         /** Just shows a simple notification that there are client side validation issues to be fixed */
         function showValidationNotification() {
             //TODO: We need to make the validation UI much better, there's a lot of inconsistencies in v8 including colors, issues with the property groups and validation errors between variants
@@ -576,6 +582,7 @@
                                 overlayService.close();
                             }, function (err) {
                                 $scope.page.buttonGroupState = 'error';
+                                handleHttpException(err);
                             });
 
 
@@ -621,7 +628,7 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
-                                    $exceptionHandler(err);
+                                    handleHttpException(err);
                                 });
                         },
                         close: function () {
@@ -644,7 +651,7 @@
                     $scope.page.buttonGroupState = "success";
                 }, function (err) {
                     $scope.page.buttonGroupState = "error";
-                    $exceptionHandler(err);
+                    handleHttpException(err);
                 });;
             }
         };
@@ -680,7 +687,7 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
-                                    $exceptionHandler(err);
+                                    handleHttpException(err);
                                 });
                         },
                         close: function () {
@@ -705,7 +712,7 @@
                     $scope.page.buttonGroupState = "success";
                 }, function (err) {
                     $scope.page.buttonGroupState = "error";
-                    $exceptionHandler(err);
+                    handleHttpException(err);
                 });
             }
         };
@@ -743,7 +750,7 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
-                                    $exceptionHandler(err);
+                                    handleHttpException(err);
                                 });
                         },
                         close: function (oldModel) {
@@ -768,7 +775,7 @@
                     $scope.page.saveButtonState = "success";
                 }, function (err) {
                     $scope.page.saveButtonState = "error";
-                    $exceptionHandler(err);
+                    handleHttpException(err);
                 });
             }
 
@@ -821,7 +828,7 @@
                             model.submitButtonState = "error";
                             //re-map the dialog model since we've re-bound the properties
                             dialog.variants = Utilities.copy($scope.content.variants);
-                            $exceptionHandler(err);
+                            handleHttpException(err);
                         });
 
                     },
@@ -880,7 +887,7 @@
                             model.submitButtonState = "error";
                             //re-map the dialog model since we've re-bound the properties
                             dialog.variants = $scope.content.variants;
-                            $exceptionHandler(err);
+                            handleHttpException(err);
                         });
 
                     },

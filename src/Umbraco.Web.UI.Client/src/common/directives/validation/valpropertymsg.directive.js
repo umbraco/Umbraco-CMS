@@ -84,24 +84,34 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
             }
 
             // return true if there is only a single error left on the property form of either valPropertyMsg or valServer
-            function shouldClearError() {
-                var errCount = 0;
+            function checkAndClearError() {
 
-                for (var e in formCtrl.$error) {
-                    if (Utilities.isArray(formCtrl.$error[e])) {
-                        errCount++;
-                    }
+                var errCount = angularHelper.countAllFormErrors(formCtrl);
+
+                if (errCount === 0) {
+                    resetError();
+                    return true;
                 }
 
-                //we are explicitly checking for valServer errors here, since we shouldn't auto clear
-                // based on other errors. We'll also check if there's no other validation errors apart from valPropertyMsg, if valPropertyMsg
-                // is the only one, then we'll clear.
+                if (errCount > 2) {
+                    return false;
+                }
 
-                if (errCount === 0
-                    || (errCount === 1 && hasExplicitError())
-                    || (formCtrl.$invalid && Utilities.isArray(formCtrl.$error.valServer))) {
-
+                var hasValServer = Utilities.isArray(formCtrl.$error.valServer);
+                if (errCount === 1 && hasValServer) {
                     return true;
+                }
+
+                var hasOwnErr = hasExplicitError();
+                if ((errCount === 1 && hasOwnErr) || (errCount === 2 && hasOwnErr && hasValServer)) {
+
+                    var propertyValidationPath = umbPropCtrl.getValidationPath();
+                    // check if we can clear it based on child server errors, if we are the only explicit one remaining we can clear ourselves
+                    if (isLastServerError(propertyValidationPath)) {
+                        serverValidationManager.removePropertyError(propertyValidationPath, currentCulture, "", currentSegment);
+                        return true;
+                    }
+                    return false;
                 }
 
                 return false;
@@ -113,14 +123,13 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
             }
 
             // returns true if there is only a single server validation error for this property validation key in it's validation path
-            function isLastServerError(propertyValidationKey) {
+            function isLastServerError(propertyValidationPath) {
                 var nestedErrs = serverValidationManager.getPropertyErrorsByValidationPath(
-                    propertyValidationKey,
+                    propertyValidationPath,
                     currentCulture,
-                    "",
                     currentSegment,
-                    true);
-                if (nestedErrs.length === 1 && nestedErrs[0].propertyAlias === propertyValidationKey) {
+                    { matchType: "prefix" });
+                if (nestedErrs.length === 0 || (nestedErrs.length === 1 && nestedErrs[0].propertyAlias === propertyValidationPath)) {
 
                     return true;
                 }
@@ -144,13 +153,7 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                                 return;
                             }
 
-                            if (shouldClearError()) {
-                                var propertyValidationKey = umbPropCtrl.getValidationPath();
-                                // check if we can clear it based on child server errors, if we are the only explicit one remaining we can clear ourselves
-                                if (isLastServerError(propertyValidationKey)) {                                
-                                    serverValidationManager.removePropertyError(propertyValidationKey, currentCulture, "", currentSegment);
-                                }
-
+                            if (checkAndClearError()) {
                                 resetError();
                             }
                             else if (showValidation && scope.errorMsg === "") {
@@ -170,10 +173,11 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
             }
 
             function resetError() {
+                stopWatch();
                 hasError = false;
                 formCtrl.$setValidity('valPropertyMsg', true, formCtrl);
                 scope.errorMsg = "";
-                stopWatch();
+                
             }
 
             function checkValidationStatus() {
@@ -270,7 +274,7 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                             hasError = !isValid;
                             if (hasError) {
                                 //set the error message to the server message
-                                scope.errorMsg = propertyErrors.length > 0 ? labels.propertyHasErrors : propertyErrors[0].errorMsg || labels.propertyHasErrors;
+                                scope.errorMsg = propertyErrors.length > 1 ? labels.propertyHasErrors : propertyErrors[0].errorMsg || labels.propertyHasErrors;
                                 //flag that the current validator is invalid
                                 formCtrl.$setValidity('valPropertyMsg', false, formCtrl);
                                 startWatch();
