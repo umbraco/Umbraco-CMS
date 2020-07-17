@@ -18,49 +18,10 @@
                     <div class="__plus" ng-style="{'left':inlineCreateButtonCtrl.plusPosX}">+</div>
                 </button>
 
-                <div class="umb-block-list__block" ng-class="{'--active':layout.$block.active}">
-
-                    <umb-block-list-scoped-block
-                        ng-if="layout.$block.config.stylesheet"
-                        class="umb-block-list__block--content blockelement__draggable-element"
-                        view="{{layout.$block.view}}"
-                        stylesheet="/{{::layout.$block.config.stylesheet}}"
-                        api="vm.blockEditorApi"
-                        block="layout.$block"
-                        index="$index">
-                    </umb-block-list-scoped-block>
-                    <umb-block-list-block
-                        ng-if="!layout.$block.config.stylesheet"
-                        class="umb-block-list__block--content"
-                        view="{{layout.$block.view}}"
-                        api="vm.blockEditorApi"
-                        block="layout.$block"
-                        index="$index">
-                    </umb-block-list-block>
-
-                    <div class="umb-block-list__block--actions">
-                        <button type="button" class="btn-reset umb-outline action --settings" localize="title" title="actions_editSettings"
-                                ng-click="vm.blockEditorApi.openSettingsForBlock(layout.$block, $index);"
-                                ng-if="layout.$block.showSettings === true">
-                            <i class="icon icon-settings" aria-hidden="true"></i>
-                            <span class="sr-only">
-                                <localize key="general_settings">Settings</localize>
-                            </span>
-                        </button>
-                        <button type="button" class="btn-reset umb-outline action --copy" localize="title" title="actions_copy" ng-click="vm.blockEditorApi.copyBlock(layout.$block);" ng-if="layout.$block.showCopy === true">
-                            <i class="icon icon-documents" aria-hidden="true"></i>
-                            <span class="sr-only">
-                                <localize key="general_copy">Copy</localize>
-                            </span>
-                        </button>
-                        <button type="button" class="btn-reset umb-outline action --delete" localize="title" title="actions_delete" ng-click="vm.blockEditorApi.requestDeleteBlock(layout.$block);">
-                            <i class="icon icon-trash" aria-hidden="true"></i>
-                            <span class="sr-only">
-                                <localize key="general_delete">Delete</localize>
-                            </span>
-                        </button>
-                    </div>
-                </div>
+                <umb-block-list-row block-editor-api="vm.blockEditorApi"
+                                    layout="layout"
+                                    index="$index">
+                </umb-block-list-row>
 
             </div>
         </div>

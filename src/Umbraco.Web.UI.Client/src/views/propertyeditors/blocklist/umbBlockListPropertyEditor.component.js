@@ -17,10 +17,10 @@
             controller: BlockListController,
             controllerAs: "vm",
             bindings: {
-                model: "=",
-                propertyForm: "="
+                model: "="
             },
             require: {
+                propertyForm: "^form",
                 umbProperty: "?^umbProperty",
                 umbVariantContent: '?^^umbVariantContent',
                 umbVariantContentEditors: '?^^umbVariantContentEditors',
@@ -28,7 +28,7 @@
             }
         });
 
-    function BlockListController($scope, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager) {
+    function BlockListController($scope, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper) {
         
         var unsubscribe = [];
         var modelObject;
@@ -64,6 +64,16 @@
         });
 
         vm.$onInit = function() {
+
+            if (!vm.umbVariantContent) {
+                // not found, then fallback to searching the scope chain, this may be needed when DOM inheritance isn't maintained but scope
+                // inheritance is (i.e.infinite editing)
+                var found = angularHelper.traverseScopeChain($scope, s => s && s.vm && s.vm.constructor.name === "umbVariantContentController");
+                vm.umbVariantContent = found ? found.vm : null;
+                if (!vm.umbVariantContent) {
+                    throw "Could not find umbVariantContent in the $scope chain";
+                }
+            }
 
             // set the onValueChanged callback, this will tell us if the block list model changed on the server
             // once the data is submitted. If so we need to re-initialize
@@ -258,7 +268,7 @@
             blockObject.active = true;
         }
 
-        function editBlock(blockObject, openSettings, blockIndex) {
+        function editBlock(blockObject, openSettings, blockIndex, parentForm) {
 
             // this must be set
             if (blockIndex === undefined) {
@@ -289,6 +299,7 @@
             
             var blockEditorModel = {
                 $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
+                $parentForm: parentForm || vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
                 hideContent: blockObject.hideContentInOverlay,
                 openSettings: openSettings === true,
                 liveEditing: liveEditing,
@@ -345,6 +356,8 @@
 
             var amountOfAvailableTypes = vm.availableBlockTypes.length;
             var blockPickerModel = {
+                $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
+                $parentForm: vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
                 availableItems: vm.availableBlockTypes,
                 title: vm.labels.grid_addElement,
                 orderBy: "$index",
@@ -378,7 +391,7 @@
                             if (inlineEditing === true) {
                                 activateBlock(vm.layout[createIndex].$block);
                             } else if (inlineEditing === false && vm.layout[createIndex].$block.hideContentInOverlay !== true) {
-                                editBlock(vm.layout[createIndex].$block, false, createIndex);
+                                editBlock(vm.layout[createIndex].$block, false, createIndex, blockPickerModel.$parentForm);
                             }
                         }
                     }
@@ -521,6 +534,7 @@
             });
         }
 
+        // TODO: We'll need to pass in a parentForm here too
         function openSettingsForBlock(block, blockIndex) {
             editBlock(block, true, blockIndex);
         }

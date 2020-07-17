@@ -280,7 +280,7 @@ Opens an overlay to show a custom YSOD. </br>
                                 templateScope.model = scope.model;
                                 element.html(response.data);
                                 element.show();
-                                $compile(element.contents())(templateScope);
+                                $compile(element)(templateScope);
                             });
                     }
                 }

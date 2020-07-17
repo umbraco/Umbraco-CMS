@@ -137,7 +137,7 @@
     // This directive allows for us to run a custom $compile for the view within the repeater which allows
     // us to maintain a $scope hierarchy with the rendered view based on the $scope that initiated the 
     // infinite editing. The retain the $scope hiearchy a special $parentScope property is passed in to the model.
-    function EditorRepeaterDirective($http, $templateCache, $compile) {
+    function EditorRepeaterDirective($http, $templateCache, $compile, angularHelper) {
         function link(scope, el, attr, ctrl) {
             
             var editor = scope && scope.$parent ? scope.$parent.model : null;
@@ -159,14 +159,24 @@
                         });
 
                         // NOTE: the 'model' name here directly affects the naming convention used in infinite editors, this why you access the model
-                        // like $scope.model.If this is changed, everything breaks.This is because we are entirely reliant upon ng - include and inheriting $scopes.
+                        // like $scope.model.If this is changed, everything breaks.This is because we are entirely reliant upon ng-include and inheriting $scopes.
                         // by default without a $parentScope used for infinite editing the 'model' propety will be set because the view creates the scopes in 
                         // ng-repeat by ng-repeat="model in editors"
                         templateScope.model = editor;
-                        
-                        element.html(response.data);
+
                         element.show();
-                        $compile(element.contents())(templateScope);
+
+                        // if a parentForm is supplied then we can link them but to do that we need to inject a top level form
+                        if (editor.$parentForm) {
+                            element.html("<ng-form name='infiniteEditorForm'>" + response.data + "</ng-form>");
+                        }
+                        
+                        $compile(element)(templateScope);
+
+                        // if a parentForm is supplied then we can link them
+                        if (editor.$parentForm) {
+                            editor.$parentForm.$addControl(templateScope.infiniteEditorForm);
+                        }
                     });
             }
 

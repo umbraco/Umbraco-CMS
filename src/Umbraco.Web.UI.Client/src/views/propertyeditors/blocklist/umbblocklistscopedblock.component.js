@@ -20,7 +20,8 @@
                 view: "@",
                 block: "=",
                 api: "<",
-                index: "<"
+                index: "<",
+                parentForm: "<"
             }
         }
     );
@@ -34,6 +35,7 @@
             $scope.block = model.block;
             $scope.api = model.api;
             $scope.index = model.index;
+            $scope.parentForm = model.parentForm;
 
             var shadowRoot = $element[0].attachShadow({mode:'open'});
             shadowRoot.innerHTML = `
