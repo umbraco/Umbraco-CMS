@@ -5,35 +5,63 @@
      * @ngdoc directive
      * @name umbraco.directives.directive:umbBlockListBlock
      * @description
-     * The component for a style-inheriting block of the block list property editor.
+     * The component to render the view for a block. 
+     * If a stylesheet is used then this uses a ShadowDom to make a scoped element.
+     * This way the backoffice styling does not collide with the block style.
      */
     
     angular
         .module("umbraco")
         .component("umbBlockListBlock", {
-            template: '<div ng-include="model.view"></div>',
             controller: BlockListBlockController,
             controllerAs: "model",
             bindings: {
+                stylesheet: "@",
                 view: "@",
                 block: "=",
                 api: "<",
                 index: "<",
                 parentForm: "<"
+            },
+            require: {
+                valFormManager: "^^valFormManager"
             }
         }
     );
 
-    function BlockListBlockController($scope) {
+    function BlockListBlockController($scope, $compile, $element) {
         var model = this;
+
         model.$onInit = function () {
-            // Ugh, due to the way we work with angularjs and property editors not being components and needing to use ng-include,
-            // it means we need to expose things directly on the $scope so they can use them.            
+            // This is ugly and is only necessary because we are not using components and instead 
+            // relying on ng-include. It is definitely possible to compile the contents
+            // of the view into the DOM using $templateCache and $http instead of using 
+            // ng - include which means that the controllerAs flows directly to the view. 
+            // This would mean that any custom components would need to be updated instead of relying on $scope. 
+            // Guess we'll leave it for now but means all things need to be copied to the $scope and then all 
+            // primitives need to be watched.
 
             $scope.block = model.block;
             $scope.api = model.api;
             $scope.index = model.index;
             $scope.parentForm = model.parentForm;
+            $scope.valFormManager = model.valFormManager;
+
+            if (model.stylesheet) {
+                // TODO: Not sure why this needs a prefixed /? this means it will never work in a virtual directory
+                model.stylesheet = "/" + model.stylesheet;
+                var shadowRoot = $element[0].attachShadow({ mode: 'open' });
+                shadowRoot.innerHTML = `
+                    <style>
+                    @import "${model.stylesheet}"
+                    </style>
+                    <div ng-include="'${model.view}'"></div>
+                `;
+                $compile(shadowRoot)($scope);
+            }
+            else {
+                $element.append($compile('<div ng-include="model.view"></div>')($scope)); 
+            }
         };
 
         // We need to watch for changes on primitive types and upate the $scope values.

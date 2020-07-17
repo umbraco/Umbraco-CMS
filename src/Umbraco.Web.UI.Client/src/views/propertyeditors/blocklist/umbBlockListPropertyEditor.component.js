@@ -198,7 +198,8 @@
                     });
                 });
             }
-            
+
+            // TODO: Why is there a '/' prefixed? that means this will never work with virtual directories
             block.view = (block.config.view ? "/" + block.config.view : getDefaultViewForBlock(block));
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;

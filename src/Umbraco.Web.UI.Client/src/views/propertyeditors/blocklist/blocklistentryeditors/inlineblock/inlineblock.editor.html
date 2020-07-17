@@ -1,6 +1,6 @@
 <div class="blockelement-inlineblock-editor"
         ng-controller="Umbraco.PropertyEditors.BlockEditor.InlineBlockEditor as vm"
-        ng-class="{ '--error': blockRowForm.$invalid }">
+        ng-class="{ '--error': parentForm.$invalid && valFormManager.isShowingValidation() }">
     <button type="button" class="btn-reset umb-outline blockelement__draggable-element"
             ng-click="vm.openBlock(block)"
             ng-focus="block.focus">

@@ -42,7 +42,7 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
             }));
         };
 
-        this.showValidation = $scope.showValidation === true;
+        this.isShowingValidation = () => $scope.showValidation === true;
 
         this.notify = function () {
             notify($scope);
@@ -136,7 +136,7 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
             var isSavingNewItem = false;
 
             //we should show validation if there are any msgs in the server validation collection
-            if (serverValidationManager.items.length > 0 || (parentFormMgr && parentFormMgr.showValidation)) {
+            if (serverValidationManager.items.length > 0 || (parentFormMgr && parentFormMgr.isShowingValidation())) {
                 element.addClass(SHOW_VALIDATION_CLASS_NAME);
                 scope.showValidation = true;
                 notifySubView();

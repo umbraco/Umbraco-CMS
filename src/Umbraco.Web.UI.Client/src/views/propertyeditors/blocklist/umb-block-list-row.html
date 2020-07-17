@@ -1,16 +1,7 @@
 <ng-form name="vm.blockRowForm" val-server-match="{ 'contains' : vm.layout.$block.content.key }">
     <div class="umb-block-list__block" ng-class="{'--active':vm.layout.$block.active}">
 
-        <umb-block-list-scoped-block ng-if="vm.layout.$block.config.stylesheet"
-                                     class="umb-block-list__block--content blockelement__draggable-element"
-                                     view="{{vm.layout.$block.view}}"
-                                     stylesheet="/{{::vm.layout.$block.config.stylesheet}}"
-                                     api="vm.blockEditorApi"
-                                     block="vm.layout.$block"
-                                     index="vm.index"
-                                     parent-form="vm.blockRowForm">
-        </umb-block-list-scoped-block>
-        <umb-block-list-block ng-if="!vm.layout.$block.config.stylesheet"
+        <umb-block-list-block stylesheet="{{::vm.layout.$block.config.stylesheet}}"
                               class="umb-block-list__block--content"
                               view="{{vm.layout.$block.view}}"
                               api="vm.blockEditorApi"
