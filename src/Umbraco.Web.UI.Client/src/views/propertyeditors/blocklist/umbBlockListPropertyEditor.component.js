@@ -64,7 +64,6 @@
         });
 
         vm.$onInit = function() {
-
             if (!vm.umbVariantContent) {
                 // not found, then fallback to searching the scope chain, this may be needed when DOM inheritance isn't maintained but scope
                 // inheritance is (i.e.infinite editing)
