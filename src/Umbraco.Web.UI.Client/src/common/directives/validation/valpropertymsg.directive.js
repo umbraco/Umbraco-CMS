@@ -171,6 +171,7 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
             // we find all ngModel controls recursively on this form (but stop recursing before we get to the next)
             // umbProperty form). Then for each ngModelController we assign a new $validator. This $validator 
             // will execute whenever the value is changed which allows us to check and reset the server validator
+            // TODO: Is this even needed?
             function startWatch() {
                 if (!watcher) {
 
