@@ -12,6 +12,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         void ClearSchedule(DateTime date);
 
+        void ClearSchedule(DateTime date, ContentScheduleAction action);
+
+        bool HasContentForExpiration(DateTime date);
+        bool HasContentForRelease(DateTime date);
+
         /// <summary>
         /// Gets <see cref="IContent"/> objects having an expiration date before (lower than, or equal to) a specified date.
         /// </summary>
