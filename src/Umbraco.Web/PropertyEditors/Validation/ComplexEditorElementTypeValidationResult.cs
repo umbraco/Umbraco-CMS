@@ -18,8 +18,20 @@ namespace Umbraco.Web.PropertyEditors.Validation
 
         public IList<ComplexEditorPropertyTypeValidationResult> ValidationResults { get; } = new List<ComplexEditorPropertyTypeValidationResult>();
 
-        // TODO: We don't use this anywhere, though it's nice for debugging
+        /// <summary>
+        /// The element type alias of the validation result
+        /// </summary>
+        /// <remarks>
+        /// This is useful for debugging purposes but it's not actively used in the angular app
+        /// </remarks>
         public string ElementTypeAlias { get; }
+
+        /// <summary>
+        /// The Block ID of the validation result
+        /// </summary>
+        /// <remarks>
+        /// This is the GUID id of the content item based on the element type
+        /// </remarks>
         public Guid BlockId { get; }
     }
 }

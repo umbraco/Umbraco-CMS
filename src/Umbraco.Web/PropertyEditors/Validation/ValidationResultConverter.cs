@@ -71,7 +71,7 @@ namespace Umbraco.Web.PropertyEditors.Validation
                 {
                     { "$id", elementTypeValidationResult.BlockId },
 
-                    // TODO: We don't use this anywhere, though it's nice for debugging
+                    // We don't use this anywhere, though it's nice for debugging
                     { "$elementTypeAlias", elementTypeValidationResult.ElementTypeAlias }
                 };
 
