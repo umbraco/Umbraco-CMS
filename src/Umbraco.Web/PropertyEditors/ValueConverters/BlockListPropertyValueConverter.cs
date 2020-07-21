@@ -51,7 +51,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             {
                 var configuration = propertyType.DataType.ConfigurationAs<BlockListConfiguration>();
                 var contentTypes = configuration.Blocks;
-                var contentTypeMap = contentTypes.ToDictionary(x => x.Key);
+                var contentElementTypeMap = contentTypes.ToDictionary(x => x.ContentElementTypeKey);
 
                 var contentPublishedElements = new Dictionary<Guid, IPublishedElement>();
                 var settingsPublishedElements = new Dictionary<Guid, IPublishedElement>();
@@ -100,12 +100,19 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     if (!contentData.ContentType.TryGetKey(out var contentTypeKey))
                         throw new InvalidOperationException("The content type was not of type " + typeof(IPublishedContentType2));
 
-                    if (!contentTypeMap.TryGetValue(contentTypeKey, out var blockConfig))
+                    if (!contentElementTypeMap.TryGetValue(contentTypeKey, out var blockConfig))
                         continue;
 
                     // this can happen if they have a settings type, save content, remove the settings type, and display the front-end page before saving the content again
-                    if (settingsData != null && string.IsNullOrWhiteSpace(blockConfig.SettingsElementTypeKey))
-                        settingsData = null;
+                    // we also ensure that the content type's match since maybe the settings type has been changed after this has been persisted.
+                    if (settingsData != null)
+                    {
+                        if (!settingsData.ContentType.TryGetKey(out var settingsElementTypeKey))
+                            throw new InvalidOperationException("The settings element type was not of type " + typeof(IPublishedContentType2));
+
+                        if (!blockConfig.SettingsElementTypeKey.HasValue || settingsElementTypeKey != blockConfig.SettingsElementTypeKey)
+                            settingsData = null;
+                    }
 
                     var layoutRef = new BlockListLayoutReference(contentGuidUdi, contentData, settingGuidUdi, settingsData);
                     layout.Add(layoutRef);

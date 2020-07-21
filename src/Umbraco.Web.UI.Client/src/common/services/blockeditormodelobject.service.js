@@ -710,6 +710,7 @@
             },
 
             // private
+            // TODO: Then this can just be a method in the outer scope
             _createSettingsEntry: function(elementTypeKey) {
                 var settings = {
                     contentTypeKey: elementTypeKey,
@@ -718,7 +719,9 @@
                 this.value.settingsData.push(settings);
                 return settings.udi;
             },
+
             // private
+            // TODO: Then this can just be a method in the outer scope
             _getSettingsByUdi: function(udi) {
                 return this.value.settingsData.find(entry => entry.udi === udi) || null;
             },

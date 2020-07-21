@@ -27,11 +27,12 @@ namespace Umbraco.Web.PropertyEditors
             [JsonProperty("thumbnail")]
             public string Thumbnail { get; set; }
 
+            // TODO: This is named inconsistently in JS but renaming it needs to be done in quite a lot of places, this should be contentElementTypeKey
             [JsonProperty("contentTypeKey")]
-            public Guid Key { get; set; }
+            public Guid ContentElementTypeKey { get; set; }
 
             [JsonProperty("settingsElementTypeKey")]
-            public string SettingsElementTypeKey { get; set; }
+            public Guid? SettingsElementTypeKey { get; set; }
 
             [JsonProperty("view")]
             public string View { get; set; }
