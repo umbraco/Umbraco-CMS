@@ -278,7 +278,7 @@ data: []}";
             Assert.AreEqual(1, converted.Layout.Count());
             var layout0 = converted.Layout.ElementAt(0);
             Assert.IsNull(layout0.Settings);
-            Assert.AreEqual(Udi.Parse("umb://element/1304E1DDAC87439684FE8A399231CB3D"), layout0.Udi);
+            Assert.AreEqual(Udi.Parse("umb://element/1304E1DDAC87439684FE8A399231CB3D"), layout0.ContentUdi);
         }
 
         [Test]
@@ -326,12 +326,12 @@ data: []}";
             Assert.AreEqual(2, converted.Layout.Count());
 
             var item0 = converted.Layout.ElementAt(0);
-            Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Data.Key);
-            Assert.AreEqual("Test1", item0.Data.ContentType.Alias);
+            Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Content.Key);
+            Assert.AreEqual("Test1", item0.Content.ContentType.Alias);
 
             var item1 = converted.Layout.ElementAt(1);
-            Assert.AreEqual(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A"), item1.Data.Key);
-            Assert.AreEqual("Test2", item1.Data.ContentType.Alias);
+            Assert.AreEqual(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A"), item1.Content.Key);
+            Assert.AreEqual("Test2", item1.Content.ContentType.Alias);
 
         }
 

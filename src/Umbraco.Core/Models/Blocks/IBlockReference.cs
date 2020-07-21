@@ -8,6 +8,6 @@
     /// </remarks>
     public interface IBlockReference
     {
-        Udi Udi { get; }
+        Udi ContentUdi { get; }
     }
 }
