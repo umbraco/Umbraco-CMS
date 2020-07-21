@@ -145,7 +145,7 @@
         });
 
         
-        it('getBlockObject syncs primative values', function (done) {
+        it('getBlockObject syncs primitive values', function (done) {
 
             var propertyModel = angular.copy(propertyModelMock);
 

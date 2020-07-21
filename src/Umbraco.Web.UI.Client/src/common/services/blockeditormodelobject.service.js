@@ -129,9 +129,9 @@
                     var prop = tab.properties[p];
 
                     // Watch value of property since this is the only value we want to keep synced.
-                    // Do notice that it is not performing a deep watch, meaning that we are only watching primatives and changes directly to the object of property-value.
-                    // But we like to sync non-primative values as well! Yes, and this does happen, just not through this code, but through the nature of JavaScript. 
-                    // Non-primative values act as references to the same data and are therefor synced.
+                    // Do notice that it is not performing a deep watch, meaning that we are only watching primitive and changes directly to the object of property-value.
+                    // But we like to sync non-primitive values as well! Yes, and this does happen, just not through this code, but through the nature of JavaScript.
+                    // Non-primitive values act as references to the same data and are therefor synced.
                     blockObject.__watchers.push(isolatedScope.$watch("blockObjects._" + blockObject.key + "." + field + ".variants[0].tabs[" + t + "].properties[" + p + "].value", watcherCreator(blockObject, prop)));
                     
                     // We also like to watch our data model to be able to capture changes coming from other places.
@@ -257,12 +257,33 @@
             this.isolatedScope.blockObjects = {};
             
             this.__watchers.push(this.isolatedScope.$on("$destroy", this.destroy.bind(this)));
-
             this.__watchers.push(propertyEditorScope.$on("postFormSubmitting", this.sync.bind(this)));
 
         };
         
         BlockEditorModelObject.prototype = {
+
+            update: function (propertyModelValue, propertyEditorScope) {
+                // clear watchers
+                this.__watchers.forEach(w => { w(); });                
+                delete this.__watchers;
+
+                // clear block objects
+                for (const key in this.isolatedScope.blockObjects) {
+                    this.destroyBlockObject(this.isolatedScope.blockObjects[key]);
+                }
+                this.isolatedScope.blockObjects = {};
+
+                // update our values
+                this.value = propertyModelValue;
+                this.value.layout = this.value.layout || {};
+                this.value.data = this.value.data || [];
+
+                // re-create the watchers
+                this.__watchers = [];
+                this.__watchers.push(this.isolatedScope.$on("$destroy", this.destroy.bind(this)));
+                this.__watchers.push(propertyEditorScope.$on("postFormSubmitting", this.sync.bind(this)));
+            },
 
             /**
              * @ngdoc method
@@ -280,8 +301,8 @@
              * @ngdoc method
              * @name load
              * @methodOf umbraco.services.blockEditorModelObject
-             * @description Load the scaffolding models for the given configuration, these are needed to provide usefull models for each block.
-             * @param {Object} blockObject BlockObject to recive data values from.
+             * @description Load the scaffolding models for the given configuration, these are needed to provide useful models for each block.
+             * @param {Object} blockObject BlockObject to receive data values from.
              * @returns {Promise} A Promise object which resolves when all scaffold models are loaded.
              */
             load: function() {
@@ -296,7 +317,7 @@
                     }
                 });
 
-                // removing dublicates.
+                // removing duplicates.
                 scaffoldKeys = scaffoldKeys.filter((value, index, self) => self.indexOf(value) === index);
 
                 scaffoldKeys.forEach((contentTypeKey => {
@@ -376,7 +397,7 @@
              * @name getBlockObject
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Retrieve a Block Object for the given layout entry.
-             * The Block Object offers the nesecary data to display and edit a block.
+             * The Block Object offers the necessary data to display and edit a block.
              * The Block Object setups live syncronization of content and settings models back to the data of your Property Editor model.
              * The returned object, named ´BlockObject´, contains several usefull models to make editing of this block happen.
              * The ´BlockObject´ contains the following properties:
@@ -449,6 +470,8 @@
                 // make basics from scaffold
                 blockObject.content = Utilities.copy(contentScaffold);
                 blockObject.content.udi = udi;
+                // Change the content.key to the GUID part of the udi, else it's just random which we don't want, it should be consistent
+                blockObject.content.key = udiService.getKey(udi);
 
                 mapToElementModel(blockObject.content, dataModel);
 
@@ -482,7 +505,7 @@
                     }
                 }
 
-                blockObject.retriveValuesFrom = function(content, settings) {
+                blockObject.retrieveValuesFrom = function(content, settings) {
                     if (this.content !== null) {
                         mapElementValues(content, this.content);
                     }
@@ -492,7 +515,7 @@
                 }
 
 
-                blockObject.sync = function() {
+                blockObject.sync = function () {
                     if (this.content !== null) {
                         mapToPropertyModel(this.content, this.data);
                     }
@@ -509,13 +532,14 @@
                 addWatchers(blockObject, this.isolatedScope);
                 addWatchers(blockObject, this.isolatedScope, true);
 
-                blockObject.destroy = function() {
+                blockObject.destroy = function () {
                     // remove property value watchers:
                     this.__watchers.forEach(w => { w(); });
                     delete this.__watchers;
 
                     // help carbage collector:
                     delete this.config;
+
                     delete this.layout;
                     delete this.data;
                     delete this.settingsData;
@@ -524,9 +548,12 @@
                     
                     // remove model from isolatedScope.
                     delete this.__scope.blockObjects["_" + this.key];
+                    // NOTE: It seems like we should call this.__scope.$destroy(); since that is the only way to remove a scope from it's parent, 
+                    // however that is not the case since __scope is actually this.isolatedScope which gets cleaned up when the outer scope is
+                    // destroyed. If we do that here it breaks the scope chain and validation.
                     delete this.__scope;
 
-                    // removes this method, making it unposible to destroy again.
+                    // removes this method, making it impossible to destroy again.
                     delete this.destroy;
                     
                     // lets remove the key to make things blow up if this is still referenced:
@@ -639,8 +666,6 @@
 
             },
 
-
-
             /**
              * @ngdoc method
              * @name sync
@@ -654,6 +679,7 @@
             },
 
             // private
+            // TODO: Then this can just be a method in the outer scope
             _createDataEntry: function(elementTypeKey) {
                 var content = {
                     contentTypeKey: elementTypeKey,
@@ -663,6 +689,7 @@
                 return content.udi;
             },
             // private
+            // TODO: Then this can just be a method in the outer scope
             _getDataByUdi: function(udi) {
                 return this.value.contentData.find(entry => entry.udi === udi) || null;
             },

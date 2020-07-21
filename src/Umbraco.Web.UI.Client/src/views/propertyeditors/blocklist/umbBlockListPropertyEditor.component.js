@@ -17,10 +17,10 @@
             controller: BlockListController,
             controllerAs: "vm",
             bindings: {
-                model: "=",
-                propertyForm: "="
+                model: "="
             },
             require: {
+                propertyForm: "^form",
                 umbProperty: "?^umbProperty",
                 umbVariantContent: '?^^umbVariantContent',
                 umbVariantContentEditors: '?^^umbVariantContentEditors',
@@ -28,7 +28,7 @@
             }
         });
 
-    function BlockListController($scope, editorService, clipboardService, localizationService, overlayService, blockEditorService) {
+    function BlockListController($scope, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper) {
         
         var unsubscribe = [];
         var modelObject;
@@ -53,8 +53,8 @@
         }
         vm.supportCopy = clipboardService.isSupported();
 
-        vm.layout = [];// The layout object specific to this Block Editor, will be a direct reference from Property Model.
-        vm.availableBlockTypes = [];// Available block entries of this property editor.
+        vm.layout = []; // The layout object specific to this Block Editor, will be a direct reference from Property Model.
+        vm.availableBlockTypes = []; // Available block entries of this property editor.
 
         var labels = {};
         vm.labels = labels;
@@ -63,11 +63,20 @@
             labels.content_createEmpty = data[1];
         });
 
-
-
-
-
         vm.$onInit = function() {
+            if (!vm.umbVariantContent) {
+                // not found, then fallback to searching the scope chain, this may be needed when DOM inheritance isn't maintained but scope
+                // inheritance is (i.e.infinite editing)
+                var found = angularHelper.traverseScopeChain($scope, s => s && s.vm && s.vm.constructor.name === "umbVariantContentController");
+                vm.umbVariantContent = found ? found.vm : null;
+                if (!vm.umbVariantContent) {
+                    throw "Could not find umbVariantContent in the $scope chain";
+                }
+            }
+
+            // set the onValueChanged callback, this will tell us if the block list model changed on the server
+            // once the data is submitted. If so we need to re-initialize
+            vm.model.onValueChanged = onServerValueChanged;
 
             inlineEditing = vm.model.config.useInlineEditingAsDefault;
             liveEditing = vm.model.config.useLiveEditing;
@@ -121,8 +130,12 @@
             }
         };
 
-        
-
+        // Called when we save the value, the server may return an updated data and our value is re-synced
+        // we need to deal with that here so that our model values are all in sync so we basically re-initialize.
+        function onServerValueChanged(newVal, oldVal) {            
+            modelObject.update(newVal, $scope);
+            onLoaded();
+        }
         
         function setDirty() {
             if (vm.propertyForm) {
@@ -137,7 +150,7 @@
 
             // Append the blockObjects to our layout.
             vm.layout.forEach(entry => {
-                // $block must have the data property to be a valid BlockObject, if not its concidered as a destroyed blockObject.
+                // $block must have the data property to be a valid BlockObject, if not its considered as a destroyed blockObject.
                 if (entry.$block === undefined || entry.$block === null || entry.$block.data === undefined) {
                     var block = getBlockObject(entry);
     
@@ -172,11 +185,25 @@
 
             if (block === null) return null;
 
+            // ensure that the containing content variant language/culture is transfered along
+            // to the scaffolded content object representing this block. This is required for validation 
+            // along with ensuring that the umb-property inheritance is constently maintained.            
+            if (vm.umbVariantContent.editor.content.language) {
+                block.content.language = vm.umbVariantContent.editor.content.language;
+                // currently we only ever deal with invariant content for blocks so there's only one
+                block.content.variants[0].tabs.forEach(tab => {
+                    tab.properties.forEach(prop => {
+                        prop.culture = vm.umbVariantContent.editor.content.language.culture;
+                    });
+                });
+            }
+
+            // TODO: Why is there a '/' prefixed? that means this will never work with virtual directories
             block.view = (block.config.view ? "/" + block.config.view : getDefaultViewForBlock(block));
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;
             block.showSettings = block.config.settingsElementTypeKey != null;
-            block.showCopy = vm.supportCopy && block.config.contentTypeKey != null;// if we have content, otherwise it dosnt make sense to copy.
+            block.showCopy = vm.supportCopy && block.config.contentTypeKey != null;// if we have content, otherwise it doesn't make sense to copy.
 
             return block;
         }
@@ -211,15 +238,22 @@
 
         }
 
-        
-
         function deleteBlock(block) {
 
             var layoutIndex = vm.layout.findIndex(entry => entry.udi === block.content.udi);
-            if(layoutIndex === -1) {
+            if (layoutIndex === -1) {
                 throw new Error("Could not find layout entry of block with udi: "+block.content.udi)
             }
-            vm.layout.splice(layoutIndex, 1);
+
+            setDirty();
+
+            var removed = vm.layout.splice(layoutIndex, 1);
+            removed.forEach(x => {
+                // remove any server validation errors associated
+                var guid = udiService.getKey(x.udi);                
+                serverValidationManager.removePropertyError(guid, vm.umbProperty.property.culture, vm.umbProperty.property.segment, "", { matchType: "contains" });
+            });
+
             modelObject.removeDataAndDestroyModel(block);
 
         }
@@ -234,7 +268,12 @@
             blockObject.active = true;
         }
 
-        function editBlock(blockObject, openSettings) {
+        function editBlock(blockObject, openSettings, blockIndex, parentForm) {
+
+            // this must be set
+            if (blockIndex === undefined) {
+                throw "blockIndex was not specified on call to editBlock";
+            }
 
             var wasNotActiveBefore = blockObject.active !== true;
 
@@ -259,17 +298,20 @@
             }
             
             var blockEditorModel = {
+                $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
+                $parentForm: parentForm || vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
                 hideContent: blockObject.hideContentInOverlay,
                 openSettings: openSettings === true,
                 liveEditing: liveEditing,
                 title: blockObject.label,
+                index: blockIndex,
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
                 size: blockObject.config.editorSize || "medium",
                 submit: function(blockEditorModel) {
 
                     if (liveEditing === false) {
                         // transfer values when submitting in none-liveediting mode.
-                        blockObject.retriveValuesFrom(blockEditorModel.content, blockEditorModel.settings);
+                        blockObject.retrieveValuesFrom(blockEditorModel.content, blockEditorModel.settings);
                     }
 
                     blockObject.active = false;
@@ -279,7 +321,7 @@
 
                     if (liveEditing === true) {
                         // revert values when closing in liveediting mode.
-                        blockObject.retriveValuesFrom(blockContentClone, blockSettingsClone);
+                        blockObject.retrieveValuesFrom(blockContentClone, blockSettingsClone);
                     }
 
                     if (wasNotActiveBefore === true) {
@@ -314,6 +356,8 @@
 
             var amountOfAvailableTypes = vm.availableBlockTypes.length;
             var blockPickerModel = {
+                $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
+                $parentForm: vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
                 availableItems: vm.availableBlockTypes,
                 title: vm.labels.grid_addElement,
                 orderBy: "$index",
@@ -347,7 +391,7 @@
                             if (inlineEditing === true) {
                                 activateBlock(vm.layout[createIndex].$block);
                             } else if (inlineEditing === false && vm.layout[createIndex].$block.hideContentInOverlay !== true) {
-                                editBlock(vm.layout[createIndex].$block);
+                                editBlock(vm.layout[createIndex].$block, false, createIndex, blockPickerModel.$parentForm);
                             }
                         }
                     }
@@ -490,11 +534,10 @@
             });
         }
 
-        function openSettingsForBlock(block) {
-            editBlock(block, true);
+        // TODO: We'll need to pass in a parentForm here too
+        function openSettingsForBlock(block, blockIndex) {
+            editBlock(block, true, blockIndex);
         }
-
-
 
         vm.blockEditorApi = {
             activateBlock: activateBlock,
@@ -502,7 +545,7 @@
             copyBlock: copyBlock,
             requestDeleteBlock: requestDeleteBlock,
             deleteBlock: deleteBlock,
-            openSettingsForBlock: openSettingsForBlock
+            openSettingsForBlock: openSettingsForBlock 
         }
 
         vm.sortableOptions = {
