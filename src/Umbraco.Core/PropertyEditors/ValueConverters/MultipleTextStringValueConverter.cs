@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
@@ -50,6 +52,17 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 var value = sourceString.Substring(pos, npos - pos);
                 values.Add(value);
                 pos = sourceString.IndexOf("<value>", pos, StringComparison.Ordinal);
+            }
+
+            // WB: MultipleTextStringPropertyEditor stores this as JSON now - will keep XML above stuff for legacy in case?!
+            if (sourceString.DetectIsJson())
+            {
+                var json = sourceString.ConvertToJsonIfPossible();
+                if(json is JArray)
+                {
+                    var jsonArray = (JArray)json;
+                    return jsonArray.Where(x => x["value"] != null).Select(x => x["value"].Value<string>());
+                }                
             }
 
             // fall back on normal behaviour
