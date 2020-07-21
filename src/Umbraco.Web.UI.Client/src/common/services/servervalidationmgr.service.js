@@ -444,7 +444,6 @@ function serverValidationManager($timeout) {
             throw "modelState is not an object";
         }
 
-        var hasPropertyErrors = false;
         for (const [key, value] of Object.entries(modelState)) {
 
             //This is where things get interesting....
