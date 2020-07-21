@@ -53,56 +53,65 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 var contentTypes = configuration.Blocks;
                 var contentTypeMap = contentTypes.ToDictionary(x => x.Key);
 
-                var elements = new Dictionary<Guid, IPublishedElement>();
+                var contentPublishedElements = new Dictionary<Guid, IPublishedElement>();
+                var settingsPublishedElements = new Dictionary<Guid, IPublishedElement>();
 
                 var layout = new List<BlockListLayoutReference>();
-                var model = new BlockListModel(elements.Values, layout);
 
                 var value = (string)inter;
-                if (string.IsNullOrWhiteSpace(value)) return model;
+                if (string.IsNullOrWhiteSpace(value)) return BlockListModel.Empty;
 
                 var converter = new BlockListEditorDataConverter();
                 var converted = converter.Convert(value);
-                if (converted.Blocks.Count == 0) return model;
+                if (converted.ContentData.Count == 0) return BlockListModel.Empty;
 
                 var blockListLayout = converted.Layout.ToObject<IEnumerable<BlockListLayoutItem>>();
 
-                // parse the data elements
-                foreach (var data in converted.Blocks)
+                // convert the content data
+                foreach (var data in converted.ContentData)
                 {
                     var element = _blockConverter.ConvertToElement(data, referenceCacheLevel, preview);
                     if (element == null) continue;
-                    elements[element.Key] = element;
+                    contentPublishedElements[element.Key] = element;
+                }
+                // convert the settings data
+                foreach (var data in converted.SettingsData)
+                {
+                    var element = _blockConverter.ConvertToElement(data, referenceCacheLevel, preview);
+                    if (element == null) continue;
+                    settingsPublishedElements[element.Key] = element;
                 }
 
                 // if there's no elements just return since if there's no data it doesn't matter what is stored in layout
-                if (elements.Count == 0) return model;
+                if (contentPublishedElements.Count == 0) return BlockListModel.Empty;
 
                 foreach (var layoutItem in blockListLayout)
                 {
-                    // the result of this can be null, that's ok
-                    var element = layoutItem.Settings != null ? _blockConverter.ConvertToElement(layoutItem.Settings, referenceCacheLevel, preview) : null;
-
-                    var guidUdi = (GuidUdi)layoutItem.Udi;
-
-                    // get the data reference
-                    if (!elements.TryGetValue(guidUdi.Guid, out var data))
+                    // get the content reference
+                    var contentGuidUdi = (GuidUdi)layoutItem.ContentUdi;                    
+                    if (!contentPublishedElements.TryGetValue(contentGuidUdi.Guid, out var contentData))
                         continue;
 
-                    if (!data.ContentType.TryGetKey(out var contentTypeKey))
+                    // get the setting reference
+                    IPublishedElement settingsData = null;
+                    var settingGuidUdi = layoutItem.SettingsUdi != null ? (GuidUdi)layoutItem.SettingsUdi : null;
+                    if (settingGuidUdi != null) settingsPublishedElements.TryGetValue(settingGuidUdi.Guid, out settingsData);
+
+                    if (!contentData.ContentType.TryGetKey(out var contentTypeKey))
                         throw new InvalidOperationException("The content type was not of type " + typeof(IPublishedContentType2));
 
                     if (!contentTypeMap.TryGetValue(contentTypeKey, out var blockConfig))
                         continue;
 
                     // this can happen if they have a settings type, save content, remove the settings type, and display the front-end page before saving the content again
-                    if (element != null && string.IsNullOrWhiteSpace(blockConfig.SettingsElementTypeKey))
-                        element = null;
+                    if (settingsData != null && string.IsNullOrWhiteSpace(blockConfig.SettingsElementTypeKey))
+                        settingsData = null;
 
-                    var layoutRef = new BlockListLayoutReference(layoutItem.Udi, data, element);
+                    var layoutRef = new BlockListLayoutReference(contentGuidUdi, contentData, settingGuidUdi, settingsData);
                     layout.Add(layoutRef);
                 }
 
+                var model = new BlockListModel(contentPublishedElements.Values, settingsPublishedElements.Values, layout);
                 return model;
             }
         }

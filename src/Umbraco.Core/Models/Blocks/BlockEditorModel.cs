@@ -10,9 +10,10 @@ namespace Umbraco.Core.Models.Blocks
     /// </summary>
     public abstract class BlockEditorModel
     {
-        protected BlockEditorModel(IEnumerable<IPublishedElement> data)
+        protected BlockEditorModel(IEnumerable<IPublishedElement> contentData, IEnumerable<IPublishedElement> settingsData)
         {
-            Data = data ?? throw new ArgumentNullException(nameof(data));
+            ContentData = contentData ?? throw new ArgumentNullException(nameof(contentData));
+            SettingsData = settingsData ?? new List<IPublishedContent>();
         }
 
         public BlockEditorModel()
@@ -21,9 +22,15 @@ namespace Umbraco.Core.Models.Blocks
 
 
         /// <summary>
-        /// The data items of the Block List editor
+        /// The content data items of the Block List editor
         /// </summary>
-        [DataMember(Name = "data")]
-        public IEnumerable<IPublishedElement> Data { get; set; }
+        [DataMember(Name = "contentData")]
+        public IEnumerable<IPublishedElement> ContentData { get; set; } = new List<IPublishedContent>();
+
+        /// <summary>
+        /// The settings data items of the Block List editor
+        /// </summary>
+        [DataMember(Name = "settingsData")]
+        public IEnumerable<IPublishedElement> SettingsData { get; set; } = new List<IPublishedContent>();
     }
 }

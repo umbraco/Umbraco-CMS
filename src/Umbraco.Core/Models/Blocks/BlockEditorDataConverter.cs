@@ -31,8 +31,10 @@ namespace Umbraco.Core.Models.Blocks
                 return BlockEditorData.Empty;
 
             var references = GetBlockReferences(layout);
-            var blocks = value.Data.ToList();
-            return new BlockEditorData(layout, references, blocks);
+            var contentData = value.ContentData.ToList();
+            var settingsData = value.SettingsData.ToList();
+
+            return new BlockEditorData(layout, references, contentData, settingsData);
         }
 
         /// <summary>
@@ -40,7 +42,7 @@ namespace Umbraco.Core.Models.Blocks
         /// </summary>
         /// <param name="jsonLayout"></param>
         /// <returns></returns>
-        protected abstract IReadOnlyList<Udi> GetBlockReferences(JToken jsonLayout);
+        protected abstract IReadOnlyList<ContentAndSettingsReference> GetBlockReferences(JToken jsonLayout);
 
     }
 }

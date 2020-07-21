@@ -18,24 +18,32 @@ namespace Umbraco.Core.Models.Blocks
         {
         }
 
-        public BlockEditorData(JToken layout, IReadOnlyList<Udi> layoutBlockReferences, IReadOnlyList<BlockItemData> blocks)
+        public BlockEditorData(JToken layout,
+            IReadOnlyList<ContentAndSettingsReference> references,
+            IReadOnlyList<BlockItemData> contentData,
+            IReadOnlyList<BlockItemData> settingsData)
         {
             Layout = layout ?? throw new ArgumentNullException(nameof(layout));
-            LayoutBlockReferences = layoutBlockReferences ?? throw new ArgumentNullException(nameof(layoutBlockReferences));
-            Blocks = blocks ?? throw new ArgumentNullException(nameof(blocks));
+            References = references ?? throw new ArgumentNullException(nameof(references));
+            ContentData = contentData ?? throw new ArgumentNullException(nameof(contentData));
+            SettingsData = settingsData ?? throw new ArgumentNullException(nameof(settingsData));
         }
 
         public JToken Layout { get; }
-        public IReadOnlyList<Udi> LayoutBlockReferences { get; } = new List<Udi>();
-        public IReadOnlyList<BlockItemData> Blocks { get; } = new List<BlockItemData>();
+        public IReadOnlyList<ContentAndSettingsReference> References { get; } = new List<ContentAndSettingsReference>();
+        public IReadOnlyList<BlockItemData> ContentData { get; } = new List<BlockItemData>();        
+        public IReadOnlyList<BlockItemData> SettingsData { get; } = new List<BlockItemData>();
 
         internal class BlockValue
         {
             [JsonProperty("layout")]
             public IDictionary<string, JToken> Layout { get; set; }
 
-            [JsonProperty("data")]
-            public IEnumerable<BlockItemData> Data { get; set; }
+            [JsonProperty("contentData")]
+            public IEnumerable<BlockItemData> ContentData { get; set; } = new List<BlockItemData>();
+
+            [JsonProperty("settingsData")]
+            public IEnumerable<BlockItemData> SettingsData { get; set; } = new List<BlockItemData>();
         }
 
         /// <summary>

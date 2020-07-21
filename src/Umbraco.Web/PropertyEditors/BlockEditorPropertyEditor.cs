@@ -133,13 +133,13 @@ namespace Umbraco.Web.PropertyEditors
 
                 var converted = _dataConverter.Convert(propertyValue.ToString());
 
-                if (converted.Blocks.Count == 0)
+                if (converted.ContentData.Count == 0)
                     return new List<BlockValue>();
 
                 var contentTypePropertyTypes = new Dictionary<string, Dictionary<string, PropertyType>>();
                 var result = new List<BlockValue>();
 
-                foreach(var block in converted.Blocks)
+                foreach(var block in converted.ContentData)
                 {
                     var contentType = GetElementType(block);
                     if (contentType == null)

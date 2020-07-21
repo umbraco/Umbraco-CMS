@@ -8,7 +8,7 @@ namespace Umbraco.Core.Models.Blocks
     /// Represents a layout item for the Block List editor
     /// </summary>
     [DataContract(Name = "blockListLayout", Namespace = "")]
-    public class BlockListLayoutReference : IBlockElement<IPublishedElement>
+    public class BlockListLayoutReference : IBlockReference<IPublishedElement>
     {
         public BlockListLayoutReference(Udi contentUdi, IPublishedElement content, Udi settingsUdi, IPublishedElement settings)
         {

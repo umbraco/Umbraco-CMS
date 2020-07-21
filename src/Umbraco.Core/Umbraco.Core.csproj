@@ -136,6 +136,7 @@
     <Compile Include="Models\Blocks\BlockEditorData.cs" />
     <Compile Include="Models\Blocks\BlockListLayoutItem.cs" />
     <Compile Include="Models\Blocks\BlockListEditorDataConverter.cs" />
+    <Compile Include="Models\Blocks\ContentAndSettingsReference.cs" />
     <Compile Include="Models\Blocks\IBlockReference.cs" />
     <Compile Include="Models\ContentDataIntegrityReport.cs" />
     <Compile Include="Models\ContentDataIntegrityReportEntry.cs" />
@@ -150,7 +151,6 @@
     <Compile Include="Models\Blocks\BlockEditorModel.cs" />
     <Compile Include="Models\Blocks\BlockListLayoutReference.cs" />
     <Compile Include="Models\Blocks\BlockListModel.cs" />
-    <Compile Include="Models\Blocks\IBlockElement.cs" />
     <Compile Include="Models\UpgradeResult.cs" />
     <Compile Include="Persistence\Repositories\Implement\UpgradeCheckRepository.cs" />
     <Compile Include="Persistence\Repositories\IUpgradeCheckRepository.cs" />
