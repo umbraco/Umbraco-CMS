@@ -9,7 +9,7 @@
             </div>
 
             <div ng-if="notification.headline">
-                <a ng-if="notification.url" ng-href="{{notification.url}}" href="" target="_blank">
+                <a ng-if="notification.url" ng-href="{{notification.url}}" href="" target="{{notification.target}}" rel="noreferrer">
                     <strong ng-bind="notification.headline"></strong>
                     <span ng-bind-html="notification.message"></span>
                 </a>
