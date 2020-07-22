@@ -306,6 +306,10 @@ namespace umbraco
             // note that some threads could read from it while we hold the lock, though
             using (var safeXml = GetSafeXmlWriter())
             {
+                if (!safeXml.IsWriter)
+                {
+                    safeXml.UpgradeToWriter();
+                }
                 safeXml.Xml = PublishNodeDo(d, safeXml.Xml, true);
                 safeXml.AcceptChanges();
             }
