@@ -67,7 +67,7 @@
         ];
 
         // Get last selected layout for "users" (defaults to first layout = card layout)
-        vm.activeLayout = listViewHelper.getLayout("users", vm.layouts); 
+        vm.activeLayout = listViewHelper.getLayout("users", vm.layouts);
 
         // Don't show the invite button if no email is configured
         if (Umbraco.Sys.ServerVariables.umbracoSettings.showUserInvite) {
@@ -247,19 +247,19 @@
 
         function selectLayout(selectedLayout) {
             // save the selected layout for "users" so it's applied next time the user visits this section
-            vm.activeLayout = listViewHelper.setLayout("users", selectedLayout, vm.layouts); 
+            vm.activeLayout = listViewHelper.setLayout("users", selectedLayout, vm.layouts);
         }
-        
+
         function isSelectable(user) {
             return !user.isCurrentUser;
         }
-        
+
         function selectUser(user) {
-            
+
             if (!isSelectable(user)) {
                 return;
             }
-            
+
             if (user.selected) {
                 var index = vm.selection.indexOf(user.id);
                 vm.selection.splice(index, 1);
@@ -268,9 +268,9 @@
                 user.selected = true;
                 vm.selection.push(user.id);
             }
-            
+
             setBulkActions(vm.users);
-            
+
         }
 
         function clearSelection() {
@@ -279,14 +279,14 @@
             });
             vm.selection = [];
         }
-        
+
         function clickUser(user, $event) {
-            
+
             $event.stopPropagation();
-            
+
             if ($event) {
                 // targeting a new tab/window?
-                if ($event.ctrlKey || 
+                if ($event.ctrlKey ||
                     $event.shiftKey ||
                     $event.metaKey || // apple
                     ($event.button && $event.button === 1) // middle click, >IE9 + everyone else
@@ -295,7 +295,7 @@
                     return;
                 }
             }
-            
+
             goToUser(user);
             $event.preventDefault();
 
@@ -398,7 +398,7 @@
 
         function openUserGroupPicker() {
             var currentSelection = [];
-            angular.copy(vm.newUser.userGroups, currentSelection);
+            Utilities.copy(vm.newUser.userGroups, currentSelection);
             var userGroupPicker = {
                 selection: currentSelection,
                 submit: function (model) {
@@ -611,7 +611,7 @@
         // copy to clip board success
         function copySuccess() {
             if (vm.page.copyPasswordButtonState !== "success") {
-                $timeout(function(){
+                $timeout(function () {
                     vm.page.copyPasswordButtonState = "success";
                 });
                 $timeout(function () {
@@ -623,7 +623,7 @@
         // copy to clip board error
         function copyError() {
             if (vm.page.copyPasswordButtonState !== "error") {
-                $timeout(function() {
+                $timeout(function () {
                     vm.page.copyPasswordButtonState = "error";
                 });
                 $timeout(function () {
@@ -654,7 +654,7 @@
 
             return null;
         }
-        
+
         function getEditPath(user) {
             return pathToUser(user) + usersOptionsAsQueryString();
         }
@@ -699,7 +699,7 @@
                 vm.usersOptions.pageSize = data.pageSize;
                 vm.usersOptions.totalItems = data.totalItems;
                 vm.usersOptions.totalPages = data.totalPages;
-                
+
                 formatDates(vm.users);
                 setUserDisplayState(vm.users);
                 vm.userStatesFilter = usersHelper.getUserStatesFilter(data.userStates);
@@ -753,19 +753,19 @@
             var firstSelectedUserGroups;
 
             angular.forEach(users, function (user) {
-                
+
                 if (!user.selected) {
                     return;
                 }
-                
-                
+
+
                 // if the current user is selected prevent any bulk actions with the user included
                 if (user.isCurrentUser) {
                     vm.allowDisableUser = false;
                     vm.allowEnableUser = false;
                     vm.allowUnlockUser = false;
                     vm.allowSetUserGroup = false;
-                    
+
                     return false;
                 }
 
@@ -814,6 +814,7 @@
             vm.newUser.message = "";
             // clear button state
             vm.page.createButtonState = "init";
+            $scope.$emit("$setAccessibleHeader", true, "general_user", false, "", "", true);
         }
 
         init();

@@ -21,15 +21,15 @@
                                   on-edit="model.openViewPicker()"
                                   on-remove="model.removeMacroView()">
                 </umb-node-preview>
+
                 <input type="hidden" ng-model="mandatoryViewValidator" ng-required="!model.macro.node" />
 
-                <a href=""
-                   ng-show="!model.macro.node"
-                   class="umb-node-preview-add"
-                   ng-click="model.openViewPicker()"
-                   prevent-default>
+                <button type="button"
+                        class="umb-node-preview-add"
+                        ng-show="!model.macro.node"
+                        ng-click="model.openViewPicker()">
                     <localize key="general_add">Add</localize>
-                </a>
+                </button>
 
             </umb-control-group>
         </umb-box-content>
