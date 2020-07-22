@@ -2,17 +2,29 @@ angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridPrevalueEditor.LayoutConfigController",
     function ($scope, localizationService) {
 
+            var vm = this;
+
+            vm.labels = {};
         
             function init() {
-                setTitle();
+
+                var labelKeys = [
+                    "grid_addGridLayout",
+                    "grid_allowAllRowConfigurations"
+                ];
+
+                localizationService.localizeMany(labelKeys).then(function (data) {
+
+                    vm.labels.title = data[0];
+                    vm.labels.allowAllRowConfigurations = data[1];
+
+                    setTitle(vm.labels.title);
+                });
             }
 
-            function setTitle() {
+            function setTitle(value) {
                 if (!$scope.model.title) {
-                    localizationService.localize("grid_addGridLayout")
-                        .then(function(data){
-                            $scope.model.title = data;
-                        });
+                    $scope.model.title = value;
                 }
             }
 
@@ -56,13 +68,15 @@ angular.module("umbraco")
     		};
 
             $scope.toggleAllowed = function (section) {
+                section.allowAll = !section.allowAll;
+
                 if (section.allowed) {
                     delete section.allowed;
                 }
                 else {
                     section.allowed = [];
                 }
-            }
+            };
 
     		$scope.deleteSection = function(section, template) {
     			if ($scope.currentSection === section) {
@@ -90,13 +104,13 @@ angular.module("umbraco")
                 if ($scope.model.close) {
                     $scope.model.close();
                 }
-            }
+            };
 
             $scope.submit = function () {
                 if ($scope.model.submit) {
                     $scope.model.submit($scope.currentLayout);
                 }
-            }
+            };
 
     		$scope.$watch("currentLayout", function(layout){
     		    if(layout){
