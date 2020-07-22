@@ -167,8 +167,6 @@
             isDisabled: true
         }
 
-
-
         // helper to force the current form into the dirty state
         function setDirty() {
             if ($scope.$parent.$parent.propertyForm) {
@@ -187,17 +185,29 @@
         };
 
         vm.openNodeTypePicker = function ($event) {
-            if (vm.overlayMenu || vm.nodes.length >= vm.maxItems) {
+            
+            if (vm.nodes.length >= vm.maxItems) {
                 return;
             }
 
-            vm.overlayMenu = {
-                show: false,
-                style: {},
-                filter: vm.scaffolds.length > 12 ? true : false,
+            var availableItems = [];
+            _.each(vm.scaffolds, function (scaffold) {
+                availableItems.push({
+                    alias: scaffold.contentTypeAlias,
+                    name: scaffold.contentTypeName,
+                    icon: iconHelper.convertFromLegacyIcon(scaffold.icon),
+                    tooltip: scaffold.documentType.description
+                });
+            });
+
+            const dialog = {
+                view: "itempicker",
                 orderBy: "$index",
                 view: "itempicker",
                 event: $event,
+                filter: availableItems.length > 12,
+                size: availableItems.length > 6 ? "medium" : "small",
+                availableItems: availableItems,
                 clickPasteItem: function (item) {
                     if (item.type === "elementTypeArray") {
                         _.each(item.data, function (entry) {
@@ -206,44 +216,30 @@
                     } else {
                         pasteFromClipboard(item.data);
                     }
-                    vm.overlayMenu.show = false;
-                    vm.overlayMenu = null;
+
+                    overlayService.close();
                 },
                 submit: function (model) {
                     if (model && model.selectedItem) {
                         addNode(model.selectedItem.alias);
                     }
-                    vm.overlayMenu.show = false;
-                    vm.overlayMenu = null;
+
+                    overlayService.close();
                 },
                 close: function () {
-                    vm.overlayMenu.show = false;
-                    vm.overlayMenu = null;
+                    overlayService.close();
                 }
             };
 
-            // this could be used for future limiting on node types
-            vm.overlayMenu.availableItems = [];
-            _.each(vm.scaffolds, function (scaffold) {
-                vm.overlayMenu.availableItems.push({
-                    alias: scaffold.contentTypeAlias,
-                    name: scaffold.contentTypeName,
-                    icon: iconHelper.convertFromLegacyIcon(scaffold.icon),
-                    tooltip: scaffold.documentType.description
-                });
-            });
-
-            if (vm.overlayMenu.availableItems.length === 0) {
+            if (dialog.availableItems.length === 0) {
                 return;
             }
 
-            vm.overlayMenu.size = vm.overlayMenu.availableItems.length > 6 ? "medium" : "small";
-
-            vm.overlayMenu.pasteItems = [];
+            dialog.pasteItems = [];
 
             var singleEntriesForPaste = clipboardService.retriveEntriesOfType("elementType", contentTypeAliases);
             _.each(singleEntriesForPaste, function (entry) {
-                vm.overlayMenu.pasteItems.push({
+                dialog.pasteItems.push({
                     type: "elementType",
                     name: entry.label,
                     data: entry.data,
@@ -253,7 +249,7 @@
 
             var arrayEntriesForPaste = clipboardService.retriveEntriesOfType("elementTypeArray", contentTypeAliases);
             _.each(arrayEntriesForPaste, function (entry) {
-                vm.overlayMenu.pasteItems.push({
+                dialog.pasteItems.push({
                     type: "elementTypeArray",
                     name: entry.label,
                     data: entry.data,
@@ -261,26 +257,27 @@
                 });
             });
 
-            vm.overlayMenu.title = labels.grid_addElement;
-            vm.overlayMenu.hideHeader = vm.overlayMenu.pasteItems.length > 0;
+            dialog.title = dialog.pasteItems.length > 0 ? labels.grid_addElement : labels.content_createEmpty;
 
-            vm.overlayMenu.clickClearPaste = function ($event) {
+            dialog.clickClearPaste = function ($event) {
                 $event.stopPropagation();
                 $event.preventDefault();
                 clipboardService.clearEntriesOfType("elementType", contentTypeAliases);
                 clipboardService.clearEntriesOfType("elementTypeArray", contentTypeAliases);
-                vm.overlayMenu.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
-                vm.overlayMenu.hideHeader = false;
+                dialog.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
+                dialog.overlayMenu.hideHeader = false;
             };
 
-            if (vm.overlayMenu.availableItems.length === 1 && vm.overlayMenu.pasteItems.length === 0) {
+            if (dialog.availableItems.length === 1 && dialog.pasteItems.length === 0) {
                 // only one scaffold type - no need to display the picker
                 addNode(vm.scaffolds[0].contentTypeAlias);
-                vm.overlayMenu = null;
+
+                dialog.close();
+
                 return;
             }
 
-            vm.overlayMenu.show = true;
+            overlayService.open(dialog);
         };
 
         vm.editNode = function (idx) {
