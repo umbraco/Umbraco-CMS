@@ -55,11 +55,11 @@
 
                                 <!-- Save Search & Clear Search icon buttons -->
                                 <button class="save-search btn-reset" type="button" ng-show="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()">
-                                    <umb-icon icon="icon-rate" class="icon-rate" aria-hidden="true" />
+                                    <umb-icon icon="icon-rate" class="icon-rate" aria-hidden="true"></umb-icon>
                                     <localize class="sr-only" key="logViewer_saveSearch">Save Search</localize>
                                 </button>
                                 <button class="filter-search btn-reset" ng-show="vm.logOptions.filterExpression" ng-click="vm.resetSearch()">
-                                    <umb-icon icon="icon-wrong" class="icon-wrong" aria-hidden="true" />
+                                    <umb-icon icon="icon-wrong" class="icon-wrong" aria-hidden="true"></umb-icon>
                                     <localize class="sr-only" key="logViewer_filterSearch">Filter Search</localize>
                                 </button>
 
@@ -172,7 +172,7 @@
                                                     aria-haspopup="true"
                                                     aria-expanded="{{log.searchDropdownOpen === undefined ? false : log.searchDropdownOpen}}"
                                                     ng-click="log.searchDropdownOpen = !log.searchDropdownOpen">
-                                                        <umb-icon icon="icon-search" class="icon-search" />
+                                                        <umb-icon icon="icon-search" class="icon-search"></umb-icon>
                                                         <localize key="general_search">Search</localize>
                                                         <span class="caret" aria-hidden="true"></span>
                                                 </button>
