@@ -10,19 +10,19 @@ Use this directive to show an render an umbraco backoffice svg icon. All svg ico
 
 Simple icon
 <pre>
-    <umb-icon icon-name="icon-alert" />
+    <umb-icon icon="icon-alert" />
 </pre>
 
 Icon with additional attribute. It can be treated like any other dom element
 <pre>
-    <umb-icon icon-name="icon-alert" class="icon-class" ng-click="doSomething()" />
+    <umb-icon icon="icon-alert" class="icon-class" ng-click="doSomething()" />
 </pre>
 
 Manual svg string
 This format is only used in the iconpicker.html
 <pre>
     <umb-icon 
-        icon-name="icon-alert"
+        icon="icon-alert"
         svg-string='<svg height="50" width="50"><circle cx="25" cy="25" r="25" fill="red" /></svg>'
         />
 </pre>
@@ -39,29 +39,29 @@ This format is only used in the iconpicker.html
             transclude: true,
             templateUrl: "views/components/umb-icon.html",
             scope: {
-                iconName: "@",
+                icon: "@",
                 svgString: "=?"
             },
 
             link: function (scope) {
                 if (scope.svgString === undefined) {
-                    var iconName = scope.iconName.split(" ")[0]; // Ensure that only the first part of the iconName is used as sometimes the color is added too, e.g. see umbeditorheader.directive scope.openIconPicker
+                    var icon = scope.icon.split(" ")[0]; // Ensure that only the first part of the icon is used as sometimes the color is added too, e.g. see umbeditorheader.directive scope.openIconPicker
 
-                    _requestIcon(iconName);
+                    _requestIcon(icon);
                 }
-                scope.$watch("iconName", function (newValue, oldValue) {
+                scope.$watch("icon", function (newValue, oldValue) {
                     if (newValue && oldValue) {
-                        var newIconName = newValue.split(" ")[0];
-                        var oldIconName = oldValue.split(" ")[0];
+                        var newicon = newValue.split(" ")[0];
+                        var oldicon = oldValue.split(" ")[0];
 
-                        if (newIconName !== oldIconName) {
-                            _requestIcon(newIconName);
+                        if (newicon !== oldicon) {
+                            _requestIcon(newicon);
                         }
                     }
                 });
 
-                function _requestIcon(iconName) {
-                    iconHelper.getIcon(iconName)
+                function _requestIcon(icon) {
+                    iconHelper.getIcon(icon)
                         .then(icon => {
                             if (icon !== null && icon.svgString !== undefined) {
                                 scope.svgString = icon.svgString;
