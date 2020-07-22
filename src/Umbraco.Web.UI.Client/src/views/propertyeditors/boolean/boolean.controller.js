@@ -11,7 +11,7 @@ function booleanEditorController($scope, angularHelper) {
     };
 
     // Map the user config
-    angular.extend(config, $scope.model.config);
+    Utilities.extend(config, $scope.model.config);
 
     // Map back to the model
     $scope.model.config = config;
