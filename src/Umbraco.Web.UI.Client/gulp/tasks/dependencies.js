@@ -28,12 +28,15 @@ function dependencies() {
                 "./node_modules/ace-builds/src-min-noconflict/snippets/text.js",
                 "./node_modules/ace-builds/src-min-noconflict/snippets/javascript.js",
                 "./node_modules/ace-builds/src-min-noconflict/snippets/css.js",
+                "./node_modules/ace-builds/src-min-noconflict/snippets/json.js",
                 "./node_modules/ace-builds/src-min-noconflict/theme-chrome.js",
                 "./node_modules/ace-builds/src-min-noconflict/mode-razor.js",
                 "./node_modules/ace-builds/src-min-noconflict/mode-javascript.js",
                 "./node_modules/ace-builds/src-min-noconflict/mode-css.js",
                 "./node_modules/ace-builds/src-min-noconflict/worker-javascript.js",
-                "./node_modules/ace-builds/src-min-noconflict/worker-css.js"
+                "./node_modules/ace-builds/src-min-noconflict/worker-css.js",
+                "./node_modules/ace-builds/src-min-noconflict/mode-json.js",
+                "./node_modules/ace-builds/src-min-noconflict/worker-json.js"
             ],
             "base": "./node_modules/ace-builds"
         },

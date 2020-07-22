@@ -1504,6 +1504,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             });
 
             args.editor.on('Dirty', function (e) {
+            	syncContent(); // Set model.value to the RTE's content
+
                 //make the form dirty manually so that the track changes works, setting our model doesn't trigger
                 // the angular bits because tinymce replaces the textarea.
                 if (args.currentForm) {
