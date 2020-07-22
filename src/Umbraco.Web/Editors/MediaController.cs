@@ -774,10 +774,13 @@ namespace Umbraco.Web.Editors
             var total = long.MaxValue;
             while (page * pageSize < total)
             {
-                var children = Services.MediaService.GetPagedChildren(mediaId, page, pageSize, out total,
+                var children = Services.MediaService.GetPagedChildren(mediaId, page++, pageSize, out total,
                     SqlContext.Query<IMedia>().Where(x => x.Name == nameToFind));
-                foreach (var c in children)
-                    return c; //return first one if any are found
+                var match = children.FirstOrDefault(c => c.ContentType.Alias == contentTypeAlias);
+                if (match != null)
+                {
+                    return match;
+                }
             }
             return null;
         }
