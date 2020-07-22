@@ -12,7 +12,7 @@ namespace Umbraco.Web.Mvc
 
         public void WriteToHtmlTextWriter(System.Web.UI.HtmlTextWriter html)
         {
-            html.Write(Content);
+            html.WriteEncodedText(Content);
         }
     }
 }

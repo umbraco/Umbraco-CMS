@@ -26,10 +26,14 @@
 @param {string} value Set the value of the radiobutton.
 @param {string} name Set the name of the radiobutton.
 @param {string} text Set the text for the radiobutton label.
-@param {string} labelKey Set a dictinary/localization string for the checkbox label
+@param {string} labelKey Set a dictinary/localization string for the checkbox label.
+@param {string} serverValidationField Set the <code>val-server-field</code> of the radiobutton.
 @param {boolean} disabled Set the radiobutton to be disabled.
 @param {boolean} required Set the radiobutton to be required.
 @param {callback} onChange Callback when the value of the radiobutton change by interaction.
+@param {string} cssClass Set a css class modifier.
+@param {string} iconClass Set an icon next to radiobutton.
+@param {boolean} disableDirtyCheck Disable checking if the model is dirty.
 
 **/
 
@@ -77,9 +81,13 @@
             name: "@",
             text: "@",
             labelKey: "@?",
+            serverValidationField: "@",
             disabled: "<",
             required: "<",
-            onChange: "&?"
+            onChange: "&?",
+            cssClass: "@?",
+            iconClass: "@?",
+            disableDirtyCheck: "=?"
         }
     };
 
