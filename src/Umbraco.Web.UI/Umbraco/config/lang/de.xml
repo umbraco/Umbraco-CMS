@@ -4,10 +4,6 @@
     <name>The Umbraco community</name>
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
-  <!--???-->
-  <!-- = unklar-->
-  <!--!!!-->
-  <!-- = ToDo-->
   <area alias="actions">
     <key alias="assignDomain">Kulturen und Hostnamen</key>
     <key alias="auditTrail">Protokoll</key>
@@ -140,7 +136,7 @@
     <key alias="saveToPublish">Speichern und zur Abnahme übergeben</key>
     <key alias="saveListView">Listenansicht sichern</key>
     <key alias="schedulePublish">Veröffentlichung planen</key>
-    <key alias="showPage">Vorschau</key>
+    <key alias="saveAndPreview">Vorschau</key>
     <key alias="showPageDisabled">Die Vorschaufunktion ist deaktiviert, da keine Vorlage zugewiesen ist</key>
     <key alias="styleChoose">Stil auswählen</key>
     <key alias="styleShow">Stil anzeigen</key>

@@ -59,15 +59,12 @@
 
 .umb-package-link {
     display: block;
-    flex-wrap: wrap;
-    flex-direction: column;
-    justify-content: center;
     position: relative;
     box-sizing: border-box;
     height: 100%;
     width: 100%;
     border-radius: 3px;
-    border: 0 none;
+    border: 1px solid transparent;
     text-decoration: none !important;
     transition: border-color 100ms ease;
     background-color: @white;
@@ -77,8 +74,6 @@
         border-color: @blueMid;
     }
 }
-
-
 
 // Icon
 .umb-package-icon {
@@ -94,21 +89,19 @@
     border-top-right-radius: 3px;
     border-top-left-radius: 3px;
     min-height: 60px;
-}
 
-.umb-package-icon img {
-    max-width: 70px;
-    width: 70px;
-    height: auto;
+    img {
+        max-width: 70px;
+        width: 70px;
+        height: auto;
+    }
 }
-
 
 // Info
 .umb-package-info {
     padding: 15px;
     text-align: center;
 }
-
 
 // Name
 .umb-package-name {

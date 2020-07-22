@@ -68,7 +68,7 @@ namespace Umbraco.TestData
                 scope.Complete();
             }
 
-            
+
             return Content("Done");
         }
 
@@ -89,7 +89,7 @@ namespace Umbraco.TestData
                 message = "Count not high enough for specified for number of levels required";
                 return false;
             }
-            
+
             return true;
         }
 
@@ -140,7 +140,7 @@ namespace Umbraco.TestData
                     currChildCount = prev.childCount;
                     // restore the parent
                     parent = prev.parent;
-                    
+
                 }
                 else if (contentItem.Level < depth)
                 {
@@ -149,10 +149,10 @@ namespace Umbraco.TestData
 
                     // not at max depth, create below
                     parent = created.container();
-                    
+
                     currChildCount = 0;
                 }
-                
+
             }
         }
 
@@ -219,7 +219,7 @@ namespace Umbraco.TestData
             {
                 var content = Services.ContentService.Create(faker.Commerce.ProductName(), currParent, docType.Alias);
                 content.SetValue("review", faker.Rant.Review());
-                content.SetValue("desc", string.Join(", ", Enumerable.Range(0, 5).Select(x => faker.Commerce.ProductAdjective()))); ;
+                content.SetValue("desc", string.Join(", ", Enumerable.Range(0, 5).Select(x => faker.Commerce.ProductAdjective())));
                 content.SetValue("media", imageIds[random.Next(0, imageIds.Count - 1)]);
 
                 Services.ContentService.Save(content);
@@ -259,7 +259,7 @@ namespace Umbraco.TestData
             return docType;
         }
 
-        private IDataType GetOrCreateRichText() => GetOrCreateDataType(RichTextDataTypeName, Constants.PropertyEditors.Aliases.TinyMce);      
+        private IDataType GetOrCreateRichText() => GetOrCreateDataType(RichTextDataTypeName, Constants.PropertyEditors.Aliases.TinyMce);
 
         private IDataType GetOrCreateMediaPicker() => GetOrCreateDataType(MediaPickerDataTypeName, Constants.PropertyEditors.Aliases.MediaPicker);
 

@@ -52,6 +52,7 @@ angular.module('umbraco.services')
 		* @param {String} item.message longer text for the notication, trimmed after 200 characters, which can then be exanded
 		* @param {String} item.type Notification type, can be: "success","warning","error" or "info" 
 		* @param {String} item.url url to open when notification is clicked
+		* @param {String} item.target the target used together with `url`. Empty if not specified.
 		* @param {String} item.view path to custom view to load into the notification box
 		* @param {Array} item.actions Collection of button actions to append (label, func, cssClass)
 		* @param {Boolean} item.sticky if set to true, the notification will not auto-close
@@ -245,7 +246,7 @@ angular.module('umbraco.services')
 		 * @param {Int} index index where the notication should be removed from
 		 */
 		remove: function (index) {
-			if(angular.isObject(index)){
+            if (Utilities.isObject(index)){
 				var i = nArray.indexOf(index);
 				angularHelper.safeApply($rootScope, function() {
 				    nArray.splice(i, 1);

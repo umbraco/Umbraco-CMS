@@ -22,6 +22,8 @@
   # get NuGet
   $cache = 4
   $nuget = "$scriptTemp\nuget.exe"
+  # ensure the correct NuGet-source is used. This one is used by Umbraco
+  $nugetsourceUmbraco = "https://www.myget.org/F/umbracocore/api/v3/index.json"
   if (-not $local)
   {
     $source = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
@@ -61,7 +63,7 @@
   # get the build system
   if (-not $local)
   {
-    $params = "-OutputDirectory", $scriptTemp, "-Verbosity", "quiet", "-PreRelease"
+    $params = "-OutputDirectory", $scriptTemp, "-Verbosity", "quiet", "-PreRelease", "-Source", $nugetsourceUmbraco
     &$nuget install Umbraco.Build @params
     if (-not $?) { throw "Failed to download Umbraco.Build." }
   }

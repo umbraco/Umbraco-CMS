@@ -37,23 +37,13 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
-            CacheDependency dependency = null;
-            if (dependentFiles != null && dependentFiles.Any())
-            {
-                dependency = new CacheDependency(dependentFiles);
-            }
-            return Get(key, factory, timeout, isSliding, priority, removedCallback, dependency);
+            return GetInternal(key, factory, timeout, isSliding, priority, removedCallback, dependentFiles);
         }
 
         /// <inheritdoc />
         public void Insert(string key, Func<object> factory, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
-            CacheDependency dependency = null;
-            if (dependentFiles != null && dependentFiles.Any())
-            {
-                dependency = new CacheDependency(dependentFiles);
-            }
-            Insert(key, factory, timeout, isSliding, priority, removedCallback, dependency);
+            InsertInternal(key, factory, timeout, isSliding, priority, removedCallback, dependentFiles);
         }
 
         #region Dictionary
@@ -86,7 +76,7 @@ namespace Umbraco.Core.Cache
 
         protected override void EnterWriteLock()
         {
-            _locker.EnterWriteLock();;
+            _locker.EnterWriteLock();
         }
 
         protected override void ExitReadLock()
@@ -103,7 +93,7 @@ namespace Umbraco.Core.Cache
 
         #endregion
 
-        private object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, CacheDependency dependency = null)
+        private object GetInternal(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
             key = GetCacheKey(key);
 
@@ -163,6 +153,10 @@ namespace Umbraco.Core.Cache
                     var sliding = isSliding == false ? System.Web.Caching.Cache.NoSlidingExpiration : (timeout ?? System.Web.Caching.Cache.NoSlidingExpiration);
 
                     lck.UpgradeToWriteLock();
+
+                    // create a cache dependency if one is needed. 
+                    var dependency = dependentFiles != null && dependentFiles.Length > 0 ? new CacheDependency(dependentFiles) : null;
+
                     //NOTE: 'Insert' on System.Web.Caching.Cache actually does an add or update!
                     _cache.Insert(key, result, dependency, absolute, sliding, priority, removedCallback);
                 }
@@ -180,7 +174,7 @@ namespace Umbraco.Core.Cache
             return value;
         }
 
-        private void Insert(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, CacheDependency dependency = null)
+        private void InsertInternal(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
             // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
             // and make sure we don't store a null value.
@@ -197,6 +191,10 @@ namespace Umbraco.Core.Cache
             try
             {
                 _locker.EnterWriteLock();
+
+                // create a cache dependency if one is needed. 
+                var dependency = dependentFiles != null && dependentFiles.Length > 0 ? new CacheDependency(dependentFiles) : null;
+
                 //NOTE: 'Insert' on System.Web.Caching.Cache actually does an add or update!
                 _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
             }

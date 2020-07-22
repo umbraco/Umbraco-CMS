@@ -40,7 +40,7 @@
         vm.versionRegex = /^(\d+\.)(\d+\.)(\*|\d+)$/;
 
         function onInit() {
-           
+
             if (create) {
                 // Pre populate package with some values
                 packageResource.getEmpty().then(scaffold => {
@@ -78,7 +78,7 @@
 
                 });
 
-                
+
                 localizationService.localizeMany(["buttons_save", "packager_includeAllChildNodes"]).then(function (values) {
                     vm.labels.button = values[0];
                     vm.labels.includeAllChildNodes = values[1];
@@ -232,7 +232,7 @@
 
         function openFilePicker() {
 
-            let selection = angular.copy(vm.package.files);
+            let selection = Utilities.copy(vm.package.files);
 
             const filePicker = {
                 title: "Select files",

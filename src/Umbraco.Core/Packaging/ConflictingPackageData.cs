@@ -7,7 +7,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Packaging
 {
-    internal class ConflictingPackageData 
+    internal class ConflictingPackageData
     {
         private readonly IMacroService _macroService;
         private readonly IFileService _fileService;
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Packaging
             return stylesheetNodes
                 .Select(n =>
                 {
-                    var xElement = n.Element("Name") ?? n.Element("name"); ;
+                    var xElement = n.Element("Name") ?? n.Element("name");
                     if (xElement == null)
                         throw new FormatException("Missing \"Name\" element");
 

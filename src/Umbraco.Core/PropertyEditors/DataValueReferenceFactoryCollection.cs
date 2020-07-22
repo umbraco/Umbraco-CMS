@@ -13,35 +13,46 @@ namespace Umbraco.Core.PropertyEditors
 
         public IEnumerable<UmbracoEntityReference> GetAllReferences(PropertyCollection properties, PropertyEditorCollection propertyEditors)
         {
-            var trackedRelations = new List<UmbracoEntityReference>();
+            var trackedRelations = new HashSet<UmbracoEntityReference>();
 
             foreach (var p in properties)
             {
                 if (!propertyEditors.TryGet(p.PropertyType.PropertyEditorAlias, out var editor)) continue;
 
-                //TODO: Support variants/segments! This is not required for this initial prototype which is why there is a check here
-                if (!p.PropertyType.VariesByNothing()) continue;
-                var val = p.GetValue(); // get the invariant value
+                //TODO: We will need to change this once we support tracking via variants/segments
+                // for now, we are tracking values from ALL variants
 
-                var valueEditor = editor.GetValueEditor();
-                if (valueEditor is IDataValueReference reference)
+                foreach(var propertyVal in p.Values)
                 {
-                    var refs = reference.GetReferences(val);
-                    trackedRelations.AddRange(refs);
-                }                
+                    var val = propertyVal.EditedValue;
 
-                // Loop over collection that may be add to existing property editors
-                // implementation of GetReferences in IDataValueReference.
-                // Allows developers to add support for references by a
-                // package /property editor that did not implement IDataValueReference themselves
-                foreach (var item in this)
-                {
-                    // Check if this value reference is for this datatype/editor
-                    // Then call it's GetReferences method - to see if the value stored
-                    // in the dataeditor/property has referecnes to media/content items
-                    if (item.IsForEditor(editor))
-                        trackedRelations.AddRange(item.GetDataValueReference().GetReferences(val));
+                    var valueEditor = editor.GetValueEditor();
+                    if (valueEditor is IDataValueReference reference)
+                    {
+                        var refs = reference.GetReferences(val);
+                        foreach(var r in refs)
+                            trackedRelations.Add(r);
+                    }
+
+                    // Loop over collection that may be add to existing property editors
+                    // implementation of GetReferences in IDataValueReference.
+                    // Allows developers to add support for references by a
+                    // package /property editor that did not implement IDataValueReference themselves
+                    foreach (var item in this)
+                    {
+                        // Check if this value reference is for this datatype/editor
+                        // Then call it's GetReferences method - to see if the value stored
+                        // in the dataeditor/property has referecnes to media/content items
+                        if (item.IsForEditor(editor))
+                        {
+                            foreach(var r in item.GetDataValueReference().GetReferences(val))
+                                trackedRelations.Add(r);
+                        }
+                            
+                    }
                 }
+
+                
             }
 
             return trackedRelations;
