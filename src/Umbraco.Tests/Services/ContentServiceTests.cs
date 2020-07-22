@@ -70,7 +70,7 @@ namespace Umbraco.Tests.Services
 
             var found = contentService.GetBlueprintsForContentTypes().ToArray();
             Assert.AreEqual(1, found.Length);
-            
+
             //ensures it's not found by normal content
             var contentFound = contentService.GetById(found[0].Id);
             Assert.IsNull(contentFound);
@@ -141,7 +141,7 @@ namespace Umbraco.Tests.Services
             {
                 var blueprint = MockedContent.CreateTextpageContent(i % 2 == 0 ? ct1 : ct2, "hello" + i, -1);
                 contentService.SaveBlueprint(blueprint);
-            }            
+            }
 
             var found = contentService.GetBlueprintsForContentTypes().ToArray();
             Assert.AreEqual(10, found.Length);
@@ -1493,6 +1493,44 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Move_Content_Structure_With_Unpublished_Parent_To_RecycleBin_And_Empty_RecycleBin()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
+
+            // Publish all the content items in the tree
+            var content = contentService.GetById(NodeDto.NodeIdSeed + 1);
+            contentService.SaveAndPublishWithStatus(content, 0);
+
+            var descendants = contentService.GetDescendants(content).ToList();
+            foreach (var descendant in descendants)
+                contentService.SaveAndPublishWithStatus(descendant, 0);
+
+            var subsubpage = MockedContent.CreateSimpleContent(contentType, "Text Page 3", NodeDto.NodeIdSeed + 2);
+            contentService.SaveAndPublishWithStatus(subsubpage, 0);
+
+            // Unpublish only the parent - see issue https://github.com/umbraco/Umbraco-CMS/issues/8393
+            contentService.UnPublish(content, 0);
+
+            // Act
+            contentService.MoveToRecycleBin(content, 0);
+            descendants = contentService.GetDescendants(content).ToList();
+
+            // Assert
+            Assert.That(content.ParentId, Is.EqualTo(-20));
+            Assert.That(content.Trashed, Is.True);
+            Assert.That(descendants.Count, Is.EqualTo(3));
+            Assert.That(descendants.Any(x => x.Path.Contains("-20") == false), Is.False);
+
+            //Empty Recycle Bin
+            contentService.EmptyRecycleBin();
+            var trashed = contentService.GetContentInRecycleBin();
+
+            Assert.That(trashed.Any(), Is.False);
+        }
+
+        [Test]
         public void Can_Empty_RecycleBin()
         {
             // Arrange
@@ -1521,7 +1559,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentTypeService.Save(contentType);
 
             var parentPage = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(parentPage);            
+            ServiceContext.ContentService.Save(parentPage);
 
             var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
             ServiceContext.ContentService.Save(childPage);
@@ -1585,7 +1623,7 @@ namespace Umbraco.Tests.Services
 
             //Now copy, what should happen is the child pages will now have permissions inherited from the new parent
             var copy = ServiceContext.ContentService.Copy(childPage1, parentPage2.Id, false, true);
-            
+
             descendants = ServiceContext.ContentService.GetDescendants(parentPage2).ToArray();
             Assert.AreEqual(3, descendants.Length);
 

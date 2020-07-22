@@ -1152,15 +1152,32 @@ namespace Umbraco.Core.Services
                     var originalPath = content.Path;
                     var moveEventInfo = new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent);
                     var moveEventArgs = new MoveEventArgs<IContent>(evtMsgs, moveEventInfo);
-                    //get descendents to process of the content item that is being moved to trash - must be done before changing the state below
-                    //must be processed with shallowest levels first
-                    var descendants = ignoreDescendants ? Enumerable.Empty<IContent>() : GetDescendants(content).OrderBy(x => x.Level);
+                    if (uow.Events.DispatchCancelable(Trashing, this, moveEventArgs, "Trashing"))
+                    {
+                        uow.Commit();
+                        return OperationStatus.Cancelled(evtMsgs);
+                    }
                     var moveInfo = new List<MoveEventInfo<IContent>>
                     {
                         moveEventInfo
                     };
+
+                    //get descendents to process of the content item that is being moved to trash - must be done before changing the state below
+                    //must be processed with shallowest levels first
+                    var descendants = ignoreDescendants ? Enumerable.Empty<IContent>() : GetDescendants(content).OrderBy(x => x.Level);
+
                     //Do the updates for this item
                     var repository = RepositoryFactory.CreateContentRepository(uow);
+                    //Make sure that published content is unpublished before being moved to the Recycle Bin
+                    if (HasPublishedVersion(content.Id))
+                    {
+                        //TODO: this shouldn't be a 'sub operation', and if it needs to be it cannot raise events and cannot be cancelled!
+                        UnPublish(content, userId);
+                    }
+                    content.WriterId = userId;
+                    content.ChangeTrashedState(true);
+                    repository.AddOrUpdate(content);
+
                     //Loop through descendants to update their trash state, but ensuring structure by keeping the ParentId
                     foreach (var descendant in descendants)
                     {
@@ -1172,23 +1189,6 @@ namespace Umbraco.Core.Services
 
                         moveInfo.Add(new MoveEventInfo<IContent>(descendant, descendant.Path, descendant.ParentId));
                     }
-                    if (uow.Events.DispatchCancelable(Trashing, this, moveEventArgs, "Trashing"))
-                    {
-                        uow.Commit();
-                        return OperationStatus.Cancelled(evtMsgs);
-                    }
-                    
-                    //Make sure that published content is unpublished before being moved to the Recycle Bin
-                    if (HasPublishedVersion(content.Id))
-                    {
-                        //TODO: this shouldn't be a 'sub operation', and if it needs to be it cannot raise events and cannot be cancelled!
-                        UnPublish(content, userId);
-                    }
-                    content.WriterId = userId;
-                    content.ChangeTrashedState(true);
-                    repository.AddOrUpdate(content);
-
-
 
                     moveEventArgs.CanCancel = false;
                     moveEventArgs.MoveInfoCollection = moveInfo;
