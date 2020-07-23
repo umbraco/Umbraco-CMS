@@ -1,5 +1,5 @@
 angular.module('umbraco.mocks').
-    factory('mocksUtils', ['$cookies', function ($cookies) {
+    factory('mocksUtils', ['$cookies', 'udiService', function ($cookies, udiService) {
         'use strict';
          
         //by default we will perform authorization
@@ -40,13 +40,17 @@ angular.module('umbraco.mocks').
             },
 
             /** Creats a mock content object */
-            getMockContent: function(id) {
+            getMockContent: function (id, key, udi) {
+                key = key || String.CreateGuid();
+                var udi = udi || udiService.build("content", key);
                 var node = {
                     name: "My content with id: " + id,
                     updateDate: new Date().toIsoDateTimeString(),
                     publishDate: new Date().toIsoDateTimeString(),
                     createDate: new Date().toIsoDateTimeString(),
                     id: id,
+                    key: key,
+                    udi: udi,
                     parentId: 1234,
                     icon: "icon-umb-content",
                     owner: { name: "Administrator", id: 0 },
@@ -282,13 +286,17 @@ angular.module('umbraco.mocks').
 
 
             /** Creats a mock variant content object */
-            getMockVariantContent: function(id) {
+            getMockVariantContent: function(id, key, udi) {
+                key = key || String.CreateGuid();
+                var udi = udi || udiService.build("content", key);
                 var node = {
                     name: "My content with id: " + id,
                     updateDate: new Date().toIsoDateTimeString(),
                     publishDate: new Date().toIsoDateTimeString(),
                     createDate: new Date().toIsoDateTimeString(),
                     id: id,
+                    key: key,
+                    udi: udi,
                     parentId: 1234,
                     icon: "icon-umb-content",
                     owner: { name: "Administrator", id: 0 },
