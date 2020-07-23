@@ -18,11 +18,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     {
         private readonly IProfilingLogger _proflog;
         private readonly BlockEditorConverter _blockConverter;
+        private readonly BlockListEditorDataConverter _blockListEditorDataConverter;
 
         public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter)
         {
             _proflog = proflog;
             _blockConverter = blockConverter;
+            _blockListEditorDataConverter = new BlockListEditorDataConverter();
         }
 
         /// <inheritdoc />
@@ -61,8 +63,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 var value = (string)inter;
                 if (string.IsNullOrWhiteSpace(value)) return BlockListModel.Empty;
 
-                var converter = new BlockListEditorDataConverter();
-                var converted = converter.Deserialize(value);
+                var converted = _blockListEditorDataConverter.Deserialize(value);
                 if (converted.BlockValue.ContentData.Count == 0) return BlockListModel.Empty;
 
                 var blockListLayout = converted.Layout.ToObject<IEnumerable<BlockListLayoutItem>>();

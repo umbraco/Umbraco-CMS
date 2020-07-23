@@ -16,6 +16,7 @@ namespace Umbraco.Core.Models.Blocks
 
         private BlockEditorData()
         {
+            BlockValue = new BlockValue();
         }
 
         public BlockEditorData(string propertyEditorAlias,
