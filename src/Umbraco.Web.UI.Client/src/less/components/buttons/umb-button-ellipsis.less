@@ -1,0 +1,44 @@
+.umb-button-ellipsis{
+    padding: 0 5px;
+    text-align: center;
+    margin: 0 10px 0 auto;
+    cursor: pointer;
+    border-radius: @baseBorderRadius;
+    color: black;
+    position: relative;
+    opacity: 0.8;
+    transition: opacity .3s ease-out;
+
+    &.show-text{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .umb-tour-is-visible .umb-tree &,
+    &:hover,
+    &:focus{
+        opacity: 1;
+    }
+
+    &--hidden{
+        opacity: 0;
+
+        &:hover,
+        &:focus {
+            opacity: 1;
+        }
+    }
+
+    &__icon {
+        color: inherit;
+        flex-basis: 100%;
+    }
+
+    &__text {
+        color: inherit;
+        font-size: 12px;
+        line-height: 1em;
+        flex-basis: 100%;
+    }
+}
