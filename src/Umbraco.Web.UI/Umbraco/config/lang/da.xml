@@ -469,6 +469,7 @@
     <key alias="selectMemberType">Vælg medlemstype</key>
     <key alias="selectNode">Vælg node</key>
     <key alias="selectSections">Vælg sektioner</key>
+    <key alias="selectUser">Vælg bruger</key>
     <key alias="selectUsers">Vælg brugere</key>
     <key alias="noIconsFound">Ingen ikoner blev fundet</key>
     <key alias="noMacroParams">Der er ingen parametre for denne makro</key>
