@@ -47,7 +47,6 @@ namespace Umbraco.Web.Editors.Binders
         internal static void BindModel(ContentItemSave model, IContent persistedContent)
         {
             if (model is null) throw new ArgumentNullException(nameof(model));
-            if (persistedContent is null) throw new ArgumentNullException(nameof(persistedContent));
 
             model.PersistedContent = persistedContent;
 
