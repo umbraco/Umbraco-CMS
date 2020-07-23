@@ -264,15 +264,11 @@
                     expect(propertyModel.layout["Umbraco.TestBlockEditor"][0]).toBeUndefined();
 
                     done();
-                });
-
+                } catch (e) {
+                    done.fail(e);
+                }
+            });
         });
-
-
-
-
-
-
 
         it('getBlockObject of block with settings has values', function (done) {
 
