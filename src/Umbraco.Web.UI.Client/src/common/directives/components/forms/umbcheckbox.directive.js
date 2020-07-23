@@ -31,7 +31,9 @@
 @param {boolean} disabled Set the checkbox to be disabled.
 @param {boolean} required Set the checkbox to be required.
 @param {callback} onChange Callback when the value of the checkbox change by interaction.
-@param {string} cssClass Set a css class modifier
+@param {string} cssClass Set a css class modifier.
+@param {string} iconClass Set an icon next to checkbox.
+@param {boolean} disableDirtyCheck Disable checking if the model is dirty.
 
 **/
 
@@ -71,6 +73,7 @@
         templateUrl: 'views/components/forms/umb-checkbox.html',
         controller: UmbCheckboxController,
         controllerAs: 'vm',
+        transclude: true,
         bindings: {
             model: "=",
             inputId: "@",
@@ -83,7 +86,8 @@
             required: "<",
             onChange: "&?",
             cssClass: "@?",
-            iconClass: "@?"
+            iconClass: "@?",
+            disableDirtyCheck: "=?"
         }
     };
 

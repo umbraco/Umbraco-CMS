@@ -83,7 +83,7 @@
     <key alias="saveAndPublish">Lagre og publiser</key>
     <key alias="saveAndSchedule">Lagre og planlegge</key>
     <key alias="saveToPublish">Lagre og send til publisering</key>
-    <key alias="showPage">Forhåndsvis</key>
+    <key alias="saveAndPreview">Forhåndsvis</key>
     <key alias="showPageDisabled">Forhåndsvisning er deaktivert siden det ikke er angitt noen mal</key>
     <key alias="styleChoose">Velg formattering</key>
     <key alias="styleShow">Vis stiler</key>

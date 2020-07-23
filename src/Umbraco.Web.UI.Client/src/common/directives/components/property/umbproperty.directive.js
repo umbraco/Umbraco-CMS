@@ -16,10 +16,15 @@ angular.module("umbraco.directives")
             replace: true,
             templateUrl: 'views/components/property/umb-property.html',
             link: function (scope) {
-                userService.getCurrentUser().then(function (u) {
-                    var isAdmin = u.userGroups.indexOf('admin') !== -1;
-                    scope.propertyAlias = (Umbraco.Sys.ServerVariables.isDebuggingEnabled === true || isAdmin) ? scope.property.alias : null;
-                });
+
+                scope.controlLabelTitle = null;
+                if(Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
+                    userService.getCurrentUser().then(function (u) {
+                        if(u.allowedSections.indexOf("settings") !== -1 ? true : false) {
+                            scope.controlLabelTitle = scope.property.alias;
+                        }
+                    });
+                }
             },
             //Define a controller for this directive to expose APIs to other directives
             controller: function ($scope) {

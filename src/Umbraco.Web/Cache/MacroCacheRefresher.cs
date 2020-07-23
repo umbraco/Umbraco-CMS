@@ -53,7 +53,7 @@ namespace Umbraco.Web.Cache
                 {
                     macroRepoCache.Result.Clear(RepositoryCacheKeys.GetKey<IMacro>(payload.Id));
                 }
-            };
+            }
 
             base.Refresh(json);
         }

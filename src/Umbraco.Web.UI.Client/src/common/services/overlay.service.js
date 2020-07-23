@@ -15,7 +15,7 @@
         function open(newOverlay) {
 
             // prevent two open overlays at the same time
-            if(currentOverlay) {
+            if (currentOverlay) {
                 close();
             }
 
@@ -23,22 +23,22 @@
             var overlay = newOverlay;
 
             // set the default overlay position to center
-            if(!overlay.position) {
+            if (!overlay.position) {
                 overlay.position = "center";
             }
 
             // set the default overlay size to small
-            if(!overlay.size) {
+            if (!overlay.size) {
                 overlay.size = "small";
             }
 
             // use a default empty view if nothing is set
-            if(!overlay.view) {
+            if (!overlay.view) {
                 overlay.view = "views/common/overlays/default/default.html";
             }
 
             // option to disable backdrop clicks
-            if(overlay.disableBackdropClick) {
+            if (overlay.disableBackdropClick) {
                 backdropOptions.disableEventsOnClick = true;
             }
 
@@ -85,7 +85,6 @@
             }
 
             open(overlay);
-
         }
 
         function confirmDelete(overlay) {

@@ -1,4 +1,5 @@
 ﻿.umb-property-file-upload {
+    .umb-property-editor--limit-width();
 
     .umb-upload-button-big {
         display: block;
@@ -23,6 +24,12 @@
             bottom: 0;
             height: 100%;
             width: 100%;
+        }
+    }
+
+    .drag-over {
+        .umb-upload-button-big {
+            border-color: @gray-1;
         }
     }
 }

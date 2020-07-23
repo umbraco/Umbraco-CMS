@@ -45,6 +45,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
+            if (source == null) return null;
+
             var nodeIds = source.ToString()
                 .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(Udi.Parse)

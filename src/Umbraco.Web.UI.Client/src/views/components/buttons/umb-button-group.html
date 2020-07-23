@@ -1,4 +1,4 @@
-<div class="btn-group umb-button-group" ng-class="{'dropup': direction === 'up'}">
+<div class="btn-group umb-button-group" ng-class="{ 'dropup': direction === 'up', '-with-button-group-toggle': subButtons.length > 0 }">
 
    <umb-button
       ng-if="defaultButton"
@@ -32,12 +32,11 @@
    </button>
 
     <umb-dropdown
-         ng-show="subButtons.length > 0 && dropdown.isOpen"
+         ng-if="subButtons.length > 0 && dropdown.isOpen"
          class="umb-button-group__sub-buttons"
          on-close="closeDropdown()"
          deep-blur="closeDropdown()"
-         ng-class="{'-align-right': float === 'right'}"
-         >
+         ng-class="{'-align-right': float === 'right'}">
       <umb-dropdown-item ng-repeat="subButton in subButtons">
          <button
             data-element="{{subButton.alias ? 'button-' + subButton.alias : 'button-group-secondary-' + $index }}"
