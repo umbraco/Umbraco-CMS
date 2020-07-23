@@ -61,22 +61,16 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 var value = (string)inter;
                 if (string.IsNullOrWhiteSpace(value)) return model;
 
-                var objects = JsonConvert.DeserializeObject<JObject>(value);
-                if (objects.Count == 0) return model;
+                var converter = new BlockListEditorDataConverter();
+                var converted = converter.Convert(value);
+                if (converted.Blocks.Count == 0) return model;
 
-                var jsonLayout = objects["layout"] as JObject;
-                if (jsonLayout == null) return model;
-
-                var jsonData = objects["data"] as JArray;
-                if (jsonData == null) return model;
-
-                var blockListLayouts = jsonLayout[Constants.PropertyEditors.Aliases.BlockList] as JArray;
-                if (blockListLayouts == null) return model;
+                var blockListLayout = converted.Layout.ToObject<IEnumerable<BlockListLayoutItem>>();
 
                 // parse the data elements
-                foreach (var data in jsonData.Cast<JObject>())
+                foreach (var data in converted.Blocks)
                 {
-                    var element = _blockConverter.ConvertToElement(data, BlockEditorPropertyEditor.ContentTypeKeyPropertyKey, referenceCacheLevel, preview);
+                    var element = _blockConverter.ConvertToElement(data, referenceCacheLevel, preview);
                     if (element == null) continue;
                     elements[element.Key] = element;
                 }
@@ -84,14 +78,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 // if there's no elements just return since if there's no data it doesn't matter what is stored in layout
                 if (elements.Count == 0) return model;
 
-                foreach (var blockListLayout in blockListLayouts)
+                foreach (var layoutItem in blockListLayout)
                 {
-                    var settingsJson = blockListLayout["settings"] as JObject;
                     // the result of this can be null, that's ok
-                    var element = settingsJson != null ? _blockConverter.ConvertToElement(settingsJson, BlockEditorPropertyEditor.ContentTypeKeyPropertyKey, referenceCacheLevel, preview) : null;
+                    var element = layoutItem.Settings != null ? _blockConverter.ConvertToElement(layoutItem.Settings, referenceCacheLevel, preview) : null;
 
-                    if (!Udi.TryParse(blockListLayout.Value<string>("udi"), out var udi) || !(udi is GuidUdi guidUdi))
-                        continue;
+                    var guidUdi = (GuidUdi)layoutItem.Udi;
 
                     // get the data reference
                     if (!elements.TryGetValue(guidUdi.Guid, out var data))
@@ -107,7 +99,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     if (element != null && string.IsNullOrWhiteSpace(blockConfig.SettingsElementTypeKey))
                         element = null;
 
-                    var layoutRef = new BlockListLayoutReference(udi, data, element);
+                    var layoutRef = new BlockListLayoutReference(layoutItem.Udi, data, element);
                     layout.Add(layoutRef);
                 }
 

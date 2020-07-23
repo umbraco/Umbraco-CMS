@@ -65,7 +65,7 @@
             }
         });
 
-    function NestedContentController($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService) {
+    function NestedContentController($scope, $interpolate, $filter, serverValidationManager, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService) {
 
         var vm = this;
         var model = $scope.$parent.$parent.model;
@@ -298,8 +298,15 @@
         }
 
         function deleteNode(idx) {
-            vm.nodes.splice(idx, 1);
+            var removed = vm.nodes.splice(idx, 1);
+
             setDirty();
+
+            removed.forEach(x => {
+                // remove any server validation errors associated
+                serverValidationManager.removePropertyError(x.key, vm.umbProperty.property.culture, vm.umbProperty.property.segment, "", { matchType: "contains" });
+            });
+
             updateModel();
             validate();
         };
@@ -588,8 +595,14 @@
                 for (var p = 0; p < tab.properties.length; p++) {
                     var prop = tab.properties[p];
 
+                    // store the original alias before we change below, see notes
                     prop.propertyAlias = prop.alias;
+
+                    // NOTE: This is super ugly, the reason it is like this is because it controls the label/html id in the umb-property component at a higher level.
+                    // not pretty :/ but we can't change this now since it would require a bunch of plumbing to be able to change the id's higher up.
                     prop.alias = model.alias + "___" + prop.alias;
+
+                    // TODO: Do we need to deal with this separately?
                     // Force validation to occur server side as this is the
                     // only way we can have consistency between mandatory and
                     // regex validation messages. Not ideal, but it works.
@@ -664,8 +677,8 @@
         ];
 
         this.$onInit = function () {
-            if (this.umbProperty) {
-                this.umbProperty.setPropertyActions(propertyActions);
+            if (vm.umbProperty) {
+                vm.umbProperty.setPropertyActions(propertyActions);
             }
         };
 

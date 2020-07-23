@@ -267,7 +267,7 @@
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
     <Compile Include="Templates\HtmlImageSourceParserTests.cs" />
     <Compile Include="Web\Mvc\HtmlStringUtilitiesTests.cs" />
-    <Compile Include="Web\ModelStateExtensionsTests.cs" />
+    <Compile Include="Web\Validation\ModelStateExtensionsTests.cs" />
     <Compile Include="Web\Mvc\RenderIndexActionSelectorAttributeTests.cs" />
     <Compile Include="Persistence\NPocoTests\PetaPocoCachesTest.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
@@ -514,6 +514,7 @@
     <Compile Include="CoreThings\VersionExtensionTests.cs" />
     <Compile Include="Web\TemplateUtilitiesTests.cs" />
     <Compile Include="Web\UrlHelperExtensionTests.cs" />
+    <Compile Include="Web\Validation\ContentModelValidatorTests.cs" />
     <Compile Include="Web\WebExtensionMethodTests.cs" />
     <Compile Include="CoreThings\XmlExtensionsTests.cs" />
     <Compile Include="Misc\XmlHelperTests.cs" />

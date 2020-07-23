@@ -2,9 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -12,9 +10,11 @@ using Umbraco.Core.Models.Blocks;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using static Umbraco.Core.Models.Blocks.BlockEditorData;
 
 namespace Umbraco.Web.PropertyEditors
 {
+
     /// <summary>
     /// Abstract class for block editor based editors
     /// </summary>
@@ -22,15 +22,15 @@ namespace Umbraco.Web.PropertyEditors
     {
         public const string ContentTypeKeyPropertyKey = "contentTypeKey";
         public const string UdiPropertyKey = "udi";
-        private readonly IBlockEditorDataHelper _dataHelper;
+        private readonly ILocalizedTextService _localizedTextService;
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
         private readonly IContentTypeService _contentTypeService;
 
-        public BlockEditorPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, IBlockEditorDataHelper dataHelper)
+        public BlockEditorPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService localizedTextService)
             : base(logger)
         {
-            _dataHelper = dataHelper;
+            _localizedTextService = localizedTextService;
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
             _contentTypeService = contentTypeService;
@@ -41,23 +41,21 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new BlockEditorPropertyValueEditor(Attribute, _dataHelper, PropertyEditors, _dataTypeService, _contentTypeService);
+        protected override IDataValueEditor CreateValueEditor() => new BlockEditorPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService);
 
         internal class BlockEditorPropertyValueEditor : DataValueEditor, IDataValueReference
         {
-            private readonly IBlockEditorDataHelper _dataHelper;
             private readonly PropertyEditorCollection _propertyEditors;
-            private readonly IDataTypeService _dataTypeService;
+            private readonly IDataTypeService _dataTypeService; // TODO: Not used yet but we'll need it to fill in the FromEditor/ToEditor
             private readonly BlockEditorValues _blockEditorValues;
 
-            public BlockEditorPropertyValueEditor(DataEditorAttribute attribute, IBlockEditorDataHelper dataHelper, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService)
+            public BlockEditorPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService)
                 : base(attribute)
             {
-                _dataHelper = dataHelper;
                 _propertyEditors = propertyEditors;
                 _dataTypeService = dataTypeService;
-                _blockEditorValues = new BlockEditorValues(dataHelper, contentTypeService);
-                Validators.Add(new BlockEditorValidator(propertyEditors, dataTypeService, _blockEditorValues));
+                _blockEditorValues = new BlockEditorValues(new BlockListEditorDataConverter(), contentTypeService);
+                Validators.Add(new BlockEditorValidator(_blockEditorValues, propertyEditors, dataTypeService, textService));
             }
 
             public IEnumerable<UmbracoEntityReference> GetReferences(object value)
@@ -66,210 +64,146 @@ namespace Umbraco.Web.PropertyEditors
 
                 var result = new List<UmbracoEntityReference>();
 
-                foreach (var row in _blockEditorValues.GetPropertyValues(rawJson, out _))
+                foreach (var row in _blockEditorValues.GetPropertyValues(rawJson))
                 {
-                    if (row.PropType == null) continue;
+                    foreach (var prop in row.PropertyValues)
+                    {
+                        var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
 
-                    var propEditor = _propertyEditors[row.PropType.PropertyEditorAlias];
+                        var valueEditor = propEditor?.GetValueEditor();
+                        if (!(valueEditor is IDataValueReference reference)) continue;
 
-                    var valueEditor = propEditor?.GetValueEditor();
-                    if (!(valueEditor is IDataValueReference reference)) continue;
+                        var val = prop.Value.Value?.ToString();
 
-                    var val = row.JsonRowValue[row.PropKey]?.ToString();
+                        var refs = reference.GetReferences(val);
 
-                    var refs = reference.GetReferences(val);
-
-                    result.AddRange(refs);
+                        result.AddRange(refs);
+                    }
                 }
 
                 return result;
             }
         }
 
-        internal class BlockEditorValidator : IValueValidator
+        internal class BlockEditorValidator : ComplexEditorValidator
         {
-            private readonly PropertyEditorCollection _propertyEditors;
-            private readonly IDataTypeService _dataTypeService;
             private readonly BlockEditorValues _blockEditorValues;
 
-            public BlockEditorValidator(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, BlockEditorValues blockEditorValues)
+            public BlockEditorValidator(BlockEditorValues blockEditorValues, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, ILocalizedTextService textService) : base(propertyEditors, dataTypeService, textService)
             {
-                _propertyEditors = propertyEditors;
-                _dataTypeService = dataTypeService;
                 _blockEditorValues = blockEditorValues;
             }
 
-            public IEnumerable<ValidationResult> Validate(object rawValue, string valueType, object dataTypeConfiguration)
+            protected override IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object value)
             {
-                var validationResults = new List<ValidationResult>();
-
-                foreach (var row in _blockEditorValues.GetPropertyValues(rawValue, out _))
+                foreach (var row in _blockEditorValues.GetPropertyValues(value))
                 {
-                    if (row.PropType == null) continue;
-
-                    var config = _dataTypeService.GetDataType(row.PropType.DataTypeId).Configuration;
-                    var propertyEditor = _propertyEditors[row.PropType.PropertyEditorAlias];
-                    if (propertyEditor == null) continue;
-
-                    foreach (var validator in propertyEditor.GetValueEditor().Validators)
+                    var elementValidation = new ElementTypeValidationModel(row.ContentTypeAlias, row.Id);
+                    foreach (var prop in row.PropertyValues)
                     {
-                        foreach (var result in validator.Validate(row.JsonRowValue[row.PropKey], propertyEditor.GetValueEditor().ValueType, config))
-                        {
-                            result.ErrorMessage = "Item " + (row.RowIndex + 1) + " '" + row.PropType.Name + "' " + result.ErrorMessage;
-                            validationResults.Add(result);
-                        }
+                        elementValidation.AddPropertyTypeValidation(
+                            new PropertyTypeValidationModel(prop.Value.PropertyType, prop.Value.Value));
                     }
-
-                    // Check mandatory
-                    if (row.PropType.Mandatory)
-                    {
-                        if (row.JsonRowValue[row.PropKey] == null)
-                        {
-                            var message = string.IsNullOrWhiteSpace(row.PropType.MandatoryMessage)
-                                                      ? $"'{row.PropType.Name}' cannot be null"
-                                                      : row.PropType.MandatoryMessage;
-                            validationResults.Add(new ValidationResult($"Item {(row.RowIndex + 1)}: {message}", new[] { row.PropKey }));
-                        }
-                        else if (row.JsonRowValue[row.PropKey].ToString().IsNullOrWhiteSpace() || (row.JsonRowValue[row.PropKey].Type == JTokenType.Array && !row.JsonRowValue[row.PropKey].HasValues))
-                        {
-                            var message = string.IsNullOrWhiteSpace(row.PropType.MandatoryMessage)
-                                                      ? $"'{row.PropType.Name}' cannot be empty"
-                                                      : row.PropType.MandatoryMessage;
-                            validationResults.Add(new ValidationResult($"Item {(row.RowIndex + 1)}: {message}", new[] { row.PropKey }));
-                        }
-                    }
-
-                    // Check regex
-                    if (!row.PropType.ValidationRegExp.IsNullOrWhiteSpace()
-                        && row.JsonRowValue[row.PropKey] != null && !row.JsonRowValue[row.PropKey].ToString().IsNullOrWhiteSpace())
-                    {
-                        var regex = new Regex(row.PropType.ValidationRegExp);
-                        if (!regex.IsMatch(row.JsonRowValue[row.PropKey].ToString()))
-                        {
-                            var message = string.IsNullOrWhiteSpace(row.PropType.ValidationRegExpMessage)
-                                                      ? $"'{row.PropType.Name}' is invalid, it does not match the correct pattern"
-                                                      : row.PropType.ValidationRegExpMessage;
-                            validationResults.Add(new ValidationResult($"Item {(row.RowIndex + 1)}: {message}", new[] { row.PropKey }));
-                        }
-                    }
+                    yield return elementValidation;
                 }
-
-                return validationResults;
             }
         }
 
         internal class BlockEditorValues
         {
-            private readonly IBlockEditorDataHelper _dataHelper;
             private readonly Lazy<Dictionary<Guid, IContentType>> _contentTypes;
+            private readonly BlockEditorDataConverter _dataConverter;
 
-            public BlockEditorValues(IBlockEditorDataHelper dataHelper, IContentTypeService contentTypeService)
+            public BlockEditorValues(BlockEditorDataConverter dataConverter, IContentTypeService contentTypeService)
             {
-                _dataHelper = dataHelper;
                 _contentTypes = new Lazy<Dictionary<Guid, IContentType>>(() => contentTypeService.GetAll().ToDictionary(c => c.Key));
+                _dataConverter = dataConverter;
             }
 
-            private IContentType GetElementType(JObject item)
+            private IContentType GetElementType(BlockItemData item)
             {
-                Guid contentTypeKey = item[ContentTypeKeyPropertyKey]?.ToObject<Guid>() ?? Guid.Empty;
-                _contentTypes.Value.TryGetValue(contentTypeKey, out var contentType);
+                _contentTypes.Value.TryGetValue(item.ContentTypeKey, out var contentType);
                 return contentType;
             }
 
-            public IEnumerable<RowValue> GetPropertyValues(object propertyValue, out List<JObject> deserialized)
+            public IReadOnlyList<BlockValue> GetPropertyValues(object propertyValue)
             {
-                var rowValues = new List<RowValue>();
-
-                deserialized = null;
-
                 if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
-                    return Enumerable.Empty<RowValue>();
+                    return new List<BlockValue>();
 
-                var data = JsonConvert.DeserializeObject<BlockEditorData>(propertyValue.ToString());
-                if (data?.Layout == null || data.Data == null || data.Data.Count == 0)
-                    return Enumerable.Empty<RowValue>();
+                var converted = _dataConverter.Convert(propertyValue.ToString());
 
-                var blockRefs = _dataHelper.GetBlockReferences(data.Layout);
-                if (blockRefs == null)
-                    return Enumerable.Empty<RowValue>();
+                if (converted.Blocks.Count == 0)
+                    return new List<BlockValue>();
 
-                var dataMap = new Dictionary<Udi, JObject>(data.Data.Count);
-                data.Data.ForEach(d =>
+                var contentTypePropertyTypes = new Dictionary<string, Dictionary<string, PropertyType>>();
+                var result = new List<BlockValue>();
+
+                foreach(var block in converted.Blocks)
                 {
-                    var udiObj = d?[UdiPropertyKey];
-                    if (Udi.TryParse(udiObj == null || udiObj.Type != JTokenType.String ? null : udiObj.ToString(), out var udi))
-                        dataMap[udi] = d;
-                });
-
-                deserialized = blockRefs.Select(r => dataMap.TryGetValue(r.Udi, out var block) ? block : null).Where(r => r != null).ToList();
-                if (deserialized == null || deserialized.Count == 0)
-                    return Enumerable.Empty<RowValue>();
-
-                var index = 0;
-
-                foreach (var o in deserialized)
-                {
-                    var propValues = o;
-
-                    var contentType = GetElementType(propValues);
+                    var contentType = GetElementType(block);
                     if (contentType == null)
                         continue;
 
-                    var propertyTypes = contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x);
-                    var propAliases = propValues.Properties().Select(x => x.Name);
-                    foreach (var propAlias in propAliases)
+                    // get the prop types for this content type but keep a dictionary of found ones so we don't have to keep re-looking and re-creating
+                    // objects on each iteration.
+                    if (!contentTypePropertyTypes.TryGetValue(contentType.Alias, out var propertyTypes))
+                        propertyTypes = contentTypePropertyTypes[contentType.Alias] = contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x);
+
+                    var propValues = new Dictionary<string, BlockPropertyValue>();
+
+                    // find any keys that are not real property types and remove them
+                    foreach (var prop in block.RawPropertyValues.ToList())
                     {
-                        propertyTypes.TryGetValue(propAlias, out var propType);
-                        rowValues.Add(new RowValue(propAlias, propType, propValues, index));
+                        // doesn't exist so remove it
+                        if (!propertyTypes.TryGetValue(prop.Key, out var propType))
+                        {
+                            block.RawPropertyValues.Remove(prop.Key);
+                        }
+                        else
+                        {
+                            // set the value to include the resolved property type
+                            propValues[prop.Key] = new BlockPropertyValue
+                            {
+                                PropertyType = propType,
+                                Value = prop.Value
+                            };
+                        }
                     }
-                    index++;
+
+                    result.Add(new BlockValue
+                    {
+                        ContentTypeAlias = contentType.Alias,
+                        PropertyValues = propValues,
+                        Id = ((GuidUdi)block.Udi).Guid
+                    });
                 }
 
-                return rowValues;
+                return result;
             }
 
-            internal class RowValue
+            /// <summary>
+            /// Used during deserialization to populate the property value/property type of a nested content row property
+            /// </summary>
+            internal class BlockPropertyValue
             {
-                public RowValue(string propKey, PropertyType propType, JObject propValues, int index)
-                {
-                    PropKey = propKey ?? throw new ArgumentNullException(nameof(propKey));
-                    PropType = propType;
-                    JsonRowValue = propValues ?? throw new ArgumentNullException(nameof(propValues));
-                    RowIndex = index;
-                }
-
-                /// <summary>
-                /// The current property key being iterated for the row value
-                /// </summary>
-                public string PropKey { get; }
-
-                /// <summary>
-                /// The <see cref="PropertyType"/> of the value (if any), this may be null
-                /// </summary>
-                public PropertyType PropType { get; }
-
-                /// <summary>
-                /// The json values for the current row
-                /// </summary>
-                public JObject JsonRowValue { get; }
-
-                /// <summary>
-                /// The Nested Content row index
-                /// </summary>
-                public int RowIndex { get; }
+                public object Value { get; set; }
+                public PropertyType PropertyType { get; set; }
             }
 
-            private class BlockEditorData
+            /// <summary>
+            /// Used during deserialization to populate the content type alias and property values of a block
+            /// </summary>
+            internal class BlockValue
             {
-                [JsonProperty("layout")]
-                public JObject Layout { get; set; }
-
-                [JsonProperty("data")]
-                public List<JObject> Data { get; set; }
+                public Guid Id { get; set; }
+                public string ContentTypeAlias { get; set; }
+                public IDictionary<string, BlockPropertyValue> PropertyValues { get; set; } = new Dictionary<string, BlockPropertyValue>();
             }
+
         }
+
         #endregion
 
-        private static bool IsSystemPropertyKey(string propertyKey) => ContentTypeKeyPropertyKey == propertyKey || UdiPropertyKey == propertyKey;
     }
 }
