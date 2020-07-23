@@ -281,6 +281,8 @@
                     },
                     selectCompositeContentType: function (selectedContentType) {
 
+                        var deferred = $q.defer();
+
                         //first check if this is a new selection - we need to store this value here before any further digests/async
                         // because after that the scope.model.compositeContentTypes will be populated with the selected value.
                         var newSelection = scope.model.compositeContentTypes.indexOf(selectedContentType.alias) === -1;
@@ -308,7 +310,10 @@
 
                                 //based on the selection, we need to filter the available composite types list
                                 filterAvailableCompositions(selectedContentType, newSelection).then(function () {
+                            deferred.resolve({ selectedContentType, newSelection });
                                     // TODO: Here we could probably re-enable selection if we previously showed a throbber or something
+                        }, function () {
+                                    deferred.reject();
                                 });
                             });
                         }
@@ -318,10 +323,14 @@
 
                             //based on the selection, we need to filter the available composite types list
                             filterAvailableCompositions(selectedContentType, newSelection).then(function () {
+                            deferred.resolve({ selectedContentType, newSelection });
                                 // TODO: Here we could probably re-enable selection if we previously showed a throbber or something
+                    }, function () { 
+                                deferred.reject();
                             });
                         }
 
+                        return deferred.promise; 
                     }
                 };
 
@@ -530,6 +539,7 @@
                         contentType: scope.contentType,
                         contentTypeName: scope.model.name,
                         contentTypeAllowCultureVariant: scope.model.allowCultureVariant,
+                        contentTypeAllowSegmentVariant: scope.model.allowSegmentVariant,
                         view: "views/common/infiniteeditors/propertysettings/propertysettings.html",
                         size: "small",
                         submit: function (model) {
@@ -557,6 +567,7 @@
                             property.isSensitiveData = propertyModel.isSensitiveData;
                             property.isSensitiveValue = propertyModel.isSensitiveValue;
                             property.allowCultureVariant = propertyModel.allowCultureVariant;
+                            property.allowSegmentVariant = propertyModel.allowSegmentVariant;
 
                             // update existing data types
                             if (model.updateSameDataTypes) {

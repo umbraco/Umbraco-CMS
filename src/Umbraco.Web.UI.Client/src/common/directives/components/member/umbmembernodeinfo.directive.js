@@ -14,7 +14,7 @@
                 
                 userService.getCurrentUser().then(function (user) {
                     // only allow change of member type if user has access to the settings sections
-                    angular.forEach(user.sections, function (section) {
+                    Utilities.forEach(user.sections, function (section) {
                         if (section.alias === "settings") {
                             scope.allowChangeMemberType = true;
                         }

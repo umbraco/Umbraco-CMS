@@ -10,11 +10,11 @@
                 page="page"
                 content="content"
                 culture="culture"
+                segment="segment"
                 on-select-app="appChanged(app)"
                 on-select-app-anchor="appAnchorChanged(app, anchor)"
                 on-back="onBack()"
-                show-back="!(infiniteModel && infiniteModel.infiniteMode)"
-                >
+                show-back="!(infiniteModel && infiniteModel.infiniteMode)">
             </umb-variant-content-editors>
 
             <umb-editor-footer>
@@ -61,9 +61,9 @@
                         shortcut="ctrl+s"
                         add-ellipsis="{{page.saveButtonEllipsis}}">
                     </umb-button>
-                    
-                    <umb-button-group 
-                        ng-if="defaultButton && !content.trashed && !content.isElement" 
+
+                    <umb-button-group
+                        ng-if="defaultButton && !content.trashed && !content.isElement"
                         button-style="success"
                         default-button="defaultButton"
                         sub-buttons="subButtons"

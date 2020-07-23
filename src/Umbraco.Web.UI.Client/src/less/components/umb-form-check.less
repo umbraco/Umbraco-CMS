@@ -1,23 +1,18 @@
 @checkboxWidth: 18px;
 @checkboxHeight: 18px;
-label.umb-form-check--checkbox{
-    margin:3px 0;
-}
 
 .umb-form-check {
     display: flex;
+    align-items: center;
     position: relative;
-    padding-left: 0px;
-    margin: 0;
-    min-height: 22px;
+    padding-left: 0;
+    margin: 5px 0;
+    min-height: 20px;
     cursor: pointer !important;
 
-    .umb-form-check__symbol {
-        margin-top: 4px;
-        margin-right: 10px;
-    }
     .umb-form-check__info {
-        margin-left:20px;
+        margin-left: 30px;
+        position: relative;
     }
     
 
@@ -79,7 +74,6 @@ label.umb-form-check--checkbox{
     }
 
     .tabbing-active &.umb-form-check--radiobutton &__input:focus ~ .umb-form-check__state .umb-form-check__check {
-        //outline: 2px solid @inputBorderTabFocus;
         border: 2px solid @inputBorderTabFocus;
         margin: -1px;
     }
@@ -97,11 +91,10 @@ label.umb-form-check--checkbox{
 
     &__state {
         display: flex;
-        height: 18px;
+        height: 20px;
+        width: 20px;
         position: absolute;
-        margin-top: 2px;
-        top: 0;
-        left: -1px;
+        top: -1px;
     }
 
     &__check {
