@@ -69,7 +69,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 });
         }
 
-        public IPublishedContent /*IPublishedMember*/ GetById(Guid memberId)
+        public IPublishedContent GetById(Guid memberId)
         {
             return GetCacheItem(CacheKeys.MemberCacheMember("ById", _previewDefault, memberId), () =>
             {
