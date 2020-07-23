@@ -58,6 +58,11 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "ht
 		StartServerOnDebug = "false"
 	EndProjectSection
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTest\", "Umbraco.Tests.AcceptanceTest\", "{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}"
+	ProjectSection(WebsiteProperties) = preProject
+		SlnRelativePath = "Umbraco.Tests.AcceptanceTest\"
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web", "Umbraco.Web\Umbraco.Web.csproj", "{651E1350-91B6-44B7-BD60-7207006D7003}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Core", "Umbraco.Core\Umbraco.Core.csproj", "{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}"
@@ -159,6 +164,7 @@ Global
 		{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{C7311C00-2184-409B-B506-52A5FAEA8736} = {FD962632-184C-4005-A5F3-E705D92FC645}
 		{FB5676ED-7A69-492C-B802-E7B24144C0FC} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
+		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A0F2E34-D2AF-4DAB-86A0-7D7764B3D0EC}

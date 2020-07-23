@@ -448,9 +448,11 @@
   }
 
   // in these cases the gradient won't cover the background, so we override
+  &:focus,
   &:hover {
     color: @textColorHover;
     background-color: @hoverColor;
+    text-decoration: none;
   }
 
   &.disabled, &[disabled] {

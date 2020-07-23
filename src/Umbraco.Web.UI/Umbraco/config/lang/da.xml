@@ -247,7 +247,7 @@
     <key alias="routeErrorCannotRoute">Dette dokument er udgivet, men dets URL kan ikke dirigeres</key>
     <key alias="publish">Udgiv</key>
     <key alias="published">Udgivet</key>
-    <key alias="publishedPendingChanges">Udgivet (Afventende ændringer)</key>
+    <key alias="publishedPendingChanges">Udgivet (Ventede ændringer)</key>
     <key alias="publishStatus">Udgivelsesstatus</key>
     <key alias="publishDescendantsHelp"><![CDATA[Klik <em>Udgiv med undersider</em> for at udgive <strong>%0%</strong> og alle sider under og dermed gøre deres indhold offentligt tilgængelige.]]></key>
     <key alias="publishDescendantsWithVariantsHelp"><![CDATA[Klik <em>Udgiv med undersider</em> for at udgive <strong>de valgte sprog</strong> og de samme sprog for sider under og dermed gøre deres indhold offentligt tilgængelige.]]></key>
@@ -426,6 +426,7 @@
     <key alias="linkinternal">Internt link:</key>
     <key alias="linklocaltip">Ved lokalt link, indsæt da en "#" foran linket</key>
     <key alias="linknewwindow">Åben i nyt vindue?</key>
+    <key alias="macroContainerSettings">Makroindstillinger</key>
     <key alias="macroDoesNotHaveProperties">Denne makro har ingen egenskaber du kan redigere</key>
     <key alias="paste">Indsæt tekst</key>
     <key alias="permissionsEdit">Rediger rettigheder for</key>
@@ -468,6 +469,7 @@
     <key alias="selectMemberType">Vælg medlemstype</key>
     <key alias="selectNode">Vælg node</key>
     <key alias="selectSections">Vælg sektioner</key>
+    <key alias="selectUser">Vælg bruger</key>
     <key alias="selectUsers">Vælg brugere</key>
     <key alias="noIconsFound">Ingen ikoner blev fundet</key>
     <key alias="noMacroParams">Der er ingen parametre for denne makro</key>
@@ -663,6 +665,7 @@
     <key alias="icon">Ikon</key>
     <key alias="id">Id</key>
     <key alias="import">Importer</key>
+    <key alias="includeFromsubFolders">Inkludér undermapper i søgning</key>
     <key alias="excludeFromSubFolders">Søg kun i denne mappe</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Indre margen</key>
@@ -1092,10 +1095,13 @@ Mange hilsner fra Umbraco robotten
     <key alias="customCrop">Brugerdefineret</key>
   </area>
   <area alias="rollback">
+    <key alias="changes">Ændringer</key>
+    <key alias="created">Oprettet</key>
     <key alias="headline">Vælg en version at sammenligne med den nuværende version</key>
     <key alias="currentVersion">Nuværende version</key>
     <key alias="diffHelp"><![CDATA[Her vises forskellene mellem den nuværende version og den valgte version<br /><del>Rød</del> tekst vil ikke blive vist i den valgte version. <ins>Grøn betyder tilføjet</ins>]]></key>
     <key alias="documentRolledBack">Dokument tilbagerullet</key>
+    <key alias="headline">Vælg en version at sammenligne med den nuværende version</key>
     <key alias="htmlHelp">Her vises den valgte version som html. Hvis du ønsker at se forskellen mellem de 2 versioner på samme tid, brug 'diff'-oversigten</key>
     <key alias="rollbackTo">Tilbagerulning til</key>
     <key alias="selectVersion">Vælg version</key>
@@ -1749,6 +1755,12 @@ Mange hilsner fra Umbraco robotten
     <key alias="openBackofficeSearch">Åben backoffice søgning</key>
     <key alias="openCloseBackofficeHelp">Åben/Luk backoffice hjælp</key>
     <key alias="openCloseBackofficeProfileOptions">Åben/Luk dine profil indstillinger</key>
+    <key alias="assignDomainDescription">Tilføj domæne på %0%</key>
+    <key alias="createDescription">Opret ny node under %0%</key>
+    <key alias="protectDescription">Opsæt offentlig adgang på %0%</key>
+    <key alias="rightsDescription">Opsæt rettigheder på %0%</key>
+    <key alias="sortDescription">Juster soterings rækkefølgen for %0%</key>
+    <key alias="createblueprintDescription">Opret indholds skabelon baseret på %0%</key>
     <key alias="currentLanguage">Aktivt sprog</key>
     <key alias="switchLanguage">Skift sprog til</key>
     <key alias="createNewFolder">Opret ny mappe</key>
