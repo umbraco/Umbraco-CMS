@@ -13,10 +13,7 @@
                 userService.addUserToEmailMarketing(user);
             });
 
-            // Mark Tour as complete
-            // This is also can help us indicate that the user accepted
-            // Where disabled is set if user closes modal or chooses NO
-            $scope.model.completeTour();
+            $scope.model.nextStep();
         }
     }
 

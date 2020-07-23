@@ -2985,6 +2985,8 @@ namespace Umbraco.Core.Services.Implement
 
                 _documentBlueprintRepository.Save(content);
 
+                Audit(AuditType.Save, Constants.Security.SuperUserId, content.Id, $"Saved content template: {content.Name}");
+
                 scope.Events.Dispatch(SavedBlueprint, this, new SaveEventArgs<IContent>(content), "SavedBlueprint");
 
                 scope.Complete();

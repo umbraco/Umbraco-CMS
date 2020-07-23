@@ -19,7 +19,7 @@
             <umb-box>
                 <umb-box-content>
                     <div class="form-search" style="margin-bottom: 15px;">
-                        <i class="icon-search"></i>
+                        <i class="icon-search" aria-hidden="true"></i>
                         <input type="text"
                             ng-model="vm.usersOptions.filter"
                             ng-change="vm.searchUsers()"
@@ -78,7 +78,9 @@
                     action="vm.close()">
                 </umb-button>
                 <umb-button
+                    ng-if="vm.multiPicker"
                     type="button"
+                    disabled="model.selection.length === 0"
                     button-style="success"
                     label-key="general_submit"
                     action="vm.submit(model)">

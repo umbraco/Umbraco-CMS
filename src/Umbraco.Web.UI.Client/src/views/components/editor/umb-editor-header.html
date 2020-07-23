@@ -12,16 +12,16 @@
         <div class="flex items-center" style="flex: 1;">
 
             <ng-form data-element="editor-icon" name="iconForm">
-                <button 
-                    type="button" class="umb-panel-header-icon" 
-                    ng-if="!hideIcon" 
-                    ng-click="openIconPicker()" 
+                <button
+                    type="button" class="umb-panel-header-icon"
+                    ng-if="!hideIcon"
+                    ng-click="openIconPicker()"
                     ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}"
                     title="{{$parent.icon}}">
                         <i class="icon {{$parent.icon}}" ng-if="$parent.icon!=='' && $parent.icon!==null" aria-hidden="true"></i>
-                        <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
+                        <span class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
                             <localize key="settings_addIcon">Add icon</localize>
-                        </div>
+                        </span>
                 </button>
             </ng-form>
 
@@ -67,7 +67,7 @@
 
                 </div>
 
-                <div class="umb-panel-header-name" ng-if="nameLocked" title="{{key}}">{{ name }}</div>
+                <h1 class="umb-panel-header-name" id="editor-headline-{{$id}}" ng-if="nameLocked" title="{{key}}">{{ name }}</h1>
 
                 <input data-element="editor-description"
                        no-password-manager
@@ -78,7 +78,7 @@
                        ng-if="!hideDescription && !descriptionLocked"
                        ng-model="$parent.description"/>
 
-                <div class="umb-panel-header-locked-description" ng-if="descriptionLocked">{{ description }}</div>
+                <p class="umb-panel-header-locked-description" id="editor-description-{{$id}}" ng-if="descriptionLocked">{{ description }}</p>
 
             </div>
 
