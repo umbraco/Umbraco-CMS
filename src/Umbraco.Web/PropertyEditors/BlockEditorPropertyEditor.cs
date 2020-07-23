@@ -42,20 +42,22 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new BlockEditorPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService);
+        protected override IDataValueEditor CreateValueEditor() => new BlockEditorPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService, Logger);
 
         internal class BlockEditorPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private readonly PropertyEditorCollection _propertyEditors;
             private readonly IDataTypeService _dataTypeService; // TODO: Not used yet but we'll need it to fill in the FromEditor/ToEditor
+            private readonly ILogger _logger;
             private readonly BlockEditorValues _blockEditorValues;
 
-            public BlockEditorPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService)
+            public BlockEditorPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService, ILogger logger)
                 : base(attribute)
             {
                 _propertyEditors = propertyEditors;
                 _dataTypeService = dataTypeService;
-                _blockEditorValues = new BlockEditorValues(new BlockListEditorDataConverter(), contentTypeService);
+                _logger = logger;
+                _blockEditorValues = new BlockEditorValues(new BlockListEditorDataConverter(), contentTypeService, _logger);
                 Validators.Add(new BlockEditorValidator(_blockEditorValues, propertyEditors, dataTypeService, textService));
             }
 
@@ -123,38 +125,41 @@ namespace Umbraco.Web.PropertyEditors
                 {
                     foreach (var prop in row.PropertyValues)
                     {
-                        try
+                        // create a temp property with the value
+                        // - force it to be culture invariant as the block editor can't handle culture variant element properties
+                        prop.Value.PropertyType.Variations = ContentVariation.Nothing;
+                        var tempProp = new Property(prop.Value.PropertyType);
+
+                        tempProp.SetValue(prop.Value.Value);
+
+                        // convert that temp property, and store the converted value
+                        var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
+                        if (propEditor == null)
                         {
-                            // create a temp property with the value
-                            // - force it to be culture invariant as the block editor can't handle culture variant element properties
-                            prop.Value.PropertyType.Variations = ContentVariation.Nothing;
-                            var tempProp = new Property(prop.Value.PropertyType);
-
-                            tempProp.SetValue(prop.Value.Value);
-
-                            // convert that temp property, and store the converted value
-                            var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
-                            if (propEditor == null)
-                            {
-                                // NOTE: This logic was borrowed from Nested Content and I'm unsure why it exists.
-                                // if the property editor doesn't exist I think everything will break anyways?
-                                // update the raw value since this is what will get serialized out
-                                row.RawPropertyValues[prop.Key] = tempProp.GetValue()?.ToString();
-                                continue;
-                            }
-
-                            var tempConfig = dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
-                            var valEditor = propEditor.GetValueEditor(tempConfig);
-                            var convValue = valEditor.ToEditor(tempProp, dataTypeService);
-
+                            // NOTE: This logic was borrowed from Nested Content and I'm unsure why it exists.
+                            // if the property editor doesn't exist I think everything will break anyways?
                             // update the raw value since this is what will get serialized out
-                            row.RawPropertyValues[prop.Key] = convValue;
+                            row.RawPropertyValues[prop.Key] = tempProp.GetValue()?.ToString();
+                            continue;
                         }
-                        catch (InvalidOperationException)
+
+                        var dataType = dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId);
+                        if (dataType == null)
                         {
                             // deal with weird situations by ignoring them (no comment)
                             row.PropertyValues.Remove(prop.Key);
+                            _logger.Warn<BlockEditorPropertyValueEditor>(
+                                "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
+                                prop.Key, row.Key, property.PropertyType.Alias);
+                            continue;
                         }
+
+                        var tempConfig = dataType.Configuration;
+                        var valEditor = propEditor.GetValueEditor(tempConfig);
+                        var convValue = valEditor.ToEditor(tempProp, dataTypeService);
+
+                        // update the raw value since this is what will get serialized out
+                        row.RawPropertyValues[prop.Key] = convValue;
                     }
                 }
 
@@ -251,11 +256,13 @@ namespace Umbraco.Web.PropertyEditors
         {
             private readonly Lazy<Dictionary<Guid, IContentType>> _contentTypes;
             private readonly BlockEditorDataConverter _dataConverter;
+            private readonly ILogger _logger;
 
-            public BlockEditorValues(BlockEditorDataConverter dataConverter, IContentTypeService contentTypeService)
+            public BlockEditorValues(BlockEditorDataConverter dataConverter, IContentTypeService contentTypeService, ILogger logger)
             {
                 _contentTypes = new Lazy<Dictionary<Guid, IContentType>>(() => contentTypeService.GetAll().ToDictionary(c => c.Key));
                 _dataConverter = dataConverter;
+                _logger = logger;
             }
 
             private IContentType GetElementType(BlockItemData item)
@@ -318,6 +325,8 @@ namespace Umbraco.Web.PropertyEditors
                     if (!propertyTypes.TryGetValue(prop.Key, out var propType))
                     {
                         block.RawPropertyValues.Remove(prop.Key);
+                        _logger.Warn<BlockEditorValues>("The property {PropertyKey} for block {BlockKey} was removed because the property type {PropertyTypeAlias} was not found on {ContentTypeAlias}",
+                            prop.Key, block.Key, prop.Key, contentType.Alias);
                     }
                     else
                     {

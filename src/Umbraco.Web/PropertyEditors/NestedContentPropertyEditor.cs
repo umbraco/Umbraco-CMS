@@ -25,7 +25,7 @@ namespace Umbraco.Web.PropertyEditors
     [DataEditor(
         Constants.PropertyEditors.Aliases.NestedContent,
         "Nested Content",
-        "nestedcontent",
+        "nestedcontent", 
         ValueType = ValueTypes.Json,
         Group = Constants.PropertyEditors.Groups.Lists,
         Icon = "icon-thumbnail-list")]
@@ -61,19 +61,21 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService);
+        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService, Logger);
 
         internal class NestedContentPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private readonly PropertyEditorCollection _propertyEditors;
             private readonly IDataTypeService _dataTypeService;
+            private readonly ILogger _logger;
             private readonly NestedContentValues _nestedContentValues;
             
-            public NestedContentPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService)
+            public NestedContentPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService, ILogger logger)
                 : base(attribute)
             {
                 _propertyEditors = propertyEditors;
                 _dataTypeService = dataTypeService;
+                _logger = logger;
                 _nestedContentValues = new NestedContentValues(contentTypeService);
                 Validators.Add(new NestedContentValidator(_nestedContentValues, propertyEditors, dataTypeService, textService));
             }
@@ -120,10 +122,14 @@ namespace Umbraco.Web.PropertyEditors
                             // update the raw value since this is what will get serialized out
                             row.RawPropertyValues[prop.Key] = convValue;
                         }
-                        catch (InvalidOperationException)
+                        catch (InvalidOperationException ex)
                         {
                             // deal with weird situations by ignoring them (no comment)
                             row.RawPropertyValues.Remove(prop.Key);
+                            _logger.Warn<NestedContentPropertyValueEditor>(
+                                ex,
+                                "ConvertDbToString removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
+                                prop.Key, row.Id, propertyType.Alias);
                         }
                     }
                 }
@@ -185,10 +191,14 @@ namespace Umbraco.Web.PropertyEditors
                             // update the raw value since this is what will get serialized out
                             row.RawPropertyValues[prop.Key] = convValue == null ? null : JToken.FromObject(convValue);
                         }
-                        catch (InvalidOperationException)
+                        catch (InvalidOperationException ex)
                         {
                             // deal with weird situations by ignoring them (no comment)
                             row.RawPropertyValues.Remove(prop.Key);
+                            _logger.Warn<NestedContentPropertyValueEditor>(
+                                ex,
+                                "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
+                                prop.Key, row.Id, property.PropertyType.Alias);
                         }
                     }
                 }
