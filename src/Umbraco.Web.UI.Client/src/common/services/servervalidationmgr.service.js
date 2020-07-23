@@ -7,6 +7,10 @@
  * Used to handle server side validation and wires up the UI with the messages. There are 2 types of validation messages, one
  * is for user defined properties (called Properties) and the other is for field properties which are attached to the native 
  * model objects (not user defined). The methods below are named according to these rules: Properties vs Fields.
+ * 
+ * For a more indepth explanation of how server side validation works with the angular app, see this GitHub PR: 
+ * https://github.com/umbraco/Umbraco-CMS/pull/8339
+ * 
  */
 function serverValidationManager($timeout) {
 

@@ -7,7 +7,10 @@ namespace Umbraco.Web.PropertyEditors.Validation
     /// Custom <see cref="ValidationResult"/> for content properties
     /// </summary>
     /// <remarks>
-    /// This clones the original result and then ensures the nested result if it's the correct type
+    /// This clones the original result and then ensures the nested result if it's the correct type.
+    ///
+    /// For a more indepth explanation of how server side validation works with the angular app, see this GitHub PR: 
+    /// https://github.com/umbraco/Umbraco-CMS/pull/8339
     /// </remarks>
     public class ContentPropertyValidationResult : ValidationResult
     {

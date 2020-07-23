@@ -15,6 +15,9 @@ namespace Umbraco.Web.PropertyEditors.Validation
     /// <remarks>
     /// This converter is specifically used to convert validation results for content in order to be able to have nested
     /// validation results for complex editors.
+    ///
+    /// For a more indepth explanation of how server side validation works with the angular app, see this GitHub PR: 
+    /// https://github.com/umbraco/Umbraco-CMS/pull/8339
     /// </remarks>
     internal class ValidationResultConverter : JsonConverter
     {
