@@ -57,15 +57,22 @@ function valServerMatch(serverValidationManager) {
                         throw "valServerMatch dictionary keys must be one of " + allowedKeys.join();
                     }
 
-                    unsubscribe.push(serverValidationManager.subscribe(
-                        scope.valServerMatch[k],
-                        currentCulture,
-                        "",
-                        serverValidationManagerCallback,
-                        currentSegment,
-                        { matchType: k } // specify the match type
-                    ));
+                    var matchVal = scope.valServerMatch[k];
+                    if (Utilities.isString(matchVal)) {
+                        matchVal = [matchVal]; // change to an array since the value can also natively be an array
+                    }
 
+                    // match for each string in the array
+                    matchVal.forEach(m => {
+                        unsubscribe.push(serverValidationManager.subscribe(
+                            m,
+                            currentCulture,
+                            "",
+                            serverValidationManagerCallback,
+                            currentSegment,
+                            { matchType: k } // specify the match type
+                        ));
+                    })
                 });
             }
             else if (Utilities.isString(scope.valServerMatch)) {

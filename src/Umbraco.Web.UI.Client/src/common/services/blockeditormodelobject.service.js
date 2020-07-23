@@ -428,12 +428,12 @@
              */
             getBlockObject: function (layoutEntry) {
 
-                var udi = layoutEntry.contentUdi;
+                var contentUdi = layoutEntry.contentUdi;
 
-                var dataModel = getDataByUdi(udi, this.value.contentData);
+                var dataModel = getDataByUdi(contentUdi, this.value.contentData);
 
                 if (dataModel === null) {
-                    console.error("Couldn't find content model of " + udi)
+                    console.error("Couldn't find content model of " + contentUdi)
                     return null;
                 }
 
@@ -441,12 +441,12 @@
                 var contentScaffold;
 
                 if (blockConfiguration === null) {
-                    console.error("The block entry of " + udi + " is not being initialized because its contentTypeKey is not allowed for this PropertyEditor");
+                    console.error("The block entry of " + contentUdi + " is not being initialized because its contentTypeKey is not allowed for this PropertyEditor");
                 }
                 else {
                     contentScaffold = this.getScaffoldFromKey(blockConfiguration.contentTypeKey);
                     if (contentScaffold === null) {
-                        console.error("The block entry of " + udi + " is not begin initialized cause its Element Type was not loaded.");
+                        console.error("The block entry of " + contentUdi + " is not begin initialized cause its Element Type was not loaded.");
                     }
                 }
 
@@ -483,9 +483,9 @@
 
                 // make basics from scaffold
                 blockObject.content = Utilities.copy(contentScaffold);
-                blockObject.content.udi = udi;
-                // Change the content.key to the GUID part of the udi, else it's just random which we don't want, it should be consistent
-                blockObject.content.key = udiService.getKey(udi);
+                blockObject.content.udi = contentUdi;
+                // Change the content.key to the GUID part of the udi, else it's just random which we don't want, it must be consistent
+                blockObject.content.key = udiService.getKey(contentUdi);
 
                 mapToElementModel(blockObject.content, dataModel);
 
@@ -515,6 +515,9 @@
                         // make basics from scaffold
                         blockObject.settings = Utilities.copy(settingsScaffold);
                         blockObject.settings.udi = settingsUdi;
+                        // Change the settings.key to the GUID part of the udi, else it's just random which we don't want, it must be consistent
+                        blockObject.settings.key = udiService.getKey(settingsUdi);
+
                         mapToElementModel(blockObject.settings, settingsData);
                     }
                 }

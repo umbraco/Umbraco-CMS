@@ -1,4 +1,4 @@
-<ng-form name="vm.blockRowForm" val-server-match="{ 'contains' : vm.layout.$block.content.key }">
+<ng-form name="vm.blockRowForm" val-server-match="{ 'contains' : [ vm.layout.$block.content.key, vm.layout.$block.settings.key] }">
     <div class="umb-block-list__block" ng-class="{'--active':vm.layout.$block.active}">
 
         <umb-block-list-block stylesheet="{{::vm.layout.$block.config.stylesheet}}"
@@ -12,7 +12,7 @@
 
         <div class="umb-block-list__block--actions">
             <button type="button" class="btn-reset umb-outline action --settings" localize="title" title="actions_editSettings"
-                    ng-click="vm.blockEditorApi.openSettingsForBlock(vm.layout.$block, vm.index);"
+                    ng-click="vm.blockEditorApi.openSettingsForBlock(vm.layout.$block, vm.index, vm.blockRowForm);"
                     ng-if="vm.layout.$block.showSettings === true">
                 <i class="icon icon-settings" aria-hidden="true"></i>
                 <span class="sr-only">

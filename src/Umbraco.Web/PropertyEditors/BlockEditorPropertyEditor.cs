@@ -70,8 +70,8 @@ namespace Umbraco.Web.PropertyEditors
                 if (blockEditorData == null)
                     return Enumerable.Empty<UmbracoEntityReference>();
 
-                // TODO: What about Settings?
-                foreach (var row in blockEditorData.BlockValue.ContentData)
+                // loop through all content and settings data
+                foreach (var row in blockEditorData.BlockValue.ContentData.Concat(blockEditorData.BlockValue.SettingsData))
                 {
                     foreach (var prop in row.PropertyValues)
                     {
@@ -235,7 +235,7 @@ namespace Umbraco.Web.PropertyEditors
                 var blockEditorData = _blockEditorValues.DeserializeAndClean(value);
                 if (blockEditorData != null)
                 {
-                    foreach (var row in blockEditorData.BlockValue.ContentData)
+                    foreach (var row in blockEditorData.BlockValue.ContentData.Concat(blockEditorData.BlockValue.SettingsData))
                     {
                         var elementValidation = new ElementTypeValidationModel(row.ContentTypeAlias, row.Key);
                         foreach (var prop in row.PropertyValues)

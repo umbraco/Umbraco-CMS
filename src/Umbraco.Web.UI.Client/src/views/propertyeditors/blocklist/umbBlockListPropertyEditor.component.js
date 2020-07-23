@@ -555,9 +555,8 @@
             });
         }
 
-        // TODO: We'll need to pass in a parentForm here too
-        function openSettingsForBlock(block, blockIndex) {
-            editBlock(block, true, blockIndex);
+        function openSettingsForBlock(block, blockIndex, parentForm) {
+            editBlock(block, true, blockIndex, parentForm);
         }
 
         vm.blockEditorApi = {
