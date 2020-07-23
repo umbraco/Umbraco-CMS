@@ -53,9 +53,6 @@ namespace Umbraco.Web.Templates
         /// <remarks>Umbraco image tags are identified by their data-udi attributes</remarks>
         public string EnsureImageSources(string text)
         {
-            if (_umbracoContextAccessor.UmbracoContext == null)
-                throw new InvalidOperationException("Could not parse image sources, there is no current UmbracoContext");
-
             if(_getMediaUrl == null)
                 _getMediaUrl = (guid) => _umbracoContextAccessor.UmbracoContext.UrlProvider.GetMediaUrl(guid);
 

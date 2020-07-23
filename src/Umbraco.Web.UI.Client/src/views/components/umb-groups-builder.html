@@ -9,7 +9,7 @@
                 alias="compositions"
                 ng-if="compositions !== false"
                 type="button"
-                button-style="action"
+                button-style="outline"
                 label-key="contentTypeEditor_compositions"
                 icon="icon-merge"
                 action="openCompositionsDialog()"
@@ -22,7 +22,7 @@
                 alias="reorder"
                 ng-if="sorting !== false"
                 type="button"
-                button-style="action"
+                button-style="outline"
                 label-key="{{sortingButtonKey}}"
                 icon="icon-navigation"
                 action="toggleSortingMode();"
@@ -37,16 +37,16 @@
         <localize key="contentTypeEditor_noGroups"></localize>
     </div>
 
-    <a ng-if="!sortingMode" hotkey="alt+shift+p" ng-click="addPropertyToActiveGroup()"></a>    
+    <a ng-if="!sortingMode" hotkey="alt+shift+p" ng-click="addPropertyToActiveGroup()"></a>
 
     <ul class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
 
         <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__group-sortable': sortingMode}" data-element="group-{{tab.name}}">
 
             <!-- TAB INIT STATE -->
-            <a href="" class="umb-group-builder__group -placeholder" hotkey="alt+shift+g" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode" data-element="group-add">
+            <button href="" class="umb-group-builder__group -placeholder" hotkey="alt+shift+g" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode" data-element="group-add">
                 <localize key="contentTypeEditor_addGroup"></localize>
-            </a>
+            </button>
 
             <!-- TAB ACTIVE OR INACTIVE STATE -->
             <div class="umb-group-builder__group" ng-if="tab.tabState !== 'init'" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited, 'umb-group-builder__group-handle -sortable': sortingMode && !tab.inherited}" tabindex="0" ng-focus="activateGroup(tab)">
@@ -117,7 +117,7 @@
                     <li data-element="property-{{property.alias}}" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}" ng-repeat="property in tab.properties">
 
                         <!-- Add new property -->
-                        <a href=""
+                        <button href=""
                             data-element="property-add"
                             class="umb-group-builder__group-add-property"
                             ng-if="property.propertyState=='init' && !sortingMode"
@@ -125,7 +125,7 @@
                             ng-focus="activateGroup(tab)"
                             focus-when="{{property.focus}}">
                             <localize key="contentTypeEditor_addProperty"></localize>
-                        </a>
+                        </button>
 
                         <div class="umb-group-builder__property" ng-if="property.propertyState!=='init'" ng-class="{'-active': property.dialogIsOpen, '-active': property.propertyState=='active', '-inherited': property.inherited, '-locked': property.locked, 'umb-group-builder__property-handle -sortable': sortingMode && !property.inherited, '-sortable-locked': sortingMode && property.inherited}">
 
@@ -215,7 +215,12 @@
 
                                     <div class="umb-group-builder__property-tag -white" ng-if="property.allowCultureVariant">
                                         <i class="icon-shuffle umb-group-builder__property-tag-icon"></i>
-                                        <localize key="contentTypeEditor_variantsHeading"></localize>
+                                        <localize key="contentTypeEditor_cultureVariantLabel"></localize>
+                                    </div>
+
+                                    <div class="umb-group-builder__property-tag -white" ng-if="property.allowSegmentVariant">
+                                        <i class="icon-shuffle umb-group-builder__property-tag-icon"></i>
+                                        <localize key="contentTypeEditor_segmentVariantLabel"></localize>
                                     </div>
 
                                 </div>
@@ -235,7 +240,7 @@
 
                                 </div>
 
-                                <ng-form inert class="umb-group-builder__property-preview-form" name="propertyEditorPreviewForm" umb-disable-form-validation ng-click="editPropertyTypeSettings(property, tab)">
+                                <ng-form inert class="umb-group-builder__property-preview-form" name="propertyEditorPreviewForm" umb-disable-form-validation ng-click="editPropertyTypeSettings(property, tab)" tabindex="-1">
                                     <umb-property-editor
                                         ng-if="property.view !== undefined"
                                         model="property"

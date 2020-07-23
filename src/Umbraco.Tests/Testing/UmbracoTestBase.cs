@@ -43,6 +43,7 @@ using Current = Umbraco.Core.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 using Umbraco.Web.Templates;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Testing
 {
@@ -248,6 +249,7 @@ namespace Umbraco.Tests.Testing
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(RuntimeLevel.Run);
             Composition.RegisterUnique(f => runtimeStateMock.Object);
+            Composition.Register(_ => Mock.Of<IImageUrlGenerator>());
 
             // ah...
             Composition.WithCollectionBuilder<ActionCollectionBuilder>();

@@ -1,6 +1,6 @@
-<div data-element="overlay" class="umb-overlay umb-overlay-{{position}} umb-overlay--{{size}}" on-outside-click="outSideClick()" role="dialog" aria-labelledby="umb-overlay-title" aria-describedby="umb-overlay-description">
+<div data-element="{{name}}" class="umb-overlay umb-overlay-{{position}} umb-overlay--{{size}}" on-outside-click="outSideClick()" role="dialog" aria-labelledby="umb-overlay-title" aria-describedby="umb-overlay-description">
     <ng-form class="umb-overlay__form" name="overlayForm" novalidate val-form-manager>
-        <div data-element="overlay-header" class="umb-overlay-header">
+        <div data-element="overlay-header" class="umb-overlay-header" ng-show="!model.hideHeader">
             <h1 class="umb-overlay__title" id="umb-overlay-title">{{model.title}}</h1>
             <p class="umb-overlay__subtitle" id="umb-overlay-description" ng-if="model.subtitle">{{model.subtitle}}</p>
         </div>

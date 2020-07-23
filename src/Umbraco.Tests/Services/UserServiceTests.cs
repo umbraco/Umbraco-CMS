@@ -7,6 +7,7 @@ using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -925,6 +926,24 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Get_By_Profile_Id_Must_return_null_if_user_not_exists()
+        {
+            var profile = ServiceContext.UserService.GetProfileById(42);
+
+            // Assert
+            Assert.IsNull(profile);
+        }
+
+        [Test]
+        public void GetProfilesById_Must_empty_if_users_not_exists()
+        {
+            var profiles = ServiceContext.UserService.GetProfilesById(42);
+
+            // Assert
+            CollectionAssert.IsEmpty(profiles);
+        }
+
+        [Test]
         public void Get_User_By_Username()
         {
             // Arrange
@@ -950,14 +969,70 @@ namespace Umbraco.Tests.Services
             Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(originalUser.AllowedSections.Count()));
         }
 
+        [Test]
+        public void Can_Get_Assigned_StartNodes_For_User()
+        {
+            var startContentItems = BuildContentItems(3);
+
+            var testUserGroup = CreateTestUserGroup();
+
+            var userGroupId = testUserGroup.Id;
+
+            CreateTestUsers(startContentItems.Select(x => x.Id).ToArray(), testUserGroup, 3);
+
+            var usersInGroup = ServiceContext.UserService.GetAllInGroup(userGroupId);
+
+            foreach (var user in usersInGroup)
+                Assert.AreEqual(user.StartContentIds.Length, startContentItems.Length);
+        }
+
+        private Content[] BuildContentItems(int numberToCreate)
+        {
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            var startContentItems = new List<Content>();
+
+            for (var i = 0; i < numberToCreate; i++)
+                startContentItems.Add(MockedContent.CreateSimpleContent(contentType));
+
+            ServiceContext.ContentService.Save(startContentItems);
+
+            return startContentItems.ToArray();
+        }
+
         private IUser CreateTestUser(out IUserGroup userGroup)
         {
             userGroup = CreateTestUserGroup();
 
             var user = ServiceContext.UserService.CreateUserWithIdentity("test1", "test1@test.com");
+
             user.AddGroup(userGroup.ToReadOnlyGroup());
+
             ServiceContext.UserService.Save(user);
+
             return user;
+        }
+
+        private List<IUser> CreateTestUsers(int[] startContentIds, IUserGroup userGroup, int numberToCreate)
+        {
+            var users = new List<IUser>();
+
+            for (var i = 0; i < numberToCreate; i++)
+            {
+                var user = ServiceContext.UserService.CreateUserWithIdentity($"test{i}", $"test{i}@test.com");
+                user.AddGroup(userGroup.ToReadOnlyGroup());
+
+                var updateable = (User)user;
+                updateable.StartContentIds = startContentIds;
+
+                ServiceContext.UserService.Save(user);
+
+                users.Add(user);
+            }
+
+            return users;
         }
 
         private UserGroup CreateTestUserGroup(string alias = "testGroup", string name = "Test Group")

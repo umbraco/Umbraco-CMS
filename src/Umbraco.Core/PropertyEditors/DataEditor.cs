@@ -19,7 +19,6 @@ namespace Umbraco.Core.PropertyEditors
     public class DataEditor : IDataEditor
     {
         private IDictionary<string, object> _defaultConfiguration;
-        private IDataValueEditor _dataValueEditor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataEditor"/> class.
@@ -91,7 +90,7 @@ namespace Umbraco.Core.PropertyEditors
         /// simple enough for now.</para>
         /// </remarks>
         // TODO: point of that one? shouldn't we always configure?
-        public IDataValueEditor GetValueEditor() => ExplicitValueEditor ?? (_dataValueEditor ?? (_dataValueEditor = CreateValueEditor()));
+        public IDataValueEditor GetValueEditor() => ExplicitValueEditor ?? CreateValueEditor();
 
         /// <inheritdoc />
         /// <remarks>
@@ -105,7 +104,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <para>Technically, it could be cached by datatype but let's keep things
         /// simple enough for now.</para>
         /// </remarks>
-        public IDataValueEditor GetValueEditor(object configuration)
+        public virtual IDataValueEditor GetValueEditor(object configuration)
         {
             // if an explicit value editor has been set (by the manifest parser)
             // then return it, and ignore the configuration, which is going to be

@@ -45,7 +45,7 @@ function mediaHelper(umbRequestHelper, $log) {
 
                 //this performs a simple check to see if we have a media file as value
                 //it doesnt catch everything, but better then nothing
-                if (angular.isString(item.value) && item.value.indexOf(mediaRoot) === 0) {
+                if (Utilities.isString(item.value) && item.value.indexOf(mediaRoot) === 0) {
                     return true;
                 }
 
@@ -143,7 +143,7 @@ function mediaHelper(umbRequestHelper, $log) {
          */
         resolveFileFromEntity: function (mediaEntity, thumbnail) {
 
-            var mediaPath = angular.isObject(mediaEntity.metaData) ? mediaEntity.metaData.MediaPath : null;
+            var mediaPath = Utilities.isObject(mediaEntity.metaData) ? mediaEntity.metaData.MediaPath : null;
 
             if (!mediaPath) {
                 //don't throw since this image legitimately might not contain a media path, but output a warning
