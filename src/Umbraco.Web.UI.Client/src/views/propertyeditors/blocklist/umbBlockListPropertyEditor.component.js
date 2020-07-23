@@ -271,7 +271,7 @@
             var removed = vm.layout.splice(layoutIndex, 1);
             removed.forEach(x => {
                 // remove any server validation errors associated
-                var guid = udiService.getKey(x.udi);                
+                var guid = udiService.getKey(x.contentUdi);                
                 serverValidationManager.removePropertyError(guid, vm.umbProperty.property.culture, vm.umbProperty.property.segment, "", { matchType: "contains" });
             });
 
