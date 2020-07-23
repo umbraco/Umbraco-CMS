@@ -240,7 +240,7 @@
 
                                 </div>
 
-                                <ng-form inert class="umb-group-builder__property-preview-form" name="propertyEditorPreviewForm" umb-disable-form-validation ng-click="editPropertyTypeSettings(property, tab)">
+                                <ng-form inert class="umb-group-builder__property-preview-form" name="propertyEditorPreviewForm" umb-disable-form-validation ng-click="editPropertyTypeSettings(property, tab)" tabindex="-1">
                                     <umb-property-editor
                                         ng-if="property.view !== undefined"
                                         model="property"

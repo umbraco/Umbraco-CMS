@@ -491,6 +491,7 @@
     <key alias="selectMemberType">Select member type</key>
     <key alias="selectNode">Select node</key>
     <key alias="selectSections">Select sections</key>
+    <key alias="selectUser">Select user</key>
     <key alias="selectUsers">Select users</key>
     <key alias="noIconsFound">No icons were found</key>
     <key alias="noMacroParams">There are no parameters for this macro</key>
@@ -1336,10 +1337,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="customCrop">User defined</key>
   </area>
   <area alias="rollback">
-    <key alias="headline">Select a version to compare with the current version</key>
+    <key alias="changes">Changes</key>
+    <key alias="created">Created</key>
     <key alias="currentVersion">Current version</key>
     <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
     <key alias="documentRolledBack">Document has been rolled back</key>
+    <key alias="headline">Select a version to compare with the current version</key>
     <key alias="htmlHelp">This displays the selected version as HTML, if you wish to see the difference between 2 versions at the same time, use the diff view</key>
     <key alias="rollbackTo">Rollback to</key>
     <key alias="selectVersion">Select version</key>
@@ -2035,7 +2038,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="validationRegExpMessage">Enter a custom validation error message (optional)</key>
     <key alias="minCount">You need to add at least</key>
     <key alias="maxCount">You can only have</key>
+    <key alias="addUpTo">Add up to</key>
     <key alias="items">items</key>
+    <key alias="urls">url(s)</key>
+    <key alias="urlsSelected">url(s) selected</key>
     <key alias="itemsSelected">items selected</key>
     <key alias="invalidDate">Invalid date</key>
     <key alias="invalidNumber">Not a number</key>
@@ -2253,6 +2259,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="name">Name</key>
     <key alias="addNewRow">Add new row</key>
     <key alias="tabExpand">View more options</key>
+      <key alias="hasTranslation">Has translation</key>
+      <key alias="noTranslation">Missing translation</key>
+      <key alias="dictionaryListCaption">Dictionary items</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
