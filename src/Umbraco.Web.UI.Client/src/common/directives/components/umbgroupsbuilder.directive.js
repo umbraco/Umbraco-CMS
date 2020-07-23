@@ -281,7 +281,7 @@
                     },
                     selectCompositeContentType: function (selectedContentType) {
 
-                var deferred = $q.defer();
+                        var deferred = $q.defer();
 
                         //first check if this is a new selection - we need to store this value here before any further digests/async
                         // because after that the scope.model.compositeContentTypes will be populated with the selected value.
@@ -313,7 +313,7 @@
                             deferred.resolve({ selectedContentType, newSelection });
                                     // TODO: Here we could probably re-enable selection if we previously showed a throbber or something
                         }, function () {
-                            deferred.reject();
+                                    deferred.reject();
                                 });
                             });
                         }
@@ -323,14 +323,14 @@
 
                             //based on the selection, we need to filter the available composite types list
                             filterAvailableCompositions(selectedContentType, newSelection).then(function () {
-                        deferred.resolve({ selectedContentType, newSelection });
+                            deferred.resolve({ selectedContentType, newSelection });
                                 // TODO: Here we could probably re-enable selection if we previously showed a throbber or something
-                    }, function () {
-                        deferred.reject();
+                    }, function () { 
+                                deferred.reject();
                             });
                         }
 
-                return deferred.promise; 
+                        return deferred.promise; 
                     }
                 };
 
