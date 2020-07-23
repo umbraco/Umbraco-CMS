@@ -11,7 +11,7 @@
    cursor: pointer;
    position: relative;
    user-select: none;
-   box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
+   box-shadow: 0 1px 2px 0 rgba(0,0,0,0.16);
    border-radius: 3px;
 }
 
@@ -29,15 +29,15 @@
             border-radius: 5px;
             box-shadow: 0 0 4px 0 darken(@ui-selected-border, 20), inset 0 0 2px 0 darken(@ui-selected-border, 20);
             pointer-events: none;
+            transition: opacity 100ms;
         }
-        
     }
 }
 
 
 .umb-content-grid__item:hover {    
     &::before {
-        opacity: .33;
+        opacity: .2;
     }
 }
 .umb-content-grid__item.-selected:hover {    
@@ -45,6 +45,7 @@
         opacity: .75;
     }
 }
+
 
 .umb-content-grid__icon-container {
    height: 75px;
@@ -66,8 +67,10 @@
 }
 
 .umb-content-grid__item-name {
+    position: relative;
+    padding: 5px;
+    margin: -5px -5px 15px -5px;
    font-weight: bold;
-   margin-bottom: 15px;
    line-height: 1.4em;
    display: inline-flex;
    

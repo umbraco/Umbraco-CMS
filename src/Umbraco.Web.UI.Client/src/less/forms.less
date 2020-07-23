@@ -29,7 +29,7 @@ label.control-label, .control-label {
   }
 
 
-.controls-row label{padding: 0 10px 0 10px; vertical-align: middle;}
+.controls-row label:not(.umb-form-check){padding: 0 10px 0 10px; vertical-align: middle;}
 
 
 
@@ -252,7 +252,7 @@ input[type="color"],
     outline: 0;
 
     .tabbing-active & {
-        outline: 2px solid @inputBorderTabFocus;
+        outline: 2px solid @ui-outline;
     }
   }
 }
@@ -297,11 +297,10 @@ select[size] {
 }
 
 // Focus for select, file, radio, and checkbox
-select:focus,
-input[type="file"]:focus,
-input[type="radio"]:focus,
-input[type="checkbox"]:focus {
-  .tab-focus();
+input[type="file"],
+input[type="radio"],
+input[type="checkbox"] {
+  .umb-outline();
 }
 
 

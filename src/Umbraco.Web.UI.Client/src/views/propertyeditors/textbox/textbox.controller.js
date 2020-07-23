@@ -11,7 +11,19 @@ function textboxController($scope, validationMessageService) {
         // if no max is specified in the config
         $scope.model.config.maxChars = 500;
     }
-    
+
+    $scope.$on("formSubmitting", function() {
+        if ($scope.isLengthValid()) {
+            $scope.textboxFieldForm.textbox.$setValidity("maxChars", true);
+        } else {
+            $scope.textboxFieldForm.textbox.$setValidity("maxChars", false);
+        }
+    });
+
+    $scope.isLengthValid = function() {
+        return $scope.model.config.maxChars >= $scope.model.count;
+    }
+
     $scope.model.change = function () {
         if ($scope.model.value) {
             $scope.model.count = $scope.model.value.length;

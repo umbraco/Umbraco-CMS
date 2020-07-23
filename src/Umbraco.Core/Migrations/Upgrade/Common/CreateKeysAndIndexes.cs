@@ -12,6 +12,7 @@ namespace Umbraco.Core.Migrations.Upgrade.Common
         {
             // remove those that may already have keys
             Delete.KeysAndIndexes(Constants.DatabaseSchema.Tables.KeyValue).Do();
+            Delete.KeysAndIndexes(Constants.DatabaseSchema.Tables.PropertyData).Do();
 
             // re-create *all* keys and indexes
             foreach (var x in DatabaseSchemaCreator.OrderedTables)

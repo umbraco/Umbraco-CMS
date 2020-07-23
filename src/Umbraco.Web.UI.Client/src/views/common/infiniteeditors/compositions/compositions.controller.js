@@ -19,7 +19,7 @@
 
             /* make a copy of the init model so it is possible to roll 
             back the changes on cancel */
-            oldModel = angular.copy($scope.model);
+            oldModel = Utilities.copy($scope.model);
 
             if (!$scope.model.title) {
                 $scope.model.title = "Compositions";
@@ -44,6 +44,7 @@
                 });
         }
 
+        
         function isSelected(alias) {
             if ($scope.model.contentType.compositeContentTypes.indexOf(alias) !== -1) {
                 return true;
@@ -63,11 +64,10 @@
             var contentType = compositeContentType.contentType;
 
             $scope.model.selectCompositeContentType(contentType).then(function (response) {
-                console.log("selectCompositeContentType", response);
 
-                angular.forEach(vm.availableGroups, function (group) {
+                Utilities.forEach(vm.availableGroups, function (group) {
 
-                    angular.forEach(group.compositeContentTypes, function (obj) {
+                    Utilities.forEach(group.compositeContentTypes, function (obj) {
                         if (obj.allowed === false) {
                             obj.selected = false;
                         }
@@ -110,7 +110,7 @@
                 or the confirm checkbox has been checked */
                 if (compositionRemoved) {
                     vm.allowSubmit = false;
-                    localizationService.localize("general_remove").then(function(value) {
+                    localizationService.localize("general_remove").then(function (value) {
                         const dialog = {
                             view: "views/common/infiniteeditors/compositions/overlays/confirmremove.html",
                             title: value,

@@ -159,11 +159,17 @@
                                                 </tbody>
                                             </table>
 
-                                            <div class="btn-group">
-                                                <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" ng-href="" ng-click="log.searchDropdownOpen = !log.searchDropdownOpen">
-                                                    <i class="icon-search"></i> <localize key="general_search">Search</localize>
-                                                    <span class="caret"></span>
-                                                </a>
+                                            <div class="btn-group" deep-blur="log.searchDropdownOpen = !log.searchDropdownOpen">
+                                                <button 
+                                                    type="button" 
+                                                    class="btn btn-info dropdown-toggle"
+                                                    aria-haspopup="true"
+                                                    aria-expanded="{{log.searchDropdownOpen === undefined ? false : log.searchDropdownOpen}}"
+                                                    ng-click="log.searchDropdownOpen = !log.searchDropdownOpen">
+                                                        <i class="icon-search" aria-hidden="true"></i> 
+                                                        <localize key="general_search">Search</localize>
+                                                        <span class="caret" aria-hidden="true"></span>
+                                                </button>
 
                                                 <umb-dropdown ng-if="log.searchDropdownOpen" on-close="log.searchDropdownOpen = false">
                                                     <umb-dropdown-item>

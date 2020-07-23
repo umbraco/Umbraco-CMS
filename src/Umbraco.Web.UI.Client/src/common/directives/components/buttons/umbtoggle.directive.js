@@ -75,7 +75,10 @@
             scope.displayLabelOff = "";
 
             function onInit() {
+                scope.inputId = scope.inputId || "umb-toggle_" + String.CreateGuid();
+
                 setLabelText();
+
                 // must wait until the current digest cycle is finished before we emit this event on init, 
                 // otherwise other property editors might not yet be ready to receive the event
                 $timeout(function () {
@@ -113,7 +116,6 @@
             };
 
             onInit();
-
         }
 
         var directive = {

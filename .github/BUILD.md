@@ -43,6 +43,8 @@ If you only see a build.bat-file, you're probably on the wrong branch. If you sw
 
 You might run into [Powershell quirks](#powershell-quirks).
 
+If it runs without errors; Hooray! Now you can continue with [the next step](CONTRIBUTING.md#how-do-i-begin) and open the solution and build it.
+
 ### Build Infrastructure
 
 The Umbraco Build infrastructure relies on a PowerShell object. The object can be retrieved with:

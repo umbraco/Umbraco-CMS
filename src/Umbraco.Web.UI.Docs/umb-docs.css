@@ -4,7 +4,22 @@ html {
 }
 body {
     font-family: 'Segoe UI', Tahoma, Helvetica, sans-serif;
-    
+
+}
+
+.container, .navbar-static-top .container, .navbar-fixed-top .container, .navbar-fixed-bottom .container {
+    max-width: 1500px;
+    width: 95%;
+}
+
+.span3 {
+    width: 220px;
+    width: calc(90% / 12 * 3);
+}
+
+.span9 {
+    width: 700px;
+    width: calc(90% / 12 * 9);
 }
 
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
@@ -18,37 +33,43 @@ body {
     font-family: inherit;
 }
 
+.navbar .container{
+    min-height: inherit;
+    display: flex;
+    align-items: center;
+}
+
 .navbar .brand {
     display: block;
-    float: left;
-    padding: 10px 20px 10px;
-    margin-left: -20px;
-    font-size: 20px;
-    font-weight: 200;
-    color: rgba(0,0,0,.8);
+    color: white;
     text-shadow: none;
 }
 
 .navbar-fixed-top .navbar-inner {
     min-height: 50px;
-    background: #a3db78;
+    background: #3544b1;
 }
 
 .form-search .well {
-    background-color: #f5fbf1;
+    background-color: #f7f7f7;
 }
 
 .form-search > ul.nav > li.module {
-    background-color: #daf0c9;
+    background-color: #3544b1;
 }
 
-.breadcrumb {    
-    background-color: #f5fbf1;
+.form-search > ul.nav > li.module a {
+    color: white;
 }
 
-a {
-    color: #f36f21;
+.form-search > ul.nav > li.section {
+    background-color: #ccc;
 }
+
+.breadcrumb {
+    background-color: #f7f7f7;
+}
+
 a:hover {
     text-decoration: none;
     color: rgba(0,0,0,.8);
@@ -72,7 +93,19 @@ a:hover {
     color: #000;
 }
 
+.form-search > ul.nav > li.module > a:hover{
+    color: #fff;
+}
+
 .header img {
     width: 50px;
-    margin-top: 5px;
+}
+
+.content .methods code {
+    border: 1px solid #e1e1e8;
+    background-color: #f7f7f9;
+    padding: 0px 3px;
+    font-size: 85%;
+    color: #d14;
+    white-space: nowrap;
 }

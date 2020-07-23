@@ -129,8 +129,8 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // we need to get the default permissions as you can't set permissions on the very root node
-                var permission = Services.UserService.GetPermissions(Security.CurrentUser, Constants.System.Root).First();
-                var nodeActions = _actions.FromEntityPermission(permission)
+                var assignedPermissions = Services.UserService.GetAssignedPermissions(Security.CurrentUser, Constants.System.Root);
+                var nodeActions = _actions.GetByLetters(assignedPermissions)
                     .Select(x => new MenuItem(x));
 
                 //these two are the standard items
@@ -323,7 +323,7 @@ namespace Umbraco.Web.Trees
         private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool opensDialog = false)
             where TAction : IAction
         {
-            var menuItem = menu.Items.Add<TAction>(Services.TextService.Localize("actions", _actions.GetAction<TAction>().Alias), hasSeparator, opensDialog);
+            var menuItem = menu.Items.Add<TAction>(Services.TextService, hasSeparator, opensDialog);
         }
 
         public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)

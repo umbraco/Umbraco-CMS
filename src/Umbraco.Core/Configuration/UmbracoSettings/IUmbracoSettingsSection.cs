@@ -15,5 +15,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         ILoggingSection Logging { get; }
 
         IWebRoutingSection WebRouting { get; }
+
+        IKeepAliveSection KeepAlive { get; }
     }
 }
