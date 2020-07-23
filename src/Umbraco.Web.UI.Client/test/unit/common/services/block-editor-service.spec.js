@@ -1,7 +1,9 @@
 ﻿describe('blockEditorService tests', function () {
 
-    var key = "6A1F5BDD-67EF-4173-B061-D6348ED07094";
-    var udi = "umb://element/6A1F5BDD67EF4173B061D6348ED07094";
+    var contentKey = "6A1F5BDD-67EF-4173-B061-D6348ED07094";
+    var contentUdi = "umb://element/6A1F5BDD67EF4173B061D6348ED07094";
+    var settingsKey = "2AF42343-C8A2-400D-BA43-4818C2B3CDC5";
+    var settingsUdi = "umb://element/2AF42343C8A2400DBA434818C2B3CDC5";
 
     var blockEditorService, contentResource, $rootScope, $scope;
 
@@ -20,7 +22,7 @@
         contentResource = $injector.get("contentResource");
         spyOn(contentResource, "getScaffoldByKey").and.callFake(
             function () {
-                return Promise.resolve(mocksUtils.getMockVariantContent(1234, key, udi))
+                return Promise.resolve(mocksUtils.getMockVariantContent(1234, contentKey, contentUdi))
             }
         );
 
@@ -35,13 +37,13 @@
         layout: {
             "Umbraco.TestBlockEditor": [
                 {
-                    udi: udi
+                    contentUdi: contentUdi
                 }
             ]
         },
         contentData: [
             {
-                udi: 1234,
+                udi: contentUdi,
                 contentTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB",
                 testproperty: "myTestValue"
             }
@@ -53,21 +55,21 @@
         layout: {
             "Umbraco.TestBlockEditor": [
                 {
-                    udi: 1234,
-                    settingsUdi: 4567
+                    contentUdi: contentUdi,
+                    settingsUdi: settingsUdi
                 }
             ]
         },
         contentData: [
             {
-                udi: udi,
+                udi: contentUdi,
                 contentTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB",
                 testproperty: "myTestValue"
             }
         ],
         settingsData: [
             {
-                udi: 4567,
+                udi: settingsUdi,
                 contentTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB",
                 testproperty: "myTestValueForSettings"
             }
@@ -339,33 +341,34 @@
 
             modelObject.load().then(() => {
 
-                var layout = modelObject.getLayout();
+                try {
+                    var layout = modelObject.getLayout();
 
-                var blockObject = modelObject.getBlockObject(layout[0]);
+                    var blockObject = modelObject.getBlockObject(layout[0]);
 
-                blockObject.content.variants[0].tabs[0].properties[0].value.list[0] = "AA";
-                blockObject.content.variants[0].tabs[0].properties[0].value.list.push("D");
+                    blockObject.content.variants[0].tabs[0].properties[0].value.list[0] = "AA";
+                    blockObject.content.variants[0].tabs[0].properties[0].value.list.push("D");
 
-                blockObject.settings.variants[0].tabs[0].properties[0].value.list[0] = "settingsValue";
-                blockObject.settings.variants[0].tabs[0].properties[0].value.list.push("settingsNewValue");
+                    blockObject.settings.variants[0].tabs[0].properties[0].value.list[0] = "settingsValue";
+                    blockObject.settings.variants[0].tabs[0].properties[0].value.list.push("settingsNewValue");
 
-                $rootScope.$digest();// invoke angularJS Store.
+                    $rootScope.$digest();// invoke angularJS Store.
 
-                expect(propertyModel.contentData[0].testproperty.list[0]).toBe("AA");
-                expect(propertyModel.contentData[0].testproperty.list.length).toBe(4);
+                    expect(propertyModel.contentData[0].testproperty.list[0]).toBe("AA");
+                    expect(propertyModel.contentData[0].testproperty.list.length).toBe(4);
 
-                expect(propertyModel.settingsData[0].testproperty.list[0]).toBe("settingsValue");
-                expect(propertyModel.settingsData[0].testproperty.list.length).toBe(4);
+                    expect(propertyModel.settingsData[0].testproperty.list[0]).toBe("settingsValue");
+                    expect(propertyModel.settingsData[0].testproperty.list.length).toBe(4);
 
-                done();
-            } catch (e) {
-                done.fail(e);
-            }
+                    done();
+                } catch (e) {
+                    done.fail(e);
+                }
+            });
+
         });
 
+
     });
-
-
-});
 
 });
