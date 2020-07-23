@@ -517,7 +517,7 @@
         }
 
         function handleHttpException(err) {
-            if (!err.status) {
+            if (err && !err.status) {
                 $exceptionHandler(err);
             }
         }

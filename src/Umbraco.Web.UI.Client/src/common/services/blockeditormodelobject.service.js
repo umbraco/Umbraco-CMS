@@ -25,7 +25,7 @@
             if (!elementModel || !elementModel.variants || !elementModel.variants.length) { return; }
 
             var variant = elementModel.variants[0];
-            
+
             for (var t = 0; t < variant.tabs.length; t++) {
                 var tab = variant.tabs[t];
 
@@ -36,7 +36,7 @@
                     }
                 }
             }
-            
+
         }
 
         /**
@@ -44,11 +44,11 @@
          * needs to stay simple to avoid deep watching.
          */
         function mapToPropertyModel(elementModel, dataModel) {
-            
+
             if (!elementModel || !elementModel.variants || !elementModel.variants.length) { return; }
 
             var variant = elementModel.variants[0];
-            
+
             for (var t = 0; t < variant.tabs.length; t++) {
                 var tab = variant.tabs[t];
 
@@ -59,7 +59,7 @@
                     }
                 }
             }
-            
+
         }
 
         /**
@@ -98,13 +98,13 @@
             }
         }
 
-        
+
         /**
          * Generate label for Block, uses either the labelInterpolator or falls back to the contentTypeName.
          * @param {Object} blockObject BlockObject to recive data values from.
          */
         function getBlockLabel(blockObject) {
-            if(blockObject.labelInterpolator !== undefined) {
+            if (blockObject.labelInterpolator !== undefined) {
                 // We are just using the data model, since its a key/value object that is live synced. (if we need to add additional vars, we could make a shallow copy and apply those.)
                 return blockObject.labelInterpolator(blockObject.data);
             }
@@ -133,7 +133,7 @@
                     // But we like to sync non-primitive values as well! Yes, and this does happen, just not through this code, but through the nature of JavaScript.
                     // Non-primitive values act as references to the same data and are therefor synced.
                     blockObject.__watchers.push(isolatedScope.$watch("blockObjects._" + blockObject.key + "." + field + ".variants[0].tabs[" + t + "].properties[" + p + "].value", watcherCreator(blockObject, prop)));
-                    
+
                     // We also like to watch our data model to be able to capture changes coming from other places.
                     if (forSettings === true) {
                         blockObject.__watchers.push(isolatedScope.$watch("blockObjects._" + blockObject.key + "." + "settingsData" + "." + prop.alias, createLayoutSettingsModelWatcher(blockObject, prop)));
@@ -151,8 +151,8 @@
         /**
          * Used to create a prop watcher for the data in the property editor data model.
          */
-        function createDataModelWatcher(blockObject, prop)  {
-            return function() {
+        function createDataModelWatcher(blockObject, prop) {
+            return function () {
                 if (prop.value !== blockObject.data[prop.alias]) {
 
                     // sync data:
@@ -165,8 +165,8 @@
         /**
          * Used to create a prop watcher for the settings in the property editor data model.
          */
-        function createLayoutSettingsModelWatcher(blockObject, prop)  {
-            return function() {
+        function createLayoutSettingsModelWatcher(blockObject, prop) {
+            return function () {
                 if (prop.value !== blockObject.settingsData[prop.alias]) {
                     // sync data:
                     prop.value = blockObject.settingsData[prop.alias];
@@ -177,8 +177,8 @@
         /**
          * Used to create a scoped watcher for a content property on a blockObject.
          */
-        function createContentModelPropWatcher(blockObject, prop)  {
-            return function() {
+        function createContentModelPropWatcher(blockObject, prop) {
+            return function () {
                 if (blockObject.data[prop.alias] !== prop.value) {
                     // sync data:
                     blockObject.data[prop.alias] = prop.value;
@@ -191,8 +191,8 @@
         /**
          * Used to create a scoped watcher for a settings property on a blockObject.
          */
-        function createSettingsModelPropWatcher(blockObject, prop)  {
-            return function() {
+        function createSettingsModelPropWatcher(blockObject, prop) {
+            return function () {
                 if (blockObject.settingsData[prop.alias] !== prop.value) {
                     // sync data:
                     blockObject.settingsData[prop.alias] = prop.value;
@@ -255,17 +255,17 @@
 
             this.isolatedScope = scopeOfExistance.$new(true);
             this.isolatedScope.blockObjects = {};
-            
+
             this.__watchers.push(this.isolatedScope.$on("$destroy", this.destroy.bind(this)));
             this.__watchers.push(propertyEditorScope.$on("postFormSubmitting", this.sync.bind(this)));
 
         };
-        
+
         BlockEditorModelObject.prototype = {
 
             update: function (propertyModelValue, propertyEditorScope) {
                 // clear watchers
-                this.__watchers.forEach(w => { w(); });                
+                this.__watchers.forEach(w => { w(); });
                 delete this.__watchers;
 
                 // clear block objects
@@ -293,7 +293,7 @@
              * @param {string} key contentTypeKey to recive the configuration model for.
              * @returns {Object | null} Configuration model for the that specific block. Or ´null´ if the contentTypeKey isnt available in the current block configurations.
              */
-            getBlockConfiguration: function(key) {
+            getBlockConfiguration: function (key) {
                 return this.blockConfigurations.find(bc => bc.contentTypeKey === key) || null;
             },
 
@@ -305,7 +305,7 @@
              * @param {Object} blockObject BlockObject to receive data values from.
              * @returns {Promise} A Promise object which resolves when all scaffold models are loaded.
              */
-            load: function() {
+            load: function () {
                 var tasks = [];
 
                 var scaffoldKeys = [];
@@ -339,7 +339,7 @@
              * @description Retrive a list of aliases that are available for content of blocks in this property editor, does not contain aliases of block settings.
              * @return {Array} array of strings representing alias.
              */
-            getAvailableAliasesForBlockContent: function() {
+            getAvailableAliasesForBlockContent: function () {
                 return this.blockConfigurations.map(blockConfiguration => this.getScaffoldFromKey(blockConfiguration.contentTypeKey).contentTypeAlias);
             },
 
@@ -351,13 +351,13 @@
              * The purpose of this data is to provide it for the Block Picker.
              * @return {Array} array of objects representing available blocks, each object containing properties blockConfigModel and elementTypeModel.
              */
-            getAvailableBlocksForBlockPicker: function() {
+            getAvailableBlocksForBlockPicker: function () {
 
                 var blocks = [];
 
                 this.blockConfigurations.forEach(blockConfiguration => {
                     var scaffold = this.getScaffoldFromKey(blockConfiguration.contentTypeKey);
-                    if(scaffold) {
+                    if (scaffold) {
                         blocks.push({
                             blockConfigModel: blockConfiguration,
                             elementTypeModel: scaffold.documentType
@@ -376,7 +376,7 @@
              * @param {string} key contentTypeKey to recive the scaffold model for.
              * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
              */
-            getScaffoldFromKey: function(contentTypeKey) {
+            getScaffoldFromKey: function (contentTypeKey) {
                 return this.scaffolds.find(o => o.contentTypeKey === contentTypeKey);
             },
 
@@ -388,7 +388,7 @@
              * @param {string} alias contentTypeAlias to recive the scaffold model for.
              * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
              */
-            getScaffoldFromAlias: function(contentTypeAlias) {
+            getScaffoldFromAlias: function (contentTypeAlias) {
                 return this.scaffolds.find(o => o.contentTypeAlias === contentTypeAlias);
             },
 
@@ -413,14 +413,14 @@
              * @param {Object} layoutEntry the layout entry object to build the block model from.
              * @return {Object | null} The BlockObject for the given layout entry. Or null if data or configuration wasnt found for this block.
              */
-            getBlockObject: function(layoutEntry) {
+            getBlockObject: function (layoutEntry) {
 
-                var udi = layoutEntry.udi;
+                var udi = layoutEntry.contentUdi;
 
                 var dataModel = this._getDataByUdi(udi);
 
                 if (dataModel === null) {
-                    console.error("Couldnt find content model of " + udi)
+                    console.error("Couldn't find content model of " + udi)
                     return null;
                 }
 
@@ -428,11 +428,12 @@
                 var contentScaffold;
 
                 if (blockConfiguration === null) {
-                    console.error("The block entry of "+udi+" is not begin initialized cause its contentTypeKey is not allowed for this PropertyEditor");
-                } else {
+                    console.error("The block entry of " + udi + " is not being initialized because its contentTypeKey is not allowed for this PropertyEditor");
+                }
+                else {
                     contentScaffold = this.getScaffoldFromKey(blockConfiguration.contentTypeKey);
-                    if(contentScaffold === null) {
-                        console.error("The block entry of "+udi+" is not begin initialized cause its Element Type was not loaded.");
+                    if (contentScaffold === null) {
+                        console.error("The block entry of " + udi + " is not begin initialized cause its Element Type was not loaded.");
                     }
                 }
 
@@ -443,12 +444,12 @@
                         unsupported: true
                     };
                     contentScaffold = {};
-                    
+
                 }
 
                 var blockObject = {};
                 // Set an angularJS cloneNode method, to avoid this object begin cloned.
-                blockObject.cloneNode = function() {
+                blockObject.cloneNode = function () {
                     return null;// angularJS accept this as a cloned value as long as the 
                 }
                 blockObject.key = String.CreateGuid().replace(/-/g, "");
@@ -465,7 +466,7 @@
                             this.__scope.$evalAsync();
                         }
                     }.bind(blockObject)
-                , 10);
+                    , 10);
 
                 // make basics from scaffold
                 blockObject.content = Utilities.copy(contentScaffold);
@@ -505,7 +506,7 @@
                     }
                 }
 
-                blockObject.retrieveValuesFrom = function(content, settings) {
+                blockObject.retrieveValuesFrom = function (content, settings) {
                     if (this.content !== null) {
                         mapElementValues(content, this.content);
                     }
@@ -545,7 +546,7 @@
                     delete this.settingsData;
                     delete this.content;
                     delete this.settings;
-                    
+
                     // remove model from isolatedScope.
                     delete this.__scope.blockObjects["_" + this.key];
                     // NOTE: It seems like we should call this.__scope.$destroy(); since that is the only way to remove a scope from it's parent, 
@@ -555,7 +556,7 @@
 
                     // removes this method, making it impossible to destroy again.
                     delete this.destroy;
-                    
+
                     // lets remove the key to make things blow up if this is still referenced:
                     delete this.key;
                 }
@@ -580,7 +581,7 @@
                 }
                 this.destroyBlockObject(blockObject);
                 this.removeDataByUdi(udi);
-                if(settingsUdi) { 
+                if (settingsUdi) {
                     this.removeSettingsByUdi(settingsUdi);
                 }
             },
@@ -592,7 +593,7 @@
              * @description Destroys the Block Model, but all data is kept.
              * @param {Object} blockObject The BlockObject to be destroyed.
              */
-            destroyBlockObject: function(blockObject) {
+            destroyBlockObject: function (blockObject) {
                 blockObject.destroy();
             },
 
@@ -604,13 +605,13 @@
              * @param {object} defaultStructure if no data exist the layout of your poerty editor will be set to this object.
              * @return {Object} Layout object, structure depends on the model of your property editor.
              */
-            getLayout: function(defaultStructure) {
+            getLayout: function (defaultStructure) {
                 if (!this.value.layout[this.propertyEditorAlias]) {
                     this.value.layout[this.propertyEditorAlias] = defaultStructure;
                 }
                 return this.value.layout[this.propertyEditorAlias];
             },
-            
+
             /**
              * @ngdoc method
              * @name create
@@ -619,21 +620,21 @@
              * @param {string} contentTypeKey the contentTypeKey of the block you wish to create, if contentTypeKey is not avaiable in the block configuration then ´null´ will be returned.
              * @return {Object | null} Layout entry object, to be inserted at a decired location in the layout object. Or null if contentTypeKey is unavaiaible.
              */
-            create: function(contentTypeKey) {
-                
+            create: function (contentTypeKey) {
+
                 var blockConfiguration = this.getBlockConfiguration(contentTypeKey);
-                if(blockConfiguration === null) {
+                if (blockConfiguration === null) {
                     return null;
                 }
 
                 var entry = {
-                    udi: this._createDataEntry(contentTypeKey)
+                    contentUdi: this._createDataEntry(contentTypeKey)
                 }
 
                 if (blockConfiguration.settingsElementTypeKey != null) {
                     entry.settingsUdi = this._createSettingsEntry(blockConfiguration.settingsElementTypeKey)
                 }
-                
+
                 return entry;
             },
 
@@ -644,19 +645,19 @@
              * @description Insert data from ElementType Model
              * @return {Object | null} Layout entry object, to be inserted at a decired location in the layout object. Or ´null´ if the given ElementType isnt supported by the block configuration.
              */
-            createFromElementType: function(elementTypeDataModel) {
+            createFromElementType: function (elementTypeDataModel) {
 
                 elementTypeDataModel = Utilities.copy(elementTypeDataModel);
 
                 var contentTypeKey = elementTypeDataModel.contentTypeKey;
 
                 var layoutEntry = this.create(contentTypeKey);
-                if(layoutEntry === null) {
+                if (layoutEntry === null) {
                     return null;
                 }
 
                 var dataModel = this._getDataByUdi(layoutEntry.udi);
-                if(dataModel === null) {
+                if (dataModel === null) {
                     return null;
                 }
 
@@ -672,7 +673,7 @@
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Force immidiate update of the blockobject models to the property model.
              */
-            sync: function() {
+            sync: function () {
                 for (const key in this.isolatedScope.blockObjects) {
                     this.isolatedScope.blockObjects[key].sync();
                 }
@@ -680,7 +681,7 @@
 
             // private
             // TODO: Then this can just be a method in the outer scope
-            _createDataEntry: function(elementTypeKey) {
+            _createDataEntry: function (elementTypeKey) {
                 var content = {
                     contentTypeKey: elementTypeKey,
                     udi: udiService.create("element")
@@ -690,7 +691,7 @@
             },
             // private
             // TODO: Then this can just be a method in the outer scope
-            _getDataByUdi: function(udi) {
+            _getDataByUdi: function (udi) {
                 return this.value.contentData.find(entry => entry.udi === udi) || null;
             },
 
@@ -699,10 +700,10 @@
              * @name removeDataByUdi
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Removes the content data of a given UDI.
-             * Notice this method does not remove the block from your layout, this will need to be handlede by the Property Editor since this services donst know about your layout structure.
+             * Notice this method does not remove the block from your layout, this will need to be handled by the Property Editor since this services don't know about your layout structure.
              * @param {string} udi The UDI of the content data to be removed.
              */
-            removeDataByUdi: function(udi) {
+            removeDataByUdi: function (udi) {
                 const index = this.value.contentData.findIndex(o => o.udi === udi);
                 if (index !== -1) {
                     this.value.contentData.splice(index, 1);
@@ -711,7 +712,7 @@
 
             // private
             // TODO: Then this can just be a method in the outer scope
-            _createSettingsEntry: function(elementTypeKey) {
+            _createSettingsEntry: function (elementTypeKey) {
                 var settings = {
                     contentTypeKey: elementTypeKey,
                     udi: udiService.create("element")
@@ -722,7 +723,7 @@
 
             // private
             // TODO: Then this can just be a method in the outer scope
-            _getSettingsByUdi: function(udi) {
+            _getSettingsByUdi: function (udi) {
                 return this.value.settingsData.find(entry => entry.udi === udi) || null;
             },
 
@@ -731,10 +732,10 @@
              * @name removeSettingsByUdi
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Removes the settings data of a given UDI.
-             * Notice this method does not remove the settingsUdi from your layout, this will need to be handlede by the Property Editor since this services donst know about your layout structure.
+             * Notice this method does not remove the settingsUdi from your layout, this will need to be handled by the Property Editor since this services don't know about your layout structure.
              * @param {string} udi The UDI of the settings data to be removed.
              */
-            removeSettingsByUdi: function(udi) {
+            removeSettingsByUdi: function (udi) {
                 const index = this.value.settingsData.findIndex(o => o.udi === udi);
                 if (index !== -1) {
                     this.value.settingsData.splice(index, 1);
@@ -747,13 +748,13 @@
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Notice you should not need to destroy the BlockEditorModelObject since it will automaticly be destroyed when the scope of existance gets destroyed.
              */
-            destroy: function() {
+            destroy: function () {
 
                 this.__watchers.forEach(w => { w(); });
                 for (const key in this.isolatedScope.blockObjects) {
                     this.destroyBlockObject(this.isolatedScope.blockObjects[key]);
                 }
-                
+
                 delete this.__watchers;
                 delete this.value;
                 delete this.propertyEditorAlias;

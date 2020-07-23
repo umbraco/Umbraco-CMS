@@ -504,7 +504,6 @@ function serverValidationManager($timeout) {
 
                 // add a generic error for the property
                 addPropertyError(propertyValidationKey, culture, htmlFieldReference, value && Array.isArray(value) && value.length > 0 ? value[0] : null, segment);
-                hasPropertyErrors = true;
             }
             else {
 

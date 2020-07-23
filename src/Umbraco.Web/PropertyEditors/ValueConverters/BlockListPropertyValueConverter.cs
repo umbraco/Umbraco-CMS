@@ -62,20 +62,20 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 if (string.IsNullOrWhiteSpace(value)) return BlockListModel.Empty;
 
                 var converter = new BlockListEditorDataConverter();
-                var converted = converter.Convert(value);
-                if (converted.ContentData.Count == 0) return BlockListModel.Empty;
+                var converted = converter.Deserialize(value);
+                if (converted.BlockValue.ContentData.Count == 0) return BlockListModel.Empty;
 
                 var blockListLayout = converted.Layout.ToObject<IEnumerable<BlockListLayoutItem>>();
 
                 // convert the content data
-                foreach (var data in converted.ContentData)
+                foreach (var data in converted.BlockValue.ContentData)
                 {
                     var element = _blockConverter.ConvertToElement(data, referenceCacheLevel, preview);
                     if (element == null) continue;
                     contentPublishedElements[element.Key] = element;
                 }
                 // convert the settings data
-                foreach (var data in converted.SettingsData)
+                foreach (var data in converted.BlockValue.SettingsData)
                 {
                     var element = _blockConverter.ConvertToElement(data, referenceCacheLevel, preview);
                     if (element == null) continue;

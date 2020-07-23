@@ -132,7 +132,13 @@
 
         // Called when we save the value, the server may return an updated data and our value is re-synced
         // we need to deal with that here so that our model values are all in sync so we basically re-initialize.
-        function onServerValueChanged(newVal, oldVal) {            
+        function onServerValueChanged(newVal, oldVal) {   
+
+            // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
+            if (typeof newVal !== 'object' || newVal === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
+                newVal = {};
+            }
+
             modelObject.update(newVal, $scope);
             onLoaded();
         }
@@ -148,6 +154,8 @@
             // Store a reference to the layout model, because we need to maintain this model.
             vm.layout = modelObject.getLayout([]);
 
+            var invalidLayoutItems = [];
+
             // Append the blockObjects to our layout.
             vm.layout.forEach(entry => {
                 // $block must have the data property to be a valid BlockObject, if not its considered as a destroyed blockObject.
@@ -155,9 +163,22 @@
                     var block = getBlockObject(entry);
     
                     // If this entry was not supported by our property-editor it would return 'null'.
-                    if(block !== null) {
+                    if (block !== null) {
                         entry.$block = block;
                     }
+                    else {
+                        // then we need to filter this out and also update the underlying model. This could happen if the data
+                        // is invalid for some reason or the data structure has changed.
+                        invalidLayoutItems.push(entry);
+                    }
+                }
+            });
+
+            // remove the ones that are invalid
+            invalidLayoutItems.forEach(entry => {
+                var index = vm.layout.findIndex(x => x === entry);
+                if (index >= 0) {
+                    vm.layout.splice(index, 1);
                 }
             });
 
@@ -240,7 +261,7 @@
 
         function deleteBlock(block) {
 
-            var layoutIndex = vm.layout.findIndex(entry => entry.udi === block.content.udi);
+            var layoutIndex = vm.layout.findIndex(entry => entry.contentUdi === block.content.udi);
             if (layoutIndex === -1) {
                 throw new Error("Could not find layout entry of block with udi: "+block.content.udi)
             }
