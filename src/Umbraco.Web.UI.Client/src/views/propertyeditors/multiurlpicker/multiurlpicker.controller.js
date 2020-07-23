@@ -147,7 +147,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
 
         _.each($scope.model.value, function (item){
             // we must reload the "document" link URLs to match the current editor culture
-            if (item.udi.indexOf("/document/") > 0) {
+            if (item.udi && item.udi.indexOf("/document/") > 0) {
                 item.url = null;
                 entityResource.getUrlByUdi(item.udi).then(function (data) {
                     item.url = data;

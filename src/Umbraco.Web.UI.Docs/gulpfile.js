@@ -16,7 +16,7 @@ gulp.task('docs', [], function (cb) {
     var options = {
         html5Mode: false,
         startPage: '/api',
-        title: "Umbraco Backoffice UI API Documentation",
+        title: "Umbraco 8 Backoffice UI API Documentation",
         dest: './api',
         styles: ['./umb-docs.css'],
         image: "https://our.umbraco.com/assets/images/logo.svg"

@@ -52,6 +52,6 @@ namespace Umbraco.Web.Templates
 
         [Obsolete("Use " + nameof(HtmlImageSourceParser) + "." + nameof(RichTextEditorPastedImages.FindAndPersistPastedTempImages) + " instead")]
         internal static string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, ILogger logger)
-            => Current.Factory.GetInstance<RichTextEditorPastedImages>().FindAndPersistPastedTempImages(html, mediaParentFolder, userId);
+            => Current.Factory.GetInstance<RichTextEditorPastedImages>().FindAndPersistPastedTempImages(html, mediaParentFolder, userId, Current.Factory.GetInstance<IImageUrlGenerator>());
     }
 }

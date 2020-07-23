@@ -672,7 +672,8 @@
     }
 
     .imagecropper .umb-sortable-thumbnails li .crop-name,
-    .imagecropper .umb-sortable-thumbnails li .crop-size {
+    .imagecropper .umb-sortable-thumbnails li .crop-size,
+    .imagecropper .umb-sortable-thumbnails li .crop-annotation {
         display: block;
         text-align: left;
         font-size: 13px;
@@ -684,10 +685,15 @@
         margin: 10px 0 5px;
     }
 
-    .imagecropper .umb-sortable-thumbnails li .crop-size {
+    .imagecropper .umb-sortable-thumbnails li .crop-size,
+    .imagecropper .umb-sortable-thumbnails li .crop-annotation {
         font-size: 10px;
         font-style: italic;
         margin: 0 0 5px;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li .crop-annotation {
+        color: @gray-6;
     }
 
     .btn-crop-delete {
@@ -695,8 +701,15 @@
         text-align: left;
     }
 
+    .imagecropper .cropList-container {
+        h5 {
+            margin-left: 10px;
+            margin-top: 0;
+        }
+    }
+
 //
-// folder-browser
+// Folder browser
 // --------------------------------------------------
 .umb-folderbrowser .add-link {
   display: inline-block;
@@ -710,6 +723,11 @@
 //
 // File upload
 // --------------------------------------------------
+.umb-fileupload {
+    display: flex;
+    flex-direction: column;
+}
+
 .umb-fileupload .preview {
   border-radius: 5px;
   border: 1px solid @gray-6;
@@ -790,6 +808,13 @@
 
 
 //
+// Slider
+// --------------------------------------------------
+.umb-slider {
+    .umb-property-editor--limit-width();
+}
+
+//
 // Tags
 // --------------------------------------------------
 .umb-tags {
@@ -847,11 +872,11 @@
 .bootstrap-datetimepicker-widget .picker-switch .btn{ background: none; border: none;}
 .umb-datepicker .input-append .add-on{cursor: pointer;}
 .umb-datepicker .input-append .on-top {
+    border: 0 none;
     position: absolute;
     margin-left: -31px;
     margin-top: 1px;
     display: inline-block;
-    height: 22px;
     padding: 5px 6px 3px 6px;
     font-size: @baseFontSize;
     font-weight: normal;
