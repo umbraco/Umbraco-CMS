@@ -41,8 +41,8 @@
         }
 
         function preSelect(selection, users) {
-            angular.forEach(selection, function(selected){
-                angular.forEach(users, function(user){
+            Utilities.forEach(selection, function(selected){
+                Utilities.forEach(users, function(user){
                     if(selected.id === user.id) {
                         user.selected = true;
                     }
@@ -58,7 +58,7 @@
             } else {
 
                 if (user.selected) {
-                    angular.forEach($scope.model.selection, function (selectedUser, index) {
+                    Utilities.forEach($scope.model.selection, function (selectedUser, index) {
                         if (selectedUser.id === user.id) {
                             user.selected = false;
                             $scope.model.selection.splice(index, 1);
