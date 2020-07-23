@@ -162,6 +162,7 @@
                 }
             }
         }
+
         /**
          * Used to create a prop watcher for the settings in the property editor data model.
          */
@@ -200,6 +201,18 @@
             }
         }
 
+        function createDataEntry(elementTypeKey, dataItems) {
+            var data = {
+                contentTypeKey: elementTypeKey,
+                udi: udiService.create("element")
+            };
+            dataItems.push(data);
+            return data.udi;
+        }
+
+        function getDataByUdi(udi, dataItems) {
+            return dataItems.find(entry => entry.udi === udi) || null;
+        }
 
         /**
          * Used to highlight unsupported properties for the user, changes unsupported properties into a unsupported-property.
@@ -417,7 +430,7 @@
 
                 var udi = layoutEntry.contentUdi;
 
-                var dataModel = this._getDataByUdi(udi);
+                var dataModel = getDataByUdi(udi, this.value.contentData);
 
                 if (dataModel === null) {
                     console.error("Couldn't find content model of " + udi)
@@ -486,12 +499,12 @@
 
                         if (!layoutEntry.settingsUdi) {
                             // if this block does not have settings data, then create it. This could happen because settings model has been added later than this content was created.
-                            layoutEntry.settingsUdi = this._createSettingsEntry(blockConfiguration.settingsElementTypeKey);
+                            layoutEntry.settingsUdi = createDataEntry(blockConfiguration.settingsElementTypeKey, this.value.settingsData);
                         }
 
                         var settingsUdi = layoutEntry.settingsUdi;
 
-                        var settingsData = this._getSettingsByUdi(settingsUdi);
+                        var settingsData = getDataByUdi(settingsUdi, this.value.settingsData);
                         if (settingsData === null) {
                             console.error("Couldnt find content settings data of " + settingsUdi)
                             return null;
@@ -628,11 +641,11 @@
                 }
 
                 var entry = {
-                    contentUdi: this._createDataEntry(contentTypeKey)
+                    contentUdi: createDataEntry(contentTypeKey, this.value.contentData)
                 }
 
                 if (blockConfiguration.settingsElementTypeKey != null) {
-                    entry.settingsUdi = this._createSettingsEntry(blockConfiguration.settingsElementTypeKey)
+                    entry.settingsUdi = createDataEntry(blockConfiguration.settingsElementTypeKey, this.value.settingsData)
                 }
 
                 return entry;
@@ -656,7 +669,7 @@
                     return null;
                 }
 
-                var dataModel = this._getDataByUdi(layoutEntry.udi);
+                var dataModel = getDataByUdi(layoutEntry.udi, this.value.contentData);
                 if (dataModel === null) {
                     return null;
                 }
@@ -679,22 +692,6 @@
                 }
             },
 
-            // private
-            // TODO: Then this can just be a method in the outer scope
-            _createDataEntry: function (elementTypeKey) {
-                var content = {
-                    contentTypeKey: elementTypeKey,
-                    udi: udiService.create("element")
-                };
-                this.value.contentData.push(content);
-                return content.udi;
-            },
-            // private
-            // TODO: Then this can just be a method in the outer scope
-            _getDataByUdi: function (udi) {
-                return this.value.contentData.find(entry => entry.udi === udi) || null;
-            },
-
             /**
              * @ngdoc method
              * @name removeDataByUdi
@@ -708,23 +705,6 @@
                 if (index !== -1) {
                     this.value.contentData.splice(index, 1);
                 }
-            },
-
-            // private
-            // TODO: Then this can just be a method in the outer scope
-            _createSettingsEntry: function (elementTypeKey) {
-                var settings = {
-                    contentTypeKey: elementTypeKey,
-                    udi: udiService.create("element")
-                };
-                this.value.settingsData.push(settings);
-                return settings.udi;
-            },
-
-            // private
-            // TODO: Then this can just be a method in the outer scope
-            _getSettingsByUdi: function (udi) {
-                return this.value.settingsData.find(entry => entry.udi === udi) || null;
             },
 
             /**
