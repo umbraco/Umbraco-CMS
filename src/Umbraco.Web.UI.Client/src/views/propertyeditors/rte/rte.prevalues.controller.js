@@ -30,7 +30,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
             $scope.tinyMceConfig.commands = _.map($scope.tinyMceConfig.commands, function (obj) {
                 var icon = getFontIcon(obj.alias);
 
-                var objCmd = angular.extend(obj, {
+                var objCmd = Utilities.extend(obj, {
                     fontIcon: icon.name,
                     isCustom: icon.isCustom,
                     selected: $scope.model.value.toolbar.indexOf(obj.alias) >= 0,
