@@ -128,10 +128,15 @@
     </Compile>
     -->
     <Compile Include="AssemblyExtensions.cs" />
+    <Compile Include="Constants-SqlTemplates.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\ContentTypeDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyDataDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyTypeDto80.cs" />
+    <Compile Include="Models\ContentDataIntegrityReport.cs" />
+    <Compile Include="Models\ContentDataIntegrityReportEntry.cs" />
+    <Compile Include="Models\ContentDataIntegrityReportOptions.cs" />
     <Compile Include="Models\InstallLog.cs" />
+    <Compile Include="Models\RelationTypeExtensions.cs" />
     <Compile Include="Persistence\Repositories\IInstallationRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\InstallationRepository.cs" />
     <Compile Include="Services\Implement\InstallationService.cs" />

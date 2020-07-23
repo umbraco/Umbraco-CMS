@@ -15,7 +15,14 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleCo
 
         //ensure this is a bool, old data could store zeros/ones or string versions
         $scope.model.config.multiple = Object.toBoolean($scope.model.config.multiple);
-
+        
+        //ensure when form is saved that we don't store [] or [null] as string values in the database when no items are selected
+        $scope.$on("formSubmitting", function () {
+            if ($scope.model.value.length === 0 || $scope.model.value[0] === null) {
+                $scope.model.value = null;
+            }
+        });
+        
         function convertArrayToDictionaryArray(model){
             //now we need to format the items in the dictionary because we always want to have an array
             var newItems = [];

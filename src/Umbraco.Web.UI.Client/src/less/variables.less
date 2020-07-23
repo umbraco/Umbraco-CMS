@@ -83,6 +83,8 @@
 @sand-5:                #F3ECE8;// added 2019
 @sand-6:                #F6F1EF;// added 2019
 @sand-7:                #F9F7F5;// added 2019
+@sand-8:                #fbfaf9;// added 2019
+@sand-9:                #fdfcfc;// added 2019
 
 
 // Additional Icon Colours
@@ -154,11 +156,11 @@
 @ui-active-type-hover:  @blueMid;
 
 @ui-selected:           @sand-5;
-@ui-selected-hover:     ligthen(@sand-5, 10);
+@ui-selected-hover:     ligthen(@sand-5, 10%);
 @ui-selected-type:           @blueExtraDark;
 @ui-selected-type-hover:     @blueMid;
 @ui-selected-border:           @blueDark;
-@ui-selected-border-hover:     darken(@blueDark, 10);
+@ui-selected-border-hover:     darken(@blueDark, 10%);
 
 @ui-light-border:           @pinkLight;
 @ui-light-type:             @gray-4;
@@ -513,7 +515,7 @@
 // -------------------------
 @gridColumns:             12;
 @gridColumnWidth:         60px;
-@gridGutterWidth:         0px;
+@gridGutterWidth:         0;
 @gridRowWidth:            (@gridColumns * @gridColumnWidth) + (@gridGutterWidth * (@gridColumns - 1));
 
 // 1200px min

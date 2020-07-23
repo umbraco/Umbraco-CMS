@@ -13,7 +13,7 @@
  * Section navigation and search, and maintain their state for the entire application lifetime
  *
  */
-function navigationService($routeParams, $location, $q, $injector, eventsService, umbModelMapper, treeService, appState) {
+function navigationService($routeParams, $location, $q, $injector, eventsService, umbModelMapper, treeService, appState, backdropService) {
 
     //the promise that will be resolved when the navigation is ready
     var navReadyPromise = $q.defer();
@@ -26,10 +26,13 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         navReadyPromise.resolve(mainTreeApi);
     });
 
-
+    eventsService.on('appState.backdrop', function(e, args){
+        var element = $(args.element);
+        element.addClass('above-backdrop');
+    });
 
     //A list of query strings defined that when changed will not cause a reload of the route
-    var nonRoutingQueryStrings = ["mculture", "cculture", "lq", "sr"];
+    var nonRoutingQueryStrings = ["mculture", "cculture", "csegment", "lq", "sr"];
     var retainedQueryStrings = ["mculture"];
 
     function setMode(mode) {
@@ -110,6 +113,17 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
                 }
             }
             return result;
+        }
+    }
+
+    function closeBackdrop() {
+        var aboveClass = 'above-backdrop';
+        var leftColumn = $('#leftcolumn');
+        var isLeftColumnOnTop = leftColumn.hasClass(aboveClass);
+
+        if(isLeftColumnOnTop){
+            backdropService.close();
+            leftColumn.removeClass(aboveClass);
         }
     }
 
@@ -410,12 +424,15 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
          * @param {Event} event the click event triggering the method, passed from the DOM element
          */
         showMenu: function (args) {
-
             var self = this;
+
+            var backDropOptions = {
+                'element': $('#leftcolumn')[0]
+            };
 
             return treeService.getMenu({ treeNode: args.node })
                 .then(function (data) {
-
+                    backdropService.open(backDropOptions);
                     //check for a default
                     //NOTE: event will be undefined when a call to hideDialog is made so it won't re-load the default again.
                     // but perhaps there's a better way to deal with with an additional parameter in the args ? it works though.
@@ -466,6 +483,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             appState.setMenuState("currentNode", null);
             appState.setMenuState("menuActions", []);
             setMode("tree");
+            closeBackdrop();
         },
 
         /** Executes a given menu action */
@@ -650,6 +668,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             if (showMenu) {
                 this.showMenu({ skipDefault: true, node: appState.getMenuState("currentNode") });
             } else {
+                closeBackdrop();
                 setMode("default");
             }
         },
@@ -685,6 +704,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
           */
         hideNavigation: function () {
             appState.setMenuState("menuActions", []);
+            closeBackdrop();
             setMode("default");
         }
     };

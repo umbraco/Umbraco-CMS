@@ -141,9 +141,6 @@ namespace Umbraco.Web.Editors
 
             try
             {
-                //clear and replace
-                index.CreateIndex();
-
                 var cacheKey = "temp_indexing_op_" + index.Name;
                 //put temp val in cache which is used as a rudimentary way to know when the indexing is done
                 AppCaches.RuntimeCache.Insert(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5));

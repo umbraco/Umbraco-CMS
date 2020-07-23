@@ -38,7 +38,7 @@
         vm.page.loading = false;
         vm.page.saveButtonState = "init";
         vm.page.navigation = [];
-     
+
         var labelKeys = [
             "general_design",
             "general_listView",
@@ -48,7 +48,7 @@
             "shortcuts_navigateSections",
             "shortcuts_addGroup",
             "shortcuts_addProperty",
-            "shortcuts_addEditor",
+            "defaultdialogs_selectEditor",
             "shortcuts_editDataType",
             "shortcuts_toggleListView",
             "shortcuts_toggleAllowAsRoot",
@@ -91,33 +91,6 @@
             vm.labels.addChildNode = values[12];
             vm.labels.addTemplate = values[13];
             vm.labels.allowCultureVariants = values[14];
-
-            var buttons = [
-                {
-                    "name": vm.labels.design,
-                    "alias": "design",
-                    "icon": "icon-document-dashed-line",
-                    "view": "views/documenttypes/views/design/design.html"
-                },
-                {
-                    "name": vm.labels.listview,
-                    "alias": "listView",
-                    "icon": "icon-list",
-                    "view": "views/documenttypes/views/listview/listview.html"
-                },
-                {
-                    "name": vm.labels.permissions,
-                    "alias": "permissions",
-                    "icon": "icon-keychain",
-                    "view": "views/documenttypes/views/permissions/permissions.html"
-                },
-                {
-                    "name": vm.labels.templates,
-                    "alias": "templates",
-                    "icon": "icon-layout",
-                    "view": "views/documenttypes/views/templates/templates.html"
-                }
-            ];
 
             vm.page.keyboardShortcutsOverview = [
                 {
@@ -187,9 +160,6 @@
                     ]
                 }
             ];
-
-            loadButtons(buttons);
-
         });
 
         contentTypeHelper.checkModelsBuilderStatus().then(function (result) {
@@ -279,25 +249,25 @@
             contentTypeResource.getById(documentTypeId).then(function (dt) {
                 init(dt);
                 // we don't need to sync the tree in infinite mode
-                if(!infiniteMode) { 
+                if (!infiniteMode) {
                     syncTreeNode(vm.contentType, dt.path, true);
                 }
                 vm.page.loading = false;
             });
         }
 
-        function loadButtons(buttons) {
+        function loadButtons() {
+            vm.page.navigation = vm.contentType.apps;
 
-            angular.forEach(buttons,
-                function (val, index) {
+            if (disableTemplates === true) {
+                Utilities.forEach(vm.contentType.apps,
+                    (app, index) => {
+                        if (app.alias === "templates") {
+                            vm.page.navigation.splice(index, 1);
+                        }
+                    });
+            }
 
-                    if (disableTemplates === true && val.alias === "templates") {
-                        buttons.splice(index, 1);
-                    }
-
-                });
-
-            vm.page.navigation = buttons;
             initializeActiveNavigationPanel();
         }
 
@@ -307,16 +277,14 @@
             var initialViewSetFromRouteParams = false;
             var view = $routeParams.view;
             if (view) {
-                var viewPath = "views/documenttypes/views/" + view + "/" + view + ".html";
                 for (var i = 0; i < vm.page.navigation.length; i++) {
-                    if (vm.page.navigation[i].view === viewPath) {
+                    if (vm.page.navigation[i].alias.localeCompare(view, undefined, { sensitivity: 'accent' }) === 0) {
                         vm.page.navigation[i].active = true;
                         initialViewSetFromRouteParams = true;
                         break;
                     }
                 }
             }
-
             if (initialViewSetFromRouteParams === false) {
                 vm.page.navigation[0].active = true;
             }
@@ -379,17 +347,17 @@
                 }).then(function (data) {
                     //success
                     // we don't need to sync the tree in infinite mode
-                    if(!infiniteMode) {
+                    if (!infiniteMode) {
                         syncTreeNode(vm.contentType, data.path);
                     }
 
                     // emit event
                     var args = { documentType: vm.contentType };
                     eventsService.emit("editors.documentType.saved", args);
-                    
+
                     vm.page.saveButtonState = "success";
 
-                    if(infiniteMode && $scope.model.submit) {
+                    if (infiniteMode && $scope.model.submit) {
                         $scope.model.documentTypeAlias = vm.contentType.alias;
                         $scope.model.submit($scope.model);
                     }
@@ -446,10 +414,12 @@
             // convert icons for content type
             convertLegacyIcons(contentType);
 
-            //set a shared state
-            editorState.set(contentType);
-
             vm.contentType = contentType;
+
+            //set a shared state
+            editorState.set(vm.contentType);
+
+            loadButtons();
         }
 
         /** Syncs the template alias for new doc types before saving if a template is to be created */
@@ -525,11 +495,10 @@
                     if (treeExists) {
                         navigationService.syncTree({ tree: "templates", path: [], forceReload: true })
                             .then(function (syncArgs) {
-                                navigationService.reloadNode(syncArgs.node)
-                            }
-                        );
+                                navigationService.reloadNode(syncArgs.node);
+                            });
                     }
-                }); 
+                });
             }
         }));
 
