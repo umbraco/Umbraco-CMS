@@ -11,9 +11,7 @@ angular.module('umbraco.mocks').
         var ids = mocksUtils.getParameterByName(data, "ids") || "1234,1234,4234";
         var items = [];
         
-        _.each(ids, function(id){
-          items.push(_getNode( parseInt( id, 10 )) );
-        });
+        ids.forEach(id => items.push(_getNode(parseInt(id, 10))));
 
         return [200, items, null];
       }
@@ -26,8 +24,6 @@ angular.module('umbraco.mocks').
 
           var id = mocksUtils.getParameterByName(data, "id") || 1234;
           id = parseInt(id, 10);
-
-
           
           return [200, _getNode(id), null];
       }
