@@ -1,15 +1,28 @@
 function RowConfigController($scope, localizationService) {
 
+    var vm = this;
+
+    vm.labels = {};
+    
     function init() {
-        setTitle();
+        
+        var labelKeys = [
+            "grid_addRowConfiguration",
+            "grid_allowAllEditors"
+        ];
+
+        localizationService.localizeMany(labelKeys).then(function (data) {
+
+            vm.labels.title = data[0];
+            vm.labels.allowAllEditors = data[1];
+
+            setTitle(vm.labels.title);
+        });
     }
 
-    function setTitle() {
+    function setTitle(value) {
         if (!$scope.model.title) {
-            localizationService.localize("grid_addRowConfiguration")
-                .then(function(data){
-                    $scope.model.title = data;
-                });
+            $scope.model.title = value;
         }
     }
     
@@ -68,13 +81,15 @@ function RowConfigController($scope, localizationService) {
     };
 
     $scope.toggleAllowed = function (cell) {
+        cell.allowAll = !cell.allowAll;
+
         if (cell.allowed) {
             delete cell.allowed;
         }
         else {
             cell.allowed = [];
         }
-    }
+    };
 
     $scope.deleteArea = function (cell, row) {
     	if ($scope.currentCell === cell) {
@@ -102,17 +117,17 @@ function RowConfigController($scope, localizationService) {
         }
     };
     
-    $scope.close = function() {
-        if($scope.model.close) {
+    $scope.close = function () {
+        if ($scope.model.close) {
             $scope.model.close();
         }
-    }
+    };
 
     $scope.submit = function () {
         if ($scope.model.submit) {
             $scope.model.submit($scope.currentRow);
         }
-    }
+    };
 
     $scope.nameChanged = false;
     var originalName = $scope.currentRow.name;
