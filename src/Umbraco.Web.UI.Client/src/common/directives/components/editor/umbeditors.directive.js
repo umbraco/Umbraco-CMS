@@ -7,11 +7,12 @@
 
             var evts = [];
             var allowedNumberOfVisibleEditors = 3;
-            
+            var aboveBackDropCssClass = 'above-backdrop';
+            var sectionId = '#leftcolumn';
+            var isLeftColumnAbove = false;
             scope.editors = [];
             
             function addEditor(editor) {
-                
                 editor.inFront = true;
                 editor.moveRight = true;
                 editor.level = 0;
@@ -19,6 +20,14 @@
                                 
                 // push the new editor to the dom
                 scope.editors.push(editor);
+
+                if(scope.editors.length === 1){
+                    isLeftColumnAbove = $(sectionId).hasClass(aboveBackDropCssClass);
+
+                    if(isLeftColumnAbove){
+                        $(sectionId).removeClass(aboveBackDropCssClass);
+                    }
+                }
                 
                 $timeout(() => {
                     editor.moveRight = false;
@@ -32,14 +41,20 @@
             }
             
             function removeEditor(editor) {
-                
                 editor.moveRight = true;
                 
                 editor.animating = true;
                 setTimeout(removeEditorFromDOM.bind(this, editor), 400);
                 
                 updateEditors(-1);
-                
+
+                if(scope.editors.length === 1){
+                    if(isLeftColumnAbove){
+                        $('#leftcolumn').addClass(aboveBackDropCssClass);
+                    }
+
+                    isLeftColumnAbove = false;
+                }
             }
             
             function revealEditorContent(editor) {
@@ -57,7 +72,7 @@
                 if (index !== -1) {
                     scope.editors.splice(index, 1);
                 }
-                
+ 
                 updateEditors();
                 
                 scope.$digest();

@@ -9,10 +9,10 @@
 (function () {
     "use strict";
 
-    function MediaTypesEditController($scope, $routeParams, mediaTypeResource, 
-        dataTypeResource, editorState, contentEditingHelper, formHelper, 
-        navigationService, iconHelper, contentTypeHelper, notificationsService, 
-        $q, localizationService, overlayHelper, eventsService, angularHelper) {
+    function MediaTypesEditController($scope, $routeParams, $q,
+        mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, 
+        navigationService, iconHelper, contentTypeHelper, notificationsService,
+        localizationService, overlayHelper, eventsService, angularHelper) {
 
         var vm = this;
         var evts = [];
@@ -248,6 +248,7 @@
         });
 
         if (create) {
+            
             vm.page.loading = true;
 
             //we are creating so get an empty data type item
@@ -425,7 +426,7 @@
         }
 
         function close() {
-            if(infiniteMode && $scope.model.close) {
+            if (infiniteMode && $scope.model.close) {
                 $scope.model.close();
             }
         }
