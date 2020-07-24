@@ -24,27 +24,21 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IconModel GetIcon(string iconName)
         {
-            if (string.IsNullOrWhiteSpace(iconName) == false)
-            {
-                return CreateIconModel(iconName.StripFileExtension(), IOHelper.MapPath($"{GlobalSettings.Path}/assets/icons/{iconName}.svg"));
-            }
-
-            return null;
+            return string.IsNullOrWhiteSpace(iconName)
+                ? null
+                : CreateIconModel(iconName.StripFileExtension(), IOHelper.MapPath($"{GlobalSettings.IconsPath}/{iconName}.svg"));
         }
 
         /// <summary>
         /// Gets an IconModel using values from a FileInfo model
         /// </summary>
-        /// <param name="iconName"></param>
+        /// <param name="fileInfo"></param>
         /// <returns></returns>
         public IconModel GetIcon(FileInfo fileInfo)
         {
-            if (fileInfo != null && string.IsNullOrWhiteSpace(fileInfo.Name) == false)
-            {
-                return CreateIconModel(fileInfo.Name.StripFileExtension(), fileInfo.FullName);
-            }
-
-            return null;
+            return fileInfo == null || string.IsNullOrWhiteSpace(fileInfo.Name)
+                ? null
+                : CreateIconModel(fileInfo.Name.StripFileExtension(), fileInfo.FullName);
         }
 
         /// <summary>
@@ -54,10 +48,10 @@ namespace Umbraco.Web.Editors
         public List<IconModel> GetAllIcons()
         {
             var icons = new List<IconModel>();
-            var directory = new DirectoryInfo(IOHelper.MapPath($"{GlobalSettings.Path}/assets/icons"));
+            var directory = new DirectoryInfo(IOHelper.MapPath($"{GlobalSettings.IconsPath}/"));
             var iconNames = directory.GetFiles("*.svg");
 
-            iconNames?.OrderBy(f => f.Name).ToList().ForEach(iconInfo =>
+            iconNames.OrderBy(f => f.Name).ToList().ForEach(iconInfo =>
             {
                 var icon = GetIcon(iconInfo);
 
@@ -74,6 +68,7 @@ namespace Umbraco.Web.Editors
         /// Gets an IconModel containing the icon name and SvgString
         /// </summary>
         /// <param name="iconName"></param>
+        /// <param name="iconPath"></param>
         /// <returns></returns>
         private IconModel CreateIconModel(string iconName, string iconPath)
         {
@@ -84,7 +79,7 @@ namespace Umbraco.Web.Editors
 
             try
             {
-                return AppCaches.RuntimeCache.GetCacheItem<IconModel>($"{iconName}_{iconPath}", () =>
+                return AppCaches.RuntimeCache.GetCacheItem($"{iconName}_{iconPath}", () =>
                 {
                     var svgContent = File.ReadAllText(iconPath);
                     var sanitizedString = sanitizer.Sanitize(svgContent);

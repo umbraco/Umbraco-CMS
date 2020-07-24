@@ -153,9 +153,9 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                return ConfigurationManager.AppSettings.ContainsKey("umbracoIconsPath")
-                    ? IOHelper.ResolveUrl(ConfigurationManager.AppSettings["umbracoIconsPath"])
-                    : string.Empty;
+                return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.IconsPath)
+                    ? IOHelper.ResolveUrl(Constants.AppSettings.IconsPath)
+                    : $"{Path}/assets/icons";
             }
         }
 
