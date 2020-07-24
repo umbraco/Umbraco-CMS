@@ -110,7 +110,7 @@
                 }
             }
 
-            eventsService.emit('editors.content.cultureChanged', activeVariant.language.culture);
+            eventsService.emit('editors.content.cultureChanged', activeVariant.language);
         }
 
         /**
