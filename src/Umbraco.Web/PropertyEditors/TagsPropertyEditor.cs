@@ -19,7 +19,8 @@ namespace Umbraco.Web.PropertyEditors
         Constants.PropertyEditors.Aliases.Tags,
         "Tags",
         "tags",
-        Icon = "icon-tags")]
+        Icon = "icon-tags",
+        ValueType = "JSON")]
     public class TagsPropertyEditor : DataEditor
     {
         private readonly ManifestValueValidatorCollection _validators;
