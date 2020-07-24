@@ -169,20 +169,13 @@ function memberPickerController($scope, $q, entityResource, iconHelper, angularH
     };
 
     $scope.add = function (item) {
-        var currIds = _.map($scope.renderModel, function (i) {
-            if ($scope.model.config.idType === "udi") {
-                return i.udi;
-            }
-            else {
-                return i.id;
-            }            
-        });
+        var currIds = $scope.model.value ? $scope.model.value.split(',') : [];
 
-        var itemId = $scope.model.config.idType === "udi" ? item.udi : item.id;
+        var itemId = ($scope.model.config.idType === "udi" ? item.udi : item.id).toString();
 
         if (currIds.indexOf(itemId) < 0) {
-            item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-            $scope.renderModel.push({ name: item.name, id: item.id, udi: item.udi, icon: item.icon});
+            currIds.push(itemId);
+            $scope.model.value = currIds.join();
         }
     };
 
