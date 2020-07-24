@@ -13,12 +13,8 @@ using Umbraco.Core.Cache;
 
 namespace Umbraco.Web.Editors
 {
-    // TODO: I'm not sure how to correctly set up the authentication so that it only works for people logged into the backoffice. Can this be verified please.
-
     [PluginController("UmbracoApi")]
-    [IsBackOffice]
-    [WebApi.UmbracoAuthorize]
-    public class IconController : UmbracoApiController
+    public class IconController : UmbracoAuthorizedApiController
     {
 
         /// <summary>
