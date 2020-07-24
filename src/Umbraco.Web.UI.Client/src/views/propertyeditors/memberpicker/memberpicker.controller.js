@@ -165,7 +165,12 @@ function memberPickerController($scope, $q, entityResource, iconHelper, angularH
     };
 
     $scope.remove = function (index) {
-        $scope.renderModel.splice(index, 1);
+        var currIds = $scope.model.value ? $scope.model.value.split(',') : [];
+        if (currIds.length > 0) {
+            currIds.splice(index, 1);
+            angularHelper.getCurrentForm($scope).$setDirty();
+            $scope.model.value = currIds.join();
+        }
     };
 
     $scope.add = function (item) {
