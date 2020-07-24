@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function MediaNodeInfoDirective($timeout, $location, eventsService, userService, dateHelper, editorService, mediaHelper, mediaResource, $q) {
+    function MediaNodeInfoDirective($timeout, $location, $q, eventsService, userService, dateHelper, editorService, mediaHelper, mediaResource) {
 
         function link(scope, element, attrs, ctrl) {
 
@@ -37,7 +37,7 @@
                     });
                 });
 
-                // get document type details
+                // get media type details
                 scope.mediaType = scope.node.contentType;
 
                 // set the media link initially

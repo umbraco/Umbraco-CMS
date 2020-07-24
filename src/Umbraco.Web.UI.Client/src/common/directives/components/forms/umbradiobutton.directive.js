@@ -50,6 +50,8 @@
         function onInit() {
             vm.inputId = vm.inputId || "umb-radio_" + String.CreateGuid();
 
+            vm.icon = vm.icon || vm.iconClass || null;
+
             // If a labelKey is passed let's update the returned text if it's does not contain an opening square bracket [
             if (vm.labelKey) {
                  localizationService.localize(vm.labelKey).then(function (data) {
@@ -86,7 +88,8 @@
             required: "<",
             onChange: "&?",
             cssClass: "@?",
-            iconClass: "@?",
+            iconClass: "@?", // deprecated
+            icon: "@?",
             disableDirtyCheck: "=?"
         }
     };

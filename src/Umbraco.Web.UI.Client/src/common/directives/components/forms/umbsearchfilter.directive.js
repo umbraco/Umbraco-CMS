@@ -1,47 +1,40 @@
 /**
 @ngdoc directive
-@name umbraco.directives.directive:umbCheckbox
+@name umbraco.directives.directive:umbSearchFilter
 @restrict E
 @scope
 
 @description
-<b>Added in Umbraco version 7.14.0</b> Use this directive to render an umbraco checkbox.
+<b>Added in Umbraco version 8.7.0</b> Use this directive to render an umbraco search filter.
 
 <h3>Markup example</h3>
 <pre>
     <div ng-controller="My.Controller as vm">
 
-        <umb-checkbox
+        <umb-search-filter
             name="checkboxlist"
             value="{{key}}"
             model="true"
             text="{{text}}">
-        </umb-checkbox>
+        </umb-search-filter>
 
     </div>
 </pre>
 
 @param {boolean} model Set to <code>true</code> or <code>false</code> to set the checkbox to checked or unchecked.
 @param {string} inputId Set the <code>id</code> of the checkbox.
-@param {string} value Set the value of the checkbox.
-@param {string} name Set the name of the checkbox.
 @param {string} text Set the text for the checkbox label.
 @param {string} labelKey Set a dictinary/localization string for the checkbox label
-@param {string} serverValidationField Set the <code>val-server-field</code> of the checkbox.
-@param {boolean} disabled Set the checkbox to be disabled.
-@param {boolean} required Set the checkbox to be required.
 @param {callback} onChange Callback when the value of the checkbox change by interaction.
-@param {string} cssClass Set a css class modifier.
-@deprecated @param {string} iconClass Set an icon next to checkbox. Use "icon" parameter instead.
-@param {string} icon Set an icon next to checkbox.
-@param {boolean} disableDirtyCheck Disable checking if the model is dirty.
+@param {boolean} autoFocus Add autofocus to the input field
+@param {boolean} preventSubmitOnEnter Set the enter prevent directive or not
 
 **/
 
 (function () {
     'use strict';
 
-    function UmbCheckboxController($timeout, localizationService) {
+    function UmbSearchFilterController($timeout, localizationService) {
 
         var vm = this;
 
@@ -50,8 +43,6 @@
 
         function onInit() {
             vm.inputId = vm.inputId || "umb-check_" + String.CreateGuid();
-
-            vm.icon = vm.icon || vm.iconClass || null;
 
             // If a labelKey is passed let's update the returned text if it's does not contain an opening square bracket [
             if (vm.labelKey) {
@@ -73,28 +64,21 @@
     }
 
     var component = {
-        templateUrl: 'views/components/forms/umb-checkbox.html',
-        controller: UmbCheckboxController,
+        templateUrl: 'views/components/forms/umb-search-filter.html',
+        controller: UmbSearchFilterController,
         controllerAs: 'vm',
         transclude: true,
         bindings: {
             model: "=",
             inputId: "@",
-            value: "@",
-            name: "@",
             text: "@",
             labelKey: "@?",
-            serverValidationField: "@",
-            disabled: "<",
-            required: "<",
             onChange: "&?",
-            cssClass: "@?",
-            iconClass: "@?", // deprecated
-            icon: "@?",
-            disableDirtyCheck: "=?"
+            autoFocus: "<?",
+            preventSubmitOnEnter: "<?"
         }
     };
 
-    angular.module('umbraco.directives').component('umbCheckbox', component);
+    angular.module('umbraco.directives').component('umbSearchFilter', component);
 
 })();
