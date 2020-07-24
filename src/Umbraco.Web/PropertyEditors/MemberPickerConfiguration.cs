@@ -5,8 +5,11 @@ namespace Umbraco.Web.PropertyEditors
 {
     public class MemberPickerConfiguration : ConfigurationEditor
     {
-        [ConfigurationField("multiPicker", "Pick multiple items", "boolean")]
-        public bool Multiple { get; set; }
+        [ConfigurationField("minNumber", "Minimum number of items", "number")]
+        public int MinNumber { get; set; }
+
+        [ConfigurationField("maxNumber", "Maximum number of items", "number")]
+        public int MaxNumber { get; set; }
 
         public override IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>
         {

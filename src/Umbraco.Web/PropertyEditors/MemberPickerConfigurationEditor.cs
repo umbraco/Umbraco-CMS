@@ -5,6 +5,18 @@ namespace Umbraco.Web.PropertyEditors
 {
     public class MemberPickerConfigurationEditor : ConfigurationEditor<MemberPickerConfiguration>
     {
+        /// <inheritdoc />
+        public override Dictionary<string, object> ToConfigurationEditor(MemberPickerConfiguration configuration)
+        {
+            // sanitize configuration
+            var output = base.ToConfigurationEditor(configuration);
+
+            output["multiPicker"] = configuration.MaxNumber > 1;
+
+            return output;
+        }
+
+        /// <inheritdoc />
         public override IDictionary<string, object> ToValueEditor(object configuration)
         {
             // get the configuration fields

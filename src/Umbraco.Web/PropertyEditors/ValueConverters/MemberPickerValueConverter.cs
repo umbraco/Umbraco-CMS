@@ -39,8 +39,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         private bool IsMultipleDataType(PublishedDataType dataType)
         {
-            var config = ConfigurationEditor.ConfigurationAs<MemberPickerConfiguration>(dataType.Configuration);
-            return config.Multiple;
+            return ConfigurationEditor.ConfigurationAs<MemberPickerConfiguration>(dataType.Configuration).MaxNumber == 1;
         }
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
