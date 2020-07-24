@@ -78,25 +78,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 return isMultiple ? memberItems : FirstOrDefault(memberItems);
             }
 
-            //if (Current.UmbracoContext != null)
-            //{
-            //    IPublishedContent member;
-            //    if (source is int id)
-            //    {
-            //        member = _publishedSnapshotAccessor.PublishedSnapshot.Members.GetById(id);
-            //        if (member != null)
-            //            return member;
-            //    }
-            //    else
-            //    {
-            //        var sourceUdi = source as GuidUdi;
-            //        if (sourceUdi == null) return null;
-            //        member = _publishedSnapshotAccessor.PublishedSnapshot.Members.GetByProviderKey(sourceUdi.Guid);
-            //        if (member != null)
-            //            return member;
-            //    }
-            //}
-
             return source;
         }
 
