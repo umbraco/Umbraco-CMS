@@ -1,5 +1,5 @@
 <div ng-controller="Umbraco.Editors.MediaPickerController as vm">
-    <umb-editor-view >
+    <umb-editor-view>
 
         <umb-editor-header
             name="model.title"
@@ -132,64 +132,6 @@
 
                 </div>
 
-                <umb-overlay ng-if="vm.mediaPickerDetailsOverlay.show" model="vm.mediaPickerDetailsOverlay" position="right">
-                
-                <div class="umb-control-group" ng-if="vm.shouldShowUrl()">
-                    <h5>
-                        <localize key="@general_url"></localize>
-                    </h5>
-                    <input type="text" localize="placeholder" placeholder="@general_url" class="umb-property-editor umb-textstring" ng-model="target.url" />
-                </div>
-
-                    <div class="umb-control-group">
-                    <h5>
-                        <localize key="@content_altTextOptional"></localize>
-                    </h5>
-                    <input type="text" class="umb-property-editor umb-textstring" ng-model="target.altText" />
-                </div>
-
-                <div class="umb-control-group">
-
-                    <div ng-if="vm.mediaPickerDetailsOverlay.disableFocalPoint && target.thumbnail">
-                        <h5>
-                            <localize key="general_preview">Preview</localize>
-                        </h5>
-
-                        <img ng-src="{{target.thumbnail}}" alt="{{target.name}}" />
-                    </div>
-
-                    <div ng-if="!vm.mediaPickerDetailsOverlay.disableFocalPoint">
-                        <h5>
-                            <localize key="@general_focalPoint">Focal point</localize>
-                        </h5>
-
-                        <div ng-if="target.url">
-                            <umb-image-gravity src="target.url"
-                            center="target.focalPoint"
-							on-value-changed="vm.focalPointChanged(left, top)">
-                            </umb-image-gravity>
-                        </div>
-
-                        <div ng-if="cropSize">
-
-                            <h5>
-                                <localize key="general_preview">Preview</localize>
-                            </h5>
-
-                            <umb-image-thumbnail center="target.focalPoint"
-                                                 src="target.url"
-                                                 height="{{cropSize.height}}"
-                                                 width="{{cropSize.width}}"
-                                                 max-size="400">
-                            </umb-image-thumbnail>
-
-                        </div>
-                    </div>
-
-                    </div>
-
-                </umb-overlay>
-
             </form>
 
         </umb-editor-container>
@@ -218,4 +160,4 @@
 
     </umb-editor-view>
 
-    </div>
+</div>
