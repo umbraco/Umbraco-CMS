@@ -7,8 +7,10 @@
                               icon="node.icon"
                               name="node.name"
                               sortable="!sortableOptions.disabled"
-                              allow-remove="allowRemove"
-                              on-remove="remove($index)">
+                              allow-remove="allowRemoveButton"
+                              allow-open="model.config.showOpenButton && allowOpenButton && !dialogEditor"
+                              on-remove="remove($index)"
+                              on-open="openMemberEditor(node)">
             </umb-node-preview>
         </div>
 

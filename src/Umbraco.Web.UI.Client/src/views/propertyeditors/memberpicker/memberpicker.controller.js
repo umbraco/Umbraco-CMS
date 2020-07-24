@@ -1,6 +1,6 @@
 //this controller simply tells the dialogs service to open a memberPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-function memberPickerController($scope, $q, entityResource, iconHelper, angularHelper, editorService, localizationService){
+function memberPickerController($scope, $q, entityResource, editorState, iconHelper, angularHelper, editorService, localizationService){
 
     var vm = {
         labels: {
@@ -66,6 +66,7 @@ function memberPickerController($scope, $q, entityResource, iconHelper, angularH
     //the default pre-values
     var defaultConfig = {
         multiPicker: false,
+        showOpenButton: false,
         maxNumber: 1,
         minNumber: 0
     };
@@ -86,9 +87,13 @@ function memberPickerController($scope, $q, entityResource, iconHelper, angularH
 
     $scope.renderModel = [];
     $scope.sortableModel = [];
-    $scope.allowRemove = true;
+
+    $scope.allowOpenButton = true;
+    $scope.allowRemoveButton = true;
 
     $scope.labels = vm.labels;
+
+    $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;
 
     var entityType = "Member";
 
@@ -134,6 +139,7 @@ function memberPickerController($scope, $q, entityResource, iconHelper, angularH
     }
 
     $scope.model.config.multiPicker = Object.toBoolean($scope.model.config.multiPicker);
+    $scope.model.config.showOpenButton = Object.toBoolean($scope.model.config.showOpenButton);
 
     //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the
     // pre-value config on to the dialog options
@@ -186,6 +192,22 @@ function memberPickerController($scope, $q, entityResource, iconHelper, angularH
 
     $scope.clear = function() {
         $scope.renderModel = [];
+    };
+
+    $scope.openMemberEditor = function (node) {
+        var memberEditor = {
+            id: node.key,
+            submit: function (model) {
+                // update the node
+                node.name = model.memberNode.name;
+
+                editorService.close();
+            },
+            close: function () {
+                editorService.close();
+            }
+        };
+        editorService.memberEditor(memberEditor);
     };
 
     //when the scope is destroyed we need to unsubscribe
@@ -282,7 +304,7 @@ function memberPickerController($scope, $q, entityResource, iconHelper, angularH
     }
 
     function addSelectedItem(item) {
-
+        
         // set icon
         if (item.icon) {
             item.icon = iconHelper.convertFromLegacyIcon(item.icon);
@@ -299,7 +321,7 @@ function memberPickerController($scope, $q, entityResource, iconHelper, angularH
             "udi": item.udi,
             "icon": item.icon,
             "path": item.path,
-            "url": item.url
+            "key": item.key
         });
     }
 
@@ -313,16 +335,6 @@ function memberPickerController($scope, $q, entityResource, iconHelper, angularH
     }
 
     function init() {
-
-        //load member data
-        //var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];
-        //entityResource.getByIds(modelIds, "Member").then(function (data) {
-        //    _.each(data, function (item, i) {
-        //        // set default icon if it's missing
-        //        item.icon = (item.icon) ? iconHelper.convertFromLegacyIcon(item.icon) : "icon-user";
-        //        $scope.renderModel.push({ name: item.name, id: item.id, udi: item.udi, icon: item.icon });
-        //    });
-        //});
 
         localizationService.localizeMany(["general_add"])
             .then(function (data) {

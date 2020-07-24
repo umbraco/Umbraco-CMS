@@ -11,6 +11,9 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("maxNumber", "Maximum number of items", "number")]
         public int MaxNumber { get; set; }
 
+        [ConfigurationField("showOpenButton", "Show open button", "boolean", Description = "Opens the node in a dialog")]
+        public bool ShowOpen { get; set; }
+
         public override IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>
         {
             { "idType", "udi" }
