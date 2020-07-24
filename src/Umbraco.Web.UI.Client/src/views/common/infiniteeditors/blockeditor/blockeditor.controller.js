@@ -4,8 +4,8 @@ angular.module("umbraco")
             var vm = this;
 
             vm.model = $scope.model;
-            vm.model = $scope.model;
             vm.tabs = [];
+
             localizationService.localizeMany([
                 vm.model.liveEditing ? "prompt_discardChanges" : "general_close",
                 vm.model.liveEditing ? "buttons_confirmActionConfirm" : "buttons_submitChanges"
@@ -14,16 +14,13 @@ angular.module("umbraco")
                 vm.submitLabel = data[1];
             });
 
-            if ($scope.model.content && $scope.model.content.variants) {
+            if (vm.model.content && vm.model.content.variants) {
 
-                var apps = $scope.model.content.apps;
+                var apps = vm.model.content.apps;
 
-                vm.tabs = apps;
-
-                // replace view of content app.
+                // configure the content app based on settings
                 var contentApp = apps.find(entry => entry.alias === "umbContent");
                 if (contentApp) {
-                    contentApp.view = "views/common/infiniteeditors/blockeditor/blockeditor.content.html";
                     if (vm.model.hideContent) {
                         apps.splice(apps.indexOf(contentApp), 1);
                     } else if (vm.model.openSettings !== true) {
@@ -31,27 +28,16 @@ angular.module("umbraco")
                     }
                 }
 
-                // remove info app:
-                var infoAppIndex = apps.findIndex(entry => entry.alias === "umbInfo");
-                apps.splice(infoAppIndex, 1);
-
-            }
-
-            if (vm.model.settings && vm.model.settings.variants) {
-                localizationService.localize("blockEditor_tabBlockSettings").then(
-                    function (settingsName) {
-                        var settingsTab = {
-                            "name": settingsName,
-                            "alias": "settings",
-                            "icon": "icon-settings",
-                            "view": "views/common/infiniteeditors/blockeditor/blockeditor.settings.html"
-                        };
-                        vm.tabs.push(settingsTab);
+                if (vm.model.settings && vm.model.settings.variants) {
+                    var settingsApp = apps.find(entry => entry.alias === "settings");
+                    if (settingsApp) {
                         if (vm.model.openSettings) {
-                            settingsTab.active = true;
+                            settingsApp.active = true;
                         }
                     }
-                );
+                }
+
+                vm.tabs = apps;
             }
 
             vm.submitAndClose = function () {

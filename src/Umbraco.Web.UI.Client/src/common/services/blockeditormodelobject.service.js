@@ -14,7 +14,7 @@
     'use strict';
 
 
-    function blockEditorModelObjectFactory($interpolate, udiService, contentResource) {
+    function blockEditorModelObjectFactory($interpolate, udiService, contentResource, localizationService) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -215,6 +215,17 @@
         }
 
         /**
+         * Set the udi and key property for the content item
+         * @param {any} contentData
+         * @param {any} udi
+         */
+        function ensureUdiAndKey(contentData, udi) {            
+            contentData.udi = udi;
+            // Change the content.key to the GUID part of the udi, else it's just random which we don't want, it must be consistent
+            contentData.key = udiService.getKey(udi);
+        }
+
+        /**
          * Used to highlight unsupported properties for the user, changes unsupported properties into a unsupported-property.
          */
         var notSupportedProperties = [
@@ -222,7 +233,15 @@
             "Umbraco.UploadField",
             "Umbraco.ImageCropper"
         ];
-        function replaceUnsupportedProperties(scaffold) {
+
+
+        /**
+         * Formats the content apps and ensures unsupported property's have the notsupported view
+         * @param {any} scaffold
+         */
+        function formatScaffoldData(scaffold) {
+
+            // deal with not supported props
             scaffold.variants.forEach((variant) => {
                 variant.tabs.forEach((tab) => {
                     tab.properties.forEach((property) => {
@@ -232,7 +251,34 @@
                     });
                 });
             });
-            return scaffold;
+
+            // replace view of content app
+            var contentApp = scaffold.apps.find(entry => entry.alias === "umbContent");
+            if (contentApp) {
+                contentApp.view = "views/common/infiniteeditors/blockeditor/blockeditor.content.html";                
+            }
+
+            // remove info app
+            var infoAppIndex = scaffold.apps.findIndex(entry => entry.alias === "umbInfo");
+            if (infoAppIndex >= 0) {
+                scaffold.apps.splice(infoAppIndex, 1);
+            }
+
+            // add the settings app
+            return localizationService.localize("blockEditor_tabBlockSettings").then(
+                function (settingsName) {
+                    var settingsTab = {
+                        "name": settingsName,
+                        "alias": "settings",
+                        "icon": "icon-settings",
+                        "view": "views/common/infiniteeditors/blockeditor/blockeditor.settings.html",
+                        "hasError": false
+                    };
+                    scaffold.apps.push(settingsTab);
+
+                    return scaffold;
+                }
+            );
         }
 
         /**
@@ -337,7 +383,10 @@
                     tasks.push(contentResource.getScaffoldByKey(-20, contentTypeKey).then(scaffold => {
                         // this.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
                         if (this.scaffolds) {
-                            this.scaffolds.push(replaceUnsupportedProperties(scaffold));
+                            return formatScaffoldData(scaffold).then(s => this.scaffolds.push(s));
+                        }
+                        else {
+                            return Promise.resolve();
                         }
                     }));
                 }));
@@ -483,9 +532,7 @@
 
                 // make basics from scaffold
                 blockObject.content = Utilities.copy(contentScaffold);
-                blockObject.content.udi = contentUdi;
-                // Change the content.key to the GUID part of the udi, else it's just random which we don't want, it must be consistent
-                blockObject.content.key = udiService.getKey(contentUdi);
+                ensureUdiAndKey(blockObject.content, contentUdi);
 
                 mapToElementModel(blockObject.content, dataModel);
 
@@ -514,9 +561,7 @@
 
                         // make basics from scaffold
                         blockObject.settings = Utilities.copy(settingsScaffold);
-                        blockObject.settings.udi = settingsUdi;
-                        // Change the settings.key to the GUID part of the udi, else it's just random which we don't want, it must be consistent
-                        blockObject.settings.key = udiService.getKey(settingsUdi);
+                        ensureUdiAndKey(blockObject.settings, settingsUdi);
 
                         mapToElementModel(blockObject.settings, settingsData);
                     }
