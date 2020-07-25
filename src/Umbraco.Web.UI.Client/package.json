@@ -38,13 +38,14 @@
     "lazyload-js": "1.0.0",
     "moment": "2.22.2",
     "ng-file-upload": "12.2.13",
-    "nouislider": "14.4.0",
-    "npm": "6.13.6",
+    "nouislider": "14.6.0",
+    "npm": "6.14.6",
     "signalr": "2.4.0",
     "spectrum-colorpicker": "1.8.0",
     "tinymce": "4.9.10",
     "typeahead.js": "0.11.1",
-    "underscore": "1.9.1"
+    "underscore": "1.9.1",
+    "wicg-inert": "^3.0.2"
   },
   "devDependencies": {
     "@babel/core": "7.6.4",
@@ -77,7 +78,7 @@
     "karma-phantomjs-launcher": "1.0.4",
     "karma-spec-reporter": "0.0.32",
     "less": "3.10.3",
-    "lodash": "4.17.15",
+    "lodash": "4.17.19",
     "marked": "^0.7.0",
     "merge-stream": "2.0.0",
     "run-sequence": "2.2.1"

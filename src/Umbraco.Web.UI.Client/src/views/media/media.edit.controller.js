@@ -6,10 +6,10 @@
  * @description
  * The controller for the media editor
  */
-function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
+function mediaEditController($scope, $routeParams, $location, $http, $q, appState, mediaResource, 
     entityResource, navigationService, notificationsService, localizationService, 
     serverValidationManager, contentEditingHelper, fileManager, formHelper, 
-    editorState, umbRequestHelper, $http, eventsService, $location) {
+    editorState, umbRequestHelper, eventsService) {
     
     var evts = [];
     var nodeId = null;
@@ -104,12 +104,10 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
             content.apps[0].active = true;
             $scope.appChanged(content.apps[0]);
         }
-        
 
         editorState.set($scope.content);
         
         bindEvents();
-
     }
     
     function bindEvents() {
@@ -260,7 +258,6 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
                 $scope.page.loading = false;
 
                 $q.resolve($scope.content);
-
             });
 
     }
@@ -282,7 +279,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
 
     $scope.showBack = function () {
         return !infiniteMode && !!$scope.page.listViewPath;
-    }
+    };
 
     /** Callback for when user clicks the back-icon */
     $scope.onBack = function() {
