@@ -139,7 +139,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         : $scope.model.config.startNode.type === "media"
             ? "Media"
             : "Document";
-    $scope.allowOpenButton = entityType === "Document";
+    
+    $scope.allowOpenButton = true;
     $scope.allowEditButton = entityType === "Document";
     $scope.allowRemoveButton = true;
 
@@ -303,16 +304,26 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         $scope.model.value = null;
     };
 
-    $scope.openContentEditor = function (node) {
-        var contentEditor = {
-            id: node.id,
+    $scope.openEditor = function (item) {
+        console.log("item", item);
+
+        var editor = {
+            id: entityType === "Member" ? item.key : item.id,
             submit: function (model) {
+
+                var node = entityType === "Member" ? model.memberNode :
+                           entityType === "Media" ? model.mediaNode :
+                                                    model.contentNode;
+                
                 // update the node
-                node.name = model.contentNode.name;
-                node.published = model.contentNode.hasPublishedVersion;
+                item.name = node.name;
+
                 if (entityType !== "Member") {
-                    entityResource.getUrl(model.contentNode.id, entityType).then(function (data) {
-                        node.url = data;
+                    if (entityType === "Document") {
+                        item.published = node.hasPublishedVersion;
+                    }
+                    entityResource.getUrl(node.id, entityType).then(function (data) {
+                        item.url = data;
                     });
                 }
                 editorService.close();
@@ -321,7 +332,18 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
                 editorService.close();
             }
         };
-        editorService.contentEditor(contentEditor);
+
+        switch (entityType) {
+            case "Document":
+                editorService.contentEditor(editor);
+                break;
+            case "Media":
+                editorService.mediaEditor(editor);
+                break;
+            case "Member":
+                editorService.memberEditor(editor);
+                break;
+        }
     };
 
     //when the scope is destroyed we need to unsubscribe
@@ -466,6 +488,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             "icon": item.icon,
             "path": item.path,
             "url": item.url,
+            "key": item.key,
             "trashed": item.trashed,
             "published": (item.metaData && item.metaData.IsPublished === false && entityType === "Document") ? false : true
             // only content supports published/unpublished content so we set everything else to published so the UI looks correct
