@@ -303,9 +303,7 @@ angular.module("umbraco")
                     $timeout(function () {
                         if ($scope.multiPicker) {
                             var images = _.rest($scope.images, $scope.images.length - files.length);
-                            _.each(images, function (image) {
-                                selectMedia(image);
-                            });
+                            images.forEach(image => selectMedia(image));
                         } else {
                             var image = $scope.images[$scope.images.length - 1];
                             clickHandler(image);

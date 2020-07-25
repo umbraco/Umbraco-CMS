@@ -169,7 +169,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             //if the routing parameter keys are the same, we'll compare their values to see if any have changed and if so then the routing will be allowed.
             if (diff1.length === 0 && diff2.length === 0) {
                 var partsChanged = 0;
-                _.each(currRoutingKeys, function (k) {
+                currRoutingKeys.forEach(k => {
                     if (currUrlParams[k] != nextUrlParams[k]) {
                         partsChanged++;
                     }
@@ -206,7 +206,8 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             var toRetain = _.union(retainedQueryStrings, toRetain);
             var currentSearch = $location.search();
             $location.search('');
-            _.each(toRetain, function (k) {
+
+            toRetain.forEach(k => {
                 if (currentSearch[k]) {
                     $location.search(k, currentSearch[k]);
                 }
@@ -240,7 +241,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             var toRetain = Utilities.copy(nextRouteParams);
             var updated = false;
 
-            _.each(retainedQueryStrings, function (r) {
+            retainedQueryStrings.forEach(r => {
                 // if mculture is set to null in nextRouteParams, the value will be undefined and we will not retain any query string that has a value of "null"
                 if (currRouteParams[r] && nextRouteParams[r] !== undefined && !nextRouteParams[r]) {
                     toRetain[r] = currRouteParams[r];
