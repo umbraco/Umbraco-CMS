@@ -79,7 +79,7 @@
 
                 setLabelText();
 
-                // must wait until the current digest cycle is finished before we emit this event on init, 
+                // Must wait until the current digest cycle is finished before we emit this event on init, 
                 // otherwise other property editors might not yet be ready to receive the event
                 $timeout(function () {
                     eventsService.emit("toggleValue", { value: scope.checked });
@@ -104,10 +104,10 @@
                     ];
 
                     localizationService.localizeMany(labelKeys).then(function (data) {
-                        // set default label for "On"
+                        // Set default label for "On"
                         scope.displayLabelOn = data[0];
 
-                        // set default label for "Off"
+                        // Set default label for "Off"
                         scope.displayLabelOff = data[1];
                     });
                 }
