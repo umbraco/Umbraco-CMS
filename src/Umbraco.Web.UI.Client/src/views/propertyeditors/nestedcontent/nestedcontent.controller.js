@@ -98,6 +98,8 @@
         vm.wideMode = Object.toBoolean(model.config.hideLabel);
         vm.hasContentTypes = model.config.contentTypes.length > 0;
 
+        var cultureChanged = eventsService.on('editors.content.cultureChanged', (_, args) => updateModel());
+
         var labels = {};
         vm.labels = labels;
         localizationService.localizeMany(["grid_addElement", "content_createEmpty", "actions_copy"]).then(function (data) {
@@ -696,6 +698,7 @@
 
         $scope.$on("$destroy", function () {
             unsubscribe();
+            cultureChanged();
             watcher();
         });
 
