@@ -305,8 +305,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     };
 
     $scope.openEditor = function (item) {
-        console.log("item", item);
-
         var editor = {
             id: entityType === "Member" ? item.key : item.id,
             submit: function (model) {
