@@ -8,10 +8,12 @@ angular.module('umbraco.mocks').
       }
 
       function returnNodebyIds(status, data, headers) {
-        var ids = mocksUtils.getParameterByName(data, "ids") || "1234,1234,4234";
+        var ids = mocksUtils.getParameterByName(data, "ids") || ['1234','1234','4234'];
         var items = [];
         
-        ids.forEach(id => items.push(_getNode(parseInt(id, 10))));
+        for (var i = 0; i < ids.length; i += 1) {
+          items.push(_getNode(parseInt(ids[i], 10)));
+        }
 
         return [200, items, null];
       }
