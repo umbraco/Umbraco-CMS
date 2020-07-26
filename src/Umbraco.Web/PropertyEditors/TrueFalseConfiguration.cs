@@ -16,7 +16,7 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("labelOn", "Label On", "textstring", Description = "Label text when checked.")]
         public string LabelOn { get; set; }
 
-        [ConfigurationField("labelOff", "Label Off", "textstring", Description = "Label text unchecked.")]
+        [ConfigurationField("labelOff", "Label Off", "textstring", Description = "Label text when unchecked.")]
         public string LabelOff { get; set; }
     }
 }
