@@ -14,9 +14,9 @@
                 action="options(tree.root, $event)"
                 text="Open context node for {{tree.name}}"
                 state="hidden"
+                class="umb-options"
                 ng-hide="tree.root.isContainer || !tree.root.menuUrl"
-                ng-swipe-right="options(tree.root, $event)"
-                >
+                ng-swipe-right="options(tree.root, $event)">
             </umb-button-ellipsis>
 
         </div>
