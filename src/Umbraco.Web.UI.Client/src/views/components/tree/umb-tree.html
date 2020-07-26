@@ -48,9 +48,9 @@
                 action="options(group, $event)"
                 text="Open context node for {{group.name}}"
                 state="hidden"
+                class="umb-options"
                 ng-hide="group.isContainer || !group.menuUrl"
-                ng-swipe-right="options(group, $event)"
-                >
+                ng-swipe-right="options(group, $event)">
             </umb-button-ellipsis>
         </div>
 
