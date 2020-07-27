@@ -17,7 +17,6 @@ angular.module("umbraco")
             vm.changeSearch = changeSearch;
             vm.submitFolder = submitFolder;
             vm.enterSubmitFolder = enterSubmitFolder;
-            vm.focalPointChanged = focalPointChanged;
             vm.changePagination = changePagination;
 
             vm.clickHandler = clickHandler;
@@ -26,7 +25,6 @@ angular.module("umbraco")
             vm.shouldShowUrl = shouldShowUrl;
             vm.toggleListView = toggleListView;
             vm.selectLayout = selectLayout;
-
             vm.showMediaList = false;
 
             var dialogOptions = $scope.model;
@@ -87,8 +85,6 @@ angular.module("umbraco")
                 filter: '',
                 dataTypeKey: dataTypeKey
             };
-            //Uses the umb-layout-selector directive
-            //but not sure what 'paths' should be in this context
             vm.layout = {
                 layouts: [{ name: "Grid", icon: "icon-thumbnails-small", path: "gridpath", selected: true },
                 { name: "List", icon: "icon-list", path: "listpath", selected: true }],
@@ -142,6 +138,7 @@ angular.module("umbraco")
                 } else {
                     // if a target is specified, go look it up - generally this target will just contain ids not the actual full
                     // media object so we need to look it up
+                    var originalTarget = $scope.target;
                     var id = $scope.target.udi ? $scope.target.udi : $scope.target.id;
                     var altText = $scope.target.altText;
 
@@ -151,13 +148,16 @@ angular.module("umbraco")
                         entityResource.getById(id, "Media")
                             .then(function (node) {
                                 $scope.target = node;
-                                if (ensureWithinStartNode(node)) {
+                                // Moving directly to existing node's folder
+                                gotoFolder({ id: node.parentId }).then(function() {
                                     selectMedia(node);
                                     $scope.target.url = mediaHelper.resolveFileFromEntity(node);
                                     $scope.target.thumbnail = mediaHelper.resolveFileFromEntity(node, true);
                                     $scope.target.altText = altText;
+                                    $scope.target.focalPoint = originalTarget.focalPoint;
+                                    $scope.target.coordinates = originalTarget.coordinates;
                                     openDetailsDialog();
-                                }
+                                });
                             }, gotoStartNode);
                     } else {
                         // No ID set - then this is going to be a tmpimg that has not been uploaded
@@ -240,6 +240,7 @@ angular.module("umbraco")
 
                 return getChildren(folder.id);
             }
+            
             function toggleListView() {
                 vm.showMediaList = !vm.showMediaList;
             }
@@ -370,25 +371,31 @@ angular.module("umbraco")
             }
 
             function openDetailsDialog() {
-                localizationService.localize("defaultdialogs_editSelectedMedia").then(function (data) {
-                    vm.mediaPickerDetailsOverlay = {
-                        show: true,
-                        title: data,
-                        disableFocalPoint: $scope.disableFocalPoint,
-                        submit: function (model) {
-                            $scope.model.selection.push($scope.target);
-                            $scope.model.submit($scope.model);
+                
+                const dialog = {
+                    view: "views/common/infiniteeditors/mediapicker/overlays/mediacropdetails.html",
+                    size: "small",
+                    cropSize: $scope.cropSize,
+                    target: $scope.target,
+                    disableFocalPoint: $scope.disableFocalPoint,
+                    submit: function (model) {
+                        console.log("model", model);
 
-                            vm.mediaPickerDetailsOverlay.show = false;
-                            vm.mediaPickerDetailsOverlay = null;
-                        },
-                        close: function (oldModel) {
-                            vm.mediaPickerDetailsOverlay.show = false;
-                            vm.mediaPickerDetailsOverlay = null;
+                        $scope.model.selection.push($scope.target);
+                        $scope.model.submit($scope.model);
 
-                            close();
-                        }
-                    };
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+
+                        //close();
+                    }
+                };
+
+                localizationService.localize("defaultdialogs_editSelectedMedia").then(value => {
+                    dialog.title = value;
+                    editorService.open(dialog);
                 });
             };
 
@@ -541,40 +548,6 @@ angular.module("umbraco")
                         folderImage.selected = true;
                     }
                 }
-            }
-
-
-            /**
-             * Called when the umbImageGravity component updates the focal point value
-             * @param {any} left
-             * @param {any} top
-             */
-            function focalPointChanged(left, top) {
-                // update the model focalpoint value
-                $scope.target.focalPoint = {
-                    left: left,
-                    top: top
-                };
-            }
-
-            function setUpdatedMediaNodes(item) {
-                // add udi to list of updated media items so we easily can update them in other editors
-                if ($scope.model.updatedMediaNodes.indexOf(item.udi) === -1) {
-                    $scope.model.updatedMediaNodes.push(item.udi);
-                }
-            }
-
-            function shouldShowUrl() {
-                if (!$scope.target) {
-                    return false;
-                }
-                if ($scope.target.id) {
-                    return false;
-                }
-                if ($scope.target.url && $scope.target.url.toLower().indexOf("blob:") === 0) {
-                    return false;
-                }
-                return true;
             }
 
             function submit() {

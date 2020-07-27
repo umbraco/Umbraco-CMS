@@ -195,7 +195,8 @@
                 availableItems.push({
                     alias: scaffold.contentTypeAlias,
                     name: scaffold.contentTypeName,
-                    icon: iconHelper.convertFromLegacyIcon(scaffold.icon)
+                    icon: iconHelper.convertFromLegacyIcon(scaffold.icon),
+                    tooltip: scaffold.documentType.description
                 });
             });
 
