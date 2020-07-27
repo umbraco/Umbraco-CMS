@@ -3,16 +3,19 @@
  * The controller that is used for a couple different Property Editors: Multi Node Tree Picker, Content Picker,
  * since this is used by MNTP and it supports content, media and members, there is code to deal with all 3 of those types
  * @param {any} $scope
+ * @param {any} $q
+ * @param {any} $routeParams
+ * @param {any} $location
  * @param {any} entityResource
  * @param {any} editorState
  * @param {any} iconHelper
- * @param {any} $routeParams
  * @param {any} angularHelper
  * @param {any} navigationService
- * @param {any} $location
  * @param {any} localizationService
+ * @param {any} editorService
+ * @param {any} userService
  */
-function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, localizationService, editorService, $q) {
+function contentPickerController($scope, $q, $routeParams, $location, entityResource, editorState, iconHelper, angularHelper, navigationService, localizationService, editorService, userService) {
 
     var vm = {
         labels: {
@@ -140,7 +143,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             ? "Media"
             : "Document";
     
-    $scope.allowOpenButton = true;
+    $scope.allowOpenButton = false;
     $scope.allowEditButton = entityType === "Document";
     $scope.allowRemoveButton = true;
 
@@ -505,6 +508,28 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     function init() {
+        
+        userService.getCurrentUser().then(function (user) {
+            console.log("user", user);
+
+            switch (entityType) {
+                case "Document":
+                    var hasAccessToContent = user.allowedSections.indexOf("content") !== -1;
+                    $scope.allowOpenButton = hasAccessToContent;
+                    break;
+                case "Media":
+                    var hasAccessToMedia = user.allowedSections.indexOf("media") !== -1;
+                    $scope.allowOpenButton = hasAccessToMedia;
+                    break;
+                case "Member":
+                    var hasAccessToMember = user.allowedSections.indexOf("member") !== -1;
+                    $scope.allowOpenButton = hasAccessToMember;
+                    break;
+
+                default:
+            }
+        });
+
         localizationService.localizeMany(["general_recycleBin", "general_add"])
             .then(function(data) {
                 vm.labels.general_recycleBin = data[0];
