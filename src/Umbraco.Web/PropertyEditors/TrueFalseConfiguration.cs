@@ -13,10 +13,10 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("showLabels", "Show toggle labels", "boolean", Description = "Show labels next to toggle button.")]
         public bool ShowLabels { get; set; }
 
-        [ConfigurationField("labelOn", "Label On", "textstring", Description = "Label text when checked.")]
+        [ConfigurationField("labelOn", "Label On", "textstring", Description = "Label text when enabled.")]
         public string LabelOn { get; set; }
 
-        [ConfigurationField("labelOff", "Label Off", "textstring", Description = "Label text when unchecked.")]
+        [ConfigurationField("labelOff", "Label Off", "textstring", Description = "Label text when disabled.")]
         public string LabelOff { get; set; }
     }
 }
