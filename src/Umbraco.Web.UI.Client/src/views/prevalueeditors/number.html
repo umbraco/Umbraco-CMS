@@ -3,9 +3,9 @@
         <input name="numberField" class="umb-property-editor umb-number"
                type="number"
                ng-model="model.value"
-               fix-number check-integer-only />
+               fix-number only-digits="model.config && model.config.integer" />
 
-        <span ng-messages="prevalueNumberForm.numberField.$error" show-validation-on-submit >
+        <span ng-messages="prevalueNumberForm.numberField.$error" show-validation-on-submit>
             <span class="help-inline" ng-message="number">Not a number</span>
         </span>
     </ng-form>
