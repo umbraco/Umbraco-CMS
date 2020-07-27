@@ -22,6 +22,10 @@ angular.module("umbraco")
             vm.clickHandler = clickHandler;
             vm.clickItemName = clickItemName;
             vm.gotoFolder = gotoFolder;
+            vm.shouldShowUrl = shouldShowUrl;
+            vm.toggleListView = toggleListView;
+            vm.selectLayout = selectLayout;
+            vm.showMediaList = false;
 
             var dialogOptions = $scope.model;
 
@@ -80,6 +84,11 @@ angular.module("umbraco")
                 totalPages: 0,
                 filter: '',
                 dataTypeKey: dataTypeKey
+            };
+            vm.layout = {
+                layouts: [{ name: "Grid", icon: "icon-thumbnails-small", path: "gridpath", selected: true },
+                { name: "List", icon: "icon-list", path: "listpath", selected: true }],
+                activeLayout: { name: "Grid", icon: "icon-thumbnails-small", path: "gridpath", selected: true }
             };
 
             // preload selected item
@@ -230,6 +239,33 @@ angular.module("umbraco")
                 localStorageService.set("umbLastOpenedMediaNodeId", folder.id);
 
                 return getChildren(folder.id);
+            }
+
+            function shouldShowUrl() {
+                if (!$scope.model.target) {
+                    return false;
+                }
+                if ($scope.model.target.id) {
+                    return false;
+                }
+                if ($scope.model.target.url && $scope.model.target.url.toLower().indexOf("blob:") === 0) {
+                    return false;
+                }
+                return true;
+            }
+            
+            function toggleListView() {
+                vm.showMediaList = !vm.showMediaList;
+            }
+
+            function selectLayout(layout) {
+                //this somehow doesn't set the 'active=true' property for the chosen layout
+                vm.layout.activeLayout = layout;
+                //workaround
+                vm.layout.layouts.forEach(element => element.active = false);
+                layout.active = true;
+                //set whether to toggle the list
+                vm.showMediaList = (layout.name === "List");
             }
 
             function clickHandler(media, event, index) {
@@ -445,7 +481,6 @@ angular.module("umbraco")
                 // set thumbnail and src
                 mediaItem.thumbnail = mediaHelper.resolveFileFromEntity(mediaItem, true);
                 mediaItem.image = mediaHelper.resolveFileFromEntity(mediaItem, false);
-
                 // set properties to match a media object
                 if (mediaItem.metaData) {
                     mediaItem.properties = [];
@@ -473,6 +508,9 @@ angular.module("umbraco")
                             }
                         );
                     }
+                    if (mediaItem.metaData.UpdateDate !== null) {
+                        mediaItem.updateDate = mediaItem.metaData.UpdateDate;
+                    }
                 }
             }
 
@@ -487,7 +525,9 @@ angular.module("umbraco")
                             data[i].thumbnail = mediaHelper.resolveFileFromEntity(data[i], true);
                             data[i].image = mediaHelper.resolveFileFromEntity(data[i], false);
                         }
-
+                        if (data[i].metaData.UpdateDate !== null){
+                            data[i].updateDate = data[i].metaData.UpdateDate;
+                        }
                         data[i].filtered = allowedTypes && allowedTypes.indexOf(data[i].metaData.ContentTypeAlias) < 0;
                     }
 
