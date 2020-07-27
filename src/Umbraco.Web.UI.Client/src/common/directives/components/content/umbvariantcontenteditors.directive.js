@@ -109,8 +109,10 @@
                     vm.editors[s].content = variant;
                 }
             }
-
-            eventsService.emit('editors.content.cultureChanged', activeVariant.language);
+            
+            if (vm.content.variants.length > 1) {
+                eventsService.emit('editors.content.cultureChanged', activeVariant.language);
+            }
         }
 
         /**
