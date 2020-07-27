@@ -90,8 +90,6 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
     var defaultConfig = {
         multiPicker: false,
         showOpenButton: false,
-        showEditButton: false,
-        showPathOnHover: false,
         dataTypeKey: null,
         maxNumber: 1,
         minNumber: 0,
@@ -144,7 +142,6 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
             : "Document";
     
     $scope.allowOpenButton = false;
-    $scope.allowEditButton = entityType === "Document";
     $scope.allowRemoveButton = true;
 
     //the dialog options for the picker
