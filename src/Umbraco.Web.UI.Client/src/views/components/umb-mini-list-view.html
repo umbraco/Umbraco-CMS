@@ -11,10 +11,10 @@
 
         <div class="umb-mini-list-view__breadcrumb">
 
-            <a ng-if="showBackButton()" href="" class="umb-mini-list-view__back" ng-click="exitMiniListView()">
+            <button type="button" ng-if="showBackButton()" class="btn-reset umb-mini-list-view__back" ng-click="exitMiniListView()">
                 <i class="icon-arrow-left umb-mini-list-view__back-icon" aria-hidden="true"></i>
                 <span class="umb-mini-list-view__back-text"><localize key="general_back">Back</localize></span> /
-            </a>
+            </button>
 
             <umb-breadcrumbs
                 ng-if="breadcrumb && breadcrumb.length > 0"
