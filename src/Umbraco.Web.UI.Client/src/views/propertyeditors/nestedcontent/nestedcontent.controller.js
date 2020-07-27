@@ -98,7 +98,7 @@
         vm.wideMode = Object.toBoolean(model.config.hideLabel);
         vm.hasContentTypes = model.config.contentTypes.length > 0;
 
-        var cultureChanged = eventsService.on('editors.content.cultureChanged', (_, args) => updateModel());
+        var cultureChanged = eventsService.on('editors.content.cultureChanged', (name, args) => updateModel());
 
         var labels = {};
         vm.labels = labels;
