@@ -13,14 +13,14 @@
         <span class="umb-tree-item__annotation"></span>
         <a class="umb-tree-item__label" ng-href="#/{{::node.routePath}}" ng-click="select(node, $event)" title="{{::node.title}}">{{node.name}}</a>
 
-        <!-- NOTE: These are the 'option' elipses -->
+        <!-- NOTE: These are the 'option' ellipsis -->
         <umb-button-ellipsis
             ng-if="::node.menuUrl"
             element="tree-item-options"
             action="options(node, $event)"
             text="{{optionsText}} {{node.name}}"
             state="hidden"
-            >
+            class="umb-options">
         </umb-button-ellipsis>
 
         <umb-loader ng-show="node.loading" position="bottom" class="umb-tree-item__loader"></umb-loader>

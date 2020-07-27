@@ -41,6 +41,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Path = source.Path;
             target.Trashed = source.Trashed;
             target.Udi = Udi.Create(ObjectTypes.GetUdiType(source.NodeObjectType), source.Key);
+           
 
             if (source is IContentEntitySlim contentSlim)
             {
@@ -54,6 +55,8 @@ namespace Umbraco.Web.Models.Mapping
 
             if (source is IMediaEntitySlim mediaSlim)
             {
+                //pass UpdateDate for MediaPicker ListView ordering
+                source.AdditionalData["UpdateDate"] = mediaSlim.UpdateDate;
                 source.AdditionalData["MediaPath"] = mediaSlim.MediaPath;
             }
 
